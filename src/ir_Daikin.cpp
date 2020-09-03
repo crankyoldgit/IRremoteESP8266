@@ -1,13 +1,25 @@
-/*
-An Arduino sketch to emulate IR Daikin ARC433** & ARC477A1 remote control unit
-Read more at:
-http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
+// Copyright 2016 sillyfrog
+// Copyright 2017 sillyfrog, crankyoldgit
+// Copyright 2018-2020 crankyoldgit
+// Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 
-Copyright 2016 sillyfrog
-Copyright 2017 sillyfrog, crankyoldgit
-Copyright 2018-2019 crankyoldgit
-Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
-*/
+/// @file
+/// @brief Support for Daikin A/C protocols.
+/// @see Daikin http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
+/// @see Daikin https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+/// @see Daikin http://rdlab.cdmt.vn/project-2013/daikin-ir-protocol
+/// @see Daikin https://github.com/blafois/Daikin-IR-Reverse
+/// @see Daikin128 https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+/// @see Daikin152 https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+/// @see Daikin152 https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.cpp
+/// @see Daikin152 https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.h
+/// @see Daikin160 https://github.com/crankyoldgit/IRremoteESP8266/issues/731
+/// @see Daikin2 https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=B25:D32
+/// @see Daikin2 https://github.com/crankyoldgit/IRremoteESP8266/issues/582
+/// @see Daikin2 https://www.daikin.co.nz/sites/default/files/daikin-split-system-US7-FTXZ25-50NV1B.pdf
+/// @see Daikin216 https://github.com/crankyoldgit/IRremoteESP8266/issues/689
+/// @see Daikin216 https://github.com/danny-source/Arduino_DY_IRDaikin
+/// @see Daikin64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
 
 #include "ir_Daikin.h"
 #include <algorithm>
@@ -24,12 +36,6 @@ Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 #include "IRtext.h"
 #include "IRutils.h"
 
-// Constants
-// Ref:
-//   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
-//   http://rdlab.cdmt.vn/project-2013/daikin-ir-protocol
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
-
 using irutils::addBoolToString;
 using irutils::addDayToString;
 using irutils::addIntToString;
@@ -44,19 +50,14 @@ using irutils::setBits;
 using irutils::sumNibbles;
 using irutils::uint8ToBcd;
 
-
 #if SEND_DAIKIN
-// Send a Daikin A/C message.
-//
-// Args:
-//   data: An array of kDaikinStateLength bytes containing the IR command.
-//
-// Status: STABLE
-//
-// Ref:
-//   IRDaikinESP.cpp
-//   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
-//   https://github.com/blafois/Daikin-IR-Reverse
+/// Send a Daikin 280-bit A/C formatted message.
+/// Status: STABLE
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+/// @see https://github.com/blafois/Daikin-IR-Reverse
 void IRsend::sendDaikin(const unsigned char data[], const uint16_t nbytes,
                         const uint16_t repeat) {
   if (nbytes < kDaikinStateLengthShort)
@@ -98,24 +99,29 @@ void IRsend::sendDaikin(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN
 
+/// Class constructor.
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikinESP::IRDaikinESP(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
       : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRDaikinESP::begin(void) { _irsend.begin(); }
 
 #if SEND_DAIKIN
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRDaikinESP::send(const uint16_t repeat) {
   _irsend.sendDaikin(getRaw(), kDaikinStateLength, repeat);
 }
 #endif  // SEND_DAIKIN
 
-// Verify the checksums are valid for a given state.
-// Args:
-//   state:  The array to verify the checksums of.
-//   length: The size of the state.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRDaikinESP::validChecksum(uint8_t state[], const uint16_t length) {
   // Data #1
   if (length < kDaikinSection1Length ||
@@ -136,7 +142,7 @@ bool IRDaikinESP::validChecksum(uint8_t state[], const uint16_t length) {
   return true;
 }
 
-// Calculate and set the checksum values for the internal state.
+/// Calculate and set the checksum values for the internal state.
 void IRDaikinESP::checksum(void) {
   remote[kDaikinByteChecksum1] = sumBytes(remote, kDaikinSection1Length - 1);
   remote[kDaikinByteChecksum2] = sumBytes(remote + kDaikinSection1Length,
@@ -146,6 +152,7 @@ void IRDaikinESP::checksum(void) {
                                           kDaikinSection3Length - 1);
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRDaikinESP::stateReset(void) {
   for (uint8_t i = 0; i < kDaikinStateLength; i++) remote[i] = 0x0;
 
@@ -173,11 +180,16 @@ void IRDaikinESP::stateReset(void) {
   this->checksum();
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikinESP::getRaw(void) {
   this->checksum();  // Ensure correct settings before sending.
   return remote;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
+/// @param[in] length Length of the code in bytes.
 void IRDaikinESP::setRaw(const uint8_t new_code[], const uint16_t length) {
   uint8_t offset = 0;
   if (length == kDaikinStateLengthShort) {  // Handle the "short" length case.
@@ -188,28 +200,39 @@ void IRDaikinESP::setRaw(const uint8_t new_code[], const uint16_t length) {
     remote[i + offset] = new_code[i];
 }
 
+/// Change the power setting to On.
 void IRDaikinESP::on(void) { setPower(true); }
 
+/// Change the power setting to Off.
 void IRDaikinESP::off(void) { setPower(false); }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setPower(const bool on) {
   setBit(&remote[kDaikinBytePower], kDaikinBitPowerOffset, on);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getPower(void) {
   return GETBIT8(remote[kDaikinBytePower], kDaikinBitPowerOffset);
 }
 
-// Set the temp in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRDaikinESP::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kDaikinMinTemp);
   degrees = std::min(degrees, kDaikinMaxTemp);
   remote[kDaikinByteTemp] = degrees << 1;
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRDaikinESP::getTemp(void) { return remote[kDaikinByteTemp] >> 1; }
 
-// Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
+/// @note 1-5 or kDaikinFanAuto or kDaikinFanQuiet
 void IRDaikinESP::setFan(const uint8_t fan) {
   // Set the fan speed bits, leave low 4 bits alone
   uint8_t fanset;
@@ -222,6 +245,8 @@ void IRDaikinESP::setFan(const uint8_t fan) {
   setBits(&remote[kDaikinByteFan], kDaikinFanOffset, kDaikinFanSize, fanset);
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRDaikinESP::getFan(void) {
   uint8_t fan = GETBITS8(remote[kDaikinByteFan], kDaikinFanOffset,
                          kDaikinFanSize);
@@ -229,10 +254,14 @@ uint8_t IRDaikinESP::getFan(void) {
   return fan;
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRDaikinESP::getMode(void) {
   return GETBITS8(remote[kDaikinBytePower], kDaikinModeOffset, kDaikinModeSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRDaikinESP::setMode(const uint8_t mode) {
   switch (mode) {
     case kDaikinAuto:
@@ -248,35 +277,49 @@ void IRDaikinESP::setMode(const uint8_t mode) {
   }
 }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setSwingVertical(const bool on) {
   setBits(&remote[kDaikinByteFan], kDaikinSwingOffset, kDaikinSwingSize,
           on ? kDaikinSwingOn : kDaikinSwingOff);
 }
 
+/// Get the Vertical Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getSwingVertical(void) {
   return GETBITS8(remote[kDaikinByteFan], kDaikinSwingOffset, kDaikinSwingSize);
 }
 
+/// Set the Horizontal Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setSwingHorizontal(const bool on) {
   setBits(&remote[kDaikinByteSwingH], kDaikinSwingOffset, kDaikinSwingSize,
           on ? kDaikinSwingOn : kDaikinSwingOff);
 }
 
+/// Get the Horizontal Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getSwingHorizontal(void) {
   return GETBITS8(remote[kDaikinByteSwingH], kDaikinSwingOffset,
                   kDaikinSwingSize);
 }
 
+/// Set the Quiet mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setQuiet(const bool on) {
   setBit(&remote[kDaikinByteSilent], kDaikinBitSilentOffset, on);
   // Powerful & Quiet mode being on are mutually exclusive.
   if (on) this->setPowerful(false);
 }
 
+/// Get the Quiet mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getQuiet(void) {
   return GETBIT8(remote[kDaikinByteSilent], kDaikinBitSilentOffset);
 }
 
+/// Set the Powerful (Turbo) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setPowerful(const bool on) {
   setBit(&remote[kDaikinBytePowerful], kDaikinBitPowerfulOffset, on);
   if (on) {
@@ -286,45 +329,64 @@ void IRDaikinESP::setPowerful(const bool on) {
   }
 }
 
+/// Get the Powerful (Turbo) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getPowerful(void) {
   return GETBIT8(remote[kDaikinBytePowerful], kDaikinBitPowerfulOffset);
 }
 
+/// Set the Sensor mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setSensor(const bool on) {
   setBit(&remote[kDaikinByteSensor], kDaikinBitSensorOffset, on);
 }
 
+/// Get the Sensor mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getSensor(void) {
   return GETBIT8(remote[kDaikinByteSensor], kDaikinBitSensorOffset);
 }
 
+/// Set the Economy mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setEcono(const bool on) {
   setBit(&remote[kDaikinByteEcono], kDaikinBitEconoOffset, on);
   // Powerful & Econo mode being on are mutually exclusive.
   if (on) this->setPowerful(false);
 }
 
+/// Get the Economical mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getEcono(void) {
   return GETBIT8(remote[kDaikinByteEcono], kDaikinBitEconoOffset);
 }
 
+/// Set the Mould mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setMold(const bool on) {
   setBit(&remote[kDaikinByteMold], kDaikinBitMoldOffset, on);
 }
 
+/// Get the Mould mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getMold(void) {
   return GETBIT8(remote[kDaikinByteMold], kDaikinBitMoldOffset);
 }
 
+/// Set the Comfort mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setComfort(const bool on) {
   setBit(&remote[kDaikinByteComfort], kDaikinBitComfortOffset, on);
 }
 
+/// Get the Comfort mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getComfort(void) {
   return GETBIT8(remote[kDaikinByteComfort], kDaikinBitComfortOffset);
 }
 
-// starttime: Number of minutes after midnight.
+/// Set the enable status & time of the On Timer.
+/// @param[in] starttime The number of minutes past midnight.
 void IRDaikinESP::enableOnTimer(const uint16_t starttime) {
   setBit(&remote[kDaikinByteOnTimer], kDaikinBitOnTimerOffset);
   remote[kDaikinByteOnTimerMinsLow] = starttime;
@@ -333,11 +395,14 @@ void IRDaikinESP::enableOnTimer(const uint16_t starttime) {
           kDaikinOnTimerMinsHighSize, starttime >> 8);
 }
 
+/// Clear and disable the On timer.
 void IRDaikinESP::disableOnTimer(void) {
   this->enableOnTimer(kDaikinUnusedTime);
   setBit(&remote[kDaikinByteOnTimer], kDaikinBitOnTimerOffset, false);
 }
 
+/// Get the On Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikinESP::getOnTime(void) {
   return (GETBITS8(remote[kDaikinByteOnTimerMinsHigh],
                    kDaikinOnTimerMinsHighOffset,
@@ -345,11 +410,14 @@ uint16_t IRDaikinESP::getOnTime(void) {
       remote[kDaikinByteOnTimerMinsLow];
 }
 
+/// Get the enable status of the On Timer.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getOnTimerEnabled(void) {
   return GETBIT8(remote[kDaikinByteOnTimer], kDaikinBitOnTimerOffset);
 }
 
-// endtime: Number of minutes after midnight.
+/// Set the enable status & time of the Off Timer.
+/// @param[in] endtime The number of minutes past midnight.
 void IRDaikinESP::enableOffTimer(const uint16_t endtime) {
   setBit(&remote[kDaikinByteOffTimer], kDaikinBitOffTimerOffset);
   remote[kDaikinByteOffTimerMinsHigh] = endtime >> kNibbleSize;
@@ -357,20 +425,27 @@ void IRDaikinESP::enableOffTimer(const uint16_t endtime) {
           endtime);
 }
 
+/// Clear and disable the Off timer.
 void IRDaikinESP::disableOffTimer(void) {
   this->enableOffTimer(kDaikinUnusedTime);
   setBit(&remote[kDaikinByteOffTimer], kDaikinBitOffTimerOffset, false);
 }
 
+/// Get the Off Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikinESP::getOffTime(void) {
   return (remote[kDaikinByteOffTimerMinsHigh] << kNibbleSize) +
       GETBITS8(remote[kDaikinByteOffTimerMinsLow], kHighNibble, kNibbleSize);
 }
 
+/// Get the enable status of the Off Timer.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getOffTimerEnabled(void) {
   return GETBIT8(remote[kDaikinByteOffTimer], kDaikinBitOffTimerOffset);
 }
 
+/// Set the clock on the A/C unit.
+/// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikinESP::setCurrentTime(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
   if (mins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
@@ -380,33 +455,46 @@ void IRDaikinESP::setCurrentTime(const uint16_t mins_since_midnight) {
           kDaikinClockMinsHighSize, mins >> 8);
 }
 
+/// Get the clock time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikinESP::getCurrentTime(void) {
   return (GETBITS8(remote[kDaikinByteClockMinsHigh], kDaikinClockMinsHighOffset,
                    kDaikinClockMinsHighSize) << 8) +
       remote[kDaikinByteClockMinsLow];
 }
 
+/// Set the current day of the week to be sent to the A/C unit.
+/// @param[in] day_of_week The numerical representation of the day of the week.
+/// @note 1 is SUN, 2 is MON, ..., 7 is SAT
 void IRDaikinESP::setCurrentDay(const uint8_t day_of_week) {
-  // 1 is SUN, 2 is MON, ..., 7 is SAT
   setBits(&remote[kDaikinByteClockMinsHigh], kDaikinDoWOffset, kDaikinDoWSize,
           day_of_week);
 }
 
+/// Get the current day of the week to be sent to the A/C unit.
+/// @return The numerical representation of the day of the week.
+/// @note 1 is SUN, 2 is MON, ..., 7 is SAT
 uint8_t IRDaikinESP::getCurrentDay(void) {
   return GETBITS8(remote[kDaikinByteClockMinsHigh], kDaikinDoWOffset,
                   kDaikinDoWSize);
 }
 
+/// Set the enable status of the Weekly Timer.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setWeeklyTimerEnable(const bool on) {
   // Bit is cleared for `on`.
   setBit(&remote[kDaikinByteWeeklyTimer], kDaikinBitWeeklyTimerOffset, !on);
 }
 
+/// Get the enable status of the Weekly Timer.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikinESP::getWeeklyTimerEnable(void) {
   return !GETBIT8(remote[kDaikinByteWeeklyTimer], kDaikinBitWeeklyTimerOffset);
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kDaikinCool;
@@ -417,7 +505,9 @@ uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin: return kDaikinFanQuiet;
@@ -429,7 +519,9 @@ uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRDaikinESP::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kDaikinCool: return stdAc::opmode_t::kCool;
@@ -440,7 +532,9 @@ stdAc::opmode_t IRDaikinESP::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRDaikinESP::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kDaikinFanMax: return stdAc::fanspeed_t::kMax;
@@ -453,7 +547,8 @@ stdAc::fanspeed_t IRDaikinESP::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikinESP::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN;
@@ -480,7 +575,8 @@ stdAc::state_t IRDaikinESP::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRDaikinESP::toString(void) {
   String result = "";
   result.reserve(230);  // Reserve some heap for the string to reduce fragging.
@@ -510,20 +606,16 @@ String IRDaikinESP::toString(void) {
 }
 
 #if DECODE_DAIKIN
-// Decode the supplied Daikin A/C message.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. (kDaikinBits)
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Reported as working.
-//
-// Ref:
-//   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+/// Decode the supplied Daikin 280-bit message. (DAIKIN)
+/// Status: STABLE / Reported as working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 bool IRrecv::decodeDaikin(decode_results *results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   // Is there enough data to match successfully?
@@ -588,15 +680,12 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t offset,
 #endif  // DECODE_DAIKIN
 
 #if SEND_DAIKIN2
-// Send a Daikin2 A/C message.
-//
-// Args:
-//   data: An array of kDaikin2StateLength bytes containing the IR command.
-//
-// Status: STABLE / Expected to work.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
+/// Send a Daikin2 (312-bit) A/C formatted message.
+/// Status: STABLE / Expected to work.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/582
 void IRsend::sendDaikin2(const unsigned char data[], const uint16_t nbytes,
                          const uint16_t repeat) {
   if (nbytes < kDaikin2Section1Length)
@@ -622,34 +711,29 @@ void IRsend::sendDaikin2(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN2
 
-// Class for handling Daikin2 A/C messages.
-//
-// Code by crankyoldgit, Reverse engineering analysis by sheppy99
-//
-// Supported Remotes: Daikin ARC477A1 remote
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/582
-//   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit?usp=sharing
-//   https://www.daikin.co.nz/sites/default/files/daikin-split-system-US7-FTXZ25-50NV1B.pdf
+/// Class constructor.
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikin2::IRDaikin2(const uint16_t pin, const bool inverted,
                      const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRDaikin2::begin(void) { _irsend.begin(); }
 
 #if SEND_DAIKIN2
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRDaikin2::send(const uint16_t repeat) {
   _irsend.sendDaikin2(getRaw(), kDaikin2StateLength, repeat);
 }
 #endif  // SEND_DAIKIN2
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The array to verify the checksum of.
-//   length: The size of the state.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRDaikin2::validChecksum(uint8_t state[], const uint16_t length) {
   // Validate the checksum of section #1.
   if (length <= kDaikin2Section1Length - 1 ||
@@ -664,7 +748,7 @@ bool IRDaikin2::validChecksum(uint8_t state[], const uint16_t length) {
   return true;
 }
 
-// Calculate and set the checksum values for the internal state.
+/// Calculate and set the checksum values for the internal state.
 void IRDaikin2::checksum(void) {
   remote_state[kDaikin2Section1Length - 1] = sumBytes(
       remote_state, kDaikin2Section1Length - 1);
@@ -672,6 +756,7 @@ void IRDaikin2::checksum(void) {
       remote_state + kDaikin2Section1Length, kDaikin2Section2Length - 1);
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRDaikin2::stateReset(void) {
   for (uint8_t i = 0; i < kDaikin2StateLength; i++) remote_state[i] = 0x0;
 
@@ -706,33 +791,47 @@ void IRDaikin2::stateReset(void) {
   checksum();
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin2::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
 void IRDaikin2::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kDaikin2StateLength);
 }
 
+/// Change the power setting to On.
 void IRDaikin2::on(void) { setPower(true); }
 
+/// Change the power setting to Off.
 void IRDaikin2::off(void) { setPower(false); }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setPower(const bool on) {
   setBit(&remote_state[25], kDaikinBitPowerOffset, on);
   setBit(&remote_state[6], kDaikin2BitPowerOffset, !on);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getPower(void) {
   return GETBIT8(remote_state[25], kDaikinBitPowerOffset) &&
          !GETBIT8(remote_state[6], kDaikin2BitPowerOffset);
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRDaikin2::getMode(void) {
   return GETBITS8(remote_state[25], kHighNibble, kModeBitsSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] desired_mode The desired operating mode.
 void IRDaikin2::setMode(const uint8_t desired_mode) {
   uint8_t mode = desired_mode;
   switch (mode) {
@@ -747,7 +846,8 @@ void IRDaikin2::setMode(const uint8_t desired_mode) {
   if (mode == kDaikinCool) this->setTemp(this->getTemp());
 }
 
-// Set the temp in deg C
+/// Set the temperature.
+/// @param[in] desired The temperature in degrees celsius.
 void IRDaikin2::setTemp(const uint8_t desired) {
   // The A/C has a different min temp if in cool mode.
   uint8_t temp = std::max(
@@ -756,7 +856,9 @@ void IRDaikin2::setTemp(const uint8_t desired) {
   remote_state[26] = std::min(kDaikinMaxTemp, temp) << 1;
 }
 
-// Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
+/// @note 1-5 or kDaikinFanAuto or kDaikinFanQuiet
 void IRDaikin2::setFan(const uint8_t fan) {
   // Set the fan speed bits, leave low 4 bits alone
   uint8_t fanset;
@@ -769,6 +871,8 @@ void IRDaikin2::setFan(const uint8_t fan) {
   setBits(&remote_state[kDaikin2FanByte], kHighNibble, kNibbleSize, fanset);
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRDaikin2::getFan(void) {
   const uint8_t fan = GETBITS8(remote_state[kDaikin2FanByte], kHighNibble,
                               kNibbleSize);
@@ -779,8 +883,12 @@ uint8_t IRDaikin2::getFan(void) {
   }
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRDaikin2::getTemp(void) { return remote_state[26] >> 1; }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] position The position/mode to set the swing to.
 void IRDaikin2::setSwingVertical(const uint8_t position) {
   switch (position) {
     case kDaikin2SwingVHigh:
@@ -797,11 +905,15 @@ void IRDaikin2::setSwingVertical(const uint8_t position) {
   }
 }
 
+/// Get the Vertical Swing mode of the A/C.
+/// @return The native position/mode setting.
 uint8_t IRDaikin2::getSwingVertical(void) {
   return GETBITS8(remote_state[18], kLowNibble, kNibbleSize);
 }
 
-// Convert a standard A/C vertical swing into its native version.
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -815,7 +927,9 @@ uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
-// Convert a native vertical swing to it's common equivalent.
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common vertical swing position.
 stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
   switch (setting) {
     case kDaikin2SwingVHigh: return stdAc::swingv_t::kHighest;
@@ -829,12 +943,18 @@ stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
   }
 }
 
+/// Set the Horizontal Swing mode of the A/C.
+/// @param[in] position The position/mode to set the swing to.
 void IRDaikin2::setSwingHorizontal(const uint8_t position) {
   remote_state[17] = position;
 }
 
+/// Get the Horizontal Swing mode of the A/C.
+/// @return The native position/mode setting.
 uint8_t IRDaikin2::getSwingHorizontal(void) { return remote_state[17]; }
 
+/// Set the clock on the A/C unit.
+/// @param[in] numMins Nr. of minutes past midnight.
 void IRDaikin2::setCurrentTime(const uint16_t numMins) {
   uint16_t mins = numMins;
   if (numMins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
@@ -842,13 +962,16 @@ void IRDaikin2::setCurrentTime(const uint16_t numMins) {
   setBits(&remote_state[6], kLowNibble, kNibbleSize, mins >> 8);
 }
 
+/// Get the clock time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin2::getCurrentTime(void) {
   return (GETBITS8(remote_state[6], kLowNibble, kNibbleSize) << 8) |
       remote_state[5];
 }
 
-// starttime: Number of minutes after midnight.
-// Note: Timer location is shared with sleep timer.
+/// Set the enable status & time of the On Timer.
+/// @param[in] starttime The number of minutes past midnight.
+/// @note Timer location is shared with sleep timer.
 void IRDaikin2::enableOnTimer(const uint16_t starttime) {
   clearSleepTimerFlag();
   setBit(&remote_state[25], kDaikinBitOnTimerOffset);  // Set the On Timer flag.
@@ -856,26 +979,33 @@ void IRDaikin2::enableOnTimer(const uint16_t starttime) {
   setBits(&remote_state[31], kLowNibble, kNibbleSize, starttime >> 8);
 }
 
+/// Clear the On Timer flag.
 void IRDaikin2::clearOnTimerFlag(void) {
   setBit(&remote_state[25], kDaikinBitOnTimerOffset, false);
 }
 
+/// Disable the On timer.
 void IRDaikin2::disableOnTimer(void) {
   enableOnTimer(kDaikinUnusedTime);
   clearOnTimerFlag();
   clearSleepTimerFlag();
 }
 
+/// Get the On Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin2::getOnTime(void) {
   return (GETBITS8(remote_state[31], kLowNibble, kNibbleSize) << 8) +
       remote_state[30];
 }
 
+/// Get the enable status of the On Timer.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getOnTimerEnabled(void) {
   return GETBIT8(remote_state[25], kDaikinBitOnTimerOffset);
 }
 
-// endtime: Number of minutes after midnight.
+/// Set the enable status & time of the Off Timer.
+/// @param[in] endtime The number of minutes past midnight.
 void IRDaikin2::enableOffTimer(const uint16_t endtime) {
   // Set the Off Timer flag.
   setBit(&remote_state[25], kDaikinBitOffTimerOffset);
@@ -883,97 +1013,137 @@ void IRDaikin2::enableOffTimer(const uint16_t endtime) {
   setBits(&remote_state[31], kHighNibble, kNibbleSize, endtime);
 }
 
+/// Disable the Off timer.
 void IRDaikin2::disableOffTimer(void) {
   enableOffTimer(kDaikinUnusedTime);
   // Clear the Off Timer flag.
   setBit(&remote_state[25], kDaikinBitOffTimerOffset, false);
 }
 
+/// Get the Off Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin2::getOffTime(void) {
   return (remote_state[32] << 4) + GETBITS8(remote_state[31], kHighNibble,
                                             kNibbleSize);
 }
 
+/// Get the enable status of the Off Timer.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getOffTimerEnabled(void) {
   return GETBIT8(remote_state[25], kDaikinBitOffTimerOffset);
 }
 
+/// Get the Beep status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 uint8_t IRDaikin2::getBeep(void) {
   return GETBITS8(remote_state[7], kDaikin2BeepOffset, kDaikin2BeepSize);
 }
 
+/// Set the Beep mode of the A/C.
+/// @param[in] beep true, the setting is on. false, the setting is off.
 void IRDaikin2::setBeep(const uint8_t beep) {
   setBits(&remote_state[7], kDaikin2BeepOffset, kDaikin2BeepSize, beep);
 }
 
+/// Get the Light status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 uint8_t IRDaikin2::getLight(void) {
   return GETBITS8(remote_state[7], kDaikin2LightOffset, kDaikin2LightSize);
 }
 
+/// Set the Light (LED) mode of the A/C.
+/// @param[in] light true, the setting is on. false, the setting is off.
 void IRDaikin2::setLight(const uint8_t light) {
   setBits(&remote_state[7], kDaikin2LightOffset, kDaikin2LightSize, light);
 }
 
+/// Set the Mould (filter) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setMold(const bool on) {
   setBit(&remote_state[8], kDaikin2BitMoldOffset, on);
 }
 
+/// Get the Mould (filter) mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getMold(void) {
   return GETBIT8(remote_state[8], kDaikin2BitMoldOffset);
 }
 
-// Auto clean setting.
+/// Set the Auto clean mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setClean(const bool on) {
   setBit(&remote_state[8], kDaikin2BitCleanOffset, on);
 }
 
+/// Get the Auto Clean mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getClean(void) {
   return GETBIT8(remote_state[8], kDaikin2BitCleanOffset);
 }
 
-// Fresh Air settings.
+/// Set the Fresh Air mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setFreshAir(const bool on) {
   setBit(&remote_state[8], kDaikin2BitFreshAirOffset, on);
 }
 
+/// Get the Fresh Air mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getFreshAir(void) {
   return GETBIT8(remote_state[8], kDaikin2BitFreshAirOffset);
 }
 
+/// Set the (High) Fresh Air mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setFreshAirHigh(const bool on) {
   setBit(&remote_state[8], kDaikin2BitFreshAirHighOffset, on);
 }
 
+/// Get the (High) Fresh Air mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getFreshAirHigh(void) {
   return GETBIT8(remote_state[8], kDaikin2BitFreshAirHighOffset);
 }
 
+/// Set the Automatic Eye (Sensor) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setEyeAuto(bool on) {
   setBit(&remote_state[13], kDaikin2BitEyeAutoOffset, on);
 }
 
+/// Get the Automaitc Eye (Sensor) mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getEyeAuto(void) {
   return GETBIT8(remote_state[13], kDaikin2BitEyeAutoOffset);
 }
 
+/// Set the Eye (Sensor) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setEye(bool on) {
   setBit(&remote_state[36], kDaikin2BitEyeOffset, on);
 }
 
+/// Get the Eye (Sensor) mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getEye(void) {
   return GETBIT8(remote_state[36], kDaikin2BitEyeOffset);
 }
 
+/// Set the Economy mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setEcono(bool on) {
   setBit(&remote_state[36], kDaikinBitEconoOffset, on);
 }
 
+/// Get the Economical mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getEcono(void) {
   return GETBIT8(remote_state[36], kDaikinBitEconoOffset);
 }
 
-// sleeptime: Number of minutes.
-// Note: Timer location is shared with On Timer.
+/// Set the enable status & time of the Sleep Timer.
+/// @param[in] sleeptime The number of minutes past midnight.
+/// @note The Timer location is shared with On Timer.
 void IRDaikin2::enableSleepTimer(const uint16_t sleeptime) {
   enableOnTimer(sleeptime);
   clearOnTimerFlag();
@@ -981,61 +1151,85 @@ void IRDaikin2::enableSleepTimer(const uint16_t sleeptime) {
   setBit(&remote_state[36], kDaikin2BitSleepTimerOffset);
 }
 
+/// Clear the sleep timer flag.
 void IRDaikin2::clearSleepTimerFlag(void) {
   setBit(&remote_state[36], kDaikin2BitSleepTimerOffset, false);
 }
 
+/// Disable the sleep timer.
 void IRDaikin2::disableSleepTimer(void) {
   disableOnTimer();
 }
 
+/// Get the Sleep Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin2::getSleepTime(void) {
   return getOnTime();
 }
 
+/// Get the Sleep timer enabled status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getSleepTimerEnabled(void) {
   return GETBIT8(remote_state[36],  kDaikin2BitSleepTimerOffset);
 }
 
+/// Set the Quiet mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setQuiet(const bool on) {
   setBit(&remote_state[33], kDaikinBitSilentOffset, on);
   // Powerful & Quiet mode being on are mutually exclusive.
   if (on) setPowerful(false);
 }
 
+/// Get the Quiet mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getQuiet(void) {
   return GETBIT8(remote_state[33], kDaikinBitSilentOffset);
 }
 
+/// Set the Powerful (Turbo) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setPowerful(const bool on) {
   setBit(&remote_state[33], kDaikinBitPowerfulOffset, on);
   // Powerful & Quiet mode being on are mutually exclusive.
   if (on) setQuiet(false);
 }
 
+/// Get the Powerful (Turbo) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getPowerful(void) {
   return GETBIT8(remote_state[33], kDaikinBitPowerfulOffset);
 }
 
+/// Set the Purify (Filter) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setPurify(const bool on) {
   setBit(&remote_state[36], kDaikin2BitPurifyOffset, on);
 }
 
+/// Get the Purify (Filter) mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getPurify(void) {
   return GETBIT8(remote_state[36],  kDaikin2BitPurifyOffset);
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin2::convertMode(const stdAc::opmode_t mode) {
   return IRDaikinESP::convertMode(mode);
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin2::convertFan(const stdAc::fanspeed_t speed) {
   return IRDaikinESP::convertFan(speed);
 }
 
-// Convert a standard A/C horizontal swing into its native version.
+/// Convert a stdAc::swingh_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin2::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kAuto: return kDaikin2SwingHSwing;
@@ -1049,7 +1243,9 @@ uint8_t IRDaikin2::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-// Convert a native horizontal swing to it's common equivalent.
+/// Convert a native horizontal swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common horizontal swing position.
 stdAc::swingh_t IRDaikin2::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
     case kDaikin2SwingHSwing: return stdAc::swingh_t::kAuto;
@@ -1063,7 +1259,8 @@ stdAc::swingh_t IRDaikin2::toCommonSwingH(const uint8_t setting) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin2::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN2;
@@ -1088,7 +1285,8 @@ stdAc::state_t IRDaikin2::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRDaikin2::toString(void) {
   String result = "";
   result.reserve(310);  // Reserve some heap for the string to reduce fragging.
@@ -1205,24 +1403,15 @@ String IRDaikin2::toString(void) {
 }
 
 #if DECODE_DAIKIN2
-// Decode the supplied Daikin2 A/C message.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. (kDaikin2Bits)
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Supported devices:
-// - Daikin FTXZ25NV1B, FTXZ35NV1B, FTXZ50NV1B Aircon
-// - Daikin ARC477A1 remote
-//
-// Status: STABLE / Works as expected.
-//
-// Ref:
-//   https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
+/// Decode the supplied Daikin 312-bit message. (DAIKIN2)
+/// Status: STABLE / Works as expected.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeDaikin2(decode_results *results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) + kHeader - 1 + offset)
@@ -1277,19 +1466,13 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t offset,
 #endif  // DECODE_DAIKIN2
 
 #if SEND_DAIKIN216
-// Send a Daikin 216 bit A/C message.
-//
-// Args:
-//   data: An array of kDaikin216StateLength bytes containing the IR command.
-//
-// Status: Alpha/Untested on a real device.
-//
-// Supported devices:
-// - Daikin ARC433B69 remote.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/689
-//   https://github.com/danny-source/Arduino_DY_IRDaikin
+/// Send a Daikin216 (216-bit) A/C formatted message.
+/// Status: Alpha / Untested on a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/689
+/// @see https://github.com/danny-source/Arduino_DY_IRDaikin
 void IRsend::sendDaikin216(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kDaikin216Section1Length)
@@ -1313,33 +1496,29 @@ void IRsend::sendDaikin216(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN216
 
-// Class for handling Daikin 216 bit / 27 byte A/C messages.
-//
-// Code by crankyoldgit.
-//
-// Supported Remotes: Daikin ARC433B69 remote
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/689
-//   https://github.com/danny-source/Arduino_DY_IRDaikin
+/// Class Constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikin216::IRDaikin216(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRDaikin216::begin(void) { _irsend.begin(); }
 
 #if SEND_DAIKIN216
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRDaikin216::send(const uint16_t repeat) {
   _irsend.sendDaikin216(getRaw(), kDaikin216StateLength, repeat);
 }
 #endif  // SEND_DAIKIN216
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The array to verify the checksum of.
-//   length: The size of the state.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRDaikin216::validChecksum(uint8_t state[], const uint16_t length) {
   // Validate the checksum of section #1.
   if (length <= kDaikin216Section1Length - 1 ||
@@ -1354,7 +1533,7 @@ bool IRDaikin216::validChecksum(uint8_t state[], const uint16_t length) {
   return true;
 }
 
-// Calculate and set the checksum values for the internal state.
+/// Calculate and set the checksum values for the internal state.
 void IRDaikin216::checksum(void) {
   remote_state[kDaikin216Section1Length - 1] = sumBytes(
       remote_state, kDaikin216Section1Length - 1);
@@ -1362,6 +1541,7 @@ void IRDaikin216::checksum(void) {
       remote_state + kDaikin216Section1Length, kDaikin216Section2Length - 1);
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRDaikin216::stateReset(void) {
   for (uint8_t i = 0; i < kDaikin216StateLength; i++) remote_state[i] = 0x00;
   remote_state[0] =  0x11;
@@ -1376,31 +1556,45 @@ void IRDaikin216::stateReset(void) {
   // remote_state[26] is a checksum byte, it will be set by checksum().
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin216::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
 void IRDaikin216::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kDaikin216StateLength);
 }
 
+/// Change the power setting to On.
 void IRDaikin216::on(void) { setPower(true); }
 
+/// Change the power setting to Off.
 void IRDaikin216::off(void) { setPower(false); }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin216::setPower(const bool on) {
   setBit(&remote_state[kDaikin216BytePower], kDaikinBitPowerOffset, on);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin216::getPower(void) {
   return GETBIT8(remote_state[kDaikin216BytePower], kDaikinBitPowerOffset);
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRDaikin216::getMode(void) {
   return GETBITS8(remote_state[kDaikin216ByteMode], kHighNibble, kModeBitsSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRDaikin216::setMode(const uint8_t mode) {
   switch (mode) {
     case kDaikinAuto:
@@ -1416,12 +1610,15 @@ void IRDaikin216::setMode(const uint8_t mode) {
   }
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin216::convertMode(const stdAc::opmode_t mode) {
   return IRDaikinESP::convertMode(mode);
 }
 
-// Set the temp in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRDaikin216::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kDaikinMinTemp);
   degrees = std::min(degrees, kDaikinMaxTemp);
@@ -1429,12 +1626,16 @@ void IRDaikin216::setTemp(const uint8_t temp) {
           kDaikin216TempSize, degrees);
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRDaikin216::getTemp(void) {
   return GETBITS8(remote_state[kDaikin216ByteTemp], kDaikin216TempOffset,
                   kDaikin216TempSize);
 }
 
-// Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
+/// @note 1-5 or kDaikinFanAuto or kDaikinFanQuiet
 void IRDaikin216::setFan(const uint8_t fan) {
   // Set the fan speed bits, leave low 4 bits alone
   uint8_t fanset;
@@ -1448,6 +1649,8 @@ void IRDaikin216::setFan(const uint8_t fan) {
           fanset);
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRDaikin216::getFan(void) {
   uint8_t fan = GETBITS8(remote_state[kDaikin216ByteFan], kHighNibble,
                          kDaikinFanSize);
@@ -1455,32 +1658,44 @@ uint8_t IRDaikin216::getFan(void) {
   return fan;
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin216::convertFan(const stdAc::fanspeed_t speed) {
   return IRDaikinESP::convertFan(speed);
 }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin216::setSwingVertical(const bool on) {
   setBits(&remote_state[kDaikin216ByteSwingV], kLowNibble, kDaikin216SwingSize,
           on ? kDaikin216SwingOn : kDaikin216SwingOff);
 }
 
+/// Get the Vertical Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin216::getSwingVertical(void) {
   return GETBITS8(remote_state[kDaikin216ByteSwingV], kLowNibble,
                   kDaikin216SwingSize);
 }
 
+/// Set the Horizontal Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin216::setSwingHorizontal(const bool on) {
   setBits(&remote_state[kDaikin216ByteSwingH], kLowNibble, kDaikin216SwingSize,
           on ? kDaikin216SwingOn : kDaikin216SwingOff);
 }
 
+/// Get the Horizontal Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin216::getSwingHorizontal(void) {
   return GETBITS8(remote_state[kDaikin216ByteSwingH], kLowNibble,
                   kDaikin216SwingSize);
 }
 
-// This is a horrible hack till someone works out the quiet mode bit.
+/// Set the Quiet mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @note This is a horrible hack till someone works out the quiet mode bit.
 void IRDaikin216::setQuiet(const bool on) {
   if (on) {
     this->setFan(kDaikinFanQuiet);
@@ -1491,23 +1706,30 @@ void IRDaikin216::setQuiet(const bool on) {
   }
 }
 
-// This is a horrible hack till someone works out the quiet mode bit.
+/// Get the Quiet mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+/// @note This is a horrible hack till someone works out the quiet mode bit.
 bool IRDaikin216::getQuiet(void) {
   return this->getFan() == kDaikinFanQuiet;
 }
 
+/// Set the Powerful (Turbo) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin216::setPowerful(const bool on) {
   setBit(&remote_state[kDaikin216BytePowerful], kDaikinBitPowerfulOffset, on);
   // Powerful & Quiet mode being on are mutually exclusive.
   if (on) this->setQuiet(false);
 }
 
+/// Get the Powerful (Turbo) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin216::getPowerful(void) {
   return GETBIT8(remote_state[kDaikin216BytePowerful],
                  kDaikinBitPowerfulOffset);
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin216::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN216;
@@ -1534,7 +1756,8 @@ stdAc::state_t IRDaikin216::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRDaikin216::toString(void) {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
@@ -1552,24 +1775,17 @@ String IRDaikin216::toString(void) {
 }
 
 #if DECODE_DAIKIN216
-// Decode the supplied Daikin 216 bit A/C message.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. (kDaikin216Bits)
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Supported devices:
-// - Daikin ARC433B69 remote.
-//
-// Status: STABLE / Should be working.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/689
-//   https://github.com/danny-source/Arduino_DY_IRDaikin
+/// Decode the supplied Daikin 216-bit message. (DAIKIN216)
+/// Status: STABLE / Should be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/689
+/// @see https://github.com/danny-source/Arduino_DY_IRDaikin
 bool IRrecv::decodeDaikin216(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1 + offset)
@@ -1615,18 +1831,12 @@ bool IRrecv::decodeDaikin216(decode_results *results, uint16_t offset,
 #endif  // DECODE_DAIKIN216
 
 #if SEND_DAIKIN160
-// Send a Daikin 160 bit A/C message.
-//
-// Args:
-//   data: An array of kDaikin160StateLength bytes containing the IR command.
-//
-// Status: STABLE / Confirmed working.
-//
-// Supported devices:
-// - Daikin ARC423A5 remote.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/731
+/// Send a Daikin160 (160-bit) A/C formatted message.
+/// Status: STABLE / Confirmed working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/731
 void IRsend::sendDaikin160(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kDaikin160Section1Length)
@@ -1650,26 +1860,21 @@ void IRsend::sendDaikin160(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN160
 
-// Class for handling Daikin 160 bit / 20 byte A/C messages.
-//
-// Code by crankyoldgit.
-//
-// Supported Remotes: Daikin ARC423A5 remote
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/731
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikin160::IRDaikin160(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRDaikin160::begin(void) { _irsend.begin(); }
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The array to verify the checksum of.
-//   length: The size of the state.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRDaikin160::validChecksum(uint8_t state[], const uint16_t length) {
   // Validate the checksum of section #1.
   if (length <= kDaikin160Section1Length - 1 ||
@@ -1684,7 +1889,7 @@ bool IRDaikin160::validChecksum(uint8_t state[], const uint16_t length) {
   return true;
 }
 
-// Calculate and set the checksum values for the internal state.
+/// Calculate and set the checksum values for the internal state.
 void IRDaikin160::checksum(void) {
   remote_state[kDaikin160Section1Length - 1] = sumBytes(
       remote_state, kDaikin160Section1Length - 1);
@@ -1692,6 +1897,7 @@ void IRDaikin160::checksum(void) {
       remote_state + kDaikin160Section1Length, kDaikin160Section2Length - 1);
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRDaikin160::stateReset(void) {
   for (uint8_t i = 0; i < kDaikin160StateLength; i++) remote_state[i] = 0x00;
   remote_state[0] =  0x11;
@@ -1712,37 +1918,53 @@ void IRDaikin160::stateReset(void) {
   // remote_state[19] is a checksum byte, it will be set by checksum().
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin160::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
 void IRDaikin160::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kDaikin160StateLength);
 }
 
 #if SEND_DAIKIN160
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRDaikin160::send(const uint16_t repeat) {
   _irsend.sendDaikin160(getRaw(), kDaikin160StateLength, repeat);
 }
 #endif  // SEND_DAIKIN160
 
+/// Change the power setting to On.
 void IRDaikin160::on(void) { setPower(true); }
 
+/// Change the power setting to Off.
 void IRDaikin160::off(void) { setPower(false); }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin160::setPower(const bool on) {
   setBit(&remote_state[kDaikin160BytePower], kDaikinBitPowerOffset, on);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin160::getPower(void) {
   return GETBIT8(remote_state[kDaikin160BytePower], kDaikinBitPowerOffset);
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRDaikin160::getMode(void) {
   return GETBITS8(remote_state[kDaikin160ByteMode], kHighNibble, kModeBitsSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRDaikin160::setMode(const uint8_t mode) {
   switch (mode) {
     case kDaikinAuto:
@@ -1757,12 +1979,15 @@ void IRDaikin160::setMode(const uint8_t mode) {
   }
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin160::convertMode(const stdAc::opmode_t mode) {
   return IRDaikinESP::convertMode(mode);
 }
 
-// Set the temp in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRDaikin160::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kDaikinMinTemp);
   degrees = std::min(degrees, kDaikinMaxTemp) - 10;
@@ -1770,12 +1995,16 @@ void IRDaikin160::setTemp(const uint8_t temp) {
           kDaikin160TempSize, degrees);
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRDaikin160::getTemp(void) {
   return GETBITS8(remote_state[kDaikin160ByteTemp], kDaikin160TempOffset,
                   kDaikin160TempSize) + 10;
 }
 
-// Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
+/// @note 1-5 or kDaikinFanAuto or kDaikinFanQuiet
 void IRDaikin160::setFan(const uint8_t fan) {
   uint8_t fanset;
   if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
@@ -1788,6 +2017,8 @@ void IRDaikin160::setFan(const uint8_t fan) {
   setBits(&remote_state[kDaikin160ByteFan], kLowNibble, kDaikinFanSize, fanset);
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRDaikin160::getFan(void) {
   uint8_t fan = GETBITS8(remote_state[kDaikin160ByteFan], kLowNibble,
                          kDaikinFanSize);
@@ -1795,7 +2026,9 @@ uint8_t IRDaikin160::getFan(void) {
   return fan;
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin160::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
@@ -1808,6 +2041,8 @@ uint8_t IRDaikin160::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] position The position/mode to set the swing to.
 void IRDaikin160::setSwingVertical(const uint8_t position) {
   switch (position) {
     case kDaikin160SwingVLowest:
@@ -1823,12 +2058,16 @@ void IRDaikin160::setSwingVertical(const uint8_t position) {
   }
 }
 
+/// Get the Vertical Swing mode of the A/C.
+/// @return The native position/mode setting.
 uint8_t IRDaikin160::getSwingVertical(void) {
   return GETBITS8(remote_state[kDaikin160ByteSwingV], kHighNibble,
                   kDaikinSwingSize);
 }
 
-// Convert a standard A/C vertical swing into its native version.
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin160::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -1842,7 +2081,9 @@ uint8_t IRDaikin160::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
-// Convert a native vertical swing to it's common equivalent.
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common vertical swing position.
 stdAc::swingv_t IRDaikin160::toCommonSwingV(const uint8_t setting) {
   switch (setting) {
     case kDaikin160SwingVHighest: return stdAc::swingv_t::kHighest;
@@ -1855,7 +2096,8 @@ stdAc::swingv_t IRDaikin160::toCommonSwingV(const uint8_t setting) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin160::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN160;
@@ -1880,7 +2122,8 @@ stdAc::state_t IRDaikin160::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRDaikin160::toString(void) {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
@@ -1906,23 +2149,16 @@ String IRDaikin160::toString(void) {
 }
 
 #if DECODE_DAIKIN160
-// Decode the supplied Daikin 160 bit A/C message.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. (kDaikin160Bits)
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Supported devices:
-// - Daikin ARC423A5 remote.
-//
-// Status: STABLE / Confirmed working.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/731
+/// Decode the supplied Daikin 160-bit message. (DAIKIN160)
+/// Status: STABLE / Confirmed working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/731
 bool IRrecv::decodeDaikin160(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1 + offset)
@@ -1968,16 +2204,11 @@ bool IRrecv::decodeDaikin160(decode_results *results, uint16_t offset,
 #endif  // DECODE_DAIKIN160
 
 #if SEND_DAIKIN176
-// Send a Daikin 176 bit A/C message.
-//
-// Args:
-//   data: An array of kDaikin176StateLength bytes containing the IR command.
-//
-// Status: Alpha/Untested on a real device.
-//
-// Supported devices:
-// - Daikin BRC4C153 remote.
-//
+/// Send a Daikin176 (176-bit) A/C formatted message.
+/// Status: STABLE / Working on a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kDaikin176Section1Length)
@@ -2001,24 +2232,21 @@ void IRsend::sendDaikin176(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN176
 
-// Class for handling Daikin 176 bit / 22 byte A/C messages.
-//
-// Code by crankyoldgit.
-//
-// Supported Remotes: Daikin BRC4C153 remote
-//
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikin176::IRDaikin176(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRDaikin176::begin(void) { _irsend.begin(); }
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The array to verify the checksum of.
-//   length: The size of the state.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRDaikin176::validChecksum(uint8_t state[], const uint16_t length) {
   // Validate the checksum of section #1.
   if (length <= kDaikin176Section1Length - 1 ||
@@ -2033,7 +2261,7 @@ bool IRDaikin176::validChecksum(uint8_t state[], const uint16_t length) {
   return true;
 }
 
-// Calculate and set the checksum values for the internal state.
+/// Calculate and set the checksum values for the internal state.
 void IRDaikin176::checksum(void) {
   remote_state[kDaikin176Section1Length - 1] = sumBytes(
       remote_state, kDaikin176Section1Length - 1);
@@ -2041,6 +2269,7 @@ void IRDaikin176::checksum(void) {
       remote_state + kDaikin176Section1Length, kDaikin176Section2Length - 1);
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRDaikin176::stateReset(void) {
   for (uint8_t i = 0; i < kDaikin176StateLength; i++) remote_state[i] = 0x00;
   remote_state[0] =  0x11;
@@ -2061,83 +2290,114 @@ void IRDaikin176::stateReset(void) {
   _saved_temp = getTemp();
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin176::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
 void IRDaikin176::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kDaikin176StateLength);
   _saved_temp = getTemp();
 }
 
 #if SEND_DAIKIN176
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRDaikin176::send(const uint16_t repeat) {
   _irsend.sendDaikin176(getRaw(), kDaikin176StateLength, repeat);
 }
 #endif  // SEND_DAIKIN176
 
+/// Change the power setting to On.
 void IRDaikin176::on(void) { setPower(true); }
 
+/// Change the power setting to Off..
 void IRDaikin176::off(void) { setPower(false); }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin176::setPower(const bool on) {
   remote_state[kDaikin176ByteModeButton] = 0;
-  setBit(&remote_state[kDaikin176BytePower], kDaikinBitPowerOffset, on);
+  setBit(&remote_state[kDaikin176ByteModePower], kDaikinBitPowerOffset, on);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin176::getPower(void) {
-  return GETBIT8(remote_state[kDaikin176BytePower], kDaikinBitPowerOffset);
+  return GETBIT8(remote_state[kDaikin176ByteModePower], kDaikinBitPowerOffset);
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRDaikin176::getMode(void) {
-  return GETBITS8(remote_state[kDaikin176ByteMode], kHighNibble, kModeBitsSize);
+  return GETBITS8(remote_state[kDaikin176ByteModePower], kHighNibble,
+                  kModeBitsSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRDaikin176::setMode(const uint8_t mode) {
   uint8_t altmode = 0;
+  // Daikin172 has some alternate/additional mode bits that need to be changed
+  // in line with the operating mode. The following few lines match up these
+  // bits with the corresponding operating bits.
   switch (mode) {
-    case kDaikinFan: altmode = 0; break;
-    case kDaikinDry: altmode = 7; break;
-    case kDaikin176Cool: altmode = 2; break;
-    default: this->setMode(kDaikin176Cool); return;
+    case kDaikin176Dry:  altmode = 2; break;
+    case kDaikin176Fan:  altmode = 6; break;
+    case kDaikin176Auto:
+    case kDaikin176Cool:
+    case kDaikin176Heat: altmode = 7; break;
+    default: setMode(kDaikin176Cool); return;
   }
-  // Set the mode.
-  setBits(&remote_state[kDaikin176ByteMode], kHighNibble, kModeBitsSize, mode);
-  setBits(&remote_state[kDaikin176BytePower], kHighNibble, kModeBitsSize,
+  // Set the mode bits.
+  setBits(&remote_state[kDaikin176ByteModePower], kHighNibble, kModeBitsSize,
+          mode);
+  // Set the additional mode bits.
+  setBits(&remote_state[kDaikin176ByteAltMode], kHighNibble, kModeBitsSize,
           altmode);
   setTemp(_saved_temp);
   // Needs to happen after setTemp() as it will clear it.
   remote_state[kDaikin176ByteModeButton] = kDaikin176ModeButton;
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kDry: return kDaikinDry;
-    case stdAc::opmode_t::kHeat:  // Heat not supported, but fan is the closest.
-    case stdAc::opmode_t::kFan: return kDaikinFan;
-    default: return kDaikin176Cool;
+    case stdAc::opmode_t::kDry:   return kDaikin176Dry;
+    case stdAc::opmode_t::kHeat:  return kDaikin176Heat;
+    case stdAc::opmode_t::kFan:   return kDaikin176Fan;
+    case stdAc::opmode_t::kAuto:  return kDaikin176Auto;
+    default:                      return kDaikin176Cool;
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRDaikin176::toCommonMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikinDry: return stdAc::opmode_t::kDry;
-    case kDaikinHeat:  // There is no heat mode, but fan is the closest.
-    case kDaikinFan: return stdAc::opmode_t::kFan;
+    case kDaikin176Dry:  return stdAc::opmode_t::kDry;
+    case kDaikin176Heat: return stdAc::opmode_t::kHeat;
+    case kDaikin176Fan:  return stdAc::opmode_t::kFan;
+    case kDaikin176Auto: return stdAc::opmode_t::kAuto;
     default: return stdAc::opmode_t::kCool;
   }
 }
 
-// Set the temp in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRDaikin176::setTemp(const uint8_t temp) {
   uint8_t degrees = std::min(kDaikinMaxTemp, std::max(temp, kDaikinMinTemp));
   _saved_temp = degrees;
   switch (getMode()) {
-    case kDaikinDry:
-    case kDaikinFan:
+    case kDaikin176Dry:
+    case kDaikin176Fan:
       degrees = kDaikin176DryFanTemp;
   }
   setBits(&remote_state[kDaikin176ByteTemp], kDaikin176TempOffset,
@@ -2145,12 +2405,16 @@ void IRDaikin176::setTemp(const uint8_t temp) {
   remote_state[kDaikin176ByteModeButton] = 0;
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRDaikin176::getTemp(void) {
   return GETBITS8(remote_state[kDaikin176ByteTemp], kDaikin176TempOffset,
                   kDaikin176TempSize) + 9;
 }
 
-// Set the speed of the fan, 1 for Min or 3 for Max
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
+/// @note 1 for Min or 3 for Max
 void IRDaikin176::setFan(const uint8_t fan) {
   switch (fan) {
     case kDaikinFanMin:
@@ -2164,11 +2428,15 @@ void IRDaikin176::setFan(const uint8_t fan) {
   }
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRDaikin176::getFan(void) {
   return GETBITS8(remote_state[kDaikin176ByteFan], kHighNibble, kDaikinFanSize);
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -2177,6 +2445,8 @@ uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
+/// Set the Horizontal Swing mode of the A/C.
+/// @param[in] position The position/mode to set the swing to.
 void IRDaikin176::setSwingHorizontal(const uint8_t position) {
   switch (position) {
     case kDaikin176SwingHOff:
@@ -2188,12 +2458,16 @@ void IRDaikin176::setSwingHorizontal(const uint8_t position) {
   }
 }
 
+/// Get the Horizontal Swing mode of the A/C.
+/// @return The native position/mode setting.
 uint8_t IRDaikin176::getSwingHorizontal(void) {
   return GETBITS8(remote_state[kDaikin176ByteSwingH], kLowNibble,
                   kDaikinSwingSize);
 }
 
-// Convert a standard A/C horizontal swing into its native version.
+/// Convert a stdAc::swingh_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kOff:  return kDaikin176SwingHOff;
@@ -2201,7 +2475,10 @@ uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
     default: return kDaikin176SwingHAuto;
   }
 }
-// Convert a native horizontal swing to it's common equivalent.
+
+/// Convert a native horizontal swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common horizontal swing position.
 stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
     case kDaikin176SwingHOff: return stdAc::swingh_t::kOff;
@@ -2211,13 +2488,16 @@ stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRDaikin176::toCommonFanSpeed(const uint8_t speed) {
   return (speed == kDaikinFanMin) ? stdAc::fanspeed_t::kMin
                                   : stdAc::fanspeed_t::kMax;
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin176::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN176;
@@ -2243,13 +2523,14 @@ stdAc::state_t IRDaikin176::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRDaikin176::toString(void) {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kDaikinAuto, kDaikin176Cool, kDaikinHeat,
-                            kDaikinDry, kDaikinFan);
+  result += addModeToString(getMode(), kDaikin176Auto, kDaikin176Cool,
+                            kDaikin176Heat, kDaikin176Dry, kDaikin176Fan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikin176FanMax, kDaikinFanMin,
                            kDaikinFanMin, kDaikinFanMin, kDaikinFanMin);
@@ -2270,22 +2551,15 @@ String IRDaikin176::toString(void) {
 }
 
 #if DECODE_DAIKIN176
-// Decode the supplied Daikin 176 bit A/C message.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. (kDaikin176Bits)
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Supported devices:
-// - Daikin BRC4C153 remote.
-//
-// Status: STABLE / Expected to work.
-//
-
+/// Decode the supplied Daikin 176-bit message. (DAIKIN176)
+/// Status: STABLE / Expected to work.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeDaikin176(decode_results *results, uint16_t offset,
                              const uint16_t nbits,
                              const bool strict) {
@@ -2332,17 +2606,12 @@ bool IRrecv::decodeDaikin176(decode_results *results, uint16_t offset,
 #endif  // DECODE_DAIKIN176
 
 #if SEND_DAIKIN128
-// Send a Daikin 128 bit A/C message.
-//
-// Args:
-//   data: An array of kDaikin128StateLength bytes containing the IR command.
-//
-// Status: STABLE / Known Working.
-//
-// Supported devices:
-// - Daikin BRC52B63 remote.
-//
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+/// Send a Daikin128 (128-bit) A/C formatted message.
+/// Status: STABLE / Known Working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/827
 void IRsend::sendDaikin128(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kDaikin128SectionLength)
@@ -2372,19 +2641,15 @@ void IRsend::sendDaikin128(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_DAIKIN128
 
-// Class for handling Daikin 128 bit / 16 byte A/C messages.
-//
-// Code by crankyoldgit.
-// Analysis by Daniel Vena
-//
-// Status: STABLE / Known Working.
-//
-// Supported Remotes: Daikin BRC52B63 remote
-//
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikin128::IRDaikin128(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRDaikin128::begin(void) { _irsend.begin(); }
 
 uint8_t IRDaikin128::calcFirstChecksum(const uint8_t state[]) {
@@ -2397,11 +2662,9 @@ uint8_t IRDaikin128::calcSecondChecksum(const uint8_t state[]) {
                     kDaikin128SectionLength - 1);
 }
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The array to verify the checksum of.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRDaikin128::validChecksum(uint8_t state[]) {
   // Validate the checksum of section #1.
   if (state[kDaikin128SectionLength - 1] >> 4 != calcFirstChecksum(state))
@@ -2412,7 +2675,7 @@ bool IRDaikin128::validChecksum(uint8_t state[]) {
   return true;
 }
 
-// Calculate and set the checksum values for the internal state.
+/// Calculate and set the checksum values for the internal state.
 void IRDaikin128::checksum(void) {
   remote_state[kDaikin128SectionLength - 1] &= 0x0F;  // Clear upper half.
   remote_state[kDaikin128SectionLength - 1] |=
@@ -2420,6 +2683,7 @@ void IRDaikin128::checksum(void) {
   remote_state[kDaikin128StateLength - 1] = calcSecondChecksum(remote_state);
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRDaikin128::stateReset(void) {
   for (uint8_t i = 0; i < kDaikin128StateLength; i++) remote_state[i] = 0x00;
   remote_state[0] = 0x16;
@@ -2428,36 +2692,50 @@ void IRDaikin128::stateReset(void) {
   // remote_state[15] is a checksum byte, it will be set by checksum().
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin128::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
 void IRDaikin128::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kDaikin128StateLength);
 }
 
 #if SEND_DAIKIN128
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRDaikin128::send(const uint16_t repeat) {
   _irsend.sendDaikin128(getRaw(), kDaikin128StateLength, repeat);
 }
 #endif  // SEND_DAIKIN128
 
+/// Set the Power toggle setting of the A/C.
+/// @param[in] toggle true, the setting is on. false, the setting is off.
 void IRDaikin128::setPowerToggle(const bool toggle) {
   setBit(&remote_state[kDaikin128BytePowerSwingSleep],
          kDaikin128BitPowerToggleOffset, toggle);
 }
 
+/// Get the Power toggle setting of the A/C.
+/// @return The current operating mode setting.
 bool IRDaikin128::getPowerToggle(void) {
   return GETBIT8(remote_state[kDaikin128BytePowerSwingSleep],
                  kDaikin128BitPowerToggleOffset);
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRDaikin128::getMode(void) {
   return GETBITS8(remote_state[kDaikin128ByteModeFan], kLowNibble,
                   kDaikin128ModeSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRDaikin128::setMode(const uint8_t mode) {
   switch (mode) {
     case kDaikin128Auto:
@@ -2477,7 +2755,9 @@ void IRDaikin128::setMode(const uint8_t mode) {
   setEcono(getEcono());
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin128::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kDaikin128Cool;
@@ -2488,7 +2768,9 @@ uint8_t IRDaikin128::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRDaikin128::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kDaikin128Cool: return stdAc::opmode_t::kCool;
@@ -2499,21 +2781,28 @@ stdAc::opmode_t IRDaikin128::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Set the temp in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRDaikin128::setTemp(const uint8_t temp) {
   remote_state[kDaikin128ByteTemp] = uint8ToBcd(
     std::min(kDaikin128MaxTemp, std::max(temp, kDaikin128MinTemp)));
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRDaikin128::getTemp(void) {
   return bcdToUint8(remote_state[kDaikin128ByteTemp]);
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRDaikin128::getFan(void) {
   return GETBITS8(remote_state[kDaikin128ByteModeFan], kHighNibble,
                   kDaikinFanSize);
 }
 
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
 void IRDaikin128::setFan(const uint8_t speed) {
   uint8_t new_speed = speed;
   uint8_t mode = getMode();
@@ -2534,7 +2823,9 @@ void IRDaikin128::setFan(const uint8_t speed) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin128::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin: return kDaikinFanQuiet;
@@ -2546,7 +2837,9 @@ uint8_t IRDaikin128::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRDaikin128::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kDaikin128FanPowerful: return stdAc::fanspeed_t::kMax;
@@ -2558,37 +2851,51 @@ stdAc::fanspeed_t IRDaikin128::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setSwingVertical(const bool on) {
   setBit(&remote_state[kDaikin128BytePowerSwingSleep], kDaikin128BitSwingOffset,
          on);
 }
 
+/// Get the Vertical Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin128::getSwingVertical(void) {
   return GETBIT8(remote_state[kDaikin128BytePowerSwingSleep],
                  kDaikin128BitSwingOffset);
 }
 
+/// Set the Sleep mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setSleep(const bool on) {
   setBit(&remote_state[kDaikin128BytePowerSwingSleep], kDaikin128BitSleepOffset,
          on);
 }
 
+/// Get the Sleep mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin128::getSleep(void) {
   return GETBIT8(remote_state[kDaikin128BytePowerSwingSleep],
                  kDaikin128BitSleepOffset);
 }
 
+/// Set the Economy mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setEcono(const bool on) {
   uint8_t mode = getMode();
   setBit(&remote_state[kDaikin128ByteEconoLight], kDaikin128BitEconoOffset,
          on && (mode == kDaikin128Cool || mode == kDaikin128Heat));
 }
 
+/// Get the Economical mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin128::getEcono(void) {
   return GETBIT8(remote_state[kDaikin128ByteEconoLight],
                  kDaikin128BitEconoOffset);
 }
 
+/// Set the Quiet mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setQuiet(const bool on) {
   uint8_t mode = getMode();
   if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
@@ -2597,10 +2904,14 @@ void IRDaikin128::setQuiet(const bool on) {
     setFan(kDaikin128FanAuto);
 }
 
+/// Get the Quiet mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin128::getQuiet(void) {
   return getFan() == kDaikin128FanQuiet;
 }
 
+/// Set the Powerful (Turbo) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setPowerful(const bool on) {
   uint8_t mode = getMode();
   if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
@@ -2609,11 +2920,14 @@ void IRDaikin128::setPowerful(const bool on) {
     setFan(kDaikin128FanAuto);
 }
 
+/// Get the Powerful (Turbo) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin128::getPowerful(void) {
   return getFan() == kDaikin128FanPowerful;
 }
 
-// Set the clock in mins since midnight
+/// Set the clock on the A/C unit.
+/// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin128::setClock(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
   if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
@@ -2623,25 +2937,32 @@ void IRDaikin128::setClock(const uint16_t mins_since_midnight) {
   remote_state[kDaikin128ByteClockMins] = uint8ToBcd(mins % 60);
 }
 
+/// Get the clock time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin128::getClock(void) {
   return bcdToUint8(remote_state[kDaikin128ByteClockHours]) * 60 +
       bcdToUint8(remote_state[kDaikin128ByteClockMins]);
 }
 
+/// Set the enable status of the On Timer.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setOnTimerEnabled(const bool on) {
   setBit(&remote_state[kDaikin128ByteOnTimer], kDaikin128BitTimerEnabledOffset,
          on);
 }
 
+/// Get the enable status of the On Timer.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin128::getOnTimerEnabled(void) {
   return GETBIT8(remote_state[kDaikin128ByteOnTimer],
                  kDaikin128BitTimerEnabledOffset);
 }
 
-// Timer is rounds down to the nearest half hour.
-// Args:
-//   ptr: A PTR to the byte containing the Timer value to be updated.
-//   mins_since_midnight: The number of minutes the new timer should be set to.
+/// Set the time for a timer at the given location.
+/// @param[in,out] ptr Ptr to the byte containing the Timer value to be updated.
+/// @param[in] mins_since_midnight The number of minutes the new timer should
+///   be set to.
+/// @note Timer is rounds down to the nearest half hour.
 void IRDaikin128::setTimer(uint8_t *ptr, const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
   if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
@@ -2652,43 +2973,57 @@ void IRDaikin128::setTimer(uint8_t *ptr, const uint16_t mins_since_midnight) {
           uint8ToBcd(mins / 60));
 }
 
-// Timer is stored in nr of half hours internally.
-// Args:
-//   ptr: A PTR to the byte containing the Timer value.
-// Returns:
-//   A uint16_t containing the number of minutes since midnight.
+/// Get the time for a timer at the given location.
+/// @param[in] ptr A Ptr to the byte containing the Timer value.
+/// @return The number of minutes since midnight that the timer is set to.
+/// @note Timer is stored in nr. of half hours internally.
 uint16_t IRDaikin128::getTimer(const uint8_t *ptr) {
   return bcdToUint8(GETBITS8(*ptr, kDaikin128HoursOffset,
                              kDaikin128HoursSize)) * 60 +
       (GETBIT8(*ptr, kDaikin128HalfHourOffset) ? 30 : 0);
 }
 
+/// Set the On Timer time for the A/C unit.
+/// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin128::setOnTimer(const uint16_t mins_since_midnight) {
   setTimer(remote_state + kDaikin128ByteOnTimer, mins_since_midnight);
 }
 
+/// Get the On Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin128::getOnTimer(void) {
   return getTimer(remote_state + kDaikin128ByteOnTimer);
 }
 
+/// Set the enable status of the Off Timer.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setOffTimerEnabled(const bool on) {
   setBit(&remote_state[kDaikin128ByteOffTimer], kDaikin128BitTimerEnabledOffset,
          on);
 }
 
+/// Get the enable status of the Off Timer.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin128::getOffTimerEnabled(void) {
   return GETBIT8(remote_state[kDaikin128ByteOffTimer],
                  kDaikin128BitTimerEnabledOffset);
 }
 
+/// Set the Off Timer time for the A/C unit.
+/// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin128::setOffTimer(const uint16_t mins_since_midnight) {
   setTimer(remote_state + kDaikin128ByteOffTimer, mins_since_midnight);
 }
 
+/// Get the Off Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin128::getOffTimer(void) {
   return getTimer(remote_state + kDaikin128ByteOffTimer);
 }
 
+/// Set the Light toggle setting of the A/C.
+/// @param[in] unit Device to show the LED (Light) Display info about.
+/// @note 0 is off.
 void IRDaikin128::setLightToggle(const uint8_t unit) {
   switch (unit) {
     case 0:
@@ -2701,11 +3036,14 @@ void IRDaikin128::setLightToggle(const uint8_t unit) {
   }
 }
 
+/// Get the Light toggle setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRDaikin128::getLightToggle(void) {
   return remote_state[kDaikin128ByteEconoLight] & kDaikin128MaskLight;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRDaikin128::toString(void) {
   String result = "";
   result.reserve(240);  // Reserve some heap for the string to reduce fragging.
@@ -2738,7 +3076,9 @@ String IRDaikin128::toString(void) {
   return result;
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @param[in] prev Ptr to a previous state.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
   if (prev != NULL) result = *prev;
@@ -2766,22 +3106,16 @@ stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) {
 }
 
 #if DECODE_DAIKIN128
-// Decode the supplied Daikin 128 bit A/C message.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. (kDaikin128Bits)
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Supported devices:
-// - Daikin BRC52B63 remote.
-//
-// Status: STABLE / Known Working.
-//
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/827
+/// Decode the supplied Daikin 128-bit message. (DAIKIN128)
+/// Status: STABLE / Known Working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/827
 bool IRrecv::decodeDaikin128(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader) + kFooter - 1 + offset)
@@ -2836,17 +3170,12 @@ bool IRrecv::decodeDaikin128(decode_results *results, uint16_t offset,
 #endif  // DECODE_DAIKIN128
 
 #if SEND_DAIKIN152
-// Send a Daikin 152 bit A/C message.
-//
-// Args:
-//   data: An array of kDaikin152StateLength bytes containing the IR command.
-//
-// Supported devices:
-// - Daikin ARC480A5 remote.
-//
-// Status: STABLE / Known working.
-//
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+/// Send a Daikin152 (152-bit) A/C formatted message.
+/// Status: STABLE / Known Working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/873
 void IRsend::sendDaikin152(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -2866,22 +3195,16 @@ void IRsend::sendDaikin152(const unsigned char data[], const uint16_t nbytes,
 #endif  // SEND_DAIKIN152
 
 #if DECODE_DAIKIN152
-// Decode the supplied Daikin 152 bit A/C message.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. (kDaikin152Bits)
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Supported devices:
-// - Daikin ARC480A5 remote.
-//
-// Status: STABLE / Known working.
-//
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/873
+/// Decode the supplied Daikin 152-bit message. (DAIKIN152)
+/// Status: STABLE / Known Working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/873
 bool IRrecv::decodeDaikin152(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (5 + nbits + kFooter) + kHeader - 1 + offset)
@@ -2930,34 +3253,29 @@ bool IRrecv::decodeDaikin152(decode_results *results, uint16_t offset,
 }
 #endif  // DECODE_DAIKIN152
 
-// Class for handling Daikin 152 bit / 19 byte A/C messages.
-//
-// Code by crankyoldgit.
-//
-// Supported Remotes: Daikin ARC480A5 remote
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/873
-//   https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.cpp
-//   https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.h
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikin152::IRDaikin152(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRDaikin152::begin(void) { _irsend.begin(); }
 
 #if SEND_DAIKIN152
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRDaikin152::send(const uint16_t repeat) {
   _irsend.sendDaikin152(getRaw(), kDaikin152StateLength, repeat);
 }
 #endif  // SEND_DAIKIN152
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The array to verify the checksum of.
-//   length: The size of the state.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRDaikin152::validChecksum(uint8_t state[], const uint16_t length) {
   // Validate the checksum of the given state.
   if (length <= 1 || state[length - 1] != sumBytes(state, length - 1))
@@ -2966,12 +3284,13 @@ bool IRDaikin152::validChecksum(uint8_t state[], const uint16_t length) {
     return true;
 }
 
-// Calculate and set the checksum values for the internal state.
+/// Calculate and set the checksum values for the internal state.
 void IRDaikin152::checksum(void) {
   remote_state[kDaikin152StateLength - 1] = sumBytes(
       remote_state, kDaikin152StateLength - 1);
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRDaikin152::stateReset(void) {
   for (uint8_t i = 3; i < kDaikin152StateLength; i++) remote_state[i] = 0x00;
   remote_state[0] =  0x11;
@@ -2981,32 +3300,46 @@ void IRDaikin152::stateReset(void) {
   // remote_state[19] is a checksum byte, it will be set by checksum().
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin152::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
 void IRDaikin152::setRaw(const uint8_t new_code[]) {
   memcpy(remote_state, new_code, kDaikin152StateLength);
 }
 
+/// Change the power setting to On.
 void IRDaikin152::on(void) { setPower(true); }
 
+/// Change the power setting to Off.
 void IRDaikin152::off(void) { setPower(false); }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setPower(const bool on) {
   setBit(&remote_state[kDaikin152PowerByte], kDaikinBitPowerOffset, on);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin152::getPower(void) {
   return GETBIT8(remote_state[kDaikin152PowerByte], kDaikinBitPowerOffset);
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRDaikin152::getMode(void) {
   return GETBITS8(remote_state[kDaikin152ModeByte], kDaikinModeOffset,
                   kDaikinModeSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRDaikin152::setMode(const uint8_t mode) {
   switch (mode) {
     case kDaikinFan:
@@ -3027,12 +3360,15 @@ void IRDaikin152::setMode(const uint8_t mode) {
           kDaikinModeSize, mode);
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin152::convertMode(const stdAc::opmode_t mode) {
   return IRDaikinESP::convertMode(mode);
 }
 
-// Set the temp in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRDaikin152::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(
       temp, (getMode() == kDaikinHeat) ? kDaikinMinTemp : kDaikin2MinCoolTemp);
@@ -3042,12 +3378,16 @@ void IRDaikin152::setTemp(const uint8_t temp) {
           kDaikin152TempSize, degrees);
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRDaikin152::getTemp(void) {
   return GETBITS8(remote_state[kDaikin152TempByte], kDaikinTempOffset,
                   kDaikin152TempSize);
 }
 
-// Set the speed of the fan, 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
+/// @note 1-5 or kDaikinFanAuto or kDaikinFanQuiet
 void IRDaikin152::setFan(const uint8_t fan) {
   // Set the fan speed bits, leave low 4 bits alone
   uint8_t fanset;
@@ -3060,6 +3400,8 @@ void IRDaikin152::setFan(const uint8_t fan) {
   setBits(&remote_state[kDaikin152FanByte], kHighNibble, kNibbleSize, fanset);
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRDaikin152::getFan(void) {
   const uint8_t fan = GETBITS8(remote_state[kDaikin152FanByte], kHighNibble,
                                kNibbleSize);
@@ -3070,31 +3412,43 @@ uint8_t IRDaikin152::getFan(void) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin152::convertFan(const stdAc::fanspeed_t speed) {
   return IRDaikinESP::convertFan(speed);
 }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setSwingV(const bool on) {
   setBits(&remote_state[kDaikin152SwingVByte], kDaikinSwingOffset,
           kDaikinSwingSize, on ? kDaikinSwingOn : kDaikinSwingOff);
 }
 
+/// Get the Vertical Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin152::getSwingV(void) {
   return GETBITS8(remote_state[kDaikin152SwingVByte], kDaikinSwingOffset,
                   kDaikinSwingSize);
 }
 
+/// Set the Quiet mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setQuiet(const bool on) {
   setBit(&remote_state[kDaikin152QuietByte], kDaikinBitSilentOffset, on);
   // Powerful & Quiet mode being on are mutually exclusive.
   if (on) this->setPowerful(false);
 }
 
+/// Get the Quiet mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin152::getQuiet(void) {
   return GETBIT8(remote_state[kDaikin152QuietByte], kDaikinBitSilentOffset);
 }
 
+/// Set the Powerful (Turbo) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setPowerful(const bool on) {
   setBit(&remote_state[kDaikin152PowerfulByte], kDaikinBitPowerfulOffset, on);
   if (on) {
@@ -3105,29 +3459,41 @@ void IRDaikin152::setPowerful(const bool on) {
   }
 }
 
+/// Get the Powerful (Turbo) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin152::getPowerful(void) {
   return GETBIT8(remote_state[kDaikin152PowerfulByte],
                  kDaikinBitPowerfulOffset);
 }
 
+/// Set the Economy mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setEcono(const bool on) {
   setBit(&remote_state[kDaikin152EconoByte], kDaikinBitEconoOffset, on);
   // Powerful & Econo mode being on are mutually exclusive.
   if (on) this->setPowerful(false);
 }
 
+/// Get the Economical mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin152::getEcono(void) {
   return GETBIT8(remote_state[kDaikin152EconoByte], kDaikinBitEconoOffset);
 }
 
+/// Set the Sensor mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setSensor(const bool on) {
   setBit(&remote_state[kDaikin152SensorByte], kDaikin152SensorOffset, on);
 }
 
+/// Get the Sensor mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin152::getSensor(void) {
   return GETBIT8(remote_state[kDaikin152SensorByte], kDaikin152SensorOffset);
 }
 
+/// Set the Comfort mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setComfort(const bool on) {
   setBit(&remote_state[kDaikin152ComfortByte], kDaikin152ComfortOffset, on);
   if (on) {
@@ -3139,11 +3505,14 @@ void IRDaikin152::setComfort(const bool on) {
   }
 }
 
+/// Get the Comfort mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin152::getComfort(void) {
   return GETBIT8(remote_state[kDaikin152ComfortByte], kDaikin152ComfortOffset);
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin152::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN152;
@@ -3169,7 +3538,8 @@ stdAc::state_t IRDaikin152::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRDaikin152::toString(void) {
   String result = "";
   result.reserve(180);  // Reserve some heap for the string to reduce fragging.
@@ -3189,17 +3559,12 @@ String IRDaikin152::toString(void) {
 }
 
 #if SEND_DAIKIN64
-// Send a Daikin 64 bit A/C message.
-//
-// Args:
-//   data: A uint64_t containing the IR command/code.
-//
-// Supported devices:
-// - Daikin FFN-C.
-//
-// Status: Beta / Probably Working.
-//
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
+/// Send a Daikin64 (64-bit) A/C formatted message.
+/// Status: Beta / Probably Working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
 void IRsend::sendDaikin64(const uint64_t data, const uint16_t nbits,
                           const uint16_t repeat) {
   enableIROut(kDaikin64Freq);
@@ -3223,22 +3588,16 @@ void IRsend::sendDaikin64(const uint64_t data, const uint16_t nbits,
 #endif  // SEND_DAIKIN64
 
 #if DECODE_DAIKIN64
-// Decode the supplied Daikin 64 bit A/C message.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. (kDaikin64Bits)
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Supported devices:
-// - Daikin FFN-C.
-//
-// Status: Beta / Probably Working.
-//
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
+/// Decode the supplied Daikin 64-bit message. (DAIKIN64)
+/// Status: Beta / Probably Working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
 bool IRrecv::decodeDaikin64(decode_results *results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * nbits + kDaikin64Overhead - offset)
@@ -3280,33 +3639,28 @@ bool IRrecv::decodeDaikin64(decode_results *results, uint16_t offset,
 }
 #endif  // DAIKIN64
 
-// Class for handling Daikin 64 bit / 19 byte A/C messages.
-//
-// Code by crankyoldgit.
-//
-// Supported Remotes: Daikin ARC480A5 remote
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/873
-//   https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.cpp
-//   https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.h
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikin64::IRDaikin64(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRDaikin64::begin(void) { _irsend.begin(); }
 
 #if SEND_DAIKIN64
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRDaikin64::send(const uint16_t repeat) {
   _irsend.sendDaikin64(getRaw(), kDaikin64Bits, repeat);
 }
 #endif  // SEND_DAIKIN64
 
-// Calc the checksum for a given state.
-// Args:
-//   state:  The value to calc the checksum of.
-// Returns:
-//   A 4-bit checksum stored in a uint_8.
+/// Calculate the checksum for a given state.
+/// @param[in] state The value to calc the checksum of.
+/// @return The 4-bit checksum stored in a uint_8.
 uint8_t IRDaikin64::calcChecksum(const uint64_t state) {
   uint64_t data = GETBITS64(state, 0, kDaikin64ChecksumOffset);
   uint8_t result = 0;
@@ -3315,44 +3669,51 @@ uint8_t IRDaikin64::calcChecksum(const uint64_t state) {
   return result & 0xF;
 }
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The array to verify the checksum of.
-//   length: The size of the state.
-// Returns:
-//   A boolean.
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The state to verify the checksum of.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRDaikin64::validChecksum(const uint64_t state) {
   // Validate the checksum of the given state.
   return (GETBITS64(state, kDaikin64ChecksumOffset,
                     kDaikin64ChecksumSize) == calcChecksum(state));
 }
 
-// Calculate and set the checksum values for the internal state.
+/// Calculate and set the checksum values for the internal state.
 void IRDaikin64::checksum(void) {
   setBits(&remote_state, kDaikin64ChecksumOffset, kDaikin64ChecksumSize,
           calcChecksum(remote_state));
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRDaikin64::stateReset(void) {
   remote_state = kDaikin64KnownGoodState;
 }
 
+/// Get a copy of the internal state as a valid code for this protocol.
+/// @return A valid code for this protocol based on the current internal state.
 uint64_t IRDaikin64::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_state A valid code for this protocol.
 void IRDaikin64::setRaw(const uint64_t new_state) { remote_state = new_state; }
 
+/// Set the Power toggle setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setPowerToggle(const bool on) {
   setBit(&remote_state, kDaikin64PowerToggleBit, on);
 }
 
+/// Get the Power toggle setting of the A/C.
+/// @return The current operating mode setting.
 bool IRDaikin64::getPowerToggle(void) {
   return GETBIT64(remote_state, kDaikin64PowerToggleBit);
 }
 
-// Set the temp in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRDaikin64::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kDaikin64MinTemp);
   degrees = std::min(degrees, kDaikin64MaxTemp);
@@ -3360,15 +3721,21 @@ void IRDaikin64::setTemp(const uint8_t temp) {
           kDaikin64TempSize, uint8ToBcd(degrees));
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRDaikin64::getTemp(void) {
   return bcdToUint8(GETBITS64(remote_state, kDaikin64TempOffset,
                               kDaikin64TempSize));
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRDaikin64::getMode(void) {
   return GETBITS64(remote_state, kDaikin64ModeOffset, kDaikin64ModeSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRDaikin64::setMode(const uint8_t mode) {
   switch (mode) {
     case kDaikin64Fan:
@@ -3382,7 +3749,9 @@ void IRDaikin64::setMode(const uint8_t mode) {
   setBits(&remote_state, kDaikin64ModeOffset, kDaikin64ModeSize, mode);
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin64::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kDry: return kDaikin64Dry;
@@ -3391,7 +3760,9 @@ uint8_t IRDaikin64::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRDaikin64::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kDaikin64Cool: return stdAc::opmode_t::kCool;
@@ -3401,10 +3772,14 @@ stdAc::opmode_t IRDaikin64::toCommonMode(const uint8_t mode) {
   }
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRDaikin64::getFan(void) {
   return GETBITS64(remote_state, kDaikin64FanOffset, kDaikin64FanSize);
 }
 
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
 void IRDaikin64::setFan(const uint8_t speed) {
   switch (speed) {
     case kDaikin64FanQuiet:
@@ -3420,7 +3795,9 @@ void IRDaikin64::setFan(const uint8_t speed) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRDaikin64::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kDaikin64FanQuiet;
@@ -3432,7 +3809,9 @@ uint8_t IRDaikin64::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRDaikin64::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kDaikin64FanTurbo: return stdAc::fanspeed_t::kMax;
@@ -3444,10 +3823,14 @@ stdAc::fanspeed_t IRDaikin64::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
+/// Get the Turbo (Powerful) mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin64::getTurbo(void) {
   return getFan() == kDaikin64FanTurbo;
 }
 
+/// Set the Turbo (Powerful) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setTurbo(const bool on) {
   if (on) {
     setFan(kDaikin64FanTurbo);
@@ -3456,10 +3839,14 @@ void IRDaikin64::setTurbo(const bool on) {
   }
 }
 
+/// Get the Quiet mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin64::getQuiet(void) {
   return getFan() == kDaikin64FanQuiet;
 }
 
+/// Set the Quiet mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setQuiet(const bool on) {
   if (on) {
     setFan(kDaikin64FanQuiet);
@@ -3468,22 +3855,32 @@ void IRDaikin64::setQuiet(const bool on) {
   }
 }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setSwingVertical(const bool on) {
   setBit(&remote_state, kDaikin64SwingVBit, on);
 }
 
+/// Get the Vertical Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin64::getSwingVertical(void) {
   return GETBIT64(remote_state, kDaikin64SwingVBit);
 }
 
+/// Set the Sleep mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setSleep(const bool on) {
   setBit(&remote_state, kDaikin64SleepBit, on);
 }
 
+/// Get the Sleep mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin64::getSleep(void) {
   return GETBIT64(remote_state, kDaikin64SleepBit);
 }
 
+/// Set the clock on the A/C unit.
+/// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin64::setClock(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
   if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
@@ -3493,6 +3890,8 @@ void IRDaikin64::setClock(const uint16_t mins_since_midnight) {
           kDaikin64ClockHoursSize, uint8ToBcd(mins / 60));  // Hours
 }
 
+/// Get the clock time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin64::getClock(void) {
   return bcdToUint8(GETBITS64(remote_state,
                               kDaikin64ClockOffset + kDaikin64ClockMinsSize,
@@ -3501,20 +3900,28 @@ uint16_t IRDaikin64::getClock(void) {
                               kDaikin64ClockMinsSize));
 }
 
+/// Set the enable status of the On Timer.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setOnTimeEnabled(const bool on) {
   setBit(&remote_state, kDaikin64OnTimeEnableBit, on);
 }
 
+/// Get the enable status of the On Timer.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin64::getOnTimeEnabled(void) {
   return GETBIT64(remote_state, kDaikin64OnTimeEnableBit);
 }
 
+/// Get the On Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin64::getOnTime(void) {
   return bcdToUint8(GETBITS64(remote_state, kDaikin64OnTimeOffset,
                               kDaikin64OnTimeSize)) * 60 +
       (GETBIT64(remote_state, kDaikin64OnTimeHalfHourBit) ? 30 : 0);
 }
 
+/// Set the On Timer time for the A/C unit.
+/// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin64::setOnTime(const uint16_t mins_since_midnight) {
   uint16_t halfhours = mins_since_midnight / 30;
   if (mins_since_midnight >= 24 * 60) halfhours = 0;  // Bounds check.
@@ -3524,20 +3931,28 @@ void IRDaikin64::setOnTime(const uint16_t mins_since_midnight) {
   setBit(&remote_state, kDaikin64OnTimeHalfHourBit, halfhours % 2);
 }
 
+/// Set the enable status of the Off Timer.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setOffTimeEnabled(const bool on) {
   setBit(&remote_state, kDaikin64OffTimeEnableBit, on);
 }
 
+/// Get the enable status of the Off Timer.
+/// @return true, the setting is on. false, the setting is off.
 bool IRDaikin64::getOffTimeEnabled(void) {
   return GETBIT64(remote_state, kDaikin64OffTimeEnableBit);
 }
 
+/// Get the Off Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
 uint16_t IRDaikin64::getOffTime(void) {
   return bcdToUint8(GETBITS64(remote_state, kDaikin64OffTimeOffset,
                                kDaikin64OffTimeSize)) * 60 +
       (GETBIT64(remote_state, kDaikin64OffTimeHalfHourBit) ? 30 : 0);
 }
 
+/// Set the Off Timer time for the A/C unit.
+/// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin64::setOffTime(const uint16_t mins_since_midnight) {
   uint16_t halfhours = mins_since_midnight / 30;
   if (mins_since_midnight >= 24 * 60) halfhours = 0;  // Bounds check.
@@ -3547,7 +3962,8 @@ void IRDaikin64::setOffTime(const uint16_t mins_since_midnight) {
   setBit(&remote_state, kDaikin64OffTimeHalfHourBit, halfhours % 2);
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRDaikin64::toString(void) {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
@@ -3579,7 +3995,9 @@ String IRDaikin64::toString(void) {
   return result;
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @param[in] prev Ptr to a previous state.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
   if (prev != NULL) result = *prev;

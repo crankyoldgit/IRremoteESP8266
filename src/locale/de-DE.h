@@ -112,12 +112,12 @@
 
 #define D_STR_REPEAT "Wiederholen"
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #define D_STR_TIMESTAMP "Zeitstempel"
 #define D_STR_LIBRARY "Bibliothek"
 #define D_STR_MESGDESC "Nachr. Beschr."
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDumpV2 läuft und wartet auf IR Eingabe auf Pin %d"
+    "IRrecvDump läuft und wartet auf IR Eingabe auf Pin %d"
 #define D_WARN_BUFFERFULL \
     "WARNUNG: IR Code ist zu gross für Buffer (>= %d). " \
     "Dem Resultat sollte nicht vertraut werden bevor das behoben ist. " \

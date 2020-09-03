@@ -220,32 +220,32 @@ TEST(TestResultToSourceCode, ComplexProtocols) {
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
   EXPECT_EQ(
-      "uint16_t rawData[296] = {4400, 4300,  542, 1622,  542, 1622,  "
-      "542, 1622,  542, 1622,  542, 472,  542, 472,  542, 1622,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 1622,  542, 1622,  "
-      "542, 472,  542, 1622,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 1622,  542, 1622,  542, 1622,  542, 1622,  "
-      "542, 1622,  542, 1622,  542, 1622,  542, 1622,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 1622,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 1622,  542, 7048,  4400, 4300,  "
-      "542, 1622,  542, 1622,  542, 1622,  542, 1622,  542, 472,  542, 472,  "
-      "542, 1622,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 1622,  542, 1622,  542, 472,  542, 1622,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 1622,  542, 1622,  "
-      "542, 1622,  542, 1622,  542, 1622,  542, 1622,  542, 1622,  542, 1622,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 1622,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  "
-      "542, 472,  542, 472,  542, 472,  542, 472,  542, 472,  542, 1622,  "
-      "542, 7048 };  // TOSHIBA_AC\n"
+      "uint16_t rawData[296] = {4400, 4300,  580, 1600,  580, 1600,  "
+      "580, 1600,  580, 1600,  580, 490,  580, 490,  580, 1600,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 1600,  580, 1600,  "
+      "580, 490,  580, 1600,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 1600,  580, 1600,  580, 1600,  580, 1600,  "
+      "580, 1600,  580, 1600,  580, 1600,  580, 1600,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 1600,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 1600,  580, 7400,  4400, 4300,  "
+      "580, 1600,  580, 1600,  580, 1600,  580, 1600,  580, 490,  580, 490,  "
+      "580, 1600,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 1600,  580, 1600,  580, 490,  580, 1600,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 1600,  580, 1600,  "
+      "580, 1600,  580, 1600,  580, 1600,  580, 1600,  580, 1600,  580, 1600,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 1600,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  "
+      "580, 490,  580, 490,  580, 490,  580, 490,  580, 490,  580, 1600,  "
+      "580, 7400 };  // TOSHIBA_AC\n"
       "uint8_t state[9] = {0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x00, 0x00, 0x00, "
       "0x01};\n",
       resultToSourceCode(&irsend.capture));
@@ -518,6 +518,7 @@ TEST(TestUtils, MinsToString) {
 }
 
 TEST(TestUtils, sumNibbles) {
+  // PTR/Array variant.
   uint8_t testdata[] = {0x01, 0x23, 0x45};
   EXPECT_EQ(0, irutils::sumNibbles(testdata, 0));
   EXPECT_EQ(1, irutils::sumNibbles(testdata, 0, 1));
@@ -525,6 +526,30 @@ TEST(TestUtils, sumNibbles) {
   EXPECT_EQ(2, irutils::sumNibbles(testdata, 1, 1));
   EXPECT_EQ(15, irutils::sumNibbles(testdata, 3));
   EXPECT_EQ(115, irutils::sumNibbles(testdata, 3, 100));
+
+  // Integer variant.
+  EXPECT_EQ(0x0, irutils::sumNibbles(0x0));
+  EXPECT_EQ(0x1, irutils::sumNibbles(0x1));
+  EXPECT_EQ(0xF, irutils::sumNibbles(0xF));
+  EXPECT_EQ(0x4, irutils::sumNibbles(0x1111));
+  EXPECT_EQ(0x8, irutils::sumNibbles(0x2222));
+  EXPECT_EQ(0x0, irutils::sumNibbles(0x4444));
+  EXPECT_EQ(0xA, irutils::sumNibbles(0x1234));
+  EXPECT_EQ(0xA, irutils::sumNibbles(0x4321));
+  EXPECT_EQ(0xE, irutils::sumNibbles(0xABCD));
+  EXPECT_EQ(0x1, irutils::sumNibbles(0x4AE5));
+  EXPECT_EQ(0xC, irutils::sumNibbles(0xFFFF));
+  EXPECT_EQ(0x1, irutils::sumNibbles(0xC005));
+  EXPECT_EQ(0x4, irutils::sumNibbles(0xC035));
+  EXPECT_EQ(0x2, irutils::sumNibbles(0x88C0051));
+  EXPECT_EQ(0x1, irutils::sumNibbles(0x88C0051, 1));
+  EXPECT_EQ(0x2, irutils::sumNibbles(0x88C0051, 1, 1));
+  EXPECT_EQ(0x6, irutils::sumNibbles(0x88C0051, 2));
+  EXPECT_EQ(0x6, irutils::sumNibbles(0x88C0051, 4));
+  EXPECT_EQ(0x2, irutils::sumNibbles(0x88C0051, 5));
+  EXPECT_EQ(0x22, irutils::sumNibbles(0x88C0051, 16, 0, false));
+  EXPECT_EQ(0x12, irutils::sumNibbles(0x88C0051, 5, 0, false));
+  EXPECT_EQ(0x22, irutils::sumNibbles(0x88C0051, 255, 0, false));
 }
 
 TEST(TestUtils, BCD) {
@@ -718,4 +743,40 @@ TEST(TestUtils, setBits64Bit) {
   // General
   irutils::setBits(&data, 32, 4, 0b1001);
   EXPECT_EQ(0x4000000900000013, data);
+}
+
+TEST(TestUtils, InvertedBytePairs) {
+  const uint8_t correct[] = {0x00, 0xFF, 0x01, 0xFE, 0xAA, 0x55};
+  uint8_t wrong[] = {0x00, 0xFF, 0x01, 0xFD, 0xAA, 0x55};
+
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 6));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 5));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 4));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 3));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 2));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 1));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(correct, 0));
+
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 6));
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 5));
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 4));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 3));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 2));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 1));
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 0));
+
+  irutils::invertBytePairs(wrong, 0);
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 6));
+  irutils::invertBytePairs(wrong, 1);
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 6));
+  irutils::invertBytePairs(wrong, 2);
+  ASSERT_FALSE(irutils::checkInvertedBytePairs(wrong, 6));
+
+  irutils::invertBytePairs(wrong, 6);
+  ASSERT_TRUE(irutils::checkInvertedBytePairs(wrong, 6));
+  EXPECT_STATE_EQ(correct, wrong, 6 * 8);
+}
+
+TEST(TestUtils, lowLevelSanityCheck) {
+  ASSERT_EQ(0, irutils::lowLevelSanityCheck());
 }

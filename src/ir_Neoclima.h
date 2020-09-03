@@ -1,8 +1,14 @@
-// Neoclima A/C
-//
 // Copyright 2019 David Conran
 
-// Analysis by crankyoldgit & AndreyShpilevoy
+/// @file
+/// @brief Support for Neoclima protocols.
+/// Analysis by crankyoldgit & AndreyShpilevoy
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/764
+/// @see https://drive.google.com/file/d/1kjYk4zS9NQcMQhFkak-L4mp4UuaAIesW/view
+
+// Supports:
+//   Brand: Neoclima,  Model: NS-09AHTI A/C
+//   Brand: Neoclima,  Model: ZH/TY-01 remote
 
 #ifndef IR_NEOCLIMA_H_
 #define IR_NEOCLIMA_H_
@@ -17,14 +23,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-// Supports:
-//   Brand: Neoclima,  Model: NS-09AHTI A/C
-//   Brand: Neoclima,  Model: ZH/TY-01 remote
-
-// Ref:
-//  https://github.com/crankyoldgit/IRremoteESP8266/issues/764
-//  https://drive.google.com/file/d/1kjYk4zS9NQcMQhFkak-L4mp4UuaAIesW/view
 
 // Constants
 // state[1]
@@ -84,14 +82,18 @@ const uint8_t kNeoclimaFan =      0b011;
 const uint8_t kNeoclimaHeat =     0b100;
 
 // Classes
+/// Class for handling detailed Neoclima A/C messages.
 class IRNeoclimaAc {
  public:
   explicit IRNeoclimaAc(const uint16_t pin, const bool inverted = false,
                         const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_NEOCLIMA
   void send(const uint16_t repeat = kNeoclimaMinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_NEOCLIMA
   void begin(void);
@@ -146,12 +148,13 @@ class IRNeoclimaAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kNeoclimaStateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kNeoclimaStateLength];  ///< State of the remote in code.
   void checksum(const uint16_t length = kNeoclimaStateLength);
 };
 

@@ -3,7 +3,17 @@
 // Copyright 2018 Kamil Palczewski
 // Copyright 2019 s-hadinger
 
-// Pioneer remote emulation
+/// @file
+/// @brief Pioneer remote emulation
+/// @see http://www.adrian-kingston.com/IRFormatPioneer.htm
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/547
+/// @see https://www.pioneerelectronics.com/PUSA/Support/Home-Entertainment-Custom-Install/IR+Codes/A+V+Receivers
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1220
+
+// Supports:
+//   Brand: Pioneer,  Model: AV Receivers
+//   Brand: Pioneer,  Model: VSX-324 AV Receiver
+//   Brand: Pioneer,  Model: AXD7690 Remote
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
@@ -13,38 +23,22 @@
 #include "IRutils.h"
 
 // Constants
-// Ref:
-//  http://www.adrian-kingston.com/IRFormatPioneer.htm
-const uint16_t kPioneerTick = 534;
-const uint16_t kPioneerHdrMarkTicks = 16;
-const uint16_t kPioneerHdrMark = kPioneerHdrMarkTicks * kPioneerTick;
-const uint16_t kPioneerHdrSpaceTicks = 8;
-const uint16_t kPioneerHdrSpace = kPioneerHdrSpaceTicks * kPioneerTick;
-const uint16_t kPioneerBitMarkTicks = 1;
-const uint16_t kPioneerBitMark = kPioneerBitMarkTicks * kPioneerTick;
-const uint16_t kPioneerOneSpaceTicks = 3;
-const uint16_t kPioneerOneSpace = kPioneerOneSpaceTicks * kPioneerTick;
-const uint16_t kPioneerZeroSpaceTicks = 1;
-const uint16_t kPioneerZeroSpace = kPioneerZeroSpaceTicks * kPioneerTick;
-const uint16_t kPioneerMinCommandLengthTicks = 159;
-const uint32_t kPioneerMinCommandLength = kPioneerMinCommandLengthTicks *
-                                          kPioneerTick;
-const uint16_t kPioneerMinGapTicks = 47;
-const uint32_t kPioneerMinGap = kPioneerMinGapTicks * kPioneerTick;
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1220
+const uint16_t kPioneerTick = 534;  ///< uSeconds.
+const uint16_t kPioneerHdrMark = 8506;  ///< uSeconds.
+const uint16_t kPioneerHdrSpace = 4191;  ///< uSeconds.
+const uint16_t kPioneerBitMark = 568;  ///< uSeconds.
+const uint16_t kPioneerOneSpace = 1542;  ///< uSeconds.
+const uint16_t kPioneerZeroSpace = 487;  ///< uSeconds.
+const uint32_t kPioneerMinCommandLength = 84906;  ///< uSeconds.
+const uint32_t kPioneerMinGap = 25181;  ///< uSeconds.
 
 #if SEND_PIONEER
-// Send a raw Pioneer formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent.
-//           Typically kPioneerBits.
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: STABLE / Expected to be working.
-//
-// Ref:
-//  http://adrian-kingston.com/IRFormatPioneer.htm
+/// Send a raw Pioneer formatted message.
+/// Status: STABLE / Expected to be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
                          const uint16_t repeat) {
   // If nbits is to big, abort.
@@ -68,23 +62,18 @@ void IRsend::sendPioneer(const uint64_t data, const uint16_t nbits,
   }
 }
 
-// Calculate the raw Pioneer data code based on two NEC sub-codes
-// Args:
-//   address A 16-bit "published" NEC value.
-//   command: A 16-bit "published" NEC value.
-// Returns:
-//   A raw 64-bit Pioneer message code.
-//
-// Status: STABLE / Expected to work.
-//
-// Note:
-//   Address & Command can be take from a decode result OR from the spreadsheets
-//   located at:
-//     https://www.pioneerelectronics.com/PUSA/Support/Home-Entertainment-Custom-Install/IR+Codes/A+V+Receivers
-//   where the first part is considered the address,
-//   and the second the command.
-//   e.g.
-//   "A556+AF20" is an Address of 0xA556 & a Command of 0xAF20.
+/// Calculate the raw Pioneer data code based on two NEC sub-codes
+/// Status: STABLE / Expected to work.
+/// @param[in] address A 16-bit "published" NEC value.
+/// @param[in] command A 16-bit "published" NEC value.
+/// @return A raw 64-bit Pioneer message code for use with `sendPioneer()``
+/// @note Address & Command can be take from a decode result OR from the
+///   spreadsheets located at:
+///    https://www.pioneerelectronics.com/PUSA/Support/Home-Entertainment-Custom-Install/IR+Codes/A+V+Receivers
+///   where the first part is considered the address,
+///   and the second the command.
+///  e.g.
+///  "A556+AF20" is an Address of 0xA556 & a Command of 0xAF20.
 uint64_t IRsend::encodePioneer(const uint16_t address, const uint16_t command) {
   return (((uint64_t)encodeNEC(address >> 8, address & 0xFF)) << 32) |
          encodeNEC(command >> 8, command & 0xFF);
@@ -92,19 +81,14 @@ uint64_t IRsend::encodePioneer(const uint16_t address, const uint16_t command) {
 #endif  // SEND_PIONEER
 
 #if DECODE_PIONEER
-// Decode the supplied Pioneer message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kPioneerBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Should be working. (Self decodes & real examples)
-//
+/// Decode the supplied Pioneer message.
+/// Status: STABLE / Should be working. (Self decodes & real examples)
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 bool IRrecv::decodePioneer(decode_results *results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1 + offset)

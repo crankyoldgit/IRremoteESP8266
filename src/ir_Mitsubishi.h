@@ -2,17 +2,29 @@
 // Copyright 2017-2019 David Conran
 // Copyright 2019 Mark Kuchel
 
-// Mitsubishi
+/// @file
+/// @brief Support for Mitsubishi protocols.
+/// Mitsubishi (TV) decoding added from https://github.com/z3t0/Arduino-IRremote
+/// Mitsubishi (TV) sending & Mitsubishi A/C support added by David Conran
+/// @see GlobalCache's Control Tower's Mitsubishi TV data.
+/// @see https://github.com/marcosamarinho/IRremoteESP8266/blob/master/ir_Mitsubishi.cpp
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/441
+/// @see https://github.com/r45635/HVAC-IR-Control/blob/master/HVAC_ESP8266/HVAC_ESP8266.ino#L84
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/619
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/888
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/947
+/// @see https://github.com/kuchel77
 
 // Supports:
-//   Brand: Mitsubishi,  Model: TV
-//   Brand: Mitsubishi,  Model: HC3000 Projector
+//   Brand: Mitsubishi,  Model: TV (MITSUBISHI)
+//   Brand: Mitsubishi,  Model: HC3000 Projector (MITSUBISHI2)
 //   Brand: Mitsubishi,  Model: MS-GK24VA A/C
 //   Brand: Mitsubishi,  Model: KM14A 0179213 remote
-//   Brand: Mitsubishi Electric,  Model: PEAD-RP71JAA Ducted A/C
-//   Brand: Mitsubishi Electric,  Model: 001CP T7WE10714 remote
-//   Brand: Mitsubishi Electric,  Model: MSH-A24WV / MUH-A24WV A/C
-//   Brand: Mitsubishi Electric,  Model: KPOA remote
+//   Brand: Mitsubishi Electric,  Model: PEAD-RP71JAA Ducted A/C (MITSUBISHI136)
+//   Brand: Mitsubishi Electric,  Model: 001CP T7WE10714 remote (MITSUBISHI136)
+//   Brand: Mitsubishi Electric,  Model: MSH-A24WV A/C (MITSUBISHI112)
+//   Brand: Mitsubishi Electric,  Model: MUH-A24WV A/C (MITSUBISHI112)
+//   Brand: Mitsubishi Electric,  Model: KPOA remote (MITSUBISHI112)
 
 #ifndef IR_MITSUBISHI_H_
 #define IR_MITSUBISHI_H_
@@ -28,8 +40,6 @@
 #include "IRsend_test.h"
 #endif
 
-// Mitsubishi (TV) decoding added from https://github.com/z3t0/Arduino-IRremote
-// Mitsubishi (TV) sending & Mitsubishi A/C support added by David Conran
 
 // Constants
 const uint8_t kMitsubishiAcModeOffset = 3;
@@ -151,6 +161,10 @@ const uint8_t kMitsubishi112SwingHAuto =                 0b1100;
 #define MITSUBISHI_AC_COOL kMitsubishiAcCool
 #define MITSUBISHI_AC_AUTO kMitsubishiAcAuto
 
+
+/// Class for handling detailed Mitsubishi 144-bit A/C messages.
+/// @note Inspired and derived from the work done at: https://github.com/r45635/HVAC-IR-Control
+/// @warning Consider this very alpha code. Seems to work, but not validated.
 class IRMitsubishiAC {
  public:
   explicit IRMitsubishiAC(const uint16_t pin, const bool inverted = false,
@@ -159,6 +173,10 @@ class IRMitsubishiAC {
   static bool validChecksum(const uint8_t* data);
 #if SEND_MITSUBISHI_AC
   void send(const uint16_t repeat = kMitsubishiACMinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHI_AC
   void begin(void);
@@ -199,24 +217,29 @@ class IRMitsubishiAC {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  uint8_t remote_state[kMitsubishiACStateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kMitsubishiACStateLength];  ///< The state in code form.
   void checksum(void);
   static uint8_t calculateChecksum(const uint8_t* data);
 };
 
+/// Class for handling detailed Mitsubishi 136-bit A/C messages.
 class IRMitsubishi136 {
  public:
   explicit IRMitsubishi136(const uint16_t pin, const bool inverted = false,
                            const bool use_modulation = true);
-
-
   void stateReset(void);
 #if SEND_MITSUBISHI136
   void send(const uint16_t repeat = kMitsubishi136MinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHI136
   void begin(void);
@@ -249,24 +272,28 @@ class IRMitsubishi136 {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  uint8_t remote_state[kMitsubishi136StateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kMitsubishi136StateLength];  ///< The state in code form.
   void checksum(void);
 };
 
-
+/// Class for handling detailed Mitsubishi 122-bit A/C messages.
 class IRMitsubishi112 {
  public:
   explicit IRMitsubishi112(const uint16_t pin, const bool inverted = false,
                            const bool use_modulation = true);
-
-
   void stateReset(void);
 #if SEND_MITSUBISHI112
   void send(const uint16_t repeat = kMitsubishi112MinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHI112
   void begin(void);
@@ -301,11 +328,13 @@ class IRMitsubishi112 {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  uint8_t remote_state[kMitsubishi112StateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kMitsubishi112StateLength];  ///< The state in code form.
   void checksum(void);
 };
 

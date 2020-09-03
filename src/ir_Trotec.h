@@ -1,6 +1,15 @@
 // Copyright 2017 stufisher
 // Copyright 2019 crankyoldgit
 
+/// @file
+/// @brief Support for Trotec protocols.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/279
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1176
+
+// Supports:
+//   Brand: Trotec,  Model: PAC 3200 A/C
+//   Brand: Duux,  Model: Blizzard Smart 10K / DXMA04 A/C
+
 #ifndef IR_TROTEC_H_
 #define IR_TROTEC_H_
 
@@ -62,17 +71,25 @@ const uint8_t kTrotecMaxTimer = 23;
 #define TROTEC_MAX_TEMP kTrotecMaxTemp
 #define TROTEC_MAX_TIMER kTrotecMaxTimer
 
+// Class
+/// Class for handling detailed Trotec A/C messages.
 class IRTrotecESP {
  public:
   explicit IRTrotecESP(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
-
 #if SEND_TROTEC
   void send(const uint16_t repeat = kTrotecDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_TROTEC
   void begin(void);
+  void stateReset(void);
 
+  void on(void);
+  void off(void);
   void setPower(const bool state);
   bool getPower(void);
 
@@ -104,14 +121,15 @@ class IRTrotecESP {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  uint8_t remote_state[kTrotecStateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kTrotecStateLength];  ///< Remote state in IR code form.
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kTrotecStateLength);
-  void stateReset(void);
   void checksum(void);
 };
 

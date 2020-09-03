@@ -1,8 +1,13 @@
 // Copyright 2017, 2019 David Conran
 
+/// @file
+/// @brief Support for LG protocols.
+/// @see https://github.com/arendst/Tasmota/blob/54c2eb283a02e4287640a4595e506bc6eadbd7f2/sonoff/xdrv_05_irremote.ino#L327-438
+
+
 // Supports:
-//   Brand: LG,  Model: 6711A20083V remote
-//   Brand: LG,  Model: AKB74395308 remote
+//   Brand: LG,  Model: 6711A20083V remote (LG)
+//   Brand: LG,  Model: AKB74395308 remote (LG2)
 //   Brand: LG,  Model: S4-W12JA3AA A/C (LG2)
 //   Brand: LG,  Model: AKB75215403 remote (LG2)
 //   Brand: General Electric,  Model: AG1BH09AW101 Split A/C
@@ -27,7 +32,8 @@ const uint8_t kLgAcChecksumOffset = 0;  // Nr. of bits
 const uint8_t kLgAcChecksumSize = kNibbleSize;  // Nr. of bits
 const uint8_t kLgAcFanOffset = 4;  // Nr. of bits
 const uint8_t kLgAcFanSize = 3;  // Nr. of bits
-const uint8_t kLgAcFanLow = 0;     // 0b000
+const uint8_t kLgAcFanLowest = 0;  // 0b000
+const uint8_t kLgAcFanLow = 1;     // 0b001
 const uint8_t kLgAcFanMedium = 2;  // 0b010
 const uint8_t kLgAcFanHigh = 4;    // 0b100
 const uint8_t kLgAcFanAuto = 5;    // 0b101
@@ -53,20 +59,22 @@ const uint8_t kLgAcSignature = 0x88;
 
 const uint32_t kLgAcOffCommand = 0x88C0051;
 
-uint8_t calcLGChecksum(uint16_t data);
-
 // Classes
+/// Class for handling detailed LG A/C messages.
 class IRLgAc {
  public:
   explicit IRLgAc(const uint16_t pin, const bool inverted = false,
                   const bool use_modulation = true);
-
   void stateReset(void);
   static uint8_t calcChecksum(const uint32_t state);
   static bool validChecksum(const uint32_t state);
   bool isValidLgAc(void);
 #if SEND_LG
   void send(const uint16_t repeat = kLgDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_LG
   void begin(void);
@@ -93,12 +101,13 @@ class IRLgAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint32_t remote_state;
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint32_t remote_state;  ///< The state of the IR remote in IR code form.
   uint8_t _temp;
   decode_type_t _protocol;
   void checksum(void);

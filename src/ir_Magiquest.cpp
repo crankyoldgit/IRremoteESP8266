@@ -2,6 +2,11 @@
 // Copyright 2015 kitlaan
 // Copyright 2017 Jason kendall, David Conran
 
+/// @file
+/// @brief Support for MagiQuest protocols.
+/// @see https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
+/// @see https://github.com/mpflaga/Arduino-IRremote
+
 #include "ir_Magiquest.h"
 #include <algorithm>
 #include "IRrecv.h"
@@ -11,25 +16,14 @@
 #define IS_ZERO(m, s) (((m)*100 / ((m) + (s))) <= kMagiQuestZeroRatio)
 #define IS_ONE(m, s) (((m)*100 / ((m) + (s))) >= kMagiQuestOneRatio)
 
-// Strips taken from:
-// https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
-// and
-// https://github.com/mpflaga/Arduino-IRremote
-
-// Source: https://github.com/mpflaga/Arduino-IRremote
-
 #if SEND_MAGIQUEST
-// Send a MagiQuest formatted message.
-//
-// Args:
-//   data:   The contents of the message you want to send.
-//   nbits:  The bit size of the message being sent.
-//           Typically kMagiquestBits.
-//   repeat: The number of times you want the message to be repeated.
-//
-// Status: Alpha / Should be working.
-//
-void IRsend::sendMagiQuest(uint64_t data, uint16_t nbits, uint16_t repeat) {
+/// Send a MagiQuest formatted message.
+/// Status: Beta / Should be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+void IRsend::sendMagiQuest(const uint64_t data, const uint16_t nbits,
+                           const uint16_t repeat) {
   sendGeneric(0, 0,  // No Headers - Technically it's included in the data.
                      // i.e. 8 zeros.
               kMagiQuestMarkOne, kMagiQuestSpaceOne, kMagiQuestMarkZero,
@@ -38,11 +32,15 @@ void IRsend::sendMagiQuest(uint64_t data, uint16_t nbits, uint16_t repeat) {
               kMagiQuestGap, data, nbits, 36, true, repeat, 50);
 }
 
-// Encode a MagiQuest wand_id, and a magnitude into a single 64bit value.
-// (Only 48 bits of real data + 8 leading zero bits)
-// This is suitable for calling sendMagiQuest() with.
-// e.g. sendMagiQuest(encodeMagiQuest(wand_id, magnitude));
-uint64_t IRsend::encodeMagiQuest(uint32_t wand_id, uint16_t magnitude) {
+/// Encode a MagiQuest wand_id, and a magnitude into a single 64bit value.
+/// (Only 48 bits of real data + 8 leading zero bits)
+/// This is suitable for calling sendMagiQuest() with.
+/// e.g. sendMagiQuest(encodeMagiQuest(wand_id, magnitude))
+/// @param[in] wand_id The value for the wand ID.
+/// @param[in] magnitude The value for the magnitude
+/// @return A code suitable for calling sendMagiQuest() with.
+uint64_t IRsend::encodeMagiQuest(const uint32_t wand_id,
+                                 const uint16_t magnitude) {
   uint64_t result = 0;
   result = wand_id;
   result <<= 16;
@@ -51,34 +49,23 @@ uint64_t IRsend::encodeMagiQuest(uint32_t wand_id, uint16_t magnitude) {
   result &= 0xFFFFFFFFFFFFULL;
   return result;
 }
-#endif
-
-// Source:
-// https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
+#endif  // SEND_MAGIQUEST
 
 #if DECODE_MAGIQUEST
-// Decode the supplied MagiQuest message.
-// MagiQuest protocol appears to be a header of 8 'zero' bits, followed
-// by 32 bits of "wand ID" and finally 16 bits of "magnitude".
-// Even though we describe this protocol as 56 bits, it really only has
-// 48 bits of data that matter.
-//
-// In transmission order, 8 zeros + 32 wand_id + 16 magnitude.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion, inc. the 8 bit header.
-//            Typically kMagiquestBits.
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Alpha / Should work.
-//
-// Ref:
-//   https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
+/// Decode the supplied MagiQuest message.
+/// Status: Beta / Should work.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note MagiQuest protocol appears to be a header of 8 'zero' bits, followed
+/// by 32 bits of "wand ID" and finally 16 bits of "magnitude".
+/// Even though we describe this protocol as 56 bits, it really only has
+/// 48 bits of data that matter.
+/// In transmission order, 8 zeros + 32 wand_id + 16 magnitude.
+/// @see https://github.com/kitlaan/Arduino-IRremote/blob/master/ir_Magiquest.cpp
 bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   uint16_t bits = 0;
@@ -164,4 +151,4 @@ bool IRrecv::decodeMagiQuest(decode_results *results, uint16_t offset,
   results->command = data & 0xFFFF;  // Magnitude
   return true;
 }
-#endif
+#endif  // DECODE_MAGIQUEST

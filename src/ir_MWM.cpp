@@ -1,8 +1,12 @@
 // Copyright 2018 Brett T. Warden
 
-// MWM
+/// @file
+/// @brief Disney Made With Magic (MWM) Support
+/// derived from ir_Lasertag.cpp
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/557
 
-// derived from ir_Lasertag.cpp, Copyright 2017 David Conran
+// Supports:
+//   Brand: Disney,  Model: Made With Magic (Glow With The Show) wand
 
 #include <algorithm>
 #include "IRrecv.h"
@@ -23,17 +27,13 @@ const int16_t kSpace = 1;
 const int16_t kMark = 0;
 
 #if SEND_MWM
-// Send a MWM packet.
-// This protocol is 2400 bps serial, 1 start bit (mark), 1 stop bit (space), no
-// parity
-//
-// Args:
-//   data:    The message you wish to send.
-//   nbits:   Bit size of the protocol you want to send.
-//   repeat:  Nr. of extra times the data will be sent.
-//
-// Status: Implemented.
-//
+/// Send a MWM packet/message.
+/// Status: Implemented.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note This protocol is 2400 bps serial, 1 start bit (mark),
+///   1 stop bit (space), no parity
 void IRsend::sendMWM(const uint8_t data[], const uint16_t nbytes,
                      const uint16_t repeat) {
   if (nbytes < 3) return;  // Shortest possible message is 3 bytes
@@ -68,21 +68,16 @@ void IRsend::sendMWM(const uint8_t data[], const uint16_t nbytes,
 #endif  // SEND_MWM
 
 #if DECODE_MWM
-// Decode the supplied MWM message.
-// This protocol is 2400 bps serial, 1 start bit (mark), 1 stop bit (space), no
-// parity
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Implemented.
-//
+/// Decode the supplied MWM message.
+/// Status: Implemented.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note This protocol is 2400 bps serial, 1 start bit (mark),
+///   1 stop bit (space), no parity
 bool IRrecv::decodeMWM(decode_results *results, uint16_t offset,
                        const uint16_t nbits, const bool strict) {
   DPRINTLN("DEBUG: decodeMWM");

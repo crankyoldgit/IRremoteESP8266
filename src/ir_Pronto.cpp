@@ -1,6 +1,14 @@
 // Copyright 2017 David Conran
 
-// Pronto code message generation
+/// @file
+/// @brief Pronto code message generation
+/// @see http://www.etcwiki.org/wiki/Pronto_Infrared_Format
+/// @see http://www.remotecentral.com/features/irdisp2.htm
+/// @see http://harctoolbox.org/Glossary.html#ProntoSemantics
+/// @see https://irdb.globalcache.com/
+
+// Supports:
+//   Brand: Pronto,  Model: Pronto Hex
 
 #include <algorithm>
 #include "IRsend.h"
@@ -14,42 +22,37 @@ const uint16_t kProntoSeq2LenOffset = 3;
 const uint16_t kProntoDataOffset = 4;
 
 #if SEND_PRONTO
-// Send a Pronto Code formatted message.
-//
-// Args:
-//   data: An array of uint16_t containing the pronto codes.
-//   len: Nr. of entries in the data[] array.
-//   repeat: Nr. of times to repeat the message.
-//
-// Status: STABLE / Known working.
-//
-// Note:
-//   Pronto codes are typically represented in hexadecimal.
-//   You will need to convert the code to an array of integers, and calculate
-//   it's length.
-//   e.g.
-//      A Sony 20 bit DVD remote command.
-//      "0000 0067 0000 0015 0060 0018 0018 0018 0030 0018 0030 0018 0030 0018
-//       0018 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0030 0018
-//       0030 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018
-//       0030 0018 0018 03f6"
-//
-//   converts to:
-//
-//       uint16_t prontoCode[46] = {
-//           0x0000, 0x0067, 0x0000, 0x0015,
-//           0x0060, 0x0018, 0x0018, 0x0018, 0x0030, 0x0018, 0x0030, 0x0018,
-//           0x0030, 0x0018, 0x0018, 0x0018, 0x0030, 0x0018, 0x0018, 0x0018,
-//           0x0018, 0x0018, 0x0030, 0x0018, 0x0018, 0x0018, 0x0030, 0x0018,
-//           0x0030, 0x0018, 0x0030, 0x0018, 0x0018, 0x0018, 0x0018, 0x0018,
-//           0x0030, 0x0018, 0x0018, 0x0018, 0x0018, 0x0018, 0x0030, 0x0018,
-//           0x0018, 0x03f6};
-//       // Send the Pronto(Sony) code. Repeat twice as Sony's require that.
-//       sendPronto(prontoCode, 46, kSonyMinRepeat);
-//
-// Ref:
-//   http://www.etcwiki.org/wiki/Pronto_Infrared_Format
-//   http://www.remotecentral.com/features/irdisp2.htm
+/// Send a Pronto Code formatted message.
+/// Status: STABLE / Known working.
+/// @param[in] data An array of uint16_t containing the pronto codes.
+/// @param[in] len Nr. of entries in the data[] array.
+/// @param[in] repeat Nr. of times to repeat the message.
+/// @note Pronto codes are typically represented in hexadecimal.
+///   You will need to convert the code to an array of integers, and calculate
+///   it's length.
+///   e.g.
+/// @code
+///      A Sony 20 bit DVD remote command.
+///      "0000 0067 0000 0015 0060 0018 0018 0018 0030 0018 0030 0018 0030 0018
+///       0018 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0030 0018
+///       0030 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018
+///       0030 0018 0018 03f6"
+/// @endcode
+///   converts to:
+/// @code{.cpp}
+///       uint16_t prontoCode[46] = {
+///           0x0000, 0x0067, 0x0000, 0x0015,
+///           0x0060, 0x0018, 0x0018, 0x0018, 0x0030, 0x0018, 0x0030, 0x0018,
+///           0x0030, 0x0018, 0x0018, 0x0018, 0x0030, 0x0018, 0x0018, 0x0018,
+///           0x0018, 0x0018, 0x0030, 0x0018, 0x0018, 0x0018, 0x0030, 0x0018,
+///           0x0030, 0x0018, 0x0030, 0x0018, 0x0018, 0x0018, 0x0018, 0x0018,
+///           0x0030, 0x0018, 0x0018, 0x0018, 0x0018, 0x0018, 0x0030, 0x0018,
+///           0x0018, 0x03f6};
+///       // Send the Pronto(Sony) code. Repeat twice as Sony's require that.
+///       sendPronto(prontoCode, 46, kSonyMinRepeat);
+/// @endcode
+/// @see http://www.etcwiki.org/wiki/Pronto_Infrared_Format
+/// @see http://www.remotecentral.com/features/irdisp2.htm
 void IRsend::sendPronto(uint16_t data[], uint16_t len, uint16_t repeat) {
   // Check we have enough data to work out what to send.
   if (len < kProntoMinLength) return;
@@ -101,4 +104,4 @@ void IRsend::sendPronto(uint16_t data[], uint16_t len, uint16_t repeat) {
       }
   }
 }
-#endif
+#endif  // SEND_PRONTO

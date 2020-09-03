@@ -15,25 +15,16 @@
 #endif
 #include "IRtimer.h"
 
-// Originally from https://github.com/shirriff/Arduino-IRremote/
-// Updated by markszabo (https://github.com/crankyoldgit/IRremoteESP8266) for
-// sending IR code on ESP8266
-
-// IRsend ----------------------------------------------------------------------
-// Create an IRsend object.
-//
-// Args:
-//   IRsendPin:  Which GPIO pin to use when sending an IR command.
-//   inverted:   *DANGER* Optional flag to invert the output. (default = false)
-//               e.g. LED is illuminated when GPIO is LOW rather than HIGH.
-//               Setting this to something other than the default could
-//               easily destroy your IR LED if you are overdriving it.
-//               Unless you *REALLY* know what you are doing, don't change this.
-//   use_modulation: Do we do frequency modulation during transmission?
-//                   i.e. If not, assume a 100% duty cycle. Ignore attempts
-//                        to change the duty cycle etc.
-// Returns:
-//   An IRsend object.
+/// Constructor for an IRsend object.
+/// @param[in] IRsendPin Which GPIO pin to use when sending an IR command.
+/// @param[in] inverted Optional flag to invert the output. (default = false)
+///  e.g. LED is illuminated when GPIO is LOW rather than HIGH.
+/// @warning Setting `inverted` to something other than the default could
+///  easily destroy your IR LED if you are overdriving it.
+///  Unless you *REALLY* know what you are doing, don't change this.
+/// @param[in] use_modulation Do we do frequency modulation during transmission?
+///  i.e. If not, assume a 100% duty cycle. Ignore attempts to change the
+///  duty cycle etc.
 IRsend::IRsend(uint16_t IRsendPin, bool inverted, bool use_modulation)
     : IRpin(IRsendPin), periodOffset(kPeriodOffset) {
   if (inverted) {
@@ -50,7 +41,7 @@ IRsend::IRsend(uint16_t IRsendPin, bool inverted, bool use_modulation)
     _dutycycle = kDutyMax;
 }
 
-// Enable the pin for output.
+/// Enable the pin for output.
 void IRsend::begin() {
 #ifndef UNIT_TEST
   pinMode(IRpin, OUTPUT);
@@ -58,27 +49,25 @@ void IRsend::begin() {
   ledOff();  // Ensure the LED is in a known safe state when we start.
 }
 
-// Turn off the IR LED.
+/// Turn off the IR LED.
 void IRsend::ledOff() {
 #ifndef UNIT_TEST
   digitalWrite(IRpin, outputOff);
 #endif
 }
 
-// Turn on the IR LED.
+/// Turn on the IR LED.
 void IRsend::ledOn() {
 #ifndef UNIT_TEST
   digitalWrite(IRpin, outputOn);
 #endif
 }
 
-// Calculate the period for a given frequency. (T = 1/f)
-//
-// Args:
-//   freq: Frequency in Hz.
-//   use_offset: Should we use the calculated offset or not?
-// Returns:
-//   nr. of uSeconds.
+/// Calculate the period for a given frequency.
+/// @param[in] hz Frequency in Hz.
+/// @param[in] use_offset Should we use the calculated offset or not?
+/// @return nr. of uSeconds.
+/// @note (T = 1/f)
 uint32_t IRsend::calcUSecPeriod(uint32_t hz, bool use_offset) {
   if (hz == 0) hz = 1;  // Avoid Zero hz. Divide by Zero is nasty.
   uint32_t period =
@@ -90,17 +79,16 @@ uint32_t IRsend::calcUSecPeriod(uint32_t hz, bool use_offset) {
     return std::max((uint32_t)1, period);
 }
 
-// Set the output frequency modulation and duty cycle.
-//
-// Args:
-//   freq: The freq we want to modulate at. Assumes < 1000 means kHz else Hz.
-//   duty: Percentage duty cycle of the LED. e.g. 25 = 25% = 1/4 on, 3/4 off.
-//         This is ignored if modulation is disabled at object instantiation.
-//
-// Note:
-//   Integer timing functions & math mean we can't do fractions of
-//   microseconds timing. Thus minor changes to the freq & duty values may have
-//   limited effect. You've been warned.
+/// Set the output frequency modulation and duty cycle.
+/// @param[in] freq The freq we want to modulate at.
+///  Assumes < 1000 means kHz else Hz.
+/// @param[in] duty Percentage duty cycle of the LED.
+///   e.g. 25 = 25% = 1/4 on, 3/4 off.
+///   If you are not sure, try 50 percent.
+///   This is ignored if modulation is disabled at object instantiation.
+/// @note Integer timing functions & math mean we can't do fractions of
+///  microseconds timing. Thus minor changes to the freq & duty values may have
+///  limited effect. You've been warned.
 void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
   // Set the duty cycle to use if we want freq. modulation.
   if (modulation) {
@@ -121,9 +109,8 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
 }
 
 #if ALLOW_DELAY_CALLS
-// An ESP8266 RTOS watch-dog timer friendly version of delayMicroseconds().
-// Args:
-//   usec: Nr. of uSeconds to delay for.
+/// An ESP8266 RTOS watch-dog timer friendly version of delayMicroseconds().
+/// @param[in] usec Nr. of uSeconds to delay for.
 void IRsend::_delayMicroseconds(uint32_t usec) {
   // delayMicroseconds() is only accurate to 16383us.
   // Ref: https://www.arduino.cc/en/Reference/delayMicroseconds
@@ -141,13 +128,10 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
   }
 }
 #else  // ALLOW_DELAY_CALLS
-// A version of delayMicroseconds() that handles large values and does NOT use
-// the watch-dog friendly delay() calls where appropriate.
-// Args:
-//   usec: Nr. of uSeconds to delay for.
-//
-// NOTE: Use this only if you know what you are doing as it may cause the WDT
-//       to reset the ESP8266.
+/// A version of delayMicroseconds() that handles large values and does NOT use
+/// the watch-dog friendly delay() calls where appropriate.
+/// @note Use this only if you know what you are doing as it may cause the WDT
+///  to reset the ESP8266.
 void IRsend::_delayMicroseconds(uint32_t usec) {
   for (; usec > kMaxAccurateUsecDelay; usec -= kMaxAccurateUsecDelay)
 #ifndef UNIT_TEST
@@ -157,22 +141,19 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
 }
 #endif  // ALLOW_DELAY_CALLS
 
-// Modulate the IR LED for the given period (usec) and at the duty cycle set.
-//
-// Args:
-//   usec: The period of time to modulate the IR LED for, in microseconds.
-// Returns:
-//   Nr. of pulses actually sent.
-//
-// Note:
-//   The ESP8266 has no good way to do hardware PWM, so we have to do it all
-//   in software. There is a horrible kludge/brilliant hack to use the second
-//   serial TX line to do fairly accurate hardware PWM, but it is only
-//   available on a single specific GPIO and only available on some modules.
-//   e.g. It's not available on the ESP-01 module.
-//   Hence, for greater compatibility & choice, we don't use that method.
-// Ref:
-//   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
+/// Modulate the IR LED for the given period (usec) and at the duty cycle set.
+/// @param[in] usec The period of time to modulate the IR LED for, in
+///  microseconds.
+/// @return Nr. of pulses actually sent.
+/// @note
+///   The ESP8266 has no good way to do hardware PWM, so we have to do it all
+///   in software. There is a horrible kludge/brilliant hack to use the second
+///   serial TX line to do fairly accurate hardware PWM, but it is only
+///   available on a single specific GPIO and only available on some modules.
+///   e.g. It's not available on the ESP-01 module.
+///   Hence, for greater compatibility & choice, we don't use that method.
+/// Ref:
+///   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
 uint16_t IRsend::mark(uint16_t usec) {
   // Handle the simple case of no required frequency modulation.
   if (!modulation || _dutycycle >= 100) {
@@ -206,31 +187,23 @@ uint16_t IRsend::mark(uint16_t usec) {
   return counter;
 }
 
-// Turn the pin (LED) off for a given time.
-// Sends an IR space for the specified number of microseconds.
-// A space is no output, so the PWM output is disabled.
-//
-// Args:
-//   time: Time in microseconds (us).
+/// Turn the pin (LED) off for a given time.
+/// Sends an IR space for the specified number of microseconds.
+/// A space is no output, so the PWM output is disabled.
+/// @param[in] time Time in microseconds (us).
 void IRsend::space(uint32_t time) {
   ledOff();
   if (time == 0) return;
   _delayMicroseconds(time);
 }
 
-// Calculate & set any offsets to account for execution times.
-//
-// Args:
-//   hz: The frequency to calibrate at >= 1000Hz. Default is 38000Hz.
-//
-// Returns:
-//   The calculated period offset (in uSeconds) which is now in use. e.g. -5.
-//
-// Status:  Stable / Working.
-//
-// NOTE:
-//   This will generate an 65535us mark() IR LED signal.
-//   This only needs to be called once, if at all.
+/// Calculate & set any offsets to account for execution times during sending.
+///
+/// @param[in] hz The frequency to calibrate at >= 1000Hz. Default is 38000Hz.
+/// @return The calculated period offset (in uSeconds) which is now in use.
+///  e.g. -5.
+/// @note This will generate an 65535us mark() IR LED signal.
+///  This only needs to be called once, if at all.
 int8_t IRsend::calibrate(uint16_t hz) {
   if (hz < 1000)  // Were we given kHz? Supports the old call usage.
     hz *= 1000;
@@ -259,18 +232,17 @@ int8_t IRsend::calibrate(uint16_t hz) {
   return periodOffset;
 }
 
-// Generic method for sending data that is common to most protocols.
-// Will send leading or trailing 0's if the nbits is larger than the number
-// of bits in data.
-//
-// Args:
-//   onemark:    Nr. of usecs for the led to be pulsed for a '1' bit.
-//   onespace:   Nr. of usecs for the led to be fully off for a '1' bit.
-//   zeromark:   Nr. of usecs for the led to be pulsed for a '0' bit.
-//   zerospace:  Nr. of usecs for the led to be fully off for a '0' bit.
-//   data:       The data to be transmitted.
-//   nbits:      Nr. of bits of data to be sent.
-//   MSBfirst:   Flag for bit transmission order. Defaults to MSB->LSB order.
+/// Generic method for sending data that is common to most protocols.
+/// Will send leading or trailing 0's if the nbits is larger than the number
+/// of bits in data.
+/// @param[in] onemark Nr. of usecs for the led to be pulsed for a '1' bit.
+/// @param[in] onespace Nr. of usecs for the led to be fully off for a '1' bit.
+/// @param[in] zeromark Nr. of usecs for the led to be pulsed for a '0' bit.
+/// @param[in] zerospace Nr. of usecs for the led to be fully off for a '0' bit.
+/// @param[in] data The data to be transmitted.
+/// @param[in] nbits Nr. of bits of data to be sent.
+/// @param[in] MSBfirst Flag for bit transmission order.
+///   Defaults to MSB->LSB order.
 void IRsend::sendData(uint16_t onemark, uint32_t onespace, uint16_t zeromark,
                       uint32_t zerospace, uint64_t data, uint16_t nbits,
                       bool MSBfirst) {
@@ -304,35 +276,34 @@ void IRsend::sendData(uint16_t onemark, uint32_t onespace, uint16_t zeromark,
   }
 }
 
-// Generic method for sending simple protocol messages.
-// Will send leading or trailing 0's if the nbits is larger than the number
-// of bits in data.
-//
-// Args:
-//   headermark:  Nr. of usecs for the led to be pulsed for the header mark.
-//                A value of 0 means no header mark.
-//   headerspace: Nr. of usecs for the led to be off after the header mark.
-//                A value of 0 means no header space.
-//   onemark:     Nr. of usecs for the led to be pulsed for a '1' bit.
-//   onespace:    Nr. of usecs for the led to be fully off for a '1' bit.
-//   zeromark:    Nr. of usecs for the led to be pulsed for a '0' bit.
-//   zerospace:   Nr. of usecs for the led to be fully off for a '0' bit.
-//   footermark:  Nr. of usecs for the led to be pulsed for the footer mark.
-//                A value of 0 means no footer mark.
-//   gap:         Nr. of usecs for the led to be off after the footer mark.
-//                This is effectively the gap between messages.
-//                A value of 0 means no gap space.
-//   data:        The data to be transmitted.
-//   nbits:       Nr. of bits of data to be sent.
-//   frequency:   The frequency we want to modulate at.
-//                Assumes < 1000 means kHz otherwise it is in Hz.
-//                Most common value is 38000 or 38, for 38kHz.
-//   MSBfirst:    Flag for bit transmission order. Defaults to MSB->LSB order.
-//   repeat:      Nr. of extra times the message will be sent.
-//                e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
-//   dutycycle:   Percentage duty cycle of the LED.
-//                e.g. 25 = 25% = 1/4 on, 3/4 off.
-//                If you are not sure, try 50 percent.
+/// Generic method for sending simple protocol messages.
+/// Will send leading or trailing 0's if the nbits is larger than the number
+/// of bits in data.
+/// @param[in] headermark Nr. of usecs for the led to be pulsed for the header
+///   mark. A value of 0 means no header mark.
+/// @param[in] headerspace Nr. of usecs for the led to be off after the header
+///   mark. A value of 0 means no header space.
+/// @param[in] onemark Nr. of usecs for the led to be pulsed for a '1' bit.
+/// @param[in] onespace Nr. of usecs for the led to be fully off for a '1' bit.
+/// @param[in] zeromark Nr. of usecs for the led to be pulsed for a '0' bit.
+/// @param[in] zerospace Nr. of usecs for the led to be fully off for a '0' bit.
+/// @param[in] footermark Nr. of usecs for the led to be pulsed for the footer
+///   mark. A value of 0 means no footer mark.
+/// @param[in] gap Nr. of usecs for the led to be off after the footer mark.
+///   This is effectively the gap between messages.
+///   A value of 0 means no gap space.
+/// @param[in] data The data to be transmitted.
+/// @param[in] nbits Nr. of bits of data to be sent.
+/// @param[in] frequency The frequency we want to modulate at. (Hz/kHz)
+/// @param[in] MSBfirst Flag for bit transmission order.
+///   Defaults to MSB->LSB order.
+/// @param[in] repeat Nr. of extra times the message will be sent.
+///   e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
+/// @param[in] dutycycle Percentage duty cycle of the LED.
+///   e.g. 25 = 25% = 1/4 on, 3/4 off.
+///   If you are not sure, try 50 percent.
+/// @note Assumes a frequency < 1000 means kHz otherwise it is in Hz.
+///   Most common value is 38000 or 38, for 38kHz.
 void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
                          const uint16_t onemark, const uint32_t onespace,
                          const uint16_t zeromark, const uint32_t zerospace,
@@ -345,36 +316,36 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
               dutycycle);
 }
 
-// Generic method for sending simple protocol messages.
-// Will send leading or trailing 0's if the nbits is larger than the number
-// of bits in data.
-//
-// Args:
-//   headermark:  Nr. of usecs for the led to be pulsed for the header mark.
-//                A value of 0 means no header mark.
-//   headerspace: Nr. of usecs for the led to be off after the header mark.
-//                A value of 0 means no header space.
-//   onemark:     Nr. of usecs for the led to be pulsed for a '1' bit.
-//   onespace:    Nr. of usecs for the led to be fully off for a '1' bit.
-//   zeromark:    Nr. of usecs for the led to be pulsed for a '0' bit.
-//   zerospace:   Nr. of usecs for the led to be fully off for a '0' bit.
-//   footermark:  Nr. of usecs for the led to be pulsed for the footer mark.
-//                A value of 0 means no footer mark.
-//   gap:         Min. nr. of usecs for the led to be off after the footer mark.
-//                This is effectively the absolute minimum gap between messages.
-//   mesgtime:    Min. nr. of usecs a single message needs to be.
-//                This is effectively the min. total length of a single message.
-//   data:        The data to be transmitted.
-//   nbits:       Nr. of bits of data to be sent.
-//   frequency:   The frequency we want to modulate at.
-//                Assumes < 1000 means kHz otherwise it is in Hz.
-//                Most common value is 38000 or 38, for 38kHz.
-//   MSBfirst:    Flag for bit transmission order. Defaults to MSB->LSB order.
-//   repeat:      Nr. of extra times the message will be sent.
-//                e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
-//   dutycycle:   Percentage duty cycle of the LED.
-//                e.g. 25 = 25% = 1/4 on, 3/4 off.
-//                If you are not sure, try 50 percent.
+/// Generic method for sending simple protocol messages.
+/// Will send leading or trailing 0's if the nbits is larger than the number
+/// of bits in data.
+/// @param[in] headermark Nr. of usecs for the led to be pulsed for the header
+///   mark. A value of 0 means no header mark.
+/// @param[in] headerspace Nr. of usecs for the led to be off after the header
+///   mark. A value of 0 means no header space.
+/// @param[in] onemark Nr. of usecs for the led to be pulsed for a '1' bit.
+/// @param[in] onespace Nr. of usecs for the led to be fully off for a '1' bit.
+/// @param[in] zeromark Nr. of usecs for the led to be pulsed for a '0' bit.
+/// @param[in] zerospace Nr. of usecs for the led to be fully off for a '0' bit.
+/// @param[in] footermark Nr. of usecs for the led to be pulsed for the footer
+///   mark. A value of 0 means no footer mark.
+/// @param[in] gap Nr. of usecs for the led to be off after the footer mark.
+///   This is effectively the gap between messages.
+///   A value of 0 means no gap space.
+/// @param[in] mesgtime Min. nr. of usecs a single message needs to be.
+///   This is effectively the min. total length of a single message.
+/// @param[in] data The data to be transmitted.
+/// @param[in] nbits Nr. of bits of data to be sent.
+/// @param[in] frequency The frequency we want to modulate at. (Hz/kHz)
+/// @param[in] MSBfirst Flag for bit transmission order.
+///   Defaults to MSB->LSB order.
+/// @param[in] repeat Nr. of extra times the message will be sent.
+///   e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
+/// @param[in] dutycycle Percentage duty cycle of the LED.
+///   e.g. 25 = 25% = 1/4 on, 3/4 off.
+///   If you are not sure, try 50 percent.
+/// @note Assumes a frequency < 1000 means kHz otherwise it is in Hz.
+///   Most common value is 38000 or 38, for 38kHz.
 void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
                          const uint16_t onemark, const uint32_t onespace,
                          const uint16_t zeromark, const uint32_t zerospace,
@@ -409,33 +380,32 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
   }
 }
 
-// Generic method for sending simple protocol messages.
-//
-// Args:
-//   headermark:  Nr. of usecs for the led to be pulsed for the header mark.
-//                A value of 0 means no header mark.
-//   headerspace: Nr. of usecs for the led to be off after the header mark.
-//                A value of 0 means no header space.
-//   onemark:     Nr. of usecs for the led to be pulsed for a '1' bit.
-//   onespace:    Nr. of usecs for the led to be fully off for a '1' bit.
-//   zeromark:    Nr. of usecs for the led to be pulsed for a '0' bit.
-//   zerospace:   Nr. of usecs for the led to be fully off for a '0' bit.
-//   footermark:  Nr. of usecs for the led to be pulsed for the footer mark.
-//                A value of 0 means no footer mark.
-//   gap:         Nr. of usecs for the led to be off after the footer mark.
-//                This is effectively the gap between messages.
-//                A value of 0 means no gap space.
-//   dataptr:     Pointer to the data to be transmitted.
-//   nbytes:      Nr. of bytes of data to be sent.
-//   frequency:   The frequency we want to modulate at.
-//                Assumes < 1000 means kHz otherwise it is in Hz.
-//                Most common value is 38000 or 38, for 38kHz.
-//   MSBfirst:    Flag for bit transmission order. Defaults to MSB->LSB order.
-//   repeat:      Nr. of extra times the message will be sent.
-//                e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
-//   dutycycle:   Percentage duty cycle of the LED.
-//                e.g. 25 = 25% = 1/4 on, 3/4 off.
-//                If you are not sure, try 50 percent.
+/// Generic method for sending simple protocol messages.
+/// @param[in] headermark Nr. of usecs for the led to be pulsed for the header
+///   mark. A value of 0 means no header mark.
+/// @param[in] headerspace Nr. of usecs for the led to be off after the header
+///   mark. A value of 0 means no header space.
+/// @param[in] onemark Nr. of usecs for the led to be pulsed for a '1' bit.
+/// @param[in] onespace Nr. of usecs for the led to be fully off for a '1' bit.
+/// @param[in] zeromark Nr. of usecs for the led to be pulsed for a '0' bit.
+/// @param[in] zerospace Nr. of usecs for the led to be fully off for a '0' bit.
+/// @param[in] footermark Nr. of usecs for the led to be pulsed for the footer
+///   mark. A value of 0 means no footer mark.
+/// @param[in] gap Nr. of usecs for the led to be off after the footer mark.
+///   This is effectively the gap between messages.
+///   A value of 0 means no gap space.
+/// @param[in] dataptr Pointer to the data to be transmitted.
+/// @param[in] nbytes Nr. of bytes of data to be sent.
+/// @param[in] frequency The frequency we want to modulate at. (Hz/kHz)
+/// @param[in] MSBfirst Flag for bit transmission order.
+///   Defaults to MSB->LSB order.
+/// @param[in] repeat Nr. of extra times the message will be sent.
+///   e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
+/// @param[in] dutycycle Percentage duty cycle of the LED.
+///   e.g. 25 = 25% = 1/4 on, 3/4 off.
+///   If you are not sure, try 50 percent.
+/// @note Assumes a frequency < 1000 means kHz otherwise it is in Hz.
+///   Most common value is 38000 or 38, for 38kHz.
 void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
                          const uint16_t onemark, const uint32_t onespace,
                          const uint16_t zeromark, const uint32_t zerospace,
@@ -462,16 +432,16 @@ void IRsend::sendGeneric(const uint16_t headermark, const uint32_t headerspace,
   }
 }
 
-// Generic method for sending Manchester code data.
-// Will send leading or trailing 0's if the nbits is larger than the number
-// of bits in data.
-//
-// Args:
-//   half_period: Nr. of uSeconds for half the clock's period. (1/2 wavelength)
-//   data:        The data to be transmitted.
-//   nbits:       Nr. of bits of data to be sent.
-//   MSBfirst:    Flag for bit transmission order. Defaults to MSB->LSB order.
-//   GEThomas:    Use G.E. Thomas (true/default) or IEEE 802.3 (false).
+/// Generic method for sending Manchester code data.
+/// Will send leading or trailing 0's if the nbits is larger than the number
+/// of bits in data.
+/// @param[in] half_period Nr. of uSeconds for half the clock's period.
+///   (1/2 wavelength)
+/// @param[in] data The data to be transmitted.
+/// @param[in] nbits Nr. of bits of data to be sent.
+/// @param[in] MSBfirst Flag for bit transmission order.
+///   Defaults to MSB->LSB order.
+/// @param[in] GEThomas Use G.E. Thomas (true/default) or IEEE 802.3 (false).
 void IRsend::sendManchesterData(const uint16_t half_period,
                                 const uint64_t data,
                                 const uint16_t nbits, const bool MSBfirst,
@@ -508,32 +478,31 @@ void IRsend::sendManchesterData(const uint16_t half_period,
   }
 }
 
-// Generic method for sending Manchester code messages.
-// Will send leading or trailing 0's if the nbits is larger than the number
-// of bits in data.
-//
-// Args:
-//   headermark:  Nr. of usecs for the led to be pulsed for the header mark.
-//                A value of 0 means no header mark.
-//   headerspace: Nr. of usecs for the led to be off after the header mark.
-//                A value of 0 means no header space.
-//   half_period: Nr. of uSeconds for half the clock's period. (1/2 wavelength)
-//   footermark:  Nr. of usecs for the led to be pulsed for the footer mark.
-//                A value of 0 means no footer mark.
-//   gap:         Min. nr. of usecs for the led to be off after the footer mark.
-//                This is effectively the absolute minimum gap between messages.
-//   data:        The data to be transmitted.
-//   nbits:       Nr. of bits of data to be sent.
-//   frequency:   The frequency we want to modulate at.
-//                Assumes < 1000 means kHz otherwise it is in Hz.
-//                Most common value is 38000 or 38, for 38kHz.
-//   MSBfirst:    Flag for bit transmission order. Defaults to MSB->LSB order.
-//   repeat:      Nr. of extra times the message will be sent.
-//                e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
-//   dutycycle:   Percentage duty cycle of the LED.
-//                e.g. 25 = 25% = 1/4 on, 3/4 off.
-//                If you are not sure, try 50 percent.
-//   GEThomas:    Use G.E. Thomas (true/default) or IEEE 802.3 (false).
+/// Generic method for sending Manchester code messages.
+/// Will send leading or trailing 0's if the nbits is larger than the number
+/// @param[in] headermark Nr. of usecs for the led to be pulsed for the header
+///   mark. A value of 0 means no header mark.
+/// @param[in] headerspace Nr. of usecs for the led to be off after the header
+///   mark. A value of 0 means no header space.
+/// @param[in] half_period Nr. of uSeconds for half the clock's period.
+///   (1/2 wavelength)
+/// @param[in] footermark Nr. of usecs for the led to be pulsed for the footer
+///   mark. A value of 0 means no footer mark.
+/// @param[in] gap Min. nr. of usecs for the led to be off after the footer
+///   mark. This is effectively the absolute minimum gap between messages.
+/// @param[in] data The data to be transmitted.
+/// @param[in] nbits Nr. of bits of data to be sent.
+/// @param[in] frequency The frequency we want to modulate at. (Hz/kHz)
+/// @param[in] MSBfirst Flag for bit transmission order.
+///   Defaults to MSB->LSB order.
+/// @param[in] repeat Nr. of extra times the message will be sent.
+///   e.g. 0 = 1 message sent, 1 = 1 initial + 1 repeat = 2 messages
+/// @param[in] dutycycle Percentage duty cycle of the LED.
+///   e.g. 25 = 25% = 1/4 on, 3/4 off.
+///   If you are not sure, try 50 percent.
+/// @param[in] GEThomas Use G.E. Thomas (true/default) or IEEE 802.3 (false).
+/// @note Assumes a frequency < 1000 means kHz otherwise it is in Hz.
+///   Most common value is 38000 or 38, for 38kHz.
 void IRsend::sendManchester(const uint16_t headermark,
                             const uint32_t headerspace,
                             const uint16_t half_period,
@@ -550,9 +519,6 @@ void IRsend::sendManchester(const uint16_t headermark,
     // Header
     if (headermark) mark(headermark);
     if (headerspace) space(headerspace);
-    // Data Marker/sync
-    // This guarantees a double width half_period. i.e. a Period or T2.
-    sendManchesterData(half_period, 0b01, 2, true, GEThomas);
     // Data
     sendManchesterData(half_period, data, nbits, MSBfirst, GEThomas);
     // Footer
@@ -562,20 +528,14 @@ void IRsend::sendManchester(const uint16_t headermark,
 }
 
 #if SEND_RAW
-// Send a raw IRremote message.
-//
-// Args:
-//   buf: An array of uint16_t's that has microseconds elements.
-//   len: Nr. of elements in the buf[] array.
-//   hz:  Frequency to send the message at. (kHz < 1000; Hz >= 1000)
-//
-// Status: STABLE / Known working.
-//
-// Notes:
-//   Even elements are Mark times (On), Odd elements are Space times (Off).
-//
-// Ref:
-//   examples/IRrecvDumpV2/IRrecvDumpV2.ino
+/// Send a raw IRremote message.
+///
+/// @param[in] buf An array of uint16_t's that has microseconds elements.
+/// @param[in] len Nr. of elements in the buf[] array.
+/// @param[in] hz Frequency to send the message at. (kHz < 1000; Hz >= 1000)
+/// @note Even elements are Mark times (On), Odd elements are Space times (Off).
+/// Ref:
+///   examples/IRrecvDumpV2/IRrecvDumpV2.ino (or later)
 void IRsend::sendRaw(const uint16_t buf[], const uint16_t len,
                      const uint16_t hz) {
   // Set IR carrier frequency
@@ -591,11 +551,9 @@ void IRsend::sendRaw(const uint16_t buf[], const uint16_t len,
 }
 #endif  // SEND_RAW
 
-// Get the minimum number of repeats for a given protocol.
-// Args:
-//   protocol:  Protocol number/type of the message you want to send.
-// Returns:
-//   int16_t:  The number of repeats required.
+/// Get the minimum number of repeats for a given protocol.
+/// @param[in] protocol Protocol number/type of the message you want to send.
+/// @return The number of repeats required.
 uint16_t IRsend::minRepeats(const decode_type_t protocol) {
   switch (protocol) {
     // Single repeats
@@ -604,6 +562,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case COOLIX:
     case GICABLE:
     case INAX:
+    case MIDEA24:
     case MITSUBISHI:
     case MITSUBISHI2:
     case MITSUBISHI_AC:
@@ -626,16 +585,16 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
       return kSonyMinRepeat + 1;
     case SYMPHONY:
       return kSymphonyDefaultRepeat;
+    case ZEPEAL:
+      return kZepealMinRepeat;
     default:
       return kNoRepeat;
   }
 }
 
-// Get the default number of bits for a given protocol.
-// Args:
-//   protocol:  Protocol number/type you want the default nr. of bits for.
-// Returns:
-//   int16_t:  The number of bits.
+/// Get the default number of bits for a given protocol.
+/// @param[in] protocol Protocol number/type you want the default bit size for.
+/// @return The number of bits.
 uint16_t IRsend::defaultBits(const decode_type_t protocol) {
   switch (protocol) {
     case MULTIBRACKETS:
@@ -656,20 +615,23 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case LEGOPF:
     case MITSUBISHI:
     case MITSUBISHI2:
+    case ZEPEAL:
       return 16;
+    case METZ:
+      return 19;
     case RC6:
     case SONY:
     case SONY_38K:
       return 20;
     case COOLIX:
     case INAX:
+    case MIDEA24:
     case NIKAI:
     case RCMM:
       return 24;
     case LG:
     case LG2:
       return 28;
-    case AIRWELL:
     case CARRIER_AC:
     case EPSON:
     case NEC:
@@ -678,6 +640,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case SHERWOOD:
     case WHYNTER:
       return 32;
+    case AIRWELL:
+      return 34;
     case LUTRON:
     case TECO:
       return 35;
@@ -691,6 +655,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kSanyoLC7461Bits;  // 42
     case GOODWEATHER:
     case MIDEA:
+    case TRANSCOLD:
     case PANASONIC:
       return 48;
     case MAGIQUEST:
@@ -704,6 +669,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return 64;
     case ARGO:
       return kArgoBits;
+    case CORONA_AC:
+      return kCoronaAcBits;
     case DAIKIN:
       return kDaikinBits;
     case DAIKIN128:
@@ -736,6 +703,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kHitachiAc2Bits;
     case HITACHI_AC3:
       return kHitachiAc3Bits;
+    case HITACHI_AC344:
+      return kHitachiAc344Bits;
     case HITACHI_AC424:
       return kHitachiAc424Bits;
     case KELVINATOR:
@@ -756,6 +725,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kNeoclimaBits;
     case SAMSUNG_AC:
       return kSamsungAcBits;
+    case SANYO_AC:
+      return kSanyoAcBits;
     case SHARP_AC:
       return kSharpAcBits;
     case TCL112AC:
@@ -764,6 +735,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kToshibaACBits;
     case TROTEC:
       return kTrotecBits;
+    case VOLTAS:
+      return kVoltasBits;
     case WHIRLPOOL_AC:
       return kWhirlpoolAcBits;
     // No default amount of bits.
@@ -774,18 +747,17 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
   }
 }
 
-// Send a simple (up to 64 bits) IR message of a given type.
-// An unknown/unsupported type will do nothing.
-// Args:
-//   type:  Protocol number/type of the message you want to send.
-//   data:  The data you want to send (up to 64 bits).
-//   nbits: How many bits long the message is to be.
-//   repeat: How many repeats to do?
-// Returns:
-//   bool: True if it is a type we can attempt to send, false if not.
+/// Send a simple (up to 64 bits) IR message of a given type.
+/// An unknown/unsupported type will send nothing.
+/// @param[in] type Protocol number/type of the message you want to send.
+/// @param[in] data The data you want to send (up to 64 bits).
+/// @param[in] nbits How many bits long the message is to be.
+/// @param[in] repeat How many repeats to do?
+/// @return True if it is a type we can attempt to send, false if not.
 bool IRsend::send(const decode_type_t type, const uint64_t data,
                   const uint16_t nbits, const uint16_t repeat) {
-  uint16_t min_repeat = std::max(IRsend::minRepeats(type), repeat);
+  uint16_t min_repeat __attribute__((unused)) =
+      std::max(IRsend::minRepeats(type), repeat);
   switch (type) {
 #if SEND_AIRWELL
     case AIRWELL:
@@ -899,12 +871,22 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     case MAGIQUEST:
       sendMagiQuest(data, nbits, min_repeat);
       break;
-#endif
+#endif  // SEND_MAGIQUEST
+#if SEND_METZ
+    case METZ:
+      sendMetz(data, nbits, min_repeat);
+      break;
+#endif  // SEND_METZ
 #if SEND_MIDEA
     case MIDEA:
       sendMidea(data, nbits, min_repeat);
       break;
-#endif
+#endif  // SEND_MIDEA
+#if SEND_MIDEA24
+    case MIDEA24:
+      sendMidea24(data, nbits, min_repeat);
+      break;
+#endif  // SEND_MIDEA24
 #if SEND_MITSUBISHI
     case MITSUBISHI:
       sendMitsubishi(data, nbits, min_repeat);
@@ -1004,7 +986,12 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     case TECO:
       sendTeco(data, nbits, min_repeat);
       break;
-#endif
+#endif  // SEND_TECO
+#if SEND_TRANSCOLD
+    case TRANSCOLD:
+      sendTranscold(data, nbits, min_repeat);
+      break;
+#endif  // SEND_TRANSCOLD
 #if SEND_VESTEL_AC
     case VESTEL_AC:
       sendVestelAc(data, nbits, min_repeat);
@@ -1015,23 +1002,31 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendWhynter(data, nbits, min_repeat);
       break;
 #endif
+#if SEND_ZEPEAL
+    case ZEPEAL:
+      sendZepeal(data, nbits, min_repeat);
+      break;
+#endif  // SEND_ZEPEAL
     default:
       return false;
   }
   return true;
 }
 
-// Send a complex (>= 64 bits) IR message of a given type.
-// An unknown/unsupported type will do nothing.
-// Args:
-//   type:   Protocol number/type of the message you want to send.
-//   state:  A pointer to the array of bytes that make up the state[].
-//   nbytes: How many bytes are in the state.
-// Returns:
-//   bool: True if it is a type we can attempt to send, false if not.
-bool IRsend::send(const decode_type_t type, const unsigned char *state,
+/// Send a complex (>= 64 bits) IR message of a given type.
+/// An unknown/unsupported type will send nothing.
+/// @param[in] type Protocol number/type of the message you want to send.
+/// @param[in] state A pointer to the array of bytes that make up the state[].
+/// @param[in] nbytes How many bytes are in the state.
+/// @return True if it is a type we can attempt to send, false if not.
+bool IRsend::send(const decode_type_t type, const uint8_t *state,
                   const uint16_t nbytes) {
   switch (type) {
+#if SEND_VOLTAS
+    case VOLTAS:
+      sendVoltas(state, nbytes);
+      break;
+#endif  // SEND_VOLTAS
 #if SEND_AMCOR
     case AMCOR:
       sendAmcor(state, nbytes);
@@ -1040,6 +1035,11 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
 #if SEND_ARGO
     case ARGO:
       sendArgo(state, nbytes);
+      break;
+#endif  // SEND_ARGO
+#if SEND_CORONA_AC
+    case CORONA_AC:
+      sendCoronaAc(state, nbytes);
       break;
 #endif  // SEND_ARGO
 #if SEND_DAIKIN
@@ -1122,6 +1122,11 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
       sendHitachiAc3(state, nbytes);
       break;
 #endif  // SEND_HITACHI_AC3
+#if SEND_HITACHI_AC344
+    case HITACHI_AC344:
+      sendHitachiAc344(state, nbytes);
+      break;
+#endif  // SEND_HITACHI_AC344
 #if SEND_HITACHI_AC424
     case HITACHI_AC424:
       sendHitachiAc424(state, nbytes);
@@ -1175,6 +1180,11 @@ bool IRsend::send(const decode_type_t type, const unsigned char *state,
       sendSamsungAC(state, nbytes);
       break;
 #endif  // SEND_SAMSUNG_AC
+#if SEND_SANYO_AC
+    case SANYO_AC:
+      sendSanyoAc(state, nbytes);
+      break;
+#endif  // SEND_SANYO_AC
 #if SEND_SHARP_AC
     case SHARP_AC:
       sendSharpAc(state, nbytes);

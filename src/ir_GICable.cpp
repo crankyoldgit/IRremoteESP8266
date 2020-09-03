@@ -1,5 +1,12 @@
 // Copyright 2018 David Conran
-// G.I. Cable
+
+/// @file
+/// @brief G.I. Cable
+/// @see https://github.com/cyborg5/IRLib2/blob/master/IRLibProtocols/IRLib_P09_GICable.h
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/447
+
+// Supports:
+//   Brand: G.I. Cable,  Model: XRC-200 remote
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
@@ -7,10 +14,6 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRutils.h"
-
-// Ref:
-//   https://github.com/cyborg5/IRLib2/blob/master/IRLibProtocols/IRLib_P09_GICable.h
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/447
 
 // Constants
 const uint16_t kGicableHdrMark = 9000;
@@ -26,17 +29,11 @@ const uint32_t kGicableMinGap =
      kGicableBits * (kGicableBitMark + kGicableOneSpace) + kGicableBitMark);
 
 #if SEND_GICABLE
-// Send a raw G.I. Cable formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent.
-//           Typically kGicableBits.
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: Alpha / Untested.
-//
-// Ref:
+/// Send a raw G.I. Cable formatted message.
+/// Status: Alpha / Untested.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendGICable(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(kGicableHdrMark, kGicableHdrSpace, kGicableBitMark,
               kGicableOneSpace, kGicableBitMark, kGicableZeroSpace,
@@ -54,18 +51,15 @@ void IRsend::sendGICable(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif  // SEND_GICABLE
 
 #if DECODE_GICABLE
-// Decode the supplied G.I. Cable message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kGicableBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Alpha / Not tested against a real device.
+/// Decode the supplied G.I. Cable message.
+/// Status: Alpha / Not tested against a real device.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeGICable(decode_results *results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {
   if (strict && nbits != kGicableBits)

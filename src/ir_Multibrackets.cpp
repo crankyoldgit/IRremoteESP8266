@@ -1,12 +1,15 @@
 // Copyright 2020 David Conran
 
-#include "IRrecv.h"
-#include "IRsend.h"
+/// @file
+/// @brief Support for Multibrackets protocols.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1103
+/// @see http://info.multibrackets.com/data/common/manuals/4500_code.pdf
 
-// Multibrackets protocol.
-//
 // Supports:
 //   Brand: Multibrackets,  Model: Motorized Swing mount large - 4500
+
+#include "IRrecv.h"
+#include "IRsend.h"
 
 const uint16_t kMultibracketsTick = 5000;  // uSeconds
 const uint16_t kMultibracketsHdrMark = 3 * kMultibracketsTick;  // uSeconds
@@ -15,19 +18,11 @@ const uint8_t kMultibracketsTolerance = 5;  // Percent
 const uint16_t kMultibracketsFreq = 38000;  // Hertz
 
 #if SEND_MULTIBRACKETS
-// Send a Miltibrackets formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent.
-//           Typically kMultibracketsBits.
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: BETA / Appears to be working.
-//
-// Ref:
-//  https://github.com/crankyoldgit/IRremoteESP8266/issues/1103
-//  http://info.multibrackets.com/data/common/manuals/4500_code.pdf
+/// Send a Multibrackets formatted message.
+/// Status: BETA / Appears to be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendMultibrackets(uint64_t data, uint16_t nbits, uint16_t repeat) {
   enableIROut(kMultibracketsFreq);
   for (uint16_t r = 0; r <= repeat; r++) {
@@ -53,22 +48,14 @@ void IRsend::sendMultibrackets(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif  // SEND_MULTIBRACKETS
 
 #if DECODE_MULTIBRACKETS
-// Decode the Multibrackets message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kMultibracketsBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: BETA / Appears to be working.
-//
-// Ref:
-//  https://github.com/crankyoldgit/IRremoteESP8266/issues/1103
-//  http://info.multibrackets.com/data/common/manuals/4500_code.pdf
+/// Decode the Multibrackets message.
+/// Status: BETA / Appears to be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 bool IRrecv::decodeMultibrackets(decode_results *results, uint16_t offset,
                                  const uint16_t nbits, const bool strict) {
   // Compliance

@@ -1,5 +1,6 @@
 // Copyright 2018, 2020 David Conran
 
+#include "ir_Carrier.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRsend.h"
@@ -256,7 +257,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("CARRIER_AC64", typeToString(decode_type_t::CARRIER_AC64));
   ASSERT_EQ(decode_type_t::CARRIER_AC64, strToDecodeType("CARRIER_AC64"));
   ASSERT_FALSE(hasACState(decode_type_t::CARRIER_AC64));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::CARRIER_AC64));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::CARRIER_AC64));
   ASSERT_EQ(kCarrierAc64Bits,
             IRsend::defaultBits(decode_type_t::CARRIER_AC64));
   ASSERT_EQ(kCarrierAc64MinRepeat,
@@ -318,7 +319,7 @@ TEST(TestDecodeCarrierAC40, SyntheticExample) {
       "m547s497m547s497m547s497m547s1540m547s497m547s497m547s1540m547s497"
       "m547s1540m547s1540m547s497m547s497m547s497m547s497m547s497m547s497"
       "m547s1540m547s1540m547s1540m547s1540m547s497m547s1540m547s497m547s497"
-      "m547s20000"
+      "m547s150000"
       // Repeat #1
       "m8402s4166"
       "m547s1540m547s1540m547s1540m547s1540m547s497m547s497m547s497m547s497"
@@ -326,7 +327,7 @@ TEST(TestDecodeCarrierAC40, SyntheticExample) {
       "m547s497m547s497m547s497m547s1540m547s497m547s497m547s1540m547s497"
       "m547s1540m547s1540m547s497m547s497m547s497m547s497m547s497m547s497"
       "m547s1540m547s1540m547s1540m547s1540m547s497m547s1540m547s497m547s497"
-      "m547s20000"
+      "m547s150000"
       // Repeat #2
       "m8402s4166"
       "m547s1540m547s1540m547s1540m547s1540m547s497m547s497m547s497m547s497"
@@ -334,7 +335,7 @@ TEST(TestDecodeCarrierAC40, SyntheticExample) {
       "m547s497m547s497m547s497m547s1540m547s497m547s497m547s1540m547s497"
       "m547s1540m547s1540m547s497m547s497m547s497m547s497m547s497m547s497"
       "m547s1540m547s1540m547s1540m547s1540m547s497m547s1540m547s497m547s497"
-      "m547s20000",
+      "m547s150000",
       irsend.outputStr());
 }
 
@@ -368,6 +369,10 @@ TEST(TestDecodeCarrierAC64, RealExample) {
   EXPECT_EQ(0x404000102E5E5584, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Heat), Temp: 30C, Fan: 1 (Low), Swing(V): On, "
+      "Sleep: Off, On Timer: Off, Off Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }
 
 /// Send & Decode a synthetic message.
@@ -402,4 +407,208 @@ TEST(TestDecodeCarrierAC64, SyntheticExample) {
       // Footer
       "m503s100000",
       irsend.outputStr());
+}
+
+// Tests for IRCarrierAc64 class.
+
+TEST(TestCarrierAc64Class, Power) {
+  IRCarrierAc64 ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+
+  ASSERT_EQ(36, kCarrierAc64PowerOffset);
+}
+
+TEST(TestCarrierAc64Class, Temperature) {
+  IRCarrierAc64 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kCarrierAc64MinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kCarrierAc64MaxTemp, ac.getTemp());
+
+  ac.setTemp(kCarrierAc64MinTemp);
+  EXPECT_EQ(kCarrierAc64MinTemp, ac.getTemp());
+
+  ac.setTemp(kCarrierAc64MaxTemp);
+  EXPECT_EQ(kCarrierAc64MaxTemp, ac.getTemp());
+
+  ac.setTemp(kCarrierAc64MinTemp - 1);
+  EXPECT_EQ(kCarrierAc64MinTemp, ac.getTemp());
+
+  ac.setTemp(kCarrierAc64MaxTemp + 1);
+  EXPECT_EQ(kCarrierAc64MaxTemp, ac.getTemp());
+
+  ac.setTemp(17);
+  EXPECT_EQ(17, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(29);
+  EXPECT_EQ(29, ac.getTemp());
+}
+
+TEST(TestCarrierAc64Class, OperatingMode) {
+  IRCarrierAc64 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kCarrierAc64Cool);
+  EXPECT_EQ(kCarrierAc64Cool, ac.getMode());
+
+  ac.setMode(kCarrierAc64Fan);
+  EXPECT_EQ(kCarrierAc64Fan, ac.getMode());
+
+  ac.setMode(kCarrierAc64Heat);
+  EXPECT_EQ(kCarrierAc64Heat, ac.getMode());
+
+  ac.setMode(kCarrierAc64Fan + 1);
+  EXPECT_EQ(kCarrierAc64Cool, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kCarrierAc64Cool, ac.getMode());
+  ac.setMode(0);
+  EXPECT_EQ(kCarrierAc64Cool, ac.getMode());
+}
+
+TEST(TestCarrierAc64Class, Sleep) {
+  IRCarrierAc64 ac(kGpioUnused);
+  ac.begin();
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+}
+
+TEST(TestCarrierAc64Class, SwingVertical) {
+  IRCarrierAc64 ac(kGpioUnused);
+  ac.begin();
+  ac.setSwingV(true);
+  EXPECT_TRUE(ac.getSwingV());
+  ac.setSwingV(false);
+  EXPECT_FALSE(ac.getSwingV());
+  ac.setSwingV(true);
+  EXPECT_TRUE(ac.getSwingV());
+}
+
+TEST(TestCarrierAc64Class, FanSpeed) {
+  IRCarrierAc64 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFan(255);
+  EXPECT_EQ(kCarrierAc64FanAuto, ac.getFan());
+  ac.setFan(5);
+  EXPECT_EQ(kCarrierAc64FanAuto, ac.getFan());
+
+  ac.setFan(kCarrierAc64FanHigh);
+  EXPECT_EQ(kCarrierAc64FanHigh, ac.getFan());
+
+  // Beyond High should default to Auto.
+  ac.setFan(kCarrierAc64FanHigh + 1);
+  EXPECT_EQ(kCarrierAc64FanAuto, ac.getFan());
+
+  ac.setFan(kCarrierAc64FanMedium);
+  EXPECT_EQ(kCarrierAc64FanMedium, ac.getFan());
+
+  ac.setFan(kCarrierAc64FanLow);
+  EXPECT_EQ(kCarrierAc64FanLow, ac.getFan());
+
+  ac.setFan(kCarrierAc64FanAuto);
+  EXPECT_EQ(kCarrierAc64FanAuto, ac.getFan());
+}
+
+TEST(TestCarrierAc64Class, ChecksumAndSetGetRaw) {
+  IRCarrierAc64 ac(kGpioUnused);
+
+  const uint64_t valid =   0x90900030205C5584;
+  const uint64_t invalid = 0x9090003020505584;
+  ASSERT_NE(valid, invalid);
+  ASSERT_EQ(0x0C, IRCarrierAc64::calcChecksum(valid));
+  ASSERT_TRUE(IRCarrierAc64::validChecksum(valid));
+  ASSERT_FALSE(IRCarrierAc64::validChecksum(invalid));
+  ac.setRaw(valid);
+  ASSERT_EQ(valid, ac.getRaw());
+  ac.setRaw(invalid);
+  ASSERT_EQ(valid, ac.getRaw());
+
+  // Additional known states.
+  ASSERT_TRUE(IRCarrierAc64::validChecksum(0x109000002C2A5584));
+  ASSERT_TRUE(IRCarrierAc64::validChecksum(0x109000102C2B5584));
+}
+
+// Test human readable output.
+TEST(TestCarrierAc64Class, HumanReadable) {
+  IRCarrierAc64 ac(kGpioUnused);
+  EXPECT_EQ(
+      "Power: Off, Mode: 2 (Cool), Temp: 28C, Fan: 0 (Auto), Swing(V): On, "
+      "Sleep: Off, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.setPower(true);
+  ac.setMode(kCarrierAc64Fan);
+  ac.setTemp(30);
+  ac.setFan(kCarrierAc64FanAuto);
+  ac.setSwingV(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Fan), Temp: 30C, Fan: 0 (Auto), Swing(V): On, "
+      "Sleep: Off, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.setOffTimer(8* 60 + 37);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Fan), Temp: 30C, Fan: 0 (Auto), Swing(V): On, "
+      "Sleep: Off, On Timer: Off, Off Timer: 08:00",
+      ac.toString());
+  ac.setOnTimer(5 * 60 + 59);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Fan), Temp: 30C, Fan: 0 (Auto), Swing(V): On, "
+      "Sleep: Off, On Timer: 05:00, Off Timer: Off",
+      ac.toString());
+  ac.setOnTimer(59);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Fan), Temp: 30C, Fan: 0 (Auto), Swing(V): On, "
+      "Sleep: Off, On Timer: Off, Off Timer: Off",
+      ac.toString());
+  ac.setSleep(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Fan), Temp: 30C, Fan: 0 (Auto), Swing(V): On, "
+      "Sleep: On, On Timer: Off, Off Timer: Off",
+      ac.toString());
+}
+
+TEST(TestCarrierAc64Class, ReconstructKnownState) {
+  IRCarrierAc64 ac(kGpioUnused);
+  const uint64_t expected = 0x2030009020555584;
+  ac.begin();
+  ac.stateReset();
+  ASSERT_NE(expected, ac.getRaw());
+  ac.on();
+  ac.setMode(kCarrierAc64Heat);
+  ac.setTemp(16);
+  ac.setFan(kCarrierAc64FanLow);
+  ac.setSwingV(true);
+  ac.setOnTimer(3 * 60);
+  ac.setSleep(true);
+  EXPECT_EQ(expected, ac.getRaw());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Heat), Temp: 16C, Fan: 1 (Low), Swing(V): On, "
+      "Sleep: On, On Timer: Off, Off Timer: Off",
+      ac.toString());
 }

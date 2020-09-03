@@ -1,6 +1,25 @@
-// Samsung A/C
-//
 // Copyright 2018 David Conran
+/// @file
+/// @brief Support for Samsung protocols.
+/// Samsung originally added from https://github.com/shirriff/Arduino-IRremote/
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/505
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/621
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
+/// @see http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
+
+// Supports:
+//   Brand: Samsung,  Model: UA55H6300 TV (SAMSUNG)
+//   Brand: Samsung,  Model: BN59-01178B TV remote (SAMSUNG)
+//   Brand: Samsung,  Model: DB63-03556X003 remote
+//   Brand: Samsung,  Model: DB93-16761C remote
+//   Brand: Samsung,  Model: IEC-R03 remote
+//   Brand: Samsung,  Model: AK59-00167A Bluray remote (SAMSUNG36)
+//   Brand: Samsung,  Model: AH59-02692E Soundbar remote (SAMSUNG36)
+//   Brand: Samsung,  Model: HW-J551 Soundbar (SAMSUNG36)
+//   Brand: Samsung,  Model: AR09FSSDAWKNFA A/C (SAMSUNG_AC)
+//   Brand: Samsung,  Model: AR12KSFPEWQNET A/C (SAMSUNG_AC)
+//   Brand: Samsung,  Model: AR12HSSDBWKNEU A/C (SAMSUNG_AC)
+//   Brand: Samsung,  Model: AR12NXCXAWKXEU A/C (SAMSUNG_AC)
 
 #ifndef IR_SAMSUNG_H_
 #define IR_SAMSUNG_H_
@@ -16,21 +35,9 @@
 #include "IRsend_test.h"
 #endif
 
-// Supports:
-//   Brand: Samsung,  Model: UA55H6300 TV
-//   Brand: Samsung,  Model: DB63-03556X003 remote
-//   Brand: Samsung,  Model: DB93-16761C remote
-//   Brand: Samsung,  Model: IEC-R03 remote
-//   Brand: Samsung,  Model: AR09FSSDAWKNFA A/C
-//   Brand: Samsung,  Model: AR12KSFPEWQNET A/C
-//   Brand: Samsung,  Model: AR12HSSDBWKNEU A/C
-//   Brand: Samsung,  Model: AR12NXCXAWKXEU A/C
-
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/505
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
-
 // Constants
+
+// SamsungAc
 // Byte[1]
 // Checksum                                        0b11110000 ???
 const uint8_t kSamsungAcPower1Offset = 5;  // Mask 0b00100000
@@ -86,11 +93,11 @@ const uint16_t kSamsungAcSectionLength = 7;
 const uint64_t kSamsungAcPowerSection = 0x1D20F00000000;
 
 // Classes
+/// Class for handling detailed Samsung A/C messages.
 class IRSamsungAc {
  public:
   explicit IRSamsungAc(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
-
   void stateReset(const bool forcepower = true, const bool initialPower = true);
 #if SEND_SAMSUNG_AC
   void send(const uint16_t repeat = kSamsungAcDefaultRepeat,
@@ -99,6 +106,10 @@ class IRSamsungAc {
                     const bool calcchecksum = true);
   void sendOn(const uint16_t repeat = kSamsungAcDefaultRepeat);
   void sendOff(const uint16_t repeat = kSamsungAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_SAMSUNG_AC
   void begin(void);
@@ -128,7 +139,6 @@ class IRSamsungAc {
   bool getDisplay(void);
   void setIon(const bool on);
   bool getIon(void);
-
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSamsungAcStateLength);
@@ -145,13 +155,14 @@ class IRSamsungAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kSamsungAcExtendedStateLength];
-  bool _forcepower;  // Hack to know when we need to send a special power mesg.
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kSamsungAcExtendedStateLength];  ///< State in code form.
+  bool _forcepower;  ///< Hack to know when we need to send a special power mesg
   bool _lastsentpowerstate;
   void checksum(const uint16_t length = kSamsungAcStateLength);
 };

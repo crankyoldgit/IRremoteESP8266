@@ -6,7 +6,7 @@
   is selected (required for Coolix).
 
 */
-#include <FS.h>
+#include "Web-AC-control.h"
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -17,7 +17,6 @@
 #include <ESPmDNS.h>
 #include <WebServer.h>
 #include <WiFi.h>
-#include <SPIFFS.h>
 #include <Update.h>
 #endif  // ESP32
 #include <WiFiUdp.h>
@@ -73,17 +72,18 @@ WebServer server(80);
 
 bool handleFileRead(String path) {
   //  send the right file to the client (if it exists)
-  //  Serial.println("handleFileRead: " + path);
+  // Serial.println("handleFileRead: " + path);
   if (path.endsWith("/")) path += "index.html";
   // If a folder is requested, send the index file
   String contentType = getContentType(path);
   // Get the MIME type
   String pathWithGz = path + ".gz";
-  if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
+  if (FILESYSTEM.exists(pathWithGz) || FILESYSTEM.exists(path)) {
     // If the file exists, either as a compressed archive, or normal
-    if (SPIFFS.exists(pathWithGz))  // If there's a compressed version available
+    // If there's a compressed version available
+    if (FILESYSTEM.exists(pathWithGz))
       path += ".gz";  // Use the compressed verion
-    File file = SPIFFS.open(path, "r");
+    File file = FILESYSTEM.open(path, "r");
     //  Open the file
     server.streamFile(file, contentType);
     //  Send it to the client
@@ -107,14 +107,14 @@ String getContentType(String filename) {
   return "text/plain";
 }
 
-void handleFileUpload() {  // upload a new file to the SPIFFS
+void handleFileUpload() {  // upload a new file to the FILESYSTEM
   HTTPUpload& upload = server.upload();
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
     if (!filename.startsWith("/")) filename = "/" + filename;
     // Serial.print("handleFileUpload Name: "); //Serial.println(filename);
-    fsUploadFile = SPIFFS.open(filename, "w");
-    // Open the file for writing in SPIFFS (create if it doesn't exist)
+    fsUploadFile = FILESYSTEM.open(filename, "w");
+    // Open the file for writing in FILESYSTEM (create if it doesn't exist)
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (fsUploadFile)
@@ -160,9 +160,9 @@ void setup() {
 
   delay(1000);
 
-  // Serial.println("mounting FS...");
+  Serial.println("mounting " FILESYSTEMSTR "...");
 
-  if (!SPIFFS.begin()) {
+  if (!FILESYSTEM.begin()) {
     // Serial.println("Failed to mount file system");
     return;
   }
@@ -287,7 +287,7 @@ void setup() {
     ESP.restart();
   });
 
-  server.serveStatic("/", SPIFFS, "/", "max-age=86400");
+  server.serveStatic("/", FILESYSTEM, "/", "max-age=86400");
 
   server.onNotFound(handleNotFound);
 

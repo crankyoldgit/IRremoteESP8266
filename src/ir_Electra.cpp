@@ -1,4 +1,10 @@
 // Copyright 2018, 2019 David Conran
+/// @file
+/// @brief Support for Electra A/C protocols.
+/// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/AUXHeatpumpIR.cpp
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/527
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/642
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/778
 
 #include "ir_Electra.h"
 #include <algorithm>
@@ -7,15 +13,6 @@
 #include "IRsend.h"
 #include "IRtext.h"
 #include "IRutils.h"
-
-// Electra A/C added by crankyoldgit
-//
-
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/527
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/642
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/778
-//   https://github.com/ToniA/arduino-heatpumpir/blob/master/AUXHeatpumpIR.cpp
 
 // Constants
 const uint16_t kElectraAcHdrMark = 9166;
@@ -35,15 +32,12 @@ using irutils::setBit;
 using irutils::setBits;
 
 #if SEND_ELECTRA_AC
-// Send a Electra message
-//
-// Args:
-//   data:   Contents of the message to be sent. (Guessing MSBF order)
-//   nbits:  Nr. of bits of data to be sent. Typically kElectraAcBits.
-//   repeat: Nr. of additional times the message is to be sent.
-//
-// Status: Alpha / Needs testing against a real device.
-//
+/// Send a Electra A/C formatted message.
+/// Status: Alpha / Needs testing against a real device.
+/// @param[in] data The message to be sent.
+/// @note Guessing MSBF order.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendElectraAC(const uint8_t data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   for (uint16_t r = 0; r <= repeat; r++)
@@ -56,13 +50,17 @@ void IRsend::sendElectraAC(const uint8_t data[], const uint16_t nbytes,
 }
 #endif
 
-
+/// Class constructor.
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRElectraAc::IRElectraAc(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) {
   this->stateReset();
 }
 
+/// Reset the internal state to a fixed known good state.
 void IRElectraAc::stateReset(void) {
   for (uint8_t i = 1; i < kElectraAcStateLength - 2; i++) remote_state[i] = 0;
   remote_state[0] = 0xC3;
@@ -70,54 +68,78 @@ void IRElectraAc::stateReset(void) {
   // [12] is the checksum.
 }
 
+/// Set up hardware to be able to send a message.
 void IRElectraAc::begin(void) { _irsend.begin(); }
 
+/// Calculate the checksum for a given state.
+/// @param[in] state The value to calc the checksum of.
+/// @param[in] length The length of the state array.
+/// @return The calculated checksum stored in a uint_8.
 uint8_t IRElectraAc::calcChecksum(const uint8_t state[],
-                                   const uint16_t length) {
+                                  const uint16_t length) {
   if (length == 0) return state[0];
   return sumBytes(state, length - 1);
 }
 
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The state to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRElectraAc::validChecksum(const uint8_t state[], const uint16_t length) {
   if (length < 2)
     return true;  // No checksum to compare with. Assume okay.
   return (state[length - 1] == calcChecksum(state, length));
 }
 
-// Update the checksum for the internal state.
+/// Calculate and set the checksum values for the internal state.
+/// @param[in] length The length of the state array.
 void IRElectraAc::checksum(uint16_t length) {
   if (length < 2) return;
   remote_state[length - 1] = calcChecksum(remote_state, length);
 }
 
 #if SEND_ELECTRA_AC
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRElectraAc::send(const uint16_t repeat) {
-  this->checksum();
-  _irsend.sendElectraAC(remote_state, kElectraAcStateLength, repeat);
+  _irsend.sendElectraAC(getRaw(), kElectraAcStateLength, repeat);
 }
 #endif  // SEND_ELECTRA_AC
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRElectraAc::getRaw(void) {
   this->checksum();
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
+/// @param[in] length The length of the code array.
 void IRElectraAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote_state, new_code, std::min(length, kElectraAcStateLength));
 }
 
+/// Change the power setting to On.
 void IRElectraAc::on(void) { this->setPower(true); }
 
+/// Change the power setting to Off.
 void IRElectraAc::off(void) { this->setPower(false); }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setPower(const bool on) {
   setBit(&remote_state[9], kElectraAcPowerOffset, on);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRElectraAc::getPower(void) {
   return GETBIT8(remote_state[9], kElectraAcPowerOffset);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRElectraAc::setMode(const uint8_t mode) {
   switch (mode) {
     case kElectraAcAuto:
@@ -133,11 +155,15 @@ void IRElectraAc::setMode(const uint8_t mode) {
   }
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRElectraAc::getMode(void) {
   return GETBITS8(remote_state[6], kElectraAcModeOffset, kModeBitsSize);
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRElectraAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kElectraAcCool;
@@ -148,7 +174,9 @@ uint8_t IRElectraAc::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRElectraAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kElectraAcCool: return stdAc::opmode_t::kCool;
@@ -159,20 +187,24 @@ stdAc::opmode_t IRElectraAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Set the temp. in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRElectraAc::setTemp(const uint8_t temp) {
   uint8_t newtemp = std::max(kElectraAcMinTemp, temp);
   newtemp = std::min(kElectraAcMaxTemp, newtemp) - kElectraAcTempDelta;
   setBits(&remote_state[1], kElectraAcTempOffset, kElectraAcTempSize, newtemp);
 }
 
-// Return the set temp. in deg C
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRElectraAc::getTemp(void) {
   return GETBITS8(remote_state[1], kElectraAcTempOffset, kElectraAcTempSize) +
       kElectraAcTempDelta;
 }
 
-// Set the speed of the fan, 0-3, 0 is auto, 1-3 is the speed
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
+/// @note 0 is auto, 1-3 is the speed
 void IRElectraAc::setFan(const uint8_t speed) {
   switch (speed) {
     case kElectraAcFanAuto:
@@ -187,11 +219,15 @@ void IRElectraAc::setFan(const uint8_t speed) {
   }
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRElectraAc::getFan(void) {
   return GETBITS8(remote_state[4], kElectraAcFanOffset, kElectraAcFanSize);
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRElectraAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -203,7 +239,9 @@ uint8_t IRElectraAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRElectraAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kElectraAcFanHigh: return stdAc::fanspeed_t::kMax;
@@ -213,51 +251,73 @@ stdAc::fanspeed_t IRElectraAc::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setSwingV(const bool on) {
   setBits(&remote_state[1], kElectraAcSwingVOffset, kElectraAcSwingSize,
           on ? kElectraAcSwingOn : kElectraAcSwingOff);
 }
 
+/// Get the Vertical Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRElectraAc::getSwingV(void) {
   return !GETBITS8(remote_state[1], kElectraAcSwingVOffset,
                    kElectraAcSwingSize);
 }
 
+/// Set the Horizontal Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setSwingH(const bool on) {
   setBits(&remote_state[2], kElectraAcSwingHOffset, kElectraAcSwingSize,
           on ? kElectraAcSwingOn : kElectraAcSwingOff);
 }
 
+/// Get the Horizontal Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRElectraAc::getSwingH(void) {
   return !GETBITS8(remote_state[2], kElectraAcSwingHOffset,
                    kElectraAcSwingSize);
 }
 
+/// Set the Light (LED) Toggle mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setLightToggle(const bool on) {
   remote_state[11] = on ? kElectraAcLightToggleOn : kElectraAcLightToggleOff;
 }
 
+/// Get the Light (LED) Toggle mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRElectraAc::getLightToggle(void) {
   return (remote_state[11] & kElectraAcLightToggleMask) ==
       kElectraAcLightToggleMask;
 }
 
+/// Set the Clean mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setClean(const bool on) {
   setBit(&remote_state[9], kElectraAcCleanOffset, on);
 }
 
+/// Get the Clean mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRElectraAc::getClean(void) {
   return GETBIT8(remote_state[9], kElectraAcCleanOffset);
 }
 
+/// Set the Turbo mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setTurbo(const bool on) {
   setBit(&remote_state[5], kElectraAcTurboOffset, on);
 }
 
+/// Get the Turbo mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRElectraAc::getTurbo(void) {
   return GETBIT8(remote_state[5], kElectraAcTurboOffset);
 }
-// Convert the A/C state to it's common equivalent.
+
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRElectraAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::ELECTRA_AC;
@@ -284,7 +344,8 @@ stdAc::state_t IRElectraAc::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRElectraAc::toString(void) {
   String result = "";
   result.reserve(130);  // Reserve some heap for the string to reduce fragging.
@@ -304,19 +365,15 @@ String IRElectraAc::toString(void) {
 }
 
 #if DECODE_ELECTRA_AC
-// Decode the supplied Electra A/C message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kElectraAcBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Known working.
-//
+/// Decode the supplied Electra A/C message.
+/// Status: STABLE / Known working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeElectraAC(decode_results *results, uint16_t offset,
                              const uint16_t nbits,
                              const bool strict) {

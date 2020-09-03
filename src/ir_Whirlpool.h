@@ -1,6 +1,12 @@
-// Whirlpool A/C
-//
 // Copyright 2018 David Conran
+
+/// @file
+/// @brief Support for Whirlpool protocols.
+/// Decoding help from: \@redmusicxd, \@josh929800, \@raducostea
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/509
+/// @note Smart, iFeel, AroundU, PowerSave, & Silent modes are unsupported.
+///   Advanced 6thSense, Dehumidify, & Sleep modes are not supported.
+/// @note Dim == !Light, Jet == Super == Turbo
 
 // Supports:
 //   Brand: Whirlpool,  Model: DG11J1-3A remote
@@ -25,9 +31,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/509
 
 // Constants
 const uint8_t kWhirlpoolAcChecksumByte1 = 13;
@@ -84,20 +87,22 @@ const uint8_t kWhirlpoolAcAltTempOffset = 3;
 const uint8_t kWhirlpoolAcAltTempPos = 18;
 
 // Classes
+/// Class for handling detailed Whirlpool A/C messages.
 class IRWhirlpoolAc {
  public:
   explicit IRWhirlpoolAc(const uint16_t pin, const bool inverted = false,
                          const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_WHIRLPOOL_AC
   void send(const uint16_t repeat = kWhirlpoolAcDefaultRepeat,
             const bool calcchecksum = true);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_WHIRLPOOL_AC
   void begin(void);
-  void on(void);
-  void off(void);
   void setPowerToggle(const bool on);
   bool getPowerToggle(void);
   void setSleep(const bool on);
@@ -131,7 +136,7 @@ class IRWhirlpoolAc {
   uint8_t* getRaw(const bool calcchecksum = true);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kWhirlpoolAcStateLength);
-  static bool validChecksum(uint8_t state[],
+  static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kWhirlpoolAcStateLength);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
@@ -142,13 +147,14 @@ class IRWhirlpoolAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kWhirlpoolAcStateLength];
-  uint8_t _desiredtemp;
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kWhirlpoolAcStateLength];  ///< The state in IR code form
+  uint8_t _desiredtemp;  ///< The last user explicitly set temperature.
   void checksum(const uint16_t length = kWhirlpoolAcStateLength);
   uint16_t getTime(const uint16_t pos);
   void setTime(const uint16_t pos, const uint16_t minspastmidnight);

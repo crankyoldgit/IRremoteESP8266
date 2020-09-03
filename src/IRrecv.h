@@ -64,7 +64,8 @@ const uint16_t kStateSizeMax = 0;
 #endif
 
 // Types
-// information for the interrupt handler
+
+/// Information for the interrupt handler
 typedef struct {
   uint8_t recvpin;   // pin for IR data from detector
   uint8_t rcvstate;  // state machine
@@ -78,7 +79,7 @@ typedef struct {
   uint8_t timeout;   // Nr. of milliSeconds before we give up.
 } irparams_t;
 
-// results from a data match
+/// Results from a data match
 typedef struct {
   bool success;   // Was the match successful?
   uint64_t data;  // The data found.
@@ -87,7 +88,7 @@ typedef struct {
 
 // Classes
 
-// Results returned from the decoder
+/// Results returned from the decoder
 class decode_results {
  public:
   decode_type_t decode_type;  // NEC, SONY, RC5, UNKNOWN
@@ -109,7 +110,7 @@ class decode_results {
   bool repeat;  // Is the result a repeat code?
 };
 
-// main class for receiving IR
+/// Class for receiving IR messages.
 class IRrecv {
  public:
 #if defined(ESP32)
@@ -235,6 +236,16 @@ class IRrecv {
                                     const uint8_t tolerance = kUseDefTol,
                                     const int16_t excess = kMarkExcess,
                                     const bool MSBfirst = true);
+  uint16_t matchManchesterData(volatile const uint16_t *data_ptr,
+                               uint64_t *result_ptr,
+                               const uint16_t remaining,
+                               const uint16_t nbits,
+                               const uint16_t half_period,
+                               const uint16_t starting_balance = 0,
+                               const uint8_t tolerance = kUseDefTol,
+                               const int16_t excess = kMarkExcess,
+                               const bool MSBfirst = true,
+                               const bool GEThomas = true);
   uint16_t matchManchester(volatile const uint16_t *data_ptr,
                            uint64_t *result_ptr,
                            const uint16_t remaining,
@@ -251,7 +262,13 @@ class IRrecv {
                            const bool GEThomas = true);
   void crudeNoiseFilter(decode_results *results, const uint16_t floor = 0);
   bool decodeHash(decode_results *results);
-#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || SEND_SANYO)
+#if DECODE_VOLTAS
+  bool decodeVoltas(decode_results *results,
+                         uint16_t offset = kStartOffset,
+                         const uint16_t nbits = kVoltasBits,
+                         const bool strict = true);
+#endif  // DECODE_VOLTAS
+#if (DECODE_NEC || DECODE_SHERWOOD || DECODE_AIWA_RC_T501 || DECODE_SANYO)
   bool decodeNEC(decode_results *results, uint16_t offset = kStartOffset,
                  const uint16_t nbits = kNECBits, const bool strict = true);
 #endif
@@ -272,8 +289,14 @@ class IRrecv {
   bool decodeSanyoLC7461(decode_results *results,
                          uint16_t offset = kStartOffset,
                          const uint16_t nbits = kSanyoLC7461Bits,
-                         bool strict = true);
+                         const bool strict = true);
 #endif
+#if DECODE_SANYO_AC
+  bool decodeSanyoAc(decode_results *results,
+                     uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kSanyoAcBits,
+                     const bool strict = true);
+#endif  // DECODE_SANYO_AC
 #if DECODE_MITSUBISHI
   bool decodeMitsubishi(decode_results *results, uint16_t offset = kStartOffset,
                         const uint16_t nbits = kMitsubishiBits,
@@ -311,9 +334,9 @@ class IRrecv {
 #endif
 #if (DECODE_RC5 || DECODE_R6 || DECODE_LASERTAG || DECODE_MWM)
   int16_t getRClevel(decode_results *results, uint16_t *offset, uint16_t *used,
-                     uint16_t bitTime, uint8_t tolerance = kUseDefTol,
-                     int16_t excess = kMarkExcess, uint16_t delta = 0,
-                     uint8_t maxwidth = 3);
+                     uint16_t bitTime, const uint8_t tolerance = kUseDefTol,
+                     const int16_t excess = kMarkExcess,
+                     const uint16_t delta = 0, const uint8_t maxwidth = 3);
 #endif
 #if DECODE_RC5
   bool decodeRC5(decode_results *results, uint16_t offset = kStartOffset,
@@ -458,7 +481,7 @@ class IRrecv {
 #endif
 #if DECODE_TOSHIBA_AC
   bool decodeToshibaAC(decode_results *results, uint16_t offset = kStartOffset,
-                       const uint16_t nbytes = kToshibaACBits,
+                       const uint16_t nbits = kToshibaACBits,
                        const bool strict = true);
 #endif
 #if DECODE_TROTEC
@@ -470,7 +493,12 @@ class IRrecv {
   bool decodeMidea(decode_results *results, uint16_t offset = kStartOffset,
                    const uint16_t nbits = kMideaBits,
                    const bool strict = true);
-#endif
+#endif  // DECODE_MIDEA
+#if DECODE_MIDEA24
+  bool decodeMidea24(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kMidea24Bits,
+                     const bool strict = true);
+#endif  // DECODE_MIDEA24
 #if DECODE_FUJITSU_AC
   bool decodeFujitsuAC(decode_results *results, uint16_t offset = kStartOffset,
                        const uint16_t nbits = kFujitsuAcBits,
@@ -520,10 +548,10 @@ class IRrecv {
                           const uint16_t nbits = kHaierACYRW02Bits,
                           const bool strict = true);
 #endif
-#if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
+#if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2 || DECODE_HITACHI_AC344)
   bool decodeHitachiAC(decode_results *results, uint16_t offset = kStartOffset,
                        const uint16_t nbits = kHitachiAcBits,
-                       const bool strict = true);
+                       const bool strict = true, const bool MSBfirst = true);
 #endif
 #if DECODE_HITACHI_AC1
   bool decodeHitachiAC1(decode_results *results, uint16_t offset = kStartOffset,
@@ -640,6 +668,26 @@ class IRrecv {
                      const uint16_t nbits = kTechnibelAcBits,
                      const bool strict = true);
 #endif  // DECODE_TECHNIBEL_AC
+#if DECODE_CORONA_AC
+  bool decodeCoronaAc(decode_results *results, uint16_t offset = kStartOffset,
+                      const uint16_t nbits = kCoronaAcBitsShort,
+                      const bool strict = true);
+#endif  // DECODE_CORONA_AC
+#if DECODE_ZEPEAL
+bool decodeZepeal(decode_results *results, uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kZepealBits,
+                  const bool strict = true);
+#endif  // DECODE_ZEPEAL
+#if DECODE_METZ
+bool decodeMetz(decode_results *results, uint16_t offset = kStartOffset,
+                const uint16_t nbits = kMetzBits,
+                const bool strict = true);
+#endif  // DECODE_METZ
+#if DECODE_TRANSCOLD
+bool decodeTranscold(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kTranscoldBits,
+                     const bool strict = true);
+#endif  // DECODE_TRANSCOLD
 };
 
 #endif  // IRRECV_H_

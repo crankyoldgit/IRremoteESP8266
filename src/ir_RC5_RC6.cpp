@@ -1,8 +1,22 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017 David Conran
 
-// RC-5 & RC-6 support added from https://github.com/z3t0/Arduino-IRremote
-// RC-5X support added by David Conran
+/// @file
+/// @brief RC-5 & RC-6 support
+/// RC-5 & RC-6 support added from https://github.com/z3t0/Arduino-IRremote
+/// RC-5X support added by David Conran
+/// @see https://en.wikipedia.org/wiki/RC-5
+/// @see http://www.sbprojects.com/knowledge/ir/rc5.php
+/// @see https://en.wikipedia.org/wiki/Manchester_code
+/// @see https://en.wikipedia.org/wiki/RC-6
+/// @see https://www.sbprojects.net/knowledge/ir/rc6.php
+/// @see http://www.pcbheaven.com/userpages/The_Philips_RC6_Protocol/
+/// @see http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
+
+// Supports:
+//   Brand: Philips,  Model: Standard RC-5 (RC5)
+//   Brand: Philips,  Model: RC-5X (RC5X)
+//   Brand: Philips,  Model: Standard RC-6 (RC6)
 
 #include <algorithm>
 #include "IRrecv.h"
@@ -12,10 +26,6 @@
 
 // Constants
 // RC-5/RC-5X
-// Ref:
-//   https://en.wikipedia.org/wiki/RC-5
-//   http://www.sbprojects.com/knowledge/ir/rc5.php
-
 const uint16_t kRc5T1 = 889;
 const uint32_t kRc5MinCommandLength = 113778;
 const uint32_t kRc5MinGap = kRc5MinCommandLength - kRC5RawBits * (2 * kRc5T1);
@@ -23,10 +33,6 @@ const uint16_t kRc5ToggleMask = 0x800;  // The 12th bit.
 const uint16_t kRc5SamplesMin = 11;
 
 // RC-6
-// Ref:
-//   https://en.wikipedia.org/wiki/RC-6
-//   http://www.pcbheaven.com/userpages/The_Philips_RC6_Protocol/
-
 const uint16_t kRc6Tick = 444;
 const uint16_t kRc6HdrMarkTicks = 6;
 const uint16_t kRc6HdrMark = kRc6HdrMarkTicks * kRc6Tick;
@@ -42,27 +48,18 @@ const int16_t kMark = 0;
 const int16_t kSpace = 1;
 
 #if SEND_RC5
-// Send a Philips RC-5/RC-5X packet.
-//
-// Args:
-//   data:    The message you wish to send.
-//   nbits:   Bit size of the protocol you want to send.
-//   repeat:  Nr. of extra times the data will be sent.
-//
-// Status: RC-5 (stable), RC-5X (alpha)
-//
-// Note:
-//   Caller needs to take care of flipping the toggle bit.
-//   That bit differentiates between key press & key release.
-//   For RC-5 it is the MSB of the data.
-//   For RC-5X it is the 2nd MSB of the data.
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc5.php
-//   https://en.wikipedia.org/wiki/RC-5
-//   https://en.wikipedia.org/wiki/Manchester_code
-// TODO(anyone):
-//   Testing of the RC-5X components.
-void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
+/// Send a Philips RC-5/RC-5X packet.
+/// Status: RC-5 (stable), RC-5X (alpha)
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note Caller needs to take care of flipping the toggle bit.
+///   That bit differentiates between key press & key release.
+///   For RC-5 it is the MSB of the data.
+///   For RC-5X it is the 2nd MSB of the data.
+/// @todo Testing of the RC-5X components.
+void IRsend::sendRC5(const uint64_t data, uint16_t nbits,
+                     const uint16_t repeat) {
   if (nbits > sizeof(data) * 8) return;  // We can't send something that big.
   bool skipSpace = true;
   bool field_bit = true;
@@ -109,44 +106,26 @@ void IRsend::sendRC5(uint64_t data, uint16_t nbits, uint16_t repeat) {
   }
 }
 
-// Encode a Philips RC-5 data message.
-//
-// Args:
-//   address:  The 5-bit address value for the message.
-//   command:  The 6-bit command value for the message.
-//   key_released:  Boolean flag indicating if the remote key has been released.
-//
-//  Returns:
-//    A data message suitable for use in sendRC5().
-//
-// Status: Beta / Should be working.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc5.php
-//   https://en.wikipedia.org/wiki/RC-5
-uint16_t IRsend::encodeRC5(uint8_t address, uint8_t command,
-                           bool key_released) {
+/// Encode a Philips RC-5 data message.
+/// Status: Beta / Should be working.
+/// @param[in] address The 5-bit address value for the message.
+/// @param[in] command The 6-bit command value for the message.
+/// @param[in] key_released Indicate if the remote key has been released.
+/// @return A message suitable for use in sendRC5().
+uint16_t IRsend::encodeRC5(const uint8_t address, const uint8_t command,
+                           const bool key_released) {
   return (key_released << (kRC5Bits - 1)) | ((address & 0x1f) << 6) |
          (command & 0x3F);
 }
 
-// Encode a Philips RC-5X data message.
-//
-// Args:
-//   address:  The 5-bit address value for the message.
-//   command:  The 7-bit command value for the message.
-//   key_released:  Boolean flag indicating if the remote key has been released.
-//
-//  Returns:
-//    A data message suitable for use in sendRC5().
-//
-// Status: Beta / Should be working.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc5.php
-//   https://en.wikipedia.org/wiki/RC-5
-uint16_t IRsend::encodeRC5X(uint8_t address, uint8_t command,
-                            bool key_released) {
+/// Encode a Philips RC-5X data message.
+/// Status: Beta / Should be working.
+/// @param[in] address The 5-bit address value for the message.
+/// @param[in] command The 7-bit command value for the message.
+/// @param[in] key_released Indicate if the remote key has been released.
+/// @return A message suitable for use in sendRC5().
+uint16_t IRsend::encodeRC5X(const uint8_t address, const uint8_t command,
+                            const bool key_released) {
   // The 2nd start/field bit (MSB of the return value) is the value of the 7th
   // command bit.
   bool s2 = (command >> 6) & 1;
@@ -154,64 +133,43 @@ uint16_t IRsend::encodeRC5X(uint8_t address, uint8_t command,
          encodeRC5(address, command, key_released);
 }
 
-// Flip the toggle bit of a Philips RC-5/RC-5X data message.
-// Used to indicate a change of remote button's state.
-//
-// Args:
-//   data:  The existing RC-5/RC-5X message.
-//
-//  Returns:
-//    A data message suitable for use in sendRC5() with the toggle bit flipped.
-//
-// Status: STABLE.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc5.php
-//   https://en.wikipedia.org/wiki/RC-5
-uint64_t IRsend::toggleRC5(uint64_t data) { return data ^ kRc5ToggleMask; }
+/// Flip the toggle bit of a Philips RC-5/RC-5X data message.
+/// Used to indicate a change of remote button's state.
+/// Status: STABLE.
+/// @param[in] data The existing RC-5/RC-5X message.
+/// @return A data message suitable for use in sendRC5() with the toggle bit
+///   flipped.
+uint64_t IRsend::toggleRC5(const uint64_t data) {
+  return data ^ kRc5ToggleMask;
+}
 #endif  // SEND_RC5
 
 #if SEND_RC6
-// Flip the toggle bit of a Philips RC-6 data message.
-// Used to indicate a change of remote button's state.
-// For RC-6 (20-bits), it is the 17th least significant bit.
-// for RC-6 (36-bits/Xbox-360), it is the 16th least significant bit.
-//
-// Args:
-//   data:  The existing RC-6 message.
-//   nbits:  Nr. of bits in the RC-6 protocol.
-//
-//  Returns:
-//    A data message suitable for use in sendRC6() with the toggle bit flipped.
-//
-// Status: STABLE / Should work fine.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc6.php
-//   http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
-uint64_t IRsend::toggleRC6(uint64_t data, uint16_t nbits) {
+/// Flip the toggle bit of a Philips RC-6 data message.
+/// Used to indicate a change of remote button's state.
+/// Status: STABLE / Should work fine.
+/// @param[in] data The existing RC-6 message.
+/// @param [in] nbits Nr. of bits in the RC-6 protocol.
+/// @return A data message suitable for use in sendRC6() with the toggle bit
+///   flipped.
+/// @note For RC-6 (20-bits), it is the 17th least significant bit.
+/// @note For RC-6 (36-bits/Xbox-360), it is the 16th least significant bit.
+uint64_t IRsend::toggleRC6(const uint64_t data, const uint16_t nbits) {
   if (nbits == kRC6_36Bits) return data ^ kRc6_36ToggleMask;
   return data ^ kRc6ToggleMask;
 }
 
-// Encode a Philips RC-6 data message.
-//
-// Args:
-//   address:  The address (aka. control) value for the message.
-//             Includes the field/mode/toggle bits.
-//   command:  The 8-bit command value for the message. (aka. information)
-//   mode:     Which protocol to use. Defined by nr. of bits in the protocol.
-//
-//  Returns:
-//    A data message suitable for use in sendRC6().
-//
-// Status: Beta / Should be working.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc6.php
-//   http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
-//   http://www.pcbheaven.com/userpages/The_Philips_RC6_Protocol/
-uint64_t IRsend::encodeRC6(uint32_t address, uint8_t command, uint16_t mode) {
+/// Encode a Philips RC-6 data message.
+/// Status: Beta / Should be working.
+/// @param[in] address The address (aka. control) value for the message.
+///   Includes the field/mode/toggle bits.
+/// @param[in] command The 8-bit command value for the message.
+///   (aka. information)
+/// @param[in] mode Which protocol to use.
+///   Defined by nr. of bits in the protocol.
+/// @return A data message suitable for use in `sendRC6()`.
+uint64_t IRsend::encodeRC6(const uint32_t address, const uint8_t command,
+                           const uint16_t mode) {
   switch (mode) {
     case kRC6Mode0Bits:
       return ((address & 0xFFF) << 8) | (command & 0xFF);
@@ -222,22 +180,15 @@ uint64_t IRsend::encodeRC6(uint32_t address, uint8_t command, uint16_t mode) {
   }
 }
 
-// Send a Philips RC-6 packet.
-// Note: Caller needs to take care of flipping the toggle bit (The 4th Most
-//   Significant Bit). That bit differentiates between key press & key release.
-//
-// Args:
-//   data:    The message you wish to send.
-//   nbits:   Bit size of the protocol you want to send.
-//   repeat:  Nr. of extra times the data will be sent.
-//
-// Status: Stable.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc6.php
-//   http://www.righto.com/2010/12/64-bit-rc6-codes-arduino-and-xbox.html
-//   https://en.wikipedia.org/wiki/Manchester_code
-void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
+/// Send a Philips RC-6 packet.
+/// Status: Stable.
+/// @note Caller needs to take care of flipping the toggle bit (The 4th Most
+///   Significant Bit). That bit differentiates between key press & key release.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+void IRsend::sendRC6(const uint64_t data, const uint16_t nbits,
+                     const uint16_t repeat) {
   // Check we can send the number of bits requested.
   if (nbits > sizeof(data) * 8) return;
   // Set 36kHz IR carrier frequency & a 1/3 (33%) duty cycle.
@@ -271,27 +222,28 @@ void IRsend::sendRC6(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif  // SEND_RC6
 
 #if (DECODE_RC5 || DECODE_RC6 || DECODE_LASERTAG)
-// Gets one undecoded level at a time from the raw buffer.
-// The RC5/6 decoding is easier if the data is broken into time intervals.
-// E.g. if the buffer has MARK for 2 time intervals and SPACE for 1,
-// successive calls to getRClevel will return MARK, MARK, SPACE.
-// offset and used are updated to keep track of the current position.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  Ptr to the currect offset to the rawbuf.
-//   used:    Ptr to the current used counter.
-//   bitTime: Time interval of single bit in microseconds.
-//   maxwidth: Maximum number of successive levels to find in a single level
-//             (default 3)
-// Returns:
-//   int: MARK, SPACE, or -1 for error (The measured time interval is not a
-//                                      multiple of t1.)
-// Ref:
-//   https://en.wikipedia.org/wiki/Manchester_code
+/// Gets one undecoded level at a time from the raw buffer.
+/// The RC5/6 decoding is easier if the data is broken into time intervals.
+/// E.g. if the buffer has MARK for 2 time intervals and SPACE for 1,
+/// successive calls to getRClevel will return MARK, MARK, SPACE.
+/// offset and used are updated to keep track of the current position.
+/// @param[in,out] results Ptr to the data to decode and where to store the
+///   decode result.
+/// @param[in,out] offset Ptr to the currect offset to the rawbuf.
+/// @param[in,out] used Ptr to the current used counter.
+/// @param[in] bitTime Time interval of single bit in microseconds.
+/// @param[in] tolerance Percent tolerance to be used in matching.
+/// @param[in] excess Extra useconds to add to Marks & removed from Spaces.
+/// @param[in] delta A non-scaling (+/-) error margin (in useconds).
+/// @param[in] maxwidth Maximum number of successive levels to find in a single
+///   level (default is 3)
+/// @return MARK, SPACE, or -1 for error.
+///   (The measured time interval is not a  multiple of t1.)
+/// @see https://en.wikipedia.org/wiki/Manchester_code
 int16_t IRrecv::getRClevel(decode_results *results, uint16_t *offset,
-                           uint16_t *used, uint16_t bitTime, uint8_t tolerance,
-                           int16_t excess, uint16_t delta, uint8_t maxwidth) {
+                           uint16_t *used, const uint16_t bitTime,
+                           const uint8_t tolerance, const int16_t excess,
+                           const uint16_t delta, const uint8_t maxwidth) {
   DPRINT("DEBUG: getRClevel: offset = ");
   DPRINTLN(uint64ToString(*offset));
   DPRINT("DEBUG: getRClevel: rawlen = ");
@@ -343,28 +295,17 @@ int16_t IRrecv::getRClevel(decode_results *results, uint16_t *offset,
 #endif  // (DECODE_RC5 || DECODE_RC6 || DECODE_LASERTAG)
 
 #if DECODE_RC5
-// Decode the supplied RC-5/RC5X message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: RC-5 (stable), RC-5X (alpha)
-//
-// Note:
-//   The 'toggle' bit is included as the 6th (MSB) address bit, the MSB of data,
-//   & in the count of bits decoded.
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc5.php
-//   https://en.wikipedia.org/wiki/RC-5
-//   https://en.wikipedia.org/wiki/Manchester_code
-// TODO(anyone):
-//   Serious testing of the RC-5X and strict aspects needs to be done.
+/// Decode the supplied RC-5/RC5X message.
+/// Status: RC-5 (stable), RC-5X (alpha)
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note The 'toggle' bit is included as the 6th (MSB) address bit, the MSB of
+///   data, & in the count of bits decoded.
+/// @todo Serious testing of the RC-5X and strict aspects needs to be done.
 bool IRrecv::decodeRC5(decode_results *results, uint16_t offset,
                        const uint16_t nbits, const bool strict) {
   if (results->rawlen <= kRc5SamplesMin + kHeader - 1 + offset) return false;
@@ -430,24 +371,15 @@ bool IRrecv::decodeRC5(decode_results *results, uint16_t offset,
 #endif  // DECODE_RC5
 
 #if DECODE_RC6
-// Decode the supplied RC6 message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Stable.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc6.php
-//   https://en.wikipedia.org/wiki/Manchester_code
-// TODO(anyone):
-//   Testing of the strict compliance aspects.
+/// Decode the supplied RC6 message.
+/// Status: Stable.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @todo Testing of the strict compliance aspects.
 bool IRrecv::decodeRC6(decode_results *results, uint16_t offset,
                        const uint16_t nbits, const bool strict) {
   if (results->rawlen <= kHeader + 2 + 4 + offset)

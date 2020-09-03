@@ -1,5 +1,11 @@
 // Copyright 2017 David Conran
-// Lasertag
+
+/// @file
+/// @brief Support for Lasertag protocols.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/366
+
+// Supports:
+//   Brand: Lasertag,  Model: Phaser emitters
 
 #include <algorithm>
 #include "IRrecv.h"
@@ -17,16 +23,13 @@ const int16_t kSpace = 1;
 const int16_t kMark = 0;
 
 #if SEND_LASERTAG
-// Send a Lasertag packet.
-// This protocol is pretty much just raw Manchester encoding.
-//
-// Args:
-//   data:    The message you wish to send.
-//   nbits:   Bit size of the protocol you want to send.
-//   repeat:  Nr. of extra times the data will be sent.
-//
-// Status: STABLE / Working.
-//
+/// Send a Lasertag packet/message.
+/// Status: STABLE / Working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note This protocol is pretty much just raw Manchester encoding.
+/// @todo Convert this to use `sendManchester()` if we can.`
 void IRsend::sendLasertag(uint64_t data, uint16_t nbits, uint16_t repeat) {
   if (nbits > sizeof(data) * 8) return;  // We can't send something that big.
 
@@ -51,24 +54,19 @@ void IRsend::sendLasertag(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif  // SEND_LASERTAG
 
 #if DECODE_LASERTAG
-// Decode the supplied Lasertag message.
-// This protocol is pretty much just raw Manchester encoding.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: BETA / Appears to be working 90% of the time.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/rc5.php
-//   https://en.wikipedia.org/wiki/RC-5
-//   https://en.wikipedia.org/wiki/Manchester_code
+/// Decode the supplied Lasertag message.
+/// Status: BETA / Appears to be working 90% of the time.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note This protocol is pretty much just raw Manchester encoding.
+/// @see http://www.sbprojects.com/knowledge/ir/rc5.php
+/// @see https://en.wikipedia.org/wiki/RC-5
+/// @see https://en.wikipedia.org/wiki/Manchester_code
+/// @todo Convert to using `matchManchester()` if we can.
 bool IRrecv::decodeLasertag(decode_results *results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
   if (results->rawlen <= kLasertagMinSamples + offset) return false;

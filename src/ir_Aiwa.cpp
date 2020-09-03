@@ -3,15 +3,12 @@
 #include "IRrecv.h"
 #include "IRsend.h"
 
-//                         AAA   IIIII  W   W   AAA
-//                        A   A    I    W   W  A   A
-//                        AAAAA    I    W W W  AAAAA
-//                        A   A    I    W W W  A   A
-//                        A   A  IIIII   WWW   A   A
+/// @file
+/// @brief Aiwa based protocol.
+/// Based off the RC-T501 RCU
+/// Inspired by IRremoteESP8266's implementation
+/// @see https://github.com/z3t0/Arduino-IRremote
 
-// Based off the RC-T501 RCU
-// Added by David Conran. (Inspired by IRremoteESP8266's implementation:
-//                         https://github.com/z3t0/Arduino-IRremote)
 // Supports:
 //   Brand: Aiwa,  Model: RC-T501 RCU
 
@@ -23,18 +20,13 @@ const uint64_t kAiwaRcT501PreData = 0x1D8113FULL;  // 26-bits
 const uint64_t kAiwaRcT501PostData = 1ULL;
 
 #if SEND_AIWA_RC_T501
-// Send an Aiwa RC T501 formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent.
-//           Typically kAiwaRcT501Bits. Max is 37 = (64 - 27)
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: BETA / Should work.
-//
-// Ref:
-//  http://lirc.sourceforge.net/remotes/aiwa/RC-T501
+/// Send an Aiwa RC T501 formatted message.
+/// Status: BETA / Should work.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of the message to be sent.
+///   Typically kAiwaRcT501Bits. Max is 37 = (64 - 27)
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see http://lirc.sourceforge.net/remotes/aiwa/RC-T501
 void IRsend::sendAiwaRCT501(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Appears to be an extended NEC1 protocol. i.e. 42 bits instead of 32 bits.
   // So use sendNEC instead, however the twist is it has a fixed 26 bit
@@ -49,28 +41,23 @@ void IRsend::sendAiwaRCT501(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif
 
 #if DECODE_AIWA_RC_T501
-// Decode the supplied Aiwa RC T501 message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kAiwaRcT501Bits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: BETA / Should work.
-//
-// Notes:
-//   Aiwa RC T501 appears to be a 42 bit variant of the NEC1 protocol.
-//   However, we historically (original Arduino IRremote project) treats it as
-//   a 15 bit (data) protocol. So, we expect nbits to typically be 15, and we
-//   will remove the prefix and postfix from the raw data, and use that as
-//   the result.
-//
-// Ref:
-//   http://www.sbprojects.com/knowledge/ir/nec.php
+/// Decode the supplied Aiwa RC T501 message.
+/// Status: BETA / Should work.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @note
+///  Aiwa RC T501 appears to be a 42 bit variant of the NEC1 protocol.
+///  However, we historically (original Arduino IRremote project) treats it as
+///  a 15 bit (data) protocol. So, we expect nbits to typically be 15, and we
+///  will remove the prefix and postfix from the raw data, and use that as
+///  the result.
+/// @see http://www.sbprojects.com/knowledge/ir/nec.php
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
 bool IRrecv::decodeAiwaRCT501(decode_results *results, uint16_t offset,
                               const uint16_t nbits, const bool strict) {
   // Compliance

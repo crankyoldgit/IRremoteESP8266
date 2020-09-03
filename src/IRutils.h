@@ -42,6 +42,8 @@ uint64_t invertBits(const uint64_t data, const uint16_t nbits);
 decode_type_t strToDecodeType(const char *str);
 float celsiusToFahrenheit(const float deg);
 float fahrenheitToCelsius(const float deg);
+/// Namespace for covering common functions & procedures for advancd protocol
+/// handlers
 namespace irutils {
   String addBoolToString(const bool value, const String label,
                          const bool precomma = true);
@@ -67,6 +69,8 @@ namespace irutils {
   String minsToString(const uint16_t mins);
   uint8_t sumNibbles(const uint8_t * const start, const uint16_t length,
                      const uint8_t init = 0);
+  uint8_t sumNibbles(const uint64_t data, const uint8_t count = 16,
+                     const uint8_t init = 0, const bool nibbleonly = true);
   uint8_t bcdToUint8(const uint8_t bcd);
   uint8_t uint8ToBcd(const uint8_t integer);
   bool getBit(const uint64_t data, const uint8_t position,
@@ -103,5 +107,8 @@ namespace irutils {
                const uint32_t data);
   void setBits(uint64_t * const dst, const uint8_t offset, const uint8_t nbits,
                const uint64_t data);
+  uint8_t * invertBytePairs(uint8_t *ptr, const uint16_t length);
+  bool checkInvertedBytePairs(const uint8_t * const ptr, const uint16_t length);
+  uint8_t lowLevelSanityCheck(void);
 }  // namespace irutils
 #endif  // IRUTILS_H_

@@ -1,7 +1,16 @@
 // Copyright 2015 Kristian Lauszus
 // Copyright 2017, 2018 David Conran
 
-// Panasonic devices
+/// @file
+/// @brief Support for Panasonic protocols.
+/// Panasonic protocol originally added by Kristian Lauszus
+/// (Thanks to zenwheel and other people at the original blog post)
+/// @see Panasonic https://github.com/z3t0/Arduino-IRremote
+/// @see http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?2615
+/// @see Panasonic A/C support heavily influenced by https://github.com/ToniA/ESPEasy/blob/HeatpumpIR/lib/HeatpumpIR/PanasonicHeatpumpIR.cpp
+/// Panasonic A/C Clock & Timer support:
+///   Reverse Engineering by MikkelTb
+///   Code by crankyoldgit
 
 #include "ir_Panasonic.h"
 #include <algorithm>
@@ -14,29 +23,8 @@
 #include "IRtext.h"
 #include "IRutils.h"
 
-// Panasonic protocol originally added by Kristian Lauszus from:
-//   https://github.com/z3t0/Arduino-IRremote
-// (Thanks to zenwheel and other people at the original blog post)
-//
-// Panasonic A/C support add by crankyoldgit but heavily influenced by:
-//   https://github.com/ToniA/ESPEasy/blob/HeatpumpIR/lib/HeatpumpIR/PanasonicHeatpumpIR.cpp
-// Panasonic A/C Clock & Timer support:
-//   Reverse Engineering by MikkelTb
-//   Code by crankyoldgit
-// Panasonic A/C models supported:
-//   A/C Series/models:
-//     JKE, LKE, DKE, CKP, PKR, RKR, & NKE series. (In theory)
-//     CS-YW9MKD, CS-Z9RKR, CS-E7PKR (confirmed)
-//     CS-ME14CKPG / CS-ME12CKPG / CS-ME10CKPG
-//   A/C Remotes:
-//     A75C3747 (confirmed)
-//     A75C3704
-//     A75C2311 (CKP)
-
 // Constants
-// Ref:
-//   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
-
+/// @see http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
 const uint16_t kPanasonicTick = 432;
 const uint16_t kPanasonicHdrMarkTicks = 8;
 const uint16_t kPanasonicHdrMark = kPanasonicHdrMarkTicks * kPanasonicTick;
@@ -74,18 +62,15 @@ using irutils::minsToString;
 using irutils::setBit;
 using irutils::setBits;
 
+// Used by Denon as well.
 #if (SEND_PANASONIC || SEND_DENON)
-// Send a Panasonic formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. (kPanasonicBits).
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: STABLE / Should be working.
-//
-// Note:
-//   This protocol is a modified version of Kaseikyo.
+/// Send a Panasonic formatted message.
+/// Status: STABLE / Should be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note This protocol is a modified version of Kaseikyo.
+/// @note Use this method if you want to send the results of `decodePanasonic`.
 void IRsend::sendPanasonic64(const uint64_t data, const uint16_t nbits,
                              const uint16_t repeat) {
   sendGeneric(kPanasonicHdrMark, kPanasonicHdrSpace, kPanasonicBitMark,
@@ -94,39 +79,29 @@ void IRsend::sendPanasonic64(const uint64_t data, const uint16_t nbits,
               data, nbits, kPanasonicFreq, true, repeat, 50);
 }
 
-// Send a Panasonic formatted message.
-//
-// Args:
-//   address: The manufacturer code.
-//   data:    The data portion to be sent.
-//   nbits:   The number of bits of the message to be sent. (kPanasonicBits).
-//   repeat:  The number of times the command is to be repeated.
-//
-// Status: STABLE.
-//
-// Note:
-//   This protocol is a modified version of Kaseikyo.
+/// Send a Panasonic formatted message.
+/// Status: STABLE, but DEPRECATED
+/// @deprecated This is only for legacy use only, please use `sendPanasonic64()`
+///   instead.
+/// @param[in] address The 16-bit manufacturer code.
+/// @param[in] data The 32-bit data portion of the message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note This protocol is a modified version of Kaseikyo.
 void IRsend::sendPanasonic(const uint16_t address, const uint32_t data,
                            const uint16_t nbits, const uint16_t repeat) {
   sendPanasonic64(((uint64_t)address << 32) | (uint64_t)data, nbits, repeat);
 }
 
-// Calculate the raw Panasonic data based on device, subdevice, & function.
-//
-// Args:
-//   manufacturer: A 16-bit manufacturer code. e.g. 0x4004 is Panasonic.
-//   device:       An 8-bit code.
-//   subdevice:    An 8-bit code.
-//   function:     An 8-bit code.
-// Returns:
-//   A raw uint64_t Panasonic message.
-//
-// Status: STABLE / Should be working..
-//
-// Note:
-//   Panasonic 48-bit protocol is a modified version of Kaseikyo.
-// Ref:
-//   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?2615
+/// Calculate the raw Panasonic data based on device, subdevice, & function.
+/// Status: STABLE / Should be working.
+/// @param[in] manufacturer A 16-bit manufacturer code. e.g. 0x4004 is Panasonic
+/// @param[in] device An 8-bit code.
+/// @param[in] subdevice An 8-bit code.
+/// @param[in] function An 8-bit code.
+/// @return A value suitable for use with `sendPanasonic64()`.
+/// @note Panasonic 48-bit protocol is a modified version of Kaseikyo.
+/// @see http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?2615
 uint64_t IRsend::encodePanasonic(const uint16_t manufacturer,
                                  const uint8_t device,
                                  const uint8_t subdevice,
@@ -137,24 +112,21 @@ uint64_t IRsend::encodePanasonic(const uint16_t manufacturer,
 }
 #endif  // (SEND_PANASONIC || SEND_DENON)
 
+// Used by Denon as well.
 #if (DECODE_PANASONIC || DECODE_DENON)
-// Decode the supplied Panasonic message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of data bits to expect.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Should be working.
-// Note:
-//   Panasonic 48-bit protocol is a modified version of Kaseikyo.
-// Ref:
-//   http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
-//   http://www.hifi-remote.com/wiki/index.php?title=Panasonic
+/// Decode the supplied Panasonic message.
+/// Status: STABLE / Should be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] manufacturer A 16-bit manufacturer code. e.g. 0x4004 is Panasonic
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @warning Results to be used with `sendPanasonic64()`, not `sendPanasonic()`.
+/// @note Panasonic 48-bit protocol is a modified version of Kaseikyo.
+/// @see http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?2615
+/// @see http://www.hifi-remote.com/wiki/index.php?title=Panasonic
 bool IRrecv::decodePanasonic(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict,
                              const uint32_t manufacturer) {
@@ -193,24 +165,11 @@ bool IRrecv::decodePanasonic(decode_results *results, uint16_t offset,
 #endif  // (DECODE_PANASONIC || DECODE_DENON)
 
 #if SEND_PANASONIC_AC
-// Send a Panasonic A/C message.
-//
-// Args:
-//   data:   Contents of the message to be sent. (Guessing MSBF order)
-//   nbits:  Nr. of bits of data to be sent. Typically kPanasonicAcBits.
-//   repeat: Nr. of additional times the message is to be sent.
-//
-// Status: Beta / Appears to work with real device(s).
-//:
-// Panasonic A/C models supported:
-//   A/C Series/models:
-//     JKE, LKE, DKE, CKP, PKR, RKR, & NKE series.
-//     CS-YW9MKD
-//     CS-E7PKR
-//   A/C Remotes:
-//     A75C3747
-//     A75C3704
-//
+/// Send a Panasonic A/C message.
+/// Status: STABLE / Work with real device(s).
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendPanasonicAC(const uint8_t data[], const uint16_t nbytes,
                              const uint16_t repeat) {
   if (nbytes < kPanasonicAcSection1Length) return;
@@ -231,44 +190,59 @@ void IRsend::sendPanasonicAC(const uint8_t data[], const uint16_t nbytes,
 }
 #endif  // SEND_PANASONIC_AC
 
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRPanasonicAc::IRPanasonicAc(const uint16_t pin, const bool inverted,
                              const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
+/// Reset the state of the remote to a known good state/sequence.
 void IRPanasonicAc::stateReset(void) {
   memcpy(remote_state, kPanasonicKnownGoodState, kPanasonicAcStateLength);
   _temp = 25;  // An initial saved desired temp. Completely made up.
   _swingh = kPanasonicAcSwingHMiddle;  // A similar made up value for H Swing.
 }
 
+/// Set up hardware to be able to send a message.
 void IRPanasonicAc::begin(void) { _irsend.begin(); }
 
-// Verify the checksum is valid for a given state.
-// Args:
-//   state:  The array to verify the checksum of.
-//   length: The size of the state.
-// Returns:
-//   A boolean.
-bool IRPanasonicAc::validChecksum(uint8_t state[], const uint16_t length) {
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
+bool IRPanasonicAc::validChecksum(const uint8_t *state, const uint16_t length) {
   if (length < 2) return false;  // 1 byte of data can't have a checksum.
   return (state[length - 1] ==
           sumBytes(state, length - 1, kPanasonicAcChecksumInit));
 }
 
-uint8_t IRPanasonicAc::calcChecksum(uint8_t state[], const uint16_t length) {
+/// Calculate the checksum for a given state.
+/// @param[in] state The value to calc the checksum of.
+/// @param[in] length The size/length of the state.
+/// @return The calculated checksum value.
+uint8_t IRPanasonicAc::calcChecksum(const uint8_t *state,
+                                    const uint16_t length) {
   return sumBytes(state, length - 1, kPanasonicAcChecksumInit);
 }
 
+/// Calculate and set the checksum values for the internal state.
+/// @param[in] length The size/length of the state.
 void IRPanasonicAc::fixChecksum(const uint16_t length) {
   remote_state[length - 1] = this->calcChecksum(remote_state, length);
 }
 
 #if SEND_PANASONIC_AC
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRPanasonicAc::send(const uint16_t repeat) {
   _irsend.sendPanasonicAC(getRaw(), kPanasonicAcStateLength, repeat);
 }
 #endif  // SEND_PANASONIC_AC
 
+/// Set the model of the A/C to emulate.
+/// @param[in] model The enum of the appropriate model.
 void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
   switch (model) {
     case panasonic_ac_remote_model_t::kPanasonicDke:
@@ -317,6 +291,8 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
   setIon(getIon());
 }
 
+/// Get/Detect the model of the A/C.
+/// @return The enum of the compatible model.
 panasonic_ac_remote_model_t IRPanasonicAc::getModel(void) {
   if (remote_state[23] == 0x89) return kPanasonicRkr;
   if (remote_state[17] == 0x00) {
@@ -334,45 +310,55 @@ panasonic_ac_remote_model_t IRPanasonicAc::getModel(void) {
   return panasonic_ac_remote_model_t::kPanasonicUnknown;  // Default
 }
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRPanasonicAc::getRaw(void) {
   this->fixChecksum();
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] state A valid code for this protocol.
 void IRPanasonicAc::setRaw(const uint8_t state[]) {
   memcpy(remote_state, state, kPanasonicAcStateLength);
 }
 
-// Control the power state of the A/C unit.
-//
-// For CKP models, the remote has no memory of the power state the A/C unit
-// should be in. For those models setting this on/true will toggle the power
-// state of the Panasonic A/C unit with the next meessage.
-// e.g. If the A/C unit is already on, setPower(true) will turn it off.
-//      If the A/C unit is already off, setPower(true) will turn it on.
-//      setPower(false) will leave the A/C power state as it was.
-//
-// For all other models, setPower(true) should set the internal state to
-// turn it on, and setPower(false) should turn it off.
+/// Control the power state of the A/C unit.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @warning For CKP models, the remote has no memory of the power state the A/C
+///   unit should be in. For those models setting this on/true will toggle the
+///   power state of the Panasonic A/C unit with the next meessage.
+///     e.g. If the A/C unit is already on, setPower(true) will turn it off.
+///       If the A/C unit is already off, setPower(true) will turn it on.
+///       `setPower(false)` will leave the A/C power state as it was.
+///   For all other models, setPower(true) should set the internal state to
+///   turn it on, and setPower(false) should turn it off.
 void IRPanasonicAc::setPower(const bool on) {
   setBit(&remote_state[13], kPanasonicAcPowerOffset, on);
 }
 
-// Return the A/C power state of the remote.
-// Except for CKP models, where it returns if the power state will be toggled
-// on the A/C unit when the next message is sent.
+/// Get the A/C power state of the remote.
+/// @return true, the setting is on. false, the setting is off.
+/// @warning Except for CKP models, where it returns if the power state will be
+///   toggled on the A/C unit when the next message is sent.
 bool IRPanasonicAc::getPower(void) {
   return GETBIT8(remote_state[13], kPanasonicAcPowerOffset);
 }
 
+/// Change the power setting to On.
 void IRPanasonicAc::on(void) { setPower(true); }
 
+/// Change the power setting to Off.
 void IRPanasonicAc::off(void) { setPower(false); }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRPanasonicAc::getMode(void) {
   return GETBITS8(remote_state[13], kHighNibble, kModeBitsSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] desired The desired operating mode.
 void IRPanasonicAc::setMode(const uint8_t desired) {
   uint8_t mode = kPanasonicAcAuto;  // Default to Auto mode.
   switch (desired) {
@@ -394,17 +380,17 @@ void IRPanasonicAc::setMode(const uint8_t desired) {
   setBits(&remote_state[13], kHighNibble, kModeBitsSize, mode);
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRPanasonicAc::getTemp(void) {
   return GETBITS8(remote_state[14], kPanasonicAcTempOffset,
                   kPanasonicAcTempSize);
 }
 
-// Set the desitred temperature in Celsius.
-// Args:
-//   celsius: The temperature to set the A/C unit to.
-//   remember: A boolean flag for the class to remember the temperature.
-//
-// Automatically safely limits the temp to the operating range supported.
+/// Set the temperature.
+/// @param[in] celsius The temperature in degrees celsius.
+/// @param[in] remember: A flag for the class to remember the temperature.
+/// @note Automatically safely limits the temp to the operating range supported.
 void IRPanasonicAc::setTemp(const uint8_t celsius, const bool remember) {
   uint8_t temperature;
   temperature = std::max(celsius, kPanasonicAcMinTemp);
@@ -414,10 +400,14 @@ void IRPanasonicAc::setTemp(const uint8_t celsius, const bool remember) {
           temperature);
 }
 
+/// Get the current vertical swing setting.
+/// @return The current position it is set to.
 uint8_t IRPanasonicAc::getSwingVertical(void) {
   return GETBITS8(remote_state[16], kLowNibble, kNibbleSize);
 }
 
+/// Control the vertical swing setting.
+/// @param[in] desired_elevation The position to set the vertical swing to.
 void IRPanasonicAc::setSwingVertical(const uint8_t desired_elevation) {
   uint8_t elevation = desired_elevation;
   if (elevation != kPanasonicAcSwingVAuto) {
@@ -427,10 +417,14 @@ void IRPanasonicAc::setSwingVertical(const uint8_t desired_elevation) {
   setBits(&remote_state[16], kLowNibble, kNibbleSize, elevation);
 }
 
+/// Get the current horizontal swing setting.
+/// @return The current position it is set to.
 uint8_t IRPanasonicAc::getSwingHorizontal(void) {
   return GETBITS8(remote_state[17], kLowNibble, kNibbleSize);
 }
 
+/// Control the horizontal swing setting.
+/// @param[in] desired_direction The position to set the horizontal swing to.
 void IRPanasonicAc::setSwingHorizontal(const uint8_t desired_direction) {
   switch (desired_direction) {
     case kPanasonicAcSwingHAuto:
@@ -458,6 +452,8 @@ void IRPanasonicAc::setSwingHorizontal(const uint8_t desired_direction) {
   setBits(&remote_state[17], kLowNibble, kNibbleSize, direction);
 }
 
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
 void IRPanasonicAc::setFan(const uint8_t speed) {
   switch (speed) {
     case kPanasonicAcFanMin:
@@ -471,11 +467,15 @@ void IRPanasonicAc::setFan(const uint8_t speed) {
   }
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRPanasonicAc::getFan(void) {
   return GETBITS8(remote_state[16], kHighNibble, kNibbleSize) -
       kPanasonicAcFanDelta;
 }
 
+/// Get the Quiet setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRPanasonicAc::getQuiet(void) {
   switch (this->getModel()) {
     case kPanasonicRkr:
@@ -486,6 +486,8 @@ bool IRPanasonicAc::getQuiet(void) {
   }
 }
 
+/// Set the Quiet setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRPanasonicAc::setQuiet(const bool on) {
   uint8_t offset;
   switch (this->getModel()) {
@@ -497,6 +499,8 @@ void IRPanasonicAc::setQuiet(const bool on) {
   setBit(&remote_state[21], offset, on);
 }
 
+/// Get the Powerful (Turbo) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRPanasonicAc::getPowerful(void) {
   switch (this->getModel()) {
     case kPanasonicRkr:
@@ -507,6 +511,8 @@ bool IRPanasonicAc::getPowerful(void) {
   }
 }
 
+/// Set the Powerful (Turbo) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRPanasonicAc::setPowerful(const bool on) {
   uint8_t offset;
   switch (this->getModel()) {
@@ -519,11 +525,18 @@ void IRPanasonicAc::setPowerful(const bool on) {
   setBit(&remote_state[21], offset, on);
 }
 
-// Convert standard (military/24hr) time to nr. of minutes since midnight.
+/// Convert standard (military/24hr) time to nr. of minutes since midnight.
+/// @param[in] hours The hours component of the time.
+/// @param[in] mins The minutes component of the time.
+/// @return The nr of minutes since midnight.
 uint16_t IRPanasonicAc::encodeTime(const uint8_t hours, const uint8_t mins) {
   return std::min(hours, (uint8_t)23) * 60 + std::min(mins, (uint8_t)59);
 }
 
+/// Get the time from a given pointer location.
+/// @param[in] ptr A pointer to a time location in a state.
+/// @return The time expressed as nr. of minutes past midnight.
+/// @note Internal use only.
 uint16_t IRPanasonicAc::_getTime(const uint8_t ptr[]) {
   uint16_t result = (GETBITS8(
       ptr[1], kLowNibble, kPanasonicAcTimeOverflowSize) <<
@@ -532,8 +545,15 @@ uint16_t IRPanasonicAc::_getTime(const uint8_t ptr[]) {
   return result;
 }
 
+/// Get the current clock time value.
+/// @return The time expressed as nr. of minutes past midnight.
 uint16_t IRPanasonicAc::getClock(void) { return _getTime(&remote_state[24]); }
 
+/// Set the time at a given pointer location.
+/// @param[in, out] ptr A pointer to a time location in a state.
+/// @param[in] mins_since_midnight The time as nr. of minutes past midnight.
+/// @param[in] round_down Do we round to the nearest 10 minute mark?
+/// @note Internal use only.
 void IRPanasonicAc::_setTime(uint8_t * const ptr,
                              const uint16_t mins_since_midnight,
                              const bool round_down) {
@@ -546,12 +566,19 @@ void IRPanasonicAc::_setTime(uint8_t * const ptr,
           corrected >> (kPanasonicAcTimeSize - kPanasonicAcTimeOverflowSize));
 }
 
+/// Set the current clock time value.
+/// @param[in] mins_since_midnight The time as nr. of minutes past midnight.
 void IRPanasonicAc::setClock(const uint16_t mins_since_midnight) {
   _setTime(&remote_state[24], mins_since_midnight, false);
 }
 
+/// Get the On Timer time value.
+/// @return The time expressed as nr. of minutes past midnight.
 uint16_t IRPanasonicAc::getOnTimer(void) { return _getTime(&remote_state[18]); }
 
+/// Set/Enable the On Timer.
+/// @param[in] mins_since_midnight The time as nr. of minutes past midnight.
+/// @param[in] enable Do we enable the timer or not?
 void IRPanasonicAc::setOnTimer(const uint16_t mins_since_midnight,
                                const bool enable) {
   // Set the timer flag.
@@ -560,12 +587,17 @@ void IRPanasonicAc::setOnTimer(const uint16_t mins_since_midnight,
   _setTime(&remote_state[18], mins_since_midnight, true);
 }
 
+/// Cancel the On Timer.
 void IRPanasonicAc::cancelOnTimer(void) { this->setOnTimer(0, false); }
 
+/// Check if the On Timer is Enabled.
+/// @return true, the setting is on. false, the setting is off.
 bool IRPanasonicAc::isOnTimerEnabled(void) {
   return GETBIT8(remote_state[13], kPanasonicAcOnTimerOffset);
 }
 
+/// Get the Off Timer time value.
+/// @return The time expressed as nr. of minutes past midnight.
 uint16_t IRPanasonicAc::getOffTimer(void) {
   uint16_t result = (GETBITS8(remote_state[20], 0, 7) << kNibbleSize) |
       GETBITS8(remote_state[19], kHighNibble, kNibbleSize);
@@ -573,6 +605,9 @@ uint16_t IRPanasonicAc::getOffTimer(void) {
   return result;
 }
 
+/// Set/Enable the Off Timer.
+/// @param[in] mins_since_midnight The time as nr. of minutes past midnight.
+/// @param[in] enable Do we enable the timer or not?
 void IRPanasonicAc::setOffTimer(const uint16_t mins_since_midnight,
                                 const bool enable) {
   // Ensure its on a 10 minute boundary and no overflow.
@@ -587,12 +622,17 @@ void IRPanasonicAc::setOffTimer(const uint16_t mins_since_midnight,
   setBits(&remote_state[20], 0, 7, corrected >> kNibbleSize);
 }
 
+/// Cancel the Off Timer.
 void IRPanasonicAc::cancelOffTimer(void) { this->setOffTimer(0, false); }
 
+/// Check if the Off Timer is Enabled.
+/// @return true, the setting is on. false, the setting is off.
 bool IRPanasonicAc::isOffTimerEnabled(void) {
   return GETBIT8(remote_state[13], kPanasonicAcOffTimerOffset);
 }
 
+/// Get the Ion (filter) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRPanasonicAc::getIon(void) {
   switch (this->getModel()) {
     case kPanasonicDke:
@@ -603,13 +643,17 @@ bool IRPanasonicAc::getIon(void) {
   }
 }
 
+/// Set the Ion (filter) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRPanasonicAc::setIon(const bool on) {
   if (this->getModel() == kPanasonicDke)
     setBit(&remote_state[kPanasonicAcIonFilterByte],
            kPanasonicAcIonFilterOffset, on);
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kPanasonicAcCool;
@@ -620,7 +664,9 @@ uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRPanasonicAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kPanasonicAcFanMin;
@@ -632,7 +678,9 @@ uint8_t IRPanasonicAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a standard A/C vertical swing into its native setting.
+/// Convert a standard A/C vertical swing into its native setting.
+/// @param[in] position A stdAc::swingv_t position to convert.
+/// @return The equivilent native horizontal swing position.
 uint8_t IRPanasonicAc::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -644,7 +692,9 @@ uint8_t IRPanasonicAc::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
-// Convert a standard A/C horizontal swing into its native setting.
+/// Convert a standard A/C horizontal swing into its native setting.
+/// @param[in] position A stdAc::swingh_t position to convert.
+/// @return The equivilent native horizontal swing position.
 uint8_t IRPanasonicAc::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kLeftMax:  return kPanasonicAcSwingHFullLeft;
@@ -656,7 +706,9 @@ uint8_t IRPanasonicAc::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRPanasonicAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kPanasonicAcCool: return stdAc::opmode_t::kCool;
@@ -667,7 +719,9 @@ stdAc::opmode_t IRPanasonicAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] spd The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRPanasonicAc::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kPanasonicAcFanMax:     return stdAc::fanspeed_t::kMax;
@@ -679,7 +733,9 @@ stdAc::fanspeed_t IRPanasonicAc::toCommonFanSpeed(const uint8_t spd) {
   }
 }
 
-// Convert a native vertical swing to it's common equivalent.
+/// Convert a native horizontal swing postion to it's common equivalent.
+/// @param[in] pos A native position to convert.
+/// @return The common horizontal swing position.
 stdAc::swingh_t IRPanasonicAc::toCommonSwingH(const uint8_t pos) {
   switch (pos) {
     case kPanasonicAcSwingHFullLeft:  return stdAc::swingh_t::kLeftMax;
@@ -691,7 +747,9 @@ stdAc::swingh_t IRPanasonicAc::toCommonSwingH(const uint8_t pos) {
   }
 }
 
-// Convert a native vertical swing to it's common equivalent.
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] pos A native position to convert.
+/// @return The common vertical swing position.
 stdAc::swingv_t IRPanasonicAc::toCommonSwingV(const uint8_t pos) {
   if (pos >= kPanasonicAcSwingVHighest && pos <= kPanasonicAcSwingVLowest)
     return (stdAc::swingv_t)pos;
@@ -699,7 +757,8 @@ stdAc::swingv_t IRPanasonicAc::toCommonSwingV(const uint8_t pos) {
     return stdAc::swingv_t::kAuto;
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRPanasonicAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::PANASONIC_AC;
@@ -724,7 +783,8 @@ stdAc::state_t IRPanasonicAc::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the internal state into a human readable string.
+/// @return A string containing the settings in human-readable form.
 String IRPanasonicAc::toString(void) {
   String result = "";
   result.reserve(180);  // Reserve some heap for the string to reduce fragging.
@@ -808,27 +868,14 @@ String IRPanasonicAc::toString(void) {
 }
 
 #if DECODE_PANASONIC_AC
-// Decode the supplied Panasonic AC message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kPanasonicAcBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Beta / Appears to work with real device(s).
-//
-// Panasonic A/C models supported:
-//   A/C Series/models:
-//     JKE, LKE, DKE, PKR, & NKE series.
-//     CS-YW9MKD
-//     CS-E7PKR
-//   A/C Remotes:
-//     A75C3747 (Confirmed)
-//     A75C3704
+/// Decode the supplied Panasonic AC message.
+/// Status: STABLE / Works with real device(s).
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
 bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t offset,
                                const uint16_t nbits, const bool strict) {
   uint8_t min_nr_of_messages = 1;

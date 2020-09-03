@@ -1,6 +1,11 @@
 // Copyright 2020 David Conran
+/// @file
+/// @brief Support for Epson protocols.
+/// Epson is an NEC-like protocol, except it doesn't use the NEC style repeat.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1034
 
-// Epson is an NEC-like protocol, except it doesn't use the NEC style repeat.
+// Supports:
+//   Brand: Epson,  Model: EN-TW9100W Projector
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
@@ -11,17 +16,11 @@
 #include "ir_NEC.h"
 
 #if SEND_EPSON
-// Send an Epson formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent. Typically kEpsonBits.
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: Beta / Probably works.
-//
-// Ref:
-//  https://github.com/crankyoldgit/IRremoteESP8266/issues/1034
+/// Send an Epson formatted message.
+/// Status: Beta / Probably works.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of nbits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendEpson(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(kNecHdrMark, kNecHdrSpace, kNecBitMark, kNecOneSpace, kNecBitMark,
               kNecZeroSpace, kNecBitMark, kNecMinGap, kNecMinCommandLength,
@@ -31,27 +30,18 @@ void IRsend::sendEpson(uint64_t data, uint16_t nbits, uint16_t repeat) {
 #endif  // SEND_EPSON
 
 #if DECODE_EPSON
-// Decode the supplied Epson message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kNECBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Beta / Probably works.
-//
-// Notes:
-//   Experimental data indicates there are at least three
-//   messages (first + 2 repeats). We only require the first + a single repeat
-//   to match. This helps us distinguish it from NEC messages which are near
-//   identical.
-//
-// Ref:
-//  https://github.com/crankyoldgit/IRremoteESP8266/issues/1034
+/// Decode the supplied Epson message.
+/// Status: Beta / Probably works.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @note Experimental data indicates there are at least three messages
+///   (first + 2 repeats). We only require the first + a single repeat to match.
+///   This helps us distinguish it from NEC messages which are near identical.
 bool IRrecv::decodeEpson(decode_results *results, uint16_t offset,
                          const uint16_t nbits, const bool strict) {
   const uint8_t kEpsonMinMesgsForDecode = 2;

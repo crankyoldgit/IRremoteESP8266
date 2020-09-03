@@ -1,7 +1,9 @@
-// Goodweather A/C
-//
 // Copyright 2019 ribeirodanielf
 // Copyright 2019 David Conran
+
+/// @file
+/// @brief Support for Goodweather compatible HVAC protocols.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/697
 
 // Supports:
 //   Brand: Goodweather,  Model: ZH/JT-03 remote
@@ -20,11 +22,8 @@
 #include "IRsend_test.h"
 #endif
 
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/697
 
 // Constants
-
 // Timing
 const uint16_t kGoodweatherBitMark = 580;
 const uint16_t kGoodweatherOneSpace = 580;
@@ -87,14 +86,18 @@ const uint64_t kGoodweatherStateInit  = 0xD50000000000;
 
 
 // Classes
+/// Class for handling detailed Goodweather A/C messages.
 class IRGoodweatherAc {
  public:
   explicit IRGoodweatherAc(const uint16_t pin, const bool inverted = false,
                            const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_GOODWEATHER
   void send(const uint16_t repeat = kGoodweatherMinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_GOODWEATHER
   void begin(void);
@@ -130,10 +133,12 @@ class IRGoodweatherAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  uint64_t remote;  // The state of the IR remote in IR code form.
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint64_t remote;  ///< The state of the IR remote in IR code form.
 };
 #endif  // IR_GOODWEATHER_H_

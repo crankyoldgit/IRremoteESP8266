@@ -2,6 +2,15 @@
 //
 // Copyright 2018 David Conran
 
+// Supports:
+//   Brand: Beko, Model: RG57K7(B)/BGEF Remote
+//   Brand: Beko, Model: BINR 070/071 split-type A/C
+//   Brand: Midea, Model: RG52D/BGE Remote
+//   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
+//   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
+//   Brand: Tokio, Model: AATOEMF17-12CHR1SW split-type RG51|50/BGE Remote
+//   Brand: Airwell, Model: RC08B remote
+
 #ifndef IR_COOLIX_H_
 #define IR_COOLIX_H_
 
@@ -16,14 +25,6 @@
 #include "IRsend_test.h"
 #endif
 
-// Supports:
-//   Brand: Beko, Model: RG57K7(B)/BGEF Remote
-//   Brand: Beko, Model: BINR 070/071 split-type A/C
-//   Brand: Midea, Model: RG52D/BGE Remote
-//   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
-//   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
-//   Brand: Tokio, Model: AATOEMF17-12CHR1SW split-type RG51|50/BGE Remote
-//   Brand: Airwell, Model: RC08B remote
 // Ref:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/484
 // Kudos:
@@ -98,14 +99,20 @@ const uint32_t kCoolixCmdFan = 0b101100101011111111100100;  // 0xB2BFE4
 const uint32_t kCoolixDefaultState = 0b101100100001111111001000;  // 0xB21FC8
 
 // Classes
+
+/// Class for handling detailed Coolix A/C messages.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/484
 class IRCoolixAC {
  public:
   explicit IRCoolixAC(const uint16_t pin, const bool inverted = false,
                       const bool use_modulation = true);
-
   void stateReset();
 #if SEND_COOLIX
   void send(const uint16_t repeat = kCoolixDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_COOLIX
   void begin();
@@ -144,9 +151,11 @@ class IRCoolixAC {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
+  IRsend _irsend;  ///< Instance of the IR send class
 #else
-  IRsendTest _irsend;
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
 #endif
   // internal state
   bool    powerFlag;
@@ -159,8 +168,8 @@ class IRCoolixAC {
   bool    swingHFlag;
   bool    swingVFlag;
 
-  uint32_t remote_state;  // The state of the IR remote in IR code form.
-  uint32_t saved_state;   // Copy of the state if we required a special mode.
+  uint32_t remote_state;  ///< The state of the IR remote in IR code form.
+  uint32_t saved_state;   ///< Copy of the state if we required a special mode.
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw();
   void setSensorTempRaw(const uint8_t code);

@@ -1,7 +1,12 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2017, 2018, 2019 David Conran
-
-// Samsung remote emulation
+/// @file
+/// @brief Support for Samsung protocols.
+/// Samsung originally added from https://github.com/shirriff/Arduino-IRremote/
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/505
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/621
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
+/// @see http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
 
 #include "ir_Samsung.h"
 #include <algorithm>
@@ -14,11 +19,7 @@
 #include "IRtext.h"
 #include "IRutils.h"
 
-// Samsung originally added from https://github.com/shirriff/Arduino-IRremote/
-
 // Constants
-// Ref:
-//   http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
 const uint16_t kSamsungTick = 560;
 const uint16_t kSamsungHdrMarkTicks = 8;
 const uint16_t kSamsungHdrMark = kSamsungHdrMarkTicks * kSamsungTick;
@@ -52,6 +53,14 @@ const uint16_t kSamsungAcBitMark = 586;
 const uint16_t kSamsungAcOneSpace = 1432;
 const uint16_t kSamsungAcZeroSpace = 436;
 
+// Data from https://github.com/crankyoldgit/IRremoteESP8266/issues/1220
+// Values calculated based on the average of ten messages.
+const uint16_t kSamsung36HdrMark = 4515;  /// < uSeconds
+const uint16_t kSamsung36HdrSpace = 4438;  /// < uSeconds
+const uint16_t kSamsung36BitMark = 512;  /// < uSeconds
+const uint16_t kSamsung36OneSpace = 1468;  /// < uSeconds
+const uint16_t kSamsung36ZeroSpace = 490;  /// < uSeconds
+
 using irutils::addBoolToString;
 using irutils::addFanToString;
 using irutils::addIntToString;
@@ -62,19 +71,15 @@ using irutils::setBit;
 using irutils::setBits;
 
 #if SEND_SAMSUNG
-// Send a Samsung formatted message.
-// Samsung has a separate message to indicate a repeat, like NEC does.
-// TODO(crankyoldgit): Confirm that is actually how Samsung sends a repeat.
-//                     The refdoc doesn't indicate it is true.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The bit size of the message being sent. typically kSamsungBits.
-//   repeat: The number of times the message is to be repeated.
-//
-// Status: STABLE / Should be working.
-//
-// Ref: http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
+/// Send a 32-bit Samsung formatted message.
+/// Status: STABLE / Should be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
+/// @note Samsung has a separate message to indicate a repeat, like NEC does.
+/// @todo Confirm that is actually how Samsung sends a repeat.
+///   The refdoc doesn't indicate it is true.
 void IRsend::sendSAMSUNG(const uint64_t data, const uint16_t nbits,
                          const uint16_t repeat) {
   sendGeneric(kSamsungHdrMark, kSamsungHdrSpace, kSamsungBitMark,
@@ -83,16 +88,12 @@ void IRsend::sendSAMSUNG(const uint64_t data, const uint16_t nbits,
               nbits, 38, true, repeat, 33);
 }
 
-// Construct a raw Samsung message from the supplied customer(address) &
-// command.
-//
-// Args:
-//   customer: The customer code. (aka. Address)
-//   command:  The command code.
-// Returns:
-//   A raw 32-bit Samsung message suitable for sendSAMSUNG().
-//
-// Status: STABLE / Should be working.
+/// Construct a raw Samsung message from the supplied customer(address) &
+/// command.
+/// Status: STABLE / Should be working.
+/// @param[in] customer The customer code. (aka. Address)
+/// @param[in] command The command code.
+/// @return A raw 32-bit Samsung message suitable for `sendSAMSUNG()`.
 uint32_t IRsend::encodeSAMSUNG(const uint8_t customer, const uint8_t command) {
   uint8_t revcustomer = reverseBits(customer, sizeof(customer) * 8);
   uint8_t revcommand = reverseBits(command, sizeof(command) * 8);
@@ -102,27 +103,20 @@ uint32_t IRsend::encodeSAMSUNG(const uint8_t customer, const uint8_t command) {
 #endif
 
 #if DECODE_SAMSUNG
-// Decode the supplied Samsung message.
-// Samsung messages whilst 32 bits in size, only contain 16 bits of distinct
-// data. e.g. In transmition order:
-//   customer_byte + customer_byte(same) + address_byte + invert(address_byte)
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion. Typically kSamsungBits.
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE
-//
-// Note:
-//   LG 32bit protocol appears near identical to the Samsung protocol.
-//   They differ on their compliance criteria and how they repeat.
-// Ref:
-//  http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
+/// Decode the supplied Samsung 32-bit message.
+/// Status: STABLE
+/// @note Samsung messages whilst 32 bits in size, only contain 16 bits of
+///   distinct data. e.g. In transmition order:
+///   customer_byte + customer_byte(same) + address_byte + invert(address_byte)
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note LG 32bit protocol appears near identical to the Samsung protocol.
+///   They differ on their compliance criteria and how they repeat.
+/// @see http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
 bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {
   if (strict && nbits != kSamsungBits)
@@ -159,35 +153,27 @@ bool IRrecv::decodeSAMSUNG(decode_results *results, uint16_t offset,
 #endif
 
 #if SEND_SAMSUNG36
-// Send a Samsung 36-bit formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The bit size of the message being sent. typically kSamsung36Bits.
-//   repeat: The number of times the message is to be repeated.
-//
-// Status: Alpha / Experimental.
-//
-// Note:
-//   Protocol is used by Samsung Bluray Remote: ak59-00167a
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/621
+/// Send a Samsung 36-bit formatted message.
+/// Status: STABLE / Works on real devices.
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/621
 void IRsend::sendSamsung36(const uint64_t data, const uint16_t nbits,
                            const uint16_t repeat) {
   if (nbits < 16) return;  // To small to send.
   for (uint16_t r = 0; r <= repeat; r++) {
     // Block #1 (16 bits)
-    sendGeneric(kSamsungHdrMark, kSamsungHdrSpace,
-                kSamsungBitMark, kSamsungOneSpace,
-                kSamsungBitMark, kSamsungZeroSpace,
-                kSamsungBitMark, kSamsungHdrSpace,
+    sendGeneric(kSamsung36HdrMark, kSamsung36HdrSpace,
+                kSamsung36BitMark, kSamsung36OneSpace,
+                kSamsung36BitMark, kSamsung36ZeroSpace,
+                kSamsung36BitMark, kSamsung36HdrSpace,
                 data >> (nbits - 16), 16, 38, true, 0, kDutyDefault);
     // Block #2 (The rest, typically 20 bits)
     sendGeneric(0, 0,  // No header
-                kSamsungBitMark, kSamsungOneSpace,
-                kSamsungBitMark, kSamsungZeroSpace,
-                kSamsungBitMark, kSamsungMinGap,  // Gap is just a guess.
+                kSamsung36BitMark, kSamsung36OneSpace,
+                kSamsung36BitMark, kSamsung36ZeroSpace,
+                kSamsung36BitMark, kSamsungMinGap,  // Gap is just a guess.
                 // Mask off the rest of the bits.
                 data & ((1ULL << (nbits - 16)) - 1),
                 nbits - 16, 38, true, 0, kDutyDefault);
@@ -196,25 +182,15 @@ void IRsend::sendSamsung36(const uint64_t data, const uint16_t nbits,
 #endif  // SEND_SAMSUNG36
 
 #if DECODE_SAMSUNG36
-// Decode the supplied Samsung36 message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   Nr. of bits to expect in the data portion.
-//            Typically kSamsung36Bits.
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Alpha / Experimental
-//
-// Note:
-//   Protocol is used by Samsung Bluray Remote: ak59-00167a
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/621
+/// Decode the supplied Samsung36 message.
+/// Status: STABLE / Expected to work.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/621
 bool IRrecv::decodeSamsung36(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * nbits + kHeader + kFooter * 2 - 1 + offset)
@@ -230,10 +206,10 @@ bool IRrecv::decodeSamsung36(decode_results *results, uint16_t offset,
   uint16_t used;
   used = matchGeneric(results->rawbuf + offset, &data,
                       results->rawlen - offset, 16,
-                      kSamsungHdrMark, kSamsungHdrSpace,
-                      kSamsungBitMark, kSamsungOneSpace,
-                      kSamsungBitMark, kSamsungZeroSpace,
-                      kSamsungBitMark, kSamsungHdrSpace, false);
+                      kSamsung36HdrMark, kSamsung36HdrSpace,
+                      kSamsung36BitMark, kSamsung36OneSpace,
+                      kSamsung36BitMark, kSamsung36ZeroSpace,
+                      kSamsung36BitMark, kSamsung36HdrSpace, false);
   if (!used) return false;
   offset += used;
   // Data (Block #2)
@@ -241,9 +217,9 @@ bool IRrecv::decodeSamsung36(decode_results *results, uint16_t offset,
   if (!matchGeneric(results->rawbuf + offset, &data2,
                     results->rawlen - offset, nbits - 16,
                     0, 0,
-                    kSamsungBitMark, kSamsungOneSpace,
-                    kSamsungBitMark, kSamsungZeroSpace,
-                    kSamsungBitMark, kSamsungMinGap, true)) return false;
+                    kSamsung36BitMark, kSamsung36OneSpace,
+                    kSamsung36BitMark, kSamsung36ZeroSpace,
+                    kSamsung36BitMark, kSamsungMinGap, true)) return false;
   data <<= (nbits - 16);
   data += data2;
 
@@ -258,17 +234,12 @@ bool IRrecv::decodeSamsung36(decode_results *results, uint16_t offset,
 #endif  // DECODE_SAMSUNG36
 
 #if SEND_SAMSUNG_AC
-// Send a Samsung A/C message.
-//
-// Args:
-//   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. (>=kSamsungAcStateLength)
-//   repeat: Nr. of times the message is to be repeated. (Default = 0).
-//
-// Status: Stable / Known working.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/505
+/// Send a Samsung A/C message.
+/// Status: Stable / Known working.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/505
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   if (nbytes < kSamsungAcStateLength && nbytes % kSamsungAcSectionLength)
@@ -294,16 +265,20 @@ void IRsend::sendSamsungAC(const uint8_t data[], const uint16_t nbytes,
 }
 #endif  // SEND_SAMSUNG_AC
 
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRSamsungAc::IRSamsungAc(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) {
   this->stateReset();
 }
 
-// Reset the internal state of the emulation.
-// Args:
-//   forcepower: A flag indicating if force sending a special power message
-//              with the first `send()` call. Default: true
+/// Reset the internal state of the emulation.
+/// @param[in] forcepower A flag indicating if force sending a special power
+///   message with the first `send()` call.
+/// @param[in] initialPower Set the initial power state. True, on. False, off.
 void IRSamsungAc::stateReset(const bool forcepower, const bool initialPower) {
   static const uint8_t kReset[kSamsungAcExtendedStateLength] = {
       0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0, 0x01, 0x02, 0xAE, 0x71, 0x00,
@@ -314,8 +289,13 @@ void IRSamsungAc::stateReset(const bool forcepower, const bool initialPower) {
   setPower(initialPower);
 }
 
+/// Set up hardware to be able to send a message.
 void IRSamsungAc::begin(void) { _irsend.begin(); }
 
+/// Calculate the checksum for a given state.
+/// @param[in] state The array to calc the checksum of.
+/// @param[in] length The length/size of the array.
+/// @return The calculated checksum value.
 uint8_t IRSamsungAc::calcChecksum(const uint8_t state[],
                                   const uint16_t length) {
   uint8_t sum = 0;
@@ -331,6 +311,10 @@ uint8_t IRSamsungAc::calcChecksum(const uint8_t state[],
   return GETBITS8(28 - sum, kLowNibble, kNibbleSize);
 }
 
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length/size of the array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRSamsungAc::validChecksum(const uint8_t state[], const uint16_t length) {
   if (length < kSamsungAcStateLength)
     return true;  // No checksum to compare with. Assume okay.
@@ -342,7 +326,8 @@ bool IRSamsungAc::validChecksum(const uint8_t state[], const uint16_t length) {
           IRSamsungAc::calcChecksum(state, length - (7 + offset)));
 }
 
-// Update the checksum for the internal state.
+/// Update the checksum for the internal state.
+/// @param[in] length The length/size of the internal array to checksum.
 void IRSamsungAc::checksum(uint16_t length) {
   if (length < 13) return;
   setBits(&remote_state[length - 6], kHighNibble, kNibbleSize,
@@ -352,8 +337,11 @@ void IRSamsungAc::checksum(uint16_t length) {
 }
 
 #if SEND_SAMSUNG_AC
-// Use for most function/mode/settings changes to the unit.
-// i.e. When the device is already running.
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
+/// @param[in] calcchecksum Do we update the checksum before sending?
+/// @note Use for most function/mode/settings changes to the unit.
+///   i.e. When the device is already running.
 void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) this->checksum();
   // Do we need to send a the special power on/off message?
@@ -369,9 +357,12 @@ void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
   _irsend.sendSamsungAC(remote_state, kSamsungAcStateLength, repeat);
 }
 
-// Use this for when you need to power on/off the device.
-// Samsung A/C requires an extended length message when you want to
-// change the power operating mode of the A/C unit.
+/// Send the extended current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
+/// @param[in] calcchecksum Do we update the checksum before sending?
+/// @note Use this for when you need to power on/off the device.
+/// Samsung A/C requires an extended length message when you want to
+/// change the power operating mode of the A/C unit.
 void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
   if (calcchecksum) this->checksum();
   uint8_t extended_state[kSamsungAcExtendedStateLength] = {
@@ -389,9 +380,10 @@ void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
   _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
 }
 
-// Send the special extended "On" message as the library can't seem to reproduce
-// this message automatically.
-// See: https://github.com/crankyoldgit/IRremoteESP8266/issues/604#issuecomment-475020036
+/// Send the special extended "On" message as the library can't seem to
+/// reproduce this message automatically.
+/// @param[in] repeat Nr. of times the message will be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/604#issuecomment-475020036
 void IRSamsungAc::sendOn(const uint16_t repeat) {
   const uint8_t extended_state[21] = {
       0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
@@ -401,9 +393,10 @@ void IRSamsungAc::sendOn(const uint16_t repeat) {
   _lastsentpowerstate = true;  // On
 }
 
-// Send the special extended "Off" message as the library can't seem to
-// reproduce this message automatically.
-// See: https://github.com/crankyoldgit/IRremoteESP8266/issues/604#issuecomment-475020036
+/// Send the special extended "Off" message as the library can't seem to
+/// reproduce this message automatically.
+/// @param[in] repeat Nr. of times the message will be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/604#issuecomment-475020036
 void IRSamsungAc::sendOff(const uint16_t repeat) {
   const uint8_t extended_state[21] = {
       0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
@@ -414,11 +407,16 @@ void IRSamsungAc::sendOff(const uint16_t repeat) {
 }
 #endif  // SEND_SAMSUNG_AC
 
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRSamsungAc::getRaw(void) {
   this->checksum();
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
+/// @param[in] length The length/size of the new_code array.
 void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(remote_state, new_code, std::min(length,
                                           kSamsungAcExtendedStateLength));
@@ -429,23 +427,30 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   }
 }
 
+/// Set the requested power state of the A/C to on.
 void IRSamsungAc::on(void) { setPower(true); }
 
+/// Set the requested power state of the A/C to off.
 void IRSamsungAc::off(void) { setPower(false); }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setPower(const bool on) {
   setBit(&remote_state[1], kSamsungAcPower1Offset, !on);  // Cleared when on.
   setBits(&remote_state[6], kSamsungAcPower6Offset, kSamsungAcPower6Size,
           on ? 0b11 : 0b00);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRSamsungAc::getPower(void) {
   return (GETBITS8(remote_state[6], kSamsungAcPower6Offset,
                    kSamsungAcPower6Size) == 0b11) &&
       !GETBIT8(remote_state[1], kSamsungAcPower1Offset);
 }
 
-// Set the temp. in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRSamsungAc::setTemp(const uint8_t temp) {
   uint8_t newtemp = std::max(kSamsungAcMinTemp, temp);
   newtemp = std::min(kSamsungAcMaxTemp, newtemp);
@@ -453,12 +458,15 @@ void IRSamsungAc::setTemp(const uint8_t temp) {
           newtemp - kSamsungAcMinTemp);
 }
 
-// Return the set temp. in deg C
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRSamsungAc::getTemp(void) {
   return GETBITS8(remote_state[11], kHighNibble, kNibbleSize) +
       kSamsungAcMinTemp;
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRSamsungAc::setMode(const uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   uint8_t newmode = mode;
@@ -475,10 +483,14 @@ void IRSamsungAc::setMode(const uint8_t mode) {
   }
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRSamsungAc::getMode(void) {
   return GETBITS8(remote_state[12], kSamsungAcModeOffset, kModeBitsSize);
 }
 
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
 void IRSamsungAc::setFan(const uint8_t speed) {
   switch (speed) {
     case kSamsungAcFanAuto:
@@ -497,47 +509,65 @@ void IRSamsungAc::setFan(const uint8_t speed) {
   setBits(&remote_state[12], kSamsungAcFanOffest, kSamsungAcFanSize, speed);
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed/mode.
 uint8_t IRSamsungAc::getFan(void) {
   return GETBITS8(remote_state[12], kSamsungAcFanOffest, kSamsungAcFanSize);
 }
 
+/// Get the vertical swing setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+/// @todo (Hollako) Explain why sometimes the LSB of remote_state[9] is a 1.
+/// e.g. 0xAE or 0XAF for swing move.
 bool IRSamsungAc::getSwing(void) {
-  // TODO(Hollako): Explain why sometimes the LSB of remote_state[9] is a 1.
-  // e.g. 0xAE or 0XAF for swing move.
   return GETBITS8(remote_state[9], kSamsungAcSwingOffset,
                   kSamsungAcSwingSize) == kSamsungAcSwingMove;
 }
 
+/// Set the vertical swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @todo (Hollako) Explain why sometimes the LSB of remote_state[9] is a 1.
+///   e.g. 0xAE or 0XAF for swing move.
 void IRSamsungAc::setSwing(const bool on) {
-  // TODO(Hollako): Explain why sometimes the LSB of remote_state[9] is a 1.
-  // e.g. 0xAE or 0XAF for swing move.
   setBits(&remote_state[9], kSamsungAcSwingOffset, kSamsungAcSwingSize,
           on ? kSamsungAcSwingMove : kSamsungAcSwingStop);
 }
 
+/// Get the Beep setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRSamsungAc::getBeep(void) {
   return GETBIT8(remote_state[13], kSamsungAcBeepOffset);
 }
 
+/// Set the Beep setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setBeep(const bool on) {
   setBit(&remote_state[13], kSamsungAcBeepOffset, on);
 }
 
+/// Get the Clean setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRSamsungAc::getClean(void) {
   return GETBIT8(remote_state[10], kSamsungAcClean10Offset) &&
          GETBIT8(remote_state[11], kSamsungAcClean11Offset);
 }
 
+/// Set the Clean setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setClean(const bool on) {
   setBit(&remote_state[10], kSamsungAcClean10Offset, on);
   setBit(&remote_state[11], kSamsungAcClean11Offset, on);
 }
 
+/// Get the Quiet setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRSamsungAc::getQuiet(void) {
   return !GETBIT8(remote_state[1], kSamsungAcQuiet1Offset) &&
          GETBIT8(remote_state[5], kSamsungAcQuiet5Offset);
 }
 
+/// Set the Quiet setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setQuiet(const bool on) {
   setBit(&remote_state[1], kSamsungAcQuiet1Offset, !on);  // Cleared when on.
   setBit(&remote_state[5], kSamsungAcQuiet5Offset, on);
@@ -548,6 +578,8 @@ void IRSamsungAc::setQuiet(const bool on) {
   }
 }
 
+/// Get the Powerful (Turbo) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRSamsungAc::getPowerful(void) {
   return !(remote_state[8] & kSamsungAcPowerfulMask8) &&
          (GETBITS8(remote_state[10], kSamsungAcPowerful10Offset,
@@ -555,6 +587,8 @@ bool IRSamsungAc::getPowerful(void) {
          (this->getFan() == kSamsungAcFanTurbo);
 }
 
+/// Set the Powerful (Turbo) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setPowerful(const bool on) {
   uint8_t off_value = this->getBreeze() ? kSamsungAcBreezeOn : 0b000;
   setBits(&remote_state[10], kSamsungAcPowerful10Offset,
@@ -571,16 +605,18 @@ void IRSamsungAc::setPowerful(const bool on) {
   }
 }
 
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
-// Are the vanes closed over the fan outlet, to stop direct wind? Aka. WindFree
+/// Are the vanes closed over the fan outlet, to stop direct wind? Aka. WindFree
+/// @return true, the setting is on. false, the setting is off.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
 bool IRSamsungAc::getBreeze(void) {
   return (GETBITS8(remote_state[10], kSamsungAcBreezeOffset,
                    kSamsungAcBreezeSize) == kSamsungAcBreezeOn) &&
          (this->getFan() == kSamsungAcFanAuto && !getSwing());
 }
 
-// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
-// Closes the vanes over the fan outlet, to stop direct wind. Aka. WindFree
+/// Closes the vanes over the fan outlet, to stop direct wind. Aka. WindFree
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
 void IRSamsungAc::setBreeze(const bool on) {
   uint8_t off_value = this->getPowerful() ? kSamsungAcPowerful10On : 0b000;
   setBits(&remote_state[10], kSamsungAcBreezeOffset,
@@ -591,23 +627,33 @@ void IRSamsungAc::setBreeze(const bool on) {
   }
 }
 
+/// Get the Display (Light/LED) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRSamsungAc::getDisplay(void) {
   return GETBIT8(remote_state[10], kSamsungAcDisplayOffset);
 }
 
+/// Set the Display (Light/LED) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setDisplay(const bool on) {
   setBit(&remote_state[10], kSamsungAcDisplayOffset, on);
 }
 
+/// Get the Ion (Filter) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRSamsungAc::getIon(void) {
   return GETBIT8(remote_state[11], kSamsungAcIonOffset);
 }
 
+/// Set the Ion (Filter) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setIon(const bool on) {
   setBit(&remote_state[11], kSamsungAcIonOffset, on);
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRSamsungAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kSamsungAcCool;
@@ -618,7 +664,9 @@ uint8_t IRSamsungAc::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRSamsungAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -630,7 +678,9 @@ uint8_t IRSamsungAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRSamsungAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kSamsungAcCool: return stdAc::opmode_t::kCool;
@@ -641,7 +691,9 @@ stdAc::opmode_t IRSamsungAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] spd The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRSamsungAc::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kSamsungAcFanTurbo: return stdAc::fanspeed_t::kMax;
@@ -652,7 +704,8 @@ stdAc::fanspeed_t IRSamsungAc::toCommonFanSpeed(const uint8_t spd) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRSamsungAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::SAMSUNG_AC;
@@ -678,7 +731,8 @@ stdAc::state_t IRSamsungAc::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRSamsungAc::toString(void) {
   String result = "";
   result.reserve(115);  // Reserve some heap for the string to reduce fragging.
@@ -723,21 +777,15 @@ String IRSamsungAc::toString(void) {
 }
 
 #if DECODE_SAMSUNG_AC
-// Decode the supplied Samsung A/C message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kSamsungAcBits
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: Stable / Known to be working.
-//
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/505
+/// Decode the supplied Samsung A/C message.
+/// Status: Stable / Known to be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/505
 bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * nbits + kHeader * 3 + kFooter * 2 - 1 + offset)

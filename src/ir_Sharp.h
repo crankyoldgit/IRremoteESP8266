@@ -1,9 +1,20 @@
 // Copyright 2019 crankyoldgit
 
+/// @file
+/// @brief Support for Sharp protocols.
+/// @see http://www.sbprojects.com/knowledge/ir/sharp.htm
+/// @see http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
+/// @see http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
+/// @see http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp
+/// @see GlobalCache's IR Control Tower data.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/638
+/// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/SharpHeatpumpIR.cpp
+
 // Supports:
 //   Brand: Sharp,  Model: LC-52D62U TV
 //   Brand: Sharp,  Model: AY-ZP40KR A/C
 //   Brand: Sharp,  Model: AH-AxSAY A/C
+//   Brand: Sharp,  Model: CRMC-A907 JBEZ remote
 //   Brand: Sharp,  Model: AH-XP10NRY A/C
 //   Brand: Sharp,  Model: CRMC-820JBEZ remote
 
@@ -92,14 +103,18 @@ const uint8_t kSharpAcByteIon = 11;
 const uint8_t kSharpAcBitIonOffset = 2;  // Mask 0b00000x00
 // Byte[12] (Checksum)
 
-
+// Classes
+/// Class for handling detailed Sharp A/C messages.
 class IRSharpAc {
  public:
   explicit IRSharpAc(const uint16_t pin, const bool inverted = false,
                      const bool use_modulation = true);
-
 #if SEND_SHARP_AC
   void send(const uint16_t repeat = kSharpAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_SHARP_AC
   void begin(void);
@@ -144,15 +159,16 @@ class IRSharpAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  // # of bytes per command
-  uint8_t remote[kSharpAcStateLength];
-  uint8_t _temp;  // Saved copy of the desired temp.
-  uint8_t _mode;  // Saved copy of the desired mode.
-  uint8_t _fan;  // Saved copy of the desired fan speed.
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote[kSharpAcStateLength];  ///< State of the remote in IR code form
+  uint8_t _temp;  ///< Saved copy of the desired temp.
+  uint8_t _mode;  ///< Saved copy of the desired mode.
+  uint8_t _fan;  ///< Saved copy of the desired fan speed.
   void stateReset(void);
   void checksum(void);
   static uint8_t calcChecksum(uint8_t state[],

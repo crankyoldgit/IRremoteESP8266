@@ -121,8 +121,10 @@ void loop() {
       uint16_t *raw_array = resultToRawArray(&results);
       // Find out how many elements are in the array.
       size = getCorrectedRawLength(&results);
+#if SEND_RAW
       // Send it out via the IR LED circuit.
       irsend.sendRaw(raw_array, size, kFrequency);
+#endif  // SEND_RAW
       // Deallocate the memory allocated by resultToRawArray().
       delete [] raw_array;
     } else if (hasACState(protocol)) {  // Does the message require a state[]?

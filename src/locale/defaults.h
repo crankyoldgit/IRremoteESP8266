@@ -360,6 +360,9 @@
 
 // Compound words/phrases/descriptions from pre-defined words.
 // Note: Obviously these need to be defined *after* their component words.
+#ifndef D_STR_ECONOTOGGLE
+#define D_STR_ECONOTOGGLE D_STR_ECONO " " D_STR_TOGGLE
+#endif  // D_STR_ECONOTOGGLE
 #ifndef D_STR_EYEAUTO
 #define D_STR_EYEAUTO D_STR_EYE " " D_STR_AUTO
 #endif  // D_STR_EYEAUTO
@@ -372,6 +375,9 @@
 #ifndef D_STR_POWERTOGGLE
 #define D_STR_POWERTOGGLE D_STR_POWER " " D_STR_TOGGLE
 #endif  // D_STR_POWERTOGGLE
+#ifndef D_STR_POWERBUTTON
+#define D_STR_POWERBUTTON D_STR_POWER " " D_STR_BUTTON
+#endif  // D_STR_POWERBUTTON
 #ifndef D_STR_PREVIOUSPOWER
 #define D_STR_PREVIOUSPOWER D_STR_PREVIOUS " " D_STR_POWER
 #endif  // D_STR_PREVIOUSPOWER
@@ -484,6 +490,9 @@
 #ifndef D_STR_COOLIX
 #define D_STR_COOLIX "COOLIX"
 #endif  // D_STR_COOLIX
+#ifndef D_STR_CORONA_AC
+#define D_STR_CORONA_AC "CORONA_AC"
+#endif  // D_STR_CORONA_AC
 #ifndef D_STR_DAIKIN
 #define D_STR_DAIKIN "DAIKIN"
 #endif  // D_STR_DAIKIN
@@ -559,6 +568,9 @@
 #ifndef D_STR_HITACHI_AC3
 #define D_STR_HITACHI_AC3 "HITACHI_AC3"
 #endif  // D_STR_HITACHI_AC3
+#ifndef D_STR_HITACHI_AC344
+#define D_STR_HITACHI_AC344 "HITACHI_AC344"
+#endif  // D_STR_HITACHI_AC344
 #ifndef D_STR_HITACHI_AC424
 #define D_STR_HITACHI_AC424 "HITACHI_AC424"
 #endif  // D_STR_HITACHI_AC424
@@ -589,9 +601,15 @@
 #ifndef D_STR_MAGIQUEST
 #define D_STR_MAGIQUEST "MAGIQUEST"
 #endif  // D_STR_MAGIQUEST
+#ifndef D_STR_METZ
+#define D_STR_METZ "METZ"
+#endif  // D_STR_METZ
 #ifndef D_STR_MIDEA
 #define D_STR_MIDEA "MIDEA"
 #endif  // D_STR_MIDEA
+#ifndef D_STR_MIDEA24
+#define D_STR_MIDEA24 "MIDEA24"
+#endif  // D_STR_MIDEA24
 #ifndef D_STR_MITSUBISHI
 #define D_STR_MITSUBISHI "MITSUBISHI"
 #endif  // D_STR_MITSUBISHI
@@ -673,6 +691,9 @@
 #ifndef D_STR_SANYO
 #define D_STR_SANYO "SANYO"
 #endif  // D_STR_SANYO
+#ifndef D_STR_SANYO_AC
+#define D_STR_SANYO_AC "SANYO_AC"
+#endif  // D_STR_SANYO_AC
 #ifndef D_STR_SANYO_LC7461
 #define D_STR_SANYO_LC7461 "SANYO_LC7461"
 #endif  // D_STR_SANYO_LC7461
@@ -706,6 +727,9 @@
 #ifndef D_STR_TOSHIBA_AC
 #define D_STR_TOSHIBA_AC "TOSHIBA_AC"
 #endif  // D_STR_TOSHIBA_AC
+#ifndef D_STR_TRANSCOLD
+#define D_STR_TRANSCOLD "TRANSCOLD"
+#endif  // D_STR_TRANSCOLD
 #ifndef D_STR_TROTEC
 #define D_STR_TROTEC "TROTEC"
 #endif  // D_STR_TROTEC
@@ -715,14 +739,20 @@
 #ifndef D_STR_VESTEL_AC
 #define D_STR_VESTEL_AC "VESTEL_AC"
 #endif  // D_STR_VESTEL_AC
+#ifndef D_STR_VOLTAS
+#define D_STR_VOLTAS "VOLTAS"
+#endif  // D_STR_VOLTAS
 #ifndef D_STR_WHIRLPOOL_AC
 #define D_STR_WHIRLPOOL_AC "WHIRLPOOL_AC"
 #endif  // D_STR_WHIRLPOOL_AC
 #ifndef D_STR_WHYNTER
 #define D_STR_WHYNTER "WHYNTER"
 #endif  // D_STR_WHYNTER
+#ifndef D_STR_ZEPEAL
+#define D_STR_ZEPEAL "ZEPEAL"
+#endif  // D_STR_ZEPEAL
 
-// IRrecvDumpV2
+// IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP
 #define D_STR_TIMESTAMP "Timestamp"
 #endif  // D_STR_TIMESTAMP
@@ -734,7 +764,7 @@
 #endif  // D_STR_MESGDESC
 #ifndef D_STR_IRRECVDUMP_STARTUP
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDumpV2 is now running and waiting for IR input on Pin %d"
+    "IRrecvDump is now running and waiting for IR input on Pin %d"
 #endif  // D_STR_IRRECVDUMP_STARTUP
 #ifndef D_WARN_BUFFERFULL
 #define D_WARN_BUFFERFULL \

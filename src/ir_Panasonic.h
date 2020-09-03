@@ -1,24 +1,28 @@
 // Copyright 2018 David Conran
 
+/// @file
+/// @brief Support for Panasonic protocols.
+/// @see Panasonic A/C support heavily influenced by https://github.com/ToniA/ESPEasy/blob/HeatpumpIR/lib/HeatpumpIR/PanasonicHeatpumpIR.cpp
+
 // Supports:
-//   Brand: Panasonic,  Model: TV
-//   Brand: Panasonic,  Model: JKE series A/C
-//   Brand: Panasonic,  Model: DKE series A/C
-//   Brand: Panasonic,  Model: DKW series A/C (DKE)
-//   Brand: Panasonic,  Model: PKR series A/C (DKE)
-//   Brand: Panasonic,  Model: CKP series A/C
-//   Brand: Panasonic,  Model: NKE series A/C
-//   Brand: Panasonic,  Model: RKR series A/C
-//   Brand: Panasonic,  Model: CS-ME10CKPG A/C
-//   Brand: Panasonic,  Model: CS-ME12CKPG A/C
-//   Brand: Panasonic,  Model: CS-ME14CKPG A/C
-//   Brand: Panasonic,  Model: CS-E7PKR A/C (DKE)
-//   Brand: Panasonic,  Model: CS-Z9RKR A/C
-//   Brand: Panasonic,  Model: CS-YW9MKD A/C
-//   Brand: Panasonic,  Model: A75C2311 remote (CKP)
-//   Brand: Panasonic,  Model: A75C2616-1 remote (DKE)
-//   Brand: Panasonic,  Model: A75C3704 remote
-//   Brand: Panasonic,  Model: A75C3747 remote
+//   Brand: Panasonic,  Model: TV (PANASONIC)
+//   Brand: Panasonic,  Model: NKE series A/C (PANASONIC_AC NKE/2)
+//   Brand: Panasonic,  Model: DKE series A/C (PANASONIC_AC DKE/3)
+//   Brand: Panasonic,  Model: DKW series A/C (PANASONIC_AC DKE/3)
+//   Brand: Panasonic,  Model: PKR series A/C (PANASONIC_AC DKE/3)
+//   Brand: Panasonic,  Model: JKE series A/C (PANASONIC_AC JKE/4)
+//   Brand: Panasonic,  Model: CKP series A/C (PANASONIC_AC CKP/5)
+//   Brand: Panasonic,  Model: RKR series A/C (PANASONIC_AC RKR/6)
+//   Brand: Panasonic,  Model: CS-ME10CKPG A/C (PANASONIC_AC CKP/5)
+//   Brand: Panasonic,  Model: CS-ME12CKPG A/C (PANASONIC_AC CKP/5)
+//   Brand: Panasonic,  Model: CS-ME14CKPG A/C (PANASONIC_AC CKP/5)
+//   Brand: Panasonic,  Model: CS-E7PKR A/C (PANASONIC_AC DKE/2)
+//   Brand: Panasonic,  Model: CS-Z9RKR A/C (PANASONIC_AC RKR/6)
+//   Brand: Panasonic,  Model: CS-YW9MKD A/C (PANASONIC_AC JKE/4)
+//   Brand: Panasonic,  Model: A75C2311 remote (PANASONIC_AC CKP/5)
+//   Brand: Panasonic,  Model: A75C2616-1 remote (PANASONIC_AC DKE/3)
+//   Brand: Panasonic,  Model: A75C3704 remote (PANASONIC_AC DKE/3)
+//   Brand: Panasonic,  Model: A75C3747 remote (PANASONIC_AC JKE/4)
 
 #ifndef IR_PANASONIC_H_
 #define IR_PANASONIC_H_
@@ -33,9 +37,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-// Panasonic A/C support heavily influenced by:
-//   https://github.com/ToniA/ESPEasy/blob/HeatpumpIR/lib/HeatpumpIR/PanasonicHeatpumpIR.cpp
 
 // Constants
 const uint16_t kPanasonicFreq = 36700;
@@ -93,15 +94,18 @@ const uint8_t kPanasonicKnownGoodState[kPanasonicAcStateLength] = {
     0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00,
     0x00, 0x0E, 0xE0, 0x00, 0x00, 0x81, 0x00, 0x00, 0x00};
 
-
+/// Class for handling detailed Panasonic A/C messages.
 class IRPanasonicAc {
  public:
   explicit IRPanasonicAc(const uint16_t pin, const bool inverted = false,
                          const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_PANASONIC
   void send(const uint16_t repeat = kPanasonicAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_PANASONIC
   void begin(void);
@@ -117,9 +121,9 @@ class IRPanasonicAc {
   uint8_t getMode(void);
   void setRaw(const uint8_t state[]);
   uint8_t *getRaw(void);
-  static bool validChecksum(uint8_t *state,
+  static bool validChecksum(const uint8_t *state,
                             const uint16_t length = kPanasonicAcStateLength);
-  static uint8_t calcChecksum(uint8_t *state,
+  static uint8_t calcChecksum(const uint8_t *state,
                               const uint16_t length = kPanasonicAcStateLength);
   void setQuiet(const bool on);
   bool getQuiet(void);
@@ -158,16 +162,16 @@ class IRPanasonicAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
-#else
-  IRsendTest _irsend;
-#endif
-  uint8_t remote_state[kPanasonicAcStateLength];
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  uint8_t remote_state[kPanasonicAcStateLength];  ///< The state in code form.
   uint8_t _swingh;
   uint8_t _temp;
   void fixChecksum(const uint16_t length = kPanasonicAcStateLength);
-  static uint8_t calcChecksum(const uint8_t *state,
-                              const uint16_t length = kPanasonicAcStateLength);
   static uint16_t _getTime(const uint8_t ptr[]);
   static void _setTime(uint8_t * const ptr, const uint16_t mins_since_midnight,
                        const bool round_down);

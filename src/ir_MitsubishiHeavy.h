@@ -1,11 +1,21 @@
 // Copyright 2019 David Conran
 
+/// @file
+/// @brief Support for Mitsubishi Heavy Industry protocols.
+/// Code to emulate Mitsubishi Heavy Industries A/C IR remote control units.
+/// @note This code was *heavily* influenced by ToniA's great work & code,
+///   but it has been written from scratch.
+///   Nothing was copied other than constants and message analysis.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/660
+/// @see https://github.com/ToniA/Raw-IR-decoder-for-Arduino/blob/master/MitsubishiHeavy.cpp
+/// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/MitsubishiHeavyHeatpumpIR.cpp
+
 // Supports:
-//   Brand: Mitsubishi Heavy Industries,  Model: RLA502A700B remote
-//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZM-S A/C
-//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZMXA-S A/C
-//   Brand: Mitsubishi Heavy Industries,  Model: RKX502A001C remote
-//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZJ-S A/C
+//   Brand: Mitsubishi Heavy Industries,  Model: RLA502A700B remote (152 bit)
+//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZM-S A/C (152 bit)
+//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZMXA-S A/C (152 bit)
+//   Brand: Mitsubishi Heavy Industries,  Model: RKX502A001C remote (88 bit)
+//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZJ-S A/C (88 bit)
 
 #ifndef IR_MITSUBISHIHEAVY_H_
 #define IR_MITSUBISHIHEAVY_H_
@@ -19,14 +29,8 @@
 #include "IRsend_test.h"
 #endif
 
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/660
-//   https://github.com/ToniA/Raw-IR-decoder-for-Arduino/blob/master/MitsubishiHeavy.cpp
-//   https://github.com/ToniA/arduino-heatpumpir/blob/master/MitsubishiHeavyHeatpumpIR.cpp
-
 // Constants.
 const uint8_t kMitsubishiHeavySigLength = 5;
-
 
 // ZMS (152 bit)
 const uint8_t kMitsubishiHeavyZmsSig[kMitsubishiHeavySigLength] = {
@@ -124,15 +128,20 @@ const uint8_t kMitsubishiHeavy88SwingVLowest =    0b111;  // 7
 
 
 // Classes
+
+/// Class for handling detailed Mitsubishi Heavy 152-bit A/C messages.
 class IRMitsubishiHeavy152Ac {
  public:
   explicit IRMitsubishiHeavy152Ac(const uint16_t pin,
                                   const bool inverted = false,
                                   const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_MITSUBISHIHEAVY
   void send(const uint16_t repeat = kMitsubishiHeavy152MinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHIHEAVY
   void begin(void);
@@ -197,24 +206,30 @@ class IRMitsubishiHeavy152Ac {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
+  IRsend _irsend;  ///< Instance of the IR send class
 #else  // UNIT_TEST
-  IRsendTest _irsend;
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
 #endif  // UNIT_TEST
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kMitsubishiHeavy152StateLength];
+  uint8_t remote_state[kMitsubishiHeavy152StateLength];  ///< State in code form
   void checksum(void);
 };
 
+/// Class for handling detailed Mitsubishi Heavy 88-bit A/C messages.
 class IRMitsubishiHeavy88Ac {
  public:
   explicit IRMitsubishiHeavy88Ac(const uint16_t pin,
                                  const bool inverted = false,
                                  const bool use_modulation = true);
-
   void stateReset(void);
 #if SEND_MITSUBISHIHEAVY
   void send(const uint16_t repeat = kMitsubishiHeavy88MinRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_MITSUBISHIHEAVY
   void begin(void);
   void on(void);
@@ -268,12 +283,13 @@ class IRMitsubishiHeavy88Ac {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
+  IRsend _irsend;  ///< Instance of the IR send class
 #else  // UNIT_TEST
-  IRsendTest _irsend;
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
 #endif  // UNIT_TEST
-  // The state of the IR remote in IR code form.
-  uint8_t remote_state[kMitsubishiHeavy152StateLength];
+  uint8_t remote_state[kMitsubishiHeavy88StateLength];  ///< State in code form
   void checksum(void);
 };
 #endif  // IR_MITSUBISHIHEAVY_H_

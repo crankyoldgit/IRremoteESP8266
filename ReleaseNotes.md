@@ -1,5 +1,93 @@
 # Release Notes
 
+## _v2.7.10 (20200831)_
+
+**[BREAKING CHANGES]**
+- IRMQTTServer & Web-AC-Control: move SPIFFS to LittleFS for ESP8266 (#1182 #1226)
+- Daikin176: Change & increase operating mode values. (#1233 #1235)
+
+**[Bug Fixes]**
+- TOSHIBA_AC: not turning off when using `IRac` class. (#1250 #1251)
+- Haier: change position of Fan speed bits. (#1246 #1247)
+
+**[Features]**
+- Voltas: Add detailed support for Voltas A/Cs (#1238 #1248)
+- Add support for Metz protocol. (#1241 #1242)
+- Basic support for Voltas A/C protocol (#1238 #1243)
+- Add low level bit formatting sanity checks. (#1232)
+
+**[Misc]**
+- Rewrite Airwell by using bit fields (#1254)
+- Rewrite Haier YRW02 using bit fields (#1253)
+- rewrite Haier HSU07-HEA03 (#1246 #1247)
+- rewrite ir_Gree & ir_Midea by using bit field (#1240)
+- Incorrect usage of `assert()` (#1244 #1245 #1232)
+- rewrite Gree (#1210)
+
+
+## _v2.7.9 (20200730)_
+
+**[Bug Fixes]**
+- Fix mistake in `IRLGAc::convertFan()`. (#1214 #1215)
+
+**[Features]**
+- Add Sanyo A/C (72 bit) protocol with detailed support. (#1211 #1218)
+- Added modification to Midea unit to support Danby DAC AC units.  (#1213)
+- ToshibaAc: Rework to support Carrier models and add more settings. (#1205 #1212)
+- Add detailed support for Airwell A/C protocol. (#1202 #1204)
+
+**[Misc]**
+- Pioneer: Update timings based on user collected data. (#1220 #1222)
+- Samsung36: Adjust timings & update unit tests. (#1220 #1221)
+- Consolidate common code: Inverted byte pairs (#1219)
+- Remove duplicate code from `IRToshibaAC::calcChecksum()` (#1207)
+- Update missing/incorrect doxygen comments (#1203)
+
+
+## _v2.7.8 (20200622)_
+
+**[BREAKING CHANGES]**
+- Fix Manchester code handling; Increase Airwell to `34` bits. (#1200)
+
+**[Bug Fixes]**
+- Carrier40: Use correct gap value. (#1193)
+
+**[Features]**
+- CarrierAc64: Add detailed support. (#1133)
+- Add experimental support for Hitachi A/C 344 bit protocol (#1139)
+- Automatic & full library code/API documentation via Doxygen (#1150 #1154 #1155 #1156 #1158 #1165 #1167 #1169 #1180 #1184 #1189 #1191 #1194 #1195 #1197 #1198)
+- Hitachi344: Add detailed support and change bit ordering. (#1147)
+- Add Corona AC Protocol (#1152)
+- Hitachi344: Add Swing(H) and improve Swing(V) (#1148)
+- Update auto_analyse_raw_data.py with better code comment sections (#1164)
+- Add support for Midea24 protocol. (#1171)
+- Add basic Zepeal protocol support (#1178)
+
+**[Misc]**
+- scrape_supported_devices.py: avoid changes to SupportedProtocols.md (#1140)
+- auto_analyze nice exit on empty rawdata input (#1141)
+- Comments update + cleanup (#1143)
+- Update D_STR_IRRECVDUMP_STARTUP text and comments. (#1144)
+- Minor code cleanups (#1149)
+- Update `README.md`'s to point to new API docs. (#1151)
+- Update "Supports" sections (#1160)
+- Add a `doxygen` check to CI/Travis. (#1161)
+- scrape_supported_devices: warn about misplaced or legacy supports sections (#1159)
+- Add Supports sections to some files (#1163 #1166)
+- Fix compile error when `DEBUG` is enabled.
+- Add no-output option and return code on error to scrape_supported_devices
+- Travis: Add scrape_supported_devices error check
+- Update auto_analyse_raw_data.py to have a default Supports: section
+- Treat compiler warnings as errors. (#1174)
+- Remove `calcLGChecksum()` and use new generic `sumNibbles()` (#1175)
+- Suppress more potential compiler warnings. (#1179)
+- Load balance travis tasks to reduce wall clock time. (#1183)
+- Set PlatformIO's default baudrate to 115200 (#1188)
+- Some fixes to Doshisha protocol handler
+- Minor cleanups of Corona and Zepeal
+- Enable Doxygen warning when the parameters for a function/method/procedure are wrong/missing. (#1196)
+
+
 ## _v2.7.7 (20200519)_
 
 **[BREAKING CHANGES]**

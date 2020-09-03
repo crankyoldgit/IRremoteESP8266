@@ -1,5 +1,10 @@
 // Copyright 2017 Jonny Graham
 // Copyright 2017-2019 David Conran
+
+/// @file
+/// @brief Support for Fujitsu A/C protocols.
+/// Fujitsu A/C support added by Jonny Graham & David Conran
+
 #include "ir_Fujitsu.h"
 #include <algorithm>
 #ifndef ARDUINO
@@ -8,16 +13,6 @@
 #include "IRsend.h"
 #include "IRtext.h"
 #include "IRutils.h"
-
-// Fujitsu A/C support added by Jonny Graham & David Conran
-
-// Equipment it seems compatible with:
-//  * Fujitsu ASYG30LFCA with remote AR-RAH2E
-//  * Fujitsu AST9RSGCW with remote AR-DB1
-//  * Fujitsu ASYG7LMCA with remote AR-REB1E
-//  * Fujitsu AR-RAE1E remote.
-//  * Fujitsu General with remote AR-JW2
-//  * <Add models (A/C & remotes) you've gotten it working with here>
 
 // Ref:
 // These values are based on averages of measurements
@@ -39,20 +34,16 @@ using irutils::setBit;
 using irutils::setBits;
 
 #if SEND_FUJITSU_AC
-// Send a Fujitsu A/C message.
-//
-// Args:
-//   data: An array of bytes containing the IR command.
-//   nbytes: Nr. of bytes of data in the array. Typically one of:
-//           kFujitsuAcStateLength
-//           kFujitsuAcStateLength - 1
-//           kFujitsuAcStateLengthShort
-//           kFujitsuAcStateLengthShort - 1
-//   repeat: Nr. of times the message is to be repeated.
-//          (Default = kFujitsuAcMinRepeat).
-//
-// Status: STABLE / Known Good.
-//
+/// Send a Fujitsu A/C formatted message.
+/// Status: STABLE / Known Good.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+///   Typically one of:
+///          kFujitsuAcStateLength,
+///          kFujitsuAcStateLength - 1,
+///          kFujitsuAcStateLengthShort,
+///          kFujitsuAcStateLengthShort - 1
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendFujitsuAC(const unsigned char data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   sendGeneric(kFujitsuAcHdrMark, kFujitsuAcHdrSpace, kFujitsuAcBitMark,
@@ -64,7 +55,11 @@ void IRsend::sendFujitsuAC(const unsigned char data[], const uint16_t nbytes,
 
 // Code to emulate Fujitsu A/C IR remote control unit.
 
-// Initialise the object.
+/// Class Constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] model The enum for the model of A/C to be emulated.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRFujitsuAC::IRFujitsuAC(const uint16_t pin,
                          const fujitsu_ac_remote_model_t model,
                          const bool inverted, const bool use_modulation)
@@ -73,6 +68,8 @@ IRFujitsuAC::IRFujitsuAC(const uint16_t pin,
   this->stateReset();
 }
 
+/// Set the currently emulated model of the A/C.
+/// @param[in] model An enum representing the model to support/emulate.
 void IRFujitsuAC::setModel(const fujitsu_ac_remote_model_t model) {
   _model = model;
   switch (model) {
@@ -90,9 +87,11 @@ void IRFujitsuAC::setModel(const fujitsu_ac_remote_model_t model) {
   }
 }
 
+/// Get the currently emulated/detected model of the A/C.
+/// @return The enum representing the model of A/C.
 fujitsu_ac_remote_model_t IRFujitsuAC::getModel(void) { return _model; }
 
-// Reset the state of the remote to a known good state/sequence.
+/// Reset the state of the remote to a known good state/sequence.
 void IRFujitsuAC::stateReset(void) {
   _temp = 24;
   _fanSpeed = kFujitsuAcFanHigh;
@@ -104,17 +103,19 @@ void IRFujitsuAC::stateReset(void) {
   this->buildState();
 }
 
-// Configure the pin for output.
+/// Set up hardware to be able to send a message.
 void IRFujitsuAC::begin(void) { _irsend.begin(); }
 
 #if SEND_FUJITSU_AC
-// Send the current desired state to the IR LED.
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRFujitsuAC::send(const uint16_t repeat) {
   this->buildState();
   _irsend.sendFujitsuAC(remote_state, getStateLength(), repeat);
 }
 #endif  // SEND_FUJITSU_AC
 
+/// (Re)Build the state from the currently configured settings.
 void IRFujitsuAC::buildState(void) {
   remote_state[0] = 0x14;
   remote_state[1] = 0x63;
@@ -208,6 +209,8 @@ void IRFujitsuAC::buildState(void) {
   }
 }
 
+/// Get the length (size) of the state code for the current configuration.
+/// @return The length of the state array required for this config.
 uint8_t IRFujitsuAC::getStateLength(void) {
   this->buildState();  // Force an update of the internal state.
   if (((_model == fujitsu_ac_remote_model_t::ARRAH2E ||
@@ -221,12 +224,15 @@ uint8_t IRFujitsuAC::getStateLength(void) {
     return _state_length;
 }
 
-// Return a pointer to the internal state date of the remote.
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRFujitsuAC::getRaw(void) {
   this->buildState();
   return remote_state;
 }
 
+/// Build the internal state/config from the current (raw) A/C message.
+/// @param[in] length Size of the current/used (raw) A/C message array.
 void IRFujitsuAC::buildFromState(const uint16_t length) {
   switch (length) {
     case kFujitsuAcStateLength - 1:
@@ -285,6 +291,10 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
   _outsideQuiet = this->getOutsideQuiet(true);
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] newState A valid code for this protocol.
+/// @param[in] length Size of the newState array.
+/// @return true, if successful; Otherwise false. (i.e. size check)
 bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
   if (length > kFujitsuAcStateLength) return false;
   for (uint16_t i = 0; i < kFujitsuAcStateLength; i++) {
@@ -297,8 +307,11 @@ bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
   return true;
 }
 
+/// Request the A/C to step the Horizontal Swing.
 void IRFujitsuAC::stepHoriz(void) { this->setCmd(kFujitsuAcCmdStepHoriz); }
 
+/// Request the A/C to toggle the Horizontal Swing mode.
+/// @param[in] update Do we need to update the general swing config?
 void IRFujitsuAC::toggleSwingHoriz(const bool update) {
   // Toggle the current setting.
   if (update) this->setSwing(this->getSwing() ^ kFujitsuAcSwingHoriz);
@@ -306,8 +319,11 @@ void IRFujitsuAC::toggleSwingHoriz(const bool update) {
   this->setCmd(kFujitsuAcCmdToggleSwingHoriz);
 }
 
+/// Request the A/C to step the Vertical Swing.
 void IRFujitsuAC::stepVert(void) { this->setCmd(kFujitsuAcCmdStepVert); }
 
+/// Request the A/C to toggle the Vertical Swing mode.
+/// @param[in] update Do we need to update the general swing config?
 void IRFujitsuAC::toggleSwingVert(const bool update) {
   // Toggle the current setting.
   if (update) this->setSwing(this->getSwing() ^ kFujitsuAcSwingVert);
@@ -315,7 +331,8 @@ void IRFujitsuAC::toggleSwingVert(const bool update) {
   this->setCmd(kFujitsuAcCmdToggleSwingVert);
 }
 
-// Set the requested command of the A/C.
+/// Set the requested (special) command part for the A/C message.
+/// @param[in] cmd The special command code.
 void IRFujitsuAC::setCmd(const uint8_t cmd) {
   switch (cmd) {
     case kFujitsuAcCmdTurnOff:
@@ -353,39 +370,40 @@ void IRFujitsuAC::setCmd(const uint8_t cmd) {
   }
 }
 
-// Get the special command part of the message.
-// Args:
-//   raw: Do we need to get it from first principles from the raw data?
-// Returns:
-//   A uint8_t containing the contents of the special command byte.
+/// Set the requested (special) command part for the A/C message.
+/// @param[in] raw Do we need to get it from first principles from the raw data?
+/// @return The special command code.
 uint8_t IRFujitsuAC::getCmd(const bool raw) {
   if (raw) return remote_state[5];
   return _cmd;
 }
 
-// Set the requested power state of the A/C.
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRFujitsuAC::setPower(const bool on) {
   this->setCmd(on ? kFujitsuAcCmdTurnOn : kFujitsuAcCmdTurnOff);
 }
 
-// Set the requested power state of the A/C to off.
+/// Set the requested power state of the A/C to off.
 void IRFujitsuAC::off(void) { this->setPower(false); }
 
-// Set the requested power state of the A/C to on.
+/// Set the requested power state of the A/C to on.
 void IRFujitsuAC::on(void) { this->setPower(true); }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRFujitsuAC::getPower(void) { return _cmd != kFujitsuAcCmdTurnOff; }
 
+/// Set the Outside Quiet mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRFujitsuAC::setOutsideQuiet(const bool on) {
   _outsideQuiet = on;
   this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
-// Get the status of the Outside Quiet setting.
-// Args:
-//   raw: Do we get the result from base data?
-// Returns:
-//   A boolean for if it is set or not.
+/// Get the Outside Quiet mode status of the A/C.
+/// @param[in] raw Do we get the result from base data?
+/// @return true, the setting is on. false, the setting is off.
 bool IRFujitsuAC::getOutsideQuiet(const bool raw) {
   if (_state_length == kFujitsuAcStateLength && raw) {
     _outsideQuiet = GETBIT8(remote_state[14], kFujitsuAcOutsideQuietOffset);
@@ -395,16 +413,20 @@ bool IRFujitsuAC::getOutsideQuiet(const bool raw) {
   return _outsideQuiet;
 }
 
-// Set the temp. in deg C
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
 void IRFujitsuAC::setTemp(const uint8_t temp) {
   _temp = std::max((uint8_t)kFujitsuAcMinTemp, temp);
   _temp = std::min((uint8_t)kFujitsuAcMaxTemp, _temp);
   this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRFujitsuAC::getTemp(void) { return _temp; }
 
-// Set the speed of the fan
+/// Set the speed of the fan.
+/// @param[in] fanSpeed The desired setting.
 void IRFujitsuAC::setFanSpeed(const uint8_t fanSpeed) {
   if (fanSpeed > kFujitsuAcFanQuiet)
     _fanSpeed = kFujitsuAcFanHigh;  // Set the fan to maximum if out of range.
@@ -412,9 +434,13 @@ void IRFujitsuAC::setFanSpeed(const uint8_t fanSpeed) {
     _fanSpeed = fanSpeed;
   this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
+
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRFujitsuAC::getFanSpeed(void) { return _fanSpeed; }
 
-// Set the requested climate operation mode of the a/c unit.
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRFujitsuAC::setMode(const uint8_t mode) {
   if (mode > kFujitsuAcModeHeat)
     _mode = kFujitsuAcModeHeat;  // Set the mode to maximum if out of range.
@@ -423,9 +449,14 @@ void IRFujitsuAC::setMode(const uint8_t mode) {
   this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRFujitsuAC::getMode(void) { return _mode; }
 
-// Set the requested swing operation mode of the a/c unit.
+/// Set the requested swing operation mode of the A/C unit.
+/// @param[in] swingMode The swingMode code for the A/C.
+///   Vertical, Horizon, or Both. See constants for details.
+/// @note Not all models support all possible swing modes.
 void IRFujitsuAC::setSwing(const uint8_t swingMode) {
   _swingMode = swingMode;
   switch (_model) {
@@ -446,22 +477,25 @@ void IRFujitsuAC::setSwing(const uint8_t swingMode) {
   this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
-// Get what the swing part of the message should be.
-// Args:
-//   raw: Do we need to get it from first principles from the raw data?
-// Returns:
-//   A uint8_t containing the contents of the swing state.
+/// Get the requested swing operation mode of the A/C unit.
+/// @param[in] raw Do we need to get it from first principles from the raw data?
+/// @return The contents of the swing state/mode.
 uint8_t IRFujitsuAC::getSwing(const bool raw) {
   if (raw) _swingMode = GETBITS8(remote_state[10], kHighNibble,
                                  kFujitsuAcSwingSize);
   return _swingMode;
 }
 
+/// Set the Clean mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRFujitsuAC::setClean(const bool on) {
   _clean = on;
   this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
+/// Get the Clean mode status of the A/C.
+/// @param[in] raw Do we get the result from base data?
+/// @return true, the setting is on. false, the setting is off.
 bool IRFujitsuAC::getClean(const bool raw) {
   if (raw) {
     return GETBIT8(remote_state[9], kFujitsuAcCleanOffset);
@@ -473,11 +507,16 @@ bool IRFujitsuAC::getClean(const bool raw) {
   }
 }
 
+/// Set the Filter mode status of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRFujitsuAC::setFilter(const bool on) {
   _filter = on;
   this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
+/// Get the Filter mode status of the A/C.
+/// @param[in] raw Do we get the result from base data?
+/// @return true, the setting is on. false, the setting is off.
 bool IRFujitsuAC::getFilter(const bool raw) {
   if (raw) {
     return GETBIT8(remote_state[14], kFujitsuAcFilterOffset);
@@ -489,6 +528,10 @@ bool IRFujitsuAC::getFilter(const bool raw) {
   }
 }
 
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRFujitsuAC::validChecksum(uint8_t state[], const uint16_t length) {
   uint8_t sum = 0;
   uint8_t sum_complement = 0;
@@ -510,7 +553,9 @@ bool IRFujitsuAC::validChecksum(uint8_t state[], const uint16_t length) {
   return checksum == (uint8_t)(sum_complement - sum);  // Does it match?
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRFujitsuAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kFujitsuAcModeCool;
@@ -521,7 +566,9 @@ uint8_t IRFujitsuAC::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRFujitsuAC::convertFan(stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kFujitsuAcFanQuiet;
@@ -533,7 +580,9 @@ uint8_t IRFujitsuAC::convertFan(stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRFujitsuAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kFujitsuAcModeCool: return stdAc::opmode_t::kCool;
@@ -544,7 +593,9 @@ stdAc::opmode_t IRFujitsuAC::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRFujitsuAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kFujitsuAcFanHigh:  return stdAc::fanspeed_t::kMax;
@@ -555,7 +606,8 @@ stdAc::fanspeed_t IRFujitsuAC::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRFujitsuAC::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::FUJITSU_AC;
@@ -597,7 +649,8 @@ stdAc::state_t IRFujitsuAC::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRFujitsuAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
@@ -680,21 +733,15 @@ String IRFujitsuAC::toString(void) {
 }
 
 #if DECODE_FUJITSU_AC
-// Decode a Fujitsu AC IR message if possible.
-// Places successful decode information in the results pointer.
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kFujitsuAcBits.
-//   strict:  Flag to indicate if we strictly adhere to the specification.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status:  STABLE / Working.
-//
-// Ref:
-//
+/// Decode the supplied Fujitsu AC IR message if possible.
+/// Status: STABLE / Working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t offset,
                              const uint16_t nbits,
                              const bool strict) {

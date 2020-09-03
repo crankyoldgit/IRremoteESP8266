@@ -1,9 +1,8 @@
-/*
-Node MCU/ESP8266 Sketch to emulate Argo Ulisse 13 DCI remote
-Controls Argo Ulisse 13 DCI A/C
-Copyright 2017 Schmolders
-Copyright 2019 crankyoldgit
-*/
+// Copyright 2017 Schmolders
+// Copyright 2019 crankyoldgit
+/// @file
+/// @brief Argo A/C protocol.
+/// Controls an Argo Ulisse 13 DCI A/C
 
 #include "ir_Argo.h"
 #include <algorithm>
@@ -33,13 +32,11 @@ using irutils::setBit;
 using irutils::setBits;
 
 #if SEND_ARGO
-// Send an Argo A/C message.
-//
-// Args:
-//   data: An array of kArgoStateLength bytes containing the IR command.
-//
-// Status: BETA / Probably works.
-
+/// Send a Argo A/C formatted message.
+/// Status: BETA / Probably works.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendArgo(const unsigned char data[], const uint16_t nbytes,
                       const uint16_t repeat) {
   // Check if we have enough bytes to send a proper message.
@@ -51,18 +48,29 @@ void IRsend::sendArgo(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_ARGO
 
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRArgoAC::IRArgoAC(const uint16_t pin, const bool inverted,
                    const bool use_modulation)
       : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRArgoAC::begin(void) { _irsend.begin(); }
 
 #if SEND_ARGO
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRArgoAC::send(const uint16_t repeat) {
   _irsend.sendArgo(getRaw(), kArgoStateLength, repeat);
 }
 #endif  // SEND_ARGO
 
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The size of the state.
+/// @return A boolean indicating if it's checksum is valid.
 uint8_t IRArgoAC::calcChecksum(const uint8_t state[], const uint16_t length) {
   // Corresponds to byte 11 being constant 0b01
   // Only add up bytes to 9. byte 10 is 0b01 constant anyway.
@@ -70,11 +78,16 @@ uint8_t IRArgoAC::calcChecksum(const uint8_t state[], const uint16_t length) {
   return sumBytes(state, length - 2, 2);
 }
 
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The size of the state.
+/// @return A boolean indicating if it's checksum is valid.
 bool IRArgoAC::validChecksum(const uint8_t state[], const uint16_t length) {
   return ((state[length - 2] >> 2) + (state[length - 1] << 6)) ==
       IRArgoAC::calcChecksum(state, length);
 }
 
+/// Update the checksum for the internal state.
 void IRArgoAC::checksum(void) {
   uint8_t sum = IRArgoAC::calcChecksum(argo, kArgoStateLength);
   // Append sum to end of array
@@ -84,6 +97,7 @@ void IRArgoAC::checksum(void) {
   argo[11] = sum >> 6;   // Shift down 6 bits and add in two LSBs of bit 11
 }
 
+/// Reset the internals of the object to a known good state.
 void IRArgoAC::stateReset(void) {
   for (uint8_t i = 0; i < kArgoStateLength; i++) argo[i] = 0x0;
 
@@ -102,33 +116,49 @@ void IRArgoAC::stateReset(void) {
   this->setFan(kArgoFanAuto);
 }
 
+/// Get the raw state of the object, suitable to be sent with the appropriate
+/// IRsend object method.
+/// @return A PTR to the internal state.
 uint8_t* IRArgoAC::getRaw(void) {
   this->checksum();  // Ensure correct bit array before returning
   return argo;
 }
 
+/// Set the raw state of the object.
+/// @param[in] state The raw state from the native IR message.
 void IRArgoAC::setRaw(const uint8_t state[]) {
   memcpy(argo, state, kArgoStateLength);
 }
 
+/// Set the internal state to have the power on.
 void IRArgoAC::on(void) { setPower(true); }
 
+/// Set the internal state to have the power off.
 void IRArgoAC::off(void) { setPower(false); }
 
+/// Set the internal state to have the desired power.
+/// @param[in] on The desired power state.
 void IRArgoAC::setPower(const bool on) {
   setBit(&argo[9], kArgoPowerBitOffset, on);
 }
 
+/// Get the power setting from the internal state.
+/// @return A boolean indicating the power setting.
 bool IRArgoAC::getPower(void) { return GETBIT8(argo[9], kArgoPowerBitOffset); }
 
+/// Control the current Max setting. (i.e. Turbo)
+/// @param[in] on The desired setting.
 void IRArgoAC::setMax(const bool on) {
   setBit(&argo[9], kArgoMaxBitOffset, on);
 }
 
+/// Is the Max (i.e. Turbo) setting on?
+/// @return The current value.
 bool IRArgoAC::getMax(void) { return GETBIT8(argo[9], kArgoMaxBitOffset); }
 
-// Set the temp in deg C
-// Sending 0 equals +4
+/// Set the temperature.
+/// @param[in] degrees The temperature in degrees celsius.
+/// @note Sending 0 equals +4
 void IRArgoAC::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max(kArgoMinTemp, degrees);
   // delta 4 degrees. "If I want 12 degrees, I need to send 8"
@@ -141,6 +171,8 @@ void IRArgoAC::setTemp(const uint8_t degrees) {
           temp >> kArgoTempLowSize);
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
 uint8_t IRArgoAC::getTemp(void) {
   return ((GETBITS8(argo[3], kArgoTempHighOffset,
                     kArgoTempHighSize) << kArgoTempLowSize) |
@@ -148,26 +180,39 @@ uint8_t IRArgoAC::getTemp(void) {
       kArgoTempDelta;
 }
 
-// Set the speed of the fan
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
 void IRArgoAC::setFan(const uint8_t fan) {
   setBits(&argo[3], kArgoFanOffset, kArgoFanSize, std::min(fan, kArgoFan3));
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed.
 uint8_t IRArgoAC::getFan(void) {
   return GETBITS8(argo[3], kArgoFanOffset, kArgoFanSize);
 }
 
+/// Set the flap position. i.e. Swing.
+/// @warning Not yet working!
+/// @param[in] flap The desired setting.
 void IRArgoAC::setFlap(const uint8_t flap) {
   flap_mode = flap;
   // TODO(kaschmo): set correct bits for flap mode
 }
 
+/// Get the flap position. i.e. Swing.
+/// @warning Not yet working!
+/// @return The current flap setting.
 uint8_t IRArgoAC::getFlap(void) { return flap_mode; }
 
+/// Get the current operation mode setting.
+/// @return The current operation mode.
 uint8_t IRArgoAC::getMode(void) {
   return GETBITS8(argo[2], kArgoModeOffset, kArgoModeSize);
 }
 
+/// Set the desired operation mode.
+/// @param[in] mode The desired operation mode.
 void IRArgoAC::setMode(const uint8_t mode) {
   switch (mode) {
     case kArgoCool:
@@ -183,22 +228,34 @@ void IRArgoAC::setMode(const uint8_t mode) {
   }
 }
 
+/// Turn on/off the Night mode. i.e. Sleep.
+/// @param[in] on The desired setting.
 void IRArgoAC::setNight(const bool on) {
   setBit(&argo[9], kArgoNightBitOffset, on);
 }
 
+/// Get the status of Night mode. i.e. Sleep.
+/// @return true if on, false if off.
 bool IRArgoAC::getNight(void) { return GETBIT8(argo[9], kArgoNightBitOffset); }
 
+/// Turn on/off the iFeel mode.
+/// @param[in] on The desired setting.
 void IRArgoAC::setiFeel(const bool on) {
   setBit(&argo[9], kArgoIFeelBitOffset, on);
 }
 
+/// Get the status of iFeel mode.
+/// @return true if on, false if off.
 bool IRArgoAC::getiFeel(void) { return GETBIT8(argo[9], kArgoIFeelBitOffset); }
 
+/// Set the time for the A/C
+/// @warning Not yet working!
 void IRArgoAC::setTime(void) {
   // TODO(kaschmo): use function call from checksum to set time first
 }
 
+/// Set the value for the current room temperature.
+/// @param[in] degrees The temperature in degrees celsius.
 void IRArgoAC::setRoomTemp(const uint8_t degrees) {
   uint8_t temp = std::min(degrees, kArgoMaxRoomTemp);
   temp = std::max(temp, kArgoTempDelta) - kArgoTempDelta;
@@ -207,6 +264,8 @@ void IRArgoAC::setRoomTemp(const uint8_t degrees) {
           temp >> kArgoRoomTempLowSize);
 }
 
+/// Get the currently stored value for the room temperature setting.
+/// @return The current setting for the room temp. in degrees celsius.
 uint8_t IRArgoAC::getRoomTemp(void) {
   return ((GETBITS8(argo[4], kArgoRoomTempHighOffset,
                    kArgoRoomTempHighSize) << kArgoRoomTempLowSize) |
@@ -214,7 +273,9 @@ uint8_t IRArgoAC::getRoomTemp(void) {
       kArgoTempDelta;
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRArgoAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool:
@@ -231,7 +292,9 @@ uint8_t IRArgoAC::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRArgoAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -247,7 +310,9 @@ uint8_t IRArgoAC::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRArgoAC::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -265,7 +330,9 @@ uint8_t IRArgoAC::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRArgoAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kArgoCool: return stdAc::opmode_t::kCool;
@@ -276,7 +343,9 @@ stdAc::opmode_t IRArgoAC::toCommonMode(const uint8_t mode) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRArgoAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kArgoFan3: return stdAc::fanspeed_t::kMax;
@@ -286,7 +355,8 @@ stdAc::fanspeed_t IRArgoAC::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRArgoAC::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::ARGO;
@@ -311,7 +381,8 @@ stdAc::state_t IRArgoAC::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRArgoAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
@@ -374,22 +445,17 @@ String IRArgoAC::toString(void) {
 }
 
 #if DECODE_ARGO
-// Decode the supplied Argo message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kArgoBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: BETA / Probably works.
-//
-// Note:
-//   This decoder is based soley off sendArgo(). We have no actual captures
-//   to test this against. If you have one of these units, please let us know.
+/// Decode the supplied Argo message.
+/// Status: BETA / Probably works.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @note This decoder is based soley off sendArgo(). We have no actual captures
+///  to test this against. If you have one of these units, please let us know.
 bool IRrecv::decodeArgo(decode_results *results, uint16_t offset,
                         const uint16_t nbits,
                         const bool strict) {

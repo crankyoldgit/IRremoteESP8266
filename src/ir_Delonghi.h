@@ -1,6 +1,12 @@
-// Delonghi A/C
-//
 // Copyright 2020 David Conran
+
+/// @file
+/// @brief Delonghi A/C
+/// @note Kudos to TheMaxxz For the breakdown and mapping of the bit values.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1096
+
+// Supports:
+//   Brand: Delonghi,  Model: PAC A95
 
 #ifndef IR_DELONGHI_H_
 #define IR_DELONGHI_H_
@@ -15,15 +21,6 @@
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
-
-// Supports:
-//   Brand: Delonghi,  Model: PAC A95
-
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1096
-
-// Kudos:
-//   TheMaxxz: For the breakdown and mapping of the bit values.
 
 /* State bit map:
 
@@ -100,14 +97,19 @@ const uint8_t kDelonghiAcChecksumSize = 8;
 
 
 // Classes
+
+/// Class for handling detailed Delonghi A/C messages.
 class IRDelonghiAc {
  public:
   explicit IRDelonghiAc(const uint16_t pin, const bool inverted = false,
                         const bool use_modulation = true);
-
   void stateReset();
 #if SEND_DELONGHI_AC
   void send(const uint16_t repeat = kDelonghiAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_DELONGHI_AC
   void begin();
@@ -149,13 +151,15 @@ class IRDelonghiAc {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;
+  IRsend _irsend;  ///< instance of the IR send class
 #else
-  IRsendTest _irsend;
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< instance of the testing IR send class
+  /// @endcond
 #endif
-  uint64_t remote_state;  // The state of the IR remote.
-  uint8_t _saved_temp;  // The previously user requested temp value.
-  uint8_t _saved_temp_units;  // The previously user requested temp units.
+  uint64_t remote_state;  ///< The state of the IR remote.
+  uint8_t _saved_temp;  ///< The previously user requested temp value.
+  uint8_t _saved_temp_units;  ///< The previously user requested temp units.
   void checksum(void);
 };
 #endif  // IR_DELONGHI_H_

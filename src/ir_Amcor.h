@@ -1,6 +1,13 @@
-// Amcor A/C
-//
 // Copyright 2019 David Conran
+
+/// @file
+/// @brief Amcor A/C protocol.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/834
+/// @remark Kudos to ldellus; For the breakdown and mapping of the bit values.
+// Supports:
+//   Brand: Amcor,  Model: ADR-853H A/C
+//   Brand: Amcor,  Model: TAC-495 remote
+//   Brand: Amcor,  Model: TAC-444 remote
 
 #ifndef IR_AMCOR_H_
 #define IR_AMCOR_H_
@@ -16,17 +23,8 @@
 #include "IRsend_test.h"
 #endif
 
-// Supports:
-//   Brand: Amcor,  Model: ADR-853H A/C
-//   Brand: Amcor,  Model: TAC-495 remote
-//   Brand: Amcor,  Model: TAC-444 remote
-// Ref:
-//   https://github.com/crankyoldgit/IRremoteESP8266/issues/834
-// Kudos:
-//   ldellus: For the breakdown and mapping of the bit values.
 
 // Constants
-
 
 // state[1]
 const uint8_t kAmcorModeFanByte = 1;
@@ -78,6 +76,8 @@ const uint8_t kAmcorVentSize = 2;
 const uint8_t kAmcorChecksumByte = kAmcorStateLength - 1;
 
 // Classes
+
+/// Class for handling detailed Amcor A/C messages.
 class IRAmcorAc {
  public:
   explicit IRAmcorAc(const uint16_t pin, const bool inverted = false,
@@ -86,6 +86,10 @@ class IRAmcorAc {
   void stateReset();
 #if SEND_AMCOR
   void send(const uint16_t repeat = kAmcorDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_AMCOR
   void begin();
@@ -118,7 +122,9 @@ class IRAmcorAc {
  private:
   IRsend _irsend;
 #else
+  /// @cond IGNORE
   IRsendTest _irsend;
+  /// @endcond
 #endif
   uint8_t remote_state[kAmcorStateLength];  // The state of the IR remote.
   void checksum(void);

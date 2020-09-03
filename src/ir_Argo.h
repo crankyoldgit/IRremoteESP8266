@@ -1,5 +1,6 @@
 // Copyright 2017 Schmolders
-// Adds support for Argo Ulisse 13 DCI Mobile Split ACs.
+/// @file
+/// @brief Support for Argo Ulisse 13 DCI Mobile Split ACs.
 
 // Supports:
 //   Brand: Argo,  Model: Ulisse 13 DCI Mobile Split A/C
@@ -124,6 +125,7 @@ const uint8_t kArgoFlapFull = 7;
 #define ARGO_FLAP_FULL            kArgoFlapFull
 
 
+/// Class for handling detailed Argo A/C messages.
 class IRArgoAC {
  public:
   explicit IRArgoAC(const uint16_t pin, const bool inverted = false,
@@ -131,6 +133,10 @@ class IRArgoAC {
 
 #if SEND_ARGO
   void send(const uint16_t repeat = kArgoDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_ARGO
   void begin(void);
@@ -181,9 +187,11 @@ class IRArgoAC {
 #ifndef UNIT_TEST
 
  private:
-  IRsend _irsend;  // instance of the IR send class
+  IRsend _irsend;  ///< instance of the IR send class
 #else
-  IRsendTest _irsend;  // instance of the testing IR send class
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< instance of the testing IR send class
+  /// @endcond
 #endif
   // # of bytes per command
   uint8_t argo[kArgoStateLength];  // Defined in IRremoteESP8266.h
