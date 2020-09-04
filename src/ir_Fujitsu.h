@@ -77,6 +77,15 @@ const uint8_t kFujitsuAcOutsideQuietOffset = 7;
 const uint8_t kFujitsuAcCleanOffset = 3;
 const uint8_t kFujitsuAcFilterOffset = 3;
 
+const uint8_t kFujitsuAcTimerTypeByte = 9;
+const uint8_t kFujitsuAcTimerTypeOffset = 4;  ///< Mask: 0b00xx0000
+const uint8_t kFujitsuAcTimerTypeSize = 2;    ///< Mask: 0b00xx0000
+const uint8_t kFujitsuAcStopTimers =                       0b00;  // 0
+const uint8_t kFujitsuAcSleepTimer =                       0b01;  // 1
+const uint8_t kFujitsuAcOffTimer =                         0b10;  // 2
+const uint8_t kFujitsuAcOnTimer =                          0b11;  // 3
+const uint16_t kFujitsuAcTimerMax = 12 * 60;  ///< Minutes.
+
 // Legacy defines.
 #define FUJITSU_AC_MODE_AUTO kFujitsuAcModeAuto
 #define FUJITSU_AC_MODE_COOL kFujitsuAcModeCool
@@ -146,9 +155,14 @@ class IRFujitsuAC {
   void setFilter(const bool on);
   bool getFilter(const bool raw = false);
   void setOutsideQuiet(const bool on);
-
   bool getOutsideQuiet(const bool raw = false);
-
+  uint8_t getTimerType(const bool raw = false);
+  void setTimerType(const uint8_t timertype);
+  uint16_t getOnTimer(const bool raw = false);
+  void setOnTimer(const uint16_t nr_mins);
+  uint16_t getOffSleepTimer(const bool raw = false);
+  void setOffTimer(const uint16_t nr_mins);
+  void setSleepTimer(const uint16_t nr_mins);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
@@ -176,8 +190,12 @@ class IRFujitsuAC {
   bool _outsideQuiet;
   bool _clean;
   bool _filter;
+  uint16_t _ontimer;
+  uint16_t _offtimer;  // Also is the sleep timer value
+  uint8_t _timertype;
   void buildState(void);
   void buildFromState(const uint16_t length);
+  void setOffSleepTimer(const uint16_t nr_mins);
 };
 
 #endif  // IR_FUJITSU_H_

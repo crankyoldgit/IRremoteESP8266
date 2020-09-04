@@ -218,7 +218,7 @@ void electra(IRElectraAc *ac,
                const stdAc::fanspeed_t fan,
                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                const bool quiet, const bool turbo, const bool econo,
-               const bool filter, const bool clean);
+               const bool filter, const bool clean, const int16_t sleep = -1);
 #endif  // SEND_FUJITSU_AC
 #if SEND_GOODWEATHER
   void goodweather(IRGoodweatherAc *ac,
