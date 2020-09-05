@@ -9,6 +9,8 @@
 // Supports:
 //   Brand: Neoclima,  Model: NS-09AHTI A/C
 //   Brand: Neoclima,  Model: ZH/TY-01 remote
+//   Brand: Soleus Air,  Model: TTWM1-10-01 A/C
+//   Brand: Soleus Air,  Model: ZCF/TL-05 remote
 
 #ifndef IR_NEOCLIMA_H_
 #define IR_NEOCLIMA_H_
