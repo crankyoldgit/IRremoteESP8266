@@ -31,14 +31,15 @@
 const uint8_t kNeoclima8CHeatOffset = 1;
 const uint8_t kNeoclimaIonOffset = 2;
 // state[3]
-const uint8_t kNeoclimaLightOffset = 0;
-const uint8_t kNeoclimaHoldOffset = 2;
-const uint8_t kNeoclimaTurboOffset = 3;
-const uint8_t kNeoclimaEyeOffset = 6;
+const uint8_t kNeoclimaLightOffset = 0;   ///< Mask 0b0000000x
+const uint8_t kNeoclimaHoldOffset = 2;    ///< Mask 0b00000x00
+const uint8_t kNeoclimaTurboOffset = 3;   ///< Mask 0b0000x000
+const uint8_t kNeoclimaEconoOffset = 4;   ///< Mask 0b000x0000
+const uint8_t kNeoclimaEyeOffset = 6;     ///< Mask 0b0x000000
 // state[5]
-const uint8_t kNeoclimaFreshOffset = 7;
-const uint8_t kNeoclimaButtonOffset = 0;
-const uint8_t kNeoclimaButtonSize = 5;
+const uint8_t kNeoclimaFreshOffset = 7;   ///< Mask 0bx0000000
+const uint8_t kNeoclimaButtonOffset = 0;  ///< Mask 0b000xxxxx
+const uint8_t kNeoclimaButtonSize = 5;    ///< Mask 0b000xxxxx
 const uint8_t kNeoclimaButtonPower =    0x00;
 const uint8_t kNeoclimaButtonMode =     0x01;
 const uint8_t kNeoclimaButtonTempUp =   0x02;
@@ -50,6 +51,7 @@ const uint8_t kNeoclimaButtonHold =     0x08;
 const uint8_t kNeoclimaButtonSleep =    0x09;
 const uint8_t kNeoclimaButtonTurbo =    0x0A;
 const uint8_t kNeoclimaButtonLight =    0x0B;
+const uint8_t kNeoclimaButtonEcono =    0x0D;
 const uint8_t kNeoclimaButtonEye =      0x0E;
 const uint8_t kNeoclimaButtonFollow =   0x13;
 const uint8_t kNeoclimaButtonIon =      0x14;
@@ -119,6 +121,8 @@ class IRNeoclimaAc {
   bool getSleep(void);
   void setTurbo(const bool on);
   bool getTurbo(void);
+  void setEcono(const bool on);
+  bool getEcono(void);
   void setFresh(const bool on);
   bool getFresh(void);
   void setHold(const bool on);

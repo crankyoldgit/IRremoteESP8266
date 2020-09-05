@@ -1102,9 +1102,9 @@ TEST(TestIRac, Neoclima) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): On, Sleep: On, Turbo: Off, Hold: Off, Ion: On, "
-      "Eye: Off, Light: On, Follow: Off, 8C Heat: Off, Fresh: Off, "
-      "Button: 0 (Power)";
+      "Swing(V): Off, Swing(H): On, Sleep: On, Turbo: Off, Econo: On, "
+      "Hold: Off, Ion: On, Eye: Off, Light: On, Follow: Off, 8C Heat: Off, "
+      "Fresh: Off, Button: 0 (Power)";
 
   ac.begin();
   irac.neoclima(&ac,
@@ -1115,6 +1115,7 @@ TEST(TestIRac, Neoclima) {
                 stdAc::swingv_t::kOff,       // Veritcal swing
                 stdAc::swingh_t::kAuto,      // Horizontal swing
                 false,                       // Turbo
+                true,                        // Econo
                 true,                        // Light
                 true,                        // Filter
                 8 * 60);                     // Sleep
