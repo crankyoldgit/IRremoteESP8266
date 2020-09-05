@@ -62,6 +62,8 @@ const PROGMEM char* kSilentStr = D_STR_SILENT;  ///< "Silent"
 const PROGMEM char* kFilterStr = D_STR_FILTER;  ///< "Filter"
 const PROGMEM char* k3DStr = D_STR_3D;  ///< "3D"
 const PROGMEM char* kCelsiusStr = D_STR_CELSIUS;  ///< "Celsius"
+const PROGMEM char* kCelsiusFahrenheitStr = D_STR_CELSIUS_FAHRENHEIT;  ///<
+///< "Celsius/Fahrenheit"
 const PROGMEM char* kTempUpStr = D_STR_TEMPUP;  ///< "Temp Up"
 const PROGMEM char* kTempDownStr = D_STR_TEMPDOWN;  ///< "Temp Down"
 const PROGMEM char* kStartStr = D_STR_START;  ///< "Start"

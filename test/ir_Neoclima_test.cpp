@@ -161,20 +161,63 @@ TEST(TestIRNeoclimaAcClass, OperatingMode) {
   EXPECT_EQ(kNeoclimaAuto, ac.getMode());
 }
 
-TEST(TestIRNeoclimaAcClass, SetAndGetTemp) {
+TEST(TestIRNeoclimaAcClass, Temperature) {
   IRNeoclimaAc ac(kGpioUnused);
+  // Celsius
   ac.setTemp(25);
   EXPECT_EQ(25, ac.getTemp());
-  ac.setTemp(kNeoclimaMinTemp);
-  EXPECT_EQ(kNeoclimaMinTemp, ac.getTemp());
+  ac.setTemp(kNeoclimaMinTempC);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMinTempC, ac.getTemp());
   EXPECT_EQ(kNeoclimaButtonTempDown, ac.getButton());
-  ac.setTemp(kNeoclimaMinTemp - 1);
-  EXPECT_EQ(kNeoclimaMinTemp, ac.getTemp());
-  ac.setTemp(kNeoclimaMaxTemp);
-  EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
+  ac.setTemp(kNeoclimaMinTempC - 1);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMinTempC, ac.getTemp());
+  ac.setTemp(kNeoclimaMaxTempC);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMaxTempC, ac.getTemp());
   EXPECT_EQ(kNeoclimaButtonTempUp, ac.getButton());
-  ac.setTemp(kNeoclimaMaxTemp + 1);
-  EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
+  ac.setTemp(kNeoclimaMaxTempC + 1);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMaxTempC, ac.getTemp());
+  // Fahrenheit
+  ac.setTemp(kNeoclimaMinTempF, false);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMinTempF, ac.getTemp());
+  ac.setTemp(kNeoclimaMinTempF - 1, false);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMinTempF, ac.getTemp());
+  ac.setTemp(kNeoclimaMaxTempF, false);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMaxTempF, ac.getTemp());
+  EXPECT_EQ(kNeoclimaButtonTempUp, ac.getButton());
+  ac.setTemp(kNeoclimaMaxTempF + 1, false);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMaxTempF, ac.getTemp());
+
+  // Real data
+  // Data from: https://github.com/crankyoldgit/IRremoteESP8266/issues/1260#issuecomment-687235135
+  const uint8_t temp_68F[12] =
+      {0x00, 0x00, 0x00, 0x10, 0x00, 0x1E, 0x00, 0xA2, 0x00, 0x27, 0xA5, 0x9C};
+  ac.setRaw(temp_68F);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(68, ac.getTemp());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 68F, Fan: 1 (High), Swing(V): Off, "
+      "Swing(H): On, Sleep: Off, Turbo: Off, Econo: On, Hold: Off, Ion: Off, "
+      "Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, Fresh: Off, "
+      "Button: 30 (Celsius/Fahrenheit)", ac.toString());
+
+  const uint8_t temp_20C[12] =
+      {0x00, 0x00, 0x00, 0x10, 0x00, 0x1E, 0x00, 0x22, 0x00, 0x24, 0xA5, 0x19};
+  ac.setRaw(temp_20C);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(20, ac.getTemp());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 1 (High), Swing(V): Off, "
+      "Swing(H): On, Sleep: Off, Turbo: Off, Econo: On, Hold: Off, Ion: Off, "
+      "Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, Fresh: Off, "
+      "Button: 30 (Celsius/Fahrenheit)", ac.toString());
 }
 
 TEST(TestIRNeoclimaAcClass, FanSpeed) {
@@ -326,7 +369,7 @@ TEST(TestIRNeoclimaAcClass, Hold) {
   EXPECT_EQ(kNeoclimaButtonHold, ac.getButton());
 }
 
-TEST(TestIRNeoclimaAcClass, 8CHeat) {
+TEST(TestIRNeoclimaAcClass, _8CHeat) {
   IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   ac.set8CHeat(true);

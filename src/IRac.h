@@ -338,7 +338,8 @@ void electra(IRElectraAc *ac,
 #endif  // SEND_MITSUBISHIHEAVY
 #if SEND_NEOCLIMA
   void neoclima(IRNeoclimaAc *ac, const bool on, const stdAc::opmode_t mode,
-                const float degrees, const stdAc::fanspeed_t fan,
+                const bool celsius, const float degrees,
+                const stdAc::fanspeed_t fan,
                 const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                 const bool turbo, const bool econo, const bool light,
                 const bool filter, const int16_t sleep = -1);

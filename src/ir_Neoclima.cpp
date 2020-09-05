@@ -1,11 +1,12 @@
-// Copyright 2019 David Conran
+// Copyright 2019-2020 David Conran
 
 /// @file
 /// @brief Support for Neoclima protocols.
-/// Analysis by crankyoldgit & AndreyShpilevoy
+/// Analysis by crankyoldgit, AndreyShpilevoy, & griffisc306
 /// Code by crankyoldgit
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/764
 /// @see https://drive.google.com/file/d/1kjYk4zS9NQcMQhFkak-L4mp4UuaAIesW/view
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1260
 
 #include "ir_Neoclima.h"
 #include <algorithm>
@@ -147,6 +148,7 @@ void IRNeoclimaAc::setButton(const uint8_t button) {
     case kNeoclimaButton8CHeat:
     case kNeoclimaButtonTurbo:
     case kNeoclimaButtonEcono:
+    case kNeoclimaButtonTempUnit:
       setBits(&remote_state[5], kNeoclimaButtonOffset, kNeoclimaButtonSize,
               button);
       break;
@@ -235,23 +237,29 @@ stdAc::opmode_t IRNeoclimaAc::toCommonMode(const uint8_t mode) {
 
 /// Set the temperature.
 /// @param[in] temp The temperature in degrees celsius.
-void IRNeoclimaAc::setTemp(const uint8_t temp) {
+/// @param[in] celsius Use Fahrenheit (false) or Celsius (true).
+void IRNeoclimaAc::setTemp(const uint8_t temp, const bool celsius) {
   uint8_t oldtemp = getTemp();
-  uint8_t newtemp = std::max(kNeoclimaMinTemp, temp);
-  newtemp = std::min(kNeoclimaMaxTemp, newtemp);
+  setBit(&remote_state[7], kNeoclimaUseFahrenheitOffset, !celsius);
+  const uint8_t min_temp = celsius ? kNeoclimaMinTempC : kNeoclimaMinTempF;
+  const uint8_t max_temp = celsius ? kNeoclimaMaxTempC : kNeoclimaMaxTempF;
+  const uint8_t newtemp = std::min(max_temp, std::max(min_temp, temp));
   if (oldtemp > newtemp)
     setButton(kNeoclimaButtonTempDown);
   else if (newtemp > oldtemp)
     setButton(kNeoclimaButtonTempUp);
   setBits(&remote_state[9], kNeoclimaTempOffset, kNeoclimaTempSize,
-          newtemp - kNeoclimaMinTemp);
+          newtemp - min_temp);
 }
 
 /// Get the current temperature setting.
-/// @return The current setting for temp. in degrees celsius.
+/// @return The current setting for temp. in degrees.
+/// @note The units of the temperature (F/C) is determined by `getTempUnits()`.
 uint8_t IRNeoclimaAc::getTemp(void) {
+  const uint8_t min_temp = getTempUnits() ? kNeoclimaMinTempC
+                                          : kNeoclimaMinTempF;
   return GETBITS8(remote_state[9], kNeoclimaTempOffset, kNeoclimaTempSize) +
-      kNeoclimaMinTemp;
+      min_temp;
 }
 
 /// Set the speed of the fan.
@@ -457,6 +465,12 @@ bool IRNeoclimaAc::getEye(void) {
   return GETBIT8(remote_state[3], kNeoclimaEyeOffset);
 }
 
+/// Is the A/C unit using Fahrenheit or Celsius for temperature units.
+/// @return false, Fahrenheit. true, Celsius.
+bool IRNeoclimaAc::getTempUnits(void) {
+  return !GETBIT8(remote_state[7], kNeoclimaUseFahrenheitOffset);
+}
+
 /* DISABLED
    TODO(someone): Work out why "on" is either 0x5D or 0x5F
 void IRNeoclimaAc::setFollow(const bool on) {
@@ -482,7 +496,7 @@ stdAc::state_t IRNeoclimaAc::toCommon(void) {
   result.model = -1;  // No models used.
   result.power = getPower();
   result.mode = toCommonMode(getMode());
-  result.celsius = true;
+  result.celsius = getTempUnits();
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.swingv = getSwingV() ? stdAc::swingv_t::kAuto
@@ -510,7 +524,7 @@ String IRNeoclimaAc::toString(void) {
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kNeoclimaAuto, kNeoclimaCool,
                             kNeoclimaHeat, kNeoclimaDry, kNeoclimaFan);
-  result += addTempToString(getTemp());
+  result += addTempToString(getTemp(), getTempUnits());
   result += addFanToString(getFan(), kNeoclimaFanHigh, kNeoclimaFanLow,
                            kNeoclimaFanAuto, kNeoclimaFanAuto, kNeoclimaFanMed);
   result += addBoolToString(getSwingV(), kSwingVStr);
@@ -545,6 +559,7 @@ String IRNeoclimaAc::toString(void) {
     case kNeoclimaButton8CHeat:   result += k8CHeatStr; break;
     case kNeoclimaButtonTurbo:    result += kTurboStr; break;
     case kNeoclimaButtonEcono:    result += kEconoStr; break;
+    case kNeoclimaButtonTempUnit: result += kCelsiusFahrenheitStr; break;
     default:                      result += kUnknownStr;
   }
   result += ')';

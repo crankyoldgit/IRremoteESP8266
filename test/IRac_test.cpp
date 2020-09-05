@@ -1110,7 +1110,8 @@ TEST(TestIRac, Neoclima) {
   irac.neoclima(&ac,
                 true,                        // Power
                 stdAc::opmode_t::kCool,      // Mode
-                20,                          // Celsius
+                true,                        // Celsius
+                20,                          // Degrees
                 stdAc::fanspeed_t::kLow,     // Fan speed
                 stdAc::swingv_t::kOff,       // Veritcal swing
                 stdAc::swingh_t::kAuto,      // Horizontal swing
