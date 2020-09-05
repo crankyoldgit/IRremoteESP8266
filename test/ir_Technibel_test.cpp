@@ -1,4 +1,4 @@
-// Copyright 2020 David Conran
+// Copyright 2020 Quentin BRIOLLANT
 
 #include "IRac.h"
 #include "ir_Technibel.h"
@@ -52,22 +52,21 @@ TEST(TestDecodeTechnibelAc, RealExample) {
       504, 1662, 558, 564, 528, 566, 528, 1668, 528, 562, 528, 1666, 532, 1664,
       582};
 
-
   irsend.reset();
   irsend.sendRaw(rawData, 115, 38000);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(TECHNIBEL_AC, irsend.capture.decode_type);
   EXPECT_EQ(kTechnibelAcBits, irsend.capture.bits);
-  EXPECT_EQ(0xD2000048448118, irsend.capture.value);
+  EXPECT_EQ(0x1881221200004B, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.command);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Auto), Fan: 2 (Medium), Temp: 18C, "
       "Sleep: Off, Swing(V): On, Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
-  // stdAc::state_t r, p;
-  // ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // Tests for IRTechnibelAc class.
@@ -257,21 +256,21 @@ TEST(TestIRTechnibelAcClass, Timer) {
   EXPECT_FALSE(ac.getTimerEnabled());
   EXPECT_EQ(0, ac.getTimer());
 
-  ac.setTimer(1);
+  ac.setTimer(60);
   EXPECT_TRUE(ac.getTimerEnabled());
-  EXPECT_EQ(1, ac.getTimer());
+  EXPECT_EQ(60, ac.getTimer());
 
-  ac.setTimer(20);
+  ac.setTimer(1200);
   EXPECT_TRUE(ac.getTimerEnabled());
-  EXPECT_EQ(20, ac.getTimer());
-
-  ac.setTimerEnabled(false);
-  ac.setTimer(24);
-  EXPECT_TRUE(ac.getTimerEnabled());
-  EXPECT_EQ(24, ac.getTimer());
+  EXPECT_EQ(1200, ac.getTimer());
 
   ac.setTimerEnabled(false);
-  ac.setTimer(25);
+  ac.setTimer(1440);
   EXPECT_TRUE(ac.getTimerEnabled());
-  EXPECT_EQ(24, ac.getTimer());
+  EXPECT_EQ(1440, ac.getTimer());
+
+  ac.setTimerEnabled(false);
+  ac.setTimer(1500);
+  EXPECT_TRUE(ac.getTimerEnabled());
+  EXPECT_EQ(1440, ac.getTimer());
 }

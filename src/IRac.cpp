@@ -252,7 +252,7 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_TCL112AC
     case decode_type_t::TCL112AC:
 #endif
-#if SEND_TECO
+#if SEND_TECHNIBEL_AC
     case decode_type_t::TECHNIBEL_AC:
 #endif
 #if SEND_TECO
@@ -1750,6 +1750,39 @@ void IRac::tcl112(IRTcl112Ac *ac,
 }
 #endif  // SEND_TCL112AC
 
+#if SEND_TECHNIBEL_AC
+/// Send a Technibel A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRTechnibelAc object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] light Turn on the LED/Display mode.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
+void IRac::technibel(IRTechnibelAc *ac,
+                const bool on, const stdAc::opmode_t mode, const float degrees,
+                const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                const int16_t sleep) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwing(swingv != stdAc::swingv_t::kOff);
+  // No Horizontal swing setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_TECHNIBEL_AC
+
 #if SEND_TECO
 /// Send a Teco A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRTecoAc object to use.
@@ -2466,6 +2499,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_TCL112AC
+#if SEND_TECHNIBEL_AC
+    case TECHNIBEL_AC:
+    {
+      IRTechnibelAc ac(_pin, _inverted, _modulation);
+      technibel(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+           send.sleep);
+      break;
+    }
+#endif  // SEND_TECHNIBEL_AC
 #if SEND_TECO
     case TECO:
     {
@@ -3183,7 +3225,7 @@ namespace IRAcUtils {
 #endif  // DECODE_VESTEL_AC
 #if DECODE_TECHNIBEL_AC
       case decode_type_t::TECHNIBEL_AC: {
-        IRTechnibelAc ac(0);
+        IRTechnibelAc ac(kGpioUnused);
         ac.setRaw(result->value);  // TechnibelAc uses value instead of state.
         return ac.toString();
       }
@@ -3564,6 +3606,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_TCL112AC
+#if DECODE_TECHNIBEL_AC
+      case decode_type_t::TECHNIBEL_AC: {
+        IRTechnibelAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_TECHNIBEL_AC
 #if DECODE_TECO
       case decode_type_t::TECO: {
         IRTecoAc ac(kGpioUnused);

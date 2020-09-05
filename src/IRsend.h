@@ -633,7 +633,7 @@ class IRsend {
 #endif
 #if SEND_TECHNIBEL_AC
   void sendTechnibelAc(uint64_t data, uint16_t nbits = kTechnibelAcBits,
-                      uint16_t repeat = kTechnibelAcDefaultRepeat);
+                       uint16_t repeat = kTechnibelAcDefaultRepeat);
 #endif
 #if SEND_CORONA_AC
   void sendCoronaAc(const uint8_t data[],

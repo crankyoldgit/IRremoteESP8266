@@ -31,72 +31,84 @@
 +--+--+--+--+--+--+--+--+--+------------+-----------+----------+--+--+--+--+
 |     FIXED HEADER      |ON|TIMER CHANGE|TEMP CHANGE|FAN CHANGE|    MODE   |
 +--+--+--+--+--+--+--+--+--+------------+-----------+----------+--+--+--+--+
-  0  1  2  3  4  5  6  7  8      9            10          11    12 13 14 15
+ 55 54 53 52 51 50 49 48 47      46           45         44     43 42 41 40
 
 +-----+------+-----+-----+---+--+--+--+---+--+--+--+--+--+--+--+
 |TIMER|C OR F|SWING|SLEEP| 0 |   FAN  | 0 |     TEMPERATURE    |
 +-----+------+-----+-----+---+--+--+--+---+--+--+--+--+--+--+--+
-   16    17     18    19   20 21 22 23  24 25 26 27 28 28 30 31
+   39    38     37    36   35 34 33 32  31 30 29 28 27 26 25 24
 
 +---+---+---+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 | 0 | 0 | 0 | ON TIME HOUR |         FOOTER        |       CHECKSUM        |
 +---+---+---+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-  32  33  34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 48 50 51 52 53 54 55
+ 23  22  21  20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
 
 
 */
 
 // Constants
-const uint8_t kTechnibelAcPowerBit = 8;
-const uint8_t kTechnibelAcTimerChangeBit = kTechnibelAcPowerBit + 1;  // 9
-const uint8_t kTechnibelAcTempChangeBit = kTechnibelAcTimerChangeBit + 1;  // 10
-const uint8_t kTechnibelAcFanChangeBit = kTechnibelAcTempChangeBit + 1;  // 11
-const uint8_t kTechnibelAcModeOffset = kTechnibelAcFanChangeBit + 1;  // 12
-const uint8_t kTechnibelAcModeSize = 4;
-const uint8_t kTechnibelAcCool =   0b0001;
-const uint8_t kTechnibelAcDry =    0b0010;
-const uint8_t kTechnibelAcFan =    0b0100;
-const uint8_t kTechnibelAcHeat =   0b1000;
-const uint8_t kTechnibelAcTimerEnableBit = kTechnibelAcModeOffset
-                                          + kTechnibelAcModeSize;  // 16
-const uint8_t kTechnibelAcTempUnitBit = kTechnibelAcTimerEnableBit + 1;
-                                      // 17 (0 = Celsius, 1 = Fahrenheit)
-const uint8_t kTechnibelAcSwingBit = kTechnibelAcTempUnitBit + 1;  // 18
-const uint8_t kTechnibelAcSleepBit = kTechnibelAcSwingBit + 1;  // 19
-// '0' bit
-const uint8_t kTechnibelAcFanOffset = kTechnibelAcSleepBit + 2;  // 21
-const uint8_t kTechnibelAcFanSize = 3;
-const uint8_t kTechnibelAcFanLow =    0b001;
-const uint8_t kTechnibelAcFanMedium = 0b010;
-const uint8_t kTechnibelAcFanHigh =   0b100;
-// '0' bit
-const uint8_t kTechnibelAcTempOffset = kTechnibelAcFanOffset
-                                      + kTechnibelAcFanSize + 1;  // 25
-const uint8_t kTechnibelAcTempSize = 7;
+const uint8_t kTechnibelAcChecksumOffset = 0;
+const uint8_t kTechnibelAcChecksumSize = 8;
+
+const uint8_t kTechnibelAcFooterOffset = kTechnibelAcChecksumOffset
+                                        + kTechnibelAcChecksumSize;
+const uint8_t kTechnibelAcFooterSize = 8;
+
+const uint8_t kTechnibelAcTimerHoursOffset = kTechnibelAcFooterOffset
+                                            + kTechnibelAcFooterSize;
+const uint8_t kTechnibelAcHoursSize = 8;  // Max 24 hrs
+const uint8_t kTechnibelAcTimerMax = 24;
+
+const uint8_t kTechnibelAcTempOffset = kTechnibelAcTimerHoursOffset
+                                      + kTechnibelAcHoursSize;
+const uint8_t kTechnibelAcTempSize = 8;
 const uint8_t kTechnibelAcTempMinC = 16;  // Deg C
 const uint8_t kTechnibelAcTempMaxC = 31;  // Deg C
 const uint8_t kTechnibelAcTempMinF = 61;  // Deg F
 const uint8_t kTechnibelAcTempMaxF = 88;  // Deg F
-// '0' bit
-// '0' bit
-// '0' bit
-const uint8_t kTechnibelAcTimerHoursOffset = kTechnibelAcTempOffset
-                                            + kTechnibelAcTempSize + 3;  // 35
-const uint8_t kTechnibelAcHoursSize = 5;  // Max 24 hrs
-const uint8_t kTechnibelAcTimerMax = 24;
-const uint8_t kTechnibelAcFooterOffset = kTechnibelAcTimerHoursOffset
-                                        + kTechnibelAcHoursSize;  // 40
-const uint8_t kTechnibelAcFooterSize = 8;
-const uint8_t kTechnibelAcChecksumOffset = kTechnibelAcFooterOffset
-                                          + kTechnibelAcFooterSize;  // 48
-const uint8_t kTechnibelAcChecksumSize = 8;
 
+const uint8_t kTechnibelAcFanOffset = kTechnibelAcTempOffset
+                                      + kTechnibelAcTempSize;
+const uint8_t kTechnibelAcFanSize = 4;
+const uint8_t kTechnibelAcFanLow =    0b0001;
+const uint8_t kTechnibelAcFanMedium = 0b0010;
+const uint8_t kTechnibelAcFanHigh =   0b0100;
+
+const uint8_t kTechnibelAcSleepBit = kTechnibelAcFanOffset
+                                     + kTechnibelAcFanSize;
+
+const uint8_t kTechnibelAcSwingBit = kTechnibelAcSleepBit + 1;
+
+const uint8_t kTechnibelAcTempUnitBit = kTechnibelAcSwingBit + 1;
+                                      // (0 = Celsius, 1 = Fahrenheit)
+
+const uint8_t kTechnibelAcTimerEnableBit = kTechnibelAcTempUnitBit + 1;
+
+const uint8_t kTechnibelAcModeOffset = kTechnibelAcTimerEnableBit + 1;
+const uint8_t kTechnibelAcModeSize = 4;
+const uint8_t kTechnibelAcCool = 0b0001;
+const uint8_t kTechnibelAcDry =  0b0010;
+const uint8_t kTechnibelAcFan =  0b0100;
+const uint8_t kTechnibelAcHeat = 0b1000;
+
+const uint8_t kTechnibelAcFanChangeBit = kTechnibelAcModeOffset
+                                         + kTechnibelAcModeSize;
+
+const uint8_t kTechnibelAcTempChangeBit = kTechnibelAcFanChangeBit + 1;
+
+const uint8_t kTechnibelAcTimerChangeBit = kTechnibelAcTempChangeBit + 1;
+
+const uint8_t kTechnibelAcPowerBit = kTechnibelAcTimerChangeBit + 1;
+
+const uint8_t kTechnibelAcHeaderOffset = kTechnibelAcPowerBit + 1;
+const uint8_t kTechnibelAcHeaderSize = 8;
+const uint8_t kTechnibelAcHeader = 0b00011000;
 
 // Classes
 class IRTechnibelAc {
  public:
   explicit IRTechnibelAc(const uint16_t pin, const bool inverted = false,
-                        const bool use_modulation = true);
+                         const bool use_modulation = true);
 
   void stateReset();
 #if SEND_TECHNIBEL_AC
@@ -126,8 +138,8 @@ class IRTechnibelAc {
   bool getSleep();
   void setTimerEnabled(const bool on);
   bool getTimerEnabled(void);
-  void setTimer(const uint8_t nr_of_hours);
-  uint8_t getTimer(void);
+  void setTimer(const uint16_t nr_of_mins);
+  uint16_t getTimer(void);
   uint64_t getRaw();
   void setRaw(const uint64_t state);
   uint8_t convertMode(const stdAc::opmode_t mode);

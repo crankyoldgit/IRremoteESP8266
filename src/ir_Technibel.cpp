@@ -30,41 +30,32 @@ const uint16_t kTechnibelAcOverhead = 3;
 
 
 #if SEND_TECHNIBEL_AC
-// Send an Technibel AC formatted message.
-//
-// Args:
-//   data:   The message to be sent.
-//   nbits:  The number of bits of the message to be sent.
-//           Typically kTechnibelAcBits.
-//   repeat: The number of times the command is to be repeated.
-//
-// Status: STABLE / Reported as working on a real device.
+/// Send an Technibel AC formatted message.
+/// Status: STABLE / Reported as working on a real device.
+/// @param[in] data containing the IR command.
+/// @param[in] nbits Nr. of bits to send. usually kTechnibelAcBits
+/// @param[in] repeat Nr. of times the message is to be repeated.
 void IRsend::sendTechnibelAc(const uint64_t data, const uint16_t nbits,
-                            const uint16_t repeat) {
+                             const uint16_t repeat) {
   sendGeneric(kTechnibelAcHdrMark, kTechnibelAcHdrSpace,
               kTechnibelAcBitMark, kTechnibelAcOneSpace,
               kTechnibelAcBitMark, kTechnibelAcZeroSpace,
               kTechnibelAcBitMark, kTechnibelAcGap,
-              data, nbits, kTechnibelAcFreq, false,  // LSB First.
+              data, nbits, kTechnibelAcFreq, true,  // LSB First.
               repeat, kDutyDefault);
 }
 #endif  // SEND_TECHNIBEL_AC
 
 #if DECODE_TECHNIBEL_AC
-// Decode the supplied TECHNIBEL_AC message.
-//
-// Args:
-//   results: Ptr to the data to decode and where to store the decode result.
-//   offset:  The starting index to use when attempting to decode the raw data.
-//            Typically/Defaults to kStartOffset.
-//   nbits:   The number of data bits to expect. Typically kTechnibelAcBits.
-//   strict:  Flag indicating if we should perform strict matching.
-// Returns:
-//   boolean: True if it can decode it, false if it can't.
-//
-// Status: STABLE / Expected to be working.
+/// Status: STABLE / Reported as working on a real device
+/// @param[in,out] results Ptr to data to decode & where to store the decode
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect (kTechnibelAcBits).
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeTechnibelAc(decode_results *results, uint16_t offset,
-                              const uint16_t nbits, const bool strict) {
+                               const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * nbits + kTechnibelAcOverhead - offset) {
     return false;  // Too short a message to match.
   }
@@ -81,7 +72,7 @@ bool IRrecv::decodeTechnibelAc(decode_results *results, uint16_t offset,
                     kTechnibelAcBitMark, kTechnibelAcOneSpace,
                     kTechnibelAcBitMark, kTechnibelAcZeroSpace,
                     kTechnibelAcBitMark, kTechnibelAcGap, true,
-                    _tolerance, kMarkExcess, false)) return false;
+                    _tolerance, kMarkExcess, true)) return false;
 
   // Success
   results->decode_type = decode_type_t::TECHNIBEL_AC;
@@ -93,92 +84,109 @@ bool IRrecv::decodeTechnibelAc(decode_results *results, uint16_t offset,
 }
 #endif  // DECODE_TECHNIBEL_AC
 
-
-// Class for controlling the settings of a Technibel A/C
-
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRTechnibelAc::IRTechnibelAc(const uint16_t pin, const bool inverted,
-                           const bool use_modulation)
-      : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+                             const bool use_modulation)
+      : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Set up hardware to be able to send a message.
 void IRTechnibelAc::begin(void) { _irsend.begin(); }
 
 #if SEND_TECHNIBEL_AC
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
 void IRTechnibelAc::send(const uint16_t repeat) {
   _irsend.sendTechnibelAc(getRaw(), kTechnibelAcBits, repeat);
 }
 #endif  // SEND_TECHNIBEL_AC
 
+/// Compute the checksum of the internal state.
+/// @param[in] state A valid code for this protocol.
+/// @return The checksum byte of the internal state.
 uint8_t IRTechnibelAc::calcChecksum(const uint64_t state) {
   uint8_t sum = 0;
   // Add up all the 8 bit data chunks.
-  for (uint8_t offset = kTechnibelAcPowerBit;
-        offset < kTechnibelAcFooterOffset; offset += 8) {
-    sum += reverseBits(GETBITS64(state, offset, 8), 8);
+  for (uint8_t offset = kTechnibelAcTimerHoursOffset;
+        offset < kTechnibelAcHeaderOffset; offset += 8) {
+    sum += GETBITS64(state, offset, 8);
   }
-  sum -= 1;
   sum = invertBits(sum, 8);
-  sum = reverseBits(sum, 8);
-
+  sum += 1;
   return sum;
 }
 
-bool IRTechnibelAc::validChecksum(const uint64_t state) {
-  return (GETBITS64(state, kTechnibelAcChecksumOffset,
-                    kTechnibelAcChecksumSize) ==
-      IRTechnibelAc::calcChecksum(state));
-}
-
+/// Set the checksum of the internal state.
 void IRTechnibelAc::checksum(void) {
   setBits(&remote_state, kTechnibelAcChecksumOffset, kTechnibelAcChecksumSize,
           calcChecksum(remote_state));
 }
 
+/// Reset the internal state of the emulation.
+/// @note Mode:Cool, Power:Off, fan:Low, temp:20, swing:Off, sleep:Off
 void IRTechnibelAc::stateReset(void) {
-  remote_state = 0x00000000000018;
   _saved_temp = 20;  // DegC  (Random reasonable default value)
   _saved_temp_units = 0;  // Celsius
 
-  this->off();
-  this->setTemp(_saved_temp);
-  this->setTempUnit(_saved_temp_units);
-  this->setMode(kTechnibelAcCool);
-  this->setFan(kTechnibelAcFanLow);
+  off();
+  setTemp(_saved_temp);
+  setTempUnit(_saved_temp_units);
+  setMode(kTechnibelAcCool);
+  setFan(kTechnibelAcFanLow);
+  setSwing(false);
+  setSleep(false);
 }
 
+/// Get a copy of the internal state/code for this protocol.
+/// @return A code for this protocol based on the current internal state.
 uint64_t IRTechnibelAc::getRaw(void) {
-  this->checksum();
+  setBits(&remote_state, kTechnibelAcHeaderOffset, kTechnibelAcHeaderSize,
+          kTechnibelAcHeader);
+  checksum();
   return remote_state;
 }
 
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] state A valid code for this protocol.
 void IRTechnibelAc::setRaw(const uint64_t state) {
   remote_state = state;
 }
 
-void IRTechnibelAc::on(void) {
-  setPower(true);
-}
+/// Set the requested power state of the A/C to on.
+void IRTechnibelAc::on(void) { setPower(true); }
 
-void IRTechnibelAc::off(void) {
-  setPower(false);
-}
+/// Set the requested power state of the A/C to off.
+void IRTechnibelAc::off(void) { setPower(false); }
 
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRTechnibelAc::setPower(const bool on) {
   setBit(&remote_state, kTechnibelAcPowerBit, on);
 }
 
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
 bool IRTechnibelAc::getPower(void) {
   return GETBIT64(remote_state, kTechnibelAcPowerBit);
 }
 
+/// Set the temperature unit setting.
+/// @param[in] fahrenheit true, the unit is °F. false, the unit is °C.
 void IRTechnibelAc::setTempUnit(const bool fahrenheit) {
   setBit(&remote_state, kTechnibelAcTempUnitBit, fahrenheit);
 }
 
+/// Get the temperature unit setting.
+/// @return true, the unit is °F. false, the unit is °C.
 bool IRTechnibelAc::getTempUnit(void) {
   return GETBIT64(remote_state, kTechnibelAcTempUnitBit);
 }
 
-// Set the temp
+/// Set the temperature.
+/// @param[in] degrees The temperature in degrees.
+/// @param[in] fahrenheit The temperature unit: true=°F, false(default)=°C.
 void IRTechnibelAc::setTemp(const uint8_t degrees, const bool fahrenheit) {
   uint8_t temp;
   uint8_t temp_min = kTechnibelAcTempMinC;
@@ -193,18 +201,17 @@ void IRTechnibelAc::setTemp(const uint8_t degrees, const bool fahrenheit) {
   _saved_temp = temp;
   _saved_temp_units = fahrenheit;
 
-  uint8_t temp_reversed = reverseBits(temp, kTechnibelAcTempSize);
-  setBits(&remote_state, kTechnibelAcTempOffset, kTechnibelAcTempSize,
-          temp_reversed);
+  setBits(&remote_state, kTechnibelAcTempOffset, kTechnibelAcTempSize, temp);
 }
 
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees.
 uint8_t IRTechnibelAc::getTemp(void) {
-  uint8_t temp = GETBITS64(remote_state, kTechnibelAcTempOffset,
-                            kTechnibelAcTempSize);
-  return reverseBits(temp, kTechnibelAcTempSize);
+  return GETBITS64(remote_state, kTechnibelAcTempOffset, kTechnibelAcTempSize);
 }
 
-// Set the speed of the fan
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
 void IRTechnibelAc::setFan(const uint8_t speed) {
   // Mode fan speed rules.
   if (getMode() == kTechnibelAcDry && speed != kTechnibelAcFanLow) {
@@ -217,19 +224,19 @@ void IRTechnibelAc::setFan(const uint8_t speed) {
   } else if (speed < kTechnibelAcFanLow) {
     setFan(kTechnibelAcFanLow);
   } else {
-    uint8_t speed_reversed = reverseBits(speed, kTechnibelAcFanSize);
-    setBits(&remote_state, kTechnibelAcFanOffset, kTechnibelAcFanSize,
-            speed_reversed);
+    setBits(&remote_state, kTechnibelAcFanOffset, kTechnibelAcFanSize, speed);
   }
 }
 
+/// Get the current fan speed setting.
+/// @return The current fan speed/mode.
 uint8_t IRTechnibelAc::getFan(void) {
-  uint8_t speed = GETBITS64(remote_state, kTechnibelAcFanOffset,
-                            kTechnibelAcFanSize);
-  return reverseBits(speed, kTechnibelAcFanSize);
+  return GETBITS64(remote_state, kTechnibelAcFanOffset, kTechnibelAcFanSize);
 }
 
-// Convert a standard A/C Fan speed into its native fan speed.
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRTechnibelAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -245,7 +252,9 @@ uint8_t IRTechnibelAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-// Convert a native fan speed to it's common equivalent.
+/// Convert a native fan speed into its stdAc equivilant.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::fanspeed_t IRTechnibelAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kTechnibelAcFanHigh:   return stdAc::fanspeed_t::kHigh;
@@ -255,12 +264,15 @@ stdAc::fanspeed_t IRTechnibelAc::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
 uint8_t IRTechnibelAc::getMode(void) {
-  uint8_t mode = GETBITS64(remote_state, kTechnibelAcModeOffset,
+  return GETBITS64(remote_state, kTechnibelAcModeOffset,
                             kTechnibelAcModeSize);
-  return reverseBits(mode, kTechnibelAcModeSize);
 }
 
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
 void IRTechnibelAc::setMode(const uint8_t mode) {
   switch (mode) {
     case kTechnibelAcHeat:
@@ -269,18 +281,18 @@ void IRTechnibelAc::setMode(const uint8_t mode) {
     case kTechnibelAcCool:
       break;
     default:
-      this->setMode(kTechnibelAcCool);
+      setMode(kTechnibelAcCool);
       return;
   }
-  uint8_t mode_reversed = reverseBits(mode, kTechnibelAcModeSize);
-  setBits(&remote_state, kTechnibelAcModeOffset, kTechnibelAcModeSize,
-          mode_reversed);
+  setBits(&remote_state, kTechnibelAcModeOffset, kTechnibelAcModeSize, mode);
   setFan(getFan());  // Re-force any fan speed constraints.
   // Restore previous temp settings for cool mode.
   setTemp(_saved_temp, _saved_temp_units);
 }
 
-// Convert a standard A/C mode into its native mode.
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivilant of the enum.
 uint8_t IRTechnibelAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool:
@@ -296,7 +308,9 @@ uint8_t IRTechnibelAc::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-// Convert a native mode to it's common equivalent.
+/// Convert a native mode into its stdAc equivilant.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivilant of the native setting.
 stdAc::opmode_t IRTechnibelAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kTechnibelAcCool:  return stdAc::opmode_t::kCool;
@@ -307,27 +321,33 @@ stdAc::opmode_t IRTechnibelAc::toCommonMode(const uint8_t mode) {
   }
 }
 
+/// Set the (vertical) swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRTechnibelAc::setSwing(const bool on) {
   setBit(&remote_state, kTechnibelAcSwingBit, on);
 }
 
+/// Get the (vertical) swing setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRTechnibelAc::getSwing(void) {
   return GETBIT64(remote_state, kTechnibelAcSwingBit);
 }
 
-// Convert a standard A/C swing into its native swing.
+/// Convert a stdAc::swingv_t enum into it's native swing.
+/// @param[in] swing The enum to be converted.
+/// @return true, the swing is on. false, the swing is off.
 bool IRTechnibelAc::convertSwing(const stdAc::swingv_t swing) {
   switch (swing) {
     case stdAc::swingv_t::kOff:
       return false;
-    case stdAc::swingv_t::kAuto:
-      return true;
     default:
       return true;
   }
 }
 
-// Convert a native swing to it's common equivalent.
+/// Convert a native swing into its stdAc equivilant.
+/// @param[in] swing true, the swing is on. false, the swing is off.
+/// @return The stdAc equivilant of the native setting.
 stdAc::swingv_t IRTechnibelAc::toCommonSwing(const bool swing) {
   if (swing)
     return stdAc::swingv_t::kAuto;
@@ -335,48 +355,62 @@ stdAc::swingv_t IRTechnibelAc::toCommonSwing(const bool swing) {
     return stdAc::swingv_t::kOff;
 }
 
+/// Set the Sleep setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
 void IRTechnibelAc::setSleep(const bool on) {
   setBit(&remote_state, kTechnibelAcSleepBit, on);
 }
 
+/// Get the Sleep setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
 bool IRTechnibelAc::getSleep(void) {
   return GETBIT64(remote_state, kTechnibelAcSleepBit);
 }
 
+/// Is the timer function enabled?
+/// @return true, the setting is on. false, the setting is off.
 void IRTechnibelAc::setTimerEnabled(const bool on) {
   setBit(&remote_state, kTechnibelAcTimerEnableBit, on);
 }
 
+/// Is the timer function enabled?
+/// @return true, the setting is on. false, the setting is off.
 bool IRTechnibelAc::getTimerEnabled(void) {
   return GETBIT64(remote_state, kTechnibelAcTimerEnableBit);
 }
 
-// Set the timer to shutdown the device in nr of minutes.
-// Args:
-//   nr_of_hours: Total nr of hours to wait before shutting down the device.
-//               (Max 24 hrs)
-void IRTechnibelAc::setTimer(const uint8_t nr_of_hours) {
-  uint8_t value = std::min(kTechnibelAcTimerMax, nr_of_hours);
-  uint8_t value_reversed = reverseBits(value, kTechnibelAcHoursSize);
+/// Set the timer for when the A/C unit will switch off.
+/// @param[in] nr_of_mins Number of minutes before power off.
+///   `0` will clear the timer. Max is 24 hrs (1440 mins).
+/// @note Time is stored internaly in hours.
+void IRTechnibelAc::setTimer(const uint16_t nr_of_mins) {
+  uint8_t hours = nr_of_mins / 60;
+  uint8_t value = std::min(kTechnibelAcTimerMax, hours);
   setBits(&remote_state, kTechnibelAcTimerHoursOffset, kTechnibelAcHoursSize,
-          value_reversed);
+          value);
   // Enable or not?
   setTimerEnabled(value > 0);
 }
 
-uint8_t IRTechnibelAc::getTimer(void) {
-  uint8_t timer = GETBITS64(remote_state, kTechnibelAcTimerHoursOffset,
-                            kTechnibelAcHoursSize);
-  return reverseBits(timer, kTechnibelAcHoursSize);
+/// Get the timer time for when the A/C unit will switch power state.
+/// @return The number of minutes left on the timer. `0` means off.
+uint16_t IRTechnibelAc::getTimer(void) {
+  uint16_t mins = 0;
+  if (getTimerEnabled()) {
+    mins = GETBITS64(remote_state, kTechnibelAcTimerHoursOffset,
+                     kTechnibelAcHoursSize) * 60;
+  }
+  return mins;
 }
 
-// Convert the A/C state to it's common equivalent.
+/// Convert the current internal state into its stdAc::state_t equivilant.
+/// @return The stdAc equivilant of the native settings.
 stdAc::state_t IRTechnibelAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::TECHNIBEL_AC;
   result.power = getPower();
   result.mode = toCommonMode(getMode());
-  result.celsius = getTempUnit();
+  result.celsius = !getTempUnit();
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.sleep = getSleep() ? 0 : -1;
@@ -395,7 +429,8 @@ stdAc::state_t IRTechnibelAc::toCommon(void) {
   return result;
 }
 
-// Convert the internal state into a human readable string.
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
 String IRTechnibelAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
@@ -409,8 +444,10 @@ String IRTechnibelAc::toString(void) {
   result += addTempToString(getTemp(), !getTempUnit());
   result += addBoolToString(getSleep(), kSleepStr);
   result += addBoolToString(getSwing(), kSwingVStr);
-  uint8_t hours = getTimer();
-  result += addLabeledString((hours && getTimerEnabled()) ?
-                              minsToString(hours * 60) : kOffStr, kTimerStr);
+  if (getTimerEnabled())
+    result += addLabeledString(irutils::minsToString(getTimer()),
+                               kTimerStr);
+  else
+    result += addBoolToString(false, kTimerStr);
   return result;
 }
