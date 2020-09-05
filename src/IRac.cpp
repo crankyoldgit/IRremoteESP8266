@@ -1758,7 +1758,6 @@ void IRac::tcl112(IRTcl112Ac *ac,
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
-/// @param[in] light Turn on the LED/Display mode.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::technibel(IRTechnibelAc *ac,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
