@@ -28,7 +28,6 @@ using irutils::addBoolToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
-using irutils::setBits;
 
 #if SEND_AMCOR
 /// Send a Amcor HVAC formatted message.
@@ -126,31 +125,30 @@ bool IRAmcorAc::validChecksum(const uint8_t state[], const uint16_t length) {
 
 /// Update the checksum value for the internal state.
 void IRAmcorAc::checksum(void) {
-  remote_state[kAmcorChecksumByte] = IRAmcorAc::calcChecksum(remote_state,
-                                                             kAmcorStateLength);
+  _.Sum = IRAmcorAc::calcChecksum(_.raw, kAmcorStateLength);
 }
 
 /// Reset the internals of the object to a known good state.
 void IRAmcorAc::stateReset(void) {
-  for (uint8_t i = 1; i < kAmcorStateLength; i++) remote_state[i] = 0x0;
-  remote_state[0] = 0x01;
-  setFan(kAmcorFanAuto);
-  setMode(kAmcorAuto);
-  setTemp(25);  // 25C
+  for (uint8_t i = 1; i < kAmcorStateLength; i++) _.raw[i] = 0x0;
+  _.raw[0] = 0x01;
+  _.Fan = kAmcorFanAuto;
+  _.Mode = kAmcorAuto;
+  _.Temp = 25;  // 25C
 }
 
 /// Get the raw state of the object, suitable to be sent with the appropriate
 /// IRsend object method.
 /// @return A PTR to the internal state.
 uint8_t* IRAmcorAc::getRaw(void) {
-  this->checksum();  // Ensure correct bit array before returning
-  return remote_state;
+  checksum();  // Ensure correct bit array before returning
+  return _.raw;
 }
 
 /// Set the raw state of the object.
 /// @param[in] state The raw state from the native IR message.
 void IRAmcorAc::setRaw(const uint8_t state[]) {
-  memcpy(remote_state, state, kAmcorStateLength);
+  std::memcpy(_.raw, state, kAmcorStateLength);
 }
 
 /// Set the internal state to have the power on.
@@ -162,15 +160,13 @@ void IRAmcorAc::off(void) { setPower(false); }
 /// Set the internal state to have the desired power.
 /// @param[in] on The desired power state.
 void IRAmcorAc::setPower(const bool on) {
-  setBits(&remote_state[kAmcorPowerByte], kAmcorPowerOffset, kAmcorPowerSize,
-          on ? kAmcorPowerOn : kAmcorPowerOff);
+  _.Power = (on ? kAmcorPowerOn : kAmcorPowerOff);
 }
 
 /// Get the power setting from the internal state.
 /// @return A boolean indicating the power setting.
-bool IRAmcorAc::getPower(void) {
-  return GETBITS8(remote_state[kAmcorPowerByte], kAmcorPowerOffset,
-                  kAmcorPowerSize) == kAmcorPowerOn;
+bool IRAmcorAc::getPower(void) const {
+  return _.Power == kAmcorPowerOn;
 }
 
 /// Set the temperature.
@@ -178,15 +174,13 @@ bool IRAmcorAc::getPower(void) {
 void IRAmcorAc::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max(kAmcorMinTemp, degrees);
   temp = std::min(kAmcorMaxTemp, temp);
-  setBits(&remote_state[kAmcorTempByte], kAmcorTempOffset, kAmcorTempSize,
-          temp);
+  _.Temp = temp;
 }
 
 /// Get the current temperature setting.
 /// @return Get current setting for temp. in degrees celsius.
-uint8_t IRAmcorAc::getTemp(void) {
-  return GETBITS8(remote_state[kAmcorTempByte], kAmcorTempOffset,
-                  kAmcorTempSize);
+uint8_t IRAmcorAc::getTemp(void) const {
+  return _.Temp;
 }
 
 /// Control the current Maximum Cooling or Heating setting. (i.e. Turbo)
@@ -194,22 +188,20 @@ uint8_t IRAmcorAc::getTemp(void) {
 /// @param[in] on The desired setting.
 void IRAmcorAc::setMax(const bool on) {
   if (on) {
-    switch (getMode()) {
-      case kAmcorCool: setTemp(kAmcorMinTemp); break;
-      case kAmcorHeat: setTemp(kAmcorMaxTemp); break;
+    switch (_.Mode) {
+      case kAmcorCool: _.Temp = kAmcorMinTemp; break;
+      case kAmcorHeat: _.Temp = kAmcorMaxTemp; break;
       // Not allowed in all other operating modes.
       default: return;
     }
   }
-  setBits(&remote_state[kAmcorSpecialByte], kAmcorMaxOffset, kAmcorMaxSize,
-          on ? kAmcorMax : 0);
+  _.Max = (on ? kAmcorMax : 0);
 }
 
 /// Is the Maximum Cooling or Heating setting (i.e. Turbo) setting on?
 /// @return The current value.
-bool IRAmcorAc::getMax(void) {
-  return GETBITS8(remote_state[kAmcorSpecialByte], kAmcorMaxOffset,
-                  kAmcorMaxSize) == kAmcorMax;
+bool IRAmcorAc::getMax(void) const {
+  return _.Max == kAmcorMax;
 }
 
 /// Set the speed of the fan.
@@ -220,26 +212,23 @@ void IRAmcorAc::setFan(const uint8_t speed) {
     case kAmcorFanMin:
     case kAmcorFanMed:
     case kAmcorFanMax:
-      setBits(&remote_state[kAmcorModeFanByte], kAmcorFanOffset, kAmcorFanSize,
-              speed);
+      _.Fan = speed;
       break;
     default:
-      setFan(kAmcorFanAuto);
+      _.Fan = kAmcorFanAuto;
   }
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRAmcorAc::getFan(void) {
-  return GETBITS8(remote_state[kAmcorModeFanByte], kAmcorFanOffset,
-                  kAmcorFanSize);
+uint8_t IRAmcorAc::getFan(void) const {
+  return _.Fan;
 }
 
 /// Get the current operation mode setting.
 /// @return The current operation mode.
-uint8_t IRAmcorAc::getMode(void) {
-  return GETBITS8(remote_state[kAmcorModeFanByte], kAmcorModeOffset,
-                  kAmcorModeSize);
+uint8_t IRAmcorAc::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the desired operation mode.
@@ -251,13 +240,13 @@ void IRAmcorAc::setMode(const uint8_t mode) {
     case kAmcorHeat:
     case kAmcorDry:
     case kAmcorAuto:
-      setBits(&remote_state[kAmcorSpecialByte], kAmcorVentOffset,
-              kAmcorVentSize, (mode == kAmcorFan) ? kAmcorVentOn : 0);
-      setBits(&remote_state[kAmcorModeFanByte], kAmcorModeOffset,
-              kAmcorModeSize, mode);
+      _.Vent = (mode == kAmcorFan) ? kAmcorVentOn : 0;
+      _.Mode = mode;
       return;
     default:
-      this->setMode(kAmcorAuto);
+      _.Vent = 0;
+      _.Mode = kAmcorAuto;
+      break;
   }
 }
 
@@ -324,14 +313,14 @@ stdAc::fanspeed_t IRAmcorAc::toCommonFanSpeed(const uint8_t speed) {
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRAmcorAc::toCommon(void) {
+stdAc::state_t IRAmcorAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::AMCOR;
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = getPower();
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.degrees = _.Temp;
+  result.fanspeed = toCommonFanSpeed(_.Fan);
   // Not supported.
   result.model = -1;
   result.turbo = false;
@@ -350,16 +339,16 @@ stdAc::state_t IRAmcorAc::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRAmcorAc::toString(void) {
+String IRAmcorAc::toString(void) const {
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kAmcorAuto, kAmcorCool,
+  result += addModeToString(_.Mode, kAmcorAuto, kAmcorCool,
                             kAmcorHeat, kAmcorDry, kAmcorFan);
-  result += addFanToString(getFan(), kAmcorFanMax, kAmcorFanMin,
+  result += addFanToString(_.Fan, kAmcorFanMax, kAmcorFanMin,
                            kAmcorFanAuto, kAmcorFanAuto,
                            kAmcorFanMed);
-  result += addTempToString(getTemp());
+  result += addTempToString(_.Temp);
   result += addBoolToString(getMax(), kMaxStr);
   return result;
 }
