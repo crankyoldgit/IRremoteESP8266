@@ -20,35 +20,53 @@
 
 //  ARGO Ulisse DCI
 
-/*
-	Protocol Description:
-  All in LSB first as it is sent. argo message array will be stored MSB first!
-  do LSB-MSB conversion in sendData
-  Byte 0: const 0	0	1	1	0	1	0	1
-  Byte 1: const 1	0	1	0	1	1	1	1
-  Byte 2: 0 0 0, 3bit Cool/Heat Mode, 2bit start SetTemp LSB first
-  Byte 3: 3bit End SetTemp, 2bit Fan Mode, 3bit RoomTemp LSB first
-  Byte 4: 2bit RoomTemp, 3bit Flap Mode, 3bit OnTimer
-  Byte 5: 8bit OnTimer
-  Byte 6: 8Bit OffTimer
-  Byte 7: 3bit OffTimer, 5bit Time
-  Byte 8: 6bit Time, 1bit Timer On/Off, 1bit Timer Program
-  Byte 9: 1bit Timer Program, 1bit Timer 1h, 1 bit Night Mode, 1bit Max Mode, 1bit Filter, 1bit on/off, 1bit const 0, 1bit iFeel
-  Byte 10: 2bit const 0 1, 6bit Checksum
-  Byte 11: 2bit Checksum
-*/
+union ArgoProtocol {
+  uint8_t raw[kArgoStateLength];  ///< The state in native IR code form
+  struct {
+    // Byte 0
+    uint64_t          :8;  // Typically 0b00110101
+    // Byte 1
+    uint64_t          :8;  // Typically 0b10101111
+    // Byte 2~4
+    uint64_t          :3;
+    uint64_t Mode     :3;
+    uint64_t Temp     :5;  // straddle byte 2 and 3
+    uint64_t Fan      :2;
+    uint64_t RoomTemp :5;  // straddle byte 3 and 4
+    uint64_t Flap     :3;  // SwingV
+    uint64_t          :3;  // OnTimer, maybe hours
+    // Byte 5
+    uint64_t          :8;  // OnTimer, maybe minutes
+    // Byte 6
+    uint64_t          :8;  // OffTimer, maybe minutes
+    // Byte 7
+    uint64_t          :3;  // OffTimer, maybe hours
+    uint64_t          :5;  // Time
+    // Byte 8
+    uint8_t           :6;  // Time
+    uint8_t           :1;  // Timer On/Off
+    uint8_t           :1;  // Timer Program
+    // Byte 9
+    uint8_t           :1;  // Timer Program
+    uint8_t           :1;  // Timer 1h
+    uint8_t Night     :1;
+    uint8_t Max       :1;
+    uint8_t           :1;  // Filter
+    uint8_t Power     :1;
+    uint8_t           :1;  // const 0
+    uint8_t iFeel     :1;
+    // Byte 10~11
+    uint16_t          :2;  // const 01
+    uint16_t Sum      :8;
+    uint16_t          :6;
+  };
+};
 
 // Constants. Store MSB left.
 
-// byte[2]
 const uint8_t kArgoHeatBit =      0b00100000;
-//            kArgoTempLowMask =  0b11000000;
-const uint8_t kArgoTempLowOffset = 5;
-const uint8_t kArgoTempLowSize = 2;
 
 // Mode                           0b00111000
-const uint8_t kArgoModeOffset = 3;
-const uint8_t kArgoModeSize = 3;
 const uint8_t kArgoCool =           0b000;
 const uint8_t kArgoDry =            0b001;
 const uint8_t kArgoAuto =           0b010;
@@ -58,40 +76,19 @@ const uint8_t kArgoHeatAuto =       0b101;
 // ?no idea what mode that is
 const uint8_t kArgoHeatBlink =      0b110;
 
-// byte[3]
-//            kArgoTempHighMask =    0b00000111;
-const uint8_t kArgoTempHighOffset = 0;
-const uint8_t kArgoTempHighSize = 3;
 // Fan                               0b00011000
-const uint8_t kArgoFanOffset = 3;
-const uint8_t kArgoFanSize = 2;
 const uint8_t kArgoFanAuto = 0;      // 0b00
 const uint8_t kArgoFan1 = 1;         // 0b01
 const uint8_t kArgoFan2 = 2;         // 0b10
 const uint8_t kArgoFan3 = 3;         // 0b11
-//            kArgoRoomTempLowMask = 0b11100000;
-const uint8_t kArgoRoomTempLowOffset = 5;
-const uint8_t kArgoRoomTempLowSize = 3;
 
-// byte[4]
-//            kArgoRoomTempHighMask = 0b00000011;
-const uint8_t kArgoRoomTempHighOffset = 0;
-const uint8_t kArgoRoomTempHighSize = 2;
-
+// Temp
 const uint8_t kArgoTempDelta = 4;
-const uint8_t kArgoMaxRoomTemp =
-    ((1 << (kArgoRoomTempHighSize + kArgoRoomTempLowSize)) - 1) +
-    kArgoTempDelta;  // 35C
-
-// byte[9]
-const uint8_t kArgoNightBitOffset = 2;
-const uint8_t kArgoMaxBitOffset = 3;
-const uint8_t kArgoPowerBitOffset = 5;
-const uint8_t kArgoIFeelBitOffset = 7;
-
+const uint8_t kArgoMaxRoomTemp = 35;  // Celsius
 const uint8_t kArgoMinTemp = 10;  // Celsius delta +4
 const uint8_t kArgoMaxTemp = 32;  // Celsius
 
+// Flap/SwingV
 const uint8_t kArgoFlapAuto = 0;
 const uint8_t kArgoFlap1 = 1;
 const uint8_t kArgoFlap2 = 2;
@@ -144,32 +141,32 @@ class IRArgoAC {
   void off(void);
 
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
 
   void setTemp(const uint8_t degrees);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
 
   void setFan(const uint8_t fan);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
 
   void setFlap(const uint8_t flap);
-  uint8_t getFlap(void);
+  uint8_t getFlap(void) const;
 
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
 
   void setMax(const bool on);
-  bool getMax(void);
+  bool getMax(void) const;
 
   void setNight(const bool on);
-  bool getNight(void);
+  bool getNight(void) const;
 
   void setiFeel(const bool on);
-  bool getiFeel(void);
+  bool getiFeel(void) const;
 
   void setTime(void);
   void setRoomTemp(const uint8_t degrees);
-  uint8_t getRoomTemp(void);
+  uint8_t getRoomTemp(void) const;
 
   uint8_t* getRaw(void);
   void setRaw(const uint8_t state[]);
@@ -182,8 +179,8 @@ class IRArgoAC {
   static uint8_t convertSwingV(const stdAc::swingv_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString();
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -194,7 +191,7 @@ class IRArgoAC {
   /// @endcond
 #endif
   // # of bytes per command
-  uint8_t argo[kArgoStateLength];  // Defined in IRremoteESP8266.h
+  ArgoProtocol _;
   void stateReset(void);
   void checksum(void);
 

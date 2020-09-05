@@ -28,8 +28,6 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_ARGO
 /// Send a Argo A/C formatted message.
@@ -54,7 +52,7 @@ void IRsend::sendArgo(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRArgoAC::IRArgoAC(const uint16_t pin, const bool inverted,
                    const bool use_modulation)
-      : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+      : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Set up hardware to be able to send a message.
 void IRArgoAC::begin(void) { _irsend.begin(); }
@@ -89,45 +87,44 @@ bool IRArgoAC::validChecksum(const uint8_t state[], const uint16_t length) {
 
 /// Update the checksum for the internal state.
 void IRArgoAC::checksum(void) {
-  uint8_t sum = IRArgoAC::calcChecksum(argo, kArgoStateLength);
+  uint8_t sum = IRArgoAC::calcChecksum(_.raw, kArgoStateLength);
   // Append sum to end of array
   // Set const part of checksum bit 10
-  argo[10] = 0b00000010;
-  argo[10] += sum << 2;  // Shift up 2 bits and append to byte 10
-  argo[11] = sum >> 6;   // Shift down 6 bits and add in two LSBs of bit 11
+  _.raw[10] = 0b00000010;
+  _.Sum = sum;
 }
 
 /// Reset the internals of the object to a known good state.
 void IRArgoAC::stateReset(void) {
-  for (uint8_t i = 0; i < kArgoStateLength; i++) argo[i] = 0x0;
+  for (uint8_t i = 0; i < kArgoStateLength; i++) _.raw[i] = 0x0;
 
   // Argo Message. Store MSB left.
   // Default message:
-  argo[0] = 0b10101100;  // LSB first (as sent) 0b00110101; //const preamble
-  argo[1] = 0b11110101;  // LSB first: 0b10101111; //const preamble
+  _.raw[0] = 0b10101100;  // LSB first (as sent) 0b00110101; //const preamble
+  _.raw[1] = 0b11110101;  // LSB first: 0b10101111; //const preamble
   // Keep payload 2-9 at zero
-  argo[10] = 0b00000010;  // Const 01, checksum 6bit
-  argo[11] = 0b00000000;  // Checksum 2bit
+  _.raw[10] = 0b00000010;  // Const 01
+  _.Sum = 0;
 
-  this->off();
-  this->setTemp(20);
-  this->setRoomTemp(25);
-  this->setMode(kArgoAuto);
-  this->setFan(kArgoFanAuto);
+  off();
+  setTemp(20);
+  setRoomTemp(25);
+  setMode(kArgoAuto);
+  setFan(kArgoFanAuto);
 }
 
 /// Get the raw state of the object, suitable to be sent with the appropriate
 /// IRsend object method.
 /// @return A PTR to the internal state.
 uint8_t* IRArgoAC::getRaw(void) {
-  this->checksum();  // Ensure correct bit array before returning
-  return argo;
+  checksum();  // Ensure correct bit array before returning
+  return _.raw;
 }
 
 /// Set the raw state of the object.
 /// @param[in] state The raw state from the native IR message.
 void IRArgoAC::setRaw(const uint8_t state[]) {
-  memcpy(argo, state, kArgoStateLength);
+  std::memcpy(_.raw, state, kArgoStateLength);
 }
 
 /// Set the internal state to have the power on.
@@ -139,22 +136,22 @@ void IRArgoAC::off(void) { setPower(false); }
 /// Set the internal state to have the desired power.
 /// @param[in] on The desired power state.
 void IRArgoAC::setPower(const bool on) {
-  setBit(&argo[9], kArgoPowerBitOffset, on);
+  _.Power = on;
 }
 
 /// Get the power setting from the internal state.
 /// @return A boolean indicating the power setting.
-bool IRArgoAC::getPower(void) { return GETBIT8(argo[9], kArgoPowerBitOffset); }
+bool IRArgoAC::getPower(void) const { return _.Power; }
 
 /// Control the current Max setting. (i.e. Turbo)
 /// @param[in] on The desired setting.
 void IRArgoAC::setMax(const bool on) {
-  setBit(&argo[9], kArgoMaxBitOffset, on);
+  _.Max = on;
 }
 
 /// Is the Max (i.e. Turbo) setting on?
 /// @return The current value.
-bool IRArgoAC::getMax(void) { return GETBIT8(argo[9], kArgoMaxBitOffset); }
+bool IRArgoAC::getMax(void) const { return _.Max; }
 
 /// Set the temperature.
 /// @param[in] degrees The temperature in degrees celsius.
@@ -163,33 +160,27 @@ void IRArgoAC::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max(kArgoMinTemp, degrees);
   // delta 4 degrees. "If I want 12 degrees, I need to send 8"
   temp = std::min(kArgoMaxTemp, temp) - kArgoTempDelta;
-  // Settemp = Bit 6,7 of byte 2, and bit 0-2 of byte 3
   // mask out bits
   // argo[13] & 0x00000100;  // mask out ON/OFF Bit
-  setBits(&argo[2], kArgoTempLowOffset, kArgoTempLowSize, temp);
-  setBits(&argo[3], kArgoTempHighOffset, kArgoTempHighSize,
-          temp >> kArgoTempLowSize);
+  _.Temp = temp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRArgoAC::getTemp(void) {
-  return ((GETBITS8(argo[3], kArgoTempHighOffset,
-                    kArgoTempHighSize) << kArgoTempLowSize) |
-           GETBITS8(argo[2], kArgoTempLowOffset, kArgoTempLowSize)) +
-      kArgoTempDelta;
+uint8_t IRArgoAC::getTemp(void) const {
+  return _.Temp + kArgoTempDelta;
 }
 
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting.
 void IRArgoAC::setFan(const uint8_t fan) {
-  setBits(&argo[3], kArgoFanOffset, kArgoFanSize, std::min(fan, kArgoFan3));
+  _.Fan = std::min(fan, kArgoFan3);
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRArgoAC::getFan(void) {
-  return GETBITS8(argo[3], kArgoFanOffset, kArgoFanSize);
+uint8_t IRArgoAC::getFan(void) const {
+  return _.Fan;
 }
 
 /// Set the flap position. i.e. Swing.
@@ -203,12 +194,12 @@ void IRArgoAC::setFlap(const uint8_t flap) {
 /// Get the flap position. i.e. Swing.
 /// @warning Not yet working!
 /// @return The current flap setting.
-uint8_t IRArgoAC::getFlap(void) { return flap_mode; }
+uint8_t IRArgoAC::getFlap(void) const { return flap_mode; }
 
 /// Get the current operation mode setting.
 /// @return The current operation mode.
-uint8_t IRArgoAC::getMode(void) {
-  return GETBITS8(argo[2], kArgoModeOffset, kArgoModeSize);
+uint8_t IRArgoAC::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the desired operation mode.
@@ -221,32 +212,32 @@ void IRArgoAC::setMode(const uint8_t mode) {
     case kArgoOff:
     case kArgoHeat:
     case kArgoHeatAuto:
-      setBits(&argo[2], kArgoModeOffset, kArgoModeSize, mode);
+      _.Mode = mode;
       return;
     default:
-      this->setMode(kArgoAuto);
+      _.Mode = kArgoAuto;
   }
 }
 
 /// Turn on/off the Night mode. i.e. Sleep.
 /// @param[in] on The desired setting.
 void IRArgoAC::setNight(const bool on) {
-  setBit(&argo[9], kArgoNightBitOffset, on);
+  _.Night = on;
 }
 
 /// Get the status of Night mode. i.e. Sleep.
 /// @return true if on, false if off.
-bool IRArgoAC::getNight(void) { return GETBIT8(argo[9], kArgoNightBitOffset); }
+bool IRArgoAC::getNight(void) const { return _.Night; }
 
 /// Turn on/off the iFeel mode.
 /// @param[in] on The desired setting.
 void IRArgoAC::setiFeel(const bool on) {
-  setBit(&argo[9], kArgoIFeelBitOffset, on);
+  _.iFeel = on;
 }
 
 /// Get the status of iFeel mode.
 /// @return true if on, false if off.
-bool IRArgoAC::getiFeel(void) { return GETBIT8(argo[9], kArgoIFeelBitOffset); }
+bool IRArgoAC::getiFeel(void) const { return _.iFeel; }
 
 /// Set the time for the A/C
 /// @warning Not yet working!
@@ -259,18 +250,13 @@ void IRArgoAC::setTime(void) {
 void IRArgoAC::setRoomTemp(const uint8_t degrees) {
   uint8_t temp = std::min(degrees, kArgoMaxRoomTemp);
   temp = std::max(temp, kArgoTempDelta) - kArgoTempDelta;
-  setBits(&argo[3], kArgoRoomTempLowOffset, kArgoRoomTempLowSize, temp);
-  setBits(&argo[4], kArgoRoomTempHighOffset, kArgoRoomTempHighSize,
-          temp >> kArgoRoomTempLowSize);
+  _.RoomTemp = temp;
 }
 
 /// Get the currently stored value for the room temperature setting.
 /// @return The current setting for the room temp. in degrees celsius.
-uint8_t IRArgoAC::getRoomTemp(void) {
-  return ((GETBITS8(argo[4], kArgoRoomTempHighOffset,
-                   kArgoRoomTempHighSize) << kArgoRoomTempLowSize) |
-           GETBITS8(argo[3], kArgoRoomTempLowOffset, kArgoRoomTempLowSize)) +
-      kArgoTempDelta;
+uint8_t IRArgoAC::getRoomTemp(void) const {
+  return _.RoomTemp + kArgoTempDelta;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -357,16 +343,16 @@ stdAc::fanspeed_t IRArgoAC::toCommonFanSpeed(const uint8_t speed) {
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRArgoAC::toCommon(void) {
+stdAc::state_t IRArgoAC::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::ARGO;
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.turbo = this->getMax();
-  result.sleep = this->getNight() ? 0 : -1;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.turbo = _.Max;
+  result.sleep = _.Night ? 0 : -1;
   // Not supported.
   result.model = -1;  // Not supported.
   result.swingv = stdAc::swingv_t::kOff;
@@ -383,13 +369,13 @@ stdAc::state_t IRArgoAC::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRArgoAC::toString(void) {
+String IRArgoAC::toString(void) const {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addIntToString(getMode(), kModeStr);
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addIntToString(_.Mode, kModeStr);
   result += kSpaceLBraceStr;
-  switch (getMode()) {
+  switch (_.Mode) {
     case kArgoAuto:
       result += kAutoStr;
       break;
@@ -414,9 +400,9 @@ String IRArgoAC::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getFan(), kFanStr);
+  result += addIntToString(_.Fan, kFanStr);
   result += kSpaceLBraceStr;
-  switch (getFan()) {
+  switch (_.Fan) {
     case kArgoFanAuto:
       result += kAutoStr;
       break;
@@ -438,9 +424,9 @@ String IRArgoAC::toString(void) {
   result += kRoomStr;
   result += ' ';
   result += addTempToString(getRoomTemp(), true, false);
-  result += addBoolToString(getMax(), kMaxStr);
-  result += addBoolToString(getiFeel(), kIFeelStr);
-  result += addBoolToString(getNight(), kNightStr);
+  result += addBoolToString(_.Max, kMaxStr);
+  result += addBoolToString(_.iFeel, kIFeelStr);
+  result += addBoolToString(_.Night, kNightStr);
   return result;
 }
 
