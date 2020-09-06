@@ -97,7 +97,7 @@ TEST(TestIRac, Argo) {
             stdAc::opmode_t::kHeat,      // Mode
             21,                          // Celsius
             stdAc::fanspeed_t::kHigh,    // Fan speed
-            stdAc::swingv_t::kOff,       // Veritcal swing
+            stdAc::swingv_t::kOff,       // Vertical swing
             false,                       // Turbo
             -1);                         // Sleep
   EXPECT_TRUE(ac.getPower());
@@ -123,8 +123,8 @@ TEST(TestIRac, Carrier64) {
             stdAc::opmode_t::kHeat,      // Mode
             21,                          // Celsius
             stdAc::fanspeed_t::kHigh,    // Fan speed
-            stdAc::swingv_t::kAuto,      // Veritcal swing
-            1);                         // Sleep
+            stdAc::swingv_t::kAuto,      // Vertical swing
+            1);                          // Sleep
   EXPECT_TRUE(ac.getPower());  // Power.
   EXPECT_EQ(kCarrierAc64Heat, ac.getMode());  // Operating mode.
   EXPECT_EQ(21, ac.getTemp());  // Temperature.
@@ -156,7 +156,7 @@ TEST(TestIRac, Coolix) {
               stdAc::opmode_t::kHeat,      // Mode
               21,                          // Celsius
               stdAc::fanspeed_t::kHigh,    // Fan speed
-              stdAc::swingv_t::kOff,       // Veritcal swing
+              stdAc::swingv_t::kOff,       // Vertical swing
               stdAc::swingh_t::kOff,       // Horizontal swing
               false,                       // Turbo
               false,                       // Light
@@ -225,7 +225,7 @@ TEST(TestIRac, Corona) {
               stdAc::opmode_t::kHeat,      // Mode
               21,                          // Celsius
               stdAc::fanspeed_t::kHigh,    // Fan speed
-              stdAc::swingv_t::kAuto,      // Veritcal swing
+              stdAc::swingv_t::kAuto,      // Vertical swing
               true);                       // Econo (PowerSave)
   EXPECT_TRUE(ac.getPower());  // Power.
   EXPECT_TRUE(ac.getPowerButton());  // Power.button
@@ -262,7 +262,7 @@ TEST(TestIRac, Daikin) {
               stdAc::opmode_t::kCool,      // Mode
               19,                          // Celsius
               stdAc::fanspeed_t::kMax,     // Fan speed
-              stdAc::swingv_t::kOff,       // Veritcal swing
+              stdAc::swingv_t::kOff,       // Vertical swing
               stdAc::swingh_t::kOff,       // Horizontal swing
               false,                       // Quiet
               false,                       // Turbo
@@ -294,7 +294,7 @@ TEST(TestIRac, Daikin128) {
                  stdAc::opmode_t::kHeat,      // Mode
                  27,                          // Celsius
                  stdAc::fanspeed_t::kMin,     // Fan speed
-                 stdAc::swingv_t::kAuto,       // Veritcal swing
+                 stdAc::swingv_t::kAuto,      // Vertical swing
                  true,                        // Quiet
                  false,                       // Turbo
                  true,                        // Light
@@ -325,7 +325,7 @@ TEST(TestIRac, Daikin152) {
                  stdAc::opmode_t::kCool,      // Mode
                  27,                          // Celsius
                  stdAc::fanspeed_t::kMedium,  // Fan speed
-                 stdAc::swingv_t::kAuto,      // Veritcal swing
+                 stdAc::swingv_t::kAuto,      // Vertical swing
                  false,                       // Quiet
                  false,                       // Turbo
                  true);                       // Econo
@@ -353,7 +353,7 @@ TEST(TestIRac, Daikin160) {
                  stdAc::opmode_t::kDry,       // Mode
                  23,                          // Celsius
                  stdAc::fanspeed_t::kMin,     // Fan speed
-                 stdAc::swingv_t::kMiddle);   // Veritcal swing
+                 stdAc::swingv_t::kMiddle);   // Vertical swing
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
@@ -405,7 +405,7 @@ TEST(TestIRac, Daikin2) {
                stdAc::opmode_t::kCool,      // Mode
                19,                          // Celsius
                stdAc::fanspeed_t::kLow,     // Fan speed
-               stdAc::swingv_t::kOff,       // Veritcal swing
+               stdAc::swingv_t::kOff,       // Vertical swing
                stdAc::swingh_t::kMiddle,    // Horizontal swing
                false,                       // Quiet
                false,                       // Turbo
@@ -440,7 +440,7 @@ TEST(TestIRac, Daikin216) {
                  stdAc::opmode_t::kHeat,      // Mode
                  31,                          // Celsius
                  stdAc::fanspeed_t::kMedium,  // Fan speed
-                 stdAc::swingv_t::kAuto,      // Veritcal swing
+                 stdAc::swingv_t::kAuto,      // Vertical swing
                  stdAc::swingh_t::kLeft,      // Horizontal swing
                  true,                        // Quiet
                  false);                      // Turbo (Powerful)
@@ -469,7 +469,7 @@ TEST(TestIRac, Daikin64) {
                 stdAc::opmode_t::kCool,      // Mode
                 27,                          // Celsius
                 stdAc::fanspeed_t::kLow,     // Fan Speed
-                stdAc::swingv_t::kAuto,      // Veritcal swing
+                stdAc::swingv_t::kAuto,      // Vertical swing
                 false,                       // Quiet
                 false,                       // Turbo
                 360,                         // Sleep
@@ -521,7 +521,7 @@ TEST(TestIRac, Electra) {
                stdAc::opmode_t::kFan,       // Mode
                26,                          // Celsius
                stdAc::fanspeed_t::kHigh,    // Fan speed
-               stdAc::swingv_t::kAuto,      // Veritcal swing
+               stdAc::swingv_t::kAuto,      // Vertical swing
                stdAc::swingh_t::kLeft,      // Horizontal swing
                true,                        // Turbo
                true,                        // Light (toggle)
@@ -555,7 +555,7 @@ TEST(TestIRac, Fujitsu) {
                stdAc::opmode_t::kCool,      // Mode
                19,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
-               stdAc::swingv_t::kOff,       // Veritcal swing
+               stdAc::swingv_t::kOff,       // Vertical swing
                stdAc::swingh_t::kOff,       // Horizontal swing
                false,                       // Quiet
                false,                       // Turbo (Powerful)
@@ -578,7 +578,7 @@ TEST(TestIRac, Fujitsu) {
                stdAc::opmode_t::kCool,      // Mode
                19,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
-               stdAc::swingv_t::kOff,       // Veritcal swing
+               stdAc::swingv_t::kOff,       // Vertical swing
                stdAc::swingh_t::kOff,       // Horizontal swing
                false,                       // Quiet
                false,                       // Turbo (Powerful)
@@ -599,7 +599,7 @@ TEST(TestIRac, Fujitsu) {
                stdAc::opmode_t::kCool,      // Mode
                19,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
-               stdAc::swingv_t::kOff,       // Veritcal swing
+               stdAc::swingv_t::kOff,       // Vertical swing
                stdAc::swingh_t::kOff,       // Horizontal swing
                false,                       // Quiet
                false,                       // Turbo (Powerful)
@@ -629,7 +629,7 @@ TEST(TestIRac, Goodweather) {
                    stdAc::opmode_t::kCool,      // Mode
                    19,                          // Celsius
                    stdAc::fanspeed_t::kMedium,  // Fan speed
-                   stdAc::swingv_t::kHigh,      // Veritcal swing
+                   stdAc::swingv_t::kHigh,      // Vertical swing
                    true,                        // Turbo
                    true,                        // Light
                    8 * 60 + 0);                 // Sleep time
@@ -661,7 +661,7 @@ TEST(TestIRac, Gree) {
             false,                          // Celsius
             71,                             // Degrees (F)
             stdAc::fanspeed_t::kMedium,     // Fan speed
-            stdAc::swingv_t::kHigh,         // Veritcal swing
+            stdAc::swingv_t::kHigh,         // Vertical swing
             false,                          // Turbo
             true,                           // Light
             true,                           // Clean (aka Mold/XFan)
@@ -691,7 +691,7 @@ TEST(TestIRac, Haier) {
              stdAc::opmode_t::kCool,      // Mode
              24,                          // Celsius
              stdAc::fanspeed_t::kMedium,  // Fan speed
-             stdAc::swingv_t::kHigh,      // Veritcal swing
+             stdAc::swingv_t::kHigh,      // Vertical swing
              true,                        // Filter
              8 * 60 + 0,                  // Sleep time
              13 * 60 + 45);               // Clock
@@ -721,7 +721,7 @@ TEST(TestIRac, HaierYrwo2) {
              stdAc::opmode_t::kCool,      // Mode
              23,                          // Celsius
              stdAc::fanspeed_t::kMedium,  // Fan speed
-             stdAc::swingv_t::kHigh,      // Veritcal swing
+             stdAc::swingv_t::kHigh,      // Vertical swing
              true,                        // Turbo
              true,                        // Filter
              8 * 60 + 0);                 // Sleep time
@@ -749,7 +749,7 @@ TEST(TestIRac, Hitachi) {
                stdAc::opmode_t::kAuto,      // Mode
                22,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
-               stdAc::swingv_t::kOff,       // Veritcal swing
+               stdAc::swingv_t::kOff,       // Vertical swing
                stdAc::swingh_t::kAuto);     // Horizontal swing
 
   ASSERT_EQ(expected, ac.toString());
@@ -905,7 +905,7 @@ TEST(TestIRac, Kelvinator) {
                   stdAc::opmode_t::kCool,      // Mode
                   19,                          // Celsius
                   stdAc::fanspeed_t::kMedium,  // Fan speed
-                  stdAc::swingv_t::kOff,       // Veritcal swing
+                  stdAc::swingv_t::kOff,       // Vertical swing
                   stdAc::swingh_t::kOff,       // Horizontal swing
                   false,                       // Quiet
                   false,                       // Turbo
@@ -993,7 +993,7 @@ TEST(TestIRac, Mitsubishi) {
                   stdAc::opmode_t::kCool,      // Mode
                   20,                          // Celsius
                   stdAc::fanspeed_t::kMedium,  // Fan speed
-                  stdAc::swingv_t::kOff,       // Veritcal swing
+                  stdAc::swingv_t::kOff,       // Vertical swing
                   stdAc::swingh_t::kOff,       // Horizontal swing
                   false,                       // Silent
                   14 * 60 + 35);               // Clock
@@ -1021,7 +1021,7 @@ TEST(TestIRac, Mitsubishi136) {
                      stdAc::opmode_t::kDry,       // Mode
                      22,                          // Celsius
                      stdAc::fanspeed_t::kMax,     // Fan speed
-                     stdAc::swingv_t::kHighest,   // Veritcal swing
+                     stdAc::swingv_t::kHighest,   // Vertical swing
                      false);                      // Quiet
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
@@ -1048,7 +1048,7 @@ TEST(TestIRac, MitsubishiHeavy88) {
                          stdAc::opmode_t::kCool,      // Mode
                          21,                          // Celsius
                          stdAc::fanspeed_t::kMedium,  // Fan speed
-                         stdAc::swingv_t::kAuto,      // Veritcal swing
+                         stdAc::swingv_t::kAuto,      // Vertical swing
                          stdAc::swingh_t::kOff,       // Horizontal swing
                          false,                       // Turbo
                          false,                       // Econo
@@ -1078,7 +1078,7 @@ TEST(TestIRac, MitsubishiHeavy152) {
                           stdAc::opmode_t::kCool,      // Mode
                           20,                          // Celsius
                           stdAc::fanspeed_t::kLow,     // Fan speed
-                          stdAc::swingv_t::kOff,       // Veritcal swing
+                          stdAc::swingv_t::kOff,       // Vertical swing
                           stdAc::swingh_t::kAuto,      // Horizontal swing
                           true,                        // Silent
                           false,                       // Turbo
@@ -1112,7 +1112,7 @@ TEST(TestIRac, Neoclima) {
                 stdAc::opmode_t::kCool,      // Mode
                 20,                          // Celsius
                 stdAc::fanspeed_t::kLow,     // Fan speed
-                stdAc::swingv_t::kOff,       // Veritcal swing
+                stdAc::swingv_t::kOff,       // Vertical swing
                 stdAc::swingh_t::kAuto,      // Horizontal swing
                 false,                       // Turbo
                 true,                        // Light
@@ -1144,7 +1144,7 @@ TEST(TestIRac, Panasonic) {
                  stdAc::opmode_t::kHeat,      // Mode
                  28,                          // Celsius
                  stdAc::fanspeed_t::kMedium,  // Fan speed
-                 stdAc::swingv_t::kAuto,      // Veritcal swing
+                 stdAc::swingv_t::kAuto,      // Vertical swing
                  stdAc::swingh_t::kLeft,      // Horizontal swing
                  true,                        // Quiet
                  false,                       // Turbo
@@ -1171,7 +1171,7 @@ TEST(TestIRac, Panasonic) {
                stdAc::opmode_t::kCool,      // Mode
                18,                          // Celsius
                stdAc::fanspeed_t::kMax,     // Fan speed
-               stdAc::swingv_t::kHigh,      // Veritcal swing
+               stdAc::swingv_t::kHigh,      // Vertical swing
                stdAc::swingh_t::kMiddle,    // Horizontal swing
                false,                       // Quiet
                true,                        // Turbo
@@ -1201,7 +1201,7 @@ TEST(TestIRac, Samsung) {
                stdAc::opmode_t::kAuto,      // Mode
                28,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
-               stdAc::swingv_t::kAuto,      // Veritcal swing
+               stdAc::swingv_t::kAuto,      // Vertical swing
                true,                        // Quiet
                false,                       // Turbo
                true,                        // Light (Display)
@@ -1225,7 +1225,7 @@ TEST(TestIRac, Samsung) {
                stdAc::opmode_t::kAuto,      // Mode
                28,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
-               stdAc::swingv_t::kAuto,      // Veritcal swing
+               stdAc::swingv_t::kAuto,      // Vertical swing
                true,                        // Quiet
                false,                       // Turbo
                true,                        // Light (Display)
@@ -1292,7 +1292,7 @@ TEST(TestIRac, Sharp) {
              stdAc::opmode_t::kCool,       // Mode
              28,                           // Celsius
              stdAc::fanspeed_t::kMedium,   // Fan speed
-             stdAc::swingv_t::kAuto,       // Veritcal swing
+             stdAc::swingv_t::kAuto,       // Vertical swing
              false,                        // Turbo
              true,                         // Filter (Ion)
              false);                       // Clean
@@ -1320,7 +1320,7 @@ TEST(TestIRac, Tcl112) {
               stdAc::opmode_t::kCool,      // Mode
               20,                          // Celsius
               stdAc::fanspeed_t::kMedium,  // Fan speed
-              stdAc::swingv_t::kOff,       // Veritcal swing
+              stdAc::swingv_t::kOff,       // Vertical swing
               stdAc::swingh_t::kAuto,      // Horizontal swing
               false,                       // Turbo
               true,                        // Light
@@ -1331,6 +1331,33 @@ TEST(TestIRac, Tcl112) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(TCL112AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
+TEST(TestIRac, Technibel) {
+  IRTechnibelAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 8 (Heat), Fan: 2 (Medium), Temp: 72F, Sleep: On, "
+      "Swing(V): On, Timer: Off";
+
+  ac.begin();
+  irac.technibel(&ac,
+                 true,                        // Power
+                 stdAc::opmode_t::kHeat,      // Mode
+                 false,                       // Celsius
+                 72,                          // Degrees
+                 stdAc::fanspeed_t::kMedium,  // Fan speed
+                 stdAc::swingv_t::kAuto,      // Vertical swing
+                 8 * 60 + 30);                // Sleep
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(decode_type_t::TECHNIBEL_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTechnibelAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
@@ -1350,7 +1377,7 @@ TEST(TestIRac, Teco) {
             stdAc::opmode_t::kAuto,      // Mode
             21,                          // Celsius
             stdAc::fanspeed_t::kMedium,  // Fan speed
-            stdAc::swingv_t::kAuto,      // Veritcal swing
+            stdAc::swingv_t::kAuto,      // Vertical swing
             true,                        // Light
             8 * 60 + 30);                // Sleep
   ASSERT_EQ(expected, ac.toString());
@@ -1479,7 +1506,7 @@ TEST(TestIRac, Vestel) {
               stdAc::opmode_t::kAuto,    // Mode
               22,                        // Celsius
               stdAc::fanspeed_t::kLow,   // Fan speed
-              stdAc::swingv_t::kHigh,    // Veritcal swing
+              stdAc::swingv_t::kHigh,    // Vertical swing
               false,                     // Turbo
               true,                      // Filter
               8 * 60 + 0);               // Sleep time
@@ -1503,7 +1530,7 @@ TEST(TestIRac, Vestel) {
               stdAc::opmode_t::kAuto,    // Mode
               22,                        // Celsius
               stdAc::fanspeed_t::kLow,   // Fan speed
-              stdAc::swingv_t::kHigh,    // Veritcal swing
+              stdAc::swingv_t::kHigh,    // Vertical swing
               false,                     // Turbo
               true,                      // Filter
               8 * 60 + 0,                // Sleep time
@@ -1527,7 +1554,7 @@ TEST(TestIRac, Vestel) {
               stdAc::opmode_t::kAuto,    // Mode
               22,                        // Celsius
               stdAc::fanspeed_t::kLow,   // Fan speed
-              stdAc::swingv_t::kHigh,    // Veritcal swing
+              stdAc::swingv_t::kHigh,    // Vertical swing
               false,                     // Turbo
               true,                      // Filter
               8 * 60 + 0,                // Sleep time
@@ -1649,7 +1676,7 @@ TEST(TestIRac, Whirlpool) {
                  stdAc::opmode_t::kAuto,      // Mode
                  21,                          // Celsius
                  stdAc::fanspeed_t::kMedium,  // Fan speed
-                 stdAc::swingv_t::kAuto,      // Veritcal swing
+                 stdAc::swingv_t::kAuto,      // Vertical swing
                  false,                       // Turbo
                  true,                        // Light
                  8 * 60 + 30,                 // Sleep
@@ -1951,7 +1978,7 @@ TEST(TestIRac, Issue821) {
               result.mode,      // Mode
               result.degrees,   // Celsius
               result.fanspeed,  // Fan speed
-              result.swingv,       // Veritcal swing
+              result.swingv,       // Vertical swing
               result.swingh,       // Horizontal swing
               result.turbo,                       // Turbo
               result.light,                       // Light
@@ -2043,7 +2070,7 @@ TEST(TestIRac, Issue1001) {
                  result.mode,      // Mode
                  result.degrees,   // Celsius
                  result.fanspeed,  // Fan speed
-                 result.swingv,    // Veritcal swing
+                 result.swingv,    // Vertical swing
                  result.turbo,     // Turbo
                  result.light,     // Light
                  result.sleep);    // Sleep
@@ -2074,7 +2101,7 @@ TEST(TestIRac, Issue1001) {
                  result.mode,      // Mode
                  result.degrees,   // Celsius
                  result.fanspeed,  // Fan speed
-                 result.swingv,    // Veritcal swing
+                 result.swingv,    // Vertical swing
                  result.turbo,     // Turbo
                  result.light,     // Light
                  result.sleep);    // Sleep

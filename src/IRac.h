@@ -384,9 +384,9 @@ void electra(IRElectraAc *ac,
 #endif  // SEND_TCL112AC
 #if SEND_TECHNIBEL_AC
   void technibel(IRTechnibelAc *ac,
-            const bool on, const stdAc::opmode_t mode, const float degrees,
-            const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
-            const int16_t sleep = -1);
+            const bool on, const stdAc::opmode_t mode, const bool celsius,
+            const float degrees, const stdAc::fanspeed_t fan,
+            const stdAc::swingv_t swingv, const int16_t sleep = -1);
 #endif  // SEND_TECHNIBEL_AC
 #if SEND_TECO
   void teco(IRTecoAc *ac,

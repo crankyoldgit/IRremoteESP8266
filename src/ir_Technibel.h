@@ -18,13 +18,8 @@
 #endif
 
 // Supports:
-//   Brand: TECHNIBEL,  Model: IRO PLUS
+//   Brand: Technibel,  Model: IRO PLUS
 
-// Ref:
-//
-
-// Kudos:
-//   : For the breakdown and mapping of the bit values.
 
 /* State bit map:
 
@@ -50,17 +45,17 @@
 const uint8_t kTechnibelAcChecksumOffset = 0;
 const uint8_t kTechnibelAcChecksumSize = 8;
 
-const uint8_t kTechnibelAcFooterOffset = kTechnibelAcChecksumOffset
-                                        + kTechnibelAcChecksumSize;
+const uint8_t kTechnibelAcFooterOffset = kTechnibelAcChecksumOffset +
+    kTechnibelAcChecksumSize;
 const uint8_t kTechnibelAcFooterSize = 8;
 
-const uint8_t kTechnibelAcTimerHoursOffset = kTechnibelAcFooterOffset
-                                            + kTechnibelAcFooterSize;
+const uint8_t kTechnibelAcTimerHoursOffset = kTechnibelAcFooterOffset +
+    kTechnibelAcFooterSize;
 const uint8_t kTechnibelAcHoursSize = 8;  // Max 24 hrs
 const uint8_t kTechnibelAcTimerMax = 24;
 
-const uint8_t kTechnibelAcTempOffset = kTechnibelAcTimerHoursOffset
-                                      + kTechnibelAcHoursSize;
+const uint8_t kTechnibelAcTempOffset = kTechnibelAcTimerHoursOffset +
+    kTechnibelAcHoursSize;
 const uint8_t kTechnibelAcTempSize = 8;
 const uint8_t kTechnibelAcTempMinC = 16;  // Deg C
 const uint8_t kTechnibelAcTempMaxC = 31;  // Deg C
@@ -68,19 +63,19 @@ const uint8_t kTechnibelAcTempMinF = 61;  // Deg F
 const uint8_t kTechnibelAcTempMaxF = 88;  // Deg F
 
 const uint8_t kTechnibelAcFanOffset = kTechnibelAcTempOffset
-                                      + kTechnibelAcTempSize;
+    + kTechnibelAcTempSize;
 const uint8_t kTechnibelAcFanSize = 4;
 const uint8_t kTechnibelAcFanLow =    0b0001;
 const uint8_t kTechnibelAcFanMedium = 0b0010;
 const uint8_t kTechnibelAcFanHigh =   0b0100;
 
-const uint8_t kTechnibelAcSleepBit = kTechnibelAcFanOffset
-                                     + kTechnibelAcFanSize;
+const uint8_t kTechnibelAcSleepBit = kTechnibelAcFanOffset +
+    kTechnibelAcFanSize;
 
 const uint8_t kTechnibelAcSwingBit = kTechnibelAcSleepBit + 1;
 
+// (0 = Celsius, 1 = Fahrenheit)
 const uint8_t kTechnibelAcTempUnitBit = kTechnibelAcSwingBit + 1;
-                                      // (0 = Celsius, 1 = Fahrenheit)
 
 const uint8_t kTechnibelAcTimerEnableBit = kTechnibelAcTempUnitBit + 1;
 
@@ -91,8 +86,8 @@ const uint8_t kTechnibelAcDry =  0b0010;
 const uint8_t kTechnibelAcFan =  0b0100;
 const uint8_t kTechnibelAcHeat = 0b1000;
 
-const uint8_t kTechnibelAcFanChangeBit = kTechnibelAcModeOffset
-                                         + kTechnibelAcModeSize;
+const uint8_t kTechnibelAcFanChangeBit = kTechnibelAcModeOffset +
+    kTechnibelAcModeSize;
 
 const uint8_t kTechnibelAcTempChangeBit = kTechnibelAcFanChangeBit + 1;
 
@@ -104,15 +99,22 @@ const uint8_t kTechnibelAcHeaderOffset = kTechnibelAcPowerBit + 1;
 const uint8_t kTechnibelAcHeaderSize = 8;
 const uint8_t kTechnibelAcHeader = 0b00011000;
 
+const uint64_t kTechnibelAcResetState = 0x180101140000EA;  ///<
+///< Mode:Cool, Power:Off, fan:Low, temp:20, swing:Off, sleep:Off
+
+
 // Classes
 class IRTechnibelAc {
  public:
   explicit IRTechnibelAc(const uint16_t pin, const bool inverted = false,
                          const bool use_modulation = true);
-
   void stateReset();
 #if SEND_TECHNIBEL_AC
   void send(const uint16_t repeat = kTechnibelAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_TECHNIBEL_AC
   void begin();
