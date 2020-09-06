@@ -153,6 +153,12 @@
 #ifndef D_STR_CELSIUS
 #define D_STR_CELSIUS "Celsius"
 #endif  // D_STR_CELSIUS
+#ifndef D_STR_FAHRENHEIT
+#define D_STR_FAHRENHEIT "Fahrenheit"
+#endif  // D_STR_FAHRENHEIT
+#ifndef D_STR_CELSIUS_FAHRENHEIT
+#define D_STR_CELSIUS_FAHRENHEIT D_STR_CELSIUS "/" D_STR_FAHRENHEIT
+#endif  // D_STR_CELSIUS_FAHRENHEIT
 #ifndef D_STR_UP
 #define D_STR_UP "Up"
 #endif  // D_STR_UP

@@ -18,7 +18,7 @@ TEST(TestUtils, Housekeeping) {
 
 // Test sending typical data only.
 TEST(TestSendNeoclima, SendDataOnly) {
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   uint8_t state[kNeoclimaStateLength] = {
@@ -48,8 +48,8 @@ TEST(TestSendNeoclima, SendDataOnly) {
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/764#issuecomment-503755096
 TEST(TestDecodeNeoclima, RealExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   uint16_t rawData[197] = {
       6112, 7392, 540, 602, 516, 578, 522, 604, 540, 554, 540, 554, 540, 576,
       518, 576, 516, 554, 540, 608, 542, 554, 540, 554, 540, 576, 518, 604, 516,
@@ -78,13 +78,13 @@ TEST(TestDecodeNeoclima, RealExample) {
   ASSERT_EQ(decode_type_t::NEOCLIMA, irsend.capture.decode_type);
   ASSERT_EQ(kNeoclimaBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 26C, Fan: 3 (Low), "
-      "Swing(V): Off, Swing(H): On, Sleep: Off, Turbo: Off, Hold: Off, "
-      "Ion: Off, Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, Fresh: Off, "
-      "Button: 0 (Power)",
+      "Swing(V): Off, Swing(H): On, Sleep: Off, Turbo: Off, Econo: Off, "
+      "Hold: Off, Ion: Off, Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, "
+      "Fresh: Off, Button: 0 (Power)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -92,8 +92,8 @@ TEST(TestDecodeNeoclima, RealExample) {
 
 // Self decode.
 TEST(TestDecodeNeoclima, SyntheticExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
 
   uint8_t expectedState[kNeoclimaStateLength] = {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -110,7 +110,7 @@ TEST(TestDecodeNeoclima, SyntheticExample) {
 }
 
 TEST(TestIRNeoclimaAcClass, Power) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
 
   ac.on();
@@ -129,7 +129,7 @@ TEST(TestIRNeoclimaAcClass, Power) {
 }
 
 TEST(TestIRNeoclimaAcClass, OperatingMode) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kNeoclimaAuto);
@@ -161,24 +161,67 @@ TEST(TestIRNeoclimaAcClass, OperatingMode) {
   EXPECT_EQ(kNeoclimaAuto, ac.getMode());
 }
 
-TEST(TestIRNeoclimaAcClass, SetAndGetTemp) {
-  IRNeoclimaAc ac(0);
+TEST(TestIRNeoclimaAcClass, Temperature) {
+  IRNeoclimaAc ac(kGpioUnused);
+  // Celsius
   ac.setTemp(25);
   EXPECT_EQ(25, ac.getTemp());
-  ac.setTemp(kNeoclimaMinTemp);
-  EXPECT_EQ(kNeoclimaMinTemp, ac.getTemp());
+  ac.setTemp(kNeoclimaMinTempC);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMinTempC, ac.getTemp());
   EXPECT_EQ(kNeoclimaButtonTempDown, ac.getButton());
-  ac.setTemp(kNeoclimaMinTemp - 1);
-  EXPECT_EQ(kNeoclimaMinTemp, ac.getTemp());
-  ac.setTemp(kNeoclimaMaxTemp);
-  EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
+  ac.setTemp(kNeoclimaMinTempC - 1);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMinTempC, ac.getTemp());
+  ac.setTemp(kNeoclimaMaxTempC);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMaxTempC, ac.getTemp());
   EXPECT_EQ(kNeoclimaButtonTempUp, ac.getButton());
-  ac.setTemp(kNeoclimaMaxTemp + 1);
-  EXPECT_EQ(kNeoclimaMaxTemp, ac.getTemp());
+  ac.setTemp(kNeoclimaMaxTempC + 1);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMaxTempC, ac.getTemp());
+  // Fahrenheit
+  ac.setTemp(kNeoclimaMinTempF, false);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMinTempF, ac.getTemp());
+  ac.setTemp(kNeoclimaMinTempF - 1, false);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMinTempF, ac.getTemp());
+  ac.setTemp(kNeoclimaMaxTempF, false);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMaxTempF, ac.getTemp());
+  EXPECT_EQ(kNeoclimaButtonTempUp, ac.getButton());
+  ac.setTemp(kNeoclimaMaxTempF + 1, false);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(kNeoclimaMaxTempF, ac.getTemp());
+
+  // Real data
+  // Data from: https://github.com/crankyoldgit/IRremoteESP8266/issues/1260#issuecomment-687235135
+  const uint8_t temp_68F[12] =
+      {0x00, 0x00, 0x00, 0x10, 0x00, 0x1E, 0x00, 0xA2, 0x00, 0x27, 0xA5, 0x9C};
+  ac.setRaw(temp_68F);
+  EXPECT_FALSE(ac.getTempUnits());
+  EXPECT_EQ(68, ac.getTemp());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 68F, Fan: 1 (High), Swing(V): Off, "
+      "Swing(H): On, Sleep: Off, Turbo: Off, Econo: On, Hold: Off, Ion: Off, "
+      "Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, Fresh: Off, "
+      "Button: 30 (Celsius/Fahrenheit)", ac.toString());
+
+  const uint8_t temp_20C[12] =
+      {0x00, 0x00, 0x00, 0x10, 0x00, 0x1E, 0x00, 0x22, 0x00, 0x24, 0xA5, 0x19};
+  ac.setRaw(temp_20C);
+  EXPECT_TRUE(ac.getTempUnits());
+  EXPECT_EQ(20, ac.getTemp());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 1 (High), Swing(V): Off, "
+      "Swing(H): On, Sleep: Off, Turbo: Off, Econo: On, Hold: Off, Ion: Off, "
+      "Eye: Off, Light: Off, Follow: Off, 8C Heat: Off, Fresh: Off, "
+      "Button: 30 (Celsius/Fahrenheit)", ac.toString());
 }
 
 TEST(TestIRNeoclimaAcClass, FanSpeed) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
 
   ac.setFan(0);
@@ -231,7 +274,7 @@ TEST(TestIRNeoclimaAcClass, FanSpeed) {
 }
 
 TEST(TestIRNeoclimaAcClass, Sleep) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   ac.setSleep(true);
   EXPECT_TRUE(ac.getSleep());
@@ -243,7 +286,7 @@ TEST(TestIRNeoclimaAcClass, Sleep) {
 }
 
 TEST(TestIRNeoclimaAcClass, Turbo) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   ac.setTurbo(true);
   EXPECT_TRUE(ac.getTurbo());
@@ -266,8 +309,32 @@ TEST(TestIRNeoclimaAcClass, Turbo) {
   EXPECT_FALSE(ac.getTurbo());
 }
 
+TEST(TestIRNeoclimaAcClass, Econo) {
+  IRNeoclimaAc ac(kGpioUnused);
+  ac.begin();
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  EXPECT_EQ(kNeoclimaButtonEcono, ac.getButton());
+  // Data from:
+  //   https://github.com/crankyoldgit/IRremoteESP8266/issues/1260#issuecomment-687235135
+  uint8_t econo_off[12] = {
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x22, 0x00, 0x20, 0xA5, 0xF4};
+  uint8_t econo_on[12] = {
+      0x00, 0x00, 0x00, 0x10, 0x00, 0x0D, 0x00, 0x22, 0x00, 0x20, 0xA5, 0x04};
+  ac.setRaw(econo_on);
+  EXPECT_TRUE(ac.getEcono());
+  EXPECT_EQ(kNeoclimaButtonEcono, ac.getButton());
+  ac.setRaw(econo_off);
+  EXPECT_EQ(kNeoclimaButtonEcono, ac.getButton());
+  EXPECT_FALSE(ac.getEcono());
+}
+
 TEST(TestIRNeoclimaAcClass, Fresh) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   ac.setFresh(true);
   EXPECT_TRUE(ac.getFresh());
@@ -291,7 +358,7 @@ TEST(TestIRNeoclimaAcClass, Fresh) {
 }
 
 TEST(TestIRNeoclimaAcClass, Hold) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   ac.setHold(true);
   EXPECT_TRUE(ac.getHold());
@@ -302,8 +369,8 @@ TEST(TestIRNeoclimaAcClass, Hold) {
   EXPECT_EQ(kNeoclimaButtonHold, ac.getButton());
 }
 
-TEST(TestIRNeoclimaAcClass, 8CHeat) {
-  IRNeoclimaAc ac(0);
+TEST(TestIRNeoclimaAcClass, _8CHeat) {
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   ac.set8CHeat(true);
   EXPECT_TRUE(ac.get8CHeat());
@@ -315,7 +382,7 @@ TEST(TestIRNeoclimaAcClass, 8CHeat) {
 }
 
 TEST(TestIRNeoclimaAcClass, Light) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   ac.setLight(true);
   EXPECT_TRUE(ac.getLight());
@@ -327,7 +394,7 @@ TEST(TestIRNeoclimaAcClass, Light) {
 }
 
 TEST(TestIRNeoclimaAcClass, Ion) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   ac.setIon(true);
   EXPECT_TRUE(ac.getIon());
@@ -339,7 +406,7 @@ TEST(TestIRNeoclimaAcClass, Ion) {
 }
 
 TEST(TestIRNeoclimaAcClass, Eye) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   ac.setEye(true);
   EXPECT_TRUE(ac.getEye());
@@ -351,7 +418,7 @@ TEST(TestIRNeoclimaAcClass, Eye) {
 }
 
 TEST(TestIRNeoclimaAcClass, Follow) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.begin();
   /*  DISABLED: See TODO in ir_Neoclima.cpp
   ac.setFollow(true);
@@ -390,7 +457,7 @@ TEST(TestIRNeoclimaAcClass, ChecksumCalculation) {
   examplestate[11] = 0x12;  // Set an incorrect checksum.
   EXPECT_FALSE(IRNeoclimaAc::validChecksum(examplestate));
   EXPECT_EQ(0x39, IRNeoclimaAc::calcChecksum(examplestate));
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.setRaw(examplestate);
   // Extracting the state from the object should have a correct checksum.
   EXPECT_TRUE(IRNeoclimaAc::validChecksum(ac.getRaw()));
@@ -404,7 +471,7 @@ TEST(TestIRNeoclimaAcClass, ChecksumCalculation) {
 }
 
 TEST(TestIRNeoclimaAcClass, toCommon) {
-  IRNeoclimaAc ac(0);
+  IRNeoclimaAc ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kNeoclimaCool);
   ac.setTemp(20);

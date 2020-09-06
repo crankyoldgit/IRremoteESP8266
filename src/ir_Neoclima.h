@@ -9,6 +9,8 @@
 // Supports:
 //   Brand: Neoclima,  Model: NS-09AHTI A/C
 //   Brand: Neoclima,  Model: ZH/TY-01 remote
+//   Brand: Soleus Air,  Model: TTWM1-10-01 A/C
+//   Brand: Soleus Air,  Model: ZCF/TL-05 remote
 
 #ifndef IR_NEOCLIMA_H_
 #define IR_NEOCLIMA_H_
@@ -29,14 +31,15 @@
 const uint8_t kNeoclima8CHeatOffset = 1;
 const uint8_t kNeoclimaIonOffset = 2;
 // state[3]
-const uint8_t kNeoclimaLightOffset = 0;
-const uint8_t kNeoclimaHoldOffset = 2;
-const uint8_t kNeoclimaTurboOffset = 3;
-const uint8_t kNeoclimaEyeOffset = 6;
+const uint8_t kNeoclimaLightOffset = 0;   ///< Mask 0b0000000x
+const uint8_t kNeoclimaHoldOffset = 2;    ///< Mask 0b00000x00
+const uint8_t kNeoclimaTurboOffset = 3;   ///< Mask 0b0000x000
+const uint8_t kNeoclimaEconoOffset = 4;   ///< Mask 0b000x0000
+const uint8_t kNeoclimaEyeOffset = 6;     ///< Mask 0b0x000000
 // state[5]
-const uint8_t kNeoclimaFreshOffset = 7;
-const uint8_t kNeoclimaButtonOffset = 0;
-const uint8_t kNeoclimaButtonSize = 5;
+const uint8_t kNeoclimaFreshOffset = 7;   ///< Mask 0bx0000000
+const uint8_t kNeoclimaButtonOffset = 0;  ///< Mask 0b000xxxxx
+const uint8_t kNeoclimaButtonSize = 5;    ///< Mask 0b000xxxxx
 const uint8_t kNeoclimaButtonPower =    0x00;
 const uint8_t kNeoclimaButtonMode =     0x01;
 const uint8_t kNeoclimaButtonTempUp =   0x02;
@@ -48,33 +51,38 @@ const uint8_t kNeoclimaButtonHold =     0x08;
 const uint8_t kNeoclimaButtonSleep =    0x09;
 const uint8_t kNeoclimaButtonTurbo =    0x0A;
 const uint8_t kNeoclimaButtonLight =    0x0B;
+const uint8_t kNeoclimaButtonEcono =    0x0D;
 const uint8_t kNeoclimaButtonEye =      0x0E;
 const uint8_t kNeoclimaButtonFollow =   0x13;
 const uint8_t kNeoclimaButtonIon =      0x14;
 const uint8_t kNeoclimaButtonFresh =    0x15;
 const uint8_t kNeoclimaButton8CHeat =   0x1D;
+const uint8_t kNeoclimaButtonTempUnit = 0x1E;
 // state[7]
-const uint8_t kNeoclimaSleepOffset = 0;
-const uint8_t kNeoclimaPowerOffset = 1;
-const uint8_t kNeoclimaSwingVOffset = 2;
+const uint8_t kNeoclimaSleepOffset = 0;          // Mask 0b0000000x
+const uint8_t kNeoclimaPowerOffset = 1;          // Mask 0b000000x0
+const uint8_t kNeoclimaSwingVOffset = 2;         // Mask 0b0000xx00
 const uint8_t kNeoclimaSwingVSize = 2;  // Bits
-const uint8_t kNeoclimaSwingVOn =   0b01;
-const uint8_t kNeoclimaSwingVOff =  0b10;
-const uint8_t kNeoclimaSwingHOffset = 4;
-const uint8_t kNeoclimaFanOffest = 5;
-const uint8_t kNeoclimaFanSize = 2;
-const uint8_t kNeoclimaFanAuto =     0b00;
-const uint8_t kNeoclimaFanHigh =     0b01;
-const uint8_t kNeoclimaFanMed =      0b10;
-const uint8_t kNeoclimaFanLow =      0b11;
+const uint8_t kNeoclimaSwingVOn =                            0b01;
+const uint8_t kNeoclimaSwingVOff =                           0b10;
+const uint8_t kNeoclimaSwingHOffset = 4;         // Mask 0b000x0000
+const uint8_t kNeoclimaFanOffest = 5;            // Mask 0b0xx00000
+const uint8_t kNeoclimaFanSize = 2;  // Bits
+const uint8_t kNeoclimaFanAuto =                          0b00;
+const uint8_t kNeoclimaFanHigh =                          0b01;
+const uint8_t kNeoclimaFanMed =                           0b10;
+const uint8_t kNeoclimaFanLow =                           0b11;
+const uint8_t kNeoclimaUseFahrenheitOffset = 7;  // Mask 0bx0000000
 // state[8]
 const uint8_t kNeoclimaFollowMe = 0x5D;  // Also 0x5F
 // state[9]
-const uint8_t kNeoclimaTempOffset = 0;
+const uint8_t kNeoclimaTempOffset = 0;  // Mask 0b000xxxxx
 const uint8_t kNeoclimaTempSize = 5;  // Bits
-const uint8_t kNeoclimaMinTemp = 16;   // 16C
-const uint8_t kNeoclimaMaxTemp = 32;   // 32C
-const uint8_t kNeoclimaModeOffset = 5;
+const uint8_t kNeoclimaMinTempC = 16;   // 16C
+const uint8_t kNeoclimaMaxTempC = 32;   // 32C
+const uint8_t kNeoclimaMinTempF = 61;   // 61F
+const uint8_t kNeoclimaMaxTempF = 90;   // 90F
+const uint8_t kNeoclimaModeOffset = 5;  // Mask 0bxxx00000
 const uint8_t kNeoclimaAuto =     0b000;
 const uint8_t kNeoclimaCool =     0b001;
 const uint8_t kNeoclimaDry =      0b010;
@@ -105,7 +113,7 @@ class IRNeoclimaAc {
   bool getPower(void);
   void setMode(const uint8_t mode);
   uint8_t getMode(void);
-  void setTemp(const uint8_t temp);
+  void setTemp(const uint8_t temp, const bool celsius = true);
   uint8_t getTemp(void);
   void setFan(const uint8_t speed);
   uint8_t getFan(void);
@@ -117,6 +125,8 @@ class IRNeoclimaAc {
   bool getSleep(void);
   void setTurbo(const bool on);
   bool getTurbo(void);
+  void setEcono(const bool on);
+  bool getEcono(void);
   void setFresh(const bool on);
   bool getFresh(void);
   void setHold(const bool on);
@@ -129,6 +139,7 @@ class IRNeoclimaAc {
   bool get8CHeat(void);
   void setEye(const bool on);
   bool getEye(void);
+  bool getTempUnits(void);
   // DISABLED: See TODO in ir_Neoclima.cpp
   // void setFollow(const bool on);
   bool getFollow(void);

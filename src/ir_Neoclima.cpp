@@ -1,11 +1,12 @@
-// Copyright 2019 David Conran
+// Copyright 2019-2020 David Conran
 
 /// @file
 /// @brief Support for Neoclima protocols.
-/// Analysis by crankyoldgit & AndreyShpilevoy
+/// Analysis by crankyoldgit, AndreyShpilevoy, & griffisc306
 /// Code by crankyoldgit
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/764
 /// @see https://drive.google.com/file/d/1kjYk4zS9NQcMQhFkak-L4mp4UuaAIesW/view
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1260
 
 #include "ir_Neoclima.h"
 #include <algorithm>
@@ -64,7 +65,7 @@ void IRsend::sendNeoclima(const unsigned char data[], const uint16_t nbytes,
 IRNeoclimaAc::IRNeoclimaAc(const uint16_t pin, const bool inverted,
                            const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) {
-  this->stateReset();
+  stateReset();
 }
 
 /// Reset the state of the remote to a known good state/sequence.
@@ -115,7 +116,7 @@ void IRNeoclimaAc::send(const uint16_t repeat) {
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRNeoclimaAc::getRaw(void) {
-  this->checksum();
+  checksum();
   return remote_state;
 }
 
@@ -146,11 +147,13 @@ void IRNeoclimaAc::setButton(const uint8_t button) {
     case kNeoclimaButtonFresh:
     case kNeoclimaButton8CHeat:
     case kNeoclimaButtonTurbo:
+    case kNeoclimaButtonEcono:
+    case kNeoclimaButtonTempUnit:
       setBits(&remote_state[5], kNeoclimaButtonOffset, kNeoclimaButtonSize,
               button);
       break;
     default:
-      this->setButton(kNeoclimaButtonPower);
+      setButton(kNeoclimaButtonPower);
   }
 }
 
@@ -161,15 +164,15 @@ uint8_t IRNeoclimaAc::getButton(void) {
 }
 
 /// Set the requested power state of the A/C to on.
-void IRNeoclimaAc::on(void) { this->setPower(true); }
+void IRNeoclimaAc::on(void) { setPower(true); }
 
 /// Set the requested power state of the A/C to off.
-void IRNeoclimaAc::off(void) { this->setPower(false); }
+void IRNeoclimaAc::off(void) { setPower(false); }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setPower(const bool on) {
-  this->setButton(kNeoclimaButtonPower);
+  setButton(kNeoclimaButtonPower);
   setBit(&remote_state[7], kNeoclimaPowerOffset, on);
 }
 
@@ -185,18 +188,18 @@ void IRNeoclimaAc::setMode(const uint8_t mode) {
   switch (mode) {
     case kNeoclimaDry:
       // In this mode fan speed always LOW
-      this->setFan(kNeoclimaFanLow);
+      setFan(kNeoclimaFanLow);
       // FALL THRU
     case kNeoclimaAuto:
     case kNeoclimaCool:
     case kNeoclimaFan:
     case kNeoclimaHeat:
       setBits(&remote_state[9], kNeoclimaModeOffset, kModeBitsSize, mode);
-      this->setButton(kNeoclimaButtonMode);
+      setButton(kNeoclimaButtonMode);
       break;
     default:
       // If we get an unexpected mode, default to AUTO.
-      this->setMode(kNeoclimaAuto);
+      setMode(kNeoclimaAuto);
   }
 }
 
@@ -234,23 +237,29 @@ stdAc::opmode_t IRNeoclimaAc::toCommonMode(const uint8_t mode) {
 
 /// Set the temperature.
 /// @param[in] temp The temperature in degrees celsius.
-void IRNeoclimaAc::setTemp(const uint8_t temp) {
-  uint8_t oldtemp = this->getTemp();
-  uint8_t newtemp = std::max(kNeoclimaMinTemp, temp);
-  newtemp = std::min(kNeoclimaMaxTemp, newtemp);
+/// @param[in] celsius Use Fahrenheit (false) or Celsius (true).
+void IRNeoclimaAc::setTemp(const uint8_t temp, const bool celsius) {
+  uint8_t oldtemp = getTemp();
+  setBit(&remote_state[7], kNeoclimaUseFahrenheitOffset, !celsius);
+  const uint8_t min_temp = celsius ? kNeoclimaMinTempC : kNeoclimaMinTempF;
+  const uint8_t max_temp = celsius ? kNeoclimaMaxTempC : kNeoclimaMaxTempF;
+  const uint8_t newtemp = std::min(max_temp, std::max(min_temp, temp));
   if (oldtemp > newtemp)
-    this->setButton(kNeoclimaButtonTempDown);
+    setButton(kNeoclimaButtonTempDown);
   else if (newtemp > oldtemp)
-    this->setButton(kNeoclimaButtonTempUp);
+    setButton(kNeoclimaButtonTempUp);
   setBits(&remote_state[9], kNeoclimaTempOffset, kNeoclimaTempSize,
-          newtemp - kNeoclimaMinTemp);
+          newtemp - min_temp);
 }
 
 /// Get the current temperature setting.
-/// @return The current setting for temp. in degrees celsius.
+/// @return The current setting for temp. in degrees.
+/// @note The units of the temperature (F/C) is determined by `getTempUnits()`.
 uint8_t IRNeoclimaAc::getTemp(void) {
+  const uint8_t min_temp = getTempUnits() ? kNeoclimaMinTempC
+                                          : kNeoclimaMinTempF;
   return GETBITS8(remote_state[9], kNeoclimaTempOffset, kNeoclimaTempSize) +
-      kNeoclimaMinTemp;
+      min_temp;
 }
 
 /// Set the speed of the fan.
@@ -260,18 +269,18 @@ void IRNeoclimaAc::setFan(const uint8_t speed) {
     case kNeoclimaFanAuto:
     case kNeoclimaFanHigh:
     case kNeoclimaFanMed:
-      if (this->getMode() == kNeoclimaDry) {  // Dry mode only allows low speed.
-        this->setFan(kNeoclimaFanLow);
+      if (getMode() == kNeoclimaDry) {  // Dry mode only allows low speed.
+        setFan(kNeoclimaFanLow);
         return;
       }
       // FALL-THRU
     case kNeoclimaFanLow:
       setBits(&remote_state[7], kNeoclimaFanOffest, kNeoclimaFanSize, speed);
-      this->setButton(kNeoclimaButtonFanSpeed);
+      setButton(kNeoclimaButtonFanSpeed);
       break;
     default:
       // If we get an unexpected speed, default to Auto.
-      this->setFan(kNeoclimaFanAuto);
+      setFan(kNeoclimaFanAuto);
   }
 }
 
@@ -310,7 +319,7 @@ stdAc::fanspeed_t IRNeoclimaAc::toCommonFanSpeed(const uint8_t speed) {
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setSleep(const bool on) {
-  this->setButton(kNeoclimaButtonSleep);
+  setButton(kNeoclimaButtonSleep);
   setBit(&remote_state[7], kNeoclimaSleepOffset, on);
 }
 
@@ -323,7 +332,7 @@ bool IRNeoclimaAc::getSleep(void) {
 /// Set the vertical swing setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setSwingV(const bool on) {
-  this->setButton(kNeoclimaButtonSwing);
+  setButton(kNeoclimaButtonSwing);
   setBits(&remote_state[7], kNeoclimaSwingVOffset, kNeoclimaSwingVSize,
           on ? kNeoclimaSwingVOn : kNeoclimaSwingVOff);
 }
@@ -338,7 +347,7 @@ bool IRNeoclimaAc::getSwingV(void) {
 /// Set the horizontal swing setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setSwingH(const bool on) {
-  this->setButton(kNeoclimaButtonAirFlow);
+  setButton(kNeoclimaButtonAirFlow);
   setBit(&remote_state[7], kNeoclimaSwingHOffset, !on);  // Cleared when `on`
 }
 
@@ -351,7 +360,7 @@ bool IRNeoclimaAc::getSwingH(void) {
 /// Set the Turbo setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setTurbo(const bool on) {
-  this->setButton(kNeoclimaButtonTurbo);
+  setButton(kNeoclimaButtonTurbo);
   setBit(&remote_state[3], kNeoclimaTurboOffset, on);
 }
 
@@ -361,10 +370,23 @@ bool IRNeoclimaAc::getTurbo(void) {
   return GETBIT8(remote_state[3], kNeoclimaTurboOffset);
 }
 
+/// Set the Economy (Energy Saver) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRNeoclimaAc::setEcono(const bool on) {
+  setButton(kNeoclimaButtonEcono);
+  setBit(&remote_state[3], kNeoclimaEconoOffset, on);
+}
+
+/// Get the Economy (Energy Saver) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRNeoclimaAc::getEcono(void) {
+  return GETBIT8(remote_state[3], kNeoclimaEconoOffset);
+}
+
 /// Set the Fresh (air) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setFresh(const bool on) {
-  this->setButton(kNeoclimaButtonFresh);
+  setButton(kNeoclimaButtonFresh);
   setBit(&remote_state[5], kNeoclimaFreshOffset, on);
 }
 
@@ -377,7 +399,7 @@ bool IRNeoclimaAc::getFresh(void) {
 /// Set the Hold setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setHold(const bool on) {
-  this->setButton(kNeoclimaButtonHold);
+  setButton(kNeoclimaButtonHold);
   setBit(&remote_state[3], kNeoclimaHoldOffset, on);
 }
 
@@ -390,7 +412,7 @@ bool IRNeoclimaAc::getHold(void) {
 /// Set the Ion (filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setIon(const bool on) {
-  this->setButton(kNeoclimaButtonIon);
+  setButton(kNeoclimaButtonIon);
   setBit(&remote_state[1], kNeoclimaIonOffset, on);
 }
 
@@ -403,7 +425,7 @@ bool IRNeoclimaAc::getIon(void) {
 /// Set the Light(LED display) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setLight(const bool on) {
-  this->setButton(kNeoclimaButtonLight);
+  setButton(kNeoclimaButtonLight);
   setBit(&remote_state[3], kNeoclimaLightOffset, on);
 }
 
@@ -420,7 +442,7 @@ bool IRNeoclimaAc::getLight(void) {
 ///   automatically when nobody is at home over a longer period during severe
 ///   winter.
 void IRNeoclimaAc::set8CHeat(const bool on) {
-  this->setButton(kNeoclimaButton8CHeat);
+  setButton(kNeoclimaButton8CHeat);
   setBit(&remote_state[1], kNeoclima8CHeatOffset, on);
 }
 
@@ -433,7 +455,7 @@ bool IRNeoclimaAc::get8CHeat(void) {
 /// Set the Eye (Sensor) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRNeoclimaAc::setEye(const bool on) {
-  this->setButton(kNeoclimaButtonEye);
+  setButton(kNeoclimaButtonEye);
   setBit(&remote_state[3], kNeoclimaEyeOffset, on);
 }
 
@@ -443,10 +465,16 @@ bool IRNeoclimaAc::getEye(void) {
   return GETBIT8(remote_state[3], kNeoclimaEyeOffset);
 }
 
+/// Is the A/C unit using Fahrenheit or Celsius for temperature units.
+/// @return false, Fahrenheit. true, Celsius.
+bool IRNeoclimaAc::getTempUnits(void) {
+  return !GETBIT8(remote_state[7], kNeoclimaUseFahrenheitOffset);
+}
+
 /* DISABLED
    TODO(someone): Work out why "on" is either 0x5D or 0x5F
 void IRNeoclimaAc::setFollow(const bool on) {
-  this->setButton(kNeoclimaButtonFollow);
+  setButton(kNeoclimaButtonFollow);
   if (on)
     remote_state[8] = kNeoclimaFollowMe;
   else
@@ -466,22 +494,22 @@ stdAc::state_t IRNeoclimaAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::NEOCLIMA;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
-  result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->getSwingV() ? stdAc::swingv_t::kAuto
+  result.power = getPower();
+  result.mode = toCommonMode(getMode());
+  result.celsius = getTempUnits();
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = getSwingV() ? stdAc::swingv_t::kAuto
                                     : stdAc::swingv_t::kOff;
-  result.swingh = this->getSwingH() ? stdAc::swingh_t::kAuto
+  result.swingh = getSwingH() ? stdAc::swingh_t::kAuto
                                     : stdAc::swingh_t::kOff;
-  result.turbo = this->getTurbo();
-  result.light = this->getLight();
-  result.filter = this->getIon();
-  result.sleep = this->getSleep() ? 0 : -1;
+  result.turbo = getTurbo();
+  result.econo = getEcono();
+  result.light = getLight();
+  result.filter = getIon();
+  result.sleep = getSleep() ? 0 : -1;
   // Not supported.
   result.quiet = false;
-  result.econo = false;
   result.clean = false;
   result.beep = false;
   result.clock = -1;
@@ -492,17 +520,18 @@ stdAc::state_t IRNeoclimaAc::toCommon(void) {
 /// @return A human readable string.
 String IRNeoclimaAc::toString(void) {
   String result = "";
-  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(110);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(getMode(), kNeoclimaAuto, kNeoclimaCool,
                             kNeoclimaHeat, kNeoclimaDry, kNeoclimaFan);
-  result += addTempToString(getTemp());
+  result += addTempToString(getTemp(), getTempUnits());
   result += addFanToString(getFan(), kNeoclimaFanHigh, kNeoclimaFanLow,
                            kNeoclimaFanAuto, kNeoclimaFanAuto, kNeoclimaFanMed);
   result += addBoolToString(getSwingV(), kSwingVStr);
   result += addBoolToString(getSwingH(), kSwingHStr);
   result += addBoolToString(getSleep(), kSleepStr);
   result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getEcono(), kEconoStr);
   result += addBoolToString(getHold(), kHoldStr);
   result += addBoolToString(getIon(), kIonStr);
   result += addBoolToString(getEye(), kEyeStr);
@@ -512,7 +541,7 @@ String IRNeoclimaAc::toString(void) {
   result += addBoolToString(getFresh(), kFreshStr);
   result += addIntToString(getButton(), kButtonStr);
   result += kSpaceLBraceStr;
-  switch (this->getButton()) {
+  switch (getButton()) {
     case kNeoclimaButtonPower:    result += kPowerStr; break;
     case kNeoclimaButtonMode:     result += kModeStr; break;
     case kNeoclimaButtonTempUp:   result += kTempUpStr; break;
@@ -529,8 +558,9 @@ String IRNeoclimaAc::toString(void) {
     case kNeoclimaButtonFresh:    result += kFreshStr; break;
     case kNeoclimaButton8CHeat:   result += k8CHeatStr; break;
     case kNeoclimaButtonTurbo:    result += kTurboStr; break;
-    default:
-      result += kUnknownStr;
+    case kNeoclimaButtonEcono:    result += kEconoStr; break;
+    case kNeoclimaButtonTempUnit: result += kCelsiusFahrenheitStr; break;
+    default:                      result += kUnknownStr;
   }
   result += ')';
   return result;

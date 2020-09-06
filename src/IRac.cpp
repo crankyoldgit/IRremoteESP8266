@@ -1497,30 +1497,33 @@ void IRac::mitsubishiHeavy152(IRMitsubishiHeavy152Ac *ac,
 /// @param[in, out] ac A Ptr to an IRNeoclimaAc object to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] swingh The horizontal swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] econo Run the device in economical mode.
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::neoclima(IRNeoclimaAc *ac,
                     const bool on, const stdAc::opmode_t mode,
-                    const float degrees, const stdAc::fanspeed_t fan,
+                    const bool celsius, const float degrees,
+                    const stdAc::fanspeed_t fan,
                     const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                    const bool turbo, const bool light, const bool filter,
-                    const int16_t sleep) {
+                    const bool turbo, const bool econo, const bool light,
+                    const bool filter, const int16_t sleep) {
   ac->begin();
   ac->setMode(ac->convertMode(mode));
-  ac->setTemp(degrees);
+  ac->setTemp(degrees, celsius);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(swingv != stdAc::swingv_t::kOff);
   ac->setSwingH(swingh != stdAc::swingh_t::kOff);
   // No Quiet setting available.
   ac->setTurbo(turbo);
   ac->setLight(light);
-  // No Econo setting available.
+  ac->setEcono(econo);
   ac->setIon(filter);
   // No Clean setting available.
   // No Beep setting available.
@@ -2445,8 +2448,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case NEOCLIMA:
     {
       IRNeoclimaAc ac(_pin, _inverted, _modulation);
-      neoclima(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-               send.swingh, send.turbo, send.light, send.filter, send.sleep);
+      neoclima(&ac, send.power, send.mode, send.celsius, send.degrees,
+               send.fanspeed, send.swingv, send.swingh, send.turbo,
+               send.econo, send.light, send.filter, send.sleep);
       break;
     }
 #endif  // SEND_NEOCLIMA
