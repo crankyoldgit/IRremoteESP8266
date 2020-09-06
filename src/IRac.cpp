@@ -1755,18 +1755,19 @@ void IRac::tcl112(IRTcl112Ac *ac,
 /// @param[in, out] ac A Ptr to an IRTechnibelAc object to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::technibel(IRTechnibelAc *ac,
-                const bool on, const stdAc::opmode_t mode, const float degrees,
-                const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
-                const int16_t sleep) {
+                const bool on, const stdAc::opmode_t mode, const bool celsius,
+                const float degrees, const stdAc::fanspeed_t fan,
+                const stdAc::swingv_t swingv, const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
-  ac->setTemp(degrees);
+  ac->setTemp(degrees, !celsius);
   ac->setFan(ac->convertFan(fan));
   ac->setSwing(swingv != stdAc::swingv_t::kOff);
   // No Horizontal swing setting available.
@@ -2502,8 +2503,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case TECHNIBEL_AC:
     {
       IRTechnibelAc ac(_pin, _inverted, _modulation);
-      technibel(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-           send.sleep);
+      technibel(&ac, send.power, send.mode, send.celsius, send.degrees,
+                send.fanspeed, send.swingv, send.sleep);
       break;
     }
 #endif  // SEND_TECHNIBEL_AC

@@ -25,12 +25,12 @@ TEST(TestDecodeTechnibelAc, SyntheticSelfDecode) {
 
   irsend.begin();
   irsend.reset();
-  irsend.sendTechnibelAc(0xD2000048448118);
+  irsend.sendTechnibelAc(0x1881221200004B);
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(TECHNIBEL_AC, irsend.capture.decode_type);
   EXPECT_EQ(kTechnibelAcBits, irsend.capture.bits);
-  EXPECT_EQ(0xD2000048448118, irsend.capture.value);
+  EXPECT_EQ(0x1881221200004B, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.command);
   EXPECT_EQ(0, irsend.capture.address);
 }
@@ -62,7 +62,7 @@ TEST(TestDecodeTechnibelAc, RealExample) {
   EXPECT_EQ(0, irsend.capture.command);
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (Auto), Fan: 2 (Medium), Temp: 18C, "
+      "Power: On, Mode: 1 (Cool), Fan: 2 (Medium), Temp: 18C, "
       "Sleep: Off, Swing(V): On, Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
@@ -201,12 +201,6 @@ TEST(TestIRTechnibelAcClass, FanSpeed) {
   ac.begin();
   ac.setMode(kTechnibelAcCool);  // All fan speeds available in this mode.
 
-  ac.setFan(0);
-  EXPECT_EQ(kTechnibelAcFanLow, ac.getFan());
-
-  ac.setFan(255);
-  EXPECT_EQ(kTechnibelAcFanHigh, ac.getFan());
-
   ac.setFan(kTechnibelAcFanLow);
   EXPECT_EQ(kTechnibelAcFanLow, ac.getFan());
 
@@ -215,6 +209,21 @@ TEST(TestIRTechnibelAcClass, FanSpeed) {
 
   ac.setFan(kTechnibelAcFanHigh);
   EXPECT_EQ(kTechnibelAcFanHigh, ac.getFan());
+
+  ac.setFan(0);
+  EXPECT_EQ(kTechnibelAcFanLow, ac.getFan());
+
+  ac.setFan(kTechnibelAcFanMedium);
+  ac.setFan(255);
+  EXPECT_EQ(kTechnibelAcFanLow, ac.getFan());
+
+  // Check fan speed enforcement for Dry mode.
+  ac.setFan(kTechnibelAcFanMedium);
+  ac.setMode(kTechnibelAcDry);
+  EXPECT_EQ(kTechnibelAcFanLow, ac.getFan());
+  EXPECT_EQ(kTechnibelAcDry, ac.getMode());
+  ac.setFan(kTechnibelAcFanHigh);
+  EXPECT_EQ(kTechnibelAcFanLow, ac.getFan());
 }
 
 TEST(TestIRTechnibelAcClass, Swing) {
@@ -273,4 +282,41 @@ TEST(TestIRTechnibelAcClass, Timer) {
   ac.setTimer(1500);
   EXPECT_TRUE(ac.getTimerEnabled());
   EXPECT_EQ(1440, ac.getTimer());
+}
+
+TEST(TestIRTechnibelAcClass, ConstructKnownState) {
+  IRTechnibelAc ac(kGpioUnused);
+  EXPECT_EQ(kTechnibelAcResetState, ac.getRaw());
+  ac.on();
+  ac.setMode(kTechnibelAcCool);
+  ac.setFan(kTechnibelAcFanMedium);
+  ac.setTemp(18);  // 18C
+  ac.setSleep(false);  // Off
+  ac.setSwing(true);  // On
+  EXPECT_EQ(0x1881221200004B, ac.getRaw());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Fan: 2 (Medium), Temp: 18C, "
+      "Sleep: Off, Swing(V): On, Timer: Off",
+      ac.toString());
+}
+
+TEST(TestIRTechnibelAcClass, HumanReadable) {
+  IRTechnibelAc ac(kGpioUnused);
+  ac.begin();
+  EXPECT_EQ(
+      "Power: Off, Mode: 1 (Cool), Fan: 1 (Low), Temp: 20C, Sleep: Off, "
+      "Swing(V): Off, Timer: Off", ac.toString());
+  ac.setPower(true);
+  ac.setTemp(72, true);  // 72F
+  ac.setFan(kTechnibelAcFanMedium);
+  ac.setSleep(true);
+  ac.setSwing(true);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Fan: 2 (Medium), Temp: 72F, Sleep: On, "
+      "Swing(V): On, Timer: Off", ac.toString());
+  ac.setMode(kTechnibelAcHeat);
+  ac.setTimer(23 * 60);
+  EXPECT_EQ(
+      "Power: On, Mode: 8 (Heat), Fan: 2 (Medium), Temp: 72F, Sleep: On, "
+      "Swing(V): On, Timer: 23:00", ac.toString());
 }
