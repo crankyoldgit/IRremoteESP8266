@@ -314,10 +314,7 @@ bool IRTechnibelAc::getSwing(void) {
 /// @param[in] swing The enum to be converted.
 /// @return true, the swing is on. false, the swing is off.
 bool IRTechnibelAc::convertSwing(const stdAc::swingv_t swing) {
-  switch (swing) {
-    case stdAc::swingv_t::kOff: return false;
-    default:                    return true;
-  }
+  return swing != stdAc::swingv_t::kOff;
 }
 
 /// Convert a native swing into its stdAc equivilant.
@@ -403,8 +400,8 @@ String IRTechnibelAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), 255, kTechnibelAcCool,
-                            kTechnibelAcHeat, kTechnibelAcDry,
+  result += addModeToString(getMode(), 255,  // No Auto, so use impossible value
+                            kTechnibelAcCool, kTechnibelAcHeat, kTechnibelAcDry,
                             kTechnibelAcFan);
   result += addFanToString(getFan(), kTechnibelAcFanHigh, kTechnibelAcFanLow,
                            kTechnibelAcFanLow, kTechnibelAcFanLow,
