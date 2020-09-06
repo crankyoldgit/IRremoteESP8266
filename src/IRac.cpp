@@ -849,12 +849,13 @@ void IRac::electra(IRElectraAc *ac,
 /// @param[in] econo Run the device in economical mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
+/// @param[in] sleep Nr. of minutes for sleep mode. <= 0 is Off, > 0 is on.
 void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                    const bool quiet, const bool turbo, const bool econo,
-                   const bool filter, const bool clean) {
+                   const bool filter, const bool clean, const int16_t sleep) {
   ac->begin();
   ac->setModel(model);
   if (on) {
@@ -890,6 +891,7 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
     ac->setFilter(filter);
     ac->setClean(clean);
     // No Beep setting available.
+    ac->setSleepTimer(sleep > 0 ? sleep : 0);
     // No Sleep setting available.
     // No Clock setting available.
     ac->on();  // Ref: Issue #860
@@ -1009,7 +1011,7 @@ void IRac::haier(IRHaierAC *ac,
   // No Clean setting available.
   // No Beep setting available.
   ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
-  if (clock >=0) ac->setCurrTime(clock);
+  if (clock >= 0) ac->setCurrTime(clock);
   if (on)
     ac->setCommand(kHaierAcCmdOn);
   else

@@ -30,6 +30,7 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::minsToString;
 using irutils::setBit;
 using irutils::setBits;
 
@@ -64,8 +65,8 @@ IRFujitsuAC::IRFujitsuAC(const uint16_t pin,
                          const fujitsu_ac_remote_model_t model,
                          const bool inverted, const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) {
-  this->setModel(model);
-  this->stateReset();
+  setModel(model);
+  stateReset();
 }
 
 /// Set the currently emulated model of the A/C.
@@ -100,7 +101,10 @@ void IRFujitsuAC::stateReset(void) {
   _cmd = kFujitsuAcCmdTurnOn;
   _filter = false;
   _clean = false;
-  this->buildState();
+  _timertype = kFujitsuAcStopTimers;
+  _ontimer = 0;
+  _offtimer = 0;
+  buildState();
 }
 
 /// Set up hardware to be able to send a message.
@@ -110,7 +114,7 @@ void IRFujitsuAC::begin(void) { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRFujitsuAC::send(const uint16_t repeat) {
-  this->buildState();
+  buildState();
   _irsend.sendFujitsuAC(remote_state, getStateLength(), repeat);
 }
 #endif  // SEND_FUJITSU_AC
@@ -155,11 +159,19 @@ void IRFujitsuAC::buildState(void) {
 
     remote_state[7] = 0x30;
     remote_state[8] = (_cmd == kFujitsuAcCmdTurnOn) | (tempByte << 4);
-    remote_state[9] = _mode | 0 << 4;  // timer off
+    remote_state[9] = _mode | (getTimerType() << 4);
     remote_state[10] = _fanSpeed;
-    remote_state[11] = 0;  // timerOff values
-    remote_state[12] = 0;  // timerOff/On values
-    remote_state[13] = 0;  // timerOn values
+
+    // Set the On/Off/Sleep timer Nr of mins.
+    remote_state[11] = getOffSleepTimer();
+    remote_state[12] = ((getOnTimer() & 0x0F) << 4) |
+        ((getOffSleepTimer() >> 8) & 0x07);
+    remote_state[13] = getOnTimer() >> 4;
+    // Enable bit for the Off/Sleep timer
+    setBit(&remote_state[12], 3, getOffSleepTimer());
+    // Enable bit for the On timer
+    setBit(&remote_state[13], 7, getOnTimer());
+
     switch (_model) {
       case fujitsu_ac_remote_model_t::ARRY4:
         remote_state[14] = _filter << 3;
@@ -212,7 +224,7 @@ void IRFujitsuAC::buildState(void) {
 /// Get the length (size) of the state code for the current configuration.
 /// @return The length of the state array required for this config.
 uint8_t IRFujitsuAC::getStateLength(void) {
-  this->buildState();  // Force an update of the internal state.
+  buildState();  // Force an update of the internal state.
   if (((_model == fujitsu_ac_remote_model_t::ARRAH2E ||
         _model == fujitsu_ac_remote_model_t::ARREB1E ||
         _model == fujitsu_ac_remote_model_t::ARRY4) &&
@@ -227,7 +239,7 @@ uint8_t IRFujitsuAC::getStateLength(void) {
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRFujitsuAC::getRaw(void) {
-  this->buildState();
+  buildState();
   return remote_state;
 }
 
@@ -237,29 +249,29 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
   switch (length) {
     case kFujitsuAcStateLength - 1:
     case kFujitsuAcStateLengthShort - 1:
-      this->setModel(fujitsu_ac_remote_model_t::ARDB1);
+      setModel(fujitsu_ac_remote_model_t::ARDB1);
       // ARJW2 has horizontal swing.
-      if (this->getSwing(true) > kFujitsuAcSwingVert)
-        this->setModel(fujitsu_ac_remote_model_t::ARJW2);
+      if (getSwing(true) > kFujitsuAcSwingVert)
+        setModel(fujitsu_ac_remote_model_t::ARJW2);
       break;
     default:
-      switch (this->getCmd(true)) {
+      switch (getCmd(true)) {
         case kFujitsuAcCmdEcono:
         case kFujitsuAcCmdPowerful:
-          this->setModel(fujitsu_ac_remote_model_t::ARREB1E);
+          setModel(fujitsu_ac_remote_model_t::ARREB1E);
           break;
         default:
-          this->setModel(fujitsu_ac_remote_model_t::ARRAH2E);
+          setModel(fujitsu_ac_remote_model_t::ARRAH2E);
       }
   }
   switch (remote_state[6]) {
     case 8:
-      if (this->getModel() != fujitsu_ac_remote_model_t::ARJW2)
-        this->setModel(fujitsu_ac_remote_model_t::ARDB1);
+      if (getModel() != fujitsu_ac_remote_model_t::ARJW2)
+        setModel(fujitsu_ac_remote_model_t::ARDB1);
       break;
     case 9:
-      if (this->getModel() != fujitsu_ac_remote_model_t::ARREB1E)
-        this->setModel(fujitsu_ac_remote_model_t::ARRAH2E);
+      if (getModel() != fujitsu_ac_remote_model_t::ARREB1E)
+        setModel(fujitsu_ac_remote_model_t::ARRAH2E);
       break;
   }
   setTemp((remote_state[8] >> 4) + kFujitsuAcMinTemp);
@@ -288,7 +300,17 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
       setCmd(remote_state[5]);
       break;
   }
-  _outsideQuiet = this->getOutsideQuiet(true);
+  _outsideQuiet = getOutsideQuiet(true);
+  // Timers
+  switch (getModel()) {
+    // These models seem to have timer support.
+    case fujitsu_ac_remote_model_t::ARRAH2E:
+    case fujitsu_ac_remote_model_t::ARREB1E:
+      _offtimer = getOffSleepTimer(true);
+      _ontimer = getOnTimer(true);
+      _timertype = getTimerType(true);
+    default: break;
+  }
 }
 
 /// Set the internal state from a valid code for this protocol.
@@ -308,27 +330,27 @@ bool IRFujitsuAC::setRaw(const uint8_t newState[], const uint16_t length) {
 }
 
 /// Request the A/C to step the Horizontal Swing.
-void IRFujitsuAC::stepHoriz(void) { this->setCmd(kFujitsuAcCmdStepHoriz); }
+void IRFujitsuAC::stepHoriz(void) { setCmd(kFujitsuAcCmdStepHoriz); }
 
 /// Request the A/C to toggle the Horizontal Swing mode.
 /// @param[in] update Do we need to update the general swing config?
 void IRFujitsuAC::toggleSwingHoriz(const bool update) {
   // Toggle the current setting.
-  if (update) this->setSwing(this->getSwing() ^ kFujitsuAcSwingHoriz);
+  if (update) setSwing(getSwing() ^ kFujitsuAcSwingHoriz);
   // and set the appropriate special command.
-  this->setCmd(kFujitsuAcCmdToggleSwingHoriz);
+  setCmd(kFujitsuAcCmdToggleSwingHoriz);
 }
 
 /// Request the A/C to step the Vertical Swing.
-void IRFujitsuAC::stepVert(void) { this->setCmd(kFujitsuAcCmdStepVert); }
+void IRFujitsuAC::stepVert(void) { setCmd(kFujitsuAcCmdStepVert); }
 
 /// Request the A/C to toggle the Vertical Swing mode.
 /// @param[in] update Do we need to update the general swing config?
 void IRFujitsuAC::toggleSwingVert(const bool update) {
   // Toggle the current setting.
-  if (update) this->setSwing(this->getSwing() ^ kFujitsuAcSwingVert);
+  if (update) setSwing(getSwing() ^ kFujitsuAcSwingVert);
   // and set the appropriate special command.
-  this->setCmd(kFujitsuAcCmdToggleSwingVert);
+  setCmd(kFujitsuAcCmdToggleSwingVert);
 }
 
 /// Set the requested (special) command part for the A/C message.
@@ -381,14 +403,14 @@ uint8_t IRFujitsuAC::getCmd(const bool raw) {
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRFujitsuAC::setPower(const bool on) {
-  this->setCmd(on ? kFujitsuAcCmdTurnOn : kFujitsuAcCmdTurnOff);
+  setCmd(on ? kFujitsuAcCmdTurnOn : kFujitsuAcCmdTurnOff);
 }
 
 /// Set the requested power state of the A/C to off.
-void IRFujitsuAC::off(void) { this->setPower(false); }
+void IRFujitsuAC::off(void) { setPower(false); }
 
 /// Set the requested power state of the A/C to on.
-void IRFujitsuAC::on(void) { this->setPower(true); }
+void IRFujitsuAC::on(void) { setPower(true); }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
@@ -398,17 +420,17 @@ bool IRFujitsuAC::getPower(void) { return _cmd != kFujitsuAcCmdTurnOff; }
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRFujitsuAC::setOutsideQuiet(const bool on) {
   _outsideQuiet = on;
-  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+  setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 /// Get the Outside Quiet mode status of the A/C.
 /// @param[in] raw Do we get the result from base data?
 /// @return true, the setting is on. false, the setting is off.
 bool IRFujitsuAC::getOutsideQuiet(const bool raw) {
-  if (_state_length == kFujitsuAcStateLength && raw) {
+  if ((_state_length == kFujitsuAcStateLength) && raw) {
     _outsideQuiet = GETBIT8(remote_state[14], kFujitsuAcOutsideQuietOffset);
     // Only ARREB1E seems to have this mode.
-    if (_outsideQuiet) this->setModel(fujitsu_ac_remote_model_t::ARREB1E);
+    if (_outsideQuiet) setModel(fujitsu_ac_remote_model_t::ARREB1E);
   }
   return _outsideQuiet;
 }
@@ -418,7 +440,7 @@ bool IRFujitsuAC::getOutsideQuiet(const bool raw) {
 void IRFujitsuAC::setTemp(const uint8_t temp) {
   _temp = std::max((uint8_t)kFujitsuAcMinTemp, temp);
   _temp = std::min((uint8_t)kFujitsuAcMaxTemp, _temp);
-  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+  setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 /// Get the current temperature setting.
@@ -432,7 +454,7 @@ void IRFujitsuAC::setFanSpeed(const uint8_t fanSpeed) {
     _fanSpeed = kFujitsuAcFanHigh;  // Set the fan to maximum if out of range.
   else
     _fanSpeed = fanSpeed;
-  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+  setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 /// Get the current fan speed setting.
@@ -446,7 +468,7 @@ void IRFujitsuAC::setMode(const uint8_t mode) {
     _mode = kFujitsuAcModeHeat;  // Set the mode to maximum if out of range.
   else
     _mode = mode;
-  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+  setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 /// Get the operating mode setting of the A/C.
@@ -474,7 +496,7 @@ void IRFujitsuAC::setSwing(const uint8_t swingMode) {
       // Set the mode to max if out of range
       if (swingMode > kFujitsuAcSwingBoth) _swingMode = kFujitsuAcSwingBoth;
   }
-  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+  setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 /// Get the requested swing operation mode of the A/C unit.
@@ -490,7 +512,7 @@ uint8_t IRFujitsuAC::getSwing(const bool raw) {
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRFujitsuAC::setClean(const bool on) {
   _clean = on;
-  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+  setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 /// Get the Clean mode status of the A/C.
@@ -511,7 +533,7 @@ bool IRFujitsuAC::getClean(const bool raw) {
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRFujitsuAC::setFilter(const bool on) {
   _filter = on;
-  this->setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
+  setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 /// Get the Filter mode status of the A/C.
@@ -526,6 +548,106 @@ bool IRFujitsuAC::getFilter(const bool raw) {
       default: return false;
     }
   }
+}
+
+/// Get the Timer type of the A/C message.
+/// @param[in] raw Do we get the result from base data?
+/// @return The current timer type in numeric form.
+uint8_t IRFujitsuAC::getTimerType(const bool raw) {
+  switch (getModel()) {
+    // These models seem to have timer support.
+    case fujitsu_ac_remote_model_t::ARRAH2E:
+    case fujitsu_ac_remote_model_t::ARREB1E:
+      if (raw)
+        return GETBITS8(remote_state[kFujitsuAcTimerTypeByte],
+                        kFujitsuAcTimerTypeOffset, kFujitsuAcTimerTypeSize);
+      else
+        return _timertype;
+    default: return kFujitsuAcStopTimers;
+  }
+}
+
+/// Set the Timer type of the A/C message.
+/// @param[in] timertype The kind of timer to use for the message.
+void IRFujitsuAC::setTimerType(const uint8_t timertype) {
+  switch (timertype) {
+    case kFujitsuAcSleepTimer:
+    case kFujitsuAcOnTimer:
+    case kFujitsuAcOffTimer:
+    case kFujitsuAcStopTimers:
+      _timertype = timertype;
+      break;
+    default: setTimerType(kFujitsuAcStopTimers);
+  }
+}
+
+/// Get the On Timer setting of the A/C.
+/// @param[in] raw Do we get the result from base data?
+/// @return nr of minutes left on the timer. 0 means disabled/not supported.
+uint16_t IRFujitsuAC::getOnTimer(const bool raw) {
+  if (getTimerType(raw) == kFujitsuAcOnTimer) {
+    if (raw)
+      return (GETBITS8(remote_state[13], 0, 7) << 4) +
+          GETBITS8(remote_state[12], 4, 4);
+    else
+      return _ontimer;
+  } else {
+    return 0;
+  }
+}
+
+/// Set the On Timer setting of the A/C.
+/// @param[in] nr_mins Nr. of minutes to set the timer to. 0 means disabled.
+void IRFujitsuAC::setOnTimer(const uint16_t nr_mins) {
+  _ontimer = std::min(kFujitsuAcTimerMax, nr_mins);  // Bounds check.
+  if (_ontimer) {
+    setTimerType(kFujitsuAcOnTimer);
+  } else {
+    if (getTimerType() == kFujitsuAcOnTimer) setTimerType(kFujitsuAcStopTimers);
+  }
+}
+
+/// Get the Off/Sleep Timer setting of the A/C.
+/// @param[in] raw Do we get the result from base data?
+/// @return nr of minutes left on the timer. 0 means disabled/not supported.
+uint16_t IRFujitsuAC::getOffSleepTimer(const bool raw) {
+  switch (getTimerType(raw)) {
+    case kFujitsuAcOffTimer:
+    case kFujitsuAcSleepTimer:
+      if (raw)
+        return (GETBITS8(remote_state[12], 0, 3) << 8) +
+            remote_state[11];
+      else
+        return _offtimer;
+    default:
+      return 0;
+  }
+}
+
+/// Set the Off/Sleep Timer time for the A/C.
+/// @param[in] nr_mins Nr. of minutes to set the timer to. 0 means disabled.
+void IRFujitsuAC::setOffSleepTimer(const uint16_t nr_mins) {
+  _offtimer = std::min(kFujitsuAcTimerMax, nr_mins);  // Bounds check.
+}
+
+/// Set the Off Timer time for the A/C.
+/// @param[in] nr_mins Nr. of minutes to set the timer to. 0 means disabled.
+void IRFujitsuAC::setOffTimer(const uint16_t nr_mins) {
+  setOffSleepTimer(nr_mins);
+  if (nr_mins)
+    setTimerType(kFujitsuAcOffTimer);
+  else
+    if (getTimerType() != kFujitsuAcOnTimer) setTimerType(kFujitsuAcStopTimers);
+}
+
+/// Set the Sleep Timer time for the A/C.
+/// @param[in] nr_mins Nr. of minutes to set the timer to. 0 means disabled.
+void IRFujitsuAC::setSleepTimer(const uint16_t nr_mins) {
+  setOffSleepTimer(nr_mins);
+  if (nr_mins)
+    setTimerType(kFujitsuAcSleepTimer);
+  else
+    if (getTimerType() != kFujitsuAcOnTimer) setTimerType(kFujitsuAcStopTimers);
 }
 
 /// Verify the checksum is valid for a given state.
@@ -611,13 +733,13 @@ stdAc::fanspeed_t IRFujitsuAC::toCommonFanSpeed(const uint8_t speed) {
 stdAc::state_t IRFujitsuAC::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::FUJITSU_AC;
-  result.model = this->getModel();
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.model = getModel();
+  result.power = getPower();
+  result.mode = toCommonMode(getMode());
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFanSpeed());
-  uint8_t swing = this->getSwing();
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFanSpeed());
+  uint8_t swing = getSwing();
   switch (result.model) {
     case fujitsu_ac_remote_model_t::ARREB1E:
     case fujitsu_ac_remote_model_t::ARRAH2E:
@@ -636,9 +758,9 @@ stdAc::state_t IRFujitsuAC::toCommon(void) {
       result.swingh = stdAc::swingh_t::kOff;
   }
 
-  result.quiet = (this->getFanSpeed() == kFujitsuAcFanQuiet);
-  result.turbo = this->getCmd() == kFujitsuAcCmdPowerful;
-  result.econo = this->getCmd() == kFujitsuAcCmdEcono;
+  result.quiet = (getFanSpeed() == kFujitsuAcFanQuiet);
+  result.turbo = getCmd() == kFujitsuAcCmdPowerful;
+  result.econo = getCmd() == kFujitsuAcCmdEcono;
   // Not supported.
   result.light = false;
   result.filter = false;
@@ -654,7 +776,7 @@ stdAc::state_t IRFujitsuAC::toCommon(void) {
 String IRFujitsuAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  fujitsu_ac_remote_model_t model = this->getModel();
+  fujitsu_ac_remote_model_t model = getModel();
   result += addModelToString(decode_type_t::FUJITSU_AC, model, false);
   result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(getMode(), kFujitsuAcModeAuto, kFujitsuAcModeCool,
@@ -672,9 +794,9 @@ String IRFujitsuAC::toString(void) {
     default:  // Assume everything else does.
       result += addBoolToString(getClean(), kCleanStr);
       result += addBoolToString(getFilter(), kFilterStr);
-      result += addIntToString(this->getSwing(), kSwingStr);
+      result += addIntToString(getSwing(), kSwingStr);
       result += kSpaceLBraceStr;
-      switch (this->getSwing()) {
+      switch (getSwing()) {
         case kFujitsuAcSwingOff:
           result += kOffStr;
           break;
@@ -697,7 +819,7 @@ String IRFujitsuAC::toString(void) {
   result += kCommaSpaceStr;
   result += kCommandStr;
   result += kColonSpaceStr;
-  switch (this->getCmd()) {
+  switch (getCmd()) {
     case kFujitsuAcCmdStepHoriz:
       result += kStepStr;
       result += ' ';
@@ -727,8 +849,33 @@ String IRFujitsuAC::toString(void) {
     default:
       result += kNAStr;
   }
-  if (this->getModel() == fujitsu_ac_remote_model_t::ARREB1E)
-    result += addBoolToString(getOutsideQuiet(), kOutsideQuietStr);
+  uint16_t mins = 0;
+  String type_str = kTimerStr;
+  switch (model) {
+    case fujitsu_ac_remote_model_t::ARREB1E:
+      result += addBoolToString(getOutsideQuiet(), kOutsideQuietStr);
+      // FALL-THRU
+    // These models seem to have timer support.
+    case fujitsu_ac_remote_model_t::ARRAH2E:
+      switch (getTimerType()) {
+        case kFujitsuAcOnTimer:
+          type_str = kOnTimerStr;
+          mins = getOnTimer();
+          break;
+        case kFujitsuAcOffTimer:
+          type_str = kOffTimerStr;
+          mins = getOffSleepTimer();
+          break;
+        case kFujitsuAcSleepTimer:
+          type_str = kSleepTimerStr;
+          mins = getOffSleepTimer();
+          break;
+      }
+      result += addLabeledString(mins ? minsToString(mins) : kOffStr, type_str);
+      break;
+    default:
+      break;
+  }
   return result;
 }
 
