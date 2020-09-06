@@ -43,22 +43,22 @@ union ArgoProtocol {
     uint64_t          :3;  // OffTimer, maybe hours
     uint64_t          :5;  // Time
     // Byte 8
-    uint8_t           :6;  // Time
-    uint8_t           :1;  // Timer On/Off
-    uint8_t           :1;  // Timer Program
+    uint32_t          :6;  // Time
+    uint32_t          :1;  // Timer On/Off
+    uint32_t          :1;  // Timer Program
     // Byte 9
-    uint8_t           :1;  // Timer Program
-    uint8_t           :1;  // Timer 1h
-    uint8_t Night     :1;
-    uint8_t Max       :1;
-    uint8_t           :1;  // Filter
-    uint8_t Power     :1;
-    uint8_t           :1;  // const 0
-    uint8_t iFeel     :1;
+    uint32_t          :1;  // Timer Program
+    uint32_t          :1;  // Timer 1h
+    uint32_t Night    :1;
+    uint32_t Max      :1;
+    uint32_t          :1;  // Filter
+    uint32_t Power    :1;
+    uint32_t          :1;  // const 0
+    uint32_t iFeel    :1;
     // Byte 10~11
-    uint16_t          :2;  // const 01
-    uint16_t Sum      :8;
-    uint16_t          :6;
+    uint32_t          :2;  // const 01
+    uint32_t Sum      :8;  // straddle byte 10 and 11
+    uint32_t          :6;
   };
 };
 
