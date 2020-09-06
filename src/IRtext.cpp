@@ -269,5 +269,6 @@ const PROGMEM char *kAllProtocolNamesStr =
     D_STR_VOLTAS "\x0"
     D_STR_METZ "\x0"
     D_STR_TRANSCOLD "\x0"
+    D_STR_TECHNIBEL_AC "\x0"
     ///< New protocol strings should be added just above this line.
     "\x0";  ///< This string requires double null termination.

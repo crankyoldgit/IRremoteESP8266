@@ -32,6 +32,7 @@
 #include "ir_Sanyo.h"
 #include "ir_Sharp.h"
 #include "ir_Tcl.h"
+#include "ir_Technibel.h"
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
@@ -381,6 +382,12 @@ void electra(IRElectraAc *ac,
               const bool turbo, const bool light, const bool econo,
               const bool filter);
 #endif  // SEND_TCL112AC
+#if SEND_TECHNIBEL_AC
+  void technibel(IRTechnibelAc *ac,
+            const bool on, const stdAc::opmode_t mode, const float degrees,
+            const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+            const int16_t sleep = -1);
+#endif  // SEND_TECHNIBEL_AC
 #if SEND_TECO
   void teco(IRTecoAc *ac,
             const bool on, const stdAc::opmode_t mode, const float degrees,

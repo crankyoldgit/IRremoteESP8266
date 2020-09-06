@@ -718,6 +718,9 @@
 #ifndef D_STR_TCL112AC
 #define D_STR_TCL112AC "TCL112AC"
 #endif  // D_STR_TCL112AC
+#ifndef D_STR_TECHNIBEL_AC
+#define D_STR_TECHNIBEL_AC "TECHNIBEL_AC"
+#endif  // D_STR_TECHNIBEL_AC
 #ifndef D_STR_TECO
 #define D_STR_TECO "TECO"
 #endif  // D_STR_TECO
