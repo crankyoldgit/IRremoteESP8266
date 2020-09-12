@@ -426,8 +426,6 @@ TEST(TestCarrierAc64Class, Power) {
 
   ac.setPower(false);
   EXPECT_FALSE(ac.getPower());
-
-  ASSERT_EQ(36, kCarrierAc64PowerOffset);
 }
 
 TEST(TestCarrierAc64Class, Temperature) {

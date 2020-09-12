@@ -19,8 +19,6 @@ using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::addFanToString;
 using irutils::minsToString;
-using irutils::setBit;
-using irutils::setBits;
 using irutils::sumNibbles;
 
 // Constants
@@ -231,7 +229,7 @@ IRCarrierAc64::IRCarrierAc64(const uint16_t pin, const bool inverted,
 
 /// Reset the internal state to a fixed known good state.
 /// @note The state is powered off.
-void IRCarrierAc64::stateReset(void) { remote_state = 0x109000002C2A5584; }
+void IRCarrierAc64::stateReset(void) { _.raw = 0x109000002C2A5584; }
 
 /// Calculate the checksum for a given state.
 /// @param[in] state The value to calc the checksum of.
@@ -257,8 +255,7 @@ bool IRCarrierAc64::validChecksum(const uint64_t state) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRCarrierAc64::checksum(void) {
-  setBits(&remote_state, kCarrierAc64ChecksumOffset, kCarrierAc64ChecksumSize,
-          calcChecksum(remote_state));
+  _.Sum = calcChecksum(_.raw);
 }
 
 /// Set up hardware to be able to send a message.
@@ -276,39 +273,37 @@ void IRCarrierAc64::send(const uint16_t repeat) {
 /// @return A valid code for this protocol based on the current internal state.
 uint64_t IRCarrierAc64::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] state A valid code for this protocol.
-void IRCarrierAc64::setRaw(const uint64_t state) { remote_state = state; }
+void IRCarrierAc64::setRaw(const uint64_t state) { _.raw = state; }
 
 /// Set the temp in deg C.
 /// @param[in] temp The desired temperature in Celsius.
 void IRCarrierAc64::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kCarrierAc64MinTemp);
   degrees = std::min(degrees, kCarrierAc64MaxTemp);
-  setBits(&remote_state, kCarrierAc64TempOffset, kCarrierAc64TempSize,
-          degrees - kCarrierAc64MinTemp);
+  _.Temp = degrees - kCarrierAc64MinTemp;
 }
 
 /// Get the current temperature from the internal state.
 /// @return The current temperature in Celsius.
-uint8_t IRCarrierAc64::getTemp(void) {
-  return GETBITS64(remote_state, kCarrierAc64TempOffset, kCarrierAc64TempSize) +
-      kCarrierAc64MinTemp;
+uint8_t IRCarrierAc64::getTemp(void) const {
+  return _.Temp + kCarrierAc64MinTemp;
 }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRCarrierAc64::setPower(const bool on) {
-  setBit(&remote_state, kCarrierAc64PowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCarrierAc64::getPower(void) {
-  return GETBIT64(remote_state, kCarrierAc64PowerOffset);
+bool IRCarrierAc64::getPower(void) const {
+  return _.Power;
 }
 
 /// Change the power setting to On.
@@ -319,8 +314,8 @@ void IRCarrierAc64::off(void) { setPower(false); }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRCarrierAc64::getMode(void) {
-  return GETBITS64(remote_state, kCarrierAc64ModeOffset, kCarrierAc64ModeSize);
+uint8_t IRCarrierAc64::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -330,11 +325,10 @@ void IRCarrierAc64::setMode(const uint8_t mode) {
     case kCarrierAc64Heat:
     case kCarrierAc64Cool:
     case kCarrierAc64Fan:
-      setBits(&remote_state, kCarrierAc64ModeOffset, kCarrierAc64ModeSize,
-              mode);
+      _.Mode = mode;
       return;
     default:
-      this->setMode(kCarrierAc64Cool);
+      _.Mode = kCarrierAc64Cool;
   }
 }
 
@@ -362,17 +356,17 @@ stdAc::opmode_t IRCarrierAc64::toCommonMode(const uint8_t mode) {
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRCarrierAc64::getFan(void) {
-  return GETBITS64(remote_state, kCarrierAc64FanOffset, kCarrierAc64FanSize);
+uint8_t IRCarrierAc64::getFan(void) const {
+  return _.Fan;
 }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
 void IRCarrierAc64::setFan(const uint8_t speed) {
   if (speed > kCarrierAc64FanHigh)
-    setFan(kCarrierAc64FanAuto);
+    _.Fan = kCarrierAc64FanAuto;
   else
-    setBits(&remote_state, kCarrierAc64FanOffset, kCarrierAc64FanSize, speed);
+    _.Fan = speed;
 }
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
@@ -404,13 +398,13 @@ stdAc::fanspeed_t IRCarrierAc64::toCommonFanSpeed(const uint8_t speed) {
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRCarrierAc64::setSwingV(const bool on) {
-  setBit(&remote_state, kCarrierAc64SwingVOffset, on);
+  _.SwingV = on;
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCarrierAc64::getSwingV(void) {
-  return GETBIT64(remote_state, kCarrierAc64SwingVOffset);
+bool IRCarrierAc64::getSwingV(void) const {
+  return _.SwingV;
 }
 
 /// Set the Sleep mode of the A/C.
@@ -423,27 +417,26 @@ void IRCarrierAc64::setSleep(const bool on) {
     _cancelOnTimer();
     _cancelOffTimer();
   }
-  setBit(&remote_state, kCarrierAc64SleepOffset, on);
+  _.Sleep = on;
 }
 
 /// Get the Sleep mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCarrierAc64::getSleep(void) {
-  return GETBIT64(remote_state, kCarrierAc64SleepOffset);
+bool IRCarrierAc64::getSleep(void) const {
+  return _.Sleep;
 }
 
 /// Clear the On Timer enable bit.
 void IRCarrierAc64::_cancelOnTimer(void) {
-  setBit(&remote_state, kCarrierAc64OnTimerEnableOffset, false);
+  _.OnTimerEnable = false;
 }
 
 /// Get the current On Timer time.
 /// @return The number of minutes it is set for. 0 means it's off.
 /// @note The A/C protocol only supports one hour increments.
-uint16_t IRCarrierAc64::getOnTimer(void) {
-  if (GETBIT64(remote_state, kCarrierAc64OnTimerEnableOffset))
-    return GETBITS64(remote_state, kCarrierAc64OnTimerOffset,
-                     kCarrierAc64TimerSize) * 60;
+uint16_t IRCarrierAc64::getOnTimer(void) const {
+  if (_.OnTimerEnable)
+    return _.OnTimer * 60;
   else
     return 0;
 }
@@ -454,9 +447,8 @@ uint16_t IRCarrierAc64::getOnTimer(void) {
 /// @note The A/C protocol only supports one hour increments.
 void IRCarrierAc64::setOnTimer(const uint16_t nr_of_mins) {
   uint8_t hours = std::min((uint8_t)(nr_of_mins / 60), kCarrierAc64TimerMax);
-  setBit(&remote_state, kCarrierAc64OnTimerEnableOffset, hours);  // Enable
-  setBits(&remote_state, kCarrierAc64OnTimerOffset, kCarrierAc64TimerSize,
-          std::max(kCarrierAc64TimerMin, hours));  // Hours
+  _.OnTimerEnable = static_cast<bool>(hours);  // Enable
+  _.OnTimer = std::max(kCarrierAc64TimerMin, hours);  // Hours
   if (hours) {  // If enabled, disable the Off Timer & Sleep mode.
     _cancelOffTimer();
     setSleep(false);
@@ -465,16 +457,15 @@ void IRCarrierAc64::setOnTimer(const uint16_t nr_of_mins) {
 
 /// Clear the Off Timer enable bit.
 void IRCarrierAc64::_cancelOffTimer(void) {
-  setBit(&remote_state, kCarrierAc64OffTimerEnableOffset, false);
+  _.OffTimerEnable = false;
 }
 
 /// Get the current Off Timer time.
 /// @return The number of minutes it is set for. 0 means it's off.
 /// @note The A/C protocol only supports one hour increments.
-uint16_t IRCarrierAc64::getOffTimer(void) {
-  if (GETBIT64(remote_state, kCarrierAc64OffTimerEnableOffset))
-    return GETBITS64(remote_state, kCarrierAc64OffTimerOffset,
-                     kCarrierAc64TimerSize) * 60;
+uint16_t IRCarrierAc64::getOffTimer(void) const {
+  if (_.OffTimerEnable)
+    return _.OffTimer * 60;
   else
     return 0;
 }
@@ -486,9 +477,8 @@ uint16_t IRCarrierAc64::getOffTimer(void) {
 void IRCarrierAc64::setOffTimer(const uint16_t nr_of_mins) {
   uint8_t hours = std::min((uint8_t)(nr_of_mins / 60), kCarrierAc64TimerMax);
   // The time can be changed in sleep mode, but doesn't set the flag.
-  setBit(&remote_state, kCarrierAc64OffTimerEnableOffset, hours && !getSleep());
-  setBits(&remote_state, kCarrierAc64OffTimerOffset, kCarrierAc64TimerSize,
-          std::max(kCarrierAc64TimerMin, hours));  // Hours
+  _.OffTimerEnable = (hours && !_.Sleep);
+  _.OffTimer = std::max(kCarrierAc64TimerMin, hours);  // Hours
   if (hours) {  // If enabled, disable the On Timer & Sleep mode.
     _cancelOnTimer();
     setSleep(false);
@@ -497,18 +487,18 @@ void IRCarrierAc64::setOffTimer(const uint16_t nr_of_mins) {
 
 /// Convert the internal state into a human readable string.
 /// @return The current internal state expressed as a human readable String.
-String IRCarrierAc64::toString(void) {
+String IRCarrierAc64::toString(void) const {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), 0xFF, kCarrierAc64Cool,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, 0xFF, kCarrierAc64Cool,
                             kCarrierAc64Heat, 0xFF, kCarrierAc64Fan);
   result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kCarrierAc64FanHigh, kCarrierAc64FanLow,
+  result += addFanToString(_.Fan, kCarrierAc64FanHigh, kCarrierAc64FanLow,
                            kCarrierAc64FanAuto, kCarrierAc64FanAuto,
                            kCarrierAc64FanMedium);
-  result += addBoolToString(getSwingV(), kSwingVStr);
-  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(_.SwingV, kSwingVStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
   result += addLabeledString(getOnTimer()
                              ? minsToString(getOnTimer()) : kOffStr,
                              kOnTimerStr);
@@ -520,17 +510,17 @@ String IRCarrierAc64::toString(void) {
 
 /// Convert the A/C state to it's common stdAc::state_t equivalent.
 /// @return A stdAc::state_t state.
-stdAc::state_t IRCarrierAc64::toCommon(void) {
+stdAc::state_t IRCarrierAc64::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::CARRIER_AC64;
   result.model = -1;  // No models used.
-  result.power = getPower();
-  result.mode = toCommonMode(getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
-  result.swingv = getSwingV() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
-  result.sleep = getSleep() ? 0 : -1;
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.sleep = _.Sleep ? 0 : -1;
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;
