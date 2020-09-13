@@ -1,6 +1,6 @@
 /*
  * Send & receive arbitrary IR codes via a web server or MQTT.
- * Copyright David Conran 2016, 2017, 2018, 2019
+ * Copyright David Conran 2016, 2017, 2018, 2019, 2020
  *
  * Copyright:
  *   Code for this has been borrowed from lots of other OpenSource projects &
@@ -32,12 +32,9 @@
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
  *     - ArduinoJson (https://arduinojson.org/) (Version >= 6.0)
- *     - PubSubClient (https://pubsubclient.knolleary.net/)
+ *     - PubSubClient (https://pubsubclient.knolleary.net/) (Version >= 2.7.0)
  *     - WiFiManager (https://github.com/tzapu/WiFiManager)
  *                   (ESP8266: Version >= 0.14, ESP32: 'development' branch.)
- *   o You MUST change <PubSubClient.h> to have the following (or larger) value:
- *     (with REPORT_RAW_UNKNOWNS 1024 or more is recommended)
- *     #define MQTT_MAX_PACKET_SIZE 768
  *   o Use the smallest non-zero FILESYSTEM size you can for your board.
  *     (See the Tools -> Flash Size menu)
  *
@@ -358,16 +355,6 @@
 #include <IRac.h>
 #if MQTT_ENABLE
 #include <PubSubClient.h>
-// --------------------------------------------------------------------
-// * * * IMPORTANT * * *
-// You must change <PubSubClient.h> to have the following value.
-// #define MQTT_MAX_PACKET_SIZE 768
-// --------------------------------------------------------------------
-// Check that the user has set MQTT_MAX_PACKET_SIZE to an appropriate size.
-#if MQTT_MAX_PACKET_SIZE < 768
-#error "MQTT_MAX_PACKET_SIZE in <PubSubClient.h> is too small. "\
-  "Increase the value per comments."
-#endif  // MQTT_MAX_PACKET_SIZE < 768
 #endif  // MQTT_ENABLE
 #include <algorithm>  // NOLINT(build/include)
 #include <memory>
@@ -1307,7 +1294,7 @@ void handleInfo(void) {
                              : "Disconnected " + timeSince(lastConnectedTime)) +
     ")</i><br>"
     "Disconnections: " + String(mqttDisconnectCounter - 1) + "<br>"
-    "Max Packet Size: " + MQTT_MAX_PACKET_SIZE + " bytes<br>"
+    "Buffer Size: " + String(mqtt_client.getBufferSize()) + " bytes<br>"
     "Client id: " + MqttClientId + "<br>"
     "Command topic(s): " + listOfCommandTopics() + "<br>"
     "Acknowledgements topic: " + MqttAck + "<br>"
@@ -2191,6 +2178,8 @@ void setup(void) {
   server.on(kUrlSendDiscovery, handleSendMqttDiscovery);
 #endif  // MQTT_DISCOVERY_ENABLE
   // Finish setup of the mqtt clent object.
+  if (!mqtt_client.setBufferSize(kMqttBufferSize))
+    debug("Can't fully allocate MQTT buffer! Try a smaller value.");
   mqtt_client.setServer(MqttServer, atoi(MqttPort));
   mqtt_client.setCallback(mqttCallback);
   // Set various variables
