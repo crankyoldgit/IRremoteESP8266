@@ -32,7 +32,7 @@
  * - Arduino IDE:
  *   o Install the following libraries via Library Manager
  *     - ArduinoJson (https://arduinojson.org/) (Version >= 6.0)
- *     - PubSubClient (https://pubsubclient.knolleary.net/) (Version >= 2.7.0)
+ *     - PubSubClient (https://pubsubclient.knolleary.net/) (Version >= 2.8.0)
  *     - WiFiManager (https://github.com/tzapu/WiFiManager)
  *                   (ESP8266: Version >= 0.14, ESP32: 'development' branch.)
  *   o Use the smallest non-zero FILESYSTEM size you can for your board.
