@@ -65,7 +65,7 @@ LITERALS=$(grep "^#define [A-Z]" src/*.cpp src/*.h |
            done | sort -u |
            grep -v [\(\)] | grep -v ^_ | grep -v _\$ | grep -v VIRTUAL)
 CONSTS=$(grep "^const " src/*.cpp src/*.h |
-         sed 's/\[.*\] =.*//;s/ =.*//;s/^.* k/k/')
+         sed -E 's/\[.*\] =.*//;s/ =.*//;s/^.* \*?k/k/')
 ENUMS=$(cat src/*.h | while read a b; do
           if [[ ${a} == "};" ]]; then
             ENUM=0;
