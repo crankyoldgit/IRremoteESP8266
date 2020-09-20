@@ -8,7 +8,7 @@
  *   What    :  Driver for Transcold AC
  *   When    :  4 Sep 2020
    -----------------------------------------------------------------------------------------------------------
- 
+
  // Check header file for Raw data
  ********************************************************************************************************************/
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1256
@@ -25,14 +25,14 @@
 
 // Constants
 
-const uint16_t kTranscoldHdrMark = 6000; 
+const uint16_t kTranscoldHdrMark = 6000;
 const uint16_t kTranscoldHdrSpace = 7566;
-const uint16_t kTranscoldBitMark = 635; 
-const uint16_t kTranscoldOneSpace = 3492; 
+const uint16_t kTranscoldBitMark = 635;
+const uint16_t kTranscoldOneSpace = 3492;
 const uint16_t kTranscoldZeroSpace = 1451;
 const uint16_t kTranscoldMinGap = 7566;
 
-const uint16_t kTranscoldTick = 635;  
+const uint16_t kTranscoldTick = 635;
 const uint16_t kTranscoldBitMarkTicks =3 ;
 const uint16_t kTranscoldOneSpaceTicks = 3;
 const uint16_t kTranscoldZeroSpaceTicks = 2;
@@ -57,55 +57,55 @@ using irutils::setBits;
 /// @param[in] repeat The number of times the command is to be repeated.
 
 void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
-	Serial.println("sending recieved 1"); //only debug
+	DPRINTLN("sending recieved 1"); //only debug
   if (nbits % 8 != 0) return;  // nbits is required to be a multiple of 8.
 
   // Set IR carrier frequency
   enableIROut(38);
-Serial.println("sending recieved 2");
+  DPRINTLN("sending recieved 2");
   for (uint16_t r = 0; r <= repeat; r++) {
     // Header
     mark(kTranscoldHdrMark);
     space(kTranscoldHdrSpace);
-    Serial.println("sending recieved 3");
-	Serial.print("data "); 
-	
+    DPRINTLN("sending recieved 3");
+  	DPRINT("data ");
+
     // Data
     //   Break data into byte segments, starting at the Most Significant
     //   Byte. Each byte then being sent normal, then followed inverted.
-	//data =0b111011110110011001010100; 
-	String sent_bits;
+  	// data =0b111011110110011001010100;
+  	String sent_bits;
     for (uint16_t i = 8; i <= nbits; i += 8) {
       // Grab a bytes worth of data.
       uint8_t segment = (data >> (nbits - i)) & 0xFF;
-	  Serial.print("segment "); Serial.println(String(segment,BIN));
-	  //Serial.print("i "); Serial.println(i,BIN);
-	  sent_bits += String(segment, BIN);
+	  DPRINT("segment "); DPRINTLN(String(segment, 2));
+	  //DPRINT("i "); DPRINTLN(i, 2);
+	  sent_bits += String(segment, 2);
       // Normal
       sendData(kTranscoldBitMark, kTranscoldOneSpace, kTranscoldBitMark,
                kTranscoldZeroSpace, segment, 8, true);
       // Inverted.
       sendData(kTranscoldBitMark, kTranscoldOneSpace, kTranscoldBitMark,
                kTranscoldZeroSpace, segment ^ 0xFF , 8, true); //segment ^ 0xFF
-			   Serial.println("sending recieved 4"); 
+      DPRINTLN("sending recieved 4");
     }
-	Serial.print("Sent bits "); Serial.println(sent_bits);
-      sent_bits ="";
+  	DPRINT("Sent bits "); DPRINTLN(sent_bits);
+    sent_bits = "";
     // Footer
     mark(kTranscoldBitMark);
     space(kTranscoldMinGap);  // Pause before repeating
-	Serial.println("sending recieved 5");
+  	DPRINTLN("sending recieved 5");
   }
   space(kDefaultMessageGap);
-  Serial.println("sending recieved 6");
-  Serial.print("kTranscoldHdrMark ");Serial.println(kTranscoldHdrMark);
-  Serial.print("kTranscoldHdrSpace ");Serial.println(kTranscoldHdrSpace);
-  Serial.print("kTranscoldBitMark ");Serial.println(kTranscoldBitMark);
-   Serial.print("kTranscoldOneSpace ");Serial.println(kTranscoldOneSpace);
-   Serial.print("kTranscoldZeroSpace ");Serial.println(kTranscoldZeroSpace);
- Serial.print("kTranscoldMinGap ");Serial.println(kTranscoldMinGap);
+  DPRINTLN("sending recieved 6");
+  DPRINT("kTranscoldHdrMark ");DPRINTLN(kTranscoldHdrMark);
+  DPRINT("kTranscoldHdrSpace ");DPRINTLN(kTranscoldHdrSpace);
+  DPRINT("kTranscoldBitMark ");DPRINTLN(kTranscoldBitMark);
+  DPRINT("kTranscoldOneSpace ");DPRINTLN(kTranscoldOneSpace);
+  DPRINT("kTranscoldZeroSpace ");DPRINTLN(kTranscoldZeroSpace);
+  DPRINT("kTranscoldMinGap ");DPRINTLN(kTranscoldMinGap);
 }
-#endif 
+#endif
 
 /// Class constructor.
 /// @param[in] pin GPIO to be used when sending.
@@ -135,11 +135,10 @@ void IRTranscoldAC::begin() { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRTranscoldAC::send( uint16_t repeat) {
-	
   _irsend.sendTranscold(remote_state, kTranscoldBits, repeat);
   // make sure to remove special state from remote_state
   // after command has being transmitted.
- Serial.print("remote_state "); Serial.println(String(remote_state,BIN));
+  DPRINT("remote_state "); DPRINTLN(String(remote_state, 2));
   recoverSavedState();
 }
 #endif  // SEND_TRANSCOLD
@@ -162,7 +161,7 @@ void IRTranscoldAC::setRaw(const uint32_t new_code) {
   // must be a command changing Temp|Mode|Fan
   // it is safe to just copy to remote var
   remote_state = new_code;
-  Serial.print("new_code "); Serial.println(String(new_code,BIN)); 
+  DPRINT("new_code "); DPRINTLN(String(new_code, 2));
 }
 
 /// Is the current state is a special state?
@@ -172,7 +171,7 @@ bool IRTranscoldAC::isSpecialState(void) {
     case kTranscoldClean:
     case kTranscoldLed:
     case kTranscoldOff:
-	Serial.println("kTranscoldOff iSS");
+	DPRINTLN("kTranscoldOff iSS");
     case kTranscoldSwing:
     case kTranscoldSleep:
     case kTranscoldTurbo: return true;
@@ -195,7 +194,7 @@ bool IRTranscoldAC::handleSpecialState(const uint32_t data) {
       ledFlag = !ledFlag;
       break;
     case kTranscoldOff:
-	Serial.println("kTranscoldOff hss");
+	DPRINTLN("kTranscoldOff hss");
       powerFlag = false;
       break;
     case kTranscoldSwing:
@@ -298,7 +297,7 @@ void IRTranscoldAC::setPower(const bool on) {
   if (!on) {
     updateSavedState();
     remote_state = kTranscoldOff;
-	Serial.println("kTranscoldOff SP");
+	DPRINTLN("kTranscoldOff SP");
   } else if (!powerFlag) {
     // at this point remote_state must be ready
     // to be transmitted
@@ -582,7 +581,7 @@ stdAc::state_t IRTranscoldAC::toCommon(const stdAc::state_t *prev) {
   result.mode = this->toCommonMode(this->getMode());
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  //Serial.print("result tostring toCommon "); Serial.println(String(result));
+  //DPRINT("result tostring toCommon "); DPRINTLN(String(result));
   return result;
 }
 
@@ -592,7 +591,7 @@ String IRTranscoldAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  Serial.print("result tostring 1 "); Serial.println(result);
+  DPRINT("result tostring 1 "); DPRINTLN(result);
   if (!getPower()) return result;  // If it's off, there is no other info.
   // Special modes.
   if (getSwing()) {
@@ -641,7 +640,7 @@ String IRTranscoldAC::toString(void) {
     case kTranscoldFanAuto0:
       result += kAutoStr;
       result += '0';
-      break; 
+      break;
     case kTranscoldFanMax:
       result += kMaxStr;
       break;
@@ -661,7 +660,7 @@ String IRTranscoldAC::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  Serial.print("result tostring 2"); Serial.println(result);
+  DPRINT("result tostring 2"); DPRINTLN(result);
   // Fan mode doesn't have a temperature.
   if (getMode() != kTranscoldFan) result += addTempToString(getTemp());
   result += addBoolToString(getZoneFollow(), kZoneFollowStr);
@@ -686,10 +685,10 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
   // The protocol sends the data normal + inverted, alternating on
   // each byte. Hence twice the number of expected data bits.
   if (results->rawlen <= 2 * 2 * nbits + kHeader + kFooter - 1 + offset)
-    return false;  
+    return false;
   if (strict && nbits != kTranscoldBits)
-    return false;      
-  if (nbits % 8 != 0)  
+    return false;
+  if (nbits % 8 != 0)
     return false;
 
   uint64_t data = 0;
