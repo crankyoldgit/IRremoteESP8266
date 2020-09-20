@@ -20,6 +20,7 @@ using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::addFanToString;
 using irutils::minsToString;
+using irutils::setBits;
 
 // Constants
 const uint16_t kCoronaAcHdrMark = 3500;
@@ -152,8 +153,8 @@ IRCoronaAc::IRCoronaAc(const uint16_t pin, const bool inverted,
 /// @note The state is powered off.
 void IRCoronaAc::stateReset(void) {
   // known good state
-  _.raw[kCoronaAcSectionData0Pos] = kCoronaAcSectionData0Base;
-  _.raw[kCoronaAcSectionData1Pos] = 0x00;  // ensure no unset mem
+  _.sections[kCoronaAcSettingsSection].Data0 = kCoronaAcSectionData0Base;
+  _.sections[kCoronaAcSettingsSection].Data1 = 0x00;  // ensure no unset mem
   setPowerButton(true);  // we default to this on, any timer removes it
   setTemp(kCoronaAcMinTemp);
   setMode(kCoronaAcModeCool);
@@ -173,7 +174,8 @@ uint8_t IRCoronaAc::getSectionByte(const uint8_t section) {
   // 2 enabled bits shifted 0-2 bits depending on section
   if (section >= 3)
     return 0b10010000 | b;
-  return b | (0b11 << (section+kHighNibble));
+  setBits(&b, kHighNibble, kNibbleSize, 0b11 << section);
+  return b;
 }
 
 /// Check that a CoronaAc Section part is valid with section byte and inverted
@@ -188,10 +190,10 @@ bool IRCoronaAc::validSection(const uint8_t state[], const uint16_t pos,
   if ((section % kCoronaAcSections) * kCoronaAcSectionBytes != pos)
     return false;
   // all individual sections has the same prefix
-  auto p = reinterpret_cast<const CoronaSection*>(state + pos);
+  const CoronaSection *p = reinterpret_cast<const CoronaSection*>(state + pos);
   if (p->Header0 != kCoronaAcSectionHeader0) {
     DPRINT("State ");
-    DPRINT(pos + offsetof(CoronaSection, Header0));
+    DPRINT(&(p->Header0) - state);
     DPRINT(" expected 0x28 was ");
     DPRINTLN(uint64ToString(p->Header0, 16));
     return false;
@@ -214,16 +216,16 @@ bool IRCoronaAc::validSection(const uint8_t state[], const uint16_t pos,
   }
 
   // checking inverts
-  uint8_t d0invinv = ~p->Data0;
-  if (p->Data0Inv != d0invinv) {
+  uint8_t d0invinv = ~p->Data0Inv;
+  if (p->Data0 != d0invinv) {
     DPRINT("inverted 3 - 4 not matching, got ");
     DPRINT(uint64ToString(p->Data0, 16));
     DPRINT(" vs ");
     DPRINTLN(uint64ToString(p->Data0Inv, 16));
     return false;
   }
-  uint8_t d1invinv = ~p->Data1;
-  if (p->Data1Inv != d1invinv) {
+  uint8_t d1invinv = ~p->Data1Inv;
+  if (p->Data1 != d1invinv) {
     DPRINT("inverted 5 - 6 not matching, got ");
     DPRINT(uint64ToString(p->Data1, 16));
     DPRINT(" vs ");
@@ -236,14 +238,13 @@ bool IRCoronaAc::validSection(const uint8_t state[], const uint16_t pos,
 /// Calculate and set the check values for the internal state.
 /// @param[in,out] data The array to be modified
 void IRCoronaAc::checksum(uint8_t* data) {
-  for (uint8_t section = 0; section < kCoronaAcSections; section++) {
-    uint8_t* pos = data + section * kCoronaAcSectionBytes;
-    auto p = reinterpret_cast<CoronaSection*>(pos);
-    p->Header0 = kCoronaAcSectionHeader0;
-    p->Header1 = kCoronaAcSectionHeader1;
-    p->Label = getSectionByte(section);
-    p->Data0Inv = ~p->Data0;
-    p->Data1Inv = ~p->Data1;
+  CoronaProtocol *p = reinterpret_cast<CoronaProtocol*>(data);
+  for (uint8_t i = 0; i < kCoronaAcSections; i++) {
+    p->sections[i].Header0 = kCoronaAcSectionHeader0;
+    p->sections[i].Header1 = kCoronaAcSectionHeader1;
+    p->sections[i].Label = getSectionByte(i);
+    p->sections[i].Data0Inv = ~p->sections[i].Data0;
+    p->sections[i].Data1Inv = ~p->sections[i].Data1;
   }
 }
 
@@ -464,10 +465,9 @@ void IRCoronaAc::_setTimer(const uint8_t section, const uint16_t nr_of_mins) {
   if (1 <= nr_of_mins && nr_of_mins <= kCoronaAcTimerMax)
     hsecs = nr_of_mins * kCoronaAcTimerUnitsPerMin;
 
-  uint8_t pos = section * kCoronaAcSectionBytes;
   // convert 16 bit value to separate 8 bit parts
-  _.raw[pos + kCoronaAcSectionData1Pos] = hsecs >> 8;
-  _.raw[pos + kCoronaAcSectionData0Pos] = hsecs;
+  _.sections[section].Data1 = hsecs >> 8;
+  _.sections[section].Data0 = hsecs;
 
   // if any timer is enabled, then (remote) ac must be on (Standby)
   if (hsecs != kCoronaAcTimerOff) {
@@ -480,10 +480,9 @@ void IRCoronaAc::_setTimer(const uint8_t section, const uint16_t nr_of_mins) {
 /// @return The number of minutes it is set for. 0 means it's off.
 /// @note The A/C protocol supports 2 second increments
 uint16_t IRCoronaAc::_getTimer(const uint8_t section) const {
-  uint8_t pos = section * kCoronaAcSectionBytes;
   // combine separate 8 bit parts to 16 bit value
-  uint16_t hsecs = _.raw[pos + kCoronaAcSectionData1Pos] << 8 |
-                   _.raw[pos + kCoronaAcSectionData0Pos];
+  uint16_t hsecs = _.sections[section].Data1 << 8 |
+                   _.sections[section].Data0;
 
   if (hsecs == kCoronaAcTimerOff)
     return 0;

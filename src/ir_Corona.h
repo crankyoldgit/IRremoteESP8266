@@ -26,8 +26,21 @@
 #include "IRsend_test.h"
 #endif
 
+struct CoronaSection {
+  uint8_t Header0;
+  uint8_t Header1;
+  uint8_t Label;
+  uint8_t Data0;
+  uint8_t Data0Inv;
+  uint8_t Data1;
+  uint8_t Data1Inv;
+};
+
+const uint8_t kCoronaAcSections = 3;
+
 union CoronaProtocol {
   uint8_t raw[kCoronaAcStateLength];  ///< The state of the IR remote.
+  CoronaSection sections[kCoronaAcSections];
   struct {
     // Byte 0
     uint8_t               :8;
@@ -53,26 +66,13 @@ union CoronaProtocol {
   };
 };
 
-struct CoronaSection {
-  uint8_t Header0;
-  uint8_t Header1;
-  uint8_t Label;
-  uint8_t Data0;
-  uint8_t Data0Inv;
-  uint8_t Data1;
-  uint8_t Data1Inv;
-};
-
 // Constants
 
 // CORONA_AC
 const uint8_t kCoronaAcSectionBytes = 7;  // kCoronaAcStateLengthShort
-const uint8_t kCoronaAcSections = 3;
 const uint8_t kCoronaAcSectionHeader0 = 0x28;
 const uint8_t kCoronaAcSectionHeader1 = 0x61;
 const uint8_t kCoronaAcSectionLabelBase = 0x0D;  // 0b1101
-const uint8_t kCoronaAcSectionData0Pos = 3;
-const uint8_t kCoronaAcSectionData1Pos = 5;
 const uint8_t kCoronaAcSectionData0Base = 0x10;  // D0 Pos 4 always on
 
 const uint8_t kCoronaAcFanAuto =    0b00;  // 0
