@@ -659,7 +659,7 @@ class IRsend {
 #endif  // SEND_METZ
 #if SEND_TRANSCOLD
   void sendTranscold(const uint64_t data, const uint16_t nbits = kTranscoldBits,
-                     const uint16_t repeat = kNoRepeat);
+                     const uint16_t repeat = kTranscoldDefaultRepeat);
 #endif  // SEND_TRANSCOLD
 
  protected:

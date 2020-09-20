@@ -628,6 +628,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case MIDEA24:
     case NIKAI:
     case RCMM:
+    case TRANSCOLD:
       return 24;
     case LG:
     case LG2:
@@ -655,7 +656,6 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kSanyoLC7461Bits;  // 42
     case GOODWEATHER:
     case MIDEA:
-    case TRANSCOLD:
     case PANASONIC:
       return 48;
     case MAGIQUEST:

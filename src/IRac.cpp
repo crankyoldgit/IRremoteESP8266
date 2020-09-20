@@ -41,6 +41,7 @@
 #include "ir_Technibel.h"
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
+#include "ir_Transcold.h"
 #include "ir_Trotec.h"
 #include "ir_Vestel.h"
 #include "ir_Voltas.h"
@@ -2013,6 +2014,72 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 }
 #endif  // SEND_WHIRLPOOL_AC
 
+#if SEND_TRANSCOLD
+/// Send a Transcold A/C message with the supplied settings.
+/// @note May result in multiple messages being sent.
+/// @param[in, out] ac A Ptr to an IRTranscoldAC object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] light Turn on the LED/Display mode.
+/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
+/// @param[in] sleep Nr. of minutes for sleep mode.
+/// @note -1 is Off, >= 0 is on.
+void IRac::transcold(IRTranscoldAC *ac,
+                     const bool on, const stdAc::opmode_t mode,
+                     const float degrees, const stdAc::fanspeed_t fan,
+                     const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                     const bool turbo, const bool light, const bool clean,
+                     const int16_t sleep)  {
+  ac->begin();
+  ac->setPower(on);
+  if (!on) {
+      // after turn off AC no more commands should
+      // be accepted
+      ac->send();
+      return;
+  }
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  // No Filter setting available.
+  // No Beep setting available.
+  // No Clock setting available.
+  // No Econo setting available.
+  // No Quiet setting available.
+  if (swingv != stdAc::swingv_t::kOff || swingh != stdAc::swingh_t::kOff) {
+    // Swing has a special command that needs to be sent independently.
+    ac->setSwing();
+    ac->send();
+  }
+  if (turbo) {
+    // Turbo has a special command that needs to be sent independently.
+    ac->setTurbo();
+    ac->send();
+  }
+  if (sleep > 0) {
+    // Sleep has a special command that needs to be sent independently.
+    ac->setSleep();
+    ac->send();
+  }
+  if (light) {
+    // Light has a special command that needs to be sent independently.
+    ac->setLed();
+    ac->send();
+  }
+  if (clean) {
+    // Clean has a special command that needs to be sent independently.
+    ac->setClean();
+    ac->send();
+  }
+  ac->send();
+}
+#endif  // SEND_TRANSCOLD
+
 /// Create a new state base on the provided state that has been suitably fixed.
 /// @note This is for use with Home Assistant, which requires mode to be off if
 ///   the power is off.
@@ -2079,6 +2146,17 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         // CKP models use a power mode toggle.
         if (desired.model == panasonic_ac_remote_model_t::kPanasonicCkp)
           result.power = desired.power ^ prev->power;
+        break;
+	 case decode_type_t::TRANSCOLD:
+        if ((desired.swingv == stdAc::swingv_t::kOff) ^
+            (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
+          result.swingv = stdAc::swingv_t::kAuto;
+        else
+          result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
+        result.turbo = desired.turbo ^ prev->turbo;
+        result.light = desired.light ^ prev->light;
+        result.clean = desired.clean ^ prev->clean;
+        result.sleep = ((desired.sleep >= 0) ^ (prev->sleep >= 0)) ? 0 : -1;
         break;
       default:
         {};
@@ -2569,6 +2647,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_WHIRLPOOL_AC
+#if SEND_TRANSCOLD
+    case TRANSCOLD:
+    {
+      IRTranscoldAC ac(_pin, _inverted, _modulation);
+      transcold(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+                send.swingh, send.turbo, send.light, send.clean, send.sleep);
+      break;
+    }
+#endif  // SEND_TRANSCOLD_AC
     default:
       return false;  // Fail, didn't match anything.
   }
@@ -3272,6 +3359,14 @@ namespace IRAcUtils {
         return ac.isValidLgAc() ? ac.toString() : "";
       }
 #endif  // DECODE_LG
+#if DECODE_TRANSCOLD
+      case decode_type_t::TRANSCOLD: {
+        IRTranscoldAC ac(kGpioUnused);
+        ac.on();
+        ac.setRaw(result->value);  // TRANSCOLD uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_TRANSCOLD
       default:
         return "";
     }
@@ -3668,6 +3763,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_WHIRLPOOL_AC
+#if DECODE_TRANSCOLD
+      case decode_type_t::TRANSCOLD: {
+        IRTranscoldAC ac(kGpioUnused);
+        ac.setRaw(decode->value);  // TRANSCOLD Uses value instead of state.
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_TRANSCOLD
       default:
         return false;
     }
