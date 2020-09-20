@@ -1,16 +1,8 @@
-/***************************************************************************************************************
- *   File name      : ir_Transcold.h
- *   Description    : Driver for Transcold AC
- *   Author         : Chandrashekar Shetty (mailchandrashetty2017@gmail.com)
- *  Github 		   : @iamDshetty
-*--------------------------------------------------------------------------------------------------------------
- *   Who     :  Chandrashekar Shetty
- *   What    :  Driver for Transcold AC
- *   When    :  4 Sep 2020
-   -----------------------------------------------------------------------------------------------------------
+// Copyright 2020 Chandrashekar Shetty (iamDshetty)
+// Copyright 2020 crankyoldgit
 
- // Check header file for Raw data
- ********************************************************************************************************************/
+/// @file
+/// @brief Support for Transcold A/C protocols.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1256
 
 #include "ir_Transcold.h"
@@ -33,12 +25,13 @@ const uint16_t kTranscoldZeroSpace = 1451;
 const uint16_t kTranscoldMinGap = 7566;
 
 const uint16_t kTranscoldTick = 635;
-const uint16_t kTranscoldBitMarkTicks =3 ;
+const uint16_t kTranscoldBitMarkTicks = 3;
 const uint16_t kTranscoldOneSpaceTicks = 3;
 const uint16_t kTranscoldZeroSpaceTicks = 2;
 const uint16_t kTranscoldHdrMarkTicks = 9.4;
 const uint16_t kTranscoldHdrSpaceTicks = 12;
-const uint16_t kTranscoldMinGapTicks = kTranscoldHdrMarkTicks + kTranscoldZeroSpaceTicks;
+const uint16_t kTranscoldMinGapTicks = kTranscoldHdrMarkTicks +
+                                       kTranscoldZeroSpaceTicks;
 
 using irutils::addBoolToString;
 using irutils::addIntToString;
@@ -57,7 +50,7 @@ using irutils::setBits;
 /// @param[in] repeat The number of times the command is to be repeated.
 
 void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
-	DPRINTLN("sending recieved 1"); //only debug
+	DPRINTLN("sending recieved 1");  // only debug
   if (nbits % 8 != 0) return;  // nbits is required to be a multiple of 8.
 
   // Set IR carrier frequency
@@ -79,14 +72,14 @@ void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
       // Grab a bytes worth of data.
       uint8_t segment = (data >> (nbits - i)) & 0xFF;
 	  DPRINT("segment "); DPRINTLN(String(segment, 2));
-	  //DPRINT("i "); DPRINTLN(i, 2);
+	  // DPRINT("i "); DPRINTLN(i, 2);
 	  sent_bits += String(segment, 2);
       // Normal
       sendData(kTranscoldBitMark, kTranscoldOneSpace, kTranscoldBitMark,
                kTranscoldZeroSpace, segment, 8, true);
       // Inverted.
       sendData(kTranscoldBitMark, kTranscoldOneSpace, kTranscoldBitMark,
-               kTranscoldZeroSpace, segment ^ 0xFF , 8, true); //segment ^ 0xFF
+               kTranscoldZeroSpace, segment ^ 0xFF , 8, true);  // segment^0xFF
       DPRINTLN("sending recieved 4");
     }
   	DPRINT("Sent bits "); DPRINTLN(sent_bits);
@@ -98,12 +91,12 @@ void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
   }
   space(kDefaultMessageGap);
   DPRINTLN("sending recieved 6");
-  DPRINT("kTranscoldHdrMark ");DPRINTLN(kTranscoldHdrMark);
-  DPRINT("kTranscoldHdrSpace ");DPRINTLN(kTranscoldHdrSpace);
-  DPRINT("kTranscoldBitMark ");DPRINTLN(kTranscoldBitMark);
-  DPRINT("kTranscoldOneSpace ");DPRINTLN(kTranscoldOneSpace);
-  DPRINT("kTranscoldZeroSpace ");DPRINTLN(kTranscoldZeroSpace);
-  DPRINT("kTranscoldMinGap ");DPRINTLN(kTranscoldMinGap);
+  DPRINT("kTranscoldHdrMark "); DPRINTLN(kTranscoldHdrMark);
+  DPRINT("kTranscoldHdrSpace "); DPRINTLN(kTranscoldHdrSpace);
+  DPRINT("kTranscoldBitMark "); DPRINTLN(kTranscoldBitMark);
+  DPRINT("kTranscoldOneSpace "); DPRINTLN(kTranscoldOneSpace);
+  DPRINT("kTranscoldZeroSpace "); DPRINTLN(kTranscoldZeroSpace);
+  DPRINT("kTranscoldMinGap "); DPRINTLN(kTranscoldMinGap);
 }
 #endif
 
@@ -111,7 +104,8 @@ void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-IRTranscoldAC::IRTranscoldAC(const uint16_t pin, const bool inverted,const bool use_modulation)
+IRTranscoldAC::IRTranscoldAC(const uint16_t pin, const bool inverted,
+                             const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the internal state to a fixed known good state.
@@ -134,7 +128,7 @@ void IRTranscoldAC::begin() { _irsend.begin(); }
 #if SEND_TRANSCOLD
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
-void IRTranscoldAC::send( uint16_t repeat) {
+void IRTranscoldAC::send(uint16_t repeat) {
   _irsend.sendTranscold(remote_state, kTranscoldBits, repeat);
   // make sure to remove special state from remote_state
   // after command has being transmitted.
@@ -264,7 +258,8 @@ uint8_t IRTranscoldAC::getTemp() {
 /// @note Bypasses any checks or additional actions.
 /// @param[in] code The desired native sensor temperature.
 void IRTranscoldAC::setSensorTempRaw(const uint8_t code) {
-  setBits(&remote_state, kTranscoldSensorTempOffset, kTranscoldSensorTempSize, code);
+  setBits(&remote_state, kTranscoldSensorTempOffset, kTranscoldSensorTempSize,
+          code);
 }
 
 /// Set the sensor temperature.
@@ -581,7 +576,7 @@ stdAc::state_t IRTranscoldAC::toCommon(const stdAc::state_t *prev) {
   result.mode = this->toCommonMode(this->getMode());
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  //DPRINT("result tostring toCommon "); DPRINTLN(String(result));
+  // DPRINT("result tostring toCommon "); DPRINTLN(String(result));
   return result;
 }
 
@@ -629,8 +624,8 @@ String IRTranscoldAC::toString(void) {
     result += kToggleStr;
     return result;
   }
-  result += addModeToString(getMode(), kTranscoldAuto, kTranscoldCool, kTranscoldHeat,
-                            kTranscoldDry, kTranscoldFan);
+  result += addModeToString(getMode(), kTranscoldAuto, kTranscoldCool,
+                            kTranscoldHeat, kTranscoldDry, kTranscoldFan);
   result += addIntToString(getFan(), kFanStr);
   result += kSpaceLBraceStr;
   switch (getFan()) {
@@ -700,10 +695,12 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
   // Header
   if (!matchMark(results->rawbuf[offset], kTranscoldHdrMark)) return false;
   // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * kRawTick / kTranscoldHdrMarkTicks;
+  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
+      kTranscoldHdrMarkTicks;
   if (!matchSpace(results->rawbuf[offset], kTranscoldHdrSpace)) return false;
   // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * kRawTick / kTranscoldHdrSpaceTicks;
+  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
+      kTranscoldHdrSpaceTicks;
 
   // Data
   // Twice as many bits as there are normal plus inverted bits.
