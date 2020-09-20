@@ -2110,6 +2110,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
     // Check if we have to handle toggle settings for specific A/C protocols.
     switch (desired.protocol) {
       case decode_type_t::COOLIX:
+      case decode_type_t::TRANSCOLD:
         if ((desired.swingv == stdAc::swingv_t::kOff) ^
             (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
           result.swingv = stdAc::swingv_t::kAuto;
@@ -2149,17 +2150,6 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         // CKP models use a power mode toggle.
         if (desired.model == panasonic_ac_remote_model_t::kPanasonicCkp)
           result.power = desired.power ^ prev->power;
-        break;
-	 case decode_type_t::TRANSCOLD:
-        if ((desired.swingv == stdAc::swingv_t::kOff) ^
-            (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
-          result.swingv = stdAc::swingv_t::kAuto;
-        else
-          result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
-        result.turbo = desired.turbo ^ prev->turbo;
-        result.light = desired.light ^ prev->light;
-        result.clean = desired.clean ^ prev->clean;
-        result.sleep = ((desired.sleep >= 0) ^ (prev->sleep >= 0)) ? 0 : -1;
         break;
       default:
         {};

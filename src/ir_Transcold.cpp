@@ -47,24 +47,21 @@ void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
     // Header
     mark(kTranscoldHdrMark);
     space(kTranscoldHdrSpace);
-
     // Data
     //   Break data into byte segments, starting at the Most Significant
     //   Byte. Each byte then being sent normal, then followed inverted.
     for (uint16_t i = 8; i <= nbits; i += 8) {
       // Grab a bytes worth of data.
-      uint8_t segment = (data >> (nbits - i)) & 0xFF;
-      // Normal
+      // uint8_t segment = (data >> (nbits - i)) & 0xFF;
+      uint8_t segment = GETBITS64(data, nbits - i, 8);
+      // Normal + Inverted
+      uint16_t both = (segment << 8) | (~segment & 0xFF);
       sendData(kTranscoldBitMark, kTranscoldOneSpace, kTranscoldBitMark,
-               kTranscoldZeroSpace, segment, 8, true);
-      // Inverted.
-      sendData(kTranscoldBitMark, kTranscoldOneSpace, kTranscoldBitMark,
-               kTranscoldZeroSpace, segment ^ 0xFF , 8, true);  // segment^0xFF
+               kTranscoldZeroSpace, both, 16, true);
     }
     // Footer
     mark(kTranscoldBitMark);
     space(kTranscoldHdrSpace);
-    // Footer #2
     mark(kTranscoldBitMark);
     space(kDefaultMessageGap);
   }
@@ -644,10 +641,8 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
   // each byte. Hence twice the number of expected data bits.
   if (results->rawlen <= 2 * 2 * nbits + kHeader + kFooter - 1 + offset)
     return false;
-  if (strict && nbits != kTranscoldBits)
-    return false;
-  if (nbits % 8 != 0)
-    return false;
+  if (strict && nbits != kTranscoldBits) return false;
+  if (nbits % 8 != 0) return false;
 
   uint64_t data = 0;
   uint64_t inverted = 0;
@@ -689,16 +684,12 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
     return false;
 
   // Compliance
-  uint64_t orig = data;  // Save a copy of the data.
-  if (strict) {
-    for (uint16_t i = 0; i < nbits; i += 8, data >>= 8, inverted >>= 8)
-      if ((data & 0xFF) != ((inverted & 0xFF) ^ 0xFF)) return false;
-  }
+  if (strict && inverted != invertBits(data, nbits)) return false;
 
   // Success
   results->decode_type = decode_type_t::TRANSCOLD;
   results->bits = nbits;
-  results->value = orig;
+  results->value = data;
   results->address = 0;
   results->command = 0;
   return true;
