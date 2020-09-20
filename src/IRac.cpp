@@ -262,6 +262,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_TOSHIBA_AC
     case decode_type_t::TOSHIBA_AC:
 #endif
+#if SEND_TRANSCOLD
+    case decode_type_t::TRANSCOLD:
+#endif
 #if SEND_TROTEC
     case decode_type_t::TROTEC:
 #endif

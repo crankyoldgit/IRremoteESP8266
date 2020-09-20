@@ -34,7 +34,7 @@ TEST(TestDecodeTranscold, RealExample) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::TRANSCOLD, irsend.capture.decode_type);
   ASSERT_EQ(kTranscoldBits, irsend.capture.bits);
-  EXPECT_EQ(0xE916659A54AB, irsend.capture.value);
+  EXPECT_EQ(0xE96554, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_EQ(0x0, irsend.capture.address);
 }
@@ -44,13 +44,13 @@ TEST(TestDecodeTranscold, SyntheticExample) {
   IRrecv irrecv(kGpioUnused);
   irsend.begin();
   irsend.reset();
-  irsend.sendTranscold(0xE916659A54AB);
+  irsend.sendTranscold(0xE96554);
   irsend.makeDecodeResult();
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(decode_type_t::TRANSCOLD, irsend.capture.decode_type);
   EXPECT_EQ(kTranscoldBits, irsend.capture.bits);
-  EXPECT_EQ(0xE916659A54AB, irsend.capture.value);
+  EXPECT_EQ(0xE96554, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_EQ(0x0, irsend.capture.address);
 
@@ -72,7 +72,8 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("TRANSCOLD", typeToString(decode_type_t::TRANSCOLD));
   ASSERT_EQ(decode_type_t::TRANSCOLD, strToDecodeType("TRANSCOLD"));
   ASSERT_FALSE(hasACState(decode_type_t::TRANSCOLD));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::TRANSCOLD));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::TRANSCOLD));
   ASSERT_EQ(kTranscoldBits, IRsend::defaultBits(decode_type_t::TRANSCOLD));
-  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::TRANSCOLD));
+  ASSERT_EQ(kTranscoldDefaultRepeat,
+            IRsend::minRepeats(decode_type_t::TRANSCOLD));
 }

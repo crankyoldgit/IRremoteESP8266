@@ -17,13 +17,11 @@
 
 // Constants
 
-const uint16_t kTranscoldHdrMark = 6000;
-const uint16_t kTranscoldHdrSpace = 7566;
-const uint16_t kTranscoldBitMark = 635;
-const uint16_t kTranscoldOneSpace = 3492;
-const uint16_t kTranscoldZeroSpace = 1451;
-const uint16_t kTranscoldMinGap = 7566;
-
+const uint16_t kTranscoldHdrMark =   5944;  ///< uSeconds.
+const uint16_t kTranscoldBitMark =    555;  ///< uSeconds.
+const uint16_t kTranscoldHdrSpace =  7563;  ///< uSeconds.
+const uint16_t kTranscoldOneSpace =  3556;  ///< uSeconds.
+const uint16_t kTranscoldZeroSpace = 1526;  ///< uSeconds.
 
 using irutils::addBoolToString;
 using irutils::addIntToString;
@@ -35,60 +33,41 @@ using irutils::setBits;
 
 
 #if SEND_TRANSCOLD
-/// Send a TRANSCOLD message
+/// Send a Transcold message
 /// Status: STABLE / Confirmed Working.
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
-
 void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
-	DPRINTLN("sending recieved 1");  // only debug
   if (nbits % 8 != 0) return;  // nbits is required to be a multiple of 8.
 
   // Set IR carrier frequency
   enableIROut(38);
-  DPRINTLN("sending recieved 2");
   for (uint16_t r = 0; r <= repeat; r++) {
     // Header
     mark(kTranscoldHdrMark);
     space(kTranscoldHdrSpace);
-    DPRINTLN("sending recieved 3");
-  	DPRINT("data ");
 
     // Data
     //   Break data into byte segments, starting at the Most Significant
     //   Byte. Each byte then being sent normal, then followed inverted.
-  	// data =0b111011110110011001010100;
-  	String sent_bits;
     for (uint16_t i = 8; i <= nbits; i += 8) {
       // Grab a bytes worth of data.
       uint8_t segment = (data >> (nbits - i)) & 0xFF;
-	  DPRINT("segment "); DPRINTLN(String(segment, 2));
-	  // DPRINT("i "); DPRINTLN(i, 2);
-	  sent_bits += String(segment, 2);
       // Normal
       sendData(kTranscoldBitMark, kTranscoldOneSpace, kTranscoldBitMark,
                kTranscoldZeroSpace, segment, 8, true);
       // Inverted.
       sendData(kTranscoldBitMark, kTranscoldOneSpace, kTranscoldBitMark,
                kTranscoldZeroSpace, segment ^ 0xFF , 8, true);  // segment^0xFF
-      DPRINTLN("sending recieved 4");
     }
-  	DPRINT("Sent bits "); DPRINTLN(sent_bits);
-    sent_bits = "";
     // Footer
     mark(kTranscoldBitMark);
-    space(kTranscoldMinGap);  // Pause before repeating
-  	DPRINTLN("sending recieved 5");
+    space(kTranscoldHdrSpace);
+    // Footer #2
+    mark(kTranscoldBitMark);
+    space(kDefaultMessageGap);
   }
-  space(kDefaultMessageGap);
-  DPRINTLN("sending recieved 6");
-  DPRINT("kTranscoldHdrMark "); DPRINTLN(kTranscoldHdrMark);
-  DPRINT("kTranscoldHdrSpace "); DPRINTLN(kTranscoldHdrSpace);
-  DPRINT("kTranscoldBitMark "); DPRINTLN(kTranscoldBitMark);
-  DPRINT("kTranscoldOneSpace "); DPRINTLN(kTranscoldOneSpace);
-  DPRINT("kTranscoldZeroSpace "); DPRINTLN(kTranscoldZeroSpace);
-  DPRINT("kTranscoldMinGap "); DPRINTLN(kTranscoldMinGap);
 }
 #endif
 
@@ -124,7 +103,6 @@ void IRTranscoldAC::send(uint16_t repeat) {
   _irsend.sendTranscold(remote_state, kTranscoldBits, repeat);
   // make sure to remove special state from remote_state
   // after command has being transmitted.
-  DPRINT("remote_state "); DPRINTLN(String(remote_state, 2));
   recoverSavedState();
 }
 #endif  // SEND_TRANSCOLD
@@ -147,7 +125,6 @@ void IRTranscoldAC::setRaw(const uint32_t new_code) {
   // must be a command changing Temp|Mode|Fan
   // it is safe to just copy to remote var
   remote_state = new_code;
-  DPRINT("new_code "); DPRINTLN(String(new_code, 2));
 }
 
 /// Is the current state is a special state?
@@ -157,7 +134,6 @@ bool IRTranscoldAC::isSpecialState(void) {
     case kTranscoldClean:
     case kTranscoldLed:
     case kTranscoldOff:
-	DPRINTLN("kTranscoldOff iSS");
     case kTranscoldSwing:
     case kTranscoldSleep:
     case kTranscoldTurbo: return true;
@@ -180,7 +156,6 @@ bool IRTranscoldAC::handleSpecialState(const uint32_t data) {
       ledFlag = !ledFlag;
       break;
     case kTranscoldOff:
-	DPRINTLN("kTranscoldOff hss");
       powerFlag = false;
       break;
     case kTranscoldSwing:
@@ -284,7 +259,6 @@ void IRTranscoldAC::setPower(const bool on) {
   if (!on) {
     updateSavedState();
     remote_state = kTranscoldOff;
-	DPRINTLN("kTranscoldOff SP");
   } else if (!powerFlag) {
     // at this point remote_state must be ready
     // to be transmitted
@@ -568,7 +542,6 @@ stdAc::state_t IRTranscoldAC::toCommon(const stdAc::state_t *prev) {
   result.mode = this->toCommonMode(this->getMode());
   result.degrees = this->getTemp();
   result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  // DPRINT("result tostring toCommon "); DPRINTLN(String(result));
   return result;
 }
 
@@ -578,7 +551,6 @@ String IRTranscoldAC::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  DPRINT("result tostring 1 "); DPRINTLN(result);
   if (!getPower()) return result;  // If it's off, there is no other info.
   // Special modes.
   if (getSwing()) {
@@ -647,7 +619,6 @@ String IRTranscoldAC::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  DPRINT("result tostring 2"); DPRINTLN(result);
   // Fan mode doesn't have a temperature.
   if (getMode() != kTranscoldFan) result += addTempToString(getTemp());
   result += addBoolToString(getZoneFollow(), kZoneFollowStr);
@@ -685,8 +656,8 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
     return false;  // We can't possibly capture a Transcold packet that big.
 
   // Header
-  if (!matchMark(results->rawbuf[offset], kTranscoldHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset], kTranscoldHdrSpace)) return false;
+  if (!matchMark(results->rawbuf[offset++], kTranscoldHdrMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kTranscoldHdrSpace)) return false;
 
   // Data
   // Twice as many bits as there are normal plus inverted bits.
@@ -710,10 +681,11 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], kTranscoldBitMark))
-    return false;
+  if (!matchMark(results->rawbuf[offset++], kTranscoldBitMark)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kTranscoldHdrSpace)) return false;
+  if (!matchMark(results->rawbuf[offset++], kTranscoldBitMark)) return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kTranscoldMinGap))
+      !matchAtLeast(results->rawbuf[offset], kDefaultMessageGap))
     return false;
 
   // Compliance
