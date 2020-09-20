@@ -142,7 +142,7 @@ class IRWhirlpoolAc {
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
   String toString(void);
 #ifndef UNIT_TEST
 
