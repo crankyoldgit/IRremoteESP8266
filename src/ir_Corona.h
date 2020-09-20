@@ -26,60 +26,72 @@
 #include "IRsend_test.h"
 #endif
 
+struct CoronaSection {
+  uint8_t Header0;
+  uint8_t Header1;
+  uint8_t Label;
+  uint8_t Data0;
+  uint8_t Data0Inv;
+  uint8_t Data1;
+  uint8_t Data1Inv;
+};
+
+const uint8_t kCoronaAcSections = 3;
+
+union CoronaProtocol {
+  uint8_t raw[kCoronaAcStateLength];  ///< The state of the IR remote.
+  CoronaSection sections[kCoronaAcSections];
+  struct {
+    // Byte 0
+    uint8_t               :8;
+    // Byte 1
+    uint8_t               :8;
+    // Byte 2
+    uint8_t               :8;
+    // Byte 3
+    uint8_t Fan           :2;
+    uint8_t               :1;
+    uint8_t Econo         :1;
+    uint8_t               :1;  // always on
+    uint8_t               :1;
+    uint8_t SwingVToggle  :1;
+    uint8_t               :1;
+    // Byte 4
+    uint8_t               :8;
+    // Byte 5
+    uint8_t Temp          :4;
+    uint8_t Power         :1;
+    uint8_t PowerButton   :1;
+    uint8_t Mode          :2;
+  };
+};
+
 // Constants
 
 // CORONA_AC
 const uint8_t kCoronaAcSectionBytes = 7;  // kCoronaAcStateLengthShort
-const uint8_t kCoronaAcSections = 3;
-const uint8_t kCoronaAcSectionHeader0Pos = 0;
 const uint8_t kCoronaAcSectionHeader0 = 0x28;
-const uint8_t kCoronaAcSectionHeader1Pos = 1;
 const uint8_t kCoronaAcSectionHeader1 = 0x61;
-const uint8_t kCoronaAcSectionLabelPos = 2;
 const uint8_t kCoronaAcSectionLabelBase = 0x0D;  // 0b1101
-const uint8_t kCoronaAcSectionData0Pos = 3;
-const uint8_t kCoronaAcSectionData0InvPos = 4;
-const uint8_t kCoronaAcSectionData1Pos = 5;
-const uint8_t kCoronaAcSectionData1InvPos = 6;
 const uint8_t kCoronaAcSectionData0Base = 0x10;  // D0 Pos 4 always on
 
-const uint8_t kCoronaAcSettingsSection = 0;
-// D0
-const uint8_t kCoronaAcFanOffset = 0;        // D0 LSB Pos 0-1
-const uint8_t kCoronaAcFanSize = 2;
 const uint8_t kCoronaAcFanAuto =    0b00;  // 0
 const uint8_t kCoronaAcFanLow =     0b01;  // 1
 const uint8_t kCoronaAcFanMedium =  0b10;  // 2
 const uint8_t kCoronaAcFanHigh =    0b11;  // 3
 
-// One bit unknown                           // D0 Pos 2
-const uint8_t kCoronaAcPowerSaveOffset = 3;  // D0 Pos 3
-// One bit unknown always on                 // D0 Pos 4
-// One bit unknown                           // D0 Pos 5
-const uint8_t kCoronaAcSwingVToggleOffset = 6;  // D0 Pos 6
-// One bit unknown                           // D0 MSB Pos 7
-
-// D1
 /* full auto mode not supported by this code yet
 const uint8_t kCoronaAcAutoD0 = 0b00010100; // only combined with power save
 const uint8_t kCoronaAcAutoD1 = 0b10000011; // only combined with power
 */
-const uint8_t kCoronaAcTempOffset = 0;       // D1 LSB Pos 0
-const uint8_t kCoronaAcTempSize = 4;
 const uint8_t kCoronaAcMinTemp = 17;  // Celsius = 0b0001
 const uint8_t kCoronaAcMaxTemp = 30;  // Celsius = 0b1110
-const uint8_t kCoronaAcPowerOffset =
-    kCoronaAcTempOffset + kCoronaAcTempSize;  // D1 Pos 4
-const uint8_t kCoronaAcPowerButtonOffset =
-    kCoronaAcPowerOffset + 1;                // D1 Pos 5
-const uint8_t kCoronaAcModeOffset =
-    kCoronaAcPowerButtonOffset + 1;          // D1 MSB Pos 6-7
-const uint8_t kCoronaAcModeSize = 2;
 const uint8_t kCoronaAcModeHeat = 0b00;  // 0
 const uint8_t kCoronaAcModeDry =  0b01;  // 1
 const uint8_t kCoronaAcModeCool = 0b10;  // 2
 const uint8_t kCoronaAcModeFan =  0b11;  // 3
 
+const uint8_t kCoronaAcSettingsSection = 0;
 const uint8_t kCoronaAcOnTimerSection = 1;
 const uint8_t kCoronaAcOffTimerSection = 2;
 const uint16_t kCoronaAcTimerMax = 12 * 60;  // 12H in Minutes
@@ -108,33 +120,33 @@ class IRCoronaAc {
   static bool validSection(const uint8_t state[], const uint16_t pos,
                            const uint8_t section);
   void setPower(const bool on);
-  bool getPower();
-  bool getPowerButton();
-  void on();
-  void off();
+  bool getPower(void) const;
+  bool getPowerButton(void) const;
+  void on(void);
+  void off(void);
   void setTemp(const uint8_t temp);
-  uint8_t getTemp();
+  uint8_t getTemp(void) const;
   void setSwingVToggle(const bool on);
-  bool getSwingVToggle(void);
+  bool getSwingVToggle(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan();
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode();
+  uint8_t getMode(void) const;
   void setEcono(const bool on);
-  bool getEcono(void);
+  bool getEcono(void) const;
   void setOnTimer(const uint16_t nr_of_mins);
-  uint16_t getOnTimer(void);
+  uint16_t getOnTimer(void) const;
   void setOffTimer(const uint16_t nr_of_mins);
-  uint16_t getOffTimer(void);
+  uint16_t getOffTimer(void) const;
   uint8_t* getRaw();
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kCoronaAcStateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon();
-  String toString();
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -144,12 +156,11 @@ class IRCoronaAc {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif
-  uint8_t remote_state[kCoronaAcStateLength];  ///< The state of the IR remote.
+  CoronaProtocol _;
   static uint8_t getSectionByte(const uint8_t section);
   static void checksum(uint8_t* data);
   void setPowerButton(const bool on);
-  void _setPower(const bool on);
   void _setTimer(const uint8_t section, const uint16_t nr_of_mins);
-  uint16_t _getTimer(const uint8_t section);
+  uint16_t _getTimer(const uint8_t section) const;
 };
 #endif  // IR_CORONA_H_

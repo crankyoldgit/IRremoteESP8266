@@ -1404,9 +1404,6 @@ TEST(TestCoronaAcClass, Power) {
   EXPECT_FALSE(ac.getPower());
   EXPECT_EQ(0, ac.getOffTimer());
   EXPECT_FALSE(ac.getPowerButton());
-
-  ASSERT_EQ(4, kCoronaAcPowerOffset);
-  ASSERT_EQ(5, kCoronaAcPowerButtonOffset);
 }
 
 TEST(TestCoronaAcClass, Temperature) {
