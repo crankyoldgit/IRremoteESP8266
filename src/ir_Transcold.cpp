@@ -24,14 +24,6 @@ const uint16_t kTranscoldOneSpace = 3492;
 const uint16_t kTranscoldZeroSpace = 1451;
 const uint16_t kTranscoldMinGap = 7566;
 
-const uint16_t kTranscoldTick = 635;
-const uint16_t kTranscoldBitMarkTicks = 3;
-const uint16_t kTranscoldOneSpaceTicks = 3;
-const uint16_t kTranscoldZeroSpaceTicks = 2;
-const uint16_t kTranscoldHdrMarkTicks = 9.4;
-const uint16_t kTranscoldHdrSpaceTicks = 12;
-const uint16_t kTranscoldMinGapTicks = kTranscoldHdrMarkTicks +
-                                       kTranscoldZeroSpaceTicks;
 
 using irutils::addBoolToString;
 using irutils::addIntToString;
@@ -694,27 +686,20 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
 
   // Header
   if (!matchMark(results->rawbuf[offset], kTranscoldHdrMark)) return false;
-  // Calculate how long the common tick time is based on the header mark.
-  uint32_t m_tick = results->rawbuf[offset++] * kRawTick /
-      kTranscoldHdrMarkTicks;
   if (!matchSpace(results->rawbuf[offset], kTranscoldHdrSpace)) return false;
-  // Calculate how long the common tick time is based on the header space.
-  uint32_t s_tick = results->rawbuf[offset++] * kRawTick /
-      kTranscoldHdrSpaceTicks;
 
   // Data
   // Twice as many bits as there are normal plus inverted bits.
   for (uint16_t i = 0; i < nbits * 2; i++, offset++) {
     bool flip = (i / 8) % 2;
-    if (!matchMark(results->rawbuf[offset++], kTranscoldBitMarkTicks * m_tick))
+    if (!matchMark(results->rawbuf[offset++], kTranscoldBitMark))
       return false;
-    if (matchSpace(results->rawbuf[offset], kTranscoldOneSpaceTicks * s_tick)) {
+    if (matchSpace(results->rawbuf[offset], kTranscoldOneSpace)) {
       if (flip)
         inverted = (inverted << 1) | 1;
       else
         data = (data << 1) | 1;
-    } else if (matchSpace(results->rawbuf[offset],
-                          kTranscoldZeroSpaceTicks * s_tick)) {
+    } else if (matchSpace(results->rawbuf[offset], kTranscoldZeroSpace)) {
       if (flip)
         inverted <<= 1;
       else
@@ -725,10 +710,10 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], kTranscoldBitMarkTicks * m_tick))
+  if (!matchMark(results->rawbuf[offset++], kTranscoldBitMark))
     return false;
   if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kTranscoldMinGapTicks * s_tick))
+      !matchAtLeast(results->rawbuf[offset], kTranscoldMinGap))
     return false;
 
   // Compliance
@@ -739,7 +724,7 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
   }
 
   // Success
-  results->decode_type = TRANSCOLD;
+  results->decode_type = decode_type_t::TRANSCOLD;
   results->bits = nbits;
   results->value = orig;
   results->address = 0;
