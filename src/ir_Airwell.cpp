@@ -235,11 +235,21 @@ uint8_t IRAirwellAc::getTemp(void) const {
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
+/// @param[in] prev Ptr to the previous state if required.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRAirwellAc::toCommon(void) const {
+stdAc::state_t IRAirwellAc::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
+  // Start with the previous state if given it.
+  if (prev != NULL) {
+    result = *prev;
+  } else {
+    // Set defaults for non-zero values that are not implicitly set for when
+    // there is no previous state.
+    // e.g. Any setting that toggles should probably go here.
+    result.power = false;
+  }
   result.protocol = decode_type_t::AIRWELL;
-  result.power = _.PowerToggle;
+  if (_.PowerToggle) result.power = !result.power;
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();

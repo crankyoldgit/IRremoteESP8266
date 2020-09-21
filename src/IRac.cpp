@@ -3297,7 +3297,7 @@ namespace IRAcUtils {
       case decode_type_t::AIRWELL: {
         IRAirwellAc ac(kGpioUnused);
         ac.setRaw(decode->value);  // Uses value instead of state.
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_AIRWELL
@@ -3664,7 +3664,7 @@ namespace IRAcUtils {
       case decode_type_t::WHIRLPOOL_AC: {
         IRWhirlpoolAc ac(kGpioUnused);
         ac.setRaw(decode->state);
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_WHIRLPOOL_AC
