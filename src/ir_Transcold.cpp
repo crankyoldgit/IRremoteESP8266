@@ -72,31 +72,27 @@ void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-IRTranscoldAC::IRTranscoldAC(const uint16_t pin, const bool inverted,
+IRTranscoldAc::IRTranscoldAc(const uint16_t pin, const bool inverted,
                              const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the internal state to a fixed known good state.
-void IRTranscoldAC::stateReset() {
-  setRaw(kTranscoldDefaultState);
-  clearSensorTemp();
+void IRTranscoldAc::stateReset() {
+  setRaw(kTranscoldKnownGoodState);
+  saved_state = kTranscoldKnownGoodState;
   powerFlag = false;
-  turboFlag = false;
-  ledFlag = false;
-  cleanFlag = false;
-  sleepFlag = false;
   swingFlag = false;
   swingHFlag = false;
   swingVFlag = false;
 }
 
 /// Set up hardware to be able to send a message.
-void IRTranscoldAC::begin() { _irsend.begin(); }
+void IRTranscoldAc::begin() { _irsend.begin(); }
 
 #if SEND_TRANSCOLD
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
-void IRTranscoldAC::send(uint16_t repeat) {
+void IRTranscoldAc::send(uint16_t repeat) {
   _irsend.sendTranscold(remote_state, kTranscoldBits, repeat);
   // make sure to remove special state from remote_state
   // after command has being transmitted.
@@ -106,11 +102,11 @@ void IRTranscoldAC::send(uint16_t repeat) {
 
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
-uint32_t IRTranscoldAC::getRaw() { return remote_state; }
+uint32_t IRTranscoldAc::getRaw() { return remote_state; }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
-void IRTranscoldAC::setRaw(const uint32_t new_code) {
+void IRTranscoldAc::setRaw(const uint32_t new_code) {
   powerFlag = true;  // Everything that is not the special power off mesg is On.
   if (!handleSpecialState(new_code)) {
     // it isn`t special so might affect Temp|mode|Fan
@@ -126,14 +122,10 @@ void IRTranscoldAC::setRaw(const uint32_t new_code) {
 
 /// Is the current state is a special state?
 /// @return true, if it is. false if it isn't.
-bool IRTranscoldAC::isSpecialState(void) {
+bool IRTranscoldAc::isSpecialState(void) {
   switch (remote_state) {
-    case kTranscoldClean:
-    case kTranscoldLed:
     case kTranscoldOff:
-    case kTranscoldSwing:
-    case kTranscoldSleep:
-    case kTranscoldTurbo: return true;
+    case kTranscoldSwing: return true;
     default: return false;
   }
 }
@@ -144,25 +136,13 @@ bool IRTranscoldAC::isSpecialState(void) {
 /// @note Special state means commands that are not affecting
 /// Temperature/Mode/Fan
 /// @return true, if it is a special state. false if it isn't.
-bool IRTranscoldAC::handleSpecialState(const uint32_t data) {
+bool IRTranscoldAc::handleSpecialState(const uint32_t data) {
   switch (data) {
-    case kTranscoldClean:
-      cleanFlag = !cleanFlag;
-      break;
-    case kTranscoldLed:
-      ledFlag = !ledFlag;
-      break;
     case kTranscoldOff:
       powerFlag = false;
       break;
     case kTranscoldSwing:
       swingFlag = !swingFlag;
-      break;
-    case kTranscoldSleep:
-      sleepFlag = !sleepFlag;
-      break;
-    case kTranscoldTurbo:
-      turboFlag = !turboFlag;
       break;
     default:
       return false;
@@ -173,13 +153,13 @@ bool IRTranscoldAC::handleSpecialState(const uint32_t data) {
 /// Backup the current internal state as long as it isn't a special state.
 /// @note: Must be called before every special state to make sure the
 /// remote_state is safe
-void IRTranscoldAC::updateSavedState(void) {
+void IRTranscoldAc::updateSavedState(void) {
   if (!isSpecialState()) saved_state = remote_state;
 }
 
 /// Restore the current internal state from backup as long as it isn't a
 ///   special state.
-void IRTranscoldAC::recoverSavedState(void) {
+void IRTranscoldAc::recoverSavedState(void) {
   // If the current state is a special one, last known normal one.
   if (isSpecialState()) remote_state = saved_state;
   // If the saved_state was also a special state, reset as we expect a normal
@@ -190,19 +170,19 @@ void IRTranscoldAC::recoverSavedState(void) {
 /// Set the raw (native) temperature value.
 /// @note Bypasses any checks.
 /// @param[in] code The desired native temperature.
-void IRTranscoldAC::setTempRaw(const uint8_t code) {
+void IRTranscoldAc::setTempRaw(const uint8_t code) {
   setBits(&remote_state, kTranscoldTempOffset, kTranscoldTempSize, code);
 }
 
 /// Get the raw (native) temperature value.
 /// @return The native temperature value.
-uint8_t IRTranscoldAC::getTempRaw() {
+uint8_t IRTranscoldAc::getTempRaw() {
   return GETBITS32(remote_state, kTranscoldTempOffset, kTranscoldTempSize);
 }
 
 /// Set the temperature.
 /// @param[in] desired The temperature in degrees celsius.
-void IRTranscoldAC::setTemp(const uint8_t desired) {
+void IRTranscoldAc::setTemp(const uint8_t desired) {
   // Range check.
   uint8_t temp = std::min(desired, kTranscoldTempMax);
   temp = std::max(temp, kTranscoldTempMin);
@@ -211,48 +191,23 @@ void IRTranscoldAC::setTemp(const uint8_t desired) {
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRTranscoldAC::getTemp() {
+uint8_t IRTranscoldAc::getTemp() {
   const uint8_t code = getTempRaw();
   for (uint8_t i = 0; i < kTranscoldTempRange; i++)
     if (kTranscoldTempMap[i] == code) return kTranscoldTempMin + i;
   return kTranscoldTempMax;  // Not a temp we expected.
 }
 
-/// Set the raw (native) sensor temperature value.
-/// @note Bypasses any checks or additional actions.
-/// @param[in] code The desired native sensor temperature.
-void IRTranscoldAC::setSensorTempRaw(const uint8_t code) {
-  setBits(&remote_state, kTranscoldSensorTempOffset, kTranscoldSensorTempSize,
-          code);
-}
-
-/// Set the sensor temperature.
-/// @param[in] desired The temperature in degrees celsius.
-void IRTranscoldAC::setSensorTemp(const uint8_t desired) {
-  uint8_t temp = desired;
-  temp = std::min(temp, kTranscoldSensorTempMax);
-  temp = std::max(temp, kTranscoldSensorTempMin);
-  setSensorTempRaw(temp - kTranscoldSensorTempMin);
-  setZoneFollow(true);  // Setting a Sensor temp means you want to Zone Follow.
-}
-
-/// Get the sensor temperature setting.
-/// @return The current setting for sensor temp. in degrees celsius.
-uint8_t IRTranscoldAC::getSensorTemp() {
-  return GETBITS32(remote_state, kTranscoldSensorTempOffset,
-                   kTranscoldSensorTempSize) + kTranscoldSensorTempMin;
-}
-
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRTranscoldAC::getPower() {
+bool IRTranscoldAc::getPower() {
   // There is only an off state. Everything else is "on".
   return powerFlag;
 }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRTranscoldAC::setPower(const bool on) {
+void IRTranscoldAc::setPower(const bool on) {
   if (!on) {
     updateSavedState();
     remote_state = kTranscoldOff;
@@ -265,92 +220,26 @@ void IRTranscoldAC::setPower(const bool on) {
 }
 
 /// Change the power setting to On.
-void IRTranscoldAC::on(void) { this->setPower(true); }
+void IRTranscoldAc::on(void) { setPower(true); }
 
 /// Change the power setting to Off.
-void IRTranscoldAC::off(void) { this->setPower(false); }
+void IRTranscoldAc::off(void) { setPower(false); }
 
 /// Get the Swing setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRTranscoldAC::getSwing() { return swingFlag; }
+bool IRTranscoldAc::getSwing() { return swingFlag; }
 
 /// Toggle the Swing mode of the A/C.
-void IRTranscoldAC::setSwing() {
+void IRTranscoldAc::setSwing() {
   // Assumes that repeated sending "swing" toggles the action on the device.
   updateSavedState();
   remote_state = kTranscoldSwing;
   swingFlag = !swingFlag;
 }
 
-/// Get the Sleep setting of the A/C.
-/// @return true, the setting is on. false, the setting is off.
-bool IRTranscoldAC::getSleep() { return sleepFlag; }
-
-/// Toggle the Sleep mode of the A/C.
-void IRTranscoldAC::setSleep() {
-  updateSavedState();
-  remote_state = kTranscoldSleep;
-  sleepFlag = !sleepFlag;
-}
-
-/// Get the Turbo setting of the A/C.
-/// @return true, the setting is on. false, the setting is off.
-bool IRTranscoldAC::getTurbo() { return turboFlag; }
-
-/// Toggle the Turbo mode of the A/C.
-void IRTranscoldAC::setTurbo() {
-  // Assumes that repeated sending "turbo" toggles the action on the device.
-  updateSavedState();
-  remote_state = kTranscoldTurbo;
-  turboFlag = !turboFlag;
-}
-
-/// Get the Led (light) setting of the A/C.
-/// @return true, the setting is on. false, the setting is off.
-bool IRTranscoldAC::getLed() { return ledFlag; }
-
-/// Toggle the Led (light) mode of the A/C.
-void IRTranscoldAC::setLed() {
-  // Assumes that repeated sending "Led" toggles the action on the device.
-  updateSavedState();
-  remote_state = kTranscoldLed;
-  ledFlag = !ledFlag;
-}
-
-/// Get the Clean setting of the A/C.
-/// @return true, the setting is on. false, the setting is off.
-bool IRTranscoldAC::getClean() { return cleanFlag; }
-
-/// Toggle the Clean mode of the A/C.
-void IRTranscoldAC::setClean() {
-  updateSavedState();
-  remote_state = kTranscoldClean;
-  cleanFlag = !cleanFlag;
-}
-
-/// Get the Zone Follow setting of the A/C.
-/// @return true, the setting is on. false, the setting is off.
-bool IRTranscoldAC::getZoneFollow() {
-  return zoneFollowFlag;
-}
-
-/// Change the Zone Follow setting.
-/// @note Internal use only.
-/// @param[in] on true, the setting is on. false, the setting is off.
-void IRTranscoldAC::setZoneFollow(bool on) {
-  zoneFollowFlag = on;
-  setBit(&remote_state, kTranscoldZoneFollowMaskOffset, on);
-}
-
-/// Clear the Sensor Temperature setting..
-void IRTranscoldAC::clearSensorTemp() {
-  setZoneFollow(false);
-  setSensorTempRaw(kTranscoldSensorTempIgnoreCode);
-}
-
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired operating mode.
-void IRTranscoldAC::setMode(const uint8_t mode) {
+void IRTranscoldAc::setMode(const uint8_t mode) {
   uint32_t actualmode = mode;
   switch (actualmode) {
     case kTranscoldAuto:
@@ -378,7 +267,7 @@ void IRTranscoldAC::setMode(const uint8_t mode) {
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRTranscoldAC::getMode() {
+uint8_t IRTranscoldAc::getMode() {
   uint8_t mode = GETBITS32(remote_state, kTranscoldModeOffset,
                            kTranscoldModeSize);
   if (mode == kTranscoldDry)
@@ -388,19 +277,19 @@ uint8_t IRTranscoldAC::getMode() {
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRTranscoldAC::getFan() {
+uint8_t IRTranscoldAc::getFan() {
   return GETBITS32(remote_state, kTranscoldFanOffset, kTranscoldFanSize);
 }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
 /// @param[in] modecheck Do we enforce any mode limitations before setting?
-void IRTranscoldAC::setFan(const uint8_t speed, const bool modecheck) {
+void IRTranscoldAc::setFan(const uint8_t speed, const bool modecheck) {
   uint8_t newspeed = speed;
   switch (speed) {
     case kTranscoldFanAuto:  // Dry & Auto mode can't have this speed.
       if (modecheck) {
-        switch (this->getMode()) {
+        switch (getMode()) {
           case kTranscoldAuto:
           case kTranscoldDry:
             newspeed = kTranscoldFanAuto0;
@@ -410,7 +299,7 @@ void IRTranscoldAC::setFan(const uint8_t speed, const bool modecheck) {
       break;
     case kTranscoldFanAuto0:  // Only Dry & Auto mode can have this speed.
       if (modecheck) {
-        switch (this->getMode()) {
+        switch (getMode()) {
           case kTranscoldAuto:
           case kTranscoldDry: break;
           default: newspeed = kTranscoldFanAuto;
@@ -433,7 +322,7 @@ void IRTranscoldAC::setFan(const uint8_t speed, const bool modecheck) {
 /// Convert a standard A/C mode into its native mode.
 /// @param[in] mode A stdAc::opmode_t to be converted to it's native equivalent.
 /// @return The corresponding native mode.
-uint8_t IRTranscoldAC::convertMode(const stdAc::opmode_t mode) {
+uint8_t IRTranscoldAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kTranscoldCool;
     case stdAc::opmode_t::kHeat: return kTranscoldHeat;
@@ -446,7 +335,7 @@ uint8_t IRTranscoldAC::convertMode(const stdAc::opmode_t mode) {
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
 /// @return The native equivilant of the enum.
-uint8_t IRTranscoldAC::convertFan(const stdAc::fanspeed_t speed) {
+uint8_t IRTranscoldAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
     case stdAc::fanspeed_t::kLow: return kTranscoldFanMin;
@@ -460,7 +349,7 @@ uint8_t IRTranscoldAC::convertFan(const stdAc::fanspeed_t speed) {
 /// Convert a native mode to it's common stdAc::opmode_t equivalent.
 /// @param[in] mode A native operation mode to be converted.
 /// @return The corresponding common stdAc::opmode_t mode.
-stdAc::opmode_t IRTranscoldAC::toCommonMode(const uint8_t mode) {
+stdAc::opmode_t IRTranscoldAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kTranscoldCool: return stdAc::opmode_t::kCool;
     case kTranscoldHeat: return stdAc::opmode_t::kHeat;
@@ -473,7 +362,7 @@ stdAc::opmode_t IRTranscoldAC::toCommonMode(const uint8_t mode) {
 /// Convert a native fan speed into its stdAc equivilant.
 /// @param[in] speed The native setting to be converted.
 /// @return The stdAc equivilant of the native setting.
-stdAc::fanspeed_t IRTranscoldAC::toCommonFanSpeed(const uint8_t speed) {
+stdAc::fanspeed_t IRTranscoldAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kTranscoldFanMax: return stdAc::fanspeed_t::kMax;
     case kTranscoldFanMed: return stdAc::fanspeed_t::kMedium;
@@ -485,7 +374,7 @@ stdAc::fanspeed_t IRTranscoldAC::toCommonFanSpeed(const uint8_t speed) {
 /// Convert the A/C state to it's common stdAc::state_t equivalent.
 /// @param[in] prev Ptr to the previous state if required.
 /// @return A stdAc::state_t state.
-stdAc::state_t IRTranscoldAC::toCommon(const stdAc::state_t *prev) {
+stdAc::state_t IRTranscoldAc::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
   // Start with the previous state if given it.
   if (prev != NULL) {
@@ -495,56 +384,44 @@ stdAc::state_t IRTranscoldAC::toCommon(const stdAc::state_t *prev) {
     // there is no previous state.
     // e.g. Any setting that toggles should probably go here.
     result.swingv = stdAc::swingv_t::kOff;
-    result.turbo = false;
-    result.clean = false;
-    result.light = false;
-    result.sleep = -1;
   }
   // Not supported.
   result.model = -1;  // No models used.
   result.swingh = stdAc::swingh_t::kOff;
+  result.turbo = false;
+  result.clean = false;
+  result.light = false;
   result.quiet = false;
   result.econo = false;
   result.filter = false;
   result.beep = false;
   result.clock = -1;
+  result.sleep = -1;
 
   // Supported.
   result.protocol = decode_type_t::TRANSCOLD;
   result.celsius = true;
-  result.power = this->getPower();
+  result.power = getPower();
   // Power off state no other state info. Use the previous state if we have it.
   if (!result.power) return result;
   // Handle the special single command (Swing/Turbo/Light/Clean/Sleep) toggle
   // messages. These have no other state info so use the rest of the previous
   // state if we have it for them.
-  if (this->getSwing()) {
+  if (getSwing()) {
     result.swingv = result.swingv != stdAc::swingv_t::kOff ?
         stdAc::swingv_t::kOff : stdAc::swingv_t::kAuto;  // Invert swing.
     return result;
-  } else if (this->getTurbo()) {
-    result.turbo = !result.turbo;
-    return result;
-  } else if (this->getLed()) {
-    result.light = !result.light;
-    return result;
-  } else if (this->getClean()) {
-    result.clean = !result.clean;
-    return result;
-  } else if (this->getSleep()) {
-    result.sleep = result.sleep >= 0 ? -1 : 0;  // Invert sleep.
-    return result;
   }
   // Back to "normal" stateful messages.
-  result.mode = this->toCommonMode(this->getMode());
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.mode = toCommonMode(getMode());
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
   return result;
 }
 
 /// Convert the internal state into a human readable string.
 /// @return The current internal state expressed as a human readable String.
-String IRTranscoldAC::toString(void) {
+String IRTranscoldAc::toString(void) {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
@@ -553,34 +430,6 @@ String IRTranscoldAC::toString(void) {
   if (getSwing()) {
     result += kCommaSpaceStr;
     result += kSwingStr;
-    result += kColonSpaceStr;
-    result += kToggleStr;
-    return result;
-  }
-  if (getSleep()) {
-    result += kCommaSpaceStr;
-    result += kSleepStr;
-    result += kColonSpaceStr;
-    result += kToggleStr;
-    return result;
-  }
-  if (getTurbo()) {
-    result += kCommaSpaceStr;
-    result += kTurboStr;
-    result += kColonSpaceStr;
-    result += kToggleStr;
-    return result;
-  }
-  if (getLed()) {
-    result += kCommaSpaceStr;
-    result += kLightStr;
-    result += kColonSpaceStr;
-    result += kToggleStr;
-    return result;
-  }
-  if (getClean()) {
-    result += kCommaSpaceStr;
-    result += kCleanStr;
     result += kColonSpaceStr;
     result += kToggleStr;
     return result;
@@ -618,10 +467,6 @@ String IRTranscoldAC::toString(void) {
   result += ')';
   // Fan mode doesn't have a temperature.
   if (getMode() != kTranscoldFan) result += addTempToString(getTemp());
-  result += addBoolToString(getZoneFollow(), kZoneFollowStr);
-  result += addLabeledString(
-      (getSensorTemp() > kTranscoldSensorTempMax)
-          ? kOffStr : uint64ToString(getSensorTemp()) + 'C', kSensorTempStr);
   return result;
 }
 

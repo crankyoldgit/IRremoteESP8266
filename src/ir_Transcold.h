@@ -4,6 +4,7 @@
 /// @file
 /// @brief Support for Transcold A/C protocols.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1256
+/// @see https://docs.google.com/spreadsheets/d/1qdoyB0FyJm85HPP9oXcfui0n4ztXBFlik6kiNlkO2IM/edit?usp=sharing
 
 // Supports:
 //   Brand: Transcold,  Model: M1-F-NO-6 A/C
@@ -76,7 +77,6 @@ const uint8_t kTranscoldHeat = 0b1010;
 const uint8_t kTranscoldFan = 0b0010;
 const uint8_t kTranscoldModeOffset = 12;
 const uint8_t kTranscoldModeSize = 4;
-const uint8_t kTranscoldZoneFollowMaskOffset = 12;
 
 // Fan Control
 const uint8_t kTranscoldFanOffset = 16;
@@ -112,11 +112,6 @@ const uint8_t kTranscoldTempMap[kTranscoldTempRange] = {
     0b1100,  // 29C
     0b0100   // 30C
 };
-const uint8_t kTranscoldSensorTempMin = 16;  // Celsius
-const uint8_t kTranscoldSensorTempMax = 30;  // Celsius
-const uint8_t kTranscoldSensorTempIgnoreCode = 0b1101;
-const uint8_t kTranscoldSensorTempOffset = 8;
-const uint8_t kTranscoldSensorTempSize = 4;
 
 const uint8_t kTranscoldPrefix = 0b0000;
 const uint8_t kTranscoldUnknown = 0xFF;
@@ -124,18 +119,14 @@ const uint32_t kTranscoldOff    = 0b111011110111100101010100;
 const uint32_t kTranscoldSwing  = 0b111001110110000101010100;
 const uint32_t kTranscoldSwingH = 0b111101110110000101010100;  // NA
 const uint32_t kTranscoldSwingV = 0b111001110110000101010100;  // NA
-const uint32_t kTranscoldSleep  = 0b101100101110000000000011;  // NA
-const uint32_t kTranscoldTurbo  = 0b101101011111010110100010;  // NA
-const uint32_t kTranscoldLed    = 0b101101011111010110100101;  // NA
-const uint32_t kTranscoldClean  = 0b101101011111010110101010;  // NA
 const uint32_t kTranscoldCmdFan = 0b111011110110000101010100;  // NA
 
-const uint32_t kTranscoldDefaultState = 0b111011110111100101010100;
+const uint32_t kTranscoldKnownGoodState = 0xE96554;
 
 // Classes
-class IRTranscoldAC {
+class IRTranscoldAc {
  public:
-  explicit IRTranscoldAC(const uint16_t pin, const bool inverted = false,
+  explicit IRTranscoldAc(const uint16_t pin, const bool inverted = false,
                       const bool use_modulation = true);
   void stateReset();
 #if SEND_TRANSCOLD
@@ -153,24 +144,12 @@ class IRTranscoldAC {
   bool getPower();
   void setTemp(const uint8_t temp);
   uint8_t getTemp();
-  void setSensorTemp(const uint8_t desired);
-  uint8_t getSensorTemp();
-  void clearSensorTemp();
   void setFan(const uint8_t speed, const bool modecheck = true);
   uint8_t getFan();
   void setMode(const uint8_t mode);
   uint8_t getMode();
   void setSwing();
   bool getSwing();
-  void setSleep();
-  bool getSleep();
-  void setTurbo();
-  bool getTurbo();
-  void setLed();
-  bool getLed();
-  void setClean();
-  bool getClean();
-  bool getZoneFollow();
   uint32_t getRaw();
   void setRaw(const uint32_t new_code);
   uint8_t convertMode(const stdAc::opmode_t mode);
@@ -190,11 +169,6 @@ class IRTranscoldAC {
 #endif
   // internal state
   bool    powerFlag;
-  bool    turboFlag;
-  bool    ledFlag;
-  bool    cleanFlag;
-  bool    sleepFlag;
-  bool    zoneFollowFlag;
   bool    swingFlag;
   bool    swingHFlag;
   bool    swingVFlag;
@@ -203,8 +177,6 @@ class IRTranscoldAC {
   uint32_t saved_state;   ///< Copy of the state if we required a special mode.
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw();
-  void setSensorTempRaw(const uint8_t code);
-  void setZoneFollow(const bool on);
   bool isSpecialState(void);
   bool handleSpecialState(const uint32_t data);
   void updateSavedState(void);

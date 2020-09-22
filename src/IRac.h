@@ -431,12 +431,10 @@ void electra(IRElectraAc *ac,
                  const int16_t sleep = -1, const int16_t clock = -1);
 #endif  // SEND_WHIRLPOOL_AC
 #if SEND_TRANSCOLD
-  void transcold(IRTranscoldAC *ac,
+  void transcold(IRTranscoldAc *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,
               const stdAc::fanspeed_t fan,
-              const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-              const bool turbo, const bool light, const bool clean,
-              const int16_t sleep = -1);
+              const stdAc::swingv_t swingv, const stdAc::swingh_t swingh);
 #endif  // SEND_TRANSCOLD
 static stdAc::state_t cleanState(const stdAc::state_t state);
 static stdAc::state_t handleToggles(const stdAc::state_t desired,

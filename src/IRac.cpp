@@ -2020,24 +2020,19 @@ void IRac::whirlpool(IRWhirlpoolAc *ac, const whirlpool_ac_remote_model_t model,
 #if SEND_TRANSCOLD
 /// Send a Transcold A/C message with the supplied settings.
 /// @note May result in multiple messages being sent.
-/// @param[in, out] ac A Ptr to an IRTranscoldAC object to use.
+/// @param[in, out] ac A Ptr to an IRTranscoldAc object to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] swingh The horizontal swing setting.
-/// @param[in] turbo Run the device in turbo/powerful mode.
-/// @param[in] light Turn on the LED/Display mode.
-/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
-/// @param[in] sleep Nr. of minutes for sleep mode.
 /// @note -1 is Off, >= 0 is on.
-void IRac::transcold(IRTranscoldAC *ac,
+void IRac::transcold(IRTranscoldAc *ac,
                      const bool on, const stdAc::opmode_t mode,
                      const float degrees, const stdAc::fanspeed_t fan,
-                     const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                     const bool turbo, const bool light, const bool clean,
-                     const int16_t sleep)  {
+                     const stdAc::swingv_t swingv,
+                     const stdAc::swingh_t swingh)  {
   ac->begin();
   ac->setPower(on);
   if (!on) {
@@ -2059,26 +2054,7 @@ void IRac::transcold(IRTranscoldAC *ac,
     ac->setSwing();
     ac->send();
   }
-  if (turbo) {
-    // Turbo has a special command that needs to be sent independently.
-    ac->setTurbo();
-    ac->send();
-  }
-  if (sleep > 0) {
-    // Sleep has a special command that needs to be sent independently.
-    ac->setSleep();
-    ac->send();
-  }
-  if (light) {
-    // Light has a special command that needs to be sent independently.
-    ac->setLed();
-    ac->send();
-  }
-  if (clean) {
-    // Clean has a special command that needs to be sent independently.
-    ac->setClean();
-    ac->send();
-  }
+
   ac->send();
 }
 #endif  // SEND_TRANSCOLD
@@ -2643,9 +2619,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
 #if SEND_TRANSCOLD
     case TRANSCOLD:
     {
-      IRTranscoldAC ac(_pin, _inverted, _modulation);
+      IRTranscoldAc ac(_pin, _inverted, _modulation);
       transcold(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-                send.swingh, send.turbo, send.light, send.clean, send.sleep);
+                send.swingh);
       break;
     }
 #endif  // SEND_TRANSCOLD_AC
@@ -3354,7 +3330,7 @@ namespace IRAcUtils {
 #endif  // DECODE_LG
 #if DECODE_TRANSCOLD
       case decode_type_t::TRANSCOLD: {
-        IRTranscoldAC ac(kGpioUnused);
+        IRTranscoldAc ac(kGpioUnused);
         ac.on();
         ac.setRaw(result->value);  // TRANSCOLD uses value instead of state.
         return ac.toString();
@@ -3758,7 +3734,7 @@ namespace IRAcUtils {
 #endif  // DECODE_WHIRLPOOL_AC
 #if DECODE_TRANSCOLD
       case decode_type_t::TRANSCOLD: {
-        IRTranscoldAC ac(kGpioUnused);
+        IRTranscoldAc ac(kGpioUnused);
         ac.setRaw(decode->value);  // TRANSCOLD Uses value instead of state.
         *result = ac.toCommon(prev);
         break;
