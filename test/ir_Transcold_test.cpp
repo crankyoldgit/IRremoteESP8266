@@ -195,7 +195,7 @@ TEST(TestTranscoldAcClass, HumanReadable) {
 
 TEST(TestTranscoldAcClass, BuildKnownState) {
   IRTranscoldAc ac(kGpioUnused);
-  // temp down	19	Auto	cool	close (right)
+  // "temp down, 19, Auto, cool, close (right)"
   // Data from:
   //   https://docs.google.com/spreadsheets/d/1qdoyB0FyJm85HPP9oXcfui0n4ztXBFlik6kiNlkO2IM/edit#gid=694351627&range=A25:F25
   const uint32_t state = 0xEF6B54;
