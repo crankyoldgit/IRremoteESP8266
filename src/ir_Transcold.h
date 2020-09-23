@@ -90,14 +90,13 @@ const uint8_t kTranscoldFanZoneFollow = 0b0000;
 const uint8_t kTranscoldFanFixed = 0b1100;
 
 // Temperature
-const uint8_t kTranscoldTempMin = 17;  // Celsius
+const uint8_t kTranscoldTempMin = 18;  // Celsius
 const uint8_t kTranscoldTempMax = 30;  // Celsius
 const uint8_t kTranscoldTempRange = kTranscoldTempMax - kTranscoldTempMin + 1;
 const uint8_t kTranscoldFanTempCode = 0b1111;  // Part of Fan Mode.
 const uint8_t kTranscoldTempOffset = 8;
 const uint8_t kTranscoldTempSize = 4;
 const uint8_t kTranscoldTempMap[kTranscoldTempRange] = {
-    0b0111,  // 17C transcold starts with 18
     0b0111,  // 18c
     0b1011,  // 19C
     0b0011,  // 20C
