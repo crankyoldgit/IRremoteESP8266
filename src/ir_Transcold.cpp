@@ -66,7 +66,7 @@ void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
     space(kDefaultMessageGap);
   }
 }
-#endif
+#endif  // SEND_TRANSCOLD
 
 /// Class constructor.
 /// @param[in] pin GPIO to be used when sending.
@@ -539,4 +539,4 @@ bool IRrecv::decodeTranscold(decode_results *results, uint16_t offset,
   results->command = 0;
   return true;
 }
-#endif
+#endif  // DECODE_TRANSCOLD
