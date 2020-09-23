@@ -185,17 +185,16 @@ uint8_t IRTranscoldAc::getTempRaw() {
 void IRTranscoldAc::setTemp(const uint8_t desired) {
   // Range check.
   uint8_t temp = std::min(desired, kTranscoldTempMax);
-  temp = std::max(temp, kTranscoldTempMin);
-  setTempRaw(kTranscoldTempMap[temp - kTranscoldTempMin]);
+  temp = std::max(temp, kTranscoldTempMin) - kTranscoldTempMin + 1;
+  setTempRaw(reverseBits(invertBits(temp, kTranscoldTempSize),
+                         kTranscoldTempSize));
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
 uint8_t IRTranscoldAc::getTemp() {
-  const uint8_t code = getTempRaw();
-  for (uint8_t i = 0; i < kTranscoldTempRange; i++)
-    if (kTranscoldTempMap[i] == code) return kTranscoldTempMin + i;
-  return kTranscoldTempMax;  // Not a temp we expected.
+  return reverseBits(invertBits(getTempRaw(), kTranscoldTempSize),
+                     kTranscoldTempSize) + kTranscoldTempMin - 1;
 }
 
 /// Get the value of the current power setting.

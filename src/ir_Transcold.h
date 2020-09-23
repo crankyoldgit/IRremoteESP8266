@@ -92,25 +92,9 @@ const uint8_t kTranscoldFanFixed = 0b1100;
 // Temperature
 const uint8_t kTranscoldTempMin = 18;  // Celsius
 const uint8_t kTranscoldTempMax = 30;  // Celsius
-const uint8_t kTranscoldTempRange = kTranscoldTempMax - kTranscoldTempMin + 1;
 const uint8_t kTranscoldFanTempCode = 0b1111;  // Part of Fan Mode.
 const uint8_t kTranscoldTempOffset = 8;
 const uint8_t kTranscoldTempSize = 4;
-const uint8_t kTranscoldTempMap[kTranscoldTempRange] = {
-    0b0111,  // 18c
-    0b1011,  // 19C
-    0b0011,  // 20C
-    0b1101,  // 21C
-    0b0101,  // 22C
-    0b1001,  // 23C
-    0b0001,  // 24C
-    0b1110,  // 25C
-    0b0110,  // 26C
-    0b1010,  // 27C
-    0b0010,  // 28C
-    0b1100,  // 29C
-    0b0100   // 30C
-};
 
 const uint8_t kTranscoldPrefix = 0b0000;
 const uint8_t kTranscoldUnknown = 0xFF;
