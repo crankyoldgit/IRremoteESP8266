@@ -23,6 +23,11 @@ e.g.
 #### Output of raw data from IRrecvDumpV2.ino (if applicable)
 _Include some raw dumps of what the device saw._
 
+### What brand/model IR demodulator are you using?
+_Brand/Model code_ or _None_
+
+_If VS1838b: That is likely your problem. Please buy a better one & try again. Reporting a capture or decode issue when you use one of these is effectively wasting our & your time. See the [FAQ](https://github.com/crankyoldgit/IRremoteESP8266/wiki/Frequently-Asked-Questions#Help_Im_getting_very_inconsistent_results_when_capturing_an_IR_message_using_a_VS1838b_IR_demodulator)_
+
 ### Steps to reproduce the behavior
 _What can we do to (pref. reliably) repeat what is happening?_
 
