@@ -1586,3 +1586,55 @@ TEST(TestIRSamsungAcClass, SetAndGetBreeze) {
       "Light: On, Ion: Off",
       ac.toString());
 }
+
+TEST(TestDecodeSamsungAC, Issue1227VeryPoorSignal) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  irsend.reset();
+  // Data from row 5 of:
+  // https://cryptpad.fr/sheet/#/2/sheet/view/e1PSfhwjfTGCAPbse4h28RjvvG+YCiLgH3SxhxTNFQQ/
+  uint16_t rawData[233] = {
+      600, 17900,
+      2962, 8986,
+      472, 536, 454, 1542, 440, 532, 462, 530, 484, 508, 490, 500, 496, 496,
+      496, 494, 500, 500, 490, 1512, 470, 506, 492, 502, 488, 1490, 498, 522,
+      468, 526, 468, 1516, 466, 1544, 438, 1546, 446, 1526, 484, 1516, 470, 512,
+      480, 520, 474, 510, 478, 522, 468, 526, 466, 532, 460, 528, 466, 528, 464,
+      536, 460, 552, 436, 560, 430, 562, 432, 564, 430, 558, 438, 556, 450, 544,
+      458, 536, 462, 536, 454, 530, 462, 530, 462, 536, 458, 534, 460, 532, 458,
+      534, 462, 546, 446, 556, 434, 548, 444, 566, 428, 564, 430, 560, 428, 566,
+      432, 562, 432, 1568, 436, 1554, 430, 1562, 426, 1554,
+      434, 3060,
+      2902, 9020,
+      432, 1550, 434, 548, 444, 562, 434, 564, 422, 568, 430, 566, 420, 572,
+      426, 574, 422, 560, 434, 1574, 432, 542, 448, 548, 444, 1556, 436, 1552,
+      426, 1544, 440, 1558, 428, 564, 434, 1560, 428, 1578, 408, 1582, 408,
+      1582, 412, 1570, 430, 1546, 444, 1548, 442, 1548, 436, 542, 448, 540, 440,
+      556, 448, 554, 434, 1566, 426, 1588, 402, 570, 422, 568, 426, 582, 414,
+      568, 426, 570, 424, 1576, 426, 548, 442, 562, 426, 568, 430, 1564, 424,
+      566, 416, 558, 438, 578, 410, 578, 428, 566, 416, 576, 410, 1604, 394,
+      592, 392, 604, 402, 578, 416, 590, 404, 1586, 404, 1584, 408, 1578, 412,
+      1572, 412};  // UNKNOWN 1C646112
+
+  uint8_t expectedState[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xF2, 0xFE, 0x61, 0x10, 0x81, 0xF0};
+
+  irsend.sendRaw(rawData, 233, 38000);
+  irsend.makeDecodeResult();
+  // Data is so bad we need to tweak the tolerance massively to get a match.
+  irrecv.setTolerance(40);
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Mode: 0 (Auto), Temp: 17C, Fan: 0 (Auto), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Light: Off, Ion: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
