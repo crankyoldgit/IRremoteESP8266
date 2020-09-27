@@ -22,79 +22,49 @@
 #include "IRsend_test.h"
 #endif
 
-/* State bit map:
-
-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+------+
-|     FIXED HEADER      | TEMPERATURE  | FAN |F or C|
-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+------+
-  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14   15
-
-+--+--+--+--+-----+-----+
-|ON|  MODE  |Boost|Sleep|
-+--+--+--+--+-----+-----+
-16 17 18 19    20    21
-
-+--+--+------------+--+--+--+--+--+--+--+--+--+--+--+--+--+
-| 0| 0|Timer Enable| ON TIME HOUR | 0  0|   ON TIME MIN   |
-+--+--+------------+--+--+--+--+--+--+--+--+--+--+--+--+--+
- 22 23           24 25 26 27 28 29 30 31 32 33 34 35 36 37
-
-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-| 0  0|                   OFF TIMER                   |       CHECKSUM        |
-+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
-
-*/
+union DelonghiProtocol{
+  uint64_t raw;  ///< The state of the IR remote.
+  struct {
+    uint8_t           :8;  // Header
+    uint8_t Temp      :5;
+    uint8_t Fan       :2;
+    uint8_t Fahrenheit:1;
+    uint8_t Power     :1;
+    uint8_t Mode      :3;
+    uint8_t Boost     :1;
+    uint8_t Sleep     :1;
+    uint8_t           :2;
+    uint8_t OnTimer   :1;
+    uint8_t OnHours   :5;
+    uint8_t           :2;
+    uint8_t OnMins    :6;
+    uint8_t           :2;
+    uint8_t OffTimer  :1;
+    uint8_t OffHours  :5;
+    uint8_t           :2;
+    uint8_t OffMins   :6;
+    uint8_t           :2;
+    uint8_t Sum       :8;
+  };
+};
 
 // Constants
-const uint8_t kDelonghiAcTempOffset = 8;
-const uint8_t kDelonghiAcTempSize = 5;
 const uint8_t kDelonghiAcTempMinC = 18;  // Deg C
 const uint8_t kDelonghiAcTempMaxC = 32;  // Deg C
 const uint8_t kDelonghiAcTempMinF = 64;  // Deg F
 const uint8_t kDelonghiAcTempMaxF = 90;  // Deg F
 const uint8_t kDelonghiAcTempAutoDryMode = 0;
 const uint8_t kDelonghiAcTempFanMode = 0b00110;
-const uint8_t kDelonghiAcFanOffset = kDelonghiAcTempOffset +
-    kDelonghiAcTempSize;  // 13
-const uint8_t kDelonghiAcFanSize = 2;
 const uint8_t kDelonghiAcFanAuto =   0b00;
 const uint8_t kDelonghiAcFanHigh =   0b01;
 const uint8_t kDelonghiAcFanMedium = 0b10;
 const uint8_t kDelonghiAcFanLow =    0b11;
-const uint8_t kDelonghiAcTempUnitBit = kDelonghiAcFanOffset +
-    kDelonghiAcFanSize;  // 15 (1 = Celsius, 0 = Fahrenheit)
-const uint8_t kDelonghiAcPowerBit = kDelonghiAcTempUnitBit + 1;  // 16
-const uint8_t kDelonghiAcModeOffset = kDelonghiAcPowerBit + 1;  // 17
-const uint8_t kDelonghiAcModeSize = 3;
 const uint8_t kDelonghiAcCool =   0b000;
 const uint8_t kDelonghiAcDry =    0b001;
 const uint8_t kDelonghiAcFan =    0b010;
 const uint8_t kDelonghiAcAuto =   0b100;
-const uint8_t kDelonghiAcBoostBit = kDelonghiAcModeOffset +
-    kDelonghiAcModeSize;  // 20 (Aka Turbo)
-const uint8_t kDelonghiAcSleepBit = kDelonghiAcBoostBit + 1;  // 21
-// Two zero bits
-const uint8_t kDelonghiAcOnTimerEnableBit = kDelonghiAcSleepBit + 3;  // 24
-const uint8_t kDelonghiAcHoursSize = 5;  // Max 23 hrs
-const uint8_t kDelonghiAcMinsSize = 6;  // Max 59 mins
 const uint16_t kDelonghiAcTimerMax = 23 * 60 + 59;
-const uint8_t kDelonghiAcOnTimerHoursOffset = kDelonghiAcOnTimerEnableBit +
-    1;  // 25
-const uint8_t kDelonghiAcOnTimerMinsOffset = kDelonghiAcOnTimerHoursOffset +
-    kDelonghiAcHoursSize + 2;  // 32  (inc another two zero bits)
-// Two zero bits
-const uint8_t kDelonghiAcOffTimerEnableBit = kDelonghiAcOnTimerMinsOffset +
-    kDelonghiAcMinsSize + 2;  // 40
-const uint8_t kDelonghiAcOffTimerHoursOffset = kDelonghiAcOffTimerEnableBit +
-    1;  // 41
-const uint8_t kDelonghiAcOffTimerMinsOffset = kDelonghiAcOffTimerHoursOffset +
-    kDelonghiAcHoursSize + 2;  // 48  (inc another two zero bits)
-// Two zero bits
-const uint8_t kDelonghiAcChecksumOffset = kDelonghiAcOffTimerMinsOffset +
-    kDelonghiAcMinsSize + 2;  // 56
-const uint8_t kDelonghiAcChecksumSize = 8;
-
+const uint8_t kDelonghiAcChecksumOffset = 56;
 
 // Classes
 
@@ -103,7 +73,7 @@ class IRDelonghiAc {
  public:
   explicit IRDelonghiAc(const uint16_t pin, const bool inverted = false,
                         const bool use_modulation = true);
-  void stateReset();
+  void stateReset(void);
 #if SEND_DELONGHI_AC
   void send(const uint16_t repeat = kDelonghiAcDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
@@ -112,42 +82,42 @@ class IRDelonghiAc {
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_DELONGHI_AC
-  void begin();
+  void begin(void);
   static uint8_t calcChecksum(const uint64_t state);
   static bool validChecksum(const uint64_t state);
   void setPower(const bool on);
-  bool getPower();
-  void on();
-  void off();
+  bool getPower(void) const;
+  void on(void);
+  void off(void);
   void setTempUnit(const bool celsius);
-  bool getTempUnit(void);
+  bool getTempUnit(void) const;
   void setTemp(const uint8_t temp, const bool fahrenheit = false,
                const bool force = false);
-  uint8_t getTemp();
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan();
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode();
+  uint8_t getMode(void) const;
   void setBoost(const bool on);  // Aka Turbo
-  bool getBoost();  // Aka Turbo
+  bool getBoost(void) const;  // Aka Turbo
   void setSleep(const bool on);
-  bool getSleep();
+  bool getSleep(void) const;
   void setOnTimerEnabled(const bool on);
-  bool getOnTimerEnabled(void);
+  bool getOnTimerEnabled(void) const;
   void setOnTimer(const uint16_t nr_of_mins);
-  uint16_t getOnTimer(void);
+  uint16_t getOnTimer(void) const;
   void setOffTimerEnabled(const bool on);
-  bool getOffTimerEnabled(void);
+  bool getOffTimerEnabled(void) const;
   void setOffTimer(const uint16_t nr_of_mins);
-  uint16_t getOffTimer(void);
-  uint64_t getRaw();
+  uint16_t getOffTimer(void) const;
+  uint64_t getRaw(void);
   void setRaw(const uint64_t state);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString();
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -157,7 +127,7 @@ class IRDelonghiAc {
   IRsendTest _irsend;  ///< instance of the testing IR send class
   /// @endcond
 #endif
-  uint64_t remote_state;  ///< The state of the IR remote.
+  DelonghiProtocol _;
   uint8_t _saved_temp;  ///< The previously user requested temp value.
   uint8_t _saved_temp_units;  ///< The previously user requested temp units.
   void checksum(void);

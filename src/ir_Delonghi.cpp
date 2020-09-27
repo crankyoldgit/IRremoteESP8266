@@ -15,8 +15,6 @@ using irutils::addFanToString;
 using irutils::addLabeledString;
 using irutils::addTempToString;
 using irutils::minsToString;
-using irutils::setBit;
-using irutils::setBits;
 
 const uint16_t kDelonghiAcHdrMark = 8984;
 const uint16_t kDelonghiAcBitMark = 572;
@@ -94,7 +92,7 @@ bool IRrecv::decodeDelonghiAc(decode_results *results, uint16_t offset,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRDelonghiAc::IRDelonghiAc(const uint16_t pin, const bool inverted,
                            const bool use_modulation)
-      : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+      : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Set up hardware to be able to send a message.
 void IRDelonghiAc::begin(void) { _irsend.begin(); }
@@ -123,20 +121,19 @@ uint8_t IRDelonghiAc::calcChecksum(const uint64_t state) {
 /// @param[in] state The state to verify the checksum of.
 /// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRDelonghiAc::validChecksum(const uint64_t state) {
-  return (GETBITS64(state, kDelonghiAcChecksumOffset,
-                    kDelonghiAcChecksumSize) ==
-      IRDelonghiAc::calcChecksum(state));
+  DelonghiProtocol dp;
+  dp.raw = state;
+  return (dp.Sum == IRDelonghiAc::calcChecksum(state));
 }
 
 /// Calculate and set the checksum values for the internal state.
 void IRDelonghiAc::checksum(void) {
-  setBits(&remote_state, kDelonghiAcChecksumOffset, kDelonghiAcChecksumSize,
-          calcChecksum(remote_state));
+  _.Sum = calcChecksum(_.raw);
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRDelonghiAc::stateReset(void) {
-  remote_state = 0x5400000000000153;
+  _.raw = 0x5400000000000153;
   _saved_temp = 23;  // DegC  (Random reasonable default value)
   _saved_temp_units = 0;  // Celsius
 }
@@ -145,12 +142,12 @@ void IRDelonghiAc::stateReset(void) {
 /// @return A valid code for this protocol based on the current internal state.
 uint64_t IRDelonghiAc::getRaw(void) {
   checksum();  // Ensure correct bit array before returning
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] state A valid code for this protocol.
-void IRDelonghiAc::setRaw(const uint64_t state) { remote_state = state; }
+void IRDelonghiAc::setRaw(const uint64_t state) { _.raw = state; }
 
 /// Change the power setting to On.
 void IRDelonghiAc::on(void) { setPower(true); }
@@ -161,25 +158,25 @@ void IRDelonghiAc::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDelonghiAc::setPower(const bool on) {
-  setBit(&remote_state, kDelonghiAcPowerBit, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDelonghiAc::getPower(void) {
-  return GETBIT64(remote_state, kDelonghiAcPowerBit);
+bool IRDelonghiAc::getPower(void) const {
+  return _.Power;
 }
 
 /// Change the temperature scale units.
 /// @param[in] fahrenheit true, use Fahrenheit. false, use Celsius.
 void IRDelonghiAc::setTempUnit(const bool fahrenheit) {
-  setBit(&remote_state, kDelonghiAcTempUnitBit, fahrenheit);
+  _.Fahrenheit = fahrenheit;
 }
 
 /// Get the temperature scale unit of measure currently in use.
 /// @return true, is Fahrenheit. false, is Celsius.
-bool IRDelonghiAc::getTempUnit(void) {
-  return GETBIT64(remote_state, kDelonghiAcTempUnitBit);
+bool IRDelonghiAc::getTempUnit(void) const {
+  return _.Fahrenheit;
 }
 
 /// Set the temperature.
@@ -205,26 +202,25 @@ void IRDelonghiAc::setTemp(const uint8_t degrees, const bool fahrenheit,
     _saved_temp_units = fahrenheit;
     temp = temp - temp_min + 1;
   }
-  setBits(&remote_state, kDelonghiAcTempOffset, kDelonghiAcTempSize,
-          temp);
+  _.Temp = temp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in currently configured units/scale.
-uint8_t IRDelonghiAc::getTemp(void) {
-  return GETBITS64(remote_state, kDelonghiAcTempOffset, kDelonghiAcTempSize) +
-      (getTempUnit() ? kDelonghiAcTempMinF : kDelonghiAcTempMinC) - 1;
+uint8_t IRDelonghiAc::getTemp(void) const {
+  return _.Temp + (_.Fahrenheit ? kDelonghiAcTempMinF
+                                : kDelonghiAcTempMinC) - 1;
 }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired native setting.
 void IRDelonghiAc::setFan(const uint8_t speed) {
   // Mode fan speed rules.
-  switch (getMode()) {
+  switch (_.Mode) {
     case kDelonghiAcFan:
       // Fan mode can't have auto fan speed.
       if (speed == kDelonghiAcFanAuto) {
-        if (getFan() == kDelonghiAcFanAuto) setFan(kDelonghiAcFanHigh);
+        if (_.Fan == kDelonghiAcFanAuto) _.Fan = kDelonghiAcFanHigh;
         return;
       }
       break;
@@ -232,22 +228,22 @@ void IRDelonghiAc::setFan(const uint8_t speed) {
     case kDelonghiAcDry:
       // Auto & Dry modes only allows auto fan speed.
       if (speed != kDelonghiAcFanAuto) {
-        setFan(kDelonghiAcFanAuto);
+        _.Fan = kDelonghiAcFanAuto;
         return;
       }
       break;
   }
   // Bounds check enforcement
   if (speed > kDelonghiAcFanLow)
-    setFan(kDelonghiAcFanAuto);
+    _.Fan = kDelonghiAcFanAuto;
   else
-    setBits(&remote_state, kDelonghiAcFanOffset, kDelonghiAcFanSize, speed);
+    _.Fan = speed;
 }
 
 /// Get the current native fan speed setting.
 /// @return The current fan speed.
-uint8_t IRDelonghiAc::getFan(void) {
-  return GETBITS64(remote_state, kDelonghiAcFanOffset, kDelonghiAcFanSize);
+uint8_t IRDelonghiAc::getFan(void) const {
+  return _.Fan;
 }
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
@@ -282,33 +278,34 @@ stdAc::fanspeed_t IRDelonghiAc::toCommonFanSpeed(const uint8_t speed) {
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDelonghiAc::getMode(void) {
-  return GETBITS64(remote_state, kDelonghiAcModeOffset, kDelonghiAcModeSize);
+uint8_t IRDelonghiAc::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired native operating mode.
 void IRDelonghiAc::setMode(const uint8_t mode) {
+  _.Mode = mode;
   switch (mode) {
     case kDelonghiAcAuto:
     case kDelonghiAcDry:
       // Set special temp for these modes.
-      setTemp(kDelonghiAcTempAutoDryMode, getTempUnit(), true);
+      setTemp(kDelonghiAcTempAutoDryMode, _.Fahrenheit, true);
       break;
     case kDelonghiAcFan:
       // Set special temp for this mode.
-      setTemp(kDelonghiAcTempFanMode, getTempUnit(), true);
+      setTemp(kDelonghiAcTempFanMode, _.Fahrenheit, true);
       break;
     case kDelonghiAcCool:
+      // Restore previous temp settings for cool mode.
+      setTemp(_saved_temp, _saved_temp_units);
       break;
     default:
-      this->setMode(kDelonghiAcAuto);
-      return;
+      _.Mode = kDelonghiAcAuto;
+      setTemp(kDelonghiAcTempAutoDryMode, _.Fahrenheit, true);
+      break;
   }
-  setBits(&remote_state, kDelonghiAcModeOffset, kDelonghiAcModeSize, mode);
-  setFan(getFan());  // Re-force any fan speed constraints.
-  // Restore previous temp settings for cool mode.
-  if (mode == kDelonghiAcCool) setTemp(_saved_temp, _saved_temp_units);
+  setFan(_.Fan);  // Re-force any fan speed constraints.
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -342,37 +339,37 @@ stdAc::opmode_t IRDelonghiAc::toCommonMode(const uint8_t mode) {
 /// Set the Boost (Turbo) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDelonghiAc::setBoost(const bool on) {
-  setBit(&remote_state, kDelonghiAcBoostBit, on);
+  _.Boost = on;
 }
 
 /// Get the Boost (Turbo) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDelonghiAc::getBoost(void) {
-  return GETBIT64(remote_state, kDelonghiAcBoostBit);
+bool IRDelonghiAc::getBoost(void) const {
+  return _.Boost;
 }
 
 /// Set the Sleep mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDelonghiAc::setSleep(const bool on) {
-  setBit(&remote_state, kDelonghiAcSleepBit, on);
+  _.Sleep = on;
 }
 
 /// Get the Sleep mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDelonghiAc::getSleep(void) {
-  return GETBIT64(remote_state, kDelonghiAcSleepBit);
+bool IRDelonghiAc::getSleep(void) const {
+  return _.Sleep;
 }
 
 /// Set the enable status of the On Timer.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDelonghiAc::setOnTimerEnabled(const bool on) {
-  setBit(&remote_state, kDelonghiAcOnTimerEnableBit, on);
+  _.OnTimer = on;
 }
 
 /// Get the enable status of the On Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDelonghiAc::getOnTimerEnabled(void) {
-  return GETBIT64(remote_state, kDelonghiAcOnTimerEnableBit);
+bool IRDelonghiAc::getOnTimerEnabled(void) const {
+  return _.OnTimer;
 }
 
 /// Set the On timer to activate in nr of minutes.
@@ -380,33 +377,28 @@ bool IRDelonghiAc::getOnTimerEnabled(void) {
 /// @note Max 23 hrs and 59 minutes. i.e. 1439 mins.
 void IRDelonghiAc::setOnTimer(const uint16_t nr_of_mins) {
   uint16_t value = std::min(kDelonghiAcTimerMax, nr_of_mins);
-  setBits(&remote_state, kDelonghiAcOnTimerMinsOffset, kDelonghiAcMinsSize,
-          value % 60);  // Minutes.
-  setBits(&remote_state, kDelonghiAcOnTimerHoursOffset, kDelonghiAcHoursSize,
-          value / 60);  // Hours.
+  _.OnMins =  value % 60;
+  _.OnHours =  value / 60;
   // Enable or not?
   setOnTimerEnabled(value > 0);
 }
 
 /// Get the On timer time.
 /// @return Total nr of mins before the device turns on.
-uint16_t IRDelonghiAc::getOnTimer(void) {
-  return GETBITS64(remote_state, kDelonghiAcOnTimerHoursOffset,
-                   kDelonghiAcHoursSize) * 60 +
-      GETBITS64(remote_state, kDelonghiAcOnTimerMinsOffset,
-                      kDelonghiAcMinsSize);
+uint16_t IRDelonghiAc::getOnTimer(void) const {
+  return _.OnHours * 60 + _.OnMins;
 }
 
 /// Set the enable status of the Off Timer.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDelonghiAc::setOffTimerEnabled(const bool on) {
-  setBit(&remote_state, kDelonghiAcOffTimerEnableBit, on);
+  _.OffTimer = on;
 }
 
 /// Get the enable status of the Off Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDelonghiAc::getOffTimerEnabled(void) {
-  return GETBIT64(remote_state, kDelonghiAcOffTimerEnableBit);
+bool IRDelonghiAc::getOffTimerEnabled(void) const {
+  return _.OffTimer;
 }
 
 /// Set the Off timer to activate in nr of minutes.
@@ -414,35 +406,30 @@ bool IRDelonghiAc::getOffTimerEnabled(void) {
 /// @note Max 23 hrs and 59 minutes. i.e. 1439 mins.
 void IRDelonghiAc::setOffTimer(const uint16_t nr_of_mins) {
   uint16_t value = std::min(kDelonghiAcTimerMax, nr_of_mins);
-  setBits(&remote_state, kDelonghiAcOffTimerMinsOffset, kDelonghiAcMinsSize,
-          value % 60);  // Minutes.
-  setBits(&remote_state, kDelonghiAcOffTimerHoursOffset, kDelonghiAcHoursSize,
-          value / 60);  // Hours.
+  _.OffMins = value % 60;
+  _.OffHours = value / 60;
   // Enable or not?
   setOffTimerEnabled(value > 0);
 }
 
 /// Get the Off timer time.
 /// @return Total nr of mins before the device turns off.
-uint16_t IRDelonghiAc::getOffTimer(void) {
-  return GETBITS64(remote_state, kDelonghiAcOffTimerHoursOffset,
-                   kDelonghiAcHoursSize) * 60 +
-      GETBITS64(remote_state, kDelonghiAcOffTimerMinsOffset,
-                      kDelonghiAcMinsSize);
+uint16_t IRDelonghiAc::getOffTimer(void) const {
+  return _.OffHours * 60 + _.OffMins;
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRDelonghiAc::toCommon(void) {
+stdAc::state_t IRDelonghiAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DELONGHI_AC;
-  result.power = getPower();
-  // result.mode = this->toCommonMode(this->getMode());
-  result.celsius = getTempUnit();
+  result.power = _.Power;
+  // result.mode = toCommonMode(getMode());
+  result.celsius = !_.Fahrenheit;
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(this->getFan());
-  result.turbo = getBoost();
-  result.sleep = getSleep() ? 0 : -1;
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.turbo = _.Boost;
+  result.sleep = _.Sleep ? 0 : -1;
   // Not supported.
   result.model = -1;
   result.swingv = stdAc::swingv_t::kOff;
@@ -459,25 +446,25 @@ stdAc::state_t IRDelonghiAc::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRDelonghiAc::toString(void) {
+String IRDelonghiAc::toString(void) const {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kDelonghiAcAuto, kDelonghiAcCool,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kDelonghiAcAuto, kDelonghiAcCool,
                             kDelonghiAcAuto, kDelonghiAcDry, kDelonghiAcFan);
-  result += addFanToString(getFan(), kDelonghiAcFanHigh, kDelonghiAcFanLow,
+  result += addFanToString(_.Fan, kDelonghiAcFanHigh, kDelonghiAcFanLow,
                            kDelonghiAcFanAuto, kDelonghiAcFanAuto,
                            kDelonghiAcFanMedium);
-  result += addTempToString(getTemp(), !getTempUnit());
-  result += addBoolToString(getBoost(), kTurboStr);
-  result += addBoolToString(getSleep(), kSleepStr);
+  result += addTempToString(getTemp(), !_.Fahrenheit);
+  result += addBoolToString(_.Boost, kTurboStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
   uint16_t mins = getOnTimer();
-  result += addLabeledString((mins && getOnTimerEnabled()) ? minsToString(mins)
-                                                           : kOffStr,
+  result += addLabeledString((mins && _.OnTimer) ? minsToString(mins)
+                                                 : kOffStr,
                              kOnTimerStr);
   mins = getOffTimer();
-  result += addLabeledString((mins && getOffTimerEnabled()) ? minsToString(mins)
-                                                            : kOffStr,
+  result += addLabeledString((mins && _.OffTimer) ? minsToString(mins)
+                                                  : kOffStr,
                              kOffTimerStr);
   return result;
 }
