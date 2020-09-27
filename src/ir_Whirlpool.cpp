@@ -484,11 +484,13 @@ void IRWhirlpoolAc::setCommand(const uint8_t code) {
 /// @return The native equivilant of the enum.
 uint8_t IRWhirlpoolAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool: return kWhirlpoolAcCool;
+    case stdAc::opmode_t::kAuto: return kWhirlpoolAcAuto;
     case stdAc::opmode_t::kHeat: return kWhirlpoolAcHeat;
     case stdAc::opmode_t::kDry:  return kWhirlpoolAcDry;
     case stdAc::opmode_t::kFan:  return kWhirlpoolAcFan;
-    default:                     return kWhirlpoolAcAuto;
+    // Default to Cool as some Whirlpool models don't have an Auto mode.
+    // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1283
+    default:                     return kWhirlpoolAcCool;
   }
 }
 
