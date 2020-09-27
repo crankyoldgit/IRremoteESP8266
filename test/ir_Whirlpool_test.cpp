@@ -8,6 +8,25 @@
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
 
+
+TEST(TestUtils, Housekeeping) {
+  ASSERT_EQ("WHIRLPOOL_AC", typeToString(decode_type_t::WHIRLPOOL_AC));
+  ASSERT_EQ(decode_type_t::WHIRLPOOL_AC, strToDecodeType("WHIRLPOOL_AC"));
+  ASSERT_TRUE(hasACState(decode_type_t::WHIRLPOOL_AC));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::WHIRLPOOL_AC));
+  ASSERT_EQ(kWhirlpoolAcBits, IRsend::defaultBits(decode_type_t::WHIRLPOOL_AC));
+  ASSERT_EQ(kWhirlpoolAcDefaultRepeat,
+            IRsend::minRepeats(decode_type_t::WHIRLPOOL_AC));
+  ASSERT_EQ(whirlpool_ac_remote_model_t::DG11J13A,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::WHIRLPOOL_AC,
+                whirlpool_ac_remote_model_t::DG11J13A).c_str()));
+  ASSERT_EQ(whirlpool_ac_remote_model_t::DG11J191,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::WHIRLPOOL_AC,
+                whirlpool_ac_remote_model_t::DG11J191).c_str()));
+}
+
 // Tests for sendWhirlpoolAC().
 
 // Test sending typical data only.
@@ -91,7 +110,7 @@ TEST(TestDecodeWhirlpoolAC, Real26CFanAutoCoolingSwingOnClock1918) {
   EXPECT_EQ(WHIRLPOOL_AC, irsend.capture.decode_type);
   EXPECT_EQ(kWhirlpoolAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power Toggle: Off, Mode: 2 (Cool), Temp: 26C, "
@@ -146,7 +165,7 @@ TEST(TestDecodeWhirlpoolAC, RealTimerExample) {
   EXPECT_EQ(WHIRLPOOL_AC, irsend.capture.decode_type);
   EXPECT_EQ(kWhirlpoolAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power Toggle: Off, Mode: 3 (Dry), Temp: 25C, "
@@ -204,7 +223,7 @@ TEST(TestDecodeWhirlpoolAC, RealExampleDecode) {
   EXPECT_EQ(WHIRLPOOL_AC, irsend.capture.decode_type);
   EXPECT_EQ(kWhirlpoolAcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Model: 1 (DG11J13A), Power Toggle: Off, Mode: 1 (Auto), Temp: 25C, "
@@ -219,13 +238,13 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetRaw) {
   uint8_t expectedState[kWhirlpoolAcStateLength] = {
       0x83, 0x06, 0x10, 0x71, 0x00, 0x00, 0x91, 0x1F, 0x00, 0x00, 0x00,
       0x00, 0x00, 0xEF, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x02};
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setRaw(expectedState);
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kWhirlpoolAcBits);
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetTemp) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setCommand(0);  // Clear the previous command.
 
   ac.setModel(DG11J13A);
@@ -256,7 +275,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetTemp) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetMode) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setCommand(0);  // Clear the previous command.
 
   ac.setMode(kWhirlpoolAcCool);
@@ -273,7 +292,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetMode) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetFan) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setCommand(0);  // Clear the previous command.
 
   ac.setFan(kWhirlpoolAcFanAuto);
@@ -297,7 +316,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetFan) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetSwing) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setCommand(0);  // Clear the previous command.
 
   ac.setSwing(true);
@@ -310,7 +329,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetSwing) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetLight) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setCommand(0);  // Clear the previous command.
 
   ac.setLight(true);
@@ -322,7 +341,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetLight) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetClock) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setClock(0);
   EXPECT_EQ(0, ac.getClock());
   ac.setClock(1);
@@ -340,7 +359,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetClock) {
 }
 
 TEST(TestIRWhirlpoolAcClass, OnOffTimers) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setCommand(0);  // Clear the previous command.
 
   // On Timer
@@ -386,7 +405,7 @@ TEST(TestIRWhirlpoolAcClass, OnOffTimers) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetCommand) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setCommand(0);
   EXPECT_EQ(0, ac.getCommand());
   ac.setCommand(kWhirlpoolAcCommandFanSpeed);
@@ -396,7 +415,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetCommand) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetPowerToggle) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setCommand(0);
 
   ac.setPowerToggle(false);
@@ -415,7 +434,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetPowerToggle) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetModel) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setTemp(19);
   ac.setCommand(0);  // Set model shouldn't change the command setting.
 
@@ -459,7 +478,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetModel) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetSleep) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setFan(kWhirlpoolAcFanAuto);
   ac.setCommand(0);
 
@@ -482,7 +501,7 @@ TEST(TestIRWhirlpoolAcClass, SetAndGetSleep) {
 }
 
 TEST(TestIRWhirlpoolAcClass, SetAndGetSuper) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setFan(kWhirlpoolAcFanAuto);
   ac.setMode(kWhirlpoolAcDry);
   ac.setCommand(0);
@@ -540,7 +559,7 @@ TEST(TestIRWhirlpoolAcClass, MessageConstruction) {
   uint8_t expectedState[kWhirlpoolAcStateLength] = {
       0x83, 0x06, 0x00, 0x73, 0x00, 0x00, 0x87, 0xA3, 0x08, 0x85, 0x07,
       0x28, 0x00, 0xF5, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x05};
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setModel(DG11J13A);
   ac.setTemp(25);
   ac.setPowerToggle(false);
@@ -565,7 +584,7 @@ TEST(TestIRWhirlpoolAcClass, MessageConstruction) {
 }
 
 TEST(TestIRWhirlpoolAcClass, toCommon) {
-  IRWhirlpoolAc ac(0);
+  IRWhirlpoolAc ac(kGpioUnused);
   ac.setModel(whirlpool_ac_remote_model_t::DG11J13A);
   ac.setPowerToggle(true);
   ac.setMode(kWhirlpoolAcCool);
@@ -595,4 +614,12 @@ TEST(TestIRWhirlpoolAcClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_FALSE(ac.toCommon().quiet);
   ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+/// Some models of Whirlpool don't have an Auto mode, so don't use that as
+/// the default.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1283
+TEST(TestIRWhirlpoolAcClass, DefaultForconvertMode) {
+  EXPECT_NE(kWhirlpoolAcAuto,
+            IRWhirlpoolAc::convertMode(stdAc::opmode_t::kOff));
 }

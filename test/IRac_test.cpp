@@ -2143,7 +2143,7 @@ TEST(TestIRac, Issue1001) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(WHIRLPOOL_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kWhirlpoolAcBits, ac._irsend.capture.bits);
-  ASSERT_EQ("Model: 1 (DG11J13A), Power Toggle: On, Mode: 1 (Auto), Temp: 24C, "
+  ASSERT_EQ("Model: 1 (DG11J13A), Power Toggle: On, Mode: 2 (Cool), Temp: 24C, "
             "Fan: 0 (Auto), Swing: Off, Light: Off, Clock: 00:00, "
             "On Timer: Off, Off Timer: Off, Sleep: Off, Super: Off, "
             "Command: 1 (Power)",
