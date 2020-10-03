@@ -37,6 +37,7 @@
  * Vestel AC code by Erdem U. Altınyurt
  * Teco AC code by Fabien Valthier (hcoohb)
  * Mitsubishi 112 AC Code by kuchel77
+ * Yamaha extension to NEC code by DragRedSim
  *
  *  GPL license, all text above must be included in any redistribution
  ****************************************************/
@@ -719,6 +720,13 @@
 #define SEND_ELITESCREENS      _IR_ENABLE_DEFAULT_
 #endif  // SEND_ELITESCREENS
 
+#ifndef DECODE_YAMAHA
+#define DECODE_YAMAHA            _IR_ENABLE_DEFAULT_
+#endif  // DECODE_YAMAHA
+#ifndef SEND_YAMAHA
+#define SEND_YAMAHA               _IR_ENABLE_DEFAULT_
+#endif  // SEND_YAMAHA
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -867,8 +875,10 @@ enum decode_type_t {
   MIRAGE,
   ELITESCREENS,  // 95
   PANASONIC_AC32,
+  YAMAHA,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = PANASONIC_AC32,
+  kLastDecodeType = YAMAHA,
+
 };
 
 // Message lengths & required repeat values
@@ -1092,6 +1102,7 @@ const uint16_t kWhynterBits = 32;
 const uint8_t  kVestelAcBits = 56;
 const uint16_t kZepealBits = 16;
 const uint16_t kZepealMinRepeat = 4;
+const uint16_t kYamahaBits = 32;
 const uint16_t kVoltasBits = 80;
 const uint16_t kVoltasStateLength = 10;
 

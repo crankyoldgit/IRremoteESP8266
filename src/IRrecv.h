@@ -707,6 +707,10 @@ class IRrecv {
                           const uint16_t nbits = kEliteScreensBits,
                           const bool strict = true);
 #endif  // DECODE_ELITESCREENS
+#if DECODE_YAMAHA
+bool decodeYamaha(decode_results *results, uint16_t offset,
+                  const uint16_t nbits = kYamahaBits, const bool strict = true);
+#endif  // DECODE_YAMAHA
 };
 
 #endif  // IRRECV_H_

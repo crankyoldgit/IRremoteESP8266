@@ -772,6 +772,9 @@
 #ifndef D_STR_WHYNTER
 #define D_STR_WHYNTER "WHYNTER"
 #endif  // D_STR_WHYNTER
+#ifndef D_STR_YAMAHA
+#define D_STR_YAMAHA "YAMAHA"
+#endif  // D_STR_YAMAHA
 #ifndef D_STR_ZEPEAL
 #define D_STR_ZEPEAL "ZEPEAL"
 #endif  // D_STR_ZEPEAL

@@ -731,6 +731,12 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
       return true;
 #endif
   */
+#if DECODE_YAMAHA
+	// Yamaha utilises a modified NEC spec for some of its commands.
+	// These special cases can be caught before hitting the general NEC-like decoder.
+	DPRINTLN("Attempting Yamaha decode");
+	if (decodeYamaha(results, offset)) return true;
+#endif  // DECODE_YAMAHA
 #if DECODE_NEC
     // Some devices send NEC-like codes that don't follow the true NEC spec.
     // This should detect those. e.g. Apple TV remote etc.

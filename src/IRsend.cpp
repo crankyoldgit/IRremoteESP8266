@@ -643,6 +643,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case SAMSUNG:
     case SHERWOOD:
     case WHYNTER:
+	case YAMAHA:
       return 32;
     case AIRWELL:
       return 34;
@@ -1011,12 +1012,17 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     case VESTEL_AC:
       sendVestelAc(data, nbits, min_repeat);
       break;
-#endif
+#endif  // SEND_VESTEL_AC
 #if SEND_WHYNTER
     case WHYNTER:
       sendWhynter(data, nbits, min_repeat);
       break;
-#endif
+#endif  // SEND_WHYNTER
+#if SEND_YAMAHA
+	case YAMAHA:
+	  sendYamaha(data, nbits, min_repeat);
+	  break;
+#endif  // SEND_YAMAHA
 #if SEND_ZEPEAL
     case ZEPEAL:
       sendZepeal(data, nbits, min_repeat);

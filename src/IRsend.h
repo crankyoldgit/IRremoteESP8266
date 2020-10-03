@@ -682,6 +682,13 @@ class IRsend {
                         const uint16_t nbits = kEliteScreensBits,
                         const uint16_t repeat = kEliteScreensDefaultRepeat);
 #endif  // SEND_ELITESCREENS
+#if SEND_YAMAHA
+  void sendYamaha(uint64_t data, uint16_t nbits = kYamahaBits,
+               uint16_t repeat = kNoRepeat);
+  uint32_t encodeYamaha(uint16_t address, uint16_t command);
+  uint32_t encodeYamaha(uint32_t yamahaCode);
+  uint32_t encodeYamaha(uint16_t address, uint8_t command, bool altCommand, bool remoteID);
+#endif  // SEND_YAMAHA  
 
  protected:
 #ifdef UNIT_TEST
