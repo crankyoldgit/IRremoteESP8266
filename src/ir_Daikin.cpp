@@ -144,47 +144,44 @@ bool IRDaikinESP::validChecksum(uint8_t state[], const uint16_t length) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRDaikinESP::checksum(void) {
-  remote[kDaikinByteChecksum1] = sumBytes(remote, kDaikinSection1Length - 1);
-  remote[kDaikinByteChecksum2] = sumBytes(remote + kDaikinSection1Length,
-                                          kDaikinSection2Length - 1);
-  remote[kDaikinByteChecksum3] = sumBytes(remote + kDaikinSection1Length +
-                                          kDaikinSection2Length,
-                                          kDaikinSection3Length - 1);
+  _.Sum1 = sumBytes(_.raw, kDaikinSection1Length - 1);
+  _.Sum2 = sumBytes(_.raw + kDaikinSection1Length, kDaikinSection2Length - 1);
+  _.Sum3 = sumBytes(_.raw + kDaikinSection1Length + kDaikinSection2Length,
+                    kDaikinSection3Length - 1);
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRDaikinESP::stateReset(void) {
-  for (uint8_t i = 0; i < kDaikinStateLength; i++) remote[i] = 0x0;
+  for (uint8_t i = 0; i < kDaikinStateLength; i++) _.raw[i] = 0x0;
 
-  remote[0] = 0x11;
-  remote[1] = 0xDA;
-  remote[2] = 0x27;
-  remote[4] = 0xC5;
-  // remote[7] is a checksum byte, it will be set by checksum().
-
-  remote[8] = 0x11;
-  remote[9] = 0xDA;
-  remote[10] = 0x27;
-  remote[12] = 0x42;
-  // remote[15] is a checksum byte, it will be set by checksum().
-  remote[16] = 0x11;
-  remote[17] = 0xDA;
-  remote[18] = 0x27;
-  remote[21] = 0x49;
-  remote[22] = 0x1E;
-  remote[24] = 0xB0;
-  remote[27] = 0x06;
-  remote[28] = 0x60;
-  remote[31] = 0xC0;
-  // remote[34] is a checksum byte, it will be set by checksum().
-  this->checksum();
+  _.raw[0] = 0x11;
+  _.raw[1] = 0xDA;
+  _.raw[2] = 0x27;
+  _.raw[4] = 0xC5;
+  // _.raw[7] is a checksum byte, it will be set by checksum().
+  _.raw[8] = 0x11;
+  _.raw[9] = 0xDA;
+  _.raw[10] = 0x27;
+  _.raw[12] = 0x42;
+  // _.raw[15] is a checksum byte, it will be set by checksum().
+  _.raw[16] = 0x11;
+  _.raw[17] = 0xDA;
+  _.raw[18] = 0x27;
+  _.raw[21] = 0x49;
+  _.raw[22] = 0x1E;
+  _.raw[24] = 0xB0;
+  _.raw[27] = 0x06;
+  _.raw[28] = 0x60;
+  _.raw[31] = 0xC0;
+  // _.raw[34] is a checksum byte, it will be set by checksum().
+  checksum();
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikinESP::getRaw(void) {
-  this->checksum();  // Ensure correct settings before sending.
-  return remote;
+  checksum();  // Ensure correct settings before sending.
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
@@ -194,10 +191,10 @@ void IRDaikinESP::setRaw(const uint8_t new_code[], const uint16_t length) {
   uint8_t offset = 0;
   if (length == kDaikinStateLengthShort) {  // Handle the "short" length case.
     offset = kDaikinStateLength - kDaikinStateLengthShort;
-    this->stateReset();
+    stateReset();
   }
   for (uint8_t i = 0; i < length && i < kDaikinStateLength; i++)
-    remote[i + offset] = new_code[i];
+    _.raw[i + offset] = new_code[i];
 }
 
 /// Change the power setting to On.
@@ -209,13 +206,13 @@ void IRDaikinESP::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setPower(const bool on) {
-  setBit(&remote[kDaikinBytePower], kDaikinBitPowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getPower(void) {
-  return GETBIT8(remote[kDaikinBytePower], kDaikinBitPowerOffset);
+bool IRDaikinESP::getPower(void) const {
+  return _.Power;
 }
 
 /// Set the temperature.
@@ -223,12 +220,12 @@ bool IRDaikinESP::getPower(void) {
 void IRDaikinESP::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kDaikinMinTemp);
   degrees = std::min(degrees, kDaikinMaxTemp);
-  remote[kDaikinByteTemp] = degrees << 1;
+  _.Temp = degrees;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRDaikinESP::getTemp(void) { return remote[kDaikinByteTemp] >> 1; }
+uint8_t IRDaikinESP::getTemp(void) const { return _.Temp; }
 
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting.
@@ -242,22 +239,21 @@ void IRDaikinESP::setFan(const uint8_t fan) {
     fanset = kDaikinFanAuto;
   else
     fanset = 2 + fan;
-  setBits(&remote[kDaikinByteFan], kDaikinFanOffset, kDaikinFanSize, fanset);
+  _.Fan = fanset;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRDaikinESP::getFan(void) {
-  uint8_t fan = GETBITS8(remote[kDaikinByteFan], kDaikinFanOffset,
-                         kDaikinFanSize);
+uint8_t IRDaikinESP::getFan(void) const {
+  uint8_t fan = _.Fan;
   if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
   return fan;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDaikinESP::getMode(void) {
-  return GETBITS8(remote[kDaikinBytePower], kDaikinModeOffset, kDaikinModeSize);
+uint8_t IRDaikinESP::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -269,179 +265,166 @@ void IRDaikinESP::setMode(const uint8_t mode) {
     case kDaikinHeat:
     case kDaikinFan:
     case kDaikinDry:
-      setBits(&remote[kDaikinBytePower], kDaikinModeOffset, kDaikinModeSize,
-              mode);
+      _.Mode = mode;
       break;
     default:
-      this->setMode(kDaikinAuto);
+      _.Mode = kDaikinAuto;
   }
 }
 
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setSwingVertical(const bool on) {
-  setBits(&remote[kDaikinByteFan], kDaikinSwingOffset, kDaikinSwingSize,
-          on ? kDaikinSwingOn : kDaikinSwingOff);
+  _.SwingV = (on ? kDaikinSwingOn : kDaikinSwingOff);
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getSwingVertical(void) {
-  return GETBITS8(remote[kDaikinByteFan], kDaikinSwingOffset, kDaikinSwingSize);
+bool IRDaikinESP::getSwingVertical(void) const {
+  return _.SwingV;
 }
 
 /// Set the Horizontal Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setSwingHorizontal(const bool on) {
-  setBits(&remote[kDaikinByteSwingH], kDaikinSwingOffset, kDaikinSwingSize,
-          on ? kDaikinSwingOn : kDaikinSwingOff);
+  _.SwingH = (on ? kDaikinSwingOn : kDaikinSwingOff);
 }
 
 /// Get the Horizontal Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getSwingHorizontal(void) {
-  return GETBITS8(remote[kDaikinByteSwingH], kDaikinSwingOffset,
-                  kDaikinSwingSize);
+bool IRDaikinESP::getSwingHorizontal(void) const {
+  return _.SwingH;
 }
 
 /// Set the Quiet mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setQuiet(const bool on) {
-  setBit(&remote[kDaikinByteSilent], kDaikinBitSilentOffset, on);
+  _.Quiet = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) this->setPowerful(false);
+  if (on) setPowerful(false);
 }
 
 /// Get the Quiet mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getQuiet(void) {
-  return GETBIT8(remote[kDaikinByteSilent], kDaikinBitSilentOffset);
+bool IRDaikinESP::getQuiet(void) const {
+  return _.Quiet;
 }
 
 /// Set the Powerful (Turbo) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setPowerful(const bool on) {
-  setBit(&remote[kDaikinBytePowerful], kDaikinBitPowerfulOffset, on);
+  _.Powerful = on;
   if (on) {
     // Powerful, Quiet, & Econo mode being on are mutually exclusive.
-    this->setQuiet(false);
-    this->setEcono(false);
+    setQuiet(false);
+    setEcono(false);
   }
 }
 
 /// Get the Powerful (Turbo) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getPowerful(void) {
-  return GETBIT8(remote[kDaikinBytePowerful], kDaikinBitPowerfulOffset);
+bool IRDaikinESP::getPowerful(void) const {
+  return _.Powerful;
 }
 
 /// Set the Sensor mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setSensor(const bool on) {
-  setBit(&remote[kDaikinByteSensor], kDaikinBitSensorOffset, on);
+  _.Sensor = on;
 }
 
 /// Get the Sensor mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getSensor(void) {
-  return GETBIT8(remote[kDaikinByteSensor], kDaikinBitSensorOffset);
+bool IRDaikinESP::getSensor(void) const {
+  return _.Sensor;
 }
 
 /// Set the Economy mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setEcono(const bool on) {
-  setBit(&remote[kDaikinByteEcono], kDaikinBitEconoOffset, on);
+  _.Econo = on;
   // Powerful & Econo mode being on are mutually exclusive.
-  if (on) this->setPowerful(false);
+  if (on) setPowerful(false);
 }
 
 /// Get the Economical mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getEcono(void) {
-  return GETBIT8(remote[kDaikinByteEcono], kDaikinBitEconoOffset);
+bool IRDaikinESP::getEcono(void) const {
+  return _.Econo;
 }
 
 /// Set the Mould mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setMold(const bool on) {
-  setBit(&remote[kDaikinByteMold], kDaikinBitMoldOffset, on);
+  _.Mold = on;
 }
 
 /// Get the Mould mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getMold(void) {
-  return GETBIT8(remote[kDaikinByteMold], kDaikinBitMoldOffset);
+bool IRDaikinESP::getMold(void) const {
+  return _.Mold;
 }
 
 /// Set the Comfort mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setComfort(const bool on) {
-  setBit(&remote[kDaikinByteComfort], kDaikinBitComfortOffset, on);
+  _.Comfort = on;
 }
 
 /// Get the Comfort mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getComfort(void) {
-  return GETBIT8(remote[kDaikinByteComfort], kDaikinBitComfortOffset);
+bool IRDaikinESP::getComfort(void) const {
+  return _.Comfort;
 }
 
 /// Set the enable status & time of the On Timer.
 /// @param[in] starttime The number of minutes past midnight.
 void IRDaikinESP::enableOnTimer(const uint16_t starttime) {
-  setBit(&remote[kDaikinByteOnTimer], kDaikinBitOnTimerOffset);
-  remote[kDaikinByteOnTimerMinsLow] = starttime;
-  // only keep 4 bits
-  setBits(&remote[kDaikinByteOnTimerMinsHigh], kDaikinOnTimerMinsHighOffset,
-          kDaikinOnTimerMinsHighSize, starttime >> 8);
+  _.OnTimer = true;
+  _.OnTime = starttime;
 }
 
 /// Clear and disable the On timer.
 void IRDaikinESP::disableOnTimer(void) {
-  this->enableOnTimer(kDaikinUnusedTime);
-  setBit(&remote[kDaikinByteOnTimer], kDaikinBitOnTimerOffset, false);
+  _.OnTimer = false;
+  _.OnTime = kDaikinUnusedTime;
 }
 
 /// Get the On Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikinESP::getOnTime(void) {
-  return (GETBITS8(remote[kDaikinByteOnTimerMinsHigh],
-                   kDaikinOnTimerMinsHighOffset,
-                   kDaikinOnTimerMinsHighSize) << 8) +
-      remote[kDaikinByteOnTimerMinsLow];
+uint16_t IRDaikinESP::getOnTime(void) const {
+  return _.OnTime;
 }
 
 /// Get the enable status of the On Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getOnTimerEnabled(void) {
-  return GETBIT8(remote[kDaikinByteOnTimer], kDaikinBitOnTimerOffset);
+bool IRDaikinESP::getOnTimerEnabled(void) const {
+  return _.OnTimer;
 }
 
 /// Set the enable status & time of the Off Timer.
 /// @param[in] endtime The number of minutes past midnight.
 void IRDaikinESP::enableOffTimer(const uint16_t endtime) {
-  setBit(&remote[kDaikinByteOffTimer], kDaikinBitOffTimerOffset);
-  remote[kDaikinByteOffTimerMinsHigh] = endtime >> kNibbleSize;
-  setBits(&remote[kDaikinByteOffTimerMinsLow], kHighNibble, kNibbleSize,
-          endtime);
+  _.OffTimer = true;
+  _.OffTime = endtime;
 }
 
 /// Clear and disable the Off timer.
 void IRDaikinESP::disableOffTimer(void) {
-  this->enableOffTimer(kDaikinUnusedTime);
-  setBit(&remote[kDaikinByteOffTimer], kDaikinBitOffTimerOffset, false);
+  _.OffTimer = false;
+  _.OffTime = kDaikinUnusedTime;
 }
 
 /// Get the Off Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikinESP::getOffTime(void) {
-  return (remote[kDaikinByteOffTimerMinsHigh] << kNibbleSize) +
-      GETBITS8(remote[kDaikinByteOffTimerMinsLow], kHighNibble, kNibbleSize);
+uint16_t IRDaikinESP::getOffTime(void) const {
+  return _.OffTime;
 }
 
 /// Get the enable status of the Off Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getOffTimerEnabled(void) {
-  return GETBIT8(remote[kDaikinByteOffTimer], kDaikinBitOffTimerOffset);
+bool IRDaikinESP::getOffTimerEnabled(void) const {
+  return _.OffTimer;
 }
 
 /// Set the clock on the A/C unit.
@@ -449,47 +432,40 @@ bool IRDaikinESP::getOffTimerEnabled(void) {
 void IRDaikinESP::setCurrentTime(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
   if (mins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
-  remote[kDaikinByteClockMinsLow] = mins;
-  // only keep 3 bits
-  setBits(&remote[kDaikinByteClockMinsHigh], kDaikinClockMinsHighOffset,
-          kDaikinClockMinsHighSize, mins >> 8);
+  _.CurrentTime = mins;
 }
 
 /// Get the clock time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikinESP::getCurrentTime(void) {
-  return (GETBITS8(remote[kDaikinByteClockMinsHigh], kDaikinClockMinsHighOffset,
-                   kDaikinClockMinsHighSize) << 8) +
-      remote[kDaikinByteClockMinsLow];
+uint16_t IRDaikinESP::getCurrentTime(void) const {
+  return _.CurrentTime;
 }
 
 /// Set the current day of the week to be sent to the A/C unit.
 /// @param[in] day_of_week The numerical representation of the day of the week.
 /// @note 1 is SUN, 2 is MON, ..., 7 is SAT
 void IRDaikinESP::setCurrentDay(const uint8_t day_of_week) {
-  setBits(&remote[kDaikinByteClockMinsHigh], kDaikinDoWOffset, kDaikinDoWSize,
-          day_of_week);
+  _.CurrentDay = day_of_week;
 }
 
 /// Get the current day of the week to be sent to the A/C unit.
 /// @return The numerical representation of the day of the week.
 /// @note 1 is SUN, 2 is MON, ..., 7 is SAT
-uint8_t IRDaikinESP::getCurrentDay(void) {
-  return GETBITS8(remote[kDaikinByteClockMinsHigh], kDaikinDoWOffset,
-                  kDaikinDoWSize);
+uint8_t IRDaikinESP::getCurrentDay(void) const {
+  return _.CurrentDay;
 }
 
 /// Set the enable status of the Weekly Timer.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikinESP::setWeeklyTimerEnable(const bool on) {
   // Bit is cleared for `on`.
-  setBit(&remote[kDaikinByteWeeklyTimer], kDaikinBitWeeklyTimerOffset, !on);
+  _.WeeklyTimer = !on;
 }
 
 /// Get the enable status of the Weekly Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getWeeklyTimerEnable(void) {
-  return !GETBIT8(remote[kDaikinByteWeeklyTimer], kDaikinBitWeeklyTimerOffset);
+bool IRDaikinESP::getWeeklyTimerEnable(void) const {
+  return !_.WeeklyTimer;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -549,23 +525,23 @@ stdAc::fanspeed_t IRDaikinESP::toCommonFanSpeed(const uint8_t speed) {
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRDaikinESP::toCommon(void) {
+stdAc::state_t IRDaikinESP::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->getSwingVertical() ? stdAc::swingv_t::kAuto :
+  result.degrees = _.Temp;
+  result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto :
                                              stdAc::swingv_t::kOff;
-  result.swingh = this->getSwingHorizontal() ? stdAc::swingh_t::kAuto :
+  result.swingh = _.SwingH ? stdAc::swingh_t::kAuto :
                                                stdAc::swingh_t::kOff;
-  result.quiet = this->getQuiet();
-  result.turbo = this->getPowerful();
-  result.clean = this->getMold();
-  result.econo = this->getEcono();
+  result.quiet = _.Quiet;
+  result.turbo = _.Powerful;
+  result.clean = _.Mold;
+  result.econo = _.Econo;
   // Not supported.
   result.filter = false;
   result.light = false;
@@ -577,29 +553,29 @@ stdAc::state_t IRDaikinESP::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRDaikinESP::toString(void) {
+String IRDaikinESP::toString(void) const {
   String result = "";
   result.reserve(230);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
-  result += addTempToString(getTemp());
+  result += addTempToString(_.Temp);
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addBoolToString(getPowerful(), kPowerfulStr);
-  result += addBoolToString(getQuiet(), kQuietStr);
+  result += addBoolToString(_.Powerful, kPowerfulStr);
+  result += addBoolToString(_.Quiet, kQuietStr);
   result += addBoolToString(getSensor(), kSensorStr);
-  result += addBoolToString(getMold(), kMouldStr);
-  result += addBoolToString(getComfort(), kComfortStr);
-  result += addBoolToString(getSwingHorizontal(), kSwingHStr);
-  result += addBoolToString(getSwingVertical(), kSwingVStr);
-  result += addLabeledString(minsToString(this->getCurrentTime()), kClockStr);
-  result += addDayToString(getCurrentDay(), -1);
-  result += addLabeledString(getOnTimerEnabled()
-                             ? minsToString(this->getOnTime()) : kOffStr,
+  result += addBoolToString(_.Mold, kMouldStr);
+  result += addBoolToString(_.Comfort, kComfortStr);
+  result += addBoolToString(_.SwingH, kSwingHStr);
+  result += addBoolToString(_.SwingV, kSwingVStr);
+  result += addLabeledString(minsToString(_.CurrentTime), kClockStr);
+  result += addDayToString(_.CurrentDay, -1);
+  result += addLabeledString(_.OnTimer
+                             ? minsToString(_.OnTime) : kOffStr,
                              kOnTimerStr);
-  result += addLabeledString(getOffTimerEnabled()
-                             ? minsToString(this->getOffTime()) : kOffStr,
+  result += addLabeledString(_.OffTimer
+                             ? minsToString(_.OffTime) : kOffStr,
                              kOffTimerStr);
   result += addBoolToString(getWeeklyTimerEnable(), kWeeklyTimerStr);
   return result;
@@ -750,41 +726,39 @@ bool IRDaikin2::validChecksum(uint8_t state[], const uint16_t length) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRDaikin2::checksum(void) {
-  remote_state[kDaikin2Section1Length - 1] = sumBytes(
-      remote_state, kDaikin2Section1Length - 1);
-  remote_state[kDaikin2StateLength -1 ] = sumBytes(
-      remote_state + kDaikin2Section1Length, kDaikin2Section2Length - 1);
+  _.Sum1 = sumBytes(_.raw, kDaikin2Section1Length - 1);
+  _.Sum2 = sumBytes(_.raw + kDaikin2Section1Length, kDaikin2Section2Length - 1);
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRDaikin2::stateReset(void) {
-  for (uint8_t i = 0; i < kDaikin2StateLength; i++) remote_state[i] = 0x0;
+  for (uint8_t i = 0; i < kDaikin2StateLength; i++) _.raw[i] = 0x0;
 
-  remote_state[0] = 0x11;
-  remote_state[1] = 0xDA;
-  remote_state[2] = 0x27;
-  remote_state[4] = 0x01;
-  remote_state[6] = 0xC0;
-  remote_state[7] = 0x70;
-  remote_state[8] = 0x08;
-  remote_state[9] = 0x0C;
-  remote_state[10] = 0x80;
-  remote_state[11] = 0x04;
-  remote_state[12] = 0xB0;
-  remote_state[13] = 0x16;
-  remote_state[14] = 0x24;
-  remote_state[17] = 0xBE;
-  remote_state[18] = 0xD0;
-  // remote_state[19] is a checksum byte, it will be set by checksum().
-  remote_state[20] = 0x11;
-  remote_state[21] = 0xDA;
-  remote_state[22] = 0x27;
-  remote_state[25] = 0x08;
-  remote_state[28] = 0xA0;
-  remote_state[35] = 0xC1;
-  remote_state[36] = 0x80;
-  remote_state[37] = 0x60;
-  // remote_state[38] is a checksum byte, it will be set by checksum().
+  _.raw[0] = 0x11;
+  _.raw[1] = 0xDA;
+  _.raw[2] = 0x27;
+  _.raw[4] = 0x01;
+  _.raw[6] = 0xC0;
+  _.raw[7] = 0x70;
+  _.raw[8] = 0x08;
+  _.raw[9] = 0x0C;
+  _.raw[10] = 0x80;
+  _.raw[11] = 0x04;
+  _.raw[12] = 0xB0;
+  _.raw[13] = 0x16;
+  _.raw[14] = 0x24;
+  _.raw[17] = 0xBE;
+  _.raw[18] = 0xD0;
+  // _.raw[19] is a checksum byte, it will be set by checksum().
+  _.raw[20] = 0x11;
+  _.raw[21] = 0xDA;
+  _.raw[22] = 0x27;
+  _.raw[25] = 0x08;
+  _.raw[28] = 0xA0;
+  _.raw[35] = 0xC1;
+  _.raw[36] = 0x80;
+  _.raw[37] = 0x60;
+  // _.raw[38] is a checksum byte, it will be set by checksum().
   disableOnTimer();
   disableOffTimer();
   disableSleepTimer();
@@ -795,13 +769,13 @@ void IRDaikin2::stateReset(void) {
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin2::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRDaikin2::setRaw(const uint8_t new_code[]) {
-  memcpy(remote_state, new_code, kDaikin2StateLength);
+  std::memcpy(_.raw, new_code, kDaikin2StateLength);
 }
 
 /// Change the power setting to On.
@@ -813,21 +787,20 @@ void IRDaikin2::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setPower(const bool on) {
-  setBit(&remote_state[25], kDaikinBitPowerOffset, on);
-  setBit(&remote_state[6], kDaikin2BitPowerOffset, !on);
+  _.Power = on;
+  _.Power2 = !on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getPower(void) {
-  return GETBIT8(remote_state[25], kDaikinBitPowerOffset) &&
-         !GETBIT8(remote_state[6], kDaikin2BitPowerOffset);
+bool IRDaikin2::getPower(void) const {
+  return _.Power && !_.Power2;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDaikin2::getMode(void) {
-  return GETBITS8(remote_state[25], kHighNibble, kModeBitsSize);
+uint8_t IRDaikin2::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -841,9 +814,9 @@ void IRDaikin2::setMode(const uint8_t desired_mode) {
     case kDaikinDry: break;
     default: mode = kDaikinAuto;
   }
-  setBits(&remote_state[25], kHighNibble, kModeBitsSize, mode);
+  _.Mode = mode;
   // Redo the temp setting as Cool mode has a different min temp.
-  if (mode == kDaikinCool) this->setTemp(this->getTemp());
+  if (mode == kDaikinCool) setTemp(getTemp());
 }
 
 /// Set the temperature.
@@ -851,16 +824,19 @@ void IRDaikin2::setMode(const uint8_t desired_mode) {
 void IRDaikin2::setTemp(const uint8_t desired) {
   // The A/C has a different min temp if in cool mode.
   uint8_t temp = std::max(
-      (this->getMode() == kDaikinCool) ? kDaikin2MinCoolTemp : kDaikinMinTemp,
+      (_.Mode == kDaikinCool) ? kDaikin2MinCoolTemp : kDaikinMinTemp,
       desired);
-  remote_state[26] = std::min(kDaikinMaxTemp, temp) << 1;
+  _.Temp = std::min(kDaikinMaxTemp, temp);
 }
+
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRDaikin2::getTemp(void) const { return _.Temp; }
 
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting.
 /// @note 1-5 or kDaikinFanAuto or kDaikinFanQuiet
 void IRDaikin2::setFan(const uint8_t fan) {
-  // Set the fan speed bits, leave low 4 bits alone
   uint8_t fanset;
   if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
     fanset = fan;
@@ -868,24 +844,19 @@ void IRDaikin2::setFan(const uint8_t fan) {
     fanset = kDaikinFanAuto;
   else
     fanset = 2 + fan;
-  setBits(&remote_state[kDaikin2FanByte], kHighNibble, kNibbleSize, fanset);
+  _.Fan = fanset;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRDaikin2::getFan(void) {
-  const uint8_t fan = GETBITS8(remote_state[kDaikin2FanByte], kHighNibble,
-                              kNibbleSize);
+uint8_t IRDaikin2::getFan(void) const {
+  const uint8_t fan = _.Fan;
   switch (fan) {
     case kDaikinFanAuto:
     case kDaikinFanQuiet: return fan;
     default: return fan - 2;
   }
 }
-
-/// Get the current temperature setting.
-/// @return The current setting for temp. in degrees celsius.
-uint8_t IRDaikin2::getTemp(void) { return remote_state[26] >> 1; }
 
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] position The position/mode to set the swing to.
@@ -901,14 +872,14 @@ void IRDaikin2::setSwingVertical(const uint8_t position) {
     case kDaikin2SwingVBreeze:
     case kDaikin2SwingVCirculate:
     case kDaikin2SwingVAuto:
-      setBits(&remote_state[18], kLowNibble, kNibbleSize, position);
+      _.SwingV = position;
   }
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRDaikin2::getSwingVertical(void) {
-  return GETBITS8(remote_state[18], kLowNibble, kNibbleSize);
+uint8_t IRDaikin2::getSwingVertical(void) const {
+  return _.SwingV;
 }
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
@@ -946,27 +917,25 @@ stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
 /// Set the Horizontal Swing mode of the A/C.
 /// @param[in] position The position/mode to set the swing to.
 void IRDaikin2::setSwingHorizontal(const uint8_t position) {
-  remote_state[17] = position;
+  _.SwingH = position;
 }
 
 /// Get the Horizontal Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRDaikin2::getSwingHorizontal(void) { return remote_state[17]; }
+uint8_t IRDaikin2::getSwingHorizontal(void) const { return _.SwingH; }
 
 /// Set the clock on the A/C unit.
 /// @param[in] numMins Nr. of minutes past midnight.
 void IRDaikin2::setCurrentTime(const uint16_t numMins) {
   uint16_t mins = numMins;
   if (numMins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
-  remote_state[5] = mins;
-  setBits(&remote_state[6], kLowNibble, kNibbleSize, mins >> 8);
+  _.CurrentTime = mins;
 }
 
 /// Get the clock time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin2::getCurrentTime(void) {
-  return (GETBITS8(remote_state[6], kLowNibble, kNibbleSize) << 8) |
-      remote_state[5];
+uint16_t IRDaikin2::getCurrentTime(void) const {
+  return _.CurrentTime;
 }
 
 /// Set the enable status & time of the On Timer.
@@ -974,171 +943,167 @@ uint16_t IRDaikin2::getCurrentTime(void) {
 /// @note Timer location is shared with sleep timer.
 void IRDaikin2::enableOnTimer(const uint16_t starttime) {
   clearSleepTimerFlag();
-  setBit(&remote_state[25], kDaikinBitOnTimerOffset);  // Set the On Timer flag.
-  remote_state[30] = starttime;
-  setBits(&remote_state[31], kLowNibble, kNibbleSize, starttime >> 8);
+  _.OnTimer = true;
+  _.OnTime = starttime;
 }
 
 /// Clear the On Timer flag.
 void IRDaikin2::clearOnTimerFlag(void) {
-  setBit(&remote_state[25], kDaikinBitOnTimerOffset, false);
+  _.OnTimer = false;
 }
 
 /// Disable the On timer.
 void IRDaikin2::disableOnTimer(void) {
-  enableOnTimer(kDaikinUnusedTime);
+  _.OnTime = kDaikinUnusedTime;
   clearOnTimerFlag();
   clearSleepTimerFlag();
 }
 
 /// Get the On Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin2::getOnTime(void) {
-  return (GETBITS8(remote_state[31], kLowNibble, kNibbleSize) << 8) +
-      remote_state[30];
+uint16_t IRDaikin2::getOnTime(void) const {
+  return _.OnTime;
 }
 
 /// Get the enable status of the On Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getOnTimerEnabled(void) {
-  return GETBIT8(remote_state[25], kDaikinBitOnTimerOffset);
+bool IRDaikin2::getOnTimerEnabled(void) const {
+  return _.OnTimer;
 }
 
 /// Set the enable status & time of the Off Timer.
 /// @param[in] endtime The number of minutes past midnight.
 void IRDaikin2::enableOffTimer(const uint16_t endtime) {
   // Set the Off Timer flag.
-  setBit(&remote_state[25], kDaikinBitOffTimerOffset);
-  remote_state[32] = endtime >> 4;
-  setBits(&remote_state[31], kHighNibble, kNibbleSize, endtime);
+  _.OffTimer = true;
+  _.OffTime = endtime;
 }
 
 /// Disable the Off timer.
 void IRDaikin2::disableOffTimer(void) {
-  enableOffTimer(kDaikinUnusedTime);
+  _.OffTime = kDaikinUnusedTime;
   // Clear the Off Timer flag.
-  setBit(&remote_state[25], kDaikinBitOffTimerOffset, false);
+  _.OffTimer = false;
 }
 
 /// Get the Off Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin2::getOffTime(void) {
-  return (remote_state[32] << 4) + GETBITS8(remote_state[31], kHighNibble,
-                                            kNibbleSize);
+uint16_t IRDaikin2::getOffTime(void) const {
+  return _.OffTime;
 }
 
 /// Get the enable status of the Off Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getOffTimerEnabled(void) {
-  return GETBIT8(remote_state[25], kDaikinBitOffTimerOffset);
+bool IRDaikin2::getOffTimerEnabled(void) const {
+  return _.OffTimer;
 }
 
 /// Get the Beep status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-uint8_t IRDaikin2::getBeep(void) {
-  return GETBITS8(remote_state[7], kDaikin2BeepOffset, kDaikin2BeepSize);
+uint8_t IRDaikin2::getBeep(void) const {
+  return _.Beep;
 }
 
 /// Set the Beep mode of the A/C.
 /// @param[in] beep true, the setting is on. false, the setting is off.
 void IRDaikin2::setBeep(const uint8_t beep) {
-  setBits(&remote_state[7], kDaikin2BeepOffset, kDaikin2BeepSize, beep);
+  _.Beep = beep;
 }
 
 /// Get the Light status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-uint8_t IRDaikin2::getLight(void) {
-  return GETBITS8(remote_state[7], kDaikin2LightOffset, kDaikin2LightSize);
+uint8_t IRDaikin2::getLight(void) const {
+  return _.Light;
 }
 
 /// Set the Light (LED) mode of the A/C.
 /// @param[in] light true, the setting is on. false, the setting is off.
 void IRDaikin2::setLight(const uint8_t light) {
-  setBits(&remote_state[7], kDaikin2LightOffset, kDaikin2LightSize, light);
+  _.Light = light;
 }
 
 /// Set the Mould (filter) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setMold(const bool on) {
-  setBit(&remote_state[8], kDaikin2BitMoldOffset, on);
+  _.Mold = on;
 }
 
 /// Get the Mould (filter) mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getMold(void) {
-  return GETBIT8(remote_state[8], kDaikin2BitMoldOffset);
+bool IRDaikin2::getMold(void) const {
+  return _.Mold;
 }
 
 /// Set the Auto clean mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setClean(const bool on) {
-  setBit(&remote_state[8], kDaikin2BitCleanOffset, on);
+  _.Clean = on;
 }
 
 /// Get the Auto Clean mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getClean(void) {
-  return GETBIT8(remote_state[8], kDaikin2BitCleanOffset);
+bool IRDaikin2::getClean(void) const {
+  return _.Clean;
 }
 
 /// Set the Fresh Air mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setFreshAir(const bool on) {
-  setBit(&remote_state[8], kDaikin2BitFreshAirOffset, on);
+  _.FreshAir = on;
 }
 
 /// Get the Fresh Air mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getFreshAir(void) {
-  return GETBIT8(remote_state[8], kDaikin2BitFreshAirOffset);
+bool IRDaikin2::getFreshAir(void) const {
+  return _.FreshAir;
 }
 
 /// Set the (High) Fresh Air mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setFreshAirHigh(const bool on) {
-  setBit(&remote_state[8], kDaikin2BitFreshAirHighOffset, on);
+  _.FreshAirHigh = on;
 }
 
 /// Get the (High) Fresh Air mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getFreshAirHigh(void) {
-  return GETBIT8(remote_state[8], kDaikin2BitFreshAirHighOffset);
+bool IRDaikin2::getFreshAirHigh(void) const {
+  return _.FreshAirHigh;
 }
 
 /// Set the Automatic Eye (Sensor) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setEyeAuto(bool on) {
-  setBit(&remote_state[13], kDaikin2BitEyeAutoOffset, on);
+  _.EyeAuto = on;
 }
 
 /// Get the Automaitc Eye (Sensor) mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getEyeAuto(void) {
-  return GETBIT8(remote_state[13], kDaikin2BitEyeAutoOffset);
+bool IRDaikin2::getEyeAuto(void) const {
+  return _.EyeAuto;
 }
 
 /// Set the Eye (Sensor) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setEye(bool on) {
-  setBit(&remote_state[36], kDaikin2BitEyeOffset, on);
+  _.Eye = on;
 }
 
 /// Get the Eye (Sensor) mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getEye(void) {
-  return GETBIT8(remote_state[36], kDaikin2BitEyeOffset);
+bool IRDaikin2::getEye(void) const {
+  return _.Eye;
 }
 
 /// Set the Economy mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setEcono(bool on) {
-  setBit(&remote_state[36], kDaikinBitEconoOffset, on);
+  _.Econo = on;
 }
 
 /// Get the Economical mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getEcono(void) {
-  return GETBIT8(remote_state[36], kDaikinBitEconoOffset);
+bool IRDaikin2::getEcono(void) const {
+  return _.Econo;
 }
 
 /// Set the enable status & time of the Sleep Timer.
@@ -1147,13 +1112,12 @@ bool IRDaikin2::getEcono(void) {
 void IRDaikin2::enableSleepTimer(const uint16_t sleeptime) {
   enableOnTimer(sleeptime);
   clearOnTimerFlag();
-  // Set the Sleep Timer flag.
-  setBit(&remote_state[36], kDaikin2BitSleepTimerOffset);
+  _.SleepTimer = true;
 }
 
 /// Clear the sleep timer flag.
 void IRDaikin2::clearSleepTimerFlag(void) {
-  setBit(&remote_state[36], kDaikin2BitSleepTimerOffset, false);
+  _.SleepTimer = false;
 }
 
 /// Disable the sleep timer.
@@ -1163,54 +1127,54 @@ void IRDaikin2::disableSleepTimer(void) {
 
 /// Get the Sleep Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin2::getSleepTime(void) {
+uint16_t IRDaikin2::getSleepTime(void) const {
   return getOnTime();
 }
 
 /// Get the Sleep timer enabled status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getSleepTimerEnabled(void) {
-  return GETBIT8(remote_state[36],  kDaikin2BitSleepTimerOffset);
+bool IRDaikin2::getSleepTimerEnabled(void) const {
+  return _.SleepTimer;
 }
 
 /// Set the Quiet mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setQuiet(const bool on) {
-  setBit(&remote_state[33], kDaikinBitSilentOffset, on);
+  _.Quiet = on;
   // Powerful & Quiet mode being on are mutually exclusive.
   if (on) setPowerful(false);
 }
 
 /// Get the Quiet mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getQuiet(void) {
-  return GETBIT8(remote_state[33], kDaikinBitSilentOffset);
+bool IRDaikin2::getQuiet(void) const {
+  return _.Quiet;
 }
 
 /// Set the Powerful (Turbo) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setPowerful(const bool on) {
-  setBit(&remote_state[33], kDaikinBitPowerfulOffset, on);
+  _.Powerful = on;
   // Powerful & Quiet mode being on are mutually exclusive.
   if (on) setQuiet(false);
 }
 
 /// Get the Powerful (Turbo) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getPowerful(void) {
-  return GETBIT8(remote_state[33], kDaikinBitPowerfulOffset);
+bool IRDaikin2::getPowerful(void) const {
+  return _.Powerful;
 }
 
 /// Set the Purify (Filter) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin2::setPurify(const bool on) {
-  setBit(&remote_state[36], kDaikin2BitPurifyOffset, on);
+  _.Purify = on;
 }
 
 /// Get the Purify (Filter) mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin2::getPurify(void) {
-  return GETBIT8(remote_state[36],  kDaikin2BitPurifyOffset);
+bool IRDaikin2::getPurify(void) const {
+  return _.Purify;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -1261,25 +1225,25 @@ stdAc::swingh_t IRDaikin2::toCommonSwingH(const uint8_t setting) {
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRDaikin2::toCommon(void) {
+stdAc::state_t IRDaikin2::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN2;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.power = getPower();
+  result.mode = IRDaikinESP::toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
-  result.swingv = this->toCommonSwingV(this->getSwingVertical());
-  result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
-  result.quiet = this->getQuiet();
-  result.light = this->getLight() != 3;  // 3 is Off, everything else is On.
-  result.turbo = this->getPowerful();
-  result.clean = this->getMold();
-  result.econo = this->getEcono();
-  result.filter = this->getPurify();
-  result.beep = this->getBeep() != 3;  // 3 is Off, everything else is On.
-  result.sleep = this->getSleepTimerEnabled() ? this->getSleepTime() : -1;
+  result.degrees = _.Temp;
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(getFan());
+  result.swingv = toCommonSwingV(_.SwingV);
+  result.swingh = toCommonSwingH(_.SwingH);
+  result.quiet = _.Quiet;
+  result.light = _.Light != 3;  // 3 is Off, everything else is On.
+  result.turbo = _.Powerful;
+  result.clean = _.Mold;
+  result.econo = _.Econo;
+  result.filter = _.Purify;
+  result.beep = _.Beep != 3;  // 3 is Off, everything else is On.
+  result.sleep = _.SleepTimer ? getSleepTime() : -1;
   // Not supported.
   result.clock = -1;
   return result;
@@ -1287,18 +1251,18 @@ stdAc::state_t IRDaikin2::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRDaikin2::toString(void) {
+String IRDaikin2::toString(void) const {
   String result = "";
   result.reserve(310);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+  result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
-  result += addTempToString(getTemp());
+  result += addTempToString(_.Temp);
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addIntToString(getSwingVertical(), kSwingVStr);
+  result += addIntToString(_.SwingV, kSwingVStr);
   result += kSpaceLBraceStr;
-  switch (getSwingVertical()) {
+  switch (_.SwingV) {
     case kDaikin2SwingVHigh:
       result += kHighestStr;
       break;
@@ -1335,9 +1299,9 @@ String IRDaikin2::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getSwingHorizontal(), kSwingHStr);
+  result += addIntToString(_.SwingH, kSwingHStr);
   result += kSpaceLBraceStr;
-  switch (getSwingHorizontal()) {
+  switch (_.SwingH) {
     case kDaikin2SwingHAuto:
       result += kAutoStr;
       break;
@@ -1347,18 +1311,18 @@ String IRDaikin2::toString(void) {
     default: result += kUnknownStr;
   }
   result += ')';
-  result += addLabeledString(minsToString(getCurrentTime()), kClockStr);
+  result += addLabeledString(minsToString(_.CurrentTime), kClockStr);
   result += addLabeledString(
-      getOnTimerEnabled() ? minsToString(getOnTime()) : kOffStr, kOnTimerStr);
+      _.OnTimer ? minsToString(_.OnTime) : kOffStr, kOnTimerStr);
   result += addLabeledString(
-      getOffTimerEnabled() ? minsToString(getOffTime()) : kOffStr,
+      _.OffTimer ? minsToString(_.OffTime) : kOffStr,
       kOffTimerStr);
   result += addLabeledString(
-      getSleepTimerEnabled() ? minsToString(getSleepTime()) : kOffStr,
+      _.SleepTimer ? minsToString(getSleepTime()) : kOffStr,
       kSleepTimerStr);
-  result += addIntToString(getBeep(), kBeepStr);
+  result += addIntToString(_.Beep, kBeepStr);
   result += kSpaceLBraceStr;
-  switch (getBeep()) {
+  switch (_.Beep) {
     case kDaikinBeepLoud:
       result += kLoudStr;
       break;
@@ -1372,9 +1336,9 @@ String IRDaikin2::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getLight(), kLightStr);
+  result += addIntToString(_.Light, kLightStr);
   result += kSpaceLBraceStr;
-  switch (getLight()) {
+  switch (_.Light) {
     case kDaikinLightBright:
       result += kHighStr;
       break;
@@ -1388,17 +1352,17 @@ String IRDaikin2::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getMold(), kMouldStr);
-  result += addBoolToString(getClean(), kCleanStr);
+  result += addBoolToString(_.Mold, kMouldStr);
+  result += addBoolToString(_.Clean, kCleanStr);
   result += addLabeledString(
-      getFreshAir() ? (getFreshAirHigh() ? kHighStr : kOnStr) : kOffStr,
+      _.FreshAir ? (_.FreshAirHigh ? kHighStr : kOnStr) : kOffStr,
       kFreshStr);
-  result += addBoolToString(getEye(), kEyeStr);
-  result += addBoolToString(getEyeAuto(), kEyeAutoStr);
-  result += addBoolToString(getQuiet(), kQuietStr);
-  result += addBoolToString(getPowerful(), kPowerfulStr);
-  result += addBoolToString(getPurify(), kPurifyStr);
-  result += addBoolToString(getEcono(), kEconoStr);
+  result += addBoolToString(_.Eye, kEyeStr);
+  result += addBoolToString(_.EyeAuto, kEyeAutoStr);
+  result += addBoolToString(_.Quiet, kQuietStr);
+  result += addBoolToString(_.Powerful, kPowerfulStr);
+  result += addBoolToString(_.Purify, kPurifyStr);
+  result += addBoolToString(_.Econo, kEconoStr);
   return result;
 }
 
@@ -1535,38 +1499,37 @@ bool IRDaikin216::validChecksum(uint8_t state[], const uint16_t length) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRDaikin216::checksum(void) {
-  remote_state[kDaikin216Section1Length - 1] = sumBytes(
-      remote_state, kDaikin216Section1Length - 1);
-  remote_state[kDaikin216StateLength - 1] = sumBytes(
-      remote_state + kDaikin216Section1Length, kDaikin216Section2Length - 1);
+  _.Sum1 = sumBytes(_.raw, kDaikin216Section1Length - 1);
+  _.Sum2 = sumBytes(_.raw + kDaikin216Section1Length,
+                    kDaikin216Section2Length - 1);
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRDaikin216::stateReset(void) {
-  for (uint8_t i = 0; i < kDaikin216StateLength; i++) remote_state[i] = 0x00;
-  remote_state[0] =  0x11;
-  remote_state[1] =  0xDA;
-  remote_state[2] =  0x27;
-  remote_state[3] =  0xF0;
-  // remote_state[7] is a checksum byte, it will be set by checksum().
-  remote_state[8] =  0x11;
-  remote_state[9] =  0xDA;
-  remote_state[10] = 0x27;
-  remote_state[23] = 0xC0;
-  // remote_state[26] is a checksum byte, it will be set by checksum().
+  for (uint8_t i = 0; i < kDaikin216StateLength; i++) _.raw[i] = 0x00;
+  _.raw[0] =  0x11;
+  _.raw[1] =  0xDA;
+  _.raw[2] =  0x27;
+  _.raw[3] =  0xF0;
+  // _.raw[7] is a checksum byte, it will be set by checksum().
+  _.raw[8] =  0x11;
+  _.raw[9] =  0xDA;
+  _.raw[10] = 0x27;
+  _.raw[23] = 0xC0;
+  // _.raw[26] is a checksum byte, it will be set by checksum().
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin216::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRDaikin216::setRaw(const uint8_t new_code[]) {
-  memcpy(remote_state, new_code, kDaikin216StateLength);
+  std::memcpy(_.raw, new_code, kDaikin216StateLength);
 }
 
 /// Change the power setting to On.
@@ -1578,19 +1541,19 @@ void IRDaikin216::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin216::setPower(const bool on) {
-  setBit(&remote_state[kDaikin216BytePower], kDaikinBitPowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin216::getPower(void) {
-  return GETBIT8(remote_state[kDaikin216BytePower], kDaikinBitPowerOffset);
+bool IRDaikin216::getPower(void) const {
+  return _.Power;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDaikin216::getMode(void) {
-  return GETBITS8(remote_state[kDaikin216ByteMode], kHighNibble, kModeBitsSize);
+uint8_t IRDaikin216::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -1602,11 +1565,10 @@ void IRDaikin216::setMode(const uint8_t mode) {
     case kDaikinHeat:
     case kDaikinFan:
     case kDaikinDry:
-      setBits(&remote_state[kDaikin216ByteMode], kHighNibble, kModeBitsSize,
-              mode);
+      _.Mode = mode;
       break;
     default:
-      this->setMode(kDaikinAuto);
+      _.Mode = kDaikinAuto;
   }
 }
 
@@ -1622,15 +1584,13 @@ uint8_t IRDaikin216::convertMode(const stdAc::opmode_t mode) {
 void IRDaikin216::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kDaikinMinTemp);
   degrees = std::min(degrees, kDaikinMaxTemp);
-  setBits(&remote_state[kDaikin216ByteTemp], kDaikin216TempOffset,
-          kDaikin216TempSize, degrees);
+  _.Temp = degrees;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRDaikin216::getTemp(void) {
-  return GETBITS8(remote_state[kDaikin216ByteTemp], kDaikin216TempOffset,
-                  kDaikin216TempSize);
+uint8_t IRDaikin216::getTemp(void) const {
+  return _.Temp;
 }
 
 /// Set the speed of the fan.
@@ -1645,15 +1605,13 @@ void IRDaikin216::setFan(const uint8_t fan) {
     fanset = kDaikinFanAuto;
   else
     fanset = 2 + fan;
-  setBits(&remote_state[kDaikin216ByteFan], kHighNibble, kDaikinFanSize,
-          fanset);
+  _.Fan = fanset;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRDaikin216::getFan(void) {
-  uint8_t fan = GETBITS8(remote_state[kDaikin216ByteFan], kHighNibble,
-                         kDaikinFanSize);
+uint8_t IRDaikin216::getFan(void) const {
+  uint8_t fan = _.Fan;
   if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
   return fan;
 }
@@ -1668,29 +1626,25 @@ uint8_t IRDaikin216::convertFan(const stdAc::fanspeed_t speed) {
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin216::setSwingVertical(const bool on) {
-  setBits(&remote_state[kDaikin216ByteSwingV], kLowNibble, kDaikin216SwingSize,
-          on ? kDaikin216SwingOn : kDaikin216SwingOff);
+  _.SwingV = (on ? kDaikin216SwingOn : kDaikin216SwingOff);
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin216::getSwingVertical(void) {
-  return GETBITS8(remote_state[kDaikin216ByteSwingV], kLowNibble,
-                  kDaikin216SwingSize);
+bool IRDaikin216::getSwingVertical(void) const {
+  return _.SwingV;
 }
 
 /// Set the Horizontal Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin216::setSwingHorizontal(const bool on) {
-  setBits(&remote_state[kDaikin216ByteSwingH], kLowNibble, kDaikin216SwingSize,
-          on ? kDaikin216SwingOn : kDaikin216SwingOff);
+  _.SwingH = (on ? kDaikin216SwingOn : kDaikin216SwingOff);
 }
 
 /// Get the Horizontal Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin216::getSwingHorizontal(void) {
-  return GETBITS8(remote_state[kDaikin216ByteSwingH], kLowNibble,
-                  kDaikin216SwingSize);
+bool IRDaikin216::getSwingHorizontal(void) const {
+  return _.SwingH;
 }
 
 /// Set the Quiet mode of the A/C.
@@ -1698,53 +1652,52 @@ bool IRDaikin216::getSwingHorizontal(void) {
 /// @note This is a horrible hack till someone works out the quiet mode bit.
 void IRDaikin216::setQuiet(const bool on) {
   if (on) {
-    this->setFan(kDaikinFanQuiet);
+    setFan(kDaikinFanQuiet);
     // Powerful & Quiet mode being on are mutually exclusive.
-    this->setPowerful(false);
-  } else if (this->getFan() == kDaikinFanQuiet) {
-    this->setFan(kDaikinFanAuto);
+    setPowerful(false);
+  } else if (getFan() == kDaikinFanQuiet) {
+    setFan(kDaikinFanAuto);
   }
 }
 
 /// Get the Quiet mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 /// @note This is a horrible hack till someone works out the quiet mode bit.
-bool IRDaikin216::getQuiet(void) {
-  return this->getFan() == kDaikinFanQuiet;
+bool IRDaikin216::getQuiet(void) const {
+  return getFan() == kDaikinFanQuiet;
 }
 
 /// Set the Powerful (Turbo) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin216::setPowerful(const bool on) {
-  setBit(&remote_state[kDaikin216BytePowerful], kDaikinBitPowerfulOffset, on);
+  _.Powerful = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) this->setQuiet(false);
+  if (on) setQuiet(false);
 }
 
 /// Get the Powerful (Turbo) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin216::getPowerful(void) {
-  return GETBIT8(remote_state[kDaikin216BytePowerful],
-                 kDaikinBitPowerfulOffset);
+bool IRDaikin216::getPowerful(void) const {
+  return _.Powerful;
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRDaikin216::toCommon(void) {
+stdAc::state_t IRDaikin216::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN216;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = IRDaikinESP::toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
-  result.swingv = this->getSwingVertical() ? stdAc::swingv_t::kAuto :
-                                             stdAc::swingv_t::kOff;
-  result.swingh = this->getSwingHorizontal() ? stdAc::swingh_t::kAuto :
-                                               stdAc::swingh_t::kOff;
-  result.quiet = this->getQuiet();
-  result.turbo = this->getPowerful();
+  result.degrees = _.Temp;
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(getFan());
+  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto :
+                              stdAc::swingv_t::kOff;
+  result.swingh = _.SwingH ? stdAc::swingh_t::kAuto :
+                              stdAc::swingh_t::kOff;
+  result.quiet = getQuiet();
+  result.turbo = _.Powerful;
   // Not supported.
   result.light = false;
   result.clean = false;
@@ -1758,19 +1711,19 @@ stdAc::state_t IRDaikin216::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRDaikin216::toString(void) {
+String IRDaikin216::toString(void) const {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
-  result += addTempToString(getTemp());
+  result += addTempToString(_.Temp);
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addBoolToString(getSwingHorizontal(), kSwingHStr);
-  result += addBoolToString(getSwingVertical(), kSwingVStr);
+  result += addBoolToString(_.SwingH, kSwingHStr);
+  result += addBoolToString(_.SwingV, kSwingVStr);
   result += addBoolToString(getQuiet(), kQuietStr);
-  result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addBoolToString(_.Powerful, kPowerfulStr);
   return result;
 }
 
@@ -1891,44 +1844,43 @@ bool IRDaikin160::validChecksum(uint8_t state[], const uint16_t length) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRDaikin160::checksum(void) {
-  remote_state[kDaikin160Section1Length - 1] = sumBytes(
-      remote_state, kDaikin160Section1Length - 1);
-  remote_state[kDaikin160StateLength - 1] = sumBytes(
-      remote_state + kDaikin160Section1Length, kDaikin160Section2Length - 1);
+  _.Sum1 = sumBytes(_.raw, kDaikin160Section1Length - 1);
+  _.Sum2 = sumBytes(_.raw + kDaikin160Section1Length,
+                    kDaikin160Section2Length - 1);
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRDaikin160::stateReset(void) {
-  for (uint8_t i = 0; i < kDaikin160StateLength; i++) remote_state[i] = 0x00;
-  remote_state[0] =  0x11;
-  remote_state[1] =  0xDA;
-  remote_state[2] =  0x27;
-  remote_state[3] =  0xF0;
-  remote_state[4] =  0x0D;
-  // remote_state[6] is a checksum byte, it will be set by checksum().
-  remote_state[7] =  0x11;
-  remote_state[8] =  0xDA;
-  remote_state[9] =  0x27;
-  remote_state[11] = 0xD3;
-  remote_state[12] = 0x30;
-  remote_state[13] = 0x11;
-  remote_state[16] = 0x1E;
-  remote_state[17] = 0x0A;
-  remote_state[18] = 0x08;
-  // remote_state[19] is a checksum byte, it will be set by checksum().
+  for (uint8_t i = 0; i < kDaikin160StateLength; i++) _.raw[i] = 0x00;
+  _.raw[0] =  0x11;
+  _.raw[1] =  0xDA;
+  _.raw[2] =  0x27;
+  _.raw[3] =  0xF0;
+  _.raw[4] =  0x0D;
+  // _.raw[6] is a checksum byte, it will be set by checksum().
+  _.raw[7] =  0x11;
+  _.raw[8] =  0xDA;
+  _.raw[9] =  0x27;
+  _.raw[11] = 0xD3;
+  _.raw[12] = 0x30;
+  _.raw[13] = 0x11;
+  _.raw[16] = 0x1E;
+  _.raw[17] = 0x0A;
+  _.raw[18] = 0x08;
+  // _.raw[19] is a checksum byte, it will be set by checksum().
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin160::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRDaikin160::setRaw(const uint8_t new_code[]) {
-  memcpy(remote_state, new_code, kDaikin160StateLength);
+  std::memcpy(_.raw, new_code, kDaikin160StateLength);
 }
 
 #if SEND_DAIKIN160
@@ -1948,19 +1900,19 @@ void IRDaikin160::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin160::setPower(const bool on) {
-  setBit(&remote_state[kDaikin160BytePower], kDaikinBitPowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin160::getPower(void) {
-  return GETBIT8(remote_state[kDaikin160BytePower], kDaikinBitPowerOffset);
+bool IRDaikin160::getPower(void) const {
+  return _.Power;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDaikin160::getMode(void) {
-  return GETBITS8(remote_state[kDaikin160ByteMode], kHighNibble, kModeBitsSize);
+uint8_t IRDaikin160::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -1972,10 +1924,9 @@ void IRDaikin160::setMode(const uint8_t mode) {
     case kDaikinHeat:
     case kDaikinFan:
     case kDaikinDry:
-      setBits(&remote_state[kDaikin160ByteMode], kHighNibble, kModeBitsSize,
-              mode);
+      _.Mode = mode;
       break;
-    default: this->setMode(kDaikinAuto);
+    default: _.Mode = kDaikinAuto;
   }
 }
 
@@ -1991,15 +1942,13 @@ uint8_t IRDaikin160::convertMode(const stdAc::opmode_t mode) {
 void IRDaikin160::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kDaikinMinTemp);
   degrees = std::min(degrees, kDaikinMaxTemp) - 10;
-  setBits(&remote_state[kDaikin160ByteTemp], kDaikin160TempOffset,
-          kDaikin160TempSize, degrees);
+  _.Temp = degrees;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRDaikin160::getTemp(void) {
-  return GETBITS8(remote_state[kDaikin160ByteTemp], kDaikin160TempOffset,
-                  kDaikin160TempSize) + 10;
+uint8_t IRDaikin160::getTemp(void) const {
+  return _.Temp + 10;
 }
 
 /// Set the speed of the fan.
@@ -2013,15 +1962,13 @@ void IRDaikin160::setFan(const uint8_t fan) {
     fanset = kDaikinFanAuto;
   else
     fanset = 2 + fan;
-  // Set the fan speed bits, leave *upper* 4 bits alone
-  setBits(&remote_state[kDaikin160ByteFan], kLowNibble, kDaikinFanSize, fanset);
+  _.Fan = fanset;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRDaikin160::getFan(void) {
-  uint8_t fan = GETBITS8(remote_state[kDaikin160ByteFan], kLowNibble,
-                         kDaikinFanSize);
+uint8_t IRDaikin160::getFan(void) const {
+  uint8_t fan = _.Fan;
   if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
   return fan;
 }
@@ -2051,18 +1998,16 @@ void IRDaikin160::setSwingVertical(const uint8_t position) {
     case kDaikin160SwingVHigh:
     case kDaikin160SwingVHighest:
     case kDaikin160SwingVAuto:
-      setBits(&remote_state[kDaikin160ByteSwingV], kHighNibble,
-              kDaikinSwingSize, position);
+      _.SwingV = position;
       break;
-    default: setSwingVertical(kDaikin160SwingVAuto);
+    default: _.SwingV = kDaikin160SwingVAuto;
   }
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRDaikin160::getSwingVertical(void) {
-  return GETBITS8(remote_state[kDaikin160ByteSwingV], kHighNibble,
-                  kDaikinSwingSize);
+uint8_t IRDaikin160::getSwingVertical(void) const {
+  return _.SwingV;
 }
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
@@ -2098,16 +2043,16 @@ stdAc::swingv_t IRDaikin160::toCommonSwingV(const uint8_t setting) {
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRDaikin160::toCommon(void) {
+stdAc::state_t IRDaikin160::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN160;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = IRDaikinESP::toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
-  result.swingv = this->toCommonSwingV(this->getSwingVertical());
+  result.degrees = getTemp();
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(getFan());
+  result.swingv = toCommonSwingV(_.SwingV);
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
@@ -2124,18 +2069,18 @@ stdAc::state_t IRDaikin160::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRDaikin160::toString(void) {
+String IRDaikin160::toString(void) const {
   String result = "";
   result.reserve(150);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addIntToString(getSwingVertical(), kSwingVStr);
+  result += addIntToString(_.SwingV, kSwingVStr);
   result += kSpaceLBraceStr;
-  switch (getSwingVertical()) {
+  switch (_.SwingV) {
     case kDaikin160SwingVHighest: result += kHighestStr; break;
     case kDaikin160SwingVHigh:    result += kHighStr; break;
     case kDaikin160SwingVMiddle:  result += kMiddleStr; break;
@@ -2263,30 +2208,29 @@ bool IRDaikin176::validChecksum(uint8_t state[], const uint16_t length) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRDaikin176::checksum(void) {
-  remote_state[kDaikin176Section1Length - 1] = sumBytes(
-      remote_state, kDaikin176Section1Length - 1);
-  remote_state[kDaikin176StateLength - 1] = sumBytes(
-      remote_state + kDaikin176Section1Length, kDaikin176Section2Length - 1);
+  _.Sum1 = sumBytes(_.raw, kDaikin176Section1Length - 1);
+  _.Sum2 = sumBytes(_.raw + kDaikin176Section1Length,
+                    kDaikin176Section2Length - 1);
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRDaikin176::stateReset(void) {
-  for (uint8_t i = 0; i < kDaikin176StateLength; i++) remote_state[i] = 0x00;
-  remote_state[0] =  0x11;
-  remote_state[1] =  0xDA;
-  remote_state[2] =  0x17;
-  remote_state[3] =  0x18;
-  remote_state[4] =  0x04;
-  // remote_state[6] is a checksum byte, it will be set by checksum().
-  remote_state[7] =  0x11;
-  remote_state[8] =  0xDA;
-  remote_state[9] =  0x17;
-  remote_state[10] = 0x18;
-  remote_state[12] = 0x73;
-  remote_state[14] = 0x20;
-  remote_state[18] = 0x16;  // Fan speed and swing
-  remote_state[20] = 0x20;
-  // remote_state[21] is a checksum byte, it will be set by checksum().
+  for (uint8_t i = 0; i < kDaikin176StateLength; i++) _.raw[i] = 0x00;
+  _.raw[0] =  0x11;
+  _.raw[1] =  0xDA;
+  _.raw[2] =  0x17;
+  _.raw[3] =  0x18;
+  _.raw[4] =  0x04;
+  // _.raw[6] is a checksum byte, it will be set by checksum().
+  _.raw[7] =  0x11;
+  _.raw[8] =  0xDA;
+  _.raw[9] =  0x17;
+  _.raw[10] = 0x18;
+  _.raw[12] = 0x73;
+  _.raw[14] = 0x20;
+  _.raw[18] = 0x16;  // Fan speed and swing
+  _.raw[20] = 0x20;
+  // _.raw[21] is a checksum byte, it will be set by checksum().
   _saved_temp = getTemp();
 }
 
@@ -2294,13 +2238,13 @@ void IRDaikin176::stateReset(void) {
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin176::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRDaikin176::setRaw(const uint8_t new_code[]) {
-  memcpy(remote_state, new_code, kDaikin176StateLength);
+  std::memcpy(_.raw, new_code, kDaikin176StateLength);
   _saved_temp = getTemp();
 }
 
@@ -2321,27 +2265,28 @@ void IRDaikin176::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin176::setPower(const bool on) {
-  remote_state[kDaikin176ByteModeButton] = 0;
-  setBit(&remote_state[kDaikin176ByteModePower], kDaikinBitPowerOffset, on);
+  _.ModeButton = 0;
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin176::getPower(void) {
-  return GETBIT8(remote_state[kDaikin176ByteModePower], kDaikinBitPowerOffset);
+bool IRDaikin176::getPower(void) const {
+  return _.Power;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDaikin176::getMode(void) {
-  return GETBITS8(remote_state[kDaikin176ByteModePower], kHighNibble,
-                  kModeBitsSize);
+uint8_t IRDaikin176::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired operating mode.
 void IRDaikin176::setMode(const uint8_t mode) {
   uint8_t altmode = 0;
+  // Set the mode bits.
+  _.Mode = mode;
   // Daikin172 has some alternate/additional mode bits that need to be changed
   // in line with the operating mode. The following few lines match up these
   // bits with the corresponding operating bits.
@@ -2351,17 +2296,13 @@ void IRDaikin176::setMode(const uint8_t mode) {
     case kDaikin176Auto:
     case kDaikin176Cool:
     case kDaikin176Heat: altmode = 7; break;
-    default: setMode(kDaikin176Cool); return;
+    default: _.Mode = kDaikin176Cool; altmode = 7; break;
   }
-  // Set the mode bits.
-  setBits(&remote_state[kDaikin176ByteModePower], kHighNibble, kModeBitsSize,
-          mode);
   // Set the additional mode bits.
-  setBits(&remote_state[kDaikin176ByteAltMode], kHighNibble, kModeBitsSize,
-          altmode);
+  _.AltMode = altmode;
   setTemp(_saved_temp);
   // Needs to happen after setTemp() as it will clear it.
-  remote_state[kDaikin176ByteModeButton] = kDaikin176ModeButton;
+  _.ModeButton = kDaikin176ModeButton;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -2395,21 +2336,19 @@ stdAc::opmode_t IRDaikin176::toCommonMode(const uint8_t mode) {
 void IRDaikin176::setTemp(const uint8_t temp) {
   uint8_t degrees = std::min(kDaikinMaxTemp, std::max(temp, kDaikinMinTemp));
   _saved_temp = degrees;
-  switch (getMode()) {
+  switch (_.Mode) {
     case kDaikin176Dry:
     case kDaikin176Fan:
-      degrees = kDaikin176DryFanTemp;
+      degrees = kDaikin176DryFanTemp; break;
   }
-  setBits(&remote_state[kDaikin176ByteTemp], kDaikin176TempOffset,
-          kDaikin176TempSize, degrees - 9);
-  remote_state[kDaikin176ByteModeButton] = 0;
+  _.Temp = degrees - 9;
+  _.ModeButton = 0;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRDaikin176::getTemp(void) {
-  return GETBITS8(remote_state[kDaikin176ByteTemp], kDaikin176TempOffset,
-                  kDaikin176TempSize) + 9;
+uint8_t IRDaikin176::getTemp(void) const {
+  return _.Temp + 9;
 }
 
 /// Set the speed of the fan.
@@ -2419,19 +2358,19 @@ void IRDaikin176::setFan(const uint8_t fan) {
   switch (fan) {
     case kDaikinFanMin:
     case kDaikin176FanMax:
-      setBits(&remote_state[kDaikin176ByteFan], kHighNibble, kDaikinFanSize,
-              fan);
-      remote_state[kDaikin176ByteModeButton] = 0;
+      _.Fan = fan;
       break;
     default:
-      setFan(kDaikin176FanMax);
+      _.Fan = kDaikin176FanMax;
+      break;
   }
+  _.ModeButton = 0;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRDaikin176::getFan(void) {
-  return GETBITS8(remote_state[kDaikin176ByteFan], kHighNibble, kDaikinFanSize);
+uint8_t IRDaikin176::getFan(void) const {
+  return _.Fan;
 }
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
@@ -2451,18 +2390,16 @@ void IRDaikin176::setSwingHorizontal(const uint8_t position) {
   switch (position) {
     case kDaikin176SwingHOff:
     case kDaikin176SwingHAuto:
-      setBits(&remote_state[kDaikin176ByteSwingH], kLowNibble, kDaikinSwingSize,
-              position);
+      _.SwingH = position;
       break;
-    default: setSwingHorizontal(kDaikin176SwingHAuto);
+    default: _.SwingH = kDaikin176SwingHAuto;
   }
 }
 
 /// Get the Horizontal Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRDaikin176::getSwingHorizontal(void) {
-  return GETBITS8(remote_state[kDaikin176ByteSwingH], kLowNibble,
-                  kDaikinSwingSize);
+uint8_t IRDaikin176::getSwingHorizontal(void) const {
+  return _.SwingH;
 }
 
 /// Convert a stdAc::swingh_t enum into it's native setting.
@@ -2498,16 +2435,16 @@ stdAc::fanspeed_t IRDaikin176::toCommonFanSpeed(const uint8_t speed) {
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRDaikin176::toCommon(void) {
+stdAc::state_t IRDaikin176::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN176;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = IRDaikin176::toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = IRDaikin176::toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingh = toCommonSwingH(_.SwingH);
 
   // Not supported.
   result.swingv = stdAc::swingv_t::kOff;
@@ -2525,18 +2462,18 @@ stdAc::state_t IRDaikin176::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRDaikin176::toString(void) {
+String IRDaikin176::toString(void) const {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kDaikin176Auto, kDaikin176Cool,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kDaikin176Auto, kDaikin176Cool,
                             kDaikin176Heat, kDaikin176Dry, kDaikin176Fan);
   result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kDaikin176FanMax, kDaikinFanMin,
+  result += addFanToString(_.Fan, kDaikin176FanMax, kDaikinFanMin,
                            kDaikinFanMin, kDaikinFanMin, kDaikinFanMin);
-  result += addIntToString(getSwingHorizontal(), kSwingHStr);
+  result += addIntToString(_.SwingH, kSwingHStr);
   result += kSpaceLBraceStr;
-  switch (getSwingHorizontal()) {
+  switch (_.SwingH) {
     case kDaikin176SwingHAuto:
       result += kAutoStr;
       break;
@@ -2677,32 +2614,30 @@ bool IRDaikin128::validChecksum(uint8_t state[]) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRDaikin128::checksum(void) {
-  remote_state[kDaikin128SectionLength - 1] &= 0x0F;  // Clear upper half.
-  remote_state[kDaikin128SectionLength - 1] |=
-      (calcFirstChecksum(remote_state) << 4);
-  remote_state[kDaikin128StateLength - 1] = calcSecondChecksum(remote_state);
+  _.Sum1 = calcFirstChecksum(_.raw);
+  _.Sum2 = calcSecondChecksum(_.raw);
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRDaikin128::stateReset(void) {
-  for (uint8_t i = 0; i < kDaikin128StateLength; i++) remote_state[i] = 0x00;
-  remote_state[0] = 0x16;
-  remote_state[7] = 0x04;  // Most significant nibble is a checksum.
-  remote_state[8] = 0xA1;
-  // remote_state[15] is a checksum byte, it will be set by checksum().
+  for (uint8_t i = 0; i < kDaikin128StateLength; i++) _.raw[i] = 0x00;
+  _.raw[0] = 0x16;
+  _.raw[7] = 0x04;  // Most significant nibble is a checksum.
+  _.raw[8] = 0xA1;
+  // _.raw[15] is a checksum byte, it will be set by checksum().
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin128::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRDaikin128::setRaw(const uint8_t new_code[]) {
-  memcpy(remote_state, new_code, kDaikin128StateLength);
+  std::memcpy(_.raw, new_code, kDaikin128StateLength);
 }
 
 #if SEND_DAIKIN128
@@ -2716,22 +2651,19 @@ void IRDaikin128::send(const uint16_t repeat) {
 /// Set the Power toggle setting of the A/C.
 /// @param[in] toggle true, the setting is on. false, the setting is off.
 void IRDaikin128::setPowerToggle(const bool toggle) {
-  setBit(&remote_state[kDaikin128BytePowerSwingSleep],
-         kDaikin128BitPowerToggleOffset, toggle);
+  _.Power = toggle;
 }
 
 /// Get the Power toggle setting of the A/C.
 /// @return The current operating mode setting.
-bool IRDaikin128::getPowerToggle(void) {
-  return GETBIT8(remote_state[kDaikin128BytePowerSwingSleep],
-                 kDaikin128BitPowerToggleOffset);
+bool IRDaikin128::getPowerToggle(void) const {
+  return _.Power;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDaikin128::getMode(void) {
-  return GETBITS8(remote_state[kDaikin128ByteModeFan], kLowNibble,
-                  kDaikin128ModeSize);
+uint8_t IRDaikin128::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -2743,12 +2675,11 @@ void IRDaikin128::setMode(const uint8_t mode) {
     case kDaikin128Heat:
     case kDaikin128Fan:
     case kDaikin128Dry:
-      setBits(&remote_state[kDaikin128ByteModeFan], kLowNibble,
-              kDaikin128ModeSize, mode);
+      _.Mode = mode;
       break;
     default:
-      this->setMode(kDaikin128Auto);
-      return;
+      _.Mode = kDaikin128Auto;
+      break;
   }
   // Force a reset of mode dependant things.
   setFan(getFan());  // Covers Quiet & Powerful too.
@@ -2784,28 +2715,27 @@ stdAc::opmode_t IRDaikin128::toCommonMode(const uint8_t mode) {
 /// Set the temperature.
 /// @param[in] temp The temperature in degrees celsius.
 void IRDaikin128::setTemp(const uint8_t temp) {
-  remote_state[kDaikin128ByteTemp] = uint8ToBcd(
-    std::min(kDaikin128MaxTemp, std::max(temp, kDaikin128MinTemp)));
+  _.Temp = uint8ToBcd(std::min(kDaikin128MaxTemp,
+                              std::max(temp, kDaikin128MinTemp)));
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRDaikin128::getTemp(void) {
-  return bcdToUint8(remote_state[kDaikin128ByteTemp]);
+uint8_t IRDaikin128::getTemp(void) const {
+  return bcdToUint8(_.Temp);
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRDaikin128::getFan(void) {
-  return GETBITS8(remote_state[kDaikin128ByteModeFan], kHighNibble,
-                  kDaikinFanSize);
+uint8_t IRDaikin128::getFan(void) const {
+  return _.Fan;
 }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
 void IRDaikin128::setFan(const uint8_t speed) {
   uint8_t new_speed = speed;
-  uint8_t mode = getMode();
+  uint8_t mode = _.Mode;
   switch (speed) {
     case kDaikin128FanQuiet:
     case kDaikin128FanPowerful:
@@ -2815,11 +2745,11 @@ void IRDaikin128::setFan(const uint8_t speed) {
     case kDaikin128FanHigh:
     case kDaikin128FanMed:
     case kDaikin128FanLow:
-      setBits(&remote_state[kDaikin128ByteModeFan], kHighNibble, kDaikinFanSize,
-              new_speed);
+      _.Fan = new_speed;
       break;
     default:
-      this->setFan(kDaikin128FanAuto);
+      _.Fan = kDaikin128FanAuto;
+      return;
   }
 }
 
@@ -2854,76 +2784,70 @@ stdAc::fanspeed_t IRDaikin128::toCommonFanSpeed(const uint8_t speed) {
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setSwingVertical(const bool on) {
-  setBit(&remote_state[kDaikin128BytePowerSwingSleep], kDaikin128BitSwingOffset,
-         on);
+  _.SwingV = on;
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin128::getSwingVertical(void) {
-  return GETBIT8(remote_state[kDaikin128BytePowerSwingSleep],
-                 kDaikin128BitSwingOffset);
+bool IRDaikin128::getSwingVertical(void) const {
+  return _.SwingV;
 }
 
 /// Set the Sleep mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setSleep(const bool on) {
-  setBit(&remote_state[kDaikin128BytePowerSwingSleep], kDaikin128BitSleepOffset,
-         on);
+  _.Sleep = on;
 }
 
 /// Get the Sleep mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin128::getSleep(void) {
-  return GETBIT8(remote_state[kDaikin128BytePowerSwingSleep],
-                 kDaikin128BitSleepOffset);
+bool IRDaikin128::getSleep(void) const {
+  return _.Sleep;
 }
 
 /// Set the Economy mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setEcono(const bool on) {
-  uint8_t mode = getMode();
-  setBit(&remote_state[kDaikin128ByteEconoLight], kDaikin128BitEconoOffset,
-         on && (mode == kDaikin128Cool || mode == kDaikin128Heat));
+  uint8_t mode = _.Mode;
+  _.Econo = (on && (mode == kDaikin128Cool || mode == kDaikin128Heat));
 }
 
 /// Get the Economical mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin128::getEcono(void) {
-  return GETBIT8(remote_state[kDaikin128ByteEconoLight],
-                 kDaikin128BitEconoOffset);
+bool IRDaikin128::getEcono(void) const {
+  return _.Econo;
 }
 
 /// Set the Quiet mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setQuiet(const bool on) {
-  uint8_t mode = getMode();
+  uint8_t mode = _.Mode;
   if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
     setFan(kDaikin128FanQuiet);
-  else if (getFan() == kDaikin128FanQuiet)
+  else if (_.Fan == kDaikin128FanQuiet)
     setFan(kDaikin128FanAuto);
 }
 
 /// Get the Quiet mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin128::getQuiet(void) {
-  return getFan() == kDaikin128FanQuiet;
+bool IRDaikin128::getQuiet(void) const {
+  return _.Fan == kDaikin128FanQuiet;
 }
 
 /// Set the Powerful (Turbo) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setPowerful(const bool on) {
-  uint8_t mode = getMode();
+  uint8_t mode = _.Mode;
   if (on && (mode == kDaikin128Cool || mode == kDaikin128Heat))
     setFan(kDaikin128FanPowerful);
-  else if (getFan() == kDaikin128FanPowerful)
+  else if (_.Fan == kDaikin128FanPowerful)
     setFan(kDaikin128FanAuto);
 }
 
 /// Get the Powerful (Turbo) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin128::getPowerful(void) {
-  return getFan() == kDaikin128FanPowerful;
+bool IRDaikin128::getPowerful(void) const {
+  return _.Fan == kDaikin128FanPowerful;
 }
 
 /// Set the clock on the A/C unit.
@@ -2932,137 +2856,124 @@ void IRDaikin128::setClock(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
   if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
   // Hours.
-  remote_state[kDaikin128ByteClockHours] = uint8ToBcd(mins / 60);
+  _.ClockHours = uint8ToBcd(mins / 60);
   // Minutes.
-  remote_state[kDaikin128ByteClockMins] = uint8ToBcd(mins % 60);
+  _.ClockMins = uint8ToBcd(mins % 60);
 }
 
 /// Get the clock time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin128::getClock(void) {
-  return bcdToUint8(remote_state[kDaikin128ByteClockHours]) * 60 +
-      bcdToUint8(remote_state[kDaikin128ByteClockMins]);
+uint16_t IRDaikin128::getClock(void) const {
+  return bcdToUint8(_.ClockHours) * 60 + bcdToUint8(_.ClockMins);
 }
 
 /// Set the enable status of the On Timer.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setOnTimerEnabled(const bool on) {
-  setBit(&remote_state[kDaikin128ByteOnTimer], kDaikin128BitTimerEnabledOffset,
-         on);
+  _.OnTimer = on;
 }
 
 /// Get the enable status of the On Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin128::getOnTimerEnabled(void) {
-  return GETBIT8(remote_state[kDaikin128ByteOnTimer],
-                 kDaikin128BitTimerEnabledOffset);
+bool IRDaikin128::getOnTimerEnabled(void) const {
+  return _.OnTimer;
 }
 
-/// Set the time for a timer at the given location.
-/// @param[in,out] ptr Ptr to the byte containing the Timer value to be updated.
-/// @param[in] mins_since_midnight The number of minutes the new timer should
-///   be set to.
-/// @note Timer is rounds down to the nearest half hour.
-void IRDaikin128::setTimer(uint8_t *ptr, const uint16_t mins_since_midnight) {
-  uint16_t mins = mins_since_midnight;
-  if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
-  // Set the half hour bit
-  setBit(ptr, kDaikin128HalfHourOffset, (mins % 60) >= 30);
-  // Set the nr of whole hours.
-  setBits(ptr, kDaikin128HoursOffset, kDaikin128HoursSize,
-          uint8ToBcd(mins / 60));
-}
+#define SETTIME(x, n) do { \
+  uint16_t mins = n;\
+  if (n >= 24 * 60) mins = 0;\
+  _.x##HalfHour = (mins % 60) >= 30;\
+  _.x##Hours = uint8ToBcd(mins / 60);\
+} while (0)
 
-/// Get the time for a timer at the given location.
-/// @param[in] ptr A Ptr to the byte containing the Timer value.
-/// @return The number of minutes since midnight that the timer is set to.
-/// @note Timer is stored in nr. of half hours internally.
-uint16_t IRDaikin128::getTimer(const uint8_t *ptr) {
-  return bcdToUint8(GETBITS8(*ptr, kDaikin128HoursOffset,
-                             kDaikin128HoursSize)) * 60 +
-      (GETBIT8(*ptr, kDaikin128HalfHourOffset) ? 30 : 0);
-}
+#define GETTIME(x) bcdToUint8(_.x##Hours) * 60 + (_.x##HalfHour ? 30 : 0)
 
 /// Set the On Timer time for the A/C unit.
 /// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin128::setOnTimer(const uint16_t mins_since_midnight) {
-  setTimer(remote_state + kDaikin128ByteOnTimer, mins_since_midnight);
+  SETTIME(On, mins_since_midnight);
 }
 
 /// Get the On Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin128::getOnTimer(void) {
-  return getTimer(remote_state + kDaikin128ByteOnTimer);
+uint16_t IRDaikin128::getOnTimer(void) const {
+  return GETTIME(On);
 }
 
 /// Set the enable status of the Off Timer.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin128::setOffTimerEnabled(const bool on) {
-  setBit(&remote_state[kDaikin128ByteOffTimer], kDaikin128BitTimerEnabledOffset,
-         on);
+  _.OffTimer = on;
 }
 
 /// Get the enable status of the Off Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin128::getOffTimerEnabled(void) {
-  return GETBIT8(remote_state[kDaikin128ByteOffTimer],
-                 kDaikin128BitTimerEnabledOffset);
+bool IRDaikin128::getOffTimerEnabled(void) const {
+  return _.OffTimer;
 }
 
 /// Set the Off Timer time for the A/C unit.
 /// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin128::setOffTimer(const uint16_t mins_since_midnight) {
-  setTimer(remote_state + kDaikin128ByteOffTimer, mins_since_midnight);
+  SETTIME(Off, mins_since_midnight);
 }
 
 /// Get the Off Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin128::getOffTimer(void) {
-  return getTimer(remote_state + kDaikin128ByteOffTimer);
+uint16_t IRDaikin128::getOffTimer(void) const {
+  return GETTIME(Off);
 }
 
 /// Set the Light toggle setting of the A/C.
 /// @param[in] unit Device to show the LED (Light) Display info about.
 /// @note 0 is off.
 void IRDaikin128::setLightToggle(const uint8_t unit) {
+  _.Ceiling = 0;
+  _.Wall = 0;
   switch (unit) {
-    case 0:
     case kDaikin128BitCeiling:
-    case kDaikin128BitWall:
-      remote_state[kDaikin128ByteEconoLight] &= ~kDaikin128MaskLight;
-      remote_state[kDaikin128ByteEconoLight] |= unit;
+      _.Ceiling = 1;
       break;
-    default: setLightToggle(0);
+    case kDaikin128BitWall:
+      _.Wall = 1;
+      break;
   }
 }
 
 /// Get the Light toggle setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDaikin128::getLightToggle(void) {
-  return remote_state[kDaikin128ByteEconoLight] & kDaikin128MaskLight;
+uint8_t IRDaikin128::getLightToggle(void) const {
+  uint8_t code = 0;
+  if (_.Ceiling) {
+    code = kDaikin128BitCeiling;
+  } else if (_.Wall) {
+    code = kDaikin128BitWall;
+  }
+
+  return code;
 }
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRDaikin128::toString(void) {
+String IRDaikin128::toString(void) const {
   String result = "";
   result.reserve(240);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPowerToggle(), kPowerToggleStr, false);
-  result += addModeToString(getMode(), kDaikin128Auto, kDaikin128Cool,
+  result += addBoolToString(_.Power, kPowerToggleStr, false);
+  result += addModeToString(_.Mode, kDaikin128Auto, kDaikin128Cool,
                             kDaikin128Heat, kDaikin128Dry, kDaikin128Fan);
   result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kDaikin128FanHigh, kDaikin128FanLow,
+  result += addFanToString(_.Fan, kDaikin128FanHigh, kDaikin128FanLow,
                            kDaikin128FanAuto, kDaikin128FanQuiet,
                            kDaikin128FanMed);
   result += addBoolToString(getPowerful(), kPowerfulStr);
   result += addBoolToString(getQuiet(), kQuietStr);
-  result += addBoolToString(getSwingVertical(), kSwingVStr);
-  result += addBoolToString(getSleep(), kSleepStr);
-  result += addBoolToString(getEcono(), kEconoStr);
+  result += addBoolToString(_.SwingV, kSwingVStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
+  result += addBoolToString(_.Econo, kEconoStr);
   result += addLabeledString(minsToString(getClock()), kClockStr);
-  result += addBoolToString(getOnTimerEnabled(), kOnTimerStr);
+  result += addBoolToString(_.OnTimer, kOnTimerStr);
   result += addLabeledString(minsToString(getOnTimer()), kOnTimerStr);
-  result += addBoolToString(getOffTimerEnabled(), kOffTimerStr);
+  result += addBoolToString(_.OffTimer, kOffTimerStr);
   result += addLabeledString(minsToString(getOffTimer()), kOffTimerStr);
   result += addIntToString(getLightToggle(), kLightToggleStr);
   result += kSpaceLBraceStr;
@@ -3079,23 +2990,22 @@ String IRDaikin128::toString(void) {
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @param[in] prev Ptr to a previous state.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) {
+stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
   if (prev != NULL) result = *prev;
   result.protocol = decode_type_t::DAIKIN128;
   result.model = -1;  // No models used.
-  result.power ^= getPowerToggle();
-  result.mode = toCommonMode(getMode());
+  result.power ^= _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
-  result.swingv = getSwingVertical() ? stdAc::swingv_t::kAuto
-                                     : stdAc::swingv_t::kOff;
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
   result.quiet = getQuiet();
   result.turbo = getPowerful();
-  result.econo = getEcono();
+  result.econo = _.Econo;
   result.light ^= (getLightToggle() != 0);
-  result.sleep = getSleep() ? 0 : -1;
+  result.sleep = _.Sleep ? 0 : -1;
   result.clock = getClock();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
@@ -3286,31 +3196,30 @@ bool IRDaikin152::validChecksum(uint8_t state[], const uint16_t length) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRDaikin152::checksum(void) {
-  remote_state[kDaikin152StateLength - 1] = sumBytes(
-      remote_state, kDaikin152StateLength - 1);
+  _.Sum = sumBytes(_.raw, kDaikin152StateLength - 1);
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRDaikin152::stateReset(void) {
-  for (uint8_t i = 3; i < kDaikin152StateLength; i++) remote_state[i] = 0x00;
-  remote_state[0] =  0x11;
-  remote_state[1] =  0xDA;
-  remote_state[2] =  0x27;
-  remote_state[15] = 0xC5;
-  // remote_state[19] is a checksum byte, it will be set by checksum().
+  for (uint8_t i = 3; i < kDaikin152StateLength; i++) _.raw[i] = 0x00;
+  _.raw[0] =  0x11;
+  _.raw[1] =  0xDA;
+  _.raw[2] =  0x27;
+  _.raw[15] = 0xC5;
+  // _.raw[19] is a checksum byte, it will be set by checksum().
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRDaikin152::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRDaikin152::setRaw(const uint8_t new_code[]) {
-  memcpy(remote_state, new_code, kDaikin152StateLength);
+  std::memcpy(_.raw, new_code, kDaikin152StateLength);
 }
 
 /// Change the power setting to On.
@@ -3322,20 +3231,19 @@ void IRDaikin152::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setPower(const bool on) {
-  setBit(&remote_state[kDaikin152PowerByte], kDaikinBitPowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin152::getPower(void) {
-  return GETBIT8(remote_state[kDaikin152PowerByte], kDaikinBitPowerOffset);
+bool IRDaikin152::getPower(void) const {
+  return _.Power;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDaikin152::getMode(void) {
-  return GETBITS8(remote_state[kDaikin152ModeByte], kDaikinModeOffset,
-                  kDaikinModeSize);
+uint8_t IRDaikin152::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -3353,11 +3261,10 @@ void IRDaikin152::setMode(const uint8_t mode) {
     case kDaikinHeat:
       break;
     default:
-      this->setMode(kDaikinAuto);
+      _.Mode = kDaikinAuto;
       return;
   }
-  setBits(&remote_state[kDaikin152ModeByte], kDaikinModeOffset,
-          kDaikinModeSize, mode);
+  _.Mode = mode;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -3371,18 +3278,16 @@ uint8_t IRDaikin152::convertMode(const stdAc::opmode_t mode) {
 /// @param[in] temp The temperature in degrees celsius.
 void IRDaikin152::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(
-      temp, (getMode() == kDaikinHeat) ? kDaikinMinTemp : kDaikin2MinCoolTemp);
+      temp, (_.Mode == kDaikinHeat) ? kDaikinMinTemp : kDaikin2MinCoolTemp);
   degrees = std::min(degrees, kDaikinMaxTemp);
   if (temp == kDaikin152FanTemp) degrees = temp;  // Handle fan only temp.
-  setBits(&remote_state[kDaikin152TempByte], kDaikinTempOffset,
-          kDaikin152TempSize, degrees);
+  _.Temp = degrees;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRDaikin152::getTemp(void) {
-  return GETBITS8(remote_state[kDaikin152TempByte], kDaikinTempOffset,
-                  kDaikin152TempSize);
+uint8_t IRDaikin152::getTemp(void) const {
+  return _.Temp;
 }
 
 /// Set the speed of the fan.
@@ -3397,14 +3302,13 @@ void IRDaikin152::setFan(const uint8_t fan) {
     fanset = kDaikinFanAuto;
   else
     fanset = 2 + fan;
-  setBits(&remote_state[kDaikin152FanByte], kHighNibble, kNibbleSize, fanset);
+  _.Fan = fanset;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRDaikin152::getFan(void) {
-  const uint8_t fan = GETBITS8(remote_state[kDaikin152FanByte], kHighNibble,
-                               kNibbleSize);
+uint8_t IRDaikin152::getFan(void) const {
+  const uint8_t fan = _.Fan;
   switch (fan) {
     case kDaikinFanAuto:
     case kDaikinFanQuiet: return fan;
@@ -3422,80 +3326,77 @@ uint8_t IRDaikin152::convertFan(const stdAc::fanspeed_t speed) {
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setSwingV(const bool on) {
-  setBits(&remote_state[kDaikin152SwingVByte], kDaikinSwingOffset,
-          kDaikinSwingSize, on ? kDaikinSwingOn : kDaikinSwingOff);
+  _.SwingV = (on ? kDaikinSwingOn : kDaikinSwingOff);
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin152::getSwingV(void) {
-  return GETBITS8(remote_state[kDaikin152SwingVByte], kDaikinSwingOffset,
-                  kDaikinSwingSize);
+bool IRDaikin152::getSwingV(void) const {
+  return _.SwingV;
 }
 
 /// Set the Quiet mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setQuiet(const bool on) {
-  setBit(&remote_state[kDaikin152QuietByte], kDaikinBitSilentOffset, on);
+  _.Quiet = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) this->setPowerful(false);
+  if (on) setPowerful(false);
 }
 
 /// Get the Quiet mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin152::getQuiet(void) {
-  return GETBIT8(remote_state[kDaikin152QuietByte], kDaikinBitSilentOffset);
+bool IRDaikin152::getQuiet(void) const {
+  return _.Quiet;
 }
 
 /// Set the Powerful (Turbo) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setPowerful(const bool on) {
-  setBit(&remote_state[kDaikin152PowerfulByte], kDaikinBitPowerfulOffset, on);
+  _.Powerful = on;
   if (on) {
     // Powerful, Quiet, Comfortm & Econo mode being on are mutually exclusive.
-    this->setQuiet(false);
-    this->setComfort(false);
-    this->setEcono(false);
+    setQuiet(false);
+    setComfort(false);
+    setEcono(false);
   }
 }
 
 /// Get the Powerful (Turbo) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin152::getPowerful(void) {
-  return GETBIT8(remote_state[kDaikin152PowerfulByte],
-                 kDaikinBitPowerfulOffset);
+bool IRDaikin152::getPowerful(void) const {
+  return _.Powerful;
 }
 
 /// Set the Economy mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setEcono(const bool on) {
-  setBit(&remote_state[kDaikin152EconoByte], kDaikinBitEconoOffset, on);
+  _.Econo = on;
   // Powerful & Econo mode being on are mutually exclusive.
-  if (on) this->setPowerful(false);
+  if (on) setPowerful(false);
 }
 
 /// Get the Economical mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin152::getEcono(void) {
-  return GETBIT8(remote_state[kDaikin152EconoByte], kDaikinBitEconoOffset);
+bool IRDaikin152::getEcono(void) const {
+  return _.Econo;
 }
 
 /// Set the Sensor mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setSensor(const bool on) {
-  setBit(&remote_state[kDaikin152SensorByte], kDaikin152SensorOffset, on);
+  _.Sensor = on;
 }
 
 /// Get the Sensor mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin152::getSensor(void) {
-  return GETBIT8(remote_state[kDaikin152SensorByte], kDaikin152SensorOffset);
+bool IRDaikin152::getSensor(void) const {
+  return _.Sensor;
 }
 
 /// Set the Comfort mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin152::setComfort(const bool on) {
-  setBit(&remote_state[kDaikin152ComfortByte], kDaikin152ComfortOffset, on);
+  _.Comfort = on;
   if (on) {
     // Comfort mode is incompatible with Powerful mode.
     setPowerful(false);
@@ -3507,26 +3408,25 @@ void IRDaikin152::setComfort(const bool on) {
 
 /// Get the Comfort mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin152::getComfort(void) {
-  return GETBIT8(remote_state[kDaikin152ComfortByte], kDaikin152ComfortOffset);
+bool IRDaikin152::getComfort(void) const {
+  return _.Comfort;
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRDaikin152::toCommon(void) {
+stdAc::state_t IRDaikin152::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN152;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = IRDaikinESP::toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = IRDaikinESP::toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = IRDaikinESP::toCommonFanSpeed(this->getFan());
-  result.swingv = this->getSwingV() ? stdAc::swingv_t::kAuto
-                                    : stdAc::swingv_t::kOff;
-  result.quiet = this->getQuiet();
-  result.turbo = this->getPowerful();
-  result.econo = this->getEcono();
+  result.degrees = _.Temp;
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(getFan());
+  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.quiet = _.Quiet;
+  result.turbo = _.Powerful;
+  result.econo = _.Econo;
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.clean = false;
@@ -3540,21 +3440,21 @@ stdAc::state_t IRDaikin152::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRDaikin152::toString(void) {
+String IRDaikin152::toString(void) const {
   String result = "";
   result.reserve(180);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kDaikinAuto, kDaikinCool, kDaikinHeat,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
-  result += addTempToString(getTemp());
+  result += addTempToString(_.Temp);
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addBoolToString(getSwingV(), kSwingVStr);
-  result += addBoolToString(getPowerful(), kPowerfulStr);
-  result += addBoolToString(getQuiet(), kQuietStr);
-  result += addBoolToString(getEcono(), kEconoStr);
-  result += addBoolToString(getSensor(), kSensorStr);
-  result += addBoolToString(getComfort(), kComfortStr);
+  result += addBoolToString(_.SwingV, kSwingVStr);
+  result += addBoolToString(_.Powerful, kPowerfulStr);
+  result += addBoolToString(_.Quiet, kQuietStr);
+  result += addBoolToString(_.Econo, kEconoStr);
+  result += addBoolToString(_.Sensor, kSensorStr);
+  result += addBoolToString(_.Comfort, kComfortStr);
   return result;
 }
 
@@ -3680,36 +3580,35 @@ bool IRDaikin64::validChecksum(const uint64_t state) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRDaikin64::checksum(void) {
-  setBits(&remote_state, kDaikin64ChecksumOffset, kDaikin64ChecksumSize,
-          calcChecksum(remote_state));
+  _.Sum = calcChecksum(_.raw);
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRDaikin64::stateReset(void) {
-  remote_state = kDaikin64KnownGoodState;
+  _.raw = kDaikin64KnownGoodState;
 }
 
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
 uint64_t IRDaikin64::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_state A valid code for this protocol.
-void IRDaikin64::setRaw(const uint64_t new_state) { remote_state = new_state; }
+void IRDaikin64::setRaw(const uint64_t new_state) { _.raw = new_state; }
 
 /// Set the Power toggle setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setPowerToggle(const bool on) {
-  setBit(&remote_state, kDaikin64PowerToggleBit, on);
+  _.Power = on;
 }
 
 /// Get the Power toggle setting of the A/C.
 /// @return The current operating mode setting.
-bool IRDaikin64::getPowerToggle(void) {
-  return GETBIT64(remote_state, kDaikin64PowerToggleBit);
+bool IRDaikin64::getPowerToggle(void) const {
+  return _.Power;
 }
 
 /// Set the temperature.
@@ -3717,21 +3616,19 @@ bool IRDaikin64::getPowerToggle(void) {
 void IRDaikin64::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(temp, kDaikin64MinTemp);
   degrees = std::min(degrees, kDaikin64MaxTemp);
-  setBits(&remote_state, kDaikin64TempOffset,
-          kDaikin64TempSize, uint8ToBcd(degrees));
+  _.Temp = uint8ToBcd(degrees);
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRDaikin64::getTemp(void) {
-  return bcdToUint8(GETBITS64(remote_state, kDaikin64TempOffset,
-                              kDaikin64TempSize));
+uint8_t IRDaikin64::getTemp(void) const {
+  return bcdToUint8(_.Temp);
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRDaikin64::getMode(void) {
-  return GETBITS64(remote_state, kDaikin64ModeOffset, kDaikin64ModeSize);
+uint8_t IRDaikin64::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -3741,12 +3638,11 @@ void IRDaikin64::setMode(const uint8_t mode) {
     case kDaikin64Fan:
     case kDaikin64Dry:
     case kDaikin64Cool:
+      _.Mode = mode;
       break;
     default:
-      this->setMode(kDaikin64Cool);
-      return;
+      _.Mode = kDaikin64Cool;
   }
-  setBits(&remote_state, kDaikin64ModeOffset, kDaikin64ModeSize, mode);
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -3774,8 +3670,8 @@ stdAc::opmode_t IRDaikin64::toCommonMode(const uint8_t mode) {
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRDaikin64::getFan(void) {
-  return GETBITS64(remote_state, kDaikin64FanOffset, kDaikin64FanSize);
+uint8_t IRDaikin64::getFan(void) const {
+  return _.Fan;
 }
 
 /// Set the speed of the fan.
@@ -3788,10 +3684,10 @@ void IRDaikin64::setFan(const uint8_t speed) {
     case kDaikin64FanHigh:
     case kDaikin64FanMed:
     case kDaikin64FanLow:
-      setBits(&remote_state, kDaikin64FanOffset, kDaikin64FanSize, speed);
+      _.Fan = speed;
       break;
     default:
-      this->setFan(kDaikin64FanAuto);
+      _.Fan = kDaikin64FanAuto;
   }
 }
 
@@ -3825,8 +3721,8 @@ stdAc::fanspeed_t IRDaikin64::toCommonFanSpeed(const uint8_t speed) {
 
 /// Get the Turbo (Powerful) mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin64::getTurbo(void) {
-  return getFan() == kDaikin64FanTurbo;
+bool IRDaikin64::getTurbo(void) const {
+  return _.Fan == kDaikin64FanTurbo;
 }
 
 /// Set the Turbo (Powerful) mode of the A/C.
@@ -3834,15 +3730,15 @@ bool IRDaikin64::getTurbo(void) {
 void IRDaikin64::setTurbo(const bool on) {
   if (on) {
     setFan(kDaikin64FanTurbo);
-  } else {
-    if (getFan() == kDaikin64FanTurbo) setFan(kDaikin64FanAuto);
+  } else if (_.Fan == kDaikin64FanTurbo) {
+     setFan(kDaikin64FanAuto);
   }
 }
 
 /// Get the Quiet mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin64::getQuiet(void) {
-  return getFan() == kDaikin64FanQuiet;
+bool IRDaikin64::getQuiet(void) const {
+  return _.Fan == kDaikin64FanQuiet;
 }
 
 /// Set the Quiet mode of the A/C.
@@ -3850,33 +3746,33 @@ bool IRDaikin64::getQuiet(void) {
 void IRDaikin64::setQuiet(const bool on) {
   if (on) {
     setFan(kDaikin64FanQuiet);
-  } else {
-    if (getFan() == kDaikin64FanQuiet) setFan(kDaikin64FanAuto);
+  } else if (_.Fan == kDaikin64FanQuiet) {
+     setFan(kDaikin64FanAuto);
   }
 }
 
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setSwingVertical(const bool on) {
-  setBit(&remote_state, kDaikin64SwingVBit, on);
+  _.SwingV = on;
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin64::getSwingVertical(void) {
-  return GETBIT64(remote_state, kDaikin64SwingVBit);
+bool IRDaikin64::getSwingVertical(void) const {
+  return _.SwingV;
 }
 
 /// Set the Sleep mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setSleep(const bool on) {
-  setBit(&remote_state, kDaikin64SleepBit, on);
+  _.Sleep = on;
 }
 
 /// Get the Sleep mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin64::getSleep(void) {
-  return GETBIT64(remote_state, kDaikin64SleepBit);
+bool IRDaikin64::getSleep(void) const {
+  return _.Sleep;
 }
 
 /// Set the clock on the A/C unit.
@@ -3884,112 +3780,92 @@ bool IRDaikin64::getSleep(void) {
 void IRDaikin64::setClock(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
   if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
-  setBits(&remote_state, kDaikin64ClockOffset, kDaikin64ClockMinsSize,
-          uint8ToBcd(mins % 60));  // Mins
-  setBits(&remote_state, kDaikin64ClockOffset + kDaikin64ClockMinsSize,
-          kDaikin64ClockHoursSize, uint8ToBcd(mins / 60));  // Hours
+  _.ClockMins = uint8ToBcd(mins % 60);
+  _.ClockHours = uint8ToBcd(mins / 60);
 }
 
 /// Get the clock time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin64::getClock(void) {
-  return bcdToUint8(GETBITS64(remote_state,
-                              kDaikin64ClockOffset + kDaikin64ClockMinsSize,
-                              kDaikin64ClockHoursSize)) * 60 +
-         bcdToUint8(GETBITS64(remote_state, kDaikin64ClockOffset,
-                              kDaikin64ClockMinsSize));
+uint16_t IRDaikin64::getClock(void) const {
+  return bcdToUint8(_.ClockHours) * 60 + bcdToUint8(_.ClockMins);
 }
 
 /// Set the enable status of the On Timer.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setOnTimeEnabled(const bool on) {
-  setBit(&remote_state, kDaikin64OnTimeEnableBit, on);
+  _.OnTimer = on;
 }
 
 /// Get the enable status of the On Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin64::getOnTimeEnabled(void) {
-  return GETBIT64(remote_state, kDaikin64OnTimeEnableBit);
+bool IRDaikin64::getOnTimeEnabled(void) const {
+  return _.OnTimer;
 }
 
 /// Get the On Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin64::getOnTime(void) {
-  return bcdToUint8(GETBITS64(remote_state, kDaikin64OnTimeOffset,
-                              kDaikin64OnTimeSize)) * 60 +
-      (GETBIT64(remote_state, kDaikin64OnTimeHalfHourBit) ? 30 : 0);
+uint16_t IRDaikin64::getOnTime(void) const {
+  return GETTIME(On);
 }
 
 /// Set the On Timer time for the A/C unit.
 /// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin64::setOnTime(const uint16_t mins_since_midnight) {
-  uint16_t halfhours = mins_since_midnight / 30;
-  if (mins_since_midnight >= 24 * 60) halfhours = 0;  // Bounds check.
-  setBits(&remote_state, kDaikin64OnTimeOffset, kDaikin64OnTimeSize,
-          uint8ToBcd(halfhours / 2));  // Hours
-  // Half Hour
-  setBit(&remote_state, kDaikin64OnTimeHalfHourBit, halfhours % 2);
+  SETTIME(On, mins_since_midnight);
 }
 
 /// Set the enable status of the Off Timer.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRDaikin64::setOffTimeEnabled(const bool on) {
-  setBit(&remote_state, kDaikin64OffTimeEnableBit, on);
+  _.OffTimer = on;
 }
 
 /// Get the enable status of the Off Timer.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikin64::getOffTimeEnabled(void) {
-  return GETBIT64(remote_state, kDaikin64OffTimeEnableBit);
+bool IRDaikin64::getOffTimeEnabled(void) const {
+  return _.OffTimer;
 }
 
 /// Get the Off Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
-uint16_t IRDaikin64::getOffTime(void) {
-  return bcdToUint8(GETBITS64(remote_state, kDaikin64OffTimeOffset,
-                               kDaikin64OffTimeSize)) * 60 +
-      (GETBIT64(remote_state, kDaikin64OffTimeHalfHourBit) ? 30 : 0);
+uint16_t IRDaikin64::getOffTime(void) const {
+  return GETTIME(Off);
 }
 
 /// Set the Off Timer time for the A/C unit.
 /// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin64::setOffTime(const uint16_t mins_since_midnight) {
-  uint16_t halfhours = mins_since_midnight / 30;
-  if (mins_since_midnight >= 24 * 60) halfhours = 0;  // Bounds check.
-  setBits(&remote_state, kDaikin64OffTimeOffset, kDaikin64OffTimeSize,
-          uint8ToBcd(halfhours / 2));  // Hours
-  // Half Hour
-  setBit(&remote_state, kDaikin64OffTimeHalfHourBit, halfhours % 2);
+  SETTIME(Off, mins_since_midnight);
 }
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRDaikin64::toString(void) {
+String IRDaikin64::toString(void) const {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPowerToggle(), kPowerToggleStr, false);
-  result += addModeToString(getMode(), 0xFF, kDaikin64Cool,
+  result += addBoolToString(_.Power, kPowerToggleStr, false);
+  result += addModeToString(_.Mode, 0xFF, kDaikin64Cool,
                             0xFF, kDaikin64Dry, kDaikin64Fan);
   result += addTempToString(getTemp());
   if (!getTurbo()) {
-    result += addFanToString(getFan(), kDaikin64FanHigh, kDaikin64FanLow,
+    result += addFanToString(_.Fan, kDaikin64FanHigh, kDaikin64FanLow,
                              kDaikin64FanAuto, kDaikin64FanQuiet,
                              kDaikin64FanMed);
   } else {
-    result += addIntToString(getFan(), kFanStr);
+    result += addIntToString(_.Fan, kFanStr);
     result += kSpaceLBraceStr;
     result += kTurboStr;
     result += ')';
   }
   result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getQuiet(), kQuietStr);
-  result += addBoolToString(getSwingVertical(), kSwingVStr);
-  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(_.SwingV, kSwingVStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
   result += addLabeledString(minsToString(getClock()), kClockStr);
-  result += addLabeledString(getOnTimeEnabled()
+  result += addLabeledString(_.OnTimer
                              ? minsToString(getOnTime()) : kOffStr,
                              kOnTimerStr);
-  result += addLabeledString(getOffTimeEnabled()
+  result += addLabeledString(_.OffTimer
                              ? minsToString(getOffTime()) : kOffStr,
                              kOffTimerStr);
   return result;
@@ -3998,21 +3874,20 @@ String IRDaikin64::toString(void) {
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @param[in] prev Ptr to a previous state.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) {
+stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
   if (prev != NULL) result = *prev;
   result.protocol = decode_type_t::DAIKIN64;
   result.model = -1;  // No models used.
-  result.power ^= getPowerToggle();
-  result.mode = toCommonMode(getMode());
+  result.power ^= _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
-  result.swingv = getSwingVertical() ? stdAc::swingv_t::kAuto
-                                     : stdAc::swingv_t::kOff;
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
   result.turbo = getTurbo();
   result.quiet = getQuiet();
-  result.sleep = getSleep() ? 0 : -1;
+  result.sleep = _.Sleep ? 0 : -1;
   result.clock = getClock();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
