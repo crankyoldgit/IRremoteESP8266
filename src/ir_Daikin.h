@@ -57,6 +57,7 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Daikin A/C message.
 union DaikinESPProtocol{
   uint8_t raw[kDaikinStateLength];  ///< The state of the IR remote.
   struct {
@@ -170,6 +171,7 @@ const uint16_t kDaikinGap = 29000;
 const uint64_t kDaikinFirstHeader64 =
     0b1101011100000000000000001100010100000000001001111101101000010001;
 
+/// Native representation of a Daikin2 A/C message.
 union Daikin2Protocol{
   struct{
     uint8_t pad[3];
@@ -291,6 +293,7 @@ const uint8_t kDaikin2SwingHSwing =    0xBF;
 
 const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
+/// Native representation of a Daikin216 A/C message.
 union Daikin216Protocol{
   uint8_t raw[kDaikin216StateLength];  ///< The state of the IR remote.
   struct {
@@ -344,6 +347,7 @@ const uint16_t kDaikin216Section2Length = kDaikin216StateLength -
 const uint8_t kDaikin216SwingOn = 0b1111;
 const uint8_t kDaikin216SwingOff = 0b0000;
 
+/// Native representation of a Daikin160 A/C message.
 union Daikin160Protocol{
   uint8_t raw[kDaikin160StateLength];  ///< The state of the IR remote.
   struct {
@@ -395,6 +399,7 @@ const uint8_t kDaikin160SwingVHigh =    0x4;
 const uint8_t kDaikin160SwingVHighest = 0x5;
 const uint8_t kDaikin160SwingVAuto =    0xF;
 
+/// Native representation of a Daikin176 A/C message.
 union Daikin176Protocol{
   uint8_t raw[kDaikin176StateLength];  ///< The state of the IR remote.
   struct {
@@ -453,6 +458,7 @@ const uint8_t kDaikin176FanMax = 3;
 const uint8_t kDaikin176SwingHAuto =  0x5;
 const uint8_t kDaikin176SwingHOff = 0x6;
 
+/// Native representation of a Daikin128 A/C message.
 union Daikin128Protocol{
   uint8_t raw[kDaikin128StateLength];  ///< The state of the IR remote.
   struct {
@@ -524,6 +530,7 @@ const uint8_t kDaikin128MaxTemp = 30;  // C
 const uint8_t kDaikin128BitWall =         0b00001000;
 const uint8_t kDaikin128BitCeiling =      0b00000001;
 
+/// Native representation of a Daikin152 A/C message.
 union Daikin152Protocol{
   uint8_t raw[kDaikin152StateLength];  ///< The state of the IR remote.
   struct {
@@ -576,6 +583,7 @@ const uint16_t kDaikin152Gap = 25182;
 const uint8_t kDaikin152DryTemp = kDaikin2MinCoolTemp;  // Celsius
 const uint8_t kDaikin152FanTemp = 0x60;  // 96 Celsius
 
+/// Native representation of a Daikin64 A/C message.
 union Daikin64Protocol{
   uint64_t raw;  ///< The state of the IR remote.
   struct {
