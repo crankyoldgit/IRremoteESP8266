@@ -81,8 +81,9 @@ Collaboration diagram for IRDelonghiAc:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRDelonghiAc__coll__graph.png" border="0" usemap="#IRDelonghiAc_coll__map" alt="Collaboration graph"/></div>
 <map name="IRDelonghiAc_coll__map" id="IRDelonghiAc_coll__map">
-<area shape="rect" title="Class for handling detailed Delonghi A/C messages." alt="" coords="5,95,115,121"/>
-<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="27,5,93,32"/>
+<area shape="rect" title="Class for handling detailed Delonghi A/C messages." alt="" coords="45,95,155,121"/>
+<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
+<area shape="rect" href="unionDelonghiProtocol.html" title=" " alt="" coords="96,5,229,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -91,108 +92,102 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa6f8661cf6baa369a0a5b9d775c392e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aa6f8661cf6baa369a0a5b9d775c392e0">IRDelonghiAc</a> (const uint16_t pin, const bool inverted=false, const bool use_modulation=true)</td></tr>
 <tr class="memdesc:aa6f8661cf6baa369a0a5b9d775c392e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class constructor.  <a href="classIRDelonghiAc.html#aa6f8661cf6baa369a0a5b9d775c392e0">More...</a><br /></td></tr>
 <tr class="separator:aa6f8661cf6baa369a0a5b9d775c392e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac444790a16678a1e88f1adef02829ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aac444790a16678a1e88f1adef02829ba">stateReset</a> ()</td></tr>
-<tr class="memdesc:aac444790a16678a1e88f1adef02829ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state to a fixed known good state.  <a href="classIRDelonghiAc.html#aac444790a16678a1e88f1adef02829ba">More...</a><br /></td></tr>
-<tr class="separator:aac444790a16678a1e88f1adef02829ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acadbed22a27f2376c1e8424dec0caa35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#acadbed22a27f2376c1e8424dec0caa35">stateReset</a> (void)</td></tr>
+<tr class="memdesc:acadbed22a27f2376c1e8424dec0caa35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state to a fixed known good state.  <a href="classIRDelonghiAc.html#acadbed22a27f2376c1e8424dec0caa35">More...</a><br /></td></tr>
+<tr class="separator:acadbed22a27f2376c1e8424dec0caa35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afba831b6884771b84bab684732e0f4f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#afba831b6884771b84bab684732e0f4f5">send</a> (const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a8f18256a0a6893e077e253e5e80da164">kDelonghiAcDefaultRepeat</a>)</td></tr>
 <tr class="memdesc:afba831b6884771b84bab684732e0f4f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the current internal state as an IR message.  <a href="classIRDelonghiAc.html#afba831b6884771b84bab684732e0f4f5">More...</a><br /></td></tr>
 <tr class="separator:afba831b6884771b84bab684732e0f4f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab8f78adcd7fcbea0be753a4fc7696e0"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aab8f78adcd7fcbea0be753a4fc7696e0">calibrate</a> (void)</td></tr>
 <tr class="memdesc:aab8f78adcd7fcbea0be753a4fc7696e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the calibration to calculate uSec timing offsets for this platform.  <a href="classIRDelonghiAc.html#aab8f78adcd7fcbea0be753a4fc7696e0">More...</a><br /></td></tr>
 <tr class="separator:aab8f78adcd7fcbea0be753a4fc7696e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d5e4f95e929c2365b2be47f42c6328c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a8d5e4f95e929c2365b2be47f42c6328c">begin</a> ()</td></tr>
-<tr class="memdesc:a8d5e4f95e929c2365b2be47f42c6328c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up hardware to be able to send a message.  <a href="classIRDelonghiAc.html#a8d5e4f95e929c2365b2be47f42c6328c">More...</a><br /></td></tr>
-<tr class="separator:a8d5e4f95e929c2365b2be47f42c6328c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1ebbf63aa2331b87b95df9c5bdb41dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aa1ebbf63aa2331b87b95df9c5bdb41dc">setPower</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab21d64ace3107a8f3359b3828bc2cab5">on</a>)</td></tr>
+<tr class="memitem:af3e6d5f445b5968fc69792a1c06f6d5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#af3e6d5f445b5968fc69792a1c06f6d5b">begin</a> (void)</td></tr>
+<tr class="memdesc:af3e6d5f445b5968fc69792a1c06f6d5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up hardware to be able to send a message.  <a href="classIRDelonghiAc.html#af3e6d5f445b5968fc69792a1c06f6d5b">More...</a><br /></td></tr>
+<tr class="separator:af3e6d5f445b5968fc69792a1c06f6d5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1ebbf63aa2331b87b95df9c5bdb41dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aa1ebbf63aa2331b87b95df9c5bdb41dc">setPower</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab919817947827f900e35080f63354ac3">on</a>)</td></tr>
 <tr class="memdesc:aa1ebbf63aa2331b87b95df9c5bdb41dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRDelonghiAc.html#aa1ebbf63aa2331b87b95df9c5bdb41dc">More...</a><br /></td></tr>
 <tr class="separator:aa1ebbf63aa2331b87b95df9c5bdb41dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae077f0e444fcf24b1e0343e93244b7e8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#ae077f0e444fcf24b1e0343e93244b7e8">getPower</a> ()</td></tr>
-<tr class="memdesc:ae077f0e444fcf24b1e0343e93244b7e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRDelonghiAc.html#ae077f0e444fcf24b1e0343e93244b7e8">More...</a><br /></td></tr>
-<tr class="separator:ae077f0e444fcf24b1e0343e93244b7e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab21d64ace3107a8f3359b3828bc2cab5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#ab21d64ace3107a8f3359b3828bc2cab5">on</a> ()</td></tr>
-<tr class="memdesc:ab21d64ace3107a8f3359b3828bc2cab5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to On.  <a href="classIRDelonghiAc.html#ab21d64ace3107a8f3359b3828bc2cab5">More...</a><br /></td></tr>
-<tr class="separator:ab21d64ace3107a8f3359b3828bc2cab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2f8f1d5da390bd5e5b36102dd40f5c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aa2f8f1d5da390bd5e5b36102dd40f5c8">off</a> ()</td></tr>
-<tr class="memdesc:aa2f8f1d5da390bd5e5b36102dd40f5c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to Off.  <a href="classIRDelonghiAc.html#aa2f8f1d5da390bd5e5b36102dd40f5c8">More...</a><br /></td></tr>
-<tr class="separator:aa2f8f1d5da390bd5e5b36102dd40f5c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88a2ef78cf091f9b4ab38536b6cbe25e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a88a2ef78cf091f9b4ab38536b6cbe25e">getPower</a> (void) const</td></tr>
+<tr class="memdesc:a88a2ef78cf091f9b4ab38536b6cbe25e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRDelonghiAc.html#a88a2ef78cf091f9b4ab38536b6cbe25e">More...</a><br /></td></tr>
+<tr class="separator:a88a2ef78cf091f9b4ab38536b6cbe25e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab919817947827f900e35080f63354ac3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#ab919817947827f900e35080f63354ac3">on</a> (void)</td></tr>
+<tr class="memdesc:ab919817947827f900e35080f63354ac3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to On.  <a href="classIRDelonghiAc.html#ab919817947827f900e35080f63354ac3">More...</a><br /></td></tr>
+<tr class="separator:ab919817947827f900e35080f63354ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab584add0eb59acf3b209e7c252605304"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#ab584add0eb59acf3b209e7c252605304">off</a> (void)</td></tr>
+<tr class="memdesc:ab584add0eb59acf3b209e7c252605304"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to Off.  <a href="classIRDelonghiAc.html#ab584add0eb59acf3b209e7c252605304">More...</a><br /></td></tr>
+<tr class="separator:ab584add0eb59acf3b209e7c252605304"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e3681e49065ba232577ca05157a5ef2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a4e3681e49065ba232577ca05157a5ef2">setTempUnit</a> (const bool celsius)</td></tr>
 <tr class="memdesc:a4e3681e49065ba232577ca05157a5ef2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the temperature scale units.  <a href="classIRDelonghiAc.html#a4e3681e49065ba232577ca05157a5ef2">More...</a><br /></td></tr>
 <tr class="separator:a4e3681e49065ba232577ca05157a5ef2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bbe27e1e87fbfc6b126c7f135886632"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a8bbe27e1e87fbfc6b126c7f135886632">getTempUnit</a> (void)</td></tr>
-<tr class="memdesc:a8bbe27e1e87fbfc6b126c7f135886632"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the temperature scale unit of measure currently in use.  <a href="classIRDelonghiAc.html#a8bbe27e1e87fbfc6b126c7f135886632">More...</a><br /></td></tr>
-<tr class="separator:a8bbe27e1e87fbfc6b126c7f135886632"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a444276a706d2b5099eab4452cfe4712d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a444276a706d2b5099eab4452cfe4712d">getTempUnit</a> (void) const</td></tr>
+<tr class="memdesc:a444276a706d2b5099eab4452cfe4712d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the temperature scale unit of measure currently in use.  <a href="classIRDelonghiAc.html#a444276a706d2b5099eab4452cfe4712d">More...</a><br /></td></tr>
+<tr class="separator:a444276a706d2b5099eab4452cfe4712d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08cc3e32c50277e3f986ed2c3945ce0d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a08cc3e32c50277e3f986ed2c3945ce0d">setTemp</a> (const uint8_t temp, const bool fahrenheit=false, const bool force=false)</td></tr>
 <tr class="memdesc:a08cc3e32c50277e3f986ed2c3945ce0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRDelonghiAc.html#a08cc3e32c50277e3f986ed2c3945ce0d">More...</a><br /></td></tr>
 <tr class="separator:a08cc3e32c50277e3f986ed2c3945ce0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5664302ab883fc88c23c8bb2aa020cb9"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a5664302ab883fc88c23c8bb2aa020cb9">getTemp</a> ()</td></tr>
-<tr class="memdesc:a5664302ab883fc88c23c8bb2aa020cb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRDelonghiAc.html#a5664302ab883fc88c23c8bb2aa020cb9">More...</a><br /></td></tr>
-<tr class="separator:a5664302ab883fc88c23c8bb2aa020cb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c2d1e8a10cac59b9ef925a26191c99c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a1c2d1e8a10cac59b9ef925a26191c99c">getTemp</a> (void) const</td></tr>
+<tr class="memdesc:a1c2d1e8a10cac59b9ef925a26191c99c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRDelonghiAc.html#a1c2d1e8a10cac59b9ef925a26191c99c">More...</a><br /></td></tr>
+<tr class="separator:a1c2d1e8a10cac59b9ef925a26191c99c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a440f1e0efa18c6b1a8e18e0a97fbfb79"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a440f1e0efa18c6b1a8e18e0a97fbfb79">setFan</a> (const uint8_t speed)</td></tr>
 <tr class="memdesc:a440f1e0efa18c6b1a8e18e0a97fbfb79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRDelonghiAc.html#a440f1e0efa18c6b1a8e18e0a97fbfb79">More...</a><br /></td></tr>
 <tr class="separator:a440f1e0efa18c6b1a8e18e0a97fbfb79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd2ed0ec70e3912335a9174bca7e7f5e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#afd2ed0ec70e3912335a9174bca7e7f5e">getFan</a> ()</td></tr>
-<tr class="memdesc:afd2ed0ec70e3912335a9174bca7e7f5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current native fan speed setting.  <a href="classIRDelonghiAc.html#afd2ed0ec70e3912335a9174bca7e7f5e">More...</a><br /></td></tr>
-<tr class="separator:afd2ed0ec70e3912335a9174bca7e7f5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a897dd29a58fed41abb4a6bbe10527188"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a897dd29a58fed41abb4a6bbe10527188">getFan</a> (void) const</td></tr>
+<tr class="memdesc:a897dd29a58fed41abb4a6bbe10527188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current native fan speed setting.  <a href="classIRDelonghiAc.html#a897dd29a58fed41abb4a6bbe10527188">More...</a><br /></td></tr>
+<tr class="separator:a897dd29a58fed41abb4a6bbe10527188"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62392c26321f038a84d99d54039bcfae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a62392c26321f038a84d99d54039bcfae">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a62392c26321f038a84d99d54039bcfae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRDelonghiAc.html#a62392c26321f038a84d99d54039bcfae">More...</a><br /></td></tr>
 <tr class="separator:a62392c26321f038a84d99d54039bcfae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89d9fa5b2c4a59b46cac111418232090"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a89d9fa5b2c4a59b46cac111418232090">getMode</a> ()</td></tr>
-<tr class="memdesc:a89d9fa5b2c4a59b46cac111418232090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRDelonghiAc.html#a89d9fa5b2c4a59b46cac111418232090">More...</a><br /></td></tr>
-<tr class="separator:a89d9fa5b2c4a59b46cac111418232090"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a827d1e43e9252657147226aa3f8e4eb8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a827d1e43e9252657147226aa3f8e4eb8">setBoost</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab21d64ace3107a8f3359b3828bc2cab5">on</a>)</td></tr>
+<tr class="memitem:a09ff883265f23bf67d73e11755155600"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a09ff883265f23bf67d73e11755155600">getMode</a> (void) const</td></tr>
+<tr class="memdesc:a09ff883265f23bf67d73e11755155600"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRDelonghiAc.html#a09ff883265f23bf67d73e11755155600">More...</a><br /></td></tr>
+<tr class="separator:a09ff883265f23bf67d73e11755155600"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a827d1e43e9252657147226aa3f8e4eb8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a827d1e43e9252657147226aa3f8e4eb8">setBoost</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab919817947827f900e35080f63354ac3">on</a>)</td></tr>
 <tr class="memdesc:a827d1e43e9252657147226aa3f8e4eb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Boost (Turbo) mode of the A/C.  <a href="classIRDelonghiAc.html#a827d1e43e9252657147226aa3f8e4eb8">More...</a><br /></td></tr>
 <tr class="separator:a827d1e43e9252657147226aa3f8e4eb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf9fd996c60573eca50b5e165cbcbf63"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#abf9fd996c60573eca50b5e165cbcbf63">getBoost</a> ()</td></tr>
-<tr class="memdesc:abf9fd996c60573eca50b5e165cbcbf63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Boost (Turbo) mode of the A/C.  <a href="classIRDelonghiAc.html#abf9fd996c60573eca50b5e165cbcbf63">More...</a><br /></td></tr>
-<tr class="separator:abf9fd996c60573eca50b5e165cbcbf63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa74806e520b2b01a5b0c87ee32ce427e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aa74806e520b2b01a5b0c87ee32ce427e">setSleep</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab21d64ace3107a8f3359b3828bc2cab5">on</a>)</td></tr>
+<tr class="memitem:a6f49f15cba66d184b9bdc950114d4ff0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a6f49f15cba66d184b9bdc950114d4ff0">getBoost</a> (void) const</td></tr>
+<tr class="memdesc:a6f49f15cba66d184b9bdc950114d4ff0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Boost (Turbo) mode of the A/C.  <a href="classIRDelonghiAc.html#a6f49f15cba66d184b9bdc950114d4ff0">More...</a><br /></td></tr>
+<tr class="separator:a6f49f15cba66d184b9bdc950114d4ff0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa74806e520b2b01a5b0c87ee32ce427e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aa74806e520b2b01a5b0c87ee32ce427e">setSleep</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab919817947827f900e35080f63354ac3">on</a>)</td></tr>
 <tr class="memdesc:aa74806e520b2b01a5b0c87ee32ce427e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Sleep mode of the A/C.  <a href="classIRDelonghiAc.html#aa74806e520b2b01a5b0c87ee32ce427e">More...</a><br /></td></tr>
 <tr class="separator:aa74806e520b2b01a5b0c87ee32ce427e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9baadd8f41c6dc7f89e71415e0e57b5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#ab9baadd8f41c6dc7f89e71415e0e57b5">getSleep</a> ()</td></tr>
-<tr class="memdesc:ab9baadd8f41c6dc7f89e71415e0e57b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep mode status of the A/C.  <a href="classIRDelonghiAc.html#ab9baadd8f41c6dc7f89e71415e0e57b5">More...</a><br /></td></tr>
-<tr class="separator:ab9baadd8f41c6dc7f89e71415e0e57b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6b956c273284e287093260039003362"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#af6b956c273284e287093260039003362">setOnTimerEnabled</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab21d64ace3107a8f3359b3828bc2cab5">on</a>)</td></tr>
+<tr class="memitem:ab41702206eb36ca6e1cc8689ce259861"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#ab41702206eb36ca6e1cc8689ce259861">getSleep</a> (void) const</td></tr>
+<tr class="memdesc:ab41702206eb36ca6e1cc8689ce259861"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep mode status of the A/C.  <a href="classIRDelonghiAc.html#ab41702206eb36ca6e1cc8689ce259861">More...</a><br /></td></tr>
+<tr class="separator:ab41702206eb36ca6e1cc8689ce259861"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6b956c273284e287093260039003362"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#af6b956c273284e287093260039003362">setOnTimerEnabled</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab919817947827f900e35080f63354ac3">on</a>)</td></tr>
 <tr class="memdesc:af6b956c273284e287093260039003362"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the enable status of the On Timer.  <a href="classIRDelonghiAc.html#af6b956c273284e287093260039003362">More...</a><br /></td></tr>
 <tr class="separator:af6b956c273284e287093260039003362"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0911f40ee5838bfc6b7deb3193e6a62a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a0911f40ee5838bfc6b7deb3193e6a62a">getOnTimerEnabled</a> (void)</td></tr>
-<tr class="memdesc:a0911f40ee5838bfc6b7deb3193e6a62a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the enable status of the On Timer.  <a href="classIRDelonghiAc.html#a0911f40ee5838bfc6b7deb3193e6a62a">More...</a><br /></td></tr>
-<tr class="separator:a0911f40ee5838bfc6b7deb3193e6a62a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdd8284ec6c1d31b0cc943a49bdf3f0e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#afdd8284ec6c1d31b0cc943a49bdf3f0e">getOnTimerEnabled</a> (void) const</td></tr>
+<tr class="memdesc:afdd8284ec6c1d31b0cc943a49bdf3f0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the enable status of the On Timer.  <a href="classIRDelonghiAc.html#afdd8284ec6c1d31b0cc943a49bdf3f0e">More...</a><br /></td></tr>
+<tr class="separator:afdd8284ec6c1d31b0cc943a49bdf3f0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a478f463a632893be7c4f5223c188ad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a9a478f463a632893be7c4f5223c188ad">setOnTimer</a> (const uint16_t nr_of_mins)</td></tr>
 <tr class="memdesc:a9a478f463a632893be7c4f5223c188ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the On timer to activate in nr of minutes.  <a href="classIRDelonghiAc.html#a9a478f463a632893be7c4f5223c188ad">More...</a><br /></td></tr>
 <tr class="separator:a9a478f463a632893be7c4f5223c188ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03f6d037d62d3c641b45ec97a1bff715"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a03f6d037d62d3c641b45ec97a1bff715">getOnTimer</a> (void)</td></tr>
-<tr class="memdesc:a03f6d037d62d3c641b45ec97a1bff715"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the On timer time.  <a href="classIRDelonghiAc.html#a03f6d037d62d3c641b45ec97a1bff715">More...</a><br /></td></tr>
-<tr class="separator:a03f6d037d62d3c641b45ec97a1bff715"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5cf81c9864f3c3728d4dd65e4d9c49c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a5cf81c9864f3c3728d4dd65e4d9c49c8">setOffTimerEnabled</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab21d64ace3107a8f3359b3828bc2cab5">on</a>)</td></tr>
+<tr class="memitem:a15c948b5ab0ea17298c95dc8b9fd5887"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a15c948b5ab0ea17298c95dc8b9fd5887">getOnTimer</a> (void) const</td></tr>
+<tr class="memdesc:a15c948b5ab0ea17298c95dc8b9fd5887"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the On timer time.  <a href="classIRDelonghiAc.html#a15c948b5ab0ea17298c95dc8b9fd5887">More...</a><br /></td></tr>
+<tr class="separator:a15c948b5ab0ea17298c95dc8b9fd5887"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cf81c9864f3c3728d4dd65e4d9c49c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a5cf81c9864f3c3728d4dd65e4d9c49c8">setOffTimerEnabled</a> (const bool <a class="el" href="classIRDelonghiAc.html#ab919817947827f900e35080f63354ac3">on</a>)</td></tr>
 <tr class="memdesc:a5cf81c9864f3c3728d4dd65e4d9c49c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the enable status of the Off Timer.  <a href="classIRDelonghiAc.html#a5cf81c9864f3c3728d4dd65e4d9c49c8">More...</a><br /></td></tr>
 <tr class="separator:a5cf81c9864f3c3728d4dd65e4d9c49c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1b91f6d4bb5e41e43fc7e4b9a3187a3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#ac1b91f6d4bb5e41e43fc7e4b9a3187a3">getOffTimerEnabled</a> (void)</td></tr>
-<tr class="memdesc:ac1b91f6d4bb5e41e43fc7e4b9a3187a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the enable status of the Off Timer.  <a href="classIRDelonghiAc.html#ac1b91f6d4bb5e41e43fc7e4b9a3187a3">More...</a><br /></td></tr>
-<tr class="separator:ac1b91f6d4bb5e41e43fc7e4b9a3187a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae48767203f462ac02441c635328ef7aa"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#ae48767203f462ac02441c635328ef7aa">getOffTimerEnabled</a> (void) const</td></tr>
+<tr class="memdesc:ae48767203f462ac02441c635328ef7aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the enable status of the Off Timer.  <a href="classIRDelonghiAc.html#ae48767203f462ac02441c635328ef7aa">More...</a><br /></td></tr>
+<tr class="separator:ae48767203f462ac02441c635328ef7aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9602c652b10b06c6eeae0e6158c42c68"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a9602c652b10b06c6eeae0e6158c42c68">setOffTimer</a> (const uint16_t nr_of_mins)</td></tr>
 <tr class="memdesc:a9602c652b10b06c6eeae0e6158c42c68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Off timer to activate in nr of minutes.  <a href="classIRDelonghiAc.html#a9602c652b10b06c6eeae0e6158c42c68">More...</a><br /></td></tr>
 <tr class="separator:a9602c652b10b06c6eeae0e6158c42c68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd32fa9acbc9782df9aa00325efea2a7"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#acd32fa9acbc9782df9aa00325efea2a7">getOffTimer</a> (void)</td></tr>
-<tr class="memdesc:acd32fa9acbc9782df9aa00325efea2a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Off timer time.  <a href="classIRDelonghiAc.html#acd32fa9acbc9782df9aa00325efea2a7">More...</a><br /></td></tr>
-<tr class="separator:acd32fa9acbc9782df9aa00325efea2a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e6934607f162df3d259d8fb95319d67"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a9e6934607f162df3d259d8fb95319d67">getRaw</a> ()</td></tr>
-<tr class="memdesc:a9e6934607f162df3d259d8fb95319d67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a copy of the internal state as a valid code for this protocol.  <a href="classIRDelonghiAc.html#a9e6934607f162df3d259d8fb95319d67">More...</a><br /></td></tr>
-<tr class="separator:a9e6934607f162df3d259d8fb95319d67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a825e23b338644cd7b41a6529b2a38ee9"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a825e23b338644cd7b41a6529b2a38ee9">getOffTimer</a> (void) const</td></tr>
+<tr class="memdesc:a825e23b338644cd7b41a6529b2a38ee9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Off timer time.  <a href="classIRDelonghiAc.html#a825e23b338644cd7b41a6529b2a38ee9">More...</a><br /></td></tr>
+<tr class="separator:a825e23b338644cd7b41a6529b2a38ee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17159362299572642e485a7f815220d7"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a17159362299572642e485a7f815220d7">getRaw</a> (void)</td></tr>
+<tr class="memdesc:a17159362299572642e485a7f815220d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a copy of the internal state as a valid code for this protocol.  <a href="classIRDelonghiAc.html#a17159362299572642e485a7f815220d7">More...</a><br /></td></tr>
+<tr class="separator:a17159362299572642e485a7f815220d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a219bafa7839f10acca33526cf585152a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a219bafa7839f10acca33526cf585152a">setRaw</a> (const uint64_t state)</td></tr>
 <tr class="memdesc:a219bafa7839f10acca33526cf585152a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRDelonghiAc.html#a219bafa7839f10acca33526cf585152a">More...</a><br /></td></tr>
 <tr class="separator:a219bafa7839f10acca33526cf585152a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51a6eab431f81fa448a48c0ec071e706"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a51a6eab431f81fa448a48c0ec071e706">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
-<tr class="memdesc:a51a6eab431f81fa448a48c0ec071e706"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRDelonghiAc.html#a51a6eab431f81fa448a48c0ec071e706">More...</a><br /></td></tr>
-<tr class="separator:a51a6eab431f81fa448a48c0ec071e706"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeff2970b20963ae59b99464ae683113f"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aeff2970b20963ae59b99464ae683113f">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
-<tr class="memdesc:aeff2970b20963ae59b99464ae683113f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRDelonghiAc.html#aeff2970b20963ae59b99464ae683113f">More...</a><br /></td></tr>
-<tr class="separator:aeff2970b20963ae59b99464ae683113f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cdcd20dffb763a5f9ff7bd264c1d3e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a2cdcd20dffb763a5f9ff7bd264c1d3e8">toCommon</a> (void)</td></tr>
-<tr class="memdesc:a2cdcd20dffb763a5f9ff7bd264c1d3e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRDelonghiAc.html#a2cdcd20dffb763a5f9ff7bd264c1d3e8">More...</a><br /></td></tr>
-<tr class="separator:a2cdcd20dffb763a5f9ff7bd264c1d3e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a386fb70137a7c2100d05f3202c224887"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a386fb70137a7c2100d05f3202c224887">toString</a> ()</td></tr>
-<tr class="memdesc:a386fb70137a7c2100d05f3202c224887"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRDelonghiAc.html#a386fb70137a7c2100d05f3202c224887">More...</a><br /></td></tr>
-<tr class="separator:a386fb70137a7c2100d05f3202c224887"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30c2463464576889af014f8e15d59c75"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a30c2463464576889af014f8e15d59c75">toCommon</a> (void) const</td></tr>
+<tr class="memdesc:a30c2463464576889af014f8e15d59c75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRDelonghiAc.html#a30c2463464576889af014f8e15d59c75">More...</a><br /></td></tr>
+<tr class="separator:a30c2463464576889af014f8e15d59c75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b186047aab8735e2f33dd5bdc4b72c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a8b186047aab8735e2f33dd5bdc4b72c9">toString</a> (void) const</td></tr>
+<tr class="memdesc:a8b186047aab8735e2f33dd5bdc4b72c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRDelonghiAc.html#a8b186047aab8735e2f33dd5bdc4b72c9">More...</a><br /></td></tr>
+<tr class="separator:a8b186047aab8735e2f33dd5bdc4b72c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -202,6 +197,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae39b20bcea2b7090ac2e29d8cd28e5f6"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#ae39b20bcea2b7090ac2e29d8cd28e5f6">validChecksum</a> (const uint64_t state)</td></tr>
 <tr class="memdesc:ae39b20bcea2b7090ac2e29d8cd28e5f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the checksum is valid for a given state.  <a href="classIRDelonghiAc.html#ae39b20bcea2b7090ac2e29d8cd28e5f6">More...</a><br /></td></tr>
 <tr class="separator:ae39b20bcea2b7090ac2e29d8cd28e5f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51a6eab431f81fa448a48c0ec071e706"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a51a6eab431f81fa448a48c0ec071e706">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
+<tr class="memdesc:a51a6eab431f81fa448a48c0ec071e706"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRDelonghiAc.html#a51a6eab431f81fa448a48c0ec071e706">More...</a><br /></td></tr>
+<tr class="separator:a51a6eab431f81fa448a48c0ec071e706"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeff2970b20963ae59b99464ae683113f"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#aeff2970b20963ae59b99464ae683113f">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
+<tr class="memdesc:aeff2970b20963ae59b99464ae683113f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRDelonghiAc.html#aeff2970b20963ae59b99464ae683113f">More...</a><br /></td></tr>
+<tr class="separator:aeff2970b20963ae59b99464ae683113f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a3eef369009836a629369cf835741c4"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a5a3eef369009836a629369cf835741c4">toCommonMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a5a3eef369009836a629369cf835741c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRDelonghiAc.html#a5a3eef369009836a629369cf835741c4">More...</a><br /></td></tr>
 <tr class="separator:a5a3eef369009836a629369cf835741c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,9 +221,8 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a8cbe8b6857b7492c108118b4eda3ecb0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a8cbe8b6857b7492c108118b4eda3ecb0">_irsend</a></td></tr>
 <tr class="memdesc:a8cbe8b6857b7492c108118b4eda3ecb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">instance of the IR send class  <a href="classIRDelonghiAc.html#a8cbe8b6857b7492c108118b4eda3ecb0">More...</a><br /></td></tr>
 <tr class="separator:a8cbe8b6857b7492c108118b4eda3ecb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b3364143c52dc2a29d9db43612c07b1"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a3b3364143c52dc2a29d9db43612c07b1">remote_state</a></td></tr>
-<tr class="memdesc:a3b3364143c52dc2a29d9db43612c07b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state of the IR remote.  <a href="classIRDelonghiAc.html#a3b3364143c52dc2a29d9db43612c07b1">More...</a><br /></td></tr>
-<tr class="separator:a3b3364143c52dc2a29d9db43612c07b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85f522b680c0fb5974d741c8f399e691"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionDelonghiProtocol.html">DelonghiProtocol</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a85f522b680c0fb5974d741c8f399e691">_</a></td></tr>
+<tr class="separator:a85f522b680c0fb5974d741c8f399e691"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a724aa5748e714a7f0109a2f3502cd1d1"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDelonghiAc.html#a724aa5748e714a7f0109a2f3502cd1d1">_saved_temp</a></td></tr>
 <tr class="memdesc:a724aa5748e714a7f0109a2f3502cd1d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The previously user requested temp value.  <a href="classIRDelonghiAc.html#a724aa5748e714a7f0109a2f3502cd1d1">More...</a><br /></td></tr>
 <tr class="separator:a724aa5748e714a7f0109a2f3502cd1d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -286,8 +286,8 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a8d5e4f95e929c2365b2be47f42c6328c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8d5e4f95e929c2365b2be47f42c6328c">&#9670;&nbsp;</a></span>begin()</h2>
+<a id="af3e6d5f445b5968fc69792a1c06f6d5b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3e6d5f445b5968fc69792a1c06f6d5b">&#9670;&nbsp;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -295,6 +295,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDelonghiAc::begin </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -403,6 +404,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRDelonghiAc::convertFan </td>
@@ -412,6 +416,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed. </p>
@@ -430,6 +439,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRDelonghiAc::convertMode </td>
@@ -439,6 +451,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode. </p>
@@ -452,8 +469,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="abf9fd996c60573eca50b5e165cbcbf63"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf9fd996c60573eca50b5e165cbcbf63">&#9670;&nbsp;</a></span>getBoost()</h2>
+<a id="a6f49f15cba66d184b9bdc950114d4ff0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f49f15cba66d184b9bdc950114d4ff0">&#9670;&nbsp;</a></span>getBoost()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -461,8 +478,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDelonghiAc::getBoost </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -472,8 +490,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="afd2ed0ec70e3912335a9174bca7e7f5e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afd2ed0ec70e3912335a9174bca7e7f5e">&#9670;&nbsp;</a></span>getFan()</h2>
+<a id="a897dd29a58fed41abb4a6bbe10527188"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a897dd29a58fed41abb4a6bbe10527188">&#9670;&nbsp;</a></span>getFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -481,8 +499,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDelonghiAc::getFan </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -492,8 +511,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a89d9fa5b2c4a59b46cac111418232090"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89d9fa5b2c4a59b46cac111418232090">&#9670;&nbsp;</a></span>getMode()</h2>
+<a id="a09ff883265f23bf67d73e11755155600"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09ff883265f23bf67d73e11755155600">&#9670;&nbsp;</a></span>getMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -501,8 +520,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDelonghiAc::getMode </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -512,8 +532,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="acd32fa9acbc9782df9aa00325efea2a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd32fa9acbc9782df9aa00325efea2a7">&#9670;&nbsp;</a></span>getOffTimer()</h2>
+<a id="a825e23b338644cd7b41a6529b2a38ee9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a825e23b338644cd7b41a6529b2a38ee9">&#9670;&nbsp;</a></span>getOffTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -523,7 +543,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -533,8 +553,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac1b91f6d4bb5e41e43fc7e4b9a3187a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac1b91f6d4bb5e41e43fc7e4b9a3187a3">&#9670;&nbsp;</a></span>getOffTimerEnabled()</h2>
+<a id="ae48767203f462ac02441c635328ef7aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae48767203f462ac02441c635328ef7aa">&#9670;&nbsp;</a></span>getOffTimerEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -544,7 +564,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -554,8 +574,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a03f6d037d62d3c641b45ec97a1bff715"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03f6d037d62d3c641b45ec97a1bff715">&#9670;&nbsp;</a></span>getOnTimer()</h2>
+<a id="a15c948b5ab0ea17298c95dc8b9fd5887"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15c948b5ab0ea17298c95dc8b9fd5887">&#9670;&nbsp;</a></span>getOnTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -565,7 +585,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -575,8 +595,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a0911f40ee5838bfc6b7deb3193e6a62a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0911f40ee5838bfc6b7deb3193e6a62a">&#9670;&nbsp;</a></span>getOnTimerEnabled()</h2>
+<a id="afdd8284ec6c1d31b0cc943a49bdf3f0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdd8284ec6c1d31b0cc943a49bdf3f0e">&#9670;&nbsp;</a></span>getOnTimerEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -586,7 +606,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -596,8 +616,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ae077f0e444fcf24b1e0343e93244b7e8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae077f0e444fcf24b1e0343e93244b7e8">&#9670;&nbsp;</a></span>getPower()</h2>
+<a id="a88a2ef78cf091f9b4ab38536b6cbe25e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88a2ef78cf091f9b4ab38536b6cbe25e">&#9670;&nbsp;</a></span>getPower()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -605,8 +625,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDelonghiAc::getPower </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -616,8 +637,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a9e6934607f162df3d259d8fb95319d67"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e6934607f162df3d259d8fb95319d67">&#9670;&nbsp;</a></span>getRaw()</h2>
+<a id="a17159362299572642e485a7f815220d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17159362299572642e485a7f815220d7">&#9670;&nbsp;</a></span>getRaw()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -625,6 +646,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint64_t IRDelonghiAc::getRaw </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -636,8 +658,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab9baadd8f41c6dc7f89e71415e0e57b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab9baadd8f41c6dc7f89e71415e0e57b5">&#9670;&nbsp;</a></span>getSleep()</h2>
+<a id="ab41702206eb36ca6e1cc8689ce259861"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab41702206eb36ca6e1cc8689ce259861">&#9670;&nbsp;</a></span>getSleep()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -645,8 +667,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDelonghiAc::getSleep </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -656,8 +679,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5664302ab883fc88c23c8bb2aa020cb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5664302ab883fc88c23c8bb2aa020cb9">&#9670;&nbsp;</a></span>getTemp()</h2>
+<a id="a1c2d1e8a10cac59b9ef925a26191c99c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c2d1e8a10cac59b9ef925a26191c99c">&#9670;&nbsp;</a></span>getTemp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -665,8 +688,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDelonghiAc::getTemp </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -676,8 +700,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a8bbe27e1e87fbfc6b126c7f135886632"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8bbe27e1e87fbfc6b126c7f135886632">&#9670;&nbsp;</a></span>getTempUnit()</h2>
+<a id="a444276a706d2b5099eab4452cfe4712d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a444276a706d2b5099eab4452cfe4712d">&#9670;&nbsp;</a></span>getTempUnit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -687,7 +711,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -697,8 +721,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa2f8f1d5da390bd5e5b36102dd40f5c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2f8f1d5da390bd5e5b36102dd40f5c8">&#9670;&nbsp;</a></span>off()</h2>
+<a id="ab584add0eb59acf3b209e7c252605304"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab584add0eb59acf3b209e7c252605304">&#9670;&nbsp;</a></span>off()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -706,6 +730,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDelonghiAc::off </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -716,8 +741,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab21d64ace3107a8f3359b3828bc2cab5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab21d64ace3107a8f3359b3828bc2cab5">&#9670;&nbsp;</a></span>on()</h2>
+<a id="ab919817947827f900e35080f63354ac3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab919817947827f900e35080f63354ac3">&#9670;&nbsp;</a></span>on()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -725,6 +750,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDelonghiAc::on </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1093,8 +1119,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aac444790a16678a1e88f1adef02829ba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac444790a16678a1e88f1adef02829ba">&#9670;&nbsp;</a></span>stateReset()</h2>
+<a id="acadbed22a27f2376c1e8424dec0caa35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acadbed22a27f2376c1e8424dec0caa35">&#9670;&nbsp;</a></span>stateReset()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1102,6 +1128,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDelonghiAc::stateReset </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1112,8 +1139,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a2cdcd20dffb763a5f9ff7bd264c1d3e8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2cdcd20dffb763a5f9ff7bd264c1d3e8">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="a30c2463464576889af014f8e15d59c75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30c2463464576889af014f8e15d59c75">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1123,7 +1150,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1203,8 +1230,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a386fb70137a7c2100d05f3202c224887"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a386fb70137a7c2100d05f3202c224887">&#9670;&nbsp;</a></span>toString()</h2>
+<a id="a8b186047aab8735e2f33dd5bdc4b72c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b186047aab8735e2f33dd5bdc4b72c9">&#9670;&nbsp;</a></span>toString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1212,8 +1239,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a> IRDelonghiAc::toString </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1259,6 +1287,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a85f522b680c0fb5974d741c8f399e691"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85f522b680c0fb5974d741c8f399e691">&#9670;&nbsp;</a></span>_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="unionDelonghiProtocol.html">DelonghiProtocol</a> IRDelonghiAc::_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a8cbe8b6857b7492c108118b4eda3ecb0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8cbe8b6857b7492c108118b4eda3ecb0">&#9670;&nbsp;</a></span>_irsend</h2>
 
@@ -1328,30 +1378,6 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>The previously user requested temp units. </p>
-
-</div>
-</div>
-<a id="a3b3364143c52dc2a29d9db43612c07b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b3364143c52dc2a29d9db43612c07b1">&#9670;&nbsp;</a></span>remote_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint64_t IRDelonghiAc::remote_state</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The state of the IR remote. </p>
 
 </div>
 </div>

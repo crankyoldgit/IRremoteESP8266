@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['voltasprotocol_3747',['VoltasProtocol',['../unionVoltasProtocol.html',1,'']]]
+  ['timerms_3816',['TimerMs',['../classTimerMs.html',1,'']]]
 ];

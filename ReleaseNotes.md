@@ -1,5 +1,32 @@
 # Release Notes
 
+## _v2.7.11 (20201002)_
+
+**[Features]**
+- Transcold: Add detailed support. (#1256 #1278)
+- Airwell/Whirlpool: Add handling of previous state to `.toCommon()` (#1275 #1276)
+- IRMQTTServer: Change how MQTT packet/buffer size is set. (#1271)
+- Fujitsu: Add support for timers. (#1255 #1261 #1262)
+- Neoclima: Add Economy & Fahrenheit support (#1260 #1265)
+- Technibel: Cleanup and code fixes/improvements. (#1259 #1266)
+- Technibel: Add detailed A/C support (#1259)
+- Transcold: Add basic support. (#1256 #1258)
+
+**[Misc]**
+- refactor ir_Delonghi (#1285)
+- Whirlpool: Change default mode in `convertMode()` (#1283 #1284)
+- SamsungAC: Unit tests to help debug poor signal (#1277 #1280)
+- Add question & note about VS1838b use to issue template. (#1281)
+- rewrite ir_Corona (#1274)
+- tools/mkkeywords: Fix minor parsing issue. (#1272)
+- Add Zhongxian Li to Contributers.md (#1270)
+- rewrite Carrier (#1269)
+- rewrite ir_Argo by using bit field (#1264)
+- rewrite ir_Amcor by using bit field (#1263)
+- Update Fujitsu supported model info.
+- Clarify the scope of the LittleFS breaking change.
+
+
 ## _v2.7.10 (20200831)_
 
 **[BREAKING CHANGES]**

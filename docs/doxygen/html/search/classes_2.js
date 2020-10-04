@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['greeprotocol_3688',['GreeProtocol',['../unionGreeProtocol.html',1,'']]]
+  ['decode_5fresults_3754',['decode_results',['../classdecode__results.html',1,'']]],
+  ['delonghiprotocol_3755',['DelonghiProtocol',['../unionDelonghiProtocol.html',1,'']]]
 ];
