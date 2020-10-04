@@ -22,6 +22,7 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Delonghi A/C message.
 union DelonghiProtocol{
   uint64_t raw;  ///< The state of the IR remote.
   struct {

@@ -26,6 +26,7 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Carrier A/C message.
 union CarrierProtocol {
   uint64_t raw;  ///< The state of the IR remote.
   struct {

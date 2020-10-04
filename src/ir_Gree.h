@@ -28,6 +28,7 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Gree A/C message.
 union GreeProtocol{
   uint8_t remote_state[kGreeStateLength];  ///< The state in native IR code form
   struct {

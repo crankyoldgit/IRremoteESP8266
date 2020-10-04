@@ -26,6 +26,7 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a section of a Corona A/C message.
 struct CoronaSection {
   uint8_t Header0;
   uint8_t Header1;
@@ -38,6 +39,7 @@ struct CoronaSection {
 
 const uint8_t kCoronaAcSections = 3;
 
+/// Native representation of a Corona A/C message.
 union CoronaProtocol {
   uint8_t raw[kCoronaAcStateLength];  ///< The state of the IR remote.
   CoronaSection sections[kCoronaAcSections];

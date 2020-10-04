@@ -26,7 +26,7 @@
 #include "IRsend_test.h"
 #endif
 
-// Haier HSU07-HEA03 remote
+/// Native representation of a Haier HSU07-HEA03 A/C message.
 union HaierProtocol{
   ///< The state in native IR code form
   uint8_t remote_state[kHaierACStateLength];
@@ -131,7 +131,7 @@ const uint8_t kHaierAcSleepBit = 0b01000000;
 #define HAIER_AC_FAN_MED kHaierAcFanMed
 #define HAIER_AC_FAN_HIGH kHaierAcFanHigh
 
-// Haier YRW02 remote
+/// Native representation of a Haier YRW02 A/C message.
 union HaierYRW02Protocol{
   uint8_t raw[kHaierACYRW02StateLength];  ///< The state in native form
   struct {

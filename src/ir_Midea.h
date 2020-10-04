@@ -33,6 +33,8 @@
 #if DANBY_DAC
     kSwingVToggleStr = kIonStr;
 #endif
+
+/// Native representation of a Midea A/C message.
 union MideaProtocol{
   uint64_t remote_state;  ///< The state in native IR code form
   // only use 48bits
@@ -57,6 +59,7 @@ union MideaProtocol{
     uint8_t :0;
   };
 };
+
 // Constants
 const uint8_t kMideaACMinTempF = 62;  // Fahrenheit
 const uint8_t kMideaACMaxTempF = 86;  // Fahrenheit
