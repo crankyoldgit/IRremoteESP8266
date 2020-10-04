@@ -104,6 +104,7 @@ const uint64_t kTechnibelAcResetState = 0x180101140000EA;  ///<
 
 
 // Classes
+/// Class for handling detailed Technibel A/C messages.
 class IRTechnibelAc {
  public:
   explicit IRTechnibelAc(const uint16_t pin, const bool inverted = false,

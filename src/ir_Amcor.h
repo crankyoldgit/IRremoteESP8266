@@ -24,6 +24,7 @@
 #endif
 
 
+/// Native representation of a Amcor A/C message.
 union AmcorProtocol{
   uint8_t raw[kAmcorStateLength];  // The state of the IR remote.
   struct {

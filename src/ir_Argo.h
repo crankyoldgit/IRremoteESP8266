@@ -20,6 +20,7 @@
 
 //  ARGO Ulisse DCI
 
+/// Native representation of a Argo A/C message.
 union ArgoProtocol {
   uint8_t raw[kArgoStateLength];  ///< The state in native IR code form
   struct {

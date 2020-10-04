@@ -107,6 +107,7 @@ const uint32_t kTranscoldCmdFan = 0b111011110110000101010100;  // NA
 const uint32_t kTranscoldKnownGoodState = 0xE96554;
 
 // Classes
+/// Class for handling detailed Transcold A/C messages.
 class IRTranscoldAc {
  public:
   explicit IRTranscoldAc(const uint16_t pin, const bool inverted = false,

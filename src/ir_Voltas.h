@@ -24,7 +24,7 @@
 #include "IRsend_test.h"
 #endif
 
-
+/// Native representation of a Voltas A/C message.
 union VoltasProtocol {
   uint8_t raw[kVoltasStateLength];  ///< The state in native IR code form
   struct {

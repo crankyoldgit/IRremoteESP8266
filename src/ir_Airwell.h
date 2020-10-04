@@ -23,6 +23,7 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Airwell A/C message.
 union AirwellProtocol{
   uint64_t raw;  // The state of the IR remote in native IR code form.
   struct {
@@ -35,6 +36,7 @@ union AirwellProtocol{
     uint64_t            :0;
   };
 };
+
 // Constants
 const uint64_t kAirwellKnownGoodState = 0x140500002;  // Mode Fan, Speed 1, 25C
 // Temperature
