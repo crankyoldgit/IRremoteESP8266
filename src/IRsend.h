@@ -351,6 +351,11 @@ class IRsend {
   void sendWhynter(const uint64_t data, const uint16_t nbits = kWhynterBits,
                    const uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_MIRAGE
+  void sendMirage(const unsigned char data[],
+                  const uint16_t nbytes = kMirageStateLength,
+                  const uint16_t repeat = kMirageMinRepeat);
+#endif  // SEND_MIRAGE
 #if SEND_MITSUBISHI
   void sendMitsubishi(uint64_t data, uint16_t nbits = kMitsubishiBits,
                       uint16_t repeat = kMitsubishiMinRepeat);

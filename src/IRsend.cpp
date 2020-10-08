@@ -709,6 +709,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kHitachiAc424Bits;
     case KELVINATOR:
       return kKelvinatorBits;
+    case MIRAGE:
+      return kMirageBits;
     case MITSUBISHI_AC:
       return kMitsubishiACBits;
     case MITSUBISHI136:
@@ -1137,6 +1139,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendKelvinator(state, nbytes);
       break;
 #endif  // SEND_KELVINATOR
+#if SEND_MIRAGE
+    case MIRAGE:
+      sendMirage(state, nbytes);
+      break;
+#endif  // SEND_MIRAGE
 #if SEND_MITSUBISHI_AC
     case MITSUBISHI_AC:
       sendMitsubishiAC(state, nbytes);
