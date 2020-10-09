@@ -23,10 +23,8 @@ const uint16_t kMirageFreq = 38000;              ///< Hz. (Just a guess)
 
 #if SEND_MIRAGE
 /// Send a Mirage formatted message.
-/// Status: BETA / Probably works.
+/// Status: STABLE / Reported as working.
 /// @param[in] data An array of bytes containing the IR command.
-///                 It is assumed to be in MSB order for this code.
-/// @todo Confirm the bit ordering of the data.
 /// @param[in] nbytes Nr. of bytes of data in the array. (>=kMirageStateLength)
 /// @param[in] repeat Nr. of times the message is to be repeated.
 void IRsend::sendMirage(const uint8_t data[], const uint16_t nbytes,
@@ -35,16 +33,15 @@ void IRsend::sendMirage(const uint8_t data[], const uint16_t nbytes,
               kMirageBitMark, kMirageOneSpace,
               kMirageBitMark, kMirageZeroSpace,
               kMirageBitMark, kMirageGap,
-              data, nbytes,
-              kMirageFreq, true, repeat, kDutyDefault);
+              data, nbytes, kMirageFreq, false,  // LSB
+              repeat, kDutyDefault);
 }
 #endif  // SEND_MIRAGE
 
 #if DECODE_MIRAGE
 /// Decode the supplied Mirage message.
-/// Status: BETA / Probably works.
+/// Status: STABLE / Reported as working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
-/// @todo Confirm the bit ordering of the result data.
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect.
@@ -59,7 +56,8 @@ bool IRrecv::decodeMirage(decode_results *results, uint16_t offset,
                     kMirageHdrMark, kMirageHdrSpace,
                     kMirageBitMark, kMirageOneSpace,
                     kMirageBitMark, kMirageZeroSpace,
-                    kMirageBitMark, kMirageGap, true)) return false;
+                    kMirageBitMark, kMirageGap, true,
+                    kUseDefTol, kMarkExcess, false)) return false;
 
   // Success
   results->decode_type = decode_type_t::MIRAGE;
