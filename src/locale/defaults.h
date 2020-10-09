@@ -768,6 +768,9 @@
 #ifndef D_STR_MESGDESC
 #define D_STR_MESGDESC "Mesg Desc."
 #endif  // D_STR_MESGDESC
+#ifndef D_STR_TOLERANCE
+#define D_STR_TOLERANCE "Tolerance"
+#endif  // D_STR_TOLERANCE
 #ifndef D_STR_IRRECVDUMP_STARTUP
 #define D_STR_IRRECVDUMP_STARTUP \
     "IRrecvDump is now running and waiting for IR input on Pin %d"
