@@ -28,8 +28,6 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_ELECTRA_AC
 /// Send a Electra A/C formatted message.
@@ -57,14 +55,14 @@ void IRsend::sendElectraAC(const uint8_t data[], const uint16_t nbytes,
 IRElectraAc::IRElectraAc(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) {
-  this->stateReset();
+  stateReset();
 }
 
 /// Reset the internal state to a fixed known good state.
 void IRElectraAc::stateReset(void) {
-  for (uint8_t i = 1; i < kElectraAcStateLength - 2; i++) remote_state[i] = 0;
-  remote_state[0] = 0xC3;
-  remote_state[11] = kElectraAcLightToggleOff;
+  for (uint8_t i = 1; i < kElectraAcStateLength - 2; i++) _.raw[i] = 0;
+  _.raw[0] = 0xC3;
+  _.LightToggle = kElectraAcLightToggleOff;
   // [12] is the checksum.
 }
 
@@ -95,7 +93,7 @@ bool IRElectraAc::validChecksum(const uint8_t state[], const uint16_t length) {
 /// @param[in] length The length of the state array.
 void IRElectraAc::checksum(uint16_t length) {
   if (length < 2) return;
-  remote_state[length - 1] = calcChecksum(remote_state, length);
+  _.Sum = calcChecksum(_.raw, length);
 }
 
 #if SEND_ELECTRA_AC
@@ -109,33 +107,33 @@ void IRElectraAc::send(const uint16_t repeat) {
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRElectraAc::getRaw(void) {
-  this->checksum();
-  return remote_state;
+  checksum();
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 /// @param[in] length The length of the code array.
 void IRElectraAc::setRaw(const uint8_t new_code[], const uint16_t length) {
-  memcpy(remote_state, new_code, std::min(length, kElectraAcStateLength));
+  std::memcpy(_.raw, new_code, std::min(length, kElectraAcStateLength));
 }
 
 /// Change the power setting to On.
-void IRElectraAc::on(void) { this->setPower(true); }
+void IRElectraAc::on(void) { setPower(true); }
 
 /// Change the power setting to Off.
-void IRElectraAc::off(void) { this->setPower(false); }
+void IRElectraAc::off(void) { setPower(false); }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setPower(const bool on) {
-  setBit(&remote_state[9], kElectraAcPowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRElectraAc::getPower(void) {
-  return GETBIT8(remote_state[9], kElectraAcPowerOffset);
+bool IRElectraAc::getPower(void) const {
+  return _.Power;
 }
 
 /// Set the operating mode of the A/C.
@@ -147,18 +145,18 @@ void IRElectraAc::setMode(const uint8_t mode) {
     case kElectraAcCool:
     case kElectraAcHeat:
     case kElectraAcFan:
-      setBits(&remote_state[6], kElectraAcModeOffset, kModeBitsSize, mode);
+      _.Mode = mode;
       break;
     default:
       // If we get an unexpected mode, default to AUTO.
-      this->setMode(kElectraAcAuto);
+      _.Mode = kElectraAcAuto;
   }
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRElectraAc::getMode(void) {
-  return GETBITS8(remote_state[6], kElectraAcModeOffset, kModeBitsSize);
+uint8_t IRElectraAc::getMode(void) const {
+  return _.Mode;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -192,14 +190,13 @@ stdAc::opmode_t IRElectraAc::toCommonMode(const uint8_t mode) {
 void IRElectraAc::setTemp(const uint8_t temp) {
   uint8_t newtemp = std::max(kElectraAcMinTemp, temp);
   newtemp = std::min(kElectraAcMaxTemp, newtemp) - kElectraAcTempDelta;
-  setBits(&remote_state[1], kElectraAcTempOffset, kElectraAcTempSize, newtemp);
+  _.Temp = newtemp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRElectraAc::getTemp(void) {
-  return GETBITS8(remote_state[1], kElectraAcTempOffset, kElectraAcTempSize) +
-      kElectraAcTempDelta;
+uint8_t IRElectraAc::getTemp(void) const {
+  return _.Temp + kElectraAcTempDelta;
 }
 
 /// Set the speed of the fan.
@@ -211,18 +208,18 @@ void IRElectraAc::setFan(const uint8_t speed) {
     case kElectraAcFanHigh:
     case kElectraAcFanMed:
     case kElectraAcFanLow:
-      setBits(&remote_state[4], kElectraAcFanOffset, kElectraAcFanSize, speed);
+      _.Fan = speed;
       break;
     default:
       // If we get an unexpected speed, default to Auto.
-      this->setFan(kElectraAcFanAuto);
+      _.Fan = kElectraAcFanAuto;
   }
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRElectraAc::getFan(void) {
-  return GETBITS8(remote_state[4], kElectraAcFanOffset, kElectraAcFanSize);
+uint8_t IRElectraAc::getFan(void) const {
+  return _.Fan;
 }
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
@@ -254,85 +251,81 @@ stdAc::fanspeed_t IRElectraAc::toCommonFanSpeed(const uint8_t speed) {
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setSwingV(const bool on) {
-  setBits(&remote_state[1], kElectraAcSwingVOffset, kElectraAcSwingSize,
-          on ? kElectraAcSwingOn : kElectraAcSwingOff);
+  _.SwingV = (on ? kElectraAcSwingOn : kElectraAcSwingOff);
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRElectraAc::getSwingV(void) {
-  return !GETBITS8(remote_state[1], kElectraAcSwingVOffset,
-                   kElectraAcSwingSize);
+bool IRElectraAc::getSwingV(void) const {
+  return !_.SwingV;
 }
 
 /// Set the Horizontal Swing mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setSwingH(const bool on) {
-  setBits(&remote_state[2], kElectraAcSwingHOffset, kElectraAcSwingSize,
-          on ? kElectraAcSwingOn : kElectraAcSwingOff);
+  _.SwingH = (on ? kElectraAcSwingOn : kElectraAcSwingOff);
 }
 
 /// Get the Horizontal Swing mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRElectraAc::getSwingH(void) {
-  return !GETBITS8(remote_state[2], kElectraAcSwingHOffset,
-                   kElectraAcSwingSize);
+bool IRElectraAc::getSwingH(void) const {
+  return !_.SwingH;
 }
 
 /// Set the Light (LED) Toggle mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setLightToggle(const bool on) {
-  remote_state[11] = on ? kElectraAcLightToggleOn : kElectraAcLightToggleOff;
+  _.LightToggle = (on ? kElectraAcLightToggleOn : kElectraAcLightToggleOff);
 }
 
 /// Get the Light (LED) Toggle mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRElectraAc::getLightToggle(void) {
-  return (remote_state[11] & kElectraAcLightToggleMask) ==
+bool IRElectraAc::getLightToggle(void) const {
+  return (_.LightToggle & kElectraAcLightToggleMask) ==
       kElectraAcLightToggleMask;
 }
 
 /// Set the Clean mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setClean(const bool on) {
-  setBit(&remote_state[9], kElectraAcCleanOffset, on);
+  _.Clean = on;
 }
 
 /// Get the Clean mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRElectraAc::getClean(void) {
-  return GETBIT8(remote_state[9], kElectraAcCleanOffset);
+bool IRElectraAc::getClean(void) const {
+  return _.Clean;
 }
 
 /// Set the Turbo mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRElectraAc::setTurbo(const bool on) {
-  setBit(&remote_state[5], kElectraAcTurboOffset, on);
+  _.Turbo = on;
 }
 
 /// Get the Turbo mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRElectraAc::getTurbo(void) {
-  return GETBIT8(remote_state[5], kElectraAcTurboOffset);
+bool IRElectraAc::getTurbo(void) const {
+  return _.Turbo;
 }
 
 /// Convert the current internal state into its stdAc::state_t equivilant.
 /// @return The stdAc equivilant of the native settings.
-stdAc::state_t IRElectraAc::toCommon(void) {
+stdAc::state_t IRElectraAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::ELECTRA_AC;
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->getSwingV() ? stdAc::swingv_t::kAuto
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = getSwingV() ? stdAc::swingv_t::kAuto
                                     : stdAc::swingv_t::kOff;
-  result.swingh = this->getSwingH() ? stdAc::swingh_t::kAuto
+  result.swingh = getSwingH() ? stdAc::swingh_t::kAuto
                                     : stdAc::swingh_t::kOff;
-  result.light = this->getLightToggle();
-  result.turbo = this->getTurbo();
-  result.clean = this->getClean();
+  result.light = getLightToggle();
+  result.turbo = _.Turbo;
+  result.clean = _.Clean;
   // Not supported.
   result.model = -1;  // No models used.
   result.quiet = false;
@@ -346,21 +339,21 @@ stdAc::state_t IRElectraAc::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRElectraAc::toString(void) {
+String IRElectraAc::toString(void) const {
   String result = "";
   result.reserve(130);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kElectraAcAuto, kElectraAcCool,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kElectraAcAuto, kElectraAcCool,
                             kElectraAcHeat, kElectraAcDry, kElectraAcFan);
   result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kElectraAcFanHigh, kElectraAcFanLow,
+  result += addFanToString(_.Fan, kElectraAcFanHigh, kElectraAcFanLow,
                            kElectraAcFanAuto, kElectraAcFanAuto,
                            kElectraAcFanMed);
   result += addBoolToString(getSwingV(), kSwingVStr);
   result += addBoolToString(getSwingH(), kSwingHStr);
   result += addLabeledString(getLightToggle() ? kToggleStr : "-", kLightStr);
-  result += addBoolToString(getClean(), kCleanStr);
-  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(_.Clean, kCleanStr);
+  result += addBoolToString(_.Turbo, kTurboStr);
   return result;
 }
 
