@@ -698,6 +698,13 @@
 #define SEND_TRANSCOLD         _IR_ENABLE_DEFAULT_
 #endif  // SEND_TRANSCOLD
 
+#ifndef DECODE_MIRAGE
+#define DECODE_MIRAGE          _IR_ENABLE_DEFAULT_
+#endif  // DECODE_MIRAGE
+#ifndef SEND_MIRAGE
+#define SEND_MIRAGE            _IR_ENABLE_DEFAULT_
+#endif  // SEND_MIRAGE
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -710,7 +717,7 @@
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
      DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
      DECODE_HITACHI_AC344 || DECODE_CORONA_AC || DECODE_SANYO_AC || \
-     DECODE_VOLTAS)
+     DECODE_VOLTAS || DECODE_MIRAGE)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
@@ -843,8 +850,9 @@ enum decode_type_t {
   METZ,
   TRANSCOLD,
   TECHNIBEL_AC,
+  MIRAGE,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = TECHNIBEL_AC,
+  kLastDecodeType = MIRAGE,
 };
 
 // Message lengths & required repeat values
@@ -968,6 +976,9 @@ const uint16_t kMideaBits = 48;
 const uint16_t kMideaMinRepeat = kNoRepeat;
 const uint16_t kMidea24Bits = 24;
 const uint16_t kMidea24MinRepeat = kSingleRepeat;
+const uint16_t kMirageStateLength = 15;
+const uint16_t kMirageBits = kMirageStateLength * 8;
+const uint16_t kMirageMinRepeat = kNoRepeat;
 const uint16_t kMitsubishiBits = 16;
 // TODO(anyone): Verify that the Mitsubishi repeat is really needed.
 //               Based on marcosamarinho's code.

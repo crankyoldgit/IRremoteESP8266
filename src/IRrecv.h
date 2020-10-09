@@ -675,20 +675,26 @@ class IRrecv {
                       const bool strict = true);
 #endif  // DECODE_CORONA_AC
 #if DECODE_ZEPEAL
-bool decodeZepeal(decode_results *results, uint16_t offset = kStartOffset,
-                  const uint16_t nbits = kZepealBits,
-                  const bool strict = true);
+  bool decodeZepeal(decode_results *results, uint16_t offset = kStartOffset,
+                    const uint16_t nbits = kZepealBits,
+                    const bool strict = true);
 #endif  // DECODE_ZEPEAL
 #if DECODE_METZ
-bool decodeMetz(decode_results *results, uint16_t offset = kStartOffset,
-                const uint16_t nbits = kMetzBits,
-                const bool strict = true);
+  bool decodeMetz(decode_results *results, uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kMetzBits,
+                  const bool strict = true);
 #endif  // DECODE_METZ
 #if DECODE_TRANSCOLD
-bool decodeTranscold(decode_results *results, uint16_t offset = kStartOffset,
-                     const uint16_t nbits = kTranscoldBits,
-                     const bool strict = true);
+  bool decodeTranscold(decode_results *results, uint16_t offset = kStartOffset,
+                       const uint16_t nbits = kTranscoldBits,
+                       const bool strict = true);
 #endif  // DECODE_TRANSCOLD
+#if DECODE_MIRAGE
+  bool decodeMirage(decode_results *results,
+                    uint16_t offset = kStartOffset,
+                    const uint16_t nbits = kMirageBits,
+                    const bool strict = true);
+#endif  // DECODE_MIRAGE
 };
 
 #endif  // IRRECV_H_

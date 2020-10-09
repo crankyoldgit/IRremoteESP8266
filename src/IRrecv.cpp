@@ -876,6 +876,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Transcold decode");
     if (decodeTranscold(results, offset)) return true;
 #endif  // DECODE_TRANSCOLD
+#if DECODE_MIRAGE
+    DPRINTLN("Attempting Mirage decode");
+    if (decodeMirage(results, offset)) return true;
+#endif  // DECODE_MIRAGE
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
