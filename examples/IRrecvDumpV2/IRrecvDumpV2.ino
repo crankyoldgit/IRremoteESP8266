@@ -9,6 +9,8 @@
  *  https://github.com/crankyoldgit/IRremoteESP8266/wiki#ir-receiving
  *
  * Changes:
+ *   Version 1.2 October, 2020
+ *     - Enable easy setting of the decoding tolerance value.
  *   Version 1.0 October, 2019
  *     - Internationalisation (i18n) support.
  *     - Stop displaying the legacy raw timing info.
@@ -99,6 +101,16 @@ const uint8_t kTimeout = 15;
 // NOTE: Set this value very high to effectively turn off UNKNOWN detection.
 const uint16_t kMinUnknownSize = 12;
 
+// How much percentage lee way do we give to incoming signals in order to match
+// it?
+// e.g. +/- 25% (default) to an expected value of 500 would mean matching a
+//      value between 375 & 625 inclusive.
+// Note: Default is 25(%). Going to a value >= 50(%) will cause some protocols
+//       to no longer match correctly. In normal situations you probably do not
+//       need to adjust this value. Typically that's when the library detects
+//       your remote's message some of the time, but not all of the time.
+const uint8_t kTolerancePercentage = kTolerance;  // kTolerance is normally 25%
+
 // Legacy (No longer supported!)
 //
 // Change to `true` if you miss/need the old "Raw Timing[]" display.
@@ -127,6 +139,7 @@ void setup() {
   // Ignore messages with less than minimum on or off pulses.
   irrecv.setUnknownThreshold(kMinUnknownSize);
 #endif  // DECODE_HASH
+  irrecv.setTolerance(kTolerancePercentage);  // Override the default tolerance.
   irrecv.enableIRIn();  // Start the receiver
 }
 
@@ -142,6 +155,9 @@ void loop() {
       Serial.printf(D_WARN_BUFFERFULL "\n", kCaptureBufferSize);
     // Display the library version the message was captured with.
     Serial.println(D_STR_LIBRARY "   : v" _IRREMOTEESP8266_VERSION_ "\n");
+    // Display the tolerance percentage if it has been change from the default.
+    if (kTolerancePercentage != kTolerance)
+      Serial.printf(D_STR_TOLERANCE " : %d%%\n", kTolerancePercentage);
     // Display the basic output of what we found.
     Serial.print(resultToHumanReadableBasic(&results));
     // Display any extra A/C info if we have it.
