@@ -120,21 +120,6 @@
 #define D_STR_PREVIOUSPOWER "Vorheriger Einschaltzustand"
 #define D_STR_DISPLAYTEMP "Anzeigetemperatur"
 
-#define D_STR_PREVIOUS "Vorher"
-
-#define D_STR_FAHRENHEIT "Fahrenheit"
-#define D_STR_CELSIUS_FAHRENHEIT D_STR_CELSIUS "/" D_STR_FAHRENHEIT
-
-#define D_STR_DISPLAY "Anzeige"
-
-#define D_STR_INSIDE "Innen"
-
-
-#define D_STR_POWERBUTTON "Einschaltknopf"
-+#define D_STR_PREVIOUSPOWER D_STR_PREVIOUS " " D_STR_POWER
-#define D_STR_DISPLAYTEMP "Anzeigetemperatur"
-
-
 // IRrecvDumpV2+
 #define D_STR_TIMESTAMP "Zeitstempel"
 #define D_STR_LIBRARY "Bibliothek"
