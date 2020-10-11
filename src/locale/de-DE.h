@@ -115,6 +115,7 @@
 // IRrecvDumpV2+
 #define D_STR_TIMESTAMP "Zeitstempel"
 #define D_STR_LIBRARY "Bibliothek"
+#define D_STR_TOLERANCE "Toleranz"
 #define D_STR_MESGDESC "Nachr. Beschr."
 #define D_STR_IRRECVDUMP_STARTUP \
     "IRrecvDump läuft und wartet auf IR Eingabe auf Pin %d"
