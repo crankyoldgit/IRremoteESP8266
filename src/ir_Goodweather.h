@@ -22,6 +22,34 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Goodweather A/C message.
+union GoodweatherProtocol {
+  uint64_t raw;  ///< The state of the IR remote in IR code form.
+  struct {
+    // Byte 0
+    uint8_t :8;
+    // Byte 1
+    uint8_t Light :1;
+    uint8_t       :2;
+    uint8_t Turbo :1;
+    uint8_t       :0;
+    // Byte 2
+    uint8_t Command :4;
+    uint8_t         :0;
+    // Byte 3
+    uint8_t Sleep   :1;
+    uint8_t Power   :1;
+    uint8_t Swing   :2;
+    uint8_t AirFlow :1;
+    uint8_t Fan     :2;
+    uint8_t         :0;
+    // Byte 4
+    uint8_t Temp  :4;
+    uint8_t       :1;
+    uint8_t Mode  :3;
+    uint8_t       :0;
+  };
+};
 
 // Constants
 // Timing
@@ -31,24 +59,6 @@ const uint16_t kGoodweatherZeroSpace = 1860;
 const uint16_t kGoodweatherHdrMark = 6820;
 const uint16_t kGoodweatherHdrSpace = 6820;
 const uint8_t  kGoodweatherExtraTolerance = 12;  // +12% extra
-
-// Masks
-const uint8_t kGoodweatherBitLight = 8;
-const uint8_t kGoodweatherBitTurbo = kGoodweatherBitLight + 3;  // 11
-const uint8_t kGoodweatherBitCommand = kGoodweatherBitTurbo + 5;  // 16
-const uint8_t kGoodweatherCommandSize = 4;  // Bits
-const uint8_t kGoodweatherBitSleep = kGoodweatherBitCommand + 8;  // 24
-const uint8_t kGoodweatherBitPower = kGoodweatherBitSleep + 1;  // 25
-const uint8_t kGoodweatherBitSwing = kGoodweatherBitPower + 1;  // 26
-const uint8_t kGoodweatherSwingSize = 2;  // Bits
-const uint8_t kGoodweatherBitAirFlow = kGoodweatherBitSwing + 2;  // 28
-const uint8_t kGoodweatherBitFan = kGoodweatherBitAirFlow + 1;  // 29
-const uint8_t kGoodweatherFanSize = 2;  // Bits
-const uint8_t kGoodweatherBitTemp = kGoodweatherBitFan + 3;  // 32
-const uint8_t kGoodweatherTempSize = 4;  // Bits
-const uint8_t kGoodweatherBitMode = kGoodweatherBitTemp + 5;  // 37
-const uint8_t kGoodweatherBitEOF = kGoodweatherBitMode + 3;  // 40
-const uint64_t kGoodweatherEOFMask = 0xFFULL << kGoodweatherBitEOF;
 
 // Modes
 const uint8_t kGoodweatherAuto = 0b000;
@@ -104,32 +114,32 @@ class IRGoodweatherAc {
   void on(void);
   void off(void);
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setTemp(const uint8_t temp);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode();
+  uint8_t getMode(void) const;
   void setSwing(const uint8_t speed);
-  uint8_t getSwing(void);
+  uint8_t getSwing(void) const;
   void setSleep(const bool toggle);
-  bool getSleep(void);
+  bool getSleep(void) const;
   void setTurbo(const bool toggle);
-  bool getTurbo(void);
+  bool getTurbo(void) const;
   void setLight(const bool toggle);
-  bool getLight(void);
+  bool getLight(void) const;
   void setCommand(const uint8_t cmd);
-  uint8_t getCommand(void);
+  uint8_t getCommand(void) const;
   uint64_t getRaw(void);
   void setRaw(const uint64_t state);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
-  uint8_t convertSwingV(const stdAc::swingv_t swingv);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t swingv);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString();
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -139,6 +149,6 @@ class IRGoodweatherAc {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint64_t remote;  ///< The state of the IR remote in IR code form.
+  GoodweatherProtocol _;
 };
 #endif  // IR_GOODWEATHER_H_
