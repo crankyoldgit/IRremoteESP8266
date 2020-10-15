@@ -1254,7 +1254,6 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
               const float degrees, const stdAc::fanspeed_t fan) {
   ac->begin();
   ac->setModel(model);
-  ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -1268,6 +1267,7 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
   // No Beep setting available.
   // No Sleep setting available.
   // No Clock setting available.
+  ac->setPower(on);  // Power off affects temp, so do after setting the temp.
   ac->send();
 }
 #endif  // SEND_LG
