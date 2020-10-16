@@ -390,7 +390,7 @@ void IRrecv::crudeNoiseFilter(decode_results *results, const uint16_t floor) {
 ///   protocols you are not expecting.
 /// @param[in] noise_floor Pulses below this size (in usecs) will be removed or
 ///   merged prior to any decoding. This is to try to remove noise/poor
-///   readings & slighly increase the chances of a successful decode but at the
+///   readings & slightly increase the chances of a successful decode but at the
 ///   cost of data fidelity & integrity.
 ///   (Defaults to 0 usecs. i.e. Don't filter; which is safe!)
 /// @warning DANGER: **Here Be Dragons!**

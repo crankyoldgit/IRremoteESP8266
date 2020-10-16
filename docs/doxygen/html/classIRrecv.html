@@ -952,7 +952,7 @@ Private Attributes</h2></td></tr>
 <dl class="section warning"><dt>Warning</dt><dd>Increasing the <code>max_skip</code> value will dramatically (linearly) increase the cpu time &amp; usage to decode protocols. e.g. 0 -&gt; 1 will be a 2x increase in cpu usage/time. 0 -&gt; 2 will be a 3x increase etc. If you are going to do this, consider disabling protocol decoding for protocols you are not expecting. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">noise_floor</td><td>Pulses below this size (in usecs) will be removed or merged prior to any decoding. This is to try to remove noise/poor readings &amp; slighly increase the chances of a successful decode but at the cost of data fidelity &amp; integrity. (Defaults to 0 usecs. i.e. Don't filter; which is safe!) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">noise_floor</td><td>Pulses below this size (in usecs) will be removed or merged prior to any decoding. This is to try to remove noise/poor readings &amp; slightly increase the chances of a successful decode but at the cost of data fidelity &amp; integrity. (Defaults to 0 usecs. i.e. Don't filter; which is safe!) </td></tr>
   </table>
   </dd>
 </dl>
