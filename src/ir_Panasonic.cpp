@@ -680,7 +680,7 @@ uint8_t IRPanasonicAc::convertFan(const stdAc::fanspeed_t speed) {
 
 /// Convert a standard A/C vertical swing into its native setting.
 /// @param[in] position A stdAc::swingv_t position to convert.
-/// @return The equivilent native horizontal swing position.
+/// @return The equivalent native horizontal swing position.
 uint8_t IRPanasonicAc::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -694,7 +694,7 @@ uint8_t IRPanasonicAc::convertSwingV(const stdAc::swingv_t position) {
 
 /// Convert a standard A/C horizontal swing into its native setting.
 /// @param[in] position A stdAc::swingh_t position to convert.
-/// @return The equivilent native horizontal swing position.
+/// @return The equivalent native horizontal swing position.
 uint8_t IRPanasonicAc::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kLeftMax:  return kPanasonicAcSwingHFullLeft;

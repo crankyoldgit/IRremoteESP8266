@@ -2666,7 +2666,7 @@ bool IRac::hasStateChanged(void) { return cmpStates(next, _prev); }
 /// Convert the supplied str into the appropriate enum.
 /// @param[in] str A Ptr to a C-style string to be converted.
 /// @param[in] def The enum to return if no conversion was possible.
-/// @return The equivilent enum.
+/// @return The equivalent enum.
 stdAc::opmode_t IRac::strToOpmode(const char *str,
                                   const stdAc::opmode_t def) {
   if (!strcasecmp(str, kAutoStr) ||
@@ -2696,7 +2696,7 @@ stdAc::opmode_t IRac::strToOpmode(const char *str,
 /// Convert the supplied str into the appropriate enum.
 /// @param[in] str A Ptr to a C-style string to be converted.
 /// @param[in] def The enum to return if no conversion was possible.
-/// @return The equivilent enum.
+/// @return The equivalent enum.
 stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
                                       const stdAc::fanspeed_t def) {
   if (!strcasecmp(str, kAutoStr) ||
@@ -2727,7 +2727,7 @@ stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
 /// Convert the supplied str into the appropriate enum.
 /// @param[in] str A Ptr to a C-style string to be converted.
 /// @param[in] def The enum to return if no conversion was possible.
-/// @return The equivilent enum.
+/// @return The equivalent enum.
 stdAc::swingv_t IRac::strToSwingV(const char *str,
                                   const stdAc::swingv_t def) {
   if (!strcasecmp(str, kAutoStr) ||
@@ -2768,7 +2768,7 @@ stdAc::swingv_t IRac::strToSwingV(const char *str,
 /// Convert the supplied str into the appropriate enum.
 /// @param[in] str A Ptr to a C-style string to be converted.
 /// @param[in] def The enum to return if no conversion was possible.
-/// @return The equivilent enum.
+/// @return The equivalent enum.
 stdAc::swingh_t IRac::strToSwingH(const char *str,
                                   const stdAc::swingh_t def) {
   if (!strcasecmp(str, kAutoStr) ||
@@ -2808,7 +2808,7 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
 /// @note Assumes str is the model code or an integer >= 1.
 /// @param[in] str A Ptr to a C-style string to be converted.
 /// @param[in] def The enum to return if no conversion was possible.
-/// @return The equivilent enum.
+/// @return The equivalent enum.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
   // Gree
   if (!strcasecmp(str, "YAW1F")) {
@@ -2871,7 +2871,7 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
 /// Convert the supplied str into the appropriate boolean value.
 /// @param[in] str A Ptr to a C-style string to be converted.
 /// @param[in] def The boolean value to return if no conversion was possible.
-/// @return The equivilent boolean value.
+/// @return The equivalent boolean value.
 bool IRac::strToBool(const char *str, const bool def) {
   if (!strcasecmp(str, kOnStr) ||
       !strcasecmp(str, "1") ||
@@ -2889,14 +2889,14 @@ bool IRac::strToBool(const char *str, const bool def) {
 
 /// Convert the supplied boolean into the appropriate String.
 /// @param[in] value The boolean value to be converted.
-/// @return The equivilent String for the locale.
+/// @return The equivalent String for the locale.
 String IRac::boolToString(const bool value) {
   return value ? kOnStr : kOffStr;
 }
 
 /// Convert the supplied operation mode into the appropriate String.
 /// @param[in] mode The enum to be converted.
-/// @return The equivilent String for the locale.
+/// @return The equivalent String for the locale.
 String IRac::opmodeToString(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kOff:
@@ -2918,7 +2918,7 @@ String IRac::opmodeToString(const stdAc::opmode_t mode) {
 
 /// Convert the supplied fan speed enum into the appropriate String.
 /// @param[in] speed The enum to be converted.
-/// @return The equivilent String for the locale.
+/// @return The equivalent String for the locale.
 String IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kAuto:
@@ -2940,7 +2940,7 @@ String IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
 
 /// Convert the supplied enum into the appropriate String.
 /// @param[in] swingv The enum to be converted.
-/// @return The equivilent String for the locale.
+/// @return The equivalent String for the locale.
 String IRac::swingvToString(const stdAc::swingv_t swingv) {
   switch (swingv) {
     case stdAc::swingv_t::kOff:
@@ -2964,7 +2964,7 @@ String IRac::swingvToString(const stdAc::swingv_t swingv) {
 
 /// Convert the supplied enum into the appropriate String.
 /// @param[in] swingh The enum to be converted.
-/// @return The equivilent String for the locale.
+/// @return The equivalent String for the locale.
 String IRac::swinghToString(const stdAc::swingh_t swingh) {
   switch (swingh) {
     case stdAc::swingh_t::kOff:

@@ -1552,7 +1552,7 @@ uint8_t IRHitachiAc344::getSwingH(void) {
 
 /// Convert a standard A/C horizontal swing into its native setting.
 /// @param[in] position A stdAc::swingh_t position to convert.
-/// @return The equivilent native horizontal swing position.
+/// @return The equivalent native horizontal swing position.
 uint8_t IRHitachiAc344::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kAuto:     return kHitachiAc344SwingHAuto;
