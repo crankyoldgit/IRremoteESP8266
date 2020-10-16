@@ -152,7 +152,7 @@ bool IRrecv::decodeMitsubishi(decode_results *results, uint16_t offset,
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
 /// @note Based on a Mitsubishi HC3000 projector's remote.
-///   This protocol appears to have a manditory in-protocol repeat.
+///   This protocol appears to have a mandatory in-protocol repeat.
 ///   That is in *addition* to the entire message needing to be sent twice
 ///   for the device to accept the command. That is separate from the repeat.
 ///   i.e. Allegedly, the real remote requires the "Off" button pressed twice.
