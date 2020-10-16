@@ -129,7 +129,7 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
 /// @return True if the protocol uses a state array. False if just an integer.
 bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
-    // This is keept sorted by name
+    // This is kept sorted by name
     case AMCOR:
     case ARGO:
     case CORONA_AC:
