@@ -535,7 +535,7 @@ String IRLgAc::toString(void) {
   return result;
 }
 
-/// Check if the internal state looks like a valud LG A/C message.
+/// Check if the internal state looks like a valid LG A/C message.
 /// @return true, the internal state is a valid LG A/C mesg. Otherwise, false.
 bool IRLgAc::isValidLgAc(void) {
   return validChecksum(remote_state) &&
