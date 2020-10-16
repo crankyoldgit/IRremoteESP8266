@@ -327,7 +327,7 @@ void IRPanasonicAc::setRaw(const uint8_t state[]) {
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @warning For CKP models, the remote has no memory of the power state the A/C
 ///   unit should be in. For those models setting this on/true will toggle the
-///   power state of the Panasonic A/C unit with the next meessage.
+///   power state of the Panasonic A/C unit with the next message.
 ///     e.g. If the A/C unit is already on, setPower(true) will turn it off.
 ///       If the A/C unit is already off, setPower(true) will turn it on.
 ///       `setPower(false)` will leave the A/C power state as it was.
