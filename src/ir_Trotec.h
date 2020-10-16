@@ -59,7 +59,7 @@ const uint8_t kTrotecTimerBitOffset = 6;
 // Byte 6
 const uint8_t kTrotecMaxTimer = 23;
 
-// Legacy defines. (Deperecated)
+// Legacy defines. (Deprecated)
 #define TROTEC_AUTO kTrotecAuto
 #define TROTEC_COOL kTrotecCool
 #define TROTEC_DRY kTrotecDry

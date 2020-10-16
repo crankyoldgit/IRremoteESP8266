@@ -99,7 +99,7 @@ const uint8_t kArgoFlap5 = 5;
 const uint8_t kArgoFlap6 = 6;
 const uint8_t kArgoFlapFull = 7;
 
-// Legacy defines. (Deperecated)
+// Legacy defines. (Deprecated)
 #define ARGO_COOL_ON              kArgoCoolOn
 #define ARGO_COOL_OFF             kArgoCoolOff
 #define ARGO_COOL_AUTO            kArgoCoolAuto
