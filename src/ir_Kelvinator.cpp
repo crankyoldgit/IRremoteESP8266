@@ -395,7 +395,7 @@ bool IRKelvinatorAC::getTurbo(void) {
 
 /// Convert a standard A/C mode (stdAc::opmode_t) into it a native mode.
 /// @param[in] mode A stdAc::opmode_t operation mode.
-/// @return The native mode equivilant.
+/// @return The native mode equivalent.
 uint8_t IRKelvinatorAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kKelvinatorCool;
@@ -408,7 +408,7 @@ uint8_t IRKelvinatorAC::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a native mode to it's stdAc::opmode_t equivalent.
 /// @param[in] mode A native operating mode value.
-/// @return The stdAc::opmode_t equivilant.
+/// @return The stdAc::opmode_t equivalent.
 stdAc::opmode_t IRKelvinatorAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kKelvinatorCool: return stdAc::opmode_t::kCool;
@@ -421,7 +421,7 @@ stdAc::opmode_t IRKelvinatorAC::toCommonMode(const uint8_t mode) {
 
 /// Convert a native fan speed to it's stdAc::fanspeed_t equivalent.
 /// @param[in] speed A native fan speed value.
-/// @return The stdAc::fanspeed_t equivilant.
+/// @return The stdAc::fanspeed_t equivalent.
 stdAc::fanspeed_t IRKelvinatorAC::toCommonFanSpeed(const uint8_t speed) {
   return (stdAc::fanspeed_t)speed;
 }

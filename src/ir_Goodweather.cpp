@@ -242,7 +242,7 @@ uint8_t IRGoodweatherAc::getCommand(void) const {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRGoodweatherAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kGoodweatherCool;
@@ -255,7 +255,7 @@ uint8_t IRGoodweatherAc::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRGoodweatherAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -269,7 +269,7 @@ uint8_t IRGoodweatherAc::convertFan(const stdAc::fanspeed_t speed) {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] swingv The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRGoodweatherAc::convertSwingV(const stdAc::swingv_t swingv) {
   switch (swingv) {
     case stdAc::swingv_t::kHighest:
@@ -282,9 +282,9 @@ uint8_t IRGoodweatherAc::convertSwingV(const stdAc::swingv_t swingv) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRGoodweatherAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kGoodweatherCool: return stdAc::opmode_t::kCool;
@@ -295,9 +295,9 @@ stdAc::opmode_t IRGoodweatherAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRGoodweatherAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kGoodweatherFanHigh: return stdAc::fanspeed_t::kMax;
@@ -307,8 +307,8 @@ stdAc::fanspeed_t IRGoodweatherAc::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRGoodweatherAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::GOODWEATHER;

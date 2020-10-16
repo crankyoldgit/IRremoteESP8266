@@ -483,7 +483,7 @@ uint8_t IRGreeAC::getDisplayTempSource(void) const {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRGreeAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kGreeCool;
@@ -496,7 +496,7 @@ uint8_t IRGreeAC::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRGreeAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kGreeFanMin;
@@ -510,7 +510,7 @@ uint8_t IRGreeAC::convertFan(const stdAc::fanspeed_t speed) {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] swingv The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRGreeAC::convertSwingV(const stdAc::swingv_t swingv) {
   switch (swingv) {
     case stdAc::swingv_t::kHighest: return kGreeSwingUp;
@@ -522,9 +522,9 @@ uint8_t IRGreeAC::convertSwingV(const stdAc::swingv_t swingv) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRGreeAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kGreeCool: return stdAc::opmode_t::kCool;
@@ -535,9 +535,9 @@ stdAc::opmode_t IRGreeAC::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRGreeAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kGreeFanMax: return stdAc::fanspeed_t::kMax;
@@ -549,7 +549,7 @@ stdAc::fanspeed_t IRGreeAC::toCommonFanSpeed(const uint8_t speed) {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] pos The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 stdAc::swingv_t IRGreeAC::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
     case kGreeSwingUp: return stdAc::swingv_t::kHighest;
@@ -561,8 +561,8 @@ stdAc::swingv_t IRGreeAC::toCommonSwingV(const uint8_t pos) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRGreeAC::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::GREE;

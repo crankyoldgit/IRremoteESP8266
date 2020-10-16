@@ -408,7 +408,7 @@ void IRSanyoAc::setMode(const uint8_t mode) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRSanyoAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kSanyoAcCool;
@@ -418,9 +418,9 @@ uint8_t IRSanyoAc::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRSanyoAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kSanyoAcCool: return stdAc::opmode_t::kCool;
@@ -487,7 +487,7 @@ uint8_t IRSanyoAc::getFan(void) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRSanyoAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -499,9 +499,9 @@ uint8_t IRSanyoAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] spd The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRSanyoAc::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kSanyoAcFanHigh:   return stdAc::fanspeed_t::kHigh;
@@ -532,7 +532,7 @@ void IRSanyoAc::setSwingV(const uint8_t setting) {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRSanyoAc::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest: return kSanyoAcSwingVHighest;
@@ -620,8 +620,8 @@ void IRSanyoAc::setOffTimer(const uint16_t mins) {
           kSanyoAcOffHourSize, hours);
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRSanyoAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::SANYO_AC;

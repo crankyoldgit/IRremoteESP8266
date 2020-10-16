@@ -600,7 +600,7 @@ void IRMitsubishiAC::setTimer(uint8_t timer) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kMitsubishiAcCool;
@@ -612,7 +612,7 @@ uint8_t IRMitsubishiAC::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kMitsubishiAcFanSilent;
@@ -627,7 +627,7 @@ uint8_t IRMitsubishiAC::convertFan(const stdAc::fanspeed_t speed) {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest: return kMitsubishiAcVaneAutoMove - 6;
@@ -642,7 +642,7 @@ uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
 
 /// Convert a stdAc::swingh_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiAC::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kLeftMax:  return kMitsubishiAcWideVaneAuto - 7;
@@ -656,9 +656,9 @@ uint8_t IRMitsubishiAC::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRMitsubishiAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMitsubishiAcCool: return stdAc::opmode_t::kCool;
@@ -668,9 +668,9 @@ stdAc::opmode_t IRMitsubishiAC::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRMitsubishiAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kMitsubishiAcFanRealMax:     return stdAc::fanspeed_t::kMax;
@@ -711,8 +711,8 @@ stdAc::swingh_t IRMitsubishiAC::toCommonSwingH(const uint8_t pos) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRMitsubishiAC::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI_AC;
@@ -1042,7 +1042,7 @@ bool IRMitsubishi136::getQuiet(void) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishi136::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kMitsubishi136Cool;
@@ -1055,7 +1055,7 @@ uint8_t IRMitsubishi136::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishi136::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin: return kMitsubishi136FanMin;
@@ -1068,7 +1068,7 @@ uint8_t IRMitsubishi136::convertFan(const stdAc::fanspeed_t speed) {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishi136::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest: return kMitsubishi136SwingVHighest;
@@ -1080,9 +1080,9 @@ uint8_t IRMitsubishi136::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRMitsubishi136::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMitsubishi136Cool: return stdAc::opmode_t::kCool;
@@ -1093,9 +1093,9 @@ stdAc::opmode_t IRMitsubishi136::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRMitsubishi136::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kMitsubishi136FanMax: return stdAc::fanspeed_t::kMax;
@@ -1119,8 +1119,8 @@ stdAc::swingv_t IRMitsubishi136::toCommonSwingV(const uint8_t pos) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRMitsubishi136::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI136;
@@ -1485,7 +1485,7 @@ bool IRMitsubishi112::getQuiet(void) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishi112::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kMitsubishi112Cool;
@@ -1498,7 +1498,7 @@ uint8_t IRMitsubishi112::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishi112::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin: return kMitsubishi112FanMin;
@@ -1512,7 +1512,7 @@ uint8_t IRMitsubishi112::convertFan(const stdAc::fanspeed_t speed) {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishi112::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest: return kMitsubishi112SwingVHighest;
@@ -1526,7 +1526,7 @@ uint8_t IRMitsubishi112::convertSwingV(const stdAc::swingv_t position) {
 
 /// Convert a stdAc::swingh_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishi112::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kLeftMax: return kMitsubishi112SwingHLeftMax;
@@ -1540,9 +1540,9 @@ uint8_t IRMitsubishi112::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRMitsubishi112::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMitsubishi112Cool: return stdAc::opmode_t::kCool;
@@ -1552,9 +1552,9 @@ stdAc::opmode_t IRMitsubishi112::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRMitsubishi112::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kMitsubishi112FanMax: return stdAc::fanspeed_t::kMax;
@@ -1594,8 +1594,8 @@ stdAc::swingh_t IRMitsubishi112::toCommonSwingH(const uint8_t pos) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRMitsubishi112::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI112;

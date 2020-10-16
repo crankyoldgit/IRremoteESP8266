@@ -226,7 +226,7 @@ uint8_t IRTechnibelAc::getFan(void) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRTechnibelAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -238,9 +238,9 @@ uint8_t IRTechnibelAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRTechnibelAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kTechnibelAcFanHigh:   return stdAc::fanspeed_t::kHigh;
@@ -276,7 +276,7 @@ void IRTechnibelAc::setMode(const uint8_t mode) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRTechnibelAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kHeat: return kTechnibelAcHeat;
@@ -286,9 +286,9 @@ uint8_t IRTechnibelAc::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRTechnibelAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kTechnibelAcHeat:  return stdAc::opmode_t::kHeat;
@@ -317,9 +317,9 @@ bool IRTechnibelAc::convertSwing(const stdAc::swingv_t swing) {
   return swing != stdAc::swingv_t::kOff;
 }
 
-/// Convert a native swing into its stdAc equivilant.
+/// Convert a native swing into its stdAc equivalent.
 /// @param[in] swing true, the swing is on. false, the swing is off.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::swingv_t IRTechnibelAc::toCommonSwing(const bool swing) {
   return swing ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
 }
@@ -368,8 +368,8 @@ uint16_t IRTechnibelAc::getTimer(void) {
                                        kTechnibelAcHoursSize) * 60 : 0;
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRTechnibelAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::TECHNIBEL_AC;

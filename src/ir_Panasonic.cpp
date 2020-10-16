@@ -653,7 +653,7 @@ void IRPanasonicAc::setIon(const bool on) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kPanasonicAcCool;
@@ -666,7 +666,7 @@ uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRPanasonicAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kPanasonicAcFanMin;
@@ -706,9 +706,9 @@ uint8_t IRPanasonicAc::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRPanasonicAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kPanasonicAcCool: return stdAc::opmode_t::kCool;
@@ -719,9 +719,9 @@ stdAc::opmode_t IRPanasonicAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] spd The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRPanasonicAc::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kPanasonicAcFanMax:     return stdAc::fanspeed_t::kMax;
@@ -757,8 +757,8 @@ stdAc::swingv_t IRPanasonicAc::toCommonSwingV(const uint8_t pos) {
     return stdAc::swingv_t::kAuto;
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRPanasonicAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::PANASONIC_AC;
