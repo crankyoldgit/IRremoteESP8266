@@ -562,6 +562,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case COOLIX:
     case GICABLE:
     case INAX:
+    case LG2:
     case MIDEA24:
     case MITSUBISHI:
     case MITSUBISHI2:

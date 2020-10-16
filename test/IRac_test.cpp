@@ -929,7 +929,7 @@ TEST(TestIRac, LG) {
   IRLgAc ac(kGpioUnused);
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
-  char expected[] =
+  char lg_expected[] =
       "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 1 (Dry), Temp: 27C, Fan: 2 (Medium)";
 
@@ -941,14 +941,46 @@ TEST(TestIRac, LG) {
           27,                                   // Degrees C
           stdAc::fanspeed_t::kMedium);          // Fan speed
 
-  ASSERT_EQ(expected, ac.toString());
+  ASSERT_EQ(lg_expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(LG, ac._irsend.capture.decode_type);
   ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
-  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_EQ(lg_expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+
+  // Tests for the LG2 protocol variant/model.
+  ac._irsend.reset();
+  char lg2_expected[] =
+      "Model: 2 (AKB75215403), "
+      "Power: On, Mode: 0 (Cool), Temp: 26C, Fan: 5 (Auto)";
+  irac.lg(&ac,
+          lg_ac_remote_model_t::AKB75215403,    // Model
+          true,                                 // Power
+          stdAc::opmode_t::kCool,               // Mode
+          26,                                   // Degrees C
+          stdAc::fanspeed_t::kAuto);            // Fan speed
+
+  ASSERT_EQ(lg2_expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(lg2_expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  EXPECT_EQ(
+      "f38000d50"
+      "m3200s9850"
+      "m550s1600m550s550m550s550m550s550m550s1600m550s550m550s550m550s550"
+      "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
+      "m550s1600m550s550m550s1600m550s1600m550s550m550s1600m550s550m550s1600"
+      "m550s550m550s550m550s550m550s550"
+      "m550s56300"
+      "m3200s2250"
+      "m550s102050",
+      ac._irsend.outputStr());
+  ac._irsend.reset();
 }
 
 TEST(TestIRac, Midea) {

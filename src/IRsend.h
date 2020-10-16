@@ -265,9 +265,9 @@ class IRsend {
 #endif
 #if SEND_LG
   void sendLG(uint64_t data, uint16_t nbits = kLgBits,
-              uint16_t repeat = kNoRepeat);
+              uint16_t repeat = kLgDefaultRepeat);
   void sendLG2(uint64_t data, uint16_t nbits = kLgBits,
-               uint16_t repeat = kNoRepeat);
+               uint16_t repeat = kLg2DefaultRepeat);
   uint32_t encodeLG(uint16_t address, uint16_t command);
 #endif
 #if (SEND_SHARP || SEND_DENON)

@@ -968,6 +968,7 @@ const uint16_t kLegoPfMinRepeat = kNoRepeat;
 const uint16_t kLgBits = 28;
 const uint16_t kLg32Bits = 32;
 const uint16_t kLgDefaultRepeat = kNoRepeat;
+const uint16_t kLg2DefaultRepeat = kSingleRepeat;
 const uint16_t kLutronBits = 35;
 const uint16_t kMagiquestBits = 56;
 const uint16_t kMetzBits = 19;

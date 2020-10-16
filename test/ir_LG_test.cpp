@@ -375,7 +375,9 @@ TEST(TestSendLG2, SendDataOnly) {
       "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
       "m550s1600m550s550m550s550m550s1600m550s550m550s1600m550s550m550s550"
       "m550s1600m550s1600m550s550m550s1600"
-      "m550s55250",
+      "m550s55250"
+      "m3200s2250"
+      "m550s102050",
       irsend.outputStr());
 }
 
@@ -658,15 +660,21 @@ TEST(TestIRLgAcClass, calcChecksum) {
 }
 
 TEST(TestUtils, Housekeeping) {
+  // LG 28 bit protocol
   ASSERT_EQ("LG", typeToString(decode_type_t::LG));
   ASSERT_EQ(decode_type_t::LG, strToDecodeType("LG"));
   ASSERT_FALSE(hasACState(decode_type_t::LG));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::LG));
+  ASSERT_EQ(kLgBits, IRsend::defaultBits(decode_type_t::LG));
+  ASSERT_EQ(kLgDefaultRepeat, IRsend::minRepeats(decode_type_t::LG));
 
+  // LG2 28 bit protocol
   ASSERT_EQ("LG2", typeToString(decode_type_t::LG2));
   ASSERT_EQ(decode_type_t::LG2, strToDecodeType("LG2"));
   ASSERT_FALSE(hasACState(decode_type_t::LG2));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::LG2));
+  ASSERT_EQ(kLgBits, IRsend::defaultBits(decode_type_t::LG2));
+  ASSERT_EQ(kLg2DefaultRepeat, IRsend::minRepeats(decode_type_t::LG2));
 }
 
 TEST(TestIRLgAcClass, KnownExamples) {
