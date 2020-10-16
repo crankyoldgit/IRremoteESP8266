@@ -109,7 +109,7 @@ uint32_t IRsend::encodeSharp(const uint16_t address, const uint16_t command,
     tempaddress = reverseBits(tempaddress, kSharpAddressBits);
     tempcommand = reverseBits(tempcommand, kSharpCommandBits);
   }
-  // Concatinate all the bits.
+  // Concatenate all the bits.
   return (tempaddress << (kSharpCommandBits + 2)) | (tempcommand << 2) |
          (tempexpansion << 1) | tempcheck;
 }
