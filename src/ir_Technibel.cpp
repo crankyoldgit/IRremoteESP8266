@@ -351,7 +351,7 @@ bool IRTechnibelAc::getTimerEnabled(void) {
 /// Set the timer for when the A/C unit will switch off.
 /// @param[in] nr_of_mins Number of minutes before power off.
 ///   `0` will clear the timer. Max is 24 hrs (1440 mins).
-/// @note Time is stored internaly in hours.
+/// @note Time is stored internally in hours.
 void IRTechnibelAc::setTimer(const uint16_t nr_of_mins) {
   const uint8_t hours = nr_of_mins / 60;
   setBits(&remote_state, kTechnibelAcTimerHoursOffset, kTechnibelAcHoursSize,

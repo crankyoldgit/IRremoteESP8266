@@ -235,7 +235,7 @@ uint16_t IRTecoAc::getTimer(void) {
 /// Set the timer for when the A/C unit will switch power state.
 /// @param[in] nr_mins Number of minutes before power state change.
 ///   `0` will clear the timer. Max is 24 hrs.
-/// @note Time is stored internaly in increments of 30 mins.
+/// @note Time is stored internally in increments of 30 mins.
 void IRTecoAc::setTimer(const uint16_t nr_mins) {
   uint16_t mins = std::min(nr_mins, (uint16_t)(24 * 60));  // Limit to 24 hrs.
   uint8_t hours = mins / 60;
