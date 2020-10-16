@@ -956,7 +956,7 @@ namespace irutils {
     return true;
   }
 
-  /// Perform a low lovel bit manipulation sanity check for the given cpu
+  /// Perform a low level bit manipulation sanity check for the given cpu
   /// architecture and the compiler operation. Calls to this should return
   /// 0 if everything is as expected, anything else means the library won't work
   /// as expected.
