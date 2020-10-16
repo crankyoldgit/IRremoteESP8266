@@ -390,7 +390,7 @@ void IRNeoclimaAc::setFresh(const bool on) {
   setBit(&remote_state[5], kNeoclimaFreshOffset, on);
 }
 
-/// Get the Frsh (air) setting of the A/C.
+/// Get the Fresh (air) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRNeoclimaAc::getFresh(void) {
   return GETBIT8(remote_state[5], kNeoclimaFreshOffset);
