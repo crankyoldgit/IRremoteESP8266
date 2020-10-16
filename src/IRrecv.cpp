@@ -236,7 +236,7 @@ void IRrecv::enableIRIn(const bool pullup) {
 #endif  // UNIT_TEST
   }
 #if defined(ESP32)
-  // Initialize the ESP32 timer.
+  // Initialise the ESP32 timer.
   timer = timerBegin(_timer_num, 80, true);  // 80MHz / 80 = 1 uSec granularity.
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
   timerAlarmWrite(timer, MS_TO_USEC(irparams.timeout), ONCE);
@@ -244,12 +244,12 @@ void IRrecv::enableIRIn(const bool pullup) {
   timerAttachInterrupt(timer, &read_timeout, true);
 #endif  // ESP32
 
-  // Initialize state machine variables
+  // Initialise state machine variables
   resume();
 
 #ifndef UNIT_TEST
 #if defined(ESP8266)
-  // Initialize ESP8266 timer.
+  // Initialise ESP8266 timer.
   os_timer_disarm(&timer);
   os_timer_setfn(&timer, reinterpret_cast<os_timer_func_t *>(read_timeout),
                  NULL);
