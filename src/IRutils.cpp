@@ -129,7 +129,7 @@ String typeToString(const decode_type_t protocol, const bool isRepeat) {
 /// @return True if the protocol uses a state array. False if just an integer.
 bool hasACState(const decode_type_t protocol) {
   switch (protocol) {
-    // This is keept sorted by name
+    // This is kept sorted by name
     case AMCOR:
     case ARGO:
     case CORONA_AC:
@@ -874,7 +874,7 @@ namespace irutils {
       *data &= ~mask;
   }
 
-  /// Alter an uint8_t value by overwriting an arbitary given number of bits.
+  /// Alter an uint8_t value by overwriting an arbitrary given number of bits.
   /// @param[in,out] dst A pointer to the value to be changed.
   /// @param[in] offset Nr. of bits from the Least Significant Bit to be ignored
   /// @param[in] nbits Nr of bits of data to be placed into the destination.
@@ -891,7 +891,7 @@ namespace irutils {
     *dst |= ((data & mask) << offset);
   }
 
-  /// Alter an uint32_t value by overwriting an arbitary given number of bits.
+  /// Alter an uint32_t value by overwriting an arbitrary given number of bits.
   /// @param[in,out] dst A pointer to the value to be changed.
   /// @param[in] offset Nr. of bits from the Least Significant Bit to be ignored
   /// @param[in] nbits Nr of bits of data to be placed into the destination.
@@ -908,7 +908,7 @@ namespace irutils {
     *dst |= ((data & mask) << offset);
   }
 
-  /// Alter an uint64_t value by overwriting an arbitary given number of bits.
+  /// Alter an uint64_t value by overwriting an arbitrary given number of bits.
   /// @param[in,out] dst A pointer to the value to be changed.
   /// @param[in] offset Nr. of bits from the Least Significant Bit to be ignored
   /// @param[in] nbits Nr of bits of data to be placed into the destination.
@@ -956,7 +956,7 @@ namespace irutils {
     return true;
   }
 
-  /// Perform a low lovel bit manipulation sanity check for the given cpu
+  /// Perform a low level bit manipulation sanity check for the given cpu
   /// architecture and the compiler operation. Calls to this should return
   /// 0 if everything is as expected, anything else means the library won't work
   /// as expected.

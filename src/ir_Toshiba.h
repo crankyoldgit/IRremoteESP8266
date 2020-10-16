@@ -84,7 +84,7 @@ const uint8_t kToshibaAcTurboOn = 1;       //            0b01
 const uint8_t kToshibaAcEconoOn = 3;       //            0b11
 // Byte[last] - Checksum (xor)
 
-// Legacy defines. (Deperecated)
+// Legacy defines. (Deprecated)
 #define TOSHIBA_AC_AUTO kToshibaAcAuto
 #define TOSHIBA_AC_COOL kToshibaAcCool
 #define TOSHIBA_AC_DRY kToshibaAcDry

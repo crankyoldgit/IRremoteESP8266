@@ -327,7 +327,7 @@ void IRPanasonicAc::setRaw(const uint8_t state[]) {
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @warning For CKP models, the remote has no memory of the power state the A/C
 ///   unit should be in. For those models setting this on/true will toggle the
-///   power state of the Panasonic A/C unit with the next meessage.
+///   power state of the Panasonic A/C unit with the next message.
 ///     e.g. If the A/C unit is already on, setPower(true) will turn it off.
 ///       If the A/C unit is already off, setPower(true) will turn it on.
 ///       `setPower(false)` will leave the A/C power state as it was.
@@ -653,7 +653,7 @@ void IRPanasonicAc::setIon(const bool on) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kPanasonicAcCool;
@@ -666,7 +666,7 @@ uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRPanasonicAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kPanasonicAcFanMin;
@@ -680,7 +680,7 @@ uint8_t IRPanasonicAc::convertFan(const stdAc::fanspeed_t speed) {
 
 /// Convert a standard A/C vertical swing into its native setting.
 /// @param[in] position A stdAc::swingv_t position to convert.
-/// @return The equivilent native horizontal swing position.
+/// @return The equivalent native horizontal swing position.
 uint8_t IRPanasonicAc::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -694,7 +694,7 @@ uint8_t IRPanasonicAc::convertSwingV(const stdAc::swingv_t position) {
 
 /// Convert a standard A/C horizontal swing into its native setting.
 /// @param[in] position A stdAc::swingh_t position to convert.
-/// @return The equivilent native horizontal swing position.
+/// @return The equivalent native horizontal swing position.
 uint8_t IRPanasonicAc::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kLeftMax:  return kPanasonicAcSwingHFullLeft;
@@ -706,9 +706,9 @@ uint8_t IRPanasonicAc::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRPanasonicAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kPanasonicAcCool: return stdAc::opmode_t::kCool;
@@ -719,9 +719,9 @@ stdAc::opmode_t IRPanasonicAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] spd The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRPanasonicAc::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kPanasonicAcFanMax:     return stdAc::fanspeed_t::kMax;
@@ -757,8 +757,8 @@ stdAc::swingv_t IRPanasonicAc::toCommonSwingV(const uint8_t pos) {
     return stdAc::swingv_t::kAuto;
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRPanasonicAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::PANASONIC_AC;

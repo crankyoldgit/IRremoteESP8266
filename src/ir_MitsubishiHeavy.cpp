@@ -345,7 +345,7 @@ bool IRMitsubishiHeavy152Ac::validChecksum(const uint8_t *state,
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiHeavy152Ac::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kMitsubishiHeavyCool;
@@ -358,7 +358,7 @@ uint8_t IRMitsubishiHeavy152Ac::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiHeavy152Ac::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     // Assumes Econo is slower than Low.
@@ -373,7 +373,7 @@ uint8_t IRMitsubishiHeavy152Ac::convertFan(const stdAc::fanspeed_t speed) {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiHeavy152Ac::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kAuto:    return kMitsubishiHeavy152SwingVAuto;
@@ -388,7 +388,7 @@ uint8_t IRMitsubishiHeavy152Ac::convertSwingV(const stdAc::swingv_t position) {
 
 /// Convert a stdAc::swingh_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiHeavy152Ac::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kAuto:     return kMitsubishiHeavy152SwingHAuto;
@@ -401,9 +401,9 @@ uint8_t IRMitsubishiHeavy152Ac::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRMitsubishiHeavy152Ac::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMitsubishiHeavyCool: return stdAc::opmode_t::kCool;
@@ -414,9 +414,9 @@ stdAc::opmode_t IRMitsubishiHeavy152Ac::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] spd The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRMitsubishiHeavy152Ac::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kMitsubishiHeavy152FanMax:   return stdAc::fanspeed_t::kMax;
@@ -458,8 +458,8 @@ stdAc::swingv_t IRMitsubishiHeavy152Ac::toCommonSwingV(const uint8_t pos) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRMitsubishiHeavy152Ac::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI_HEAVY_152;
@@ -869,14 +869,14 @@ bool IRMitsubishiHeavy88Ac::validChecksum(const uint8_t *state,
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiHeavy88Ac::convertMode(const stdAc::opmode_t mode) {
   return IRMitsubishiHeavy152Ac::convertMode(mode);
 }
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiHeavy88Ac::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     // Assumes Econo is slower than Low.
@@ -891,7 +891,7 @@ uint8_t IRMitsubishiHeavy88Ac::convertFan(const stdAc::fanspeed_t speed) {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiHeavy88Ac::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kAuto:    return kMitsubishiHeavy88SwingVAuto;
@@ -906,7 +906,7 @@ uint8_t IRMitsubishiHeavy88Ac::convertSwingV(const stdAc::swingv_t position) {
 
 /// Convert a stdAc::swingh_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMitsubishiHeavy88Ac::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kAuto:     return kMitsubishiHeavy88SwingHAuto;
@@ -919,9 +919,9 @@ uint8_t IRMitsubishiHeavy88Ac::convertSwingH(const stdAc::swingh_t position) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRMitsubishiHeavy88Ac::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kMitsubishiHeavy88FanTurbo: return stdAc::fanspeed_t::kMax;
@@ -963,8 +963,8 @@ stdAc::swingv_t IRMitsubishiHeavy88Ac::toCommonSwingV(const uint8_t pos) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRMitsubishiHeavy88Ac::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI_HEAVY_88;

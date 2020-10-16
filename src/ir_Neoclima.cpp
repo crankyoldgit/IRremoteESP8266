@@ -211,7 +211,7 @@ uint8_t IRNeoclimaAc::getMode(void) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRNeoclimaAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kNeoclimaCool;
@@ -222,9 +222,9 @@ uint8_t IRNeoclimaAc::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRNeoclimaAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kNeoclimaCool: return stdAc::opmode_t::kCool;
@@ -292,7 +292,7 @@ uint8_t IRNeoclimaAc::getFan(void) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRNeoclimaAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -304,9 +304,9 @@ uint8_t IRNeoclimaAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRNeoclimaAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kNeoclimaFanHigh: return stdAc::fanspeed_t::kMax;
@@ -390,7 +390,7 @@ void IRNeoclimaAc::setFresh(const bool on) {
   setBit(&remote_state[5], kNeoclimaFreshOffset, on);
 }
 
-/// Get the Frsh (air) setting of the A/C.
+/// Get the Fresh (air) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRNeoclimaAc::getFresh(void) {
   return GETBIT8(remote_state[5], kNeoclimaFreshOffset);
@@ -488,8 +488,8 @@ bool IRNeoclimaAc::getFollow(void) {
   return (remote_state[8] & kNeoclimaFollowMe) == kNeoclimaFollowMe;
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRNeoclimaAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::NEOCLIMA;

@@ -470,7 +470,7 @@ bool IRDaikinESP::getWeeklyTimerEnable(void) const {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kDaikinCool;
@@ -483,7 +483,7 @@ uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin: return kDaikinFanQuiet;
@@ -495,9 +495,9 @@ uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRDaikinESP::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kDaikinCool: return stdAc::opmode_t::kCool;
@@ -508,9 +508,9 @@ stdAc::opmode_t IRDaikinESP::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRDaikinESP::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kDaikinFanMax: return stdAc::fanspeed_t::kMax;
@@ -523,8 +523,8 @@ stdAc::fanspeed_t IRDaikinESP::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRDaikinESP::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN;
@@ -884,7 +884,7 @@ uint8_t IRDaikin2::getSwingVertical(void) const {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -1179,21 +1179,21 @@ bool IRDaikin2::getPurify(void) const {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin2::convertMode(const stdAc::opmode_t mode) {
   return IRDaikinESP::convertMode(mode);
 }
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin2::convertFan(const stdAc::fanspeed_t speed) {
   return IRDaikinESP::convertFan(speed);
 }
 
 /// Convert a stdAc::swingh_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin2::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kAuto: return kDaikin2SwingHSwing;
@@ -1223,8 +1223,8 @@ stdAc::swingh_t IRDaikin2::toCommonSwingH(const uint8_t setting) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRDaikin2::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN2;
@@ -1574,7 +1574,7 @@ void IRDaikin216::setMode(const uint8_t mode) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin216::convertMode(const stdAc::opmode_t mode) {
   return IRDaikinESP::convertMode(mode);
 }
@@ -1618,7 +1618,7 @@ uint8_t IRDaikin216::getFan(void) const {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin216::convertFan(const stdAc::fanspeed_t speed) {
   return IRDaikinESP::convertFan(speed);
 }
@@ -1681,8 +1681,8 @@ bool IRDaikin216::getPowerful(void) const {
   return _.Powerful;
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRDaikin216::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN216;
@@ -1932,7 +1932,7 @@ void IRDaikin160::setMode(const uint8_t mode) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin160::convertMode(const stdAc::opmode_t mode) {
   return IRDaikinESP::convertMode(mode);
 }
@@ -1975,7 +1975,7 @@ uint8_t IRDaikin160::getFan(void) const {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin160::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
@@ -2012,7 +2012,7 @@ uint8_t IRDaikin160::getSwingVertical(void) const {
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin160::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
@@ -2041,8 +2041,8 @@ stdAc::swingv_t IRDaikin160::toCommonSwingV(const uint8_t setting) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRDaikin160::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN160;
@@ -2307,7 +2307,7 @@ void IRDaikin176::setMode(const uint8_t mode) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kDry:   return kDaikin176Dry;
@@ -2318,9 +2318,9 @@ uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRDaikin176::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kDaikin176Dry:  return stdAc::opmode_t::kDry;
@@ -2375,7 +2375,7 @@ uint8_t IRDaikin176::getFan(void) const {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -2404,7 +2404,7 @@ uint8_t IRDaikin176::getSwingHorizontal(void) const {
 
 /// Convert a stdAc::swingh_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
     case stdAc::swingh_t::kOff:  return kDaikin176SwingHOff;
@@ -2425,16 +2425,16 @@ stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRDaikin176::toCommonFanSpeed(const uint8_t speed) {
   return (speed == kDaikinFanMin) ? stdAc::fanspeed_t::kMin
                                   : stdAc::fanspeed_t::kMax;
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRDaikin176::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN176;
@@ -2688,7 +2688,7 @@ void IRDaikin128::setMode(const uint8_t mode) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin128::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kDaikin128Cool;
@@ -2699,9 +2699,9 @@ uint8_t IRDaikin128::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRDaikin128::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kDaikin128Cool: return stdAc::opmode_t::kCool;
@@ -2755,7 +2755,7 @@ void IRDaikin128::setFan(const uint8_t speed) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin128::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin: return kDaikinFanQuiet;
@@ -2767,9 +2767,9 @@ uint8_t IRDaikin128::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRDaikin128::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kDaikin128FanPowerful: return stdAc::fanspeed_t::kMax;
@@ -2987,9 +2987,9 @@ String IRDaikin128::toString(void) const {
   return result;
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
+/// Convert the current internal state into its stdAc::state_t equivalent.
 /// @param[in] prev Ptr to a previous state.
-/// @return The stdAc equivilant of the native settings.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
   if (prev != NULL) result = *prev;
@@ -3269,7 +3269,7 @@ void IRDaikin152::setMode(const uint8_t mode) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin152::convertMode(const stdAc::opmode_t mode) {
   return IRDaikinESP::convertMode(mode);
 }
@@ -3318,7 +3318,7 @@ uint8_t IRDaikin152::getFan(void) const {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin152::convertFan(const stdAc::fanspeed_t speed) {
   return IRDaikinESP::convertFan(speed);
 }
@@ -3354,7 +3354,7 @@ bool IRDaikin152::getQuiet(void) const {
 void IRDaikin152::setPowerful(const bool on) {
   _.Powerful = on;
   if (on) {
-    // Powerful, Quiet, Comfortm & Econo mode being on are mutually exclusive.
+    // Powerful, Quiet, Comfort & Econo mode being on are mutually exclusive.
     setQuiet(false);
     setComfort(false);
     setEcono(false);
@@ -3412,8 +3412,8 @@ bool IRDaikin152::getComfort(void) const {
   return _.Comfort;
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRDaikin152::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN152;
@@ -3647,7 +3647,7 @@ void IRDaikin64::setMode(const uint8_t mode) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin64::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kDry: return kDaikin64Dry;
@@ -3656,9 +3656,9 @@ uint8_t IRDaikin64::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRDaikin64::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kDaikin64Cool: return stdAc::opmode_t::kCool;
@@ -3693,7 +3693,7 @@ void IRDaikin64::setFan(const uint8_t speed) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRDaikin64::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kDaikin64FanQuiet;
@@ -3705,9 +3705,9 @@ uint8_t IRDaikin64::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRDaikin64::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kDaikin64FanTurbo: return stdAc::fanspeed_t::kMax;
@@ -3871,9 +3871,9 @@ String IRDaikin64::toString(void) const {
   return result;
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
+/// Convert the current internal state into its stdAc::state_t equivalent.
 /// @param[in] prev Ptr to a previous state.
-/// @return The stdAc equivilant of the native settings.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
   if (prev != NULL) result = *prev;

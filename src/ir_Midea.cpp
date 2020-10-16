@@ -314,7 +314,7 @@ void IRMideaAC::checksum(void) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMideaAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kMideaACCool;
@@ -327,7 +327,7 @@ uint8_t IRMideaAC::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRMideaAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -339,9 +339,9 @@ uint8_t IRMideaAC::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRMideaAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kMideaACCool: return stdAc::opmode_t::kCool;
@@ -352,9 +352,9 @@ stdAc::opmode_t IRMideaAC::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRMideaAC::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kMideaACFanHigh: return stdAc::fanspeed_t::kMax;
@@ -364,9 +364,9 @@ stdAc::fanspeed_t IRMideaAC::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
+/// Convert the current internal state into its stdAc::state_t equivalent.
 /// @param[in] prev A Ptr to the previous state.
-/// @return The stdAc equivilant of the native settings.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result;
   if (prev != NULL) {

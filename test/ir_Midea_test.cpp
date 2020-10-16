@@ -778,7 +778,7 @@ TEST(TestMideaACClass, Econo) {
   EXPECT_EQ("Swing(V) Toggle: Off, Econo Toggle: On", ac.toString());
 }
 
-// Test abusing the protocol for sending 6 arbitary bytes.
+// Test abusing the protocol for sending 6 arbitrary bytes.
 // See https://github.com/crankyoldgit/IRremoteESP8266/issues/887
 TEST(TestDecodeMidea, Issue887) {
   IRsendTest irsend(0);

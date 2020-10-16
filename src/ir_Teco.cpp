@@ -235,7 +235,7 @@ uint16_t IRTecoAc::getTimer(void) {
 /// Set the timer for when the A/C unit will switch power state.
 /// @param[in] nr_mins Number of minutes before power state change.
 ///   `0` will clear the timer. Max is 24 hrs.
-/// @note Time is stored internaly in increments of 30 mins.
+/// @note Time is stored internally in increments of 30 mins.
 void IRTecoAc::setTimer(const uint16_t nr_mins) {
   uint16_t mins = std::min(nr_mins, (uint16_t)(24 * 60));  // Limit to 24 hrs.
   uint8_t hours = mins / 60;
@@ -252,7 +252,7 @@ void IRTecoAc::setTimer(const uint16_t nr_mins) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRTecoAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kTecoCool;
@@ -265,7 +265,7 @@ uint8_t IRTecoAc::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRTecoAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -277,9 +277,9 @@ uint8_t IRTecoAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRTecoAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kTecoCool: return stdAc::opmode_t::kCool;
@@ -290,9 +290,9 @@ stdAc::opmode_t IRTecoAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRTecoAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kTecoFanHigh: return stdAc::fanspeed_t::kMax;
@@ -302,8 +302,8 @@ stdAc::fanspeed_t IRTecoAc::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRTecoAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::TECO;
