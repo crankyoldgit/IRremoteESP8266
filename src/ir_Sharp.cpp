@@ -76,7 +76,7 @@ void IRsend::sendSharpRaw(const uint64_t data, const uint16_t nbits,
                   0,  // Repeats are handled already.
                   33);
       // Invert the data per protocol. This is always called twice, so it's
-      // retured to original upon exiting the inner loop.
+      // returned to original upon exiting the inner loop.
       tempdata ^= kSharpToggleMask;
     }
   }
