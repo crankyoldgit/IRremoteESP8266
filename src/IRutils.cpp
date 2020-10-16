@@ -874,7 +874,7 @@ namespace irutils {
       *data &= ~mask;
   }
 
-  /// Alter an uint8_t value by overwriting an arbitary given number of bits.
+  /// Alter an uint8_t value by overwriting an arbitrary given number of bits.
   /// @param[in,out] dst A pointer to the value to be changed.
   /// @param[in] offset Nr. of bits from the Least Significant Bit to be ignored
   /// @param[in] nbits Nr of bits of data to be placed into the destination.
@@ -891,7 +891,7 @@ namespace irutils {
     *dst |= ((data & mask) << offset);
   }
 
-  /// Alter an uint32_t value by overwriting an arbitary given number of bits.
+  /// Alter an uint32_t value by overwriting an arbitrary given number of bits.
   /// @param[in,out] dst A pointer to the value to be changed.
   /// @param[in] offset Nr. of bits from the Least Significant Bit to be ignored
   /// @param[in] nbits Nr of bits of data to be placed into the destination.
@@ -908,7 +908,7 @@ namespace irutils {
     *dst |= ((data & mask) << offset);
   }
 
-  /// Alter an uint64_t value by overwriting an arbitary given number of bits.
+  /// Alter an uint64_t value by overwriting an arbitrary given number of bits.
   /// @param[in,out] dst A pointer to the value to be changed.
   /// @param[in] offset Nr. of bits from the Least Significant Bit to be ignored
   /// @param[in] nbits Nr of bits of data to be placed into the destination.
