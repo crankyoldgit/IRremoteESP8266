@@ -59,7 +59,7 @@ IRac::IRac(const uint16_t pin, const bool inverted, const bool use_modulation) {
   this->markAsSent();
 }
 
-/// Initialse the given state with the supplied settings.
+/// Initialize the given state with the supplied settings.
 /// @param[out] state A Ptr to where the settings will be stored.
 /// @param[in] vendor The vendor/protocol type.
 /// @param[in] model The A/C model if applicable.
@@ -112,7 +112,7 @@ void IRac::initState(stdAc::state_t *state,
   state->clock = clock;
 }
 
-/// Initialse the given state with the supplied settings.
+/// Initialize the given state with the supplied settings.
 /// @param[out] state A Ptr to where the settings will be stored.
 /// @note Sets all the parameters to reasonable base/automatic defaults.
 void IRac::initState(stdAc::state_t *state) {
