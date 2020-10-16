@@ -3354,7 +3354,7 @@ bool IRDaikin152::getQuiet(void) const {
 void IRDaikin152::setPowerful(const bool on) {
   _.Powerful = on;
   if (on) {
-    // Powerful, Quiet, Comfortm & Econo mode being on are mutually exclusive.
+    // Powerful, Quiet, Comfort & Econo mode being on are mutually exclusive.
     setQuiet(false);
     setComfort(false);
     setEcono(false);
