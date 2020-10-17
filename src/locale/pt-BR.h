@@ -164,4 +164,4 @@
     "Edite e aumente o valor de `kCaptureBufferSize`."
 #endif  // D_WARN_BUFFERFULL
 
-#endif  // LOCALE_DEFAULTS_H_
+#endif // LOCALE_PT_BR_H_
