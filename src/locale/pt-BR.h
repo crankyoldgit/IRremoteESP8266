@@ -76,7 +76,7 @@
 #define D_STR_LOUD "Alto"
 #define D_STR_UPPER "Mais alto"
 #define D_STR_LOWER "Mais baixo"
-#define D_STR_BREEZE "Breeze"
+#define D_STR_BREEZE "Brisa"
 #define D_STR_CIRCULATE "Circular"
 #define D_STR_CEILING "Teto"
 #define D_STR_WALL "Parede"
@@ -154,13 +154,14 @@
 #define D_STR_TOLERANCE "Tolerância"
 #ifndef D_STR_IRRECVDUMP_STARTUP
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDump está rodando e waiting por entradas IR no pino %d"
+    "IRrecvDump está rodando e aguardando por entradas IR no pino %d"
 #endif  // D_STR_IRRECVDUMP_STARTUP
 
 #ifndef D_WARN_BUFFERFULL
 #define D_WARN_BUFFERFULL \
+    "AVISO: O código IR é muito grande para o buffer (>= %d). " \
     "Esse resultado não é confiavel e precisa ser resolvido. " \
-    "Edite e aumente `kCaptureBufferSize`."
+    "Edite e aumente o valor de `kCaptureBufferSize`."
 #endif  // D_WARN_BUFFERFULL
 
 #endif  // LOCALE_DEFAULTS_H_
