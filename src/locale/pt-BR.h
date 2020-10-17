@@ -1,4 +1,4 @@
-// Copyright 2019 - Guilherme (@guieiras)
+// Copyright 2020 - Guilherme (@guieiras)
 // Locale/language file for Portuguese / Brazil.
 // This file will override the default values located in `defaults.h`.
 #ifndef LOCALE_PT_BR_H_
