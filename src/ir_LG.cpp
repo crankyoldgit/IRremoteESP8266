@@ -26,37 +26,24 @@ using irutils::setBits;
 
 
 // Constants
-const uint16_t kLgTick = 50;
-const uint16_t kLgHdrMarkTicks = 170;
-const uint16_t kLgHdrMark = kLgHdrMarkTicks * kLgTick;  // 8500
-const uint16_t kLgHdrSpaceTicks = 85;
-const uint16_t kLgHdrSpace = kLgHdrSpaceTicks * kLgTick;  // 4250
-const uint16_t kLgBitMarkTicks = 11;
-const uint16_t kLgBitMark = kLgBitMarkTicks * kLgTick;  // 550
-const uint16_t kLgOneSpaceTicks = 32;
-const uint16_t kLgOneSpace = kLgOneSpaceTicks * kLgTick;  // 1600
-const uint16_t kLgZeroSpaceTicks = 11;
-const uint16_t kLgZeroSpace = kLgZeroSpaceTicks * kLgTick;  // 550
-const uint16_t kLgRptSpaceTicks = 45;
-const uint16_t kLgRptSpace = kLgRptSpaceTicks * kLgTick;  // 2250
-const uint16_t kLgMinGapTicks = 795;
-const uint16_t kLgMinGap = kLgMinGapTicks * kLgTick;  // 39750
-const uint16_t kLgMinMessageLengthTicks = 2161;
-const uint32_t kLgMinMessageLength = kLgMinMessageLengthTicks * kLgTick;
-
-const uint16_t kLg32HdrMarkTicks = 90;
-const uint16_t kLg32HdrMark = kLg32HdrMarkTicks * kLgTick;  // 4500
-const uint16_t kLg32HdrSpaceTicks = 89;
-const uint16_t kLg32HdrSpace = kLg32HdrSpaceTicks * kLgTick;  // 4450
-const uint16_t kLg32RptHdrMarkTicks = 179;
-const uint16_t kLg32RptHdrMark = kLg32RptHdrMarkTicks * kLgTick;  // 8950
-
-const uint16_t kLg2HdrMarkTicks = 64;
-const uint16_t kLg2HdrMark = kLg2HdrMarkTicks * kLgTick;  // 3200
-const uint16_t kLg2HdrSpaceTicks = 197;
-const uint16_t kLg2HdrSpace = kLg2HdrSpaceTicks * kLgTick;  // 9850
-const uint16_t kLg2BitMarkTicks = 10;
-const uint16_t kLg2BitMark = kLg2BitMarkTicks * kLgTick;  // 500
+// Common timings
+const uint16_t kLgBitMark = 550;              ///< uSeconds.
+const uint16_t kLgOneSpace = 1600;            ///< uSeconds.
+const uint16_t kLgZeroSpace = 550;            ///< uSeconds.
+const uint16_t kLgRptSpace = 2250;            ///< uSeconds.
+const uint16_t kLgMinGap = 39750;             ///< uSeconds.
+const uint32_t kLgMinMessageLength = 108050;  ///< uSeconds.
+// LG (28 Bit)
+const uint16_t kLgHdrMark = 8500;             ///< uSeconds.
+const uint16_t kLgHdrSpace = 4250;            ///< uSeconds.
+// LG (32 Bit)
+const uint16_t kLg32HdrMark = 4500;           ///< uSeconds.
+const uint16_t kLg32HdrSpace = 4450;          ///< uSeconds.
+const uint16_t kLg32RptHdrMark = 8950;        ///< uSeconds.
+// LG2 (28 Bit)
+const uint16_t kLg2HdrMark = 3200;            ///< uSeconds.
+const uint16_t kLg2HdrSpace = 9900;           ///< uSeconds.
+const uint16_t kLg2BitMark = 480;             ///< uSeconds.
 
 #if SEND_LG
 /// Send an LG formatted message. (LG)
@@ -108,8 +95,8 @@ void IRsend::sendLG2(uint64_t data, uint16_t nbits, uint16_t repeat) {
   }
 
   // LGv2 (28-bit) protocol.
-  sendGeneric(kLg2HdrMark, kLg2HdrSpace, kLgBitMark, kLgOneSpace, kLgBitMark,
-              kLgZeroSpace, kLgBitMark, kLgMinGap, kLgMinMessageLength, data,
+  sendGeneric(kLg2HdrMark, kLg2HdrSpace, kLg2BitMark, kLgOneSpace, kLg2BitMark,
+              kLgZeroSpace, kLg2BitMark, kLgMinGap, kLgMinMessageLength, data,
               nbits, 38, true, 0,  // Repeats are handled later.
               50);
 
@@ -160,85 +147,55 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t offset,
     if (results->rawlen <= 2 * nbits + kHeader - 1 + offset)
       return false;  // Can't possibly be a valid LG message.
   }
+  // Compliance
   if (strict && nbits != kLgBits && nbits != kLg32Bits)
     return false;  // Doesn't comply with expected LG protocol.
+
+  // Header (Mark)
+  uint32_t kHdrSpace;
+  if (matchMark(results->rawbuf[offset], kLgHdrMark))
+    kHdrSpace = kLgHdrSpace;
+  else if (matchMark(results->rawbuf[offset], kLg2HdrMark))
+    kHdrSpace = kLg2HdrSpace;
+  else if (matchMark(results->rawbuf[offset], kLg32HdrMark))
+    kHdrSpace = kLg32HdrSpace;
+  else
+    return false;
+  offset++;
+
+  // Set up the expected data section values.
+  const uint16_t kBitmark = (kHdrSpace == kLg2HdrSpace) ? kLg2BitMark
+                                                        : kLgBitMark;
+  // Header Space + Data + Footer
   uint64_t data = 0;
-  bool isLg2 = false;
-
-  // Header
-  uint32_t m_tick;
-  if (matchMark(results->rawbuf[offset], kLgHdrMark)) {
-    m_tick = results->rawbuf[offset++] * kRawTick / kLgHdrMarkTicks;
-  } else if (matchMark(results->rawbuf[offset], kLg2HdrMark)) {
-    m_tick = results->rawbuf[offset++] * kRawTick / kLg2HdrMarkTicks;
-    isLg2 = true;
-  } else if (matchMark(results->rawbuf[offset], kLg32HdrMark)) {
-    m_tick = results->rawbuf[offset++] * kRawTick / kLg32HdrMarkTicks;
-  } else {
-    return false;
-  }
-  uint32_t s_tick;
-  if (isLg2) {
-    if (matchSpace(results->rawbuf[offset], kLg2HdrSpace))
-      s_tick = results->rawbuf[offset++] * kRawTick / kLg2HdrSpaceTicks;
-    else
-      return false;
-  } else {
-    if (matchSpace(results->rawbuf[offset], kLgHdrSpace))
-      s_tick = results->rawbuf[offset++] * kRawTick / kLgHdrSpaceTicks;
-    else if (matchSpace(results->rawbuf[offset], kLg2HdrSpace))
-      s_tick = results->rawbuf[offset++] * kRawTick / kLg32HdrSpaceTicks;
-    else
-      return false;
-  }
-
-  // Set up the expected tick sizes based on variant.
-  uint16_t bitmarkticks;
-  if (isLg2) {
-    bitmarkticks = kLg2BitMarkTicks;
-  } else {
-    bitmarkticks = kLgBitMarkTicks;
-  }
-
-  // Data
-  match_result_t data_result =
-      matchData(&(results->rawbuf[offset]), nbits, bitmarkticks * m_tick,
-                kLgOneSpaceTicks * s_tick, bitmarkticks * m_tick,
-                kLgZeroSpaceTicks * s_tick, _tolerance, 0);
-  if (data_result.success == false) return false;
-  data = data_result.data;
-  offset += data_result.used;
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], bitmarkticks * m_tick))
-    return false;
-  if (offset < results->rawlen &&
-      !matchAtLeast(results->rawbuf[offset], kLgMinGapTicks * s_tick))
-    return false;
+  uint16_t used = matchGeneric(results->rawbuf + offset, &data,
+                               results->rawlen - offset, nbits,
+                               0,  // Already matched the Header mark.
+                               kHdrSpace,
+                               kBitmark, kLgOneSpace, kBitmark, kLgZeroSpace,
+                               kBitmark, kLgMinGap, true, kUseDefTol, 0, true);
+  if (!used) return false;
+  offset += used;
 
   // Repeat
   if (nbits >= kLg32Bits) {
     // If we are expecting the LG 32-bit protocol, there is always
     // a repeat message. So, check for it.
-    offset++;
-    if (!matchMark(results->rawbuf[offset++], kLg32RptHdrMarkTicks * m_tick))
-      return false;
-    if (!matchSpace(results->rawbuf[offset++], kLgRptSpaceTicks * s_tick))
-      return false;
-    if (!matchMark(results->rawbuf[offset++], bitmarkticks * m_tick))
-      return false;
-    if (offset < results->rawlen &&
-        !matchAtLeast(results->rawbuf[offset], kLgMinGapTicks * s_tick))
-      return false;
+    uint64_t unused;
+    if (!matchGeneric(results->rawbuf + offset, &unused,
+                      results->rawlen - offset, 0,  // No Data bits to match.
+                      kLg32RptHdrMark, kLgRptSpace,
+                      kBitmark, kLgOneSpace, kBitmark, kLgZeroSpace,
+                      kBitmark, kLgMinGap, true, kUseDefTol)) return false;
   }
 
   // Compliance
-  uint16_t command = (data >> 4) & 0xFFFF;  // The 16 bits before the checksum.
+  uint16_t command = (data >> 4);  // The 16 bits before the checksum.
 
   if (strict && (data & 0xF) != irutils::sumNibbles(command, 4))
     return false;  // The last 4 bits sent are the expected checksum.
   // Success
-  if (isLg2)
+  if (kHdrSpace == kLg2HdrSpace)  // Was it an LG2 message?
     results->decode_type = LG2;
   else
     results->decode_type = LG;
@@ -248,7 +205,7 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t offset,
   results->address = data >> 20;  // The bits before the command.
   return true;
 }
-#endif
+#endif  // DECODE_LG
 
 // LG A/C Class
 
