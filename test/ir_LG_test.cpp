@@ -369,7 +369,7 @@ TEST(TestSendLG2, SendDataOnly) {
   irsend.reset();
   irsend.sendLG2(0x880094D);
   EXPECT_EQ(
-      "f38000d50"
+      "f38000d33"
       "m3200s9900"
       "m480s1600m480s550m480s550m480s550m480s1600m480s550m480s550m480s550"
       "m480s550m480s550m480s550m480s550m480s550m480s550m480s550m480s550"

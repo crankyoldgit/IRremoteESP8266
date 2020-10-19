@@ -98,7 +98,7 @@ void IRsend::sendLG2(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(kLg2HdrMark, kLg2HdrSpace, kLg2BitMark, kLgOneSpace, kLg2BitMark,
               kLgZeroSpace, kLg2BitMark, kLgMinGap, kLgMinMessageLength, data,
               nbits, 38, true, 0,  // Repeats are handled later.
-              50);
+              33);  // Use a duty cycle of 33% (Testing)
 
   // TODO(crackn): Verify the details of what repeat messages look like.
   // Repeat
