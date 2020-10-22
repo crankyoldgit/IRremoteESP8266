@@ -11,7 +11,7 @@
 
 // Test sending typical data only.
 TEST(TestSendLG, SendDataOnly) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -42,7 +42,7 @@ TEST(TestSendLG, SendDataOnly) {
 
 // Test sending with different repeats.
 TEST(TestSendLG, SendWithRepeats) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -75,7 +75,7 @@ TEST(TestSendLG, SendWithRepeats) {
 
 // Test sending an atypical data size.
 TEST(TestSendLG, SendUnusualSize) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -111,7 +111,7 @@ TEST(TestSendLG, SendUnusualSize) {
 // Tests for encodeLG().
 
 TEST(TestEncodeLG, NormalEncoding) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   EXPECT_EQ(0x0, irsend.encodeLG(0, 0));
   EXPECT_EQ(0x100011, irsend.encodeLG(1, 1));
   EXPECT_EQ(0x100022, irsend.encodeLG(1, 2));
@@ -125,15 +125,15 @@ TEST(TestEncodeLG, NormalEncoding) {
 
 // Decode normal LG messages.
 TEST(TestDecodeLG, NormalDecodeWithStrict) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Normal LG 28-bit message.
   irsend.reset();
   irsend.sendLG(0x4B4AE51, kLgBits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture, kStartOffset, kLgBits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LG, irsend.capture.decode_type);
   EXPECT_EQ(kLgBits, irsend.capture.bits);
   EXPECT_EQ(0x4B4AE51, irsend.capture.value);
@@ -145,7 +145,7 @@ TEST(TestDecodeLG, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendLG(0xB4B4AE51, kLg32Bits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture, kStartOffset, kLg32Bits, false));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LG, irsend.capture.decode_type);
   EXPECT_EQ(kLg32Bits, irsend.capture.bits);
   EXPECT_EQ(0xB4B4AE51, irsend.capture.value);
@@ -157,7 +157,7 @@ TEST(TestDecodeLG, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendLG(irsend.encodeLG(0x07, 0x99));
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture, kStartOffset, kLgBits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LG, irsend.capture.decode_type);
   EXPECT_EQ(kLgBits, irsend.capture.bits);
   EXPECT_EQ(0x700992, irsend.capture.value);
@@ -169,7 +169,7 @@ TEST(TestDecodeLG, NormalDecodeWithStrict) {
   irsend.reset();
   irsend.sendLG(irsend.encodeLG(0x800, 0x8000), kLg32Bits);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture, kStartOffset, kLg32Bits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LG, irsend.capture.decode_type);
   EXPECT_EQ(kLg32Bits, irsend.capture.bits);
   EXPECT_EQ(0x80080008, irsend.capture.value);
@@ -180,15 +180,15 @@ TEST(TestDecodeLG, NormalDecodeWithStrict) {
 
 // Decode normal repeated LG messages.
 TEST(TestDecodeLG, NormalDecodeWithRepeatAndStrict) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Normal LG 28-bit message with 2 repeats.
   irsend.reset();
   irsend.sendLG(irsend.encodeLG(0x07, 0x99), kLgBits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture, kStartOffset, kLgBits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LG, irsend.capture.decode_type);
   EXPECT_EQ(kLgBits, irsend.capture.bits);
   EXPECT_EQ(0x700992, irsend.capture.value);
@@ -200,7 +200,7 @@ TEST(TestDecodeLG, NormalDecodeWithRepeatAndStrict) {
   irsend.reset();
   irsend.sendLG(irsend.encodeLG(0x07, 0x99), kLg32Bits, 2);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture, kStartOffset, kLg32Bits, true));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(LG, irsend.capture.decode_type);
   EXPECT_EQ(kLg32Bits, irsend.capture.bits);
   EXPECT_EQ(0x700992, irsend.capture.value);
@@ -211,8 +211,8 @@ TEST(TestDecodeLG, NormalDecodeWithRepeatAndStrict) {
 
 // Decode unsupported LG message values.
 TEST(TestDecodeLG, DecodeWithNonStrictValues) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Illegal values should be rejected when strict is on.
@@ -249,8 +249,8 @@ TEST(TestDecodeLG, DecodeWithNonStrictValues) {
 
 // Decode unsupported LG message sizes.
 TEST(TestDecodeLG, DecodeWithNonStrictSizes) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Illegal sizes should be rejected when strict is on.
@@ -295,8 +295,8 @@ TEST(TestDecodeLG, DecodeWithNonStrictSizes) {
 
 // Decode (non-standard) 64-bit messages.
 TEST(TestDecodeLG, Decode64BitMessages) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -315,8 +315,8 @@ TEST(TestDecodeLG, Decode64BitMessages) {
 
 // Decode a 'real' example via GlobalCache
 TEST(TestDecodeLG, DecodeGlobalCacheExample) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // TODO(anyone): Find a Global Cache example of the LG 28-bit message.
@@ -342,8 +342,8 @@ TEST(TestDecodeLG, DecodeGlobalCacheExample) {
 
 // Fail to decode a non-LG example via GlobalCache
 TEST(TestDecodeLG, FailToDecodeNonLGExample) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -363,32 +363,32 @@ TEST(TestDecodeLG, FailToDecodeNonLGExample) {
 
 // Test sending typical data only.
 TEST(TestSendLG2, SendDataOnly) {
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
   irsend.sendLG2(0x880094D);
   EXPECT_EQ(
-      "f38000d50"
-      "m3200s9850"
-      "m550s1600m550s550m550s550m550s550m550s1600m550s550m550s550m550s550"
-      "m550s550m550s550m550s550m550s550m550s550m550s550m550s550m550s550"
-      "m550s1600m550s550m550s550m550s1600m550s550m550s1600m550s550m550s550"
-      "m550s1600m550s1600m550s550m550s1600"
-      "m550s55250",
+      "f38000d33"
+      "m3200s9900"
+      "m480s1600m480s550m480s550m480s550m480s1600m480s550m480s550m480s550"
+      "m480s550m480s550m480s550m480s550m480s550m480s550m480s550m480s550"
+      "m480s1600m480s550m480s550m480s1600m480s550m480s1600m480s550m480s550"
+      "m480s1600m480s1600m480s550m480s1600"
+      "m480s57230",
       irsend.outputStr());
 }
 
 TEST(TestDecodeLG2, SyntheticExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
   irsend.sendLG2(0x880094D);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeLG(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(LG2, irsend.capture.decode_type);
   EXPECT_EQ(kLgBits, irsend.capture.bits);
   EXPECT_EQ(0x880094D, irsend.capture.value);
@@ -396,8 +396,8 @@ TEST(TestDecodeLG2, SyntheticExample) {
 
 // Verify decoding of LG variant 2 messages.
 TEST(TestDecodeLG2, RealLG2Example) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -421,8 +421,8 @@ TEST(TestDecodeLG2, RealLG2Example) {
 // Tests for issue reported in
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/620
 TEST(TestDecodeLG, Issue620) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Raw data as reported in initial comment of Issue #620
@@ -662,11 +662,15 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(decode_type_t::LG, strToDecodeType("LG"));
   ASSERT_FALSE(hasACState(decode_type_t::LG));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::LG));
+  ASSERT_EQ(kLgBits, IRsendTest::defaultBits(decode_type_t::LG));
+  ASSERT_EQ(kLgDefaultRepeat, IRsendTest::minRepeats(decode_type_t::LG));
 
   ASSERT_EQ("LG2", typeToString(decode_type_t::LG2));
   ASSERT_EQ(decode_type_t::LG2, strToDecodeType("LG2"));
   ASSERT_FALSE(hasACState(decode_type_t::LG2));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::LG2));
+  ASSERT_EQ(kLgBits, IRsendTest::defaultBits(decode_type_t::LG2));
+  ASSERT_EQ(kLgDefaultRepeat, IRsendTest::minRepeats(decode_type_t::LG2));
 }
 
 TEST(TestIRLgAcClass, KnownExamples) {
@@ -794,8 +798,8 @@ TEST(TestIRLgAcClass, KnownExamples) {
 
 // Verify decoding of LG2 message.
 TEST(TestDecodeLG2, Issue1008) {
-  IRsendTest irsend(0);
-  IRrecv capture(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv capture(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -836,7 +840,7 @@ TEST(TestDecodeLG2, Issue1008) {
 
 TEST(TestIRLgAcClass, DifferentModels) {
   IRLgAc ac(kGpioUnused);
-  IRrecv capture(0);
+  IRrecv capture(kGpioUnused);
 
   ac.setRaw(0x8800347);
 
@@ -855,7 +859,6 @@ TEST(TestIRLgAcClass, DifferentModels) {
   ASSERT_EQ(expected1, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
-
 
   ac.setModel(lg_ac_remote_model_t::AKB75215403);  // aka. 2
   ac._irsend.reset();
