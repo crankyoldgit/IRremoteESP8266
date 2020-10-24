@@ -34,6 +34,38 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Hitachi 224-bit A/C message.
+union HitachiProtocol{
+  uint8_t raw[kHitachiAcStateLength];  ///< The state in native code.
+  struct {
+    // Byte 0~9
+    uint8_t pad0[10];
+    // Byte 10
+    uint8_t Mode  :8;
+    // Byte 11
+    uint8_t Temp  :8;
+    // Byte 12
+    uint8_t       :8;
+    // Byte 13
+    uint8_t Fan   :8;
+    // Byte 14
+    uint8_t         :7;
+    uint8_t SwingV  :1;
+    // Byte 15
+    uint8_t         :7;
+    uint8_t SwingH  :1;
+    // Byte 16
+    uint8_t       :8;
+    // Byte 17
+    uint8_t Power :1;
+    uint8_t       :7;
+    // Byte 18~26
+    uint8_t pad1[9];
+    // Byte 27
+    uint8_t Sum   :8;
+  };
+};
+
 // Constants
 const uint16_t kHitachiAcFreq = 38000;  // Hz.
 const uint8_t kHitachiAcAuto = 2;
@@ -48,12 +80,44 @@ const uint8_t kHitachiAcFanHigh = 5;
 const uint8_t kHitachiAcMinTemp = 16;   // 16C
 const uint8_t kHitachiAcMaxTemp = 32;   // 32C
 const uint8_t kHitachiAcAutoTemp = 23;  // 23C
-const uint8_t kHitachiAcPowerOffset = 0;
-const uint8_t kHitachiAcSwingOffset = 7;
+
+/// Native representation of a Hitachi 53-byte/424-bit A/C message.
+union Hitachi424Protocol{
+  uint8_t raw[kHitachiAc424StateLength];  ///< The state in native code
+  struct {
+    // Byte 0~10
+    uint8_t pad0[11];
+    // Byte 11
+    uint8_t Button  :8;
+    // Byte 12
+    uint8_t       :8;
+    // Byte 13
+    uint8_t       :2;
+    uint8_t Temp  :6;
+    // Byte 14~24
+    uint8_t pad1[11];
+    // Byte 25
+    uint8_t Mode  :4;
+    uint8_t Fan   :4;
+    // Byte 26
+    uint8_t       :8;
+    // Byte 27
+    uint8_t Power :8;
+    // Byte 28~34
+    uint8_t pad2[7];
+    // Byte 35
+    uint8_t SwingH  :3;
+    uint8_t         :5;
+    // Byte 36
+    uint8_t         :8;
+    // Byte 37
+    uint8_t         :5;
+    uint8_t SwingV  :1;
+    uint8_t         :2;
+  };
+};
 
 // HitachiAc424 & HitachiAc344
-// Byte[11]
-const uint8_t kHitachiAc424ButtonByte = 11;
 const uint8_t kHitachiAc424ButtonPowerMode = 0x13;
 const uint8_t kHitachiAc424ButtonFan = 0x42;
 const uint8_t kHitachiAc424ButtonTempDown = 0x43;
@@ -67,18 +131,12 @@ const uint8_t kHitachiAc344ButtonTempUp = kHitachiAc424ButtonTempUp;
 const uint8_t kHitachiAc344ButtonSwingV = kHitachiAc424ButtonSwingV;
 const uint8_t kHitachiAc344ButtonSwingH = kHitachiAc424ButtonSwingH;
 
-// Byte[13]
-const uint8_t kHitachiAc424TempByte = 13;
-const uint8_t kHitachiAc424TempOffset = 2;
-const uint8_t kHitachiAc424TempSize = 6;
 const uint8_t kHitachiAc424MinTemp = 16;   // 16C
 const uint8_t kHitachiAc424MaxTemp = 32;   // 32C
 const uint8_t kHitachiAc344MinTemp = kHitachiAc424MinTemp;
 const uint8_t kHitachiAc344MaxTemp = kHitachiAc424MaxTemp;
 const uint8_t kHitachiAc424FanTemp = 27;   // 27C
 
-// Byte[25]
-const uint8_t kHitachiAc424ModeByte = 25;
 const uint8_t kHitachiAc424Fan = 1;
 const uint8_t kHitachiAc424Cool = 3;
 const uint8_t kHitachiAc424Dry = 5;
@@ -88,7 +146,6 @@ const uint8_t kHitachiAc344Cool = kHitachiAc424Cool;
 const uint8_t kHitachiAc344Dry = kHitachiAc424Dry;
 const uint8_t kHitachiAc344Heat = kHitachiAc424Heat;
 
-const uint8_t kHitachiAc424FanByte = kHitachiAc424ModeByte;
 const uint8_t kHitachiAc424FanMin = 1;
 const uint8_t kHitachiAc424FanLow = 2;
 const uint8_t kHitachiAc424FanMedium = 3;
@@ -103,15 +160,9 @@ const uint8_t kHitachiAc344FanHigh = kHitachiAc424FanHigh;
 const uint8_t kHitachiAc344FanAuto = kHitachiAc424FanAuto;
 const uint8_t kHitachiAc344FanMax = kHitachiAc424FanMax;
 
-// Byte[27]
-const uint8_t kHitachiAc424PowerByte = 27;
 const uint8_t kHitachiAc424PowerOn = 0xF1;
 const uint8_t kHitachiAc424PowerOff = 0xE1;
 
-// Byte[35]
-const uint8_t kHitachiAc344SwingHByte = 35;
-const uint8_t kHitachiAc344SwingHOffset = 0;  // Mask 0b00000xxx
-const uint8_t kHitachiAc344SwingHSize = 3;    // Mask 0b00000xxx
 const uint8_t kHitachiAc344SwingHAuto = 0;              // 0b000
 const uint8_t kHitachiAc344SwingHRightMax = 1;          // 0b001
 const uint8_t kHitachiAc344SwingHRight = 2;             // 0b010
@@ -119,66 +170,73 @@ const uint8_t kHitachiAc344SwingHMiddle = 3;            // 0b011
 const uint8_t kHitachiAc344SwingHLeft = 4;              // 0b100
 const uint8_t kHitachiAc344SwingHLeftMax = 5;           // 0b101
 
-// Byte[37]
-const uint8_t kHitachiAc344SwingVByte = 37;
-const uint8_t kHitachiAc344SwingVOffset = 5;  // Mask 0b00x00000
 
+/// Native representation of a Hitachi 104-bit A/C message.
+union Hitachi1Protocol{
+  uint8_t raw[kHitachiAc1StateLength];  ///< The state in native code.
+  struct {
+    // Byte 0~2
+    uint8_t pad[3];
+    // Byte 3
+    uint8_t        :6;
+    uint8_t Model  :2;
+    // Byte 4
+    uint8_t        :8;
+    // Byte 5
+    uint8_t Fan    :4;
+    uint8_t Mode   :4;
+    // Byte 6
+    uint8_t        :2;
+    uint8_t Temp   :5;  // stored in LSB order.
+    uint8_t        :1;
+    // Byte 7
+    uint8_t OffTimerLow :8;  // nr. of minutes
+    // Byte 8
+    uint8_t OffTimerHigh :8;  // & in LSB order.
+    // Byte 9
+    uint8_t OnTimerLow :8;  // nr. of minutes
+    // Byte 10
+    uint8_t OnTimerHigh :8;  // & in LSB order.
+    // Byte 11
+    uint8_t SwingToggle  :1;
+    uint8_t Sleep        :3;
+    uint8_t PowerToggle  :1;
+    uint8_t Power        :1;
+    uint8_t SwingV       :1;
+    uint8_t SwingH       :1;
+    // Byte 12
+    uint8_t Sum :8;
+  };
+};
 // HitachiAc1
-// Byte[3] (Model)
-const uint8_t kHitachiAc1ModelByte = 3;
-const uint8_t kHitachiAc1ModelOffset = 6;  // Mask 0b11000000
+// Model
 const uint8_t kHitachiAc1Model_A =                 0b10;
 const uint8_t kHitachiAc1Model_B =                 0b01;
-const uint8_t kHitachiAc1ModelSize = 2;
 
-// Byte[5] (Mode & Fan)
-const uint8_t kHitachiAc1ModeByte = 5;
-const uint8_t kHitachiAc1ModeOffset = 4;
-const uint8_t kHitachiAc1ModeSize = 4;  // Mask 0b11110000
+// Mode & Fan
 const uint8_t kHitachiAc1Dry =                  0b0010;  // 2
 const uint8_t kHitachiAc1Fan =                  0b0100;  // 4
 const uint8_t kHitachiAc1Cool =                 0b0110;  // 6
 const uint8_t kHitachiAc1Heat =                 0b1001;  // 9
 const uint8_t kHitachiAc1Auto =                 0b1110;  // 14
-const uint8_t kHitachiAc1FanByte = kHitachiAc1ModeByte;
-const uint8_t kHitachiAc1FanOffset = 0;
-const uint8_t kHitachiAc1FanSize = 4;  // Mask 0b0001111
 const uint8_t kHitachiAc1FanAuto = 1;          // 0b0001
 const uint8_t kHitachiAc1FanHigh = 2;          // 0b0010
 const uint8_t kHitachiAc1FanMed = 4;           // 0b0100
 const uint8_t kHitachiAc1FanLow = 8;           // 0b1000
-// Byte[6] (Temperature)
-// Note: Temp is stored in LSB order.
-const uint8_t kHitachiAc1TempByte = 6;
-const uint8_t kHitachiAc1TempOffset = 2;
+
+// Temp
 const uint8_t kHitachiAc1TempSize = 5;  // Mask 0b01111100
 const uint8_t kHitachiAc1TempDelta = 7;
 const uint8_t kHitachiAc1TempAuto = 25;  // Celsius
-// Note: Timers are nr. of minutes & stored in LSB order.
-// Byte[7-8] (Off Timer)
+// Timer
 const uint8_t kHitachiAc1TimerSize = 16;  // Mask 0b1111111111111111
-const uint8_t kHitachiAc1OffTimerLowByte = 7;
-const uint8_t kHitachiAc1OffTimerHighByte = 8;
-// Byte[9-10] (On Timer)
-const uint8_t kHitachiAc1OnTimerLowByte = 9;
-const uint8_t kHitachiAc1OnTimerHighByte = 10;
-// Byte[11] (Power/Swing/Sleep)
-const uint8_t kHitachiAc1PowerByte = 11;
-const uint8_t kHitachiAc1PowerOffset = 5;        // Mask 0b00100000
-const uint8_t kHitachiAc1PowerToggleOffset = 4;  // Mask 0b00010000
-const uint8_t kHitachiAc1SwingByte = kHitachiAc1PowerByte;
-const uint8_t kHitachiAc1SwingHOffset = 7;        // Mask 0b10000000
-const uint8_t kHitachiAc1SwingVOffset = 6;        // Mask 0b01000000
-const uint8_t kHitachiAc1SwingToggleOffset = 0;  // Mask 0b00000001
-const uint8_t kHitachiAc1SleepByte = kHitachiAc1PowerByte;
-const uint8_t kHitachiAc1SleepOffset = 1;        // Mask 0b00001110
-const uint8_t kHitachiAc1SleepSize = 3;          // Mask 0b00001110
+// Sleep
 const uint8_t kHitachiAc1SleepOff =                          0b000;
 const uint8_t kHitachiAc1Sleep1 =                            0b001;
 const uint8_t kHitachiAc1Sleep2 =                            0b010;
 const uint8_t kHitachiAc1Sleep3 =                            0b011;
 const uint8_t kHitachiAc1Sleep4 =                            0b100;
-// Byte[12] (Checksum)
+// Checksum
 const uint8_t kHitachiAc1ChecksumStartByte = 5;
 
 
@@ -202,17 +260,17 @@ class IRHitachiAc {
   void on(void);
   void off(void);
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setTemp(const uint8_t temp);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   void setSwingVertical(const bool on);
-  bool getSwingVertical(void);
+  bool getSwingVertical(void) const;
   void setSwingHorizontal(const bool on);
-  bool getSwingHorizontal(void);
+  bool getSwingHorizontal(void) const;
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kHitachiAcStateLength);
@@ -220,12 +278,12 @@ class IRHitachiAc {
                             const uint16_t length = kHitachiAcStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kHitachiAcStateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -235,7 +293,7 @@ class IRHitachiAc {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kHitachiAcStateLength];  ///< The state in native code.
+  HitachiProtocol _;
   void checksum(const uint16_t length = kHitachiAcStateLength);
   uint8_t _previoustemp;
 };
@@ -260,29 +318,29 @@ class IRHitachiAc1 {
   void on(void);
   void off(void);
   void setModel(const hitachi_ac1_remote_model_t model);
-  hitachi_ac1_remote_model_t getModel(void);
+  hitachi_ac1_remote_model_t getModel(void) const;
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setPowerToggle(const bool on);
-  bool getPowerToggle(void);
+  bool getPowerToggle(void) const;
   void setTemp(const uint8_t temp);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed, const bool force = false);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   void setSwingToggle(const bool toggle);
-  bool getSwingToggle(void);
+  bool getSwingToggle(void) const;
   void setSwingV(const bool on);
-  bool getSwingV(void);
+  bool getSwingV(void) const;
   void setSwingH(const bool on);
-  bool getSwingH(void);
+  bool getSwingH(void) const;
   void setSleep(const uint8_t mode);
-  uint8_t getSleep(void);
+  uint8_t getSleep(void) const;
   void setOnTimer(const uint16_t mins);
-  uint16_t getOnTimer(void);
+  uint16_t getOnTimer(void) const;
   void setOffTimer(const uint16_t mins);
-  uint16_t getOffTimer(void);
+  uint16_t getOffTimer(void) const;
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kHitachiAc1StateLength);
@@ -290,12 +348,12 @@ class IRHitachiAc1 {
                             const uint16_t length = kHitachiAc1StateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kHitachiAc1StateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -305,7 +363,7 @@ class IRHitachiAc1 {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kHitachiAc1StateLength];  ///< The state in native code.
+  Hitachi1Protocol _;
   void checksum(const uint16_t length = kHitachiAc1StateLength);
 };
 
@@ -328,26 +386,26 @@ class IRHitachiAc424 {
   void on(void);
   void off(void);
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setTemp(const uint8_t temp, bool setPrevious = true);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
-  uint8_t getButton(void);
+  uint8_t getFan(void) const;
+  uint8_t getButton(void) const;
   void setButton(const uint8_t button);
   void setSwingVToggle(const bool on);
-  bool getSwingVToggle(void);
+  bool getSwingVToggle(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   uint8_t* getRaw(void);
   virtual void setRaw(const uint8_t new_code[],
                       const uint16_t length = kHitachiAc424StateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  virtual stdAc::state_t toCommon(void);
-  String toString(void);
+  virtual stdAc::state_t toCommon(void) const;
+  virtual String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -357,9 +415,9 @@ class IRHitachiAc424 {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kHitachiAc424StateLength];  ///< The state in native code
+  Hitachi424Protocol _;
   void setInvertedStates(void);
-  String _toString(void);
+  String _toString(void) const;
   uint8_t _previoustemp;
 };
 
@@ -402,19 +460,19 @@ class IRHitachiAc344: public IRHitachiAc424 {
  public:
   explicit IRHitachiAc344(const uint16_t pin, const bool inverted = false,
                           const bool use_modulation = true);
-  void stateReset(void);
+  void stateReset(void) override;
   void setRaw(const uint8_t new_code[],
-              const uint16_t length = kHitachiAc344StateLength);
-  stdAc::state_t toCommon(void);
+              const uint16_t length = kHitachiAc344StateLength) override;
+  stdAc::state_t toCommon(void) const override;
 #if SEND_HITACHI_AC344
-  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat) override;
 #endif  // SEND_HITACHI_AC344
   void setSwingV(const bool on);
-  bool getSwingV(void);
+  bool getSwingV(void) const;
   void setSwingH(const uint8_t position);
-  uint8_t getSwingH(void);
+  uint8_t getSwingH(void) const;
   static uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
-  String toString(void);
+  String toString(void) const override;
 };
 #endif  // IR_HITACHI_H_
