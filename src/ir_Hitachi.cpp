@@ -319,7 +319,7 @@ void IRHitachiAc::setSwingHorizontal(const bool on) {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRHitachiAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kHitachiAcCool;
@@ -332,7 +332,7 @@ uint8_t IRHitachiAc::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRHitachiAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -344,9 +344,9 @@ uint8_t IRHitachiAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRHitachiAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHitachiAcCool: return stdAc::opmode_t::kCool;
@@ -357,9 +357,9 @@ stdAc::opmode_t IRHitachiAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRHitachiAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kHitachiAcFanHigh:     return stdAc::fanspeed_t::kMax;
@@ -370,8 +370,8 @@ stdAc::fanspeed_t IRHitachiAc::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHitachiAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::HITACHI_AC;
@@ -720,7 +720,7 @@ uint16_t IRHitachiAc1::getOffTimer(void) const {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRHitachiAc1::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kHitachiAc1Cool;
@@ -733,7 +733,7 @@ uint8_t IRHitachiAc1::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRHitachiAc1::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
@@ -745,9 +745,9 @@ uint8_t IRHitachiAc1::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRHitachiAc1::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHitachiAc1Cool: return stdAc::opmode_t::kCool;
@@ -758,9 +758,9 @@ stdAc::opmode_t IRHitachiAc1::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRHitachiAc1::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kHitachiAc1FanHigh:     return stdAc::fanspeed_t::kMax;
@@ -770,8 +770,8 @@ stdAc::fanspeed_t IRHitachiAc1::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHitachiAc1::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::HITACHI_AC1;
@@ -1189,7 +1189,7 @@ bool IRHitachiAc424::getSwingVToggle(void) const {
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRHitachiAc424::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kHitachiAc424Cool;
@@ -1202,7 +1202,7 @@ uint8_t IRHitachiAc424::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
-/// @return The native equivilant of the enum.
+/// @return The native equivalent of the enum.
 uint8_t IRHitachiAc424::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kHitachiAc424FanMin;
@@ -1214,9 +1214,9 @@ uint8_t IRHitachiAc424::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a native mode into its stdAc equivilant.
+/// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRHitachiAc424::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHitachiAc424Cool: return stdAc::opmode_t::kCool;
@@ -1227,9 +1227,9 @@ stdAc::opmode_t IRHitachiAc424::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Convert a native fan speed into its stdAc equivilant.
+/// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
-/// @return The stdAc equivilant of the native setting.
+/// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRHitachiAc424::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kHitachiAc424FanMax:    return stdAc::fanspeed_t::kMax;
@@ -1241,8 +1241,8 @@ stdAc::fanspeed_t IRHitachiAc424::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHitachiAc424::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::HITACHI_AC424;
@@ -1547,8 +1547,8 @@ stdAc::swingh_t IRHitachiAc344::toCommonSwingH(const uint8_t pos) {
   }
 }
 
-/// Convert the current internal state into its stdAc::state_t equivilant.
-/// @return The stdAc equivilant of the native settings.
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHitachiAc344::toCommon(void) const {
   stdAc::state_t result = IRHitachiAc424::toCommon();
   result.protocol = decode_type_t::HITACHI_AC344;
