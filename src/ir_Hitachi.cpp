@@ -603,8 +603,8 @@ uint8_t IRHitachiAc1::getFan(void) const {
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
-/// @param[in] Deprecated Allow setting the speed regardless of restrictions?
-void IRHitachiAc1::setFan(const uint8_t speed, const bool ) {
+/// @param[in] force Deprecated
+void IRHitachiAc1::setFan(const uint8_t speed, const bool force ) {
   // restrictions
   switch (_.Mode) {
     case kHitachiAc1Dry:
