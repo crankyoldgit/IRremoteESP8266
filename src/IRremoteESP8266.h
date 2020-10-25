@@ -705,6 +705,13 @@
 #define SEND_MIRAGE            _IR_ENABLE_DEFAULT_
 #endif  // SEND_MIRAGE
 
+#ifndef DECODE_ELITESCREENS
+#define DECODE_ELITESCREENS    _IR_ENABLE_DEFAULT_
+#endif  // DECODE_ELITESCREENS
+#ifndef SEND_ELITESCREENS
+#define SEND_ELITESCREENS      _IR_ENABLE_DEFAULT_
+#endif  // SEND_ELITESCREENS
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -851,8 +858,9 @@ enum decode_type_t {
   TRANSCOLD,
   TECHNIBEL_AC,
   MIRAGE,
+  ELITESCREENS,  // 95
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = MIRAGE,
+  kLastDecodeType = ELITESCREENS,
 };
 
 // Message lengths & required repeat values
@@ -922,6 +930,8 @@ const uint16_t kEpsonMinRepeat = 2;
 const uint16_t kElectraAcStateLength = 13;
 const uint16_t kElectraAcBits = kElectraAcStateLength * 8;
 const uint16_t kElectraAcMinRepeat = kNoRepeat;
+const uint16_t kEliteScreensBits = 32;
+const uint16_t kEliteScreensDefaultRepeat = kSingleRepeat;
 const uint16_t kFujitsuAcMinRepeat = kNoRepeat;
 const uint16_t kFujitsuAcStateLength = 16;
 const uint16_t kFujitsuAcStateLengthShort = 7;

@@ -880,6 +880,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Mirage decode");
     if (decodeMirage(results, offset)) return true;
 #endif  // DECODE_MIRAGE
+#if DECODE_ELITESCREENS
+    DPRINTLN("Attempting EliteScreens decode");
+    if (decodeElitescreens(results, offset)) return true;
+#endif  // DECODE_ELITESCREENS
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

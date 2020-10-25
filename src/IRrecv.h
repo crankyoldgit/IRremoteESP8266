@@ -695,6 +695,12 @@ class IRrecv {
                     const uint16_t nbits = kMirageBits,
                     const bool strict = true);
 #endif  // DECODE_MIRAGE
+#if DECODE_ELITESCREENS
+  bool decodeElitescreens(decode_results *results,
+                          uint16_t offset = kStartOffset,
+                          const uint16_t nbits = kEliteScreensBits,
+                          const bool strict = true);
+#endif  // DECODE_ELITESCREENS
 };
 
 #endif  // IRRECV_H_
