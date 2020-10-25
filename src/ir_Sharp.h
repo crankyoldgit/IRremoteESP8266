@@ -12,11 +12,12 @@
 
 // Supports:
 //   Brand: Sharp,  Model: LC-52D62U TV
-//   Brand: Sharp,  Model: AY-ZP40KR A/C
-//   Brand: Sharp,  Model: AH-AxSAY A/C
-//   Brand: Sharp,  Model: CRMC-A907 JBEZ remote
-//   Brand: Sharp,  Model: AH-XP10NRY A/C
-//   Brand: Sharp,  Model: CRMC-820JBEZ remote
+//   Brand: Sharp,  Model: AY-ZP40KR A/C (A907)
+//   Brand: Sharp,  Model: AH-AxSAY A/C (A907)
+//   Brand: Sharp,  Model: CRMC-A907 JBEZ remote (A907)
+//   Brand: Sharp,  Model: AH-XP10NRY A/C (A907)
+//   Brand: Sharp,  Model: CRMC-820 JBEZ remote (A907)
+//   Brand: Sharp,  Model: CRMC-A705 JBEZ remote (A705)
 
 #ifndef IR_SHARP_H_
 #define IR_SHARP_H_
@@ -41,6 +42,7 @@ const uint16_t kSharpAcOneSpace = 1400;
 const uint32_t kSharpAcGap = kDefaultMessageGap;
 
 // Byte[4]
+const uint8_t kSharpAcModelBit = 4;  // Mask 0b000x0000
 const uint8_t kSharpAcByteTemp = 4;
 const uint8_t kSharpAcMinTemp = 15;  // Celsius
 const uint8_t kSharpAcMaxTemp = 30;  // Celsius
@@ -118,6 +120,8 @@ class IRSharpAc {
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_SHARP_AC
   void begin(void);
+  void setModel(const sharp_ac_remote_model_t model);
+  sharp_ac_remote_model_t getModel(const bool raw = false);
   void on(void);
   void off(void);
   void setPower(const bool on, const bool prev_on = true);
@@ -169,6 +173,7 @@ class IRSharpAc {
   uint8_t _temp;  ///< Saved copy of the desired temp.
   uint8_t _mode;  ///< Saved copy of the desired mode.
   uint8_t _fan;  ///< Saved copy of the desired fan speed.
+  sharp_ac_remote_model_t _model;  ///< Saved copy of the model.
   void stateReset(void);
   void checksum(void);
   static uint8_t calcChecksum(uint8_t state[],

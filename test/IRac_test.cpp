@@ -1286,20 +1286,21 @@ TEST(TestIRac, Sharp) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), "
+      "Model: 1 (A907), Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), "
       "Turbo: Off, Swing(V) Toggle: On, Ion: On, Econo: -, Clean: Off";
 
   ac.begin();
   irac.sharp(&ac,
-             true,                         // Power
-             true,                         // Previous Power
-             stdAc::opmode_t::kCool,       // Mode
-             28,                           // Celsius
-             stdAc::fanspeed_t::kMedium,   // Fan speed
-             stdAc::swingv_t::kAuto,       // Vertical swing
-             false,                        // Turbo
-             true,                         // Filter (Ion)
-             false);                       // Clean
+             sharp_ac_remote_model_t::A907,  // Model
+             true,                           // Power
+             true,                           // Previous Power
+             stdAc::opmode_t::kCool,         // Mode
+             28,                             // Celsius
+             stdAc::fanspeed_t::kMedium,     // Fan speed
+             stdAc::swingv_t::kAuto,         // Vertical swing
+             false,                          // Turbo
+             true,                           // Filter (Ion)
+             false);                         // Clean
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));

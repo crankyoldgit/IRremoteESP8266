@@ -148,6 +148,12 @@ enum panasonic_ac_remote_model_t {
   kPanasonicRkr = 6,
 };
 
+/// Sharp A/C model numbers
+enum sharp_ac_remote_model_t {
+  A907 = 1,  // 802 too.
+  A705 = 2,
+};
+
 /// Voltas A/C model numbers
 enum voltas_ac_remote_model_t {
   kVoltasUnknown = 0,  // Full Function
