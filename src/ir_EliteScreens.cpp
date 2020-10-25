@@ -44,7 +44,7 @@ void IRsend::sendElitescreens(uint64_t data, uint16_t nbits, uint16_t repeat) {
 
 #if DECODE_ELITESCREENS
 /// Decode the supplied Elite Screens message.
-/// Status: BETA / Probably works
+/// Status: STABLE / Confirmed working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
