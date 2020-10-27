@@ -726,7 +726,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case NEOCLIMA:
       return kNeoclimaBits;
     case PANASONIC_AC:
-      return kNeoclimaBits;
+      return kPanasonicAcBits;
     case SAMSUNG_AC:
       return kSamsungAcBits;
     case SANYO_AC:
