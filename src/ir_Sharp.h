@@ -73,7 +73,9 @@ const uint8_t kSharpAcFanSize = 3;  // Nr. of Bits
 const uint8_t kSharpAcFanAuto =                     0b010;  // 2
 const uint8_t kSharpAcFanMin =                      0b100;  // 4 (FAN1)
 const uint8_t kSharpAcFanMed =                      0b011;  // 3 (FAN2)
+const uint8_t kSharpAcFanA705Low =                  0b011;  // 3
 const uint8_t kSharpAcFanHigh =                     0b101;  // 5 (FAN3)
+const uint8_t kSharpAcFanA705Med =                  0b101;  // 5
 const uint8_t kSharpAcFanMax =                      0b111;  // 7 (FAN4)
 // Byte[7]
 const uint8_t kSharpAcByteTimer = 7;
@@ -160,7 +162,7 @@ class IRSharpAc {
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   stdAc::opmode_t toCommonMode(const uint8_t mode);
-  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
   String toString(void);
 #ifndef UNIT_TEST

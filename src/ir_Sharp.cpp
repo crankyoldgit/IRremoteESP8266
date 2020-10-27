@@ -731,12 +731,21 @@ stdAc::opmode_t IRSharpAc::toCommonMode(const uint8_t mode) {
 /// @param[in] speed The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRSharpAc::toCommonFanSpeed(const uint8_t speed) {
-  switch (speed) {
-    case kSharpAcFanMax:  return stdAc::fanspeed_t::kMax;
-    case kSharpAcFanHigh: return stdAc::fanspeed_t::kHigh;
-    case kSharpAcFanMed:  return stdAc::fanspeed_t::kMedium;
-    case kSharpAcFanMin:  return stdAc::fanspeed_t::kMin;
-    default:              return stdAc::fanspeed_t::kAuto;
+  switch (getModel()) {
+    case sharp_ac_remote_model_t::A705:
+      switch (speed) {
+        case kSharpAcFanA705Low:  return stdAc::fanspeed_t::kLow;
+        case kSharpAcFanA705Med:  return stdAc::fanspeed_t::kMedium;
+      }
+      // FALL-THRU
+    default:
+      switch (speed) {
+        case kSharpAcFanMax:  return stdAc::fanspeed_t::kMax;
+        case kSharpAcFanHigh: return stdAc::fanspeed_t::kHigh;
+        case kSharpAcFanMed:  return stdAc::fanspeed_t::kMedium;
+        case kSharpAcFanMin:  return stdAc::fanspeed_t::kMin;
+        default:              return stdAc::fanspeed_t::kAuto;
+      }
   }
 }
 
@@ -771,6 +780,7 @@ stdAc::state_t IRSharpAc::toCommon(void) {
 /// @return A human readable string.
 String IRSharpAc::toString(void) {
   String result = "";
+  const sharp_ac_remote_model_t model = getModel();
   result.reserve(160);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::SHARP_AC, getModel(), false);
 
@@ -780,15 +790,24 @@ String IRSharpAc::toString(void) {
   result += addModeToString(
       getMode(),
       // Make the value invalid if the model doesn't support an Auto mode.
-      (getModel() != sharp_ac_remote_model_t::A705) ? kSharpAcAuto : 255,
+      (model != sharp_ac_remote_model_t::A705) ? kSharpAcAuto : 255,
       kSharpAcCool, kSharpAcHeat, kSharpAcDry, kSharpAcFan);
   result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kSharpAcFanMax, kSharpAcFanMin,
-                           kSharpAcFanAuto, kSharpAcFanAuto, kSharpAcFanMed);
+  switch (model) {
+    case sharp_ac_remote_model_t::A705:
+      result += addFanToString(getFan(), kSharpAcFanMax, kSharpAcFanA705Low,
+                               kSharpAcFanAuto, kSharpAcFanAuto,
+                               kSharpAcFanA705Med);
+      break;
+    default:
+      result += addFanToString(getFan(), kSharpAcFanMax, kSharpAcFanMin,
+                               kSharpAcFanAuto, kSharpAcFanAuto,
+                               kSharpAcFanMed);
+  }
   result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
   result += addBoolToString(getIon(), kIonStr);
-  switch (getModel()) {
+  switch (model) {
     case sharp_ac_remote_model_t::A705:
       result += addLabeledString(getLightToggle() ? kToggleStr : "-",
                                  kLightStr);
