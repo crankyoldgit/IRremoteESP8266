@@ -60,10 +60,11 @@ const uint8_t kSharpAcPowerTimerSetting = 8;                // 0b1000
 // Byte[6]
 const uint8_t kSharpAcByteMode = 6;
 const uint8_t kSharpAcModeSize = 2;        // Mask 0b000000xx;
-const uint8_t kSharpAcAuto =                             0b00;
+const uint8_t kSharpAcAuto =                             0b00;  // A907 only
+const uint8_t kSharpAcFan =                              0b00;  // A705 only
 const uint8_t kSharpAcDry =                              0b11;
 const uint8_t kSharpAcCool =                             0b10;
-const uint8_t kSharpAcHeat =                             0b01;
+const uint8_t kSharpAcHeat =                             0b01;  // A907 only
 const uint8_t kSharpAcByteClean = kSharpAcByteMode;
 const uint8_t kSharpAcBitCleanOffset = 3;  // Mask 0b0000x000
 const uint8_t kSharpAcByteFan = kSharpAcByteMode;
@@ -158,7 +159,7 @@ class IRSharpAc {
                             const uint16_t length = kSharpAcStateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
-  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
   String toString(void);

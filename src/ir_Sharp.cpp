@@ -322,6 +322,8 @@ void IRSharpAc::setModel(const sharp_ac_remote_model_t model) {
   }
   setBit(&remote[kSharpAcByteIon], kSharpAcModelBit,
          _model == sharp_ac_remote_model_t::A705);
+  // Redo the operating mode as some models don't support all modes.
+  setMode(getMode());
 }
 
 /// Get/Detect the model of the A/C.
@@ -462,8 +464,14 @@ uint8_t IRSharpAc::getMode(void) {
 /// @param[in] mode The desired operating mode.
 /// @param[in] save Do we save this setting as a user set one?
 void IRSharpAc::setMode(const uint8_t mode, const bool save) {
+  if (mode == kSharpAcHeat && getModel() == sharp_ac_remote_model_t::A705) {
+    // A705 has no heat mode, use Fan mode instead.
+    setMode(kSharpAcFan, save);
+    return;
+  }
+
   switch (mode) {
-    case kSharpAcAuto:
+    case kSharpAcAuto:  // Also kSharpAcFan
     case kSharpAcDry:
       // When Dry or Auto, Fan always 2(Auto)
       setFan(kSharpAcFanAuto, false);
@@ -709,6 +717,12 @@ stdAc::opmode_t IRSharpAc::toCommonMode(const uint8_t mode) {
     case kSharpAcCool: return stdAc::opmode_t::kCool;
     case kSharpAcHeat: return stdAc::opmode_t::kHeat;
     case kSharpAcDry:  return stdAc::opmode_t::kDry;
+    case kSharpAcAuto:  // Also kSharpAcFan
+      switch (getModel()) {
+        case sharp_ac_remote_model_t::A705: return stdAc::opmode_t::kFan;
+        default:                            return stdAc::opmode_t::kAuto;
+      }
+      break;
     default:           return stdAc::opmode_t::kAuto;
   }
 }
@@ -763,8 +777,11 @@ String IRSharpAc::toString(void) {
   result += addLabeledString(isPowerSpecial() ? "-"
                                               : (getPower() ? kOnStr : kOffStr),
                              kPowerStr);
-  result += addModeToString(getMode(), kSharpAcAuto, kSharpAcCool, kSharpAcHeat,
-                            kSharpAcDry, kSharpAcAuto);
+  result += addModeToString(
+      getMode(),
+      // Make the value invalid if the model doesn't support an Auto mode.
+      (getModel() != sharp_ac_remote_model_t::A705) ? kSharpAcAuto : 255,
+      kSharpAcCool, kSharpAcHeat, kSharpAcDry, kSharpAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kSharpAcFanMax, kSharpAcFanMin,
                            kSharpAcFanAuto, kSharpAcFanAuto, kSharpAcFanMed);

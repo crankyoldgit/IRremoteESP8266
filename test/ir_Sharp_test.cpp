@@ -544,6 +544,25 @@ TEST(TestSharpAcClass, OperatingMode) {
 
   ac.setMode(255);
   EXPECT_EQ(kSharpAcAuto, ac.getMode());
+
+  // Tests for A705 models.
+  ac.setMode(kSharpAcHeat);
+  EXPECT_EQ(kSharpAcHeat, ac.getMode());
+  ac.setModel(sharp_ac_remote_model_t::A705);
+  // No heat mode anymore.
+  EXPECT_NE(kSharpAcHeat, ac.getMode());
+  // Even after we set it explicitly.
+  ac.setMode(kSharpAcHeat);
+  EXPECT_NE(kSharpAcHeat, ac.getMode());
+
+  // Has fan mode now. (Note: Fan mode is really Auto mode)
+  ac.setMode(kSharpAcFan);
+  EXPECT_EQ(kSharpAcFan, ac.getMode());
+  // Check toString() says Fan rather than Auto.
+  EXPECT_EQ(
+      "Model: 2 (A705), Power: Off, Mode: 0 (Fan), Temp: 15C, Fan: 2 (Auto), "
+      "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Light: -, Clean: Off",
+      ac.toString());
 }
 
 
