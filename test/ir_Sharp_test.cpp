@@ -1116,7 +1116,7 @@ TEST(TestSharpAcClass, Issue1309) {
   ac.setRaw(issue1309_on);
   EXPECT_EQ(
     "Model: 2 (A705), Power: On, Mode: 2 (Cool), Temp: 16C, Fan: 2 (Auto), "
-    "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
+    "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Light: -, Clean: Off",
     ac.toString());
   EXPECT_STATE_EQ(issue1309_on, ac.getRaw(), kSharpAcBits);
 
@@ -1128,7 +1128,7 @@ TEST(TestSharpAcClass, Issue1309) {
   ac.on();
   EXPECT_EQ(
     "Model: 2 (A705), Power: On, Mode: 2 (Cool), Temp: 16C, Fan: 2 (Auto), "
-    "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
+    "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Light: -, Clean: Off",
     ac.toString());
 }
 

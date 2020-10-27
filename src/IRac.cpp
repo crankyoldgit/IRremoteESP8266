@@ -1680,6 +1680,7 @@ void IRac::sanyo(IRSanyoAc *ac,
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] light Turn on the LED/Display mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
 void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
@@ -1687,7 +1688,7 @@ void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
                  const stdAc::opmode_t mode,
                  const float degrees, const stdAc::fanspeed_t fan,
                  const stdAc::swingv_t swingv, const bool turbo,
-                 const bool filter, const bool clean) {
+                 const bool light, const bool filter, const bool clean) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on, prev_power);
@@ -1700,7 +1701,7 @@ void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
   ac->setIon(filter);
   // No Horizontal swing setting available.
   // No Quiet setting available.
-  // No Light setting available.
+  ac->setLightToggle(light);
   // No Beep setting available.
   // No Sleep setting available.
   // No Clock setting available.
@@ -2112,7 +2113,14 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
       case decode_type_t::CORONA_AC:
       case decode_type_t::HITACHI_AC344:
       case decode_type_t::HITACHI_AC424:
+        if ((desired.swingv == stdAc::swingv_t::kOff) ^
+            (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
+          result.swingv = stdAc::swingv_t::kAuto;
+        else
+          result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
+        break;
       case decode_type_t::SHARP_AC:
+        result.light = desired.light ^ prev->light;
         if ((desired.swingv == stdAc::swingv_t::kOff) ^
             (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
           result.swingv = stdAc::swingv_t::kAuto;
@@ -2541,7 +2549,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       bool prev_power = !send.power;
       if (prev != NULL) prev_power = prev->power;
       sharp(&ac, (sharp_ac_remote_model_t)send.model, send.power, prev_power,
-            send.mode, degC, send.fanspeed, send.swingv, send.turbo,
+            send.mode, degC, send.fanspeed, send.swingv, send.turbo, send.light,
             send.filter, send.clean);
       break;
     }

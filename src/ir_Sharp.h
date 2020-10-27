@@ -143,6 +143,8 @@ class IRSharpAc {
   void setIon(const bool on);
   bool getEconoToggle(void);
   void setEconoToggle(const bool on);
+  bool getLightToggle(void);
+  void setLightToggle(const bool on);
   uint16_t getTimerTime(void);
   bool getTimerEnabled(void);
   bool getTimerType(void);
@@ -181,6 +183,8 @@ class IRSharpAc {
   void setPowerSpecial(const uint8_t value);
   uint8_t getPowerSpecial(void);
   void clearPowerSpecial(void);
+  bool _getEconoToggle(void);
+  void _setEconoToggle(const bool on);
 };
 
 #endif  // IR_SHARP_H_

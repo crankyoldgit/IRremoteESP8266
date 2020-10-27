@@ -1299,6 +1299,7 @@ TEST(TestIRac, Sharp) {
              stdAc::fanspeed_t::kMedium,     // Fan speed
              stdAc::swingv_t::kAuto,         // Vertical swing
              false,                          // Turbo
+             false,                          // Light
              true,                           // Filter (Ion)
              false);                         // Clean
   ASSERT_EQ(expected, ac.toString());

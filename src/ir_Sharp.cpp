@@ -562,7 +562,8 @@ void IRSharpAc::setIon(const bool on) {
 
 /// Get the Economical mode toggle setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSharpAc::getEconoToggle(void) {
+/// @note Shares the same location as the Light setting on A705.
+bool IRSharpAc::_getEconoToggle(void) {
   return (getPowerSpecial() == kSharpAcPowerSetSpecialOn) &&
          (getSpecial() == kSharpAcSpecialTempEcono);
 }
@@ -570,9 +571,40 @@ bool IRSharpAc::getEconoToggle(void) {
 /// Set the Economical mode toggle setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @warning Probably incompatible with `setTurbo()`
-void IRSharpAc::setEconoToggle(const bool on) {
+/// @note Shares the same location as the Light setting on A705.
+void IRSharpAc::_setEconoToggle(const bool on) {
   if (on) setSpecial(kSharpAcSpecialTempEcono);
   setPowerSpecial(on ? kSharpAcPowerSetSpecialOn : kSharpAcPowerSetSpecialOff);
+}
+
+/// Set the Economical mode toggle setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @warning Probably incompatible with `setTurbo()`
+/// @note Not available on the A705 model.
+void IRSharpAc::setEconoToggle(const bool on) {
+  if (_model != sharp_ac_remote_model_t::A705) _setEconoToggle(on);
+}
+
+/// Get the Economical mode toggle setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+/// @note Not available on the A705 model.
+bool IRSharpAc::getEconoToggle(void) {
+  return _model != sharp_ac_remote_model_t::A705 && _getEconoToggle();
+}
+
+/// Set the Light mode toggle setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @warning Probably incompatible with `setTurbo()`
+/// @note Not available on the A907 model.
+void IRSharpAc::setLightToggle(const bool on) {
+  if (_model != sharp_ac_remote_model_t::A705) _setEconoToggle(on);
+}
+
+/// Get the Light toggle setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+/// @note Not available on the A907 model.
+bool IRSharpAc::getLightToggle(void) {
+  return _model != sharp_ac_remote_model_t::A907 && _getEconoToggle();
 }
 
 /// Get how long the timer is set for, in minutes.
@@ -710,12 +742,12 @@ stdAc::state_t IRSharpAc::toCommon(void) {
                                    : stdAc::swingv_t::kOff;
   result.filter = getIon();
   result.econo = getEconoToggle();
+  result.light = getLightToggle();
   result.clean = getClean();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.beep = false;
-  result.light = false;
   result.sleep = -1;
   result.clock = -1;
   return result;
@@ -739,7 +771,15 @@ String IRSharpAc::toString(void) {
   result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
   result += addBoolToString(getIon(), kIonStr);
-  result += addLabeledString(getEconoToggle() ? kToggleStr : "-", kEconoStr);
+  switch (getModel()) {
+    case sharp_ac_remote_model_t::A705:
+      result += addLabeledString(getLightToggle() ? kToggleStr : "-",
+                                 kLightStr);
+      break;
+    default:
+      result += addLabeledString(getEconoToggle() ? kToggleStr : "-",
+                                 kEconoStr);
+  }
   result += addBoolToString(getClean(), kCleanStr);
   if (getTimerEnabled())
     result += addLabeledString(minsToString(getTimerTime()),
