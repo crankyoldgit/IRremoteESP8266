@@ -984,6 +984,7 @@ bool IRrecv::decodePanasonicAC64(decode_results *results, uint16_t offset,
   for (uint16_t block = 0;
        block < kPanasonicAc64Sections * kPanasonicAc64BlocksPerSection;
        block++) {
+    prev_section_data = section_data;
     uint16_t used = matchGeneric(results->rawbuf + offset, &section_data,
                                  results->rawlen - offset, kSectionBits,
                                  kPanasonicAc64HdrMark, kPanasonicAc64HdrSpace,
@@ -995,10 +996,9 @@ bool IRrecv::decodePanasonicAC64(decode_results *results, uint16_t offset,
     offset += used;
     // Is it the first block of the section?
     if (block % kPanasonicAc64BlocksPerSection == 0) {
-      prev_section_data = section_data;
       // Keep the data from the first of the block pairs.
       data = (data << kSectionBits) | section_data;
-    } else {
+    } else {  // Not the first block in a section.
       // Compliance
       if (strict)
         // Compare the data from the blocks in pairs.
