@@ -502,6 +502,13 @@
 #define SEND_PANASONIC_AC      _IR_ENABLE_DEFAULT_
 #endif  // SEND_PANASONIC_AC
 
+#ifndef DECODE_PANASONIC_AC64
+#define DECODE_PANASONIC_AC64  _IR_ENABLE_DEFAULT_
+#endif  // DECODE_PANASONIC_AC64
+#ifndef SEND_PANASONIC_AC64
+#define SEND_PANASONIC_AC64    _IR_ENABLE_DEFAULT_
+#endif  // SEND_PANASONIC_AC64
+
 #ifndef DECODE_MWM
 #define DECODE_MWM             _IR_ENABLE_DEFAULT_
 #endif  // DECODE_MWM
@@ -859,8 +866,9 @@ enum decode_type_t {
   TECHNIBEL_AC,
   MIRAGE,
   ELITESCREENS,  // 95
+  PANASONIC_AC64,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = ELITESCREENS,
+  kLastDecodeType = PANASONIC_AC64,
 };
 
 // Message lengths & required repeat values
@@ -1022,6 +1030,7 @@ const uint16_t kPanasonicAcStateShortLength = 16;
 const uint16_t kPanasonicAcBits = kPanasonicAcStateLength * 8;
 const uint16_t kPanasonicAcShortBits = kPanasonicAcStateShortLength * 8;
 const uint16_t kPanasonicAcDefaultRepeat = kNoRepeat;
+const uint16_t kPanasonicAc64Bits = 64;
 const uint16_t kPioneerBits = 64;
 const uint16_t kProntoMinLength = 6;
 const uint16_t kRC5RawBits = 14;

@@ -25,31 +25,27 @@
 
 // Constants
 /// @see http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
-const uint16_t kPanasonicTick = 432;
-const uint16_t kPanasonicHdrMarkTicks = 8;
-const uint16_t kPanasonicHdrMark = kPanasonicHdrMarkTicks * kPanasonicTick;
-const uint16_t kPanasonicHdrSpaceTicks = 4;
-const uint16_t kPanasonicHdrSpace = kPanasonicHdrSpaceTicks * kPanasonicTick;
-const uint16_t kPanasonicBitMarkTicks = 1;
-const uint16_t kPanasonicBitMark = kPanasonicBitMarkTicks * kPanasonicTick;
-const uint16_t kPanasonicOneSpaceTicks = 3;
-const uint16_t kPanasonicOneSpace = kPanasonicOneSpaceTicks * kPanasonicTick;
-const uint16_t kPanasonicZeroSpaceTicks = 1;
-const uint16_t kPanasonicZeroSpace = kPanasonicZeroSpaceTicks * kPanasonicTick;
-const uint16_t kPanasonicMinCommandLengthTicks = 378;
-const uint32_t kPanasonicMinCommandLength =
-    kPanasonicMinCommandLengthTicks * kPanasonicTick;
-const uint16_t kPanasonicEndGap = 5000;  // See issue #245
-const uint16_t kPanasonicMinGapTicks =
-    kPanasonicMinCommandLengthTicks -
-    (kPanasonicHdrMarkTicks + kPanasonicHdrSpaceTicks +
-     kPanasonicBits * (kPanasonicBitMarkTicks + kPanasonicOneSpaceTicks) +
-     kPanasonicBitMarkTicks);
-const uint32_t kPanasonicMinGap = kPanasonicMinGapTicks * kPanasonicTick;
+const uint16_t kPanasonicHdrMark = 3456;  ///< uSeconds.
+const uint16_t kPanasonicHdrSpace = 1728;  ///< uSeconds.
+const uint16_t kPanasonicBitMark = 432;  ///< uSeconds.
+const uint16_t kPanasonicOneSpace = 1296;  ///< uSeconds.
+const uint16_t kPanasonicZeroSpace = 432;  ///< uSeconds.
+const uint32_t kPanasonicMinCommandLength = 163296;  ///< uSeconds.
+const uint16_t kPanasonicEndGap = 5000;    ///< uSeconds. See issue #245
+const uint32_t kPanasonicMinGap = 74736;  ///< uSeconds.
 
-const uint16_t kPanasonicAcSectionGap = 10000;
+const uint16_t kPanasonicAcSectionGap = 10000;  ///< uSeconds.
 const uint16_t kPanasonicAcSection1Length = 8;
 const uint32_t kPanasonicAcMessageGap = kDefaultMessageGap;  // Just a guess.
+
+const uint16_t kPanasonicAc64HdrMark = 3543;  ///< uSeconds.
+const uint16_t kPanasonicAc64BitMark = 920;  ///< uSeconds.
+const uint16_t kPanasonicAc64HdrSpace = 3450;  ///< uSeconds.
+const uint16_t kPanasonicAc64OneSpace = 2575;  ///< uSeconds.
+const uint16_t kPanasonicAc64ZeroSpace = 828;  ///< uSeconds.
+const uint16_t kPanasonicAc64SectionGap = 13946;  ///< uSeconds.
+const uint8_t  kPanasonicAc64Sections = 2;
+const uint8_t  kPanasonicAc64BlocksPerSection = 2;
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -926,3 +922,112 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_PANASONIC_AC
+
+#if SEND_PANASONIC_AC64
+/// Send a Panasonic AC 64bit formatted message.
+/// Status: BETA / Probably works.
+/// @param[in] data containing the IR command.
+/// @param[in] nbits Nr. of bits to send. usually kPanasonicAc64Bits
+/// @param[in] repeat Nr. of times the message is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1307
+void IRsend::sendPanasonicAC64(const uint64_t data, const uint16_t nbits,
+                               const uint16_t repeat) {
+  const uint16_t kSectionBits = nbits / kPanasonicAc64Sections;
+  for (uint16_t r = 0; r <= repeat; r++) {
+    for (uint8_t section = 0; section < kPanasonicAc64Sections;  section++) {
+      // Two data blocks per section (i.e. 1 + a repeat)
+      sendGeneric(kPanasonicAc64HdrMark, kPanasonicAc64HdrSpace,  // Header
+                  kPanasonicAc64BitMark, kPanasonicAc64OneSpace,  // Data
+                  kPanasonicAc64BitMark, kPanasonicAc64ZeroSpace,
+                  0, 0,  // No Footer
+                  GETBITS64(
+                      data,
+                      kSectionBits * (kPanasonicAc64Sections - section - 1),
+                      kSectionBits),
+                  kSectionBits, kPanasonicFreq, false,
+                  kPanasonicAc64BlocksPerSection - 1,  // Repeat
+                  50);
+      // Section Footer
+      sendGeneric(kPanasonicAc64HdrMark, kPanasonicAc64HdrSpace,  // Header
+                  0, 0, 0, 0,  // No Data
+                  kPanasonicAc64BitMark, kPanasonicAc64SectionGap,  // Footer
+                  data, 0,  // No data (bits)
+                  kPanasonicFreq, true, 0, 50);
+    }
+  }
+}
+#endif  // SEND_PANASONIC_AC64
+
+#if DECODE_PANASONIC_AC64
+/// Decode the supplied Panasonic AC 64bit message.
+/// Status: BETA / Probably works.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1307
+bool IRrecv::decodePanasonicAC64(decode_results *results, uint16_t offset,
+                                 const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * (2 * (nbits + kHeader) + kFooter) - 1 + offset)
+    return false;  // Can't possibly be a valid message.
+  if (strict && nbits != kPanasonicAc64Bits)
+    return false;  // Not strictly a message.
+
+  const uint16_t kSectionBits = nbits / kPanasonicAc64Sections;
+  uint64_t data = 0;
+  uint64_t section_data = 0;
+  uint32_t prev_section_data;
+
+  for (uint16_t block = 0;
+       block < kPanasonicAc64Sections * kPanasonicAc64BlocksPerSection;
+       block++) {
+    uint16_t used = matchGeneric(results->rawbuf + offset, &section_data,
+                                 results->rawlen - offset, kSectionBits,
+                                 kPanasonicAc64HdrMark, kPanasonicAc64HdrSpace,
+                                 kPanasonicAc64BitMark, kPanasonicAc64OneSpace,
+                                 kPanasonicAc64BitMark, kPanasonicAc64ZeroSpace,
+                                 0, 0,  // No Footer
+                                 false, kUseDefTol, kMarkExcess, false);
+    if (!used) return false;
+    offset += used;
+    // Is it the first block of the section?
+    if (block % kPanasonicAc64BlocksPerSection == 0) {
+      prev_section_data = section_data;
+      // Keep the data from the first of the block pairs.
+      data = (data << kSectionBits) | section_data;
+    } else {
+      // Compliance
+      if (strict)
+        // Compare the data from the blocks in pairs.
+        if (section_data != prev_section_data) return false;
+      // Look for the section footer at the end of the blocks.
+      if ((block + 1) % kPanasonicAc64BlocksPerSection == 0) {
+        uint64_t junk;
+        used = matchGeneric(results->rawbuf + offset, &junk,
+                            results->rawlen - offset, 0,
+                            // Header
+                            kPanasonicAc64HdrMark, kPanasonicAc64HdrSpace,
+                            // No Data
+                            0, 0,
+                            0, 0,
+                            // Footer
+                            kPanasonicAc64BitMark, kPanasonicAc64SectionGap,
+                            true);
+        if (!used) return false;
+        offset += used;
+      }
+    }
+  }
+
+  // Success
+  results->value = data;
+  results->decode_type = decode_type_t::PANASONIC_AC64;
+  results->bits = nbits;
+  results->address = GETBITS64(data, kSectionBits, kSectionBits);
+  results->command = GETBITS64(data, 0, kSectionBits);;
+  return true;
+}
+#endif  // DECODE_PANASONIC_AC64
