@@ -1391,3 +1391,83 @@ TEST(TestDecodePanasonicAC64, SyntheticMessage) {
       "m920s13946",
       irsend.outputStr());
 }
+
+// Decode a real *short* Panasonic AC 64 bit message
+TEST(TestDecodePanasonicAC64, RealShortMessage) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1307#issuecomment-719038870
+  // https://github.com/crankyoldgit/IRremoteESP8266/files/5461382/quiet-powerful.txt
+  const uint16_t rawData[201] = {
+      3548, 3448, 922, 826, 922, 2576, 922, 2574, 918, 832, 916, 830, 918, 830,
+      918, 830, 918, 2574, 924, 824, 922, 2576, 922, 2574, 922, 826, 922, 826,
+      922, 826, 922, 826, 922, 2574, 922, 2574, 918, 830, 918, 2574, 922, 832,
+      916, 2574, 922, 2574, 922, 830, 918, 830, 918, 2574, 922, 826, 922, 2576,
+      922, 826, 922, 2574, 922, 2574, 922, 826, 922, 826, 3542, 3452, 918, 830,
+      918, 2574, 922, 2574, 922, 830, 916, 830, 918, 830, 918, 830, 918, 2574,
+      922, 832, 916, 2574, 922, 2574, 922, 830, 918, 830, 916, 830, 918, 830,
+      918, 2576, 922, 2574, 922, 826, 922, 2574, 922, 826, 922, 2574, 922, 2574,
+      918, 830, 916, 830, 918, 2580, 918, 830, 918, 2578, 918, 830, 918, 2580,
+      918, 2574, 922, 830, 918, 830, 3544, 3446, 922, 832, 916, 2574, 922, 2574,
+      922, 826, 922, 826, 922, 826, 922, 826, 922, 2574, 918, 830, 918, 2580,
+      916, 2580, 918, 830, 918, 830, 918, 830, 916, 830, 918, 2580, 918, 2574,
+      922, 830, 918, 2574, 922, 830, 916, 2576, 922, 2574, 922, 830, 918, 830,
+      918, 2574, 922, 830, 916, 2576, 922, 830, 918, 2574, 922, 2576, 922, 830,
+      918, 830, 3538, 3450, 922};  // UNKNOWN A9E430DB
+
+  irsend.sendRaw(rawData, 201, kPanasonicFreq);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(PANASONIC_AC64, irsend.capture.decode_type);
+  EXPECT_EQ(kPanasonicAc64Bits / 2, irsend.capture.bits);
+  EXPECT_EQ(0x35358686, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0x35358686, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+
+  EXPECT_EQ(
+      "", IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+// Decode a synthetic *short Panasonic AC 64 bit message
+TEST(TestDecodePanasonicAC64, SyntheticShortMessage) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  irsend.sendPanasonicAC64(0x35358686, kPanasonicAc64Bits / 2);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(PANASONIC_AC64, irsend.capture.decode_type);
+  EXPECT_EQ(kPanasonicAc64Bits / 2, irsend.capture.bits);
+  EXPECT_EQ(0x35358686, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0x35358686, irsend.capture.command);
+  EXPECT_FALSE(irsend.capture.repeat);
+
+  EXPECT_EQ(
+      "f36700d50"
+      "m3543s3450"
+      "m920s828m920s2575m920s2575m920s828m920s828m920s828m920s828m920s2575"
+      "m920s828m920s2575m920s2575m920s828m920s828m920s828m920s828m920s2575"
+      "m920s2575m920s828m920s2575m920s828m920s2575m920s2575m920s828m920s828"
+      "m920s2575m920s828m920s2575m920s828m920s2575m920s2575m920s828m920s828"
+      "m3543s3450"
+      "m920s828m920s2575m920s2575m920s828m920s828m920s828m920s828m920s2575"
+      "m920s828m920s2575m920s2575m920s828m920s828m920s828m920s828m920s2575"
+      "m920s2575m920s828m920s2575m920s828m920s2575m920s2575m920s828m920s828"
+      "m920s2575m920s828m920s2575m920s828m920s2575m920s2575m920s828m920s828"
+      "m3543s3450"
+      "m920s828m920s2575m920s2575m920s828m920s828m920s828m920s828m920s2575"
+      "m920s828m920s2575m920s2575m920s828m920s828m920s828m920s828m920s2575"
+      "m920s2575m920s828m920s2575m920s828m920s2575m920s2575m920s828m920s828"
+      "m920s2575m920s828m920s2575m920s828m920s2575m920s2575m920s828m920s828"
+      "m3543s3450"
+      "m920s13946",
+      irsend.outputStr());
+}
