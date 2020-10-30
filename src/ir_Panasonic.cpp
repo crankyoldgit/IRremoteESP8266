@@ -25,27 +25,27 @@
 
 // Constants
 /// @see http://www.remotecentral.com/cgi-bin/mboard/rc-pronto/thread.cgi?26152
-const uint16_t kPanasonicHdrMark = 3456;  ///< uSeconds.
-const uint16_t kPanasonicHdrSpace = 1728;  ///< uSeconds.
-const uint16_t kPanasonicBitMark = 432;  ///< uSeconds.
-const uint16_t kPanasonicOneSpace = 1296;  ///< uSeconds.
-const uint16_t kPanasonicZeroSpace = 432;  ///< uSeconds.
+const uint16_t kPanasonicHdrMark = 3456;             ///< uSeconds.
+const uint16_t kPanasonicHdrSpace = 1728;            ///< uSeconds.
+const uint16_t kPanasonicBitMark = 432;              ///< uSeconds.
+const uint16_t kPanasonicOneSpace = 1296;            ///< uSeconds.
+const uint16_t kPanasonicZeroSpace = 432;            ///< uSeconds.
 const uint32_t kPanasonicMinCommandLength = 163296;  ///< uSeconds.
-const uint16_t kPanasonicEndGap = 5000;    ///< uSeconds. See issue #245
-const uint32_t kPanasonicMinGap = 74736;  ///< uSeconds.
+const uint16_t kPanasonicEndGap = 5000;              ///< uSeconds. See #245
+const uint32_t kPanasonicMinGap = 74736;             ///< uSeconds.
 
-const uint16_t kPanasonicAcSectionGap = 10000;  ///< uSeconds.
+const uint16_t kPanasonicAcSectionGap = 10000;       ///< uSeconds.
 const uint16_t kPanasonicAcSection1Length = 8;
 const uint32_t kPanasonicAcMessageGap = kDefaultMessageGap;  // Just a guess.
 
-const uint16_t kPanasonicAc64HdrMark = 3543;  ///< uSeconds.
-const uint16_t kPanasonicAc64BitMark = 920;  ///< uSeconds.
-const uint16_t kPanasonicAc64HdrSpace = 3450;  ///< uSeconds.
-const uint16_t kPanasonicAc64OneSpace = 2575;  ///< uSeconds.
-const uint16_t kPanasonicAc64ZeroSpace = 828;  ///< uSeconds.
-const uint16_t kPanasonicAc64SectionGap = 13946;  ///< uSeconds.
-const uint8_t  kPanasonicAc64Sections = 2;
-const uint8_t  kPanasonicAc64BlocksPerSection = 2;
+const uint16_t kPanasonicAc32HdrMark = 3543;         ///< uSeconds.
+const uint16_t kPanasonicAc32BitMark = 920;          ///< uSeconds.
+const uint16_t kPanasonicAc32HdrSpace = 3450;        ///< uSeconds.
+const uint16_t kPanasonicAc32OneSpace = 2575;        ///< uSeconds.
+const uint16_t kPanasonicAc32ZeroSpace = 828;        ///< uSeconds.
+const uint16_t kPanasonicAc32SectionGap = 13946;     ///< uSeconds.
+const uint8_t  kPanasonicAc32Sections = 2;
+const uint8_t  kPanasonicAc32BlocksPerSection = 2;
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -923,54 +923,62 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t offset,
 }
 #endif  // DECODE_PANASONIC_AC
 
-#if SEND_PANASONIC_AC64
+#if SEND_PANASONIC_AC32
 /// Send a Panasonic AC 64bit formatted message.
 /// Status: BETA / Probably works.
 /// @param[in] data containing the IR command.
-/// @param[in] nbits Nr. of bits to send. usually kPanasonicAc64Bits
+/// @param[in] nbits Nr. of bits to send. Usually kPanasonicAc32Bits
 /// @param[in] repeat Nr. of times the message is to be repeated.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1307
-void IRsend::sendPanasonicAC64(const uint64_t data, const uint16_t nbits,
+void IRsend::sendPanasonicAC32(const uint64_t data, const uint16_t nbits,
                                const uint16_t repeat) {
   uint16_t section_bits;
   uint16_t sections;
   uint16_t blocks;
   // Calculate the section, block, and bit sizes based on the requested bit size
-  if (nbits > kPanasonicAc64Bits / 2) {  // A long message
-    section_bits = nbits / kPanasonicAc64Sections;
-    sections = kPanasonicAc64Sections;
-    blocks = kPanasonicAc64BlocksPerSection;
+  if (nbits > kPanasonicAc32Bits / 2) {  // A long message
+    section_bits = nbits / kPanasonicAc32Sections;
+    sections = kPanasonicAc32Sections;
+    blocks = kPanasonicAc32BlocksPerSection;
   } else {  // A short message
     section_bits = nbits;
-    sections = kPanasonicAc64Sections - 1;
-    blocks = kPanasonicAc64BlocksPerSection + 1;
+    sections = kPanasonicAc32Sections - 1;
+    blocks = kPanasonicAc32BlocksPerSection + 1;
   }
   for (uint16_t r = 0; r <= repeat; r++) {
     for (uint8_t section = 0; section < sections;  section++) {
+      uint64_t section_data;
+      section_data = GETBITS64(data, section_bits * (sections - section - 1),
+                               section_bits);
+
+      // Duplicate bytes in the data.
+      uint64_t expanded_data = 0;
+      for (uint8_t i = 0; i < sizeof(expanded_data); i++) {
+       const uint8_t first_byte = section_data >> 56;
+       for (uint8_t i = 0; i < 2; i++)
+         expanded_data = (expanded_data << 8) | first_byte;
+       section_data <<= 8;
+      }
       // Two data blocks per section (i.e. 1 + a repeat)
-      sendGeneric(kPanasonicAc64HdrMark, kPanasonicAc64HdrSpace,  // Header
-                  kPanasonicAc64BitMark, kPanasonicAc64OneSpace,  // Data
-                  kPanasonicAc64BitMark, kPanasonicAc64ZeroSpace,
+      sendGeneric(kPanasonicAc32HdrMark, kPanasonicAc32HdrSpace,  // Header
+                  kPanasonicAc32BitMark, kPanasonicAc32OneSpace,  // Data
+                  kPanasonicAc32BitMark, kPanasonicAc32ZeroSpace,
                   0, 0,  // No Footer
-                  GETBITS64(
-                      data,
-                      section_bits * (sections - section - 1),
-                      section_bits),
-                  section_bits, kPanasonicFreq, false,
+                  expanded_data, section_bits * 2, kPanasonicFreq, false,
                   blocks - 1,  // Repeat
                   50);
       // Section Footer
-      sendGeneric(kPanasonicAc64HdrMark, kPanasonicAc64HdrSpace,  // Header
+      sendGeneric(kPanasonicAc32HdrMark, kPanasonicAc32HdrSpace,  // Header
                   0, 0, 0, 0,  // No Data
-                  kPanasonicAc64BitMark, kPanasonicAc64SectionGap,  // Footer
+                  kPanasonicAc32BitMark, kPanasonicAc32SectionGap,  // Footer
                   data, 0,  // No data (bits)
                   kPanasonicFreq, true, 0, 50);
     }
   }
 }
-#endif  // SEND_PANASONIC_AC64
+#endif  // SEND_PANASONIC_AC32
 
-#if DECODE_PANASONIC_AC64
+#if DECODE_PANASONIC_AC32
 /// Decode the supplied Panasonic AC 64bit message.
 /// Status: BETA / Probably works.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
@@ -978,32 +986,47 @@ void IRsend::sendPanasonicAC64(const uint64_t data, const uint16_t nbits,
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect.
+///   Typically: kPanasonicAc32Bits or kPanasonicAc32Bits/2
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1307
-bool IRrecv::decodePanasonicAC64(decode_results *results, uint16_t offset,
+/// @note Protocol has two known configurations:
+///   (long)
+///   Two sections of identical 32 bit data block pairs. ie. (32+32)+(32+32)=128
+///   or
+///   (short)
+///   A single section of 3 x identical 32 bit data blocks i.e. (32+32+32)=96
+/// Each data block also has a pair of 8 bits repeated identical bits.
+/// e.g. (8+8)+(8+8)=32
+///
+/// So each long version really only has 32 unique bits, and the short version
+/// really only has 16 unique bits.
+bool IRrecv::decodePanasonicAC32(decode_results *results, uint16_t offset,
                                  const uint16_t nbits, const bool strict) {
-  if (strict && (nbits != kPanasonicAc64Bits &&
-                 nbits != kPanasonicAc64Bits / 2))
+  if (strict && (nbits != kPanasonicAc32Bits &&
+                 nbits != kPanasonicAc32Bits / 2))
     return false;  // Not strictly a valid bit size.
 
-  const bool is_long = (nbits > kPanasonicAc64Bits / 2);
+  // Determine if this is a long or a short message we are looking for.
+  const bool is_long = (nbits > kPanasonicAc32Bits / 2);
   const uint16_t min_length = is_long ?
-      kPanasonicAc64Sections * (2 * (nbits + kHeader) + kFooter) - 1 + offset :
-      (kPanasonicAc64BlocksPerSection + 1) * ((2 * nbits) + kHeader) +
+      kPanasonicAc32Sections * kPanasonicAc32BlocksPerSection *
+      ((2 * nbits) + kHeader + kFooter) - 1 + offset :
+      (kPanasonicAc32BlocksPerSection + 1) * ((4 * nbits) + kHeader) +
       kFooter - 1 + offset;
 
   if (results->rawlen < min_length)
     return false;  // Can't possibly be a valid message.
 
+  // Calculate the parameters for the decode based on it's length.
   uint16_t sections;
   uint16_t blocks_per_section;
   if (is_long) {
-    sections = kPanasonicAc64Sections;
-    blocks_per_section = kPanasonicAc64BlocksPerSection;
+    sections = kPanasonicAc32Sections;
+    blocks_per_section = kPanasonicAc32BlocksPerSection;
   } else {
-    sections = kPanasonicAc64Sections - 1;
-    blocks_per_section = kPanasonicAc64BlocksPerSection + 1;
+    sections = kPanasonicAc32Sections - 1;
+    blocks_per_section = kPanasonicAc32BlocksPerSection + 1;
   }
   const uint16_t bits_per_block = nbits / sections;
 
@@ -1011,23 +1034,42 @@ bool IRrecv::decodePanasonicAC64(decode_results *results, uint16_t offset,
   uint64_t section_data = 0;
   uint32_t prev_section_data;
 
+  // Match all the expected data blocks.
   for (uint16_t block = 0;
        block < sections * blocks_per_section;
        block++) {
     prev_section_data = section_data;
     uint16_t used = matchGeneric(results->rawbuf + offset, &section_data,
-                                 results->rawlen - offset, bits_per_block,
-                                 kPanasonicAc64HdrMark, kPanasonicAc64HdrSpace,
-                                 kPanasonicAc64BitMark, kPanasonicAc64OneSpace,
-                                 kPanasonicAc64BitMark, kPanasonicAc64ZeroSpace,
+                                 results->rawlen - offset, bits_per_block * 2,
+                                 kPanasonicAc32HdrMark, kPanasonicAc32HdrSpace,
+                                 kPanasonicAc32BitMark, kPanasonicAc32OneSpace,
+                                 kPanasonicAc32BitMark, kPanasonicAc32ZeroSpace,
                                  0, 0,  // No Footer
                                  false, kUseDefTol, kMarkExcess, false);
     if (!used) return false;
     offset += used;
     // Is it the first block of the section?
     if (block % blocks_per_section == 0) {
-      // Keep the data from the first of the block pairs.
-      data = (data << bits_per_block) | section_data;
+      // The protocol repeats each byte twice, so to shrink the code we
+      // remove the duplicate bytes in the collected data. We only need to do
+      // this for the first block in a section.
+      uint64_t shrunk_data = 0;
+      uint64_t data_copy = section_data;
+      for (uint8_t i = 0; i < sizeof(data_copy); i += 2) {
+        const uint8_t first_byte = GETBITS64(data_copy,
+                                             (sizeof(data_copy) - 1) * 8, 8);
+        shrunk_data = (shrunk_data << 8) | first_byte;
+        // Compliance
+        if (strict) {
+          // Every second byte must be a duplicate of the previous.
+          const uint8_t next_byte = GETBITS64(data_copy,
+                                              (sizeof(data_copy) - 2) * 8, 8);
+          if (first_byte != next_byte) return false;
+        }
+        data_copy <<= 16;
+      }
+      // Keep the data from the first of the block in the section.
+      data = (data << bits_per_block) | shrunk_data;
     } else {  // Not the first block in a section.
       // Compliance
       if (strict)
@@ -1039,12 +1081,12 @@ bool IRrecv::decodePanasonicAC64(decode_results *results, uint16_t offset,
         used = matchGeneric(results->rawbuf + offset, &junk,
                             results->rawlen - offset, 0,
                             // Header
-                            kPanasonicAc64HdrMark, kPanasonicAc64HdrSpace,
+                            kPanasonicAc32HdrMark, kPanasonicAc32HdrSpace,
                             // No Data
                             0, 0,
                             0, 0,
                             // Footer
-                            kPanasonicAc64BitMark, kPanasonicAc64SectionGap,
+                            kPanasonicAc32BitMark, kPanasonicAc32SectionGap,
                             true);
         if (!used) return false;
         offset += used;
@@ -1054,10 +1096,10 @@ bool IRrecv::decodePanasonicAC64(decode_results *results, uint16_t offset,
 
   // Success
   results->value = data;
-  results->decode_type = decode_type_t::PANASONIC_AC64;
+  results->decode_type = decode_type_t::PANASONIC_AC32;
   results->bits = nbits;
-  results->address = GETBITS64(data, bits_per_block, bits_per_block);
-  results->command = GETBITS64(data, 0, bits_per_block);
+  results->address = 0;
+  results->command = 0;
   return true;
 }
-#endif  // DECODE_PANASONIC_AC64
+#endif  // DECODE_PANASONIC_AC32

@@ -597,12 +597,12 @@ class IRrecv {
                          const uint16_t nbits = kPanasonicAcBits,
                          const bool strict = true);
 #endif  // DECODE_PANASONIC_AC
-#if DECODE_PANASONIC_AC64
-  bool decodePanasonicAC64(decode_results *results,
+#if DECODE_PANASONIC_AC32
+  bool decodePanasonicAC32(decode_results *results,
                          uint16_t offset = kStartOffset,
-                         const uint16_t nbits = kPanasonicAc64Bits,
+                         const uint16_t nbits = kPanasonicAc32Bits,
                          const bool strict = true);
-#endif  // DECODE_PANASONIC_AC64
+#endif  // DECODE_PANASONIC_AC32
 #if DECODE_PIONEER
   bool decodePioneer(decode_results *results, uint16_t offset = kStartOffset,
                      const uint16_t nbits = kPioneerBits,

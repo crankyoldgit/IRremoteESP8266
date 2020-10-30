@@ -574,11 +574,11 @@ class IRsend {
                        const uint16_t nbytes = kPanasonicAcStateLength,
                        const uint16_t repeat = kPanasonicAcDefaultRepeat);
 #endif  // SEND_PANASONIC_AC
-#if SEND_PANASONIC_AC64
-  void sendPanasonicAC64(const uint64_t data,
-                         const uint16_t nbits = kPanasonicAc64Bits,
+#if SEND_PANASONIC_AC32
+  void sendPanasonicAC32(const uint64_t data,
+                         const uint16_t nbits = kPanasonicAc32Bits,
                          const uint16_t repeat = kPanasonicAcDefaultRepeat);
-#endif  // SEND_PANASONIC_AC64
+#endif  // SEND_PANASONIC_AC32
 #if SEND_PIONEER
   void sendPioneer(const uint64_t data, const uint16_t nbits = kPioneerBits,
                    const uint16_t repeat = kNoRepeat);

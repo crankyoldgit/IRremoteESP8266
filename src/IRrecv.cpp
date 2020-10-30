@@ -884,13 +884,13 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting EliteScreens decode");
     if (decodeElitescreens(results, offset)) return true;
 #endif  // DECODE_ELITESCREENS
-#if DECODE_PANASONIC_AC64
-    DPRINTLN("Attempting Panasonic AC (64bit) long decode");
-    if (decodePanasonicAC64(results, offset, kPanasonicAc64Bits)) return true;
-    DPRINTLN("Attempting Panasonic AC (64bit) short decode");
-    if (decodePanasonicAC64(results, offset, kPanasonicAc64Bits / 2))
+#if DECODE_PANASONIC_AC32
+    DPRINTLN("Attempting Panasonic AC (32bit) long decode");
+    if (decodePanasonicAC32(results, offset, kPanasonicAc32Bits)) return true;
+    DPRINTLN("Attempting Panasonic AC (32bit) short decode");
+    if (decodePanasonicAC32(results, offset, kPanasonicAc32Bits / 2))
       return true;
-#endif  // DECODE_PANASONIC_AC64
+#endif  // DECODE_PANASONIC_AC32
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

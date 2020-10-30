@@ -1268,19 +1268,19 @@ TEST(TestPanasonic, Housekeeping) {
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::PANASONIC_AC));
   ASSERT_EQ(kPanasonicAcBits, IRsend::defaultBits(decode_type_t::PANASONIC_AC));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::PANASONIC_AC));
-  // Panasonic A/Cs (64bit)
-  ASSERT_EQ(D_STR_PANASONIC_AC64, typeToString(decode_type_t::PANASONIC_AC64));
-  ASSERT_EQ(decode_type_t::PANASONIC_AC64,
-            strToDecodeType(D_STR_PANASONIC_AC64));
-  ASSERT_FALSE(hasACState(decode_type_t::PANASONIC_AC64));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::PANASONIC_AC64));
-  ASSERT_EQ(kPanasonicAc64Bits,
-            IRsend::defaultBits(decode_type_t::PANASONIC_AC64));
-  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::PANASONIC_AC64));
+  // Panasonic A/Cs (32bit)
+  ASSERT_EQ(D_STR_PANASONIC_AC32, typeToString(decode_type_t::PANASONIC_AC32));
+  ASSERT_EQ(decode_type_t::PANASONIC_AC32,
+            strToDecodeType(D_STR_PANASONIC_AC32));
+  ASSERT_FALSE(hasACState(decode_type_t::PANASONIC_AC32));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::PANASONIC_AC32));
+  ASSERT_EQ(kPanasonicAc32Bits,
+            IRsend::defaultBits(decode_type_t::PANASONIC_AC32));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::PANASONIC_AC32));
 }
 
-// Decode a real Panasonic AC 64 bit message
-TEST(TestDecodePanasonicAC64, RealMessage) {
+// Decode a real Panasonic AC 32 bit message
+TEST(TestDecodePanasonicAC32, RealMessage) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
   irsend.begin();
@@ -1333,11 +1333,11 @@ TEST(TestDecodePanasonicAC64, RealMessage) {
   irsend.makeDecodeResult();
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  ASSERT_EQ(PANASONIC_AC64, irsend.capture.decode_type);
-  EXPECT_EQ(kPanasonicAc64Bits, irsend.capture.bits);
-  EXPECT_EQ(0x0D0DF2F23636FCFC, irsend.capture.value);
-  EXPECT_EQ(0x0D0DF2F2, irsend.capture.address);
-  EXPECT_EQ(0x3636FCFC, irsend.capture.command);
+  ASSERT_EQ(PANASONIC_AC32, irsend.capture.decode_type);
+  EXPECT_EQ(kPanasonicAc32Bits, irsend.capture.bits);
+  EXPECT_EQ(0x0DF236FC, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
 
   EXPECT_EQ(
@@ -1346,21 +1346,21 @@ TEST(TestDecodePanasonicAC64, RealMessage) {
   ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
-// Decode a synthetic Panasonic AC 64 bit message
-TEST(TestDecodePanasonicAC64, SyntheticMessage) {
+// Decode a synthetic Panasonic AC 32 bit message
+TEST(TestDecodePanasonicAC32, SyntheticMessage) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
-  irsend.sendPanasonicAC64(0x0D0DF2F23636FCFC);
+  irsend.sendPanasonicAC32(0x0DF236FC);
   irsend.makeDecodeResult();
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  ASSERT_EQ(PANASONIC_AC64, irsend.capture.decode_type);
-  EXPECT_EQ(kPanasonicAc64Bits, irsend.capture.bits);
-  EXPECT_EQ(0x0D0DF2F23636FCFC, irsend.capture.value);
-  EXPECT_EQ(0x0D0DF2F2, irsend.capture.address);
-  EXPECT_EQ(0x3636FCFC, irsend.capture.command);
+  ASSERT_EQ(PANASONIC_AC32, irsend.capture.decode_type);
+  EXPECT_EQ(kPanasonicAc32Bits, irsend.capture.bits);
+  EXPECT_EQ(0x0DF236FC, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
 
   EXPECT_EQ(
@@ -1392,8 +1392,8 @@ TEST(TestDecodePanasonicAC64, SyntheticMessage) {
       irsend.outputStr());
 }
 
-// Decode a real *short* Panasonic AC 64 bit message
-TEST(TestDecodePanasonicAC64, RealShortMessage) {
+// Decode a real *short* (16 bit) Panasonic AC 32 bit message
+TEST(TestDecodePanasonicAC32, RealShortMessage) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
   irsend.begin();
@@ -1420,11 +1420,11 @@ TEST(TestDecodePanasonicAC64, RealShortMessage) {
   irsend.makeDecodeResult();
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  ASSERT_EQ(PANASONIC_AC64, irsend.capture.decode_type);
-  EXPECT_EQ(kPanasonicAc64Bits / 2, irsend.capture.bits);
-  EXPECT_EQ(0x35358686, irsend.capture.value);
+  ASSERT_EQ(PANASONIC_AC32, irsend.capture.decode_type);
+  EXPECT_EQ(kPanasonicAc32Bits / 2, irsend.capture.bits);
+  EXPECT_EQ(0x3586, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
-  EXPECT_EQ(0x35358686, irsend.capture.command);
+  EXPECT_EQ(0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
 
   EXPECT_EQ(
@@ -1434,20 +1434,20 @@ TEST(TestDecodePanasonicAC64, RealShortMessage) {
 }
 
 // Decode a synthetic *short Panasonic AC 64 bit message
-TEST(TestDecodePanasonicAC64, SyntheticShortMessage) {
+TEST(TestDecodePanasonicAC32, SyntheticShortMessage) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
-  irsend.sendPanasonicAC64(0x35358686, kPanasonicAc64Bits / 2);
+  irsend.sendPanasonicAC32(0x3586, kPanasonicAc32Bits / 2);
   irsend.makeDecodeResult();
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  ASSERT_EQ(PANASONIC_AC64, irsend.capture.decode_type);
-  EXPECT_EQ(kPanasonicAc64Bits / 2, irsend.capture.bits);
-  EXPECT_EQ(0x35358686, irsend.capture.value);
+  ASSERT_EQ(PANASONIC_AC32, irsend.capture.decode_type);
+  EXPECT_EQ(kPanasonicAc32Bits / 2, irsend.capture.bits);
+  EXPECT_EQ(0x3586, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
-  EXPECT_EQ(0x35358686, irsend.capture.command);
+  EXPECT_EQ(0, irsend.capture.command);
   EXPECT_FALSE(irsend.capture.repeat);
 
   EXPECT_EQ(
