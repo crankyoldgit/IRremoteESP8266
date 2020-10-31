@@ -175,7 +175,7 @@ class IRKelvinatorAC {
   /// @endcond
 #endif  // UNIT_TEST
   KelvinatorProtocol _;
-  void checksum(const uint16_t length = kKelvinatorStateLength);
+  void checksum(void);
   void fixup(void);
 };
 

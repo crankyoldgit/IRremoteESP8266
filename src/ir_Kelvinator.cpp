@@ -172,9 +172,7 @@ uint8_t IRKelvinatorAC::calcBlockChecksum(const uint8_t *block,
 }
 
 /// Calculate the checksum for the internal state.
-/// @param[in] length Deprecated
-void IRKelvinatorAC::checksum(const uint16_t /*length*/) {
-  // For each command + options block.
+void IRKelvinatorAC::checksum() {
   _.Sum1 = calcBlockChecksum(_.raw);
   _.Sum2 = calcBlockChecksum(_.raw + 8);
 }
