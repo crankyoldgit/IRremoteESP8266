@@ -29,10 +29,68 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Kelvinator A/C message.
+union KelvinatorProtocol{
+  uint8_t raw[kKelvinatorStateLength];  ///< The state in IR code form.
+  struct {
+    // Byte 0
+    uint8_t Mode      :3;
+    uint8_t Power     :1;
+    uint8_t BasicFan  :2;
+    uint8_t VentSwing :1;
+    uint8_t           :1;  // Sleep Modes 1 & 3 (1 = On, 0 = Off)
+    // Byte 1
+    uint8_t Temp  :4;  // Degrees C.
+    uint8_t       :4;
+    // Byte 2
+    uint8_t           :4;
+    uint8_t Turbo     :1;
+    uint8_t Light     :1;
+    uint8_t IonFilter :1;
+    uint8_t XFan      :1;
+    // Byte 3
+    uint8_t :4;
+    uint8_t :2;  // (possibly timer related) (Typically 0b01)
+    uint8_t :2;  // End of command block (B01)
+    // (B010 marker and a gap of 20ms)
+    // Byte 4
+    uint8_t SwingV  :1;
+    uint8_t         :3;
+    uint8_t SwingH  :1;
+    uint8_t         :3;
+    // Byte 5~6
+    uint8_t pad0[2];  // Timer related. Typically 0 except when timer in use.
+    // Byte 7
+    uint8_t       :4;  // (Used in Timer mode)
+    uint8_t Sum1  :4;  // checksum of the previous bytes (0-6)
+    // (gap of 40ms)
+    // (header mark and space)
+    // Byte 8~10
+    uint8_t pad1[3];  // Repeat of byte 0~2
+    // Byte 11
+    uint8_t :4;
+    uint8_t :2;  // (possibly timer related) (Typically 0b11)
+    uint8_t :2;  // End of command block (B01)
+    // (B010 marker and a gap of 20ms)
+    // Byte 12
+    uint8_t       :1;  // Sleep mode 2 (1 = On, 0=Off)
+    uint8_t       :6;  // (Used in Sleep Mode 3, Typically 0b000000)
+    uint8_t Quiet :1;
+    // Byte 13
+    uint8_t     :8;  // (Sleep Mode 3 related, Typically 0x00)
+    // Byte 14
+    uint8_t     :4;  // (Sleep Mode 3 related, Typically 0b0000)
+    uint8_t Fan :3;
+    // Byte 15
+    uint8_t       :4;
+    uint8_t Sum2  :4;  // checksum of the previous bytes (8-14)
+  };
+};
+
 // Constants
-const uint8_t kKelvinatorAuto = 0;
+const uint8_t kKelvinatorAuto = 0;  // (temp = 25C)
 const uint8_t kKelvinatorCool = 1;
-const uint8_t kKelvinatorDry = 2;
+const uint8_t kKelvinatorDry = 2;  // (temp = 25C, but not shown)
 const uint8_t kKelvinatorFan = 3;
 const uint8_t kKelvinatorHeat = 4;
 const uint8_t kKelvinatorBasicFanMax = 3;
@@ -56,82 +114,6 @@ const uint8_t kKelvinatorAutoTemp = 25;  // 25C
 #define KELVINATOR_AUTO_TEMP kKelvinatorAutoTemp
 #define KELVINATOR_AUTO kKelvinatorAuto
 
-/*
-        Kelvinator AC map
-
-  (header mark and space)
-  byte 0 = Basic Modes
-    b2-0 = Modes
-      Modes:
-        000 = Auto (temp = 25C)
-        001 = Cool
-        010 = Dry (temp = 25C, but not shown)
-        011 = Fan
-        100 = Heat
-    b3 = Power Status (1 = On, 0 = Off)
-    b5-4 = Fan (Basic modes)
-      Fan:
-        00 = Auto
-        01 = Fan 1
-        10 = Fan 2
-        11 = Fan 3 or higher (See byte 14)
-    b6 = Vent swing (1 = On, 0 = Off) (See byte 4)
-    b7 = Sleep Modes 1 & 3 (1 = On, 0 = Off)
-  byte 1 = Temperature
-    b3-0: Degrees C.
-      0000 (0) = 16C
-      0001 (1) = 17C
-      0010 (2) = 18C
-      ...
-      1101 (13) = 29C
-      1110 (14) = 30C
-  byte 2 = Extras
-    b3-0 = UNKNOWN, typically 0.
-    b4 = Turbo Fan (1 = On, 0 = Off)
-    b5 = Light (Display) (1 = On, 0 = Off)
-    b6 = Ion Filter (1 = On, 0 = Off)
-    b7 = X-Fan (Fan runs for a while after power off) (1 = On, 0 = Off)
-  byte 3 = Section Indicator
-    b3-0 = Unused (Typically 0)
-    b5-4 = Unknown (possibly timer related) (Typically 0b01)
-    b7-6 = End of command block (B01)
-  (B010 marker and a gap of 20ms)
-  byte 4 = Extended options
-    b0 = Swing Vent Vertical (1 = On, 0 = Off)
-    b4 = Swing Vent Horizontal (1 = On, 0 = Off)
-  byte 5-6 = Timer related. Typically 0 except when timer in use.
-  byte 7 = checksum
-    b3-0 = Unknown (Used in Timer mode)
-    b7-4 = checksum of the previous bytes (0-6)
-  (gap of 40ms)
-  (header mark and space)
-  byte 8 = Repeat of byte 0
-  byte 9 = Repeat of byte 1
-  byte 10 = Repeat of byte 2
-  byte 11 = Section Indicator
-    b3-0 = Unused (Typically 0)
-    b5-4 = Unknown (possibly timer related) (Typically 0b11)
-    b7-6 = End of command block (B01)
-  (B010 marker and a gap of 20ms)
-  byte 12 = Extended options
-    b0 = Sleep mode 2 (1 = On, 0=Off)
-    b6-1 = Unknown (Used in Sleep Mode 3, Typically 0b000000)
-    b7 = Quiet Mode (1 = On, 0=Off)
-  byte 13 = Unknown (Sleep Mode 3 related, Typically 0x00)
-  byte 14 = Fan control
-    b3-0 = Unknown (Sleep Mode 3 related, Typically 0b0000)
-    b6-4 = Fan speed
-       0b000 (0) = Automatic
-       0b001 (1) = Fan 1
-       0b010 (2) = Fan 2
-       0b011 (3) = Fan 3
-       0b100 (4) = Fan 4
-       0b101 (5) = Fan 5
-  byte 15 = checksum
-    b3-0 = Unknown (Typically 0b0000)
-    b7-4 = checksum of the previous bytes (8-14)
-*/
-
 // Classes
 /// Class for handling detailed Kelvinator A/C messages.
 class IRKelvinatorAC {
@@ -151,38 +133,38 @@ class IRKelvinatorAC {
   void on(void);
   void off(void);
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setTemp(const uint8_t degrees);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   void setSwingVertical(const bool on);
-  bool getSwingVertical(void);
+  bool getSwingVertical(void) const;
   void setSwingHorizontal(const bool on);
-  bool getSwingHorizontal(void);
+  bool getSwingHorizontal(void) const;
   void setQuiet(const bool on);
-  bool getQuiet(void);
+  bool getQuiet(void) const;
   void setIonFilter(const bool on);
-  bool getIonFilter(void);
+  bool getIonFilter(void) const;
   void setLight(const bool on);
-  bool getLight(void);
+  bool getLight(void) const;
   void setXFan(const bool on);
-  bool getXFan(void);
+  bool getXFan(void) const;
   void setTurbo(const bool on);
-  bool getTurbo(void);
+  bool getTurbo(void) const;
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[]);
   static uint8_t calcBlockChecksum(
       const uint8_t* block, const uint16_t length = kKelvinatorStateLength / 2);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kKelvinatorStateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -192,7 +174,7 @@ class IRKelvinatorAC {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kKelvinatorStateLength];  ///< The state in IR code form.
+  KelvinatorProtocol _;
   void checksum(const uint16_t length = kKelvinatorStateLength);
   void fixup(void);
 };
