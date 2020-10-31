@@ -560,6 +560,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case AIWA_RC_T501:
     case AMCOR:
     case COOLIX:
+    case ELITESCREENS:
     case GICABLE:
     case INAX:
     case MIDEA24:
@@ -634,6 +635,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case LG2:
       return 28;
     case CARRIER_AC:
+    case ELITESCREENS:
     case EPSON:
     case NEC:
     case NEC_LIKE:
@@ -724,7 +726,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case NEOCLIMA:
       return kNeoclimaBits;
     case PANASONIC_AC:
-      return kNeoclimaBits;
+      return kPanasonicAcBits;
     case SAMSUNG_AC:
       return kSamsungAcBits;
     case SANYO_AC:
@@ -816,6 +818,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendDoshisha(data, nbits, min_repeat);
       break;
 #endif
+#if SEND_ELITESCREENS
+    case ELITESCREENS:
+      sendElitescreens(data, nbits, min_repeat);
+      break;
+#endif  // SEND_ELITESCREENS
 #if SEND_EPSON
     case EPSON:
       sendEpson(data, nbits, min_repeat);

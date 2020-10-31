@@ -6,6 +6,7 @@
 #include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
+#include "IRtext.h"
 #include "IRutils.h"
 #include "gtest/gtest.h"
 
@@ -1249,4 +1250,22 @@ TEST(TestDecodePanasonicAC, DkeIonRealMessages) {
       "Swing(V): 15 (Auto), Swing(H): 13 (Auto), Quiet: Off, Powerful: Off, "
       "Ion: On, Clock: 00:00, On Timer: 00:00, Off Timer: 00:00",
       ac.toString());
+}
+
+// General housekeeping
+TEST(TestPanasonic, Housekeeping) {
+  // Simple Panasonic protocol. e.g. TVs etc.
+  ASSERT_EQ(D_STR_PANASONIC, typeToString(decode_type_t::PANASONIC));
+  ASSERT_FALSE(hasACState(decode_type_t::PANASONIC));
+  ASSERT_EQ(decode_type_t::PANASONIC, strToDecodeType(D_STR_PANASONIC));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::PANASONIC));
+  ASSERT_EQ(kPanasonicBits, IRsend::defaultBits(decode_type_t::PANASONIC));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::PANASONIC));
+  // Panasonic A/Cs
+  ASSERT_EQ(D_STR_PANASONIC_AC, typeToString(decode_type_t::PANASONIC_AC));
+  ASSERT_TRUE(hasACState(decode_type_t::PANASONIC_AC));
+  ASSERT_EQ(decode_type_t::PANASONIC_AC, strToDecodeType(D_STR_PANASONIC_AC));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::PANASONIC_AC));
+  ASSERT_EQ(kPanasonicAcBits, IRsend::defaultBits(decode_type_t::PANASONIC_AC));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::PANASONIC_AC));
 }

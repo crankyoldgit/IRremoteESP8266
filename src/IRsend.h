@@ -666,6 +666,11 @@ class IRsend {
   void sendTranscold(const uint64_t data, const uint16_t nbits = kTranscoldBits,
                      const uint16_t repeat = kTranscoldDefaultRepeat);
 #endif  // SEND_TRANSCOLD
+#if SEND_ELITESCREENS
+  void sendElitescreens(const uint64_t data,
+                        const uint16_t nbits = kEliteScreensBits,
+                        const uint16_t repeat = kEliteScreensDefaultRepeat);
+#endif  // SEND_ELITESCREENS
 
  protected:
 #ifdef UNIT_TEST
