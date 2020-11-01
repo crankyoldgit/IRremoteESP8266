@@ -172,7 +172,7 @@ uint8_t IRKelvinatorAC::calcBlockChecksum(const uint8_t *block,
 }
 
 /// Calculate the checksum for the internal state.
-void IRKelvinatorAC::checksum() {
+void IRKelvinatorAC::checksum(void) {
   _.Sum1 = calcBlockChecksum(_.raw);
   _.Sum2 = calcBlockChecksum(_.raw + 8);
 }
