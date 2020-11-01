@@ -23,6 +23,8 @@
 //   Brand: Panasonic,  Model: A75C2616-1 remote (PANASONIC_AC DKE/3)
 //   Brand: Panasonic,  Model: A75C3704 remote (PANASONIC_AC DKE/3)
 //   Brand: Panasonic,  Model: A75C3747 remote (PANASONIC_AC JKE/4)
+//   Brand: Panasonic,  Model: CS-E9CKP series A/C (PANASONIC_AC32)
+//   Brand: Panasonic,  Model: A75C2295 remote (PANASONIC_AC32)
 
 #ifndef IR_PANASONIC_H_
 #define IR_PANASONIC_H_

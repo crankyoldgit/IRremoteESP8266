@@ -639,6 +639,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case EPSON:
     case NEC:
     case NEC_LIKE:
+    case PANASONIC_AC32:
     case SAMSUNG:
     case SHERWOOD:
     case WHYNTER:
@@ -926,7 +927,12 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     case PANASONIC:
       sendPanasonic64(data, nbits, min_repeat);
       break;
-#endif
+#endif  // SEND_PANASONIC
+#if SEND_PANASONIC_AC32
+    case PANASONIC_AC32:
+      sendPanasonicAC32(data, nbits, min_repeat);
+      break;
+#endif  // SEND_PANASONIC_AC32
 #if SEND_PIONEER
     case PIONEER:
       sendPioneer(data, nbits, min_repeat);
