@@ -924,8 +924,8 @@ bool IRrecv::decodePanasonicAC(decode_results *results, uint16_t offset,
 #endif  // DECODE_PANASONIC_AC
 
 #if SEND_PANASONIC_AC32
-/// Send a Panasonic AC 64bit formatted message.
-/// Status: BETA / Probably works.
+/// Send a Panasonic AC 32/16bit formatted message.
+/// Status: STABLE / Confirmed working.
 /// @param[in] data containing the IR command.
 /// @param[in] nbits Nr. of bits to send. Usually kPanasonicAc32Bits
 /// @param[in] repeat Nr. of times the message is to be repeated.
@@ -979,8 +979,8 @@ void IRsend::sendPanasonicAC32(const uint64_t data, const uint16_t nbits,
 #endif  // SEND_PANASONIC_AC32
 
 #if DECODE_PANASONIC_AC32
-/// Decode the supplied Panasonic AC 64bit message.
-/// Status: BETA / Probably works.
+/// Decode the supplied Panasonic AC 32/16bit message.
+/// Status: STABLE / Confirmed working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
