@@ -971,3 +971,44 @@ TEST(TestDecodeMidea24, LargeTimeout) {
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
 }
+
+// Verify the library can self-decode `sendMidea(0xA4A3477F1979)` to the correct
+// value.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-721829757
+TEST(TestDecodeMidea, Issue1318_self_decode) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+  irsend.reset();
+  irsend.sendMidea(0xA4A3477F1979);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MIDEA, irsend.capture.decode_type);
+  EXPECT_EQ(kMideaBits, irsend.capture.bits);
+  EXPECT_EQ(0xA4A3477F1979, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ(0, irsend.capture.command);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Heat), Celsius: On, Temp: 24C/75F, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  EXPECT_EQ(
+      "f38000d50"
+      "m4480s4480m560s1680m560s560m560s1680m560s560m560s560m560s1680"
+      "m560s560m560s560m560s1680m560s560m560s1680m560s560m560s560"
+      "m560s560m560s1680m560s1680m560s560m560s1680m560s560m560s560"
+      "m560s560m560s1680m560s1680m560s1680m560s560m560s1680m560s1680"
+      "m560s1680m560s1680m560s1680m560s1680m560s1680m560s560m560s560"
+      "m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
+      "m560s1680m560s1680m560s1680m560s1680m560s560m560s560m560s1680"
+      "m560s5600"
+      "m4480s4480m560s560m560s1680m560s560m560s1680m560s1680m560s560"
+      "m560s1680m560s1680m560s560m560s1680m560s560m560s1680m560s1680"
+      "m560s1680m560s560m560s560m560s1680m560s560m560s1680m560s1680"
+      "m560s1680m560s560m560s560m560s560m560s1680m560s560m560s560"
+      "m560s560m560s560m560s560m560s560m560s560m560s1680m560s1680"
+      "m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680"
+      "m560s560m560s560m560s560m560s560m560s1680m560s1680m560s560"
+      "m560s5600",
+      irsend.outputStr());
+}
