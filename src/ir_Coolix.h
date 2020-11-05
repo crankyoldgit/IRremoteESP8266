@@ -11,6 +11,7 @@
 //   Brand: Tokio, Model: AATOEMF17-12CHR1SW split-type RG51|50/BGE Remote
 //   Brand: Airwell, Model: RC08B remote
 //   Brand: Kaysun, Model: RG57A7/BGEF remote
+//   Brand: Kaysun, Model: Casual CF A/C
 
 #ifndef IR_COOLIX_H_
 #define IR_COOLIX_H_
