@@ -10,6 +10,7 @@
 //   Brand: Pioneer System,  Model: RUBO18GMFILCAD A/C (18K BTU) (MIDEA)
 //   Brand: Comfee, Model: MPD1-12CRN7 A/C (MIDEA)
 //   Brand: Keystone, Model: RG57H4(B)BGEF remote (MIDEA)
+//   Brand: Kaysun,  Model: RG57A6/BGEFU1 remote (MIDEA)
 //   Brand: Midea,  Model: FS40-7AR Stand Fan (MIDEA24)
 //   Brand: Danby,  Model: DAC080BGUWDB (MIDEA)
 //   Brand: Danby,  Model: DAC100BGUWDB (MIDEA)
