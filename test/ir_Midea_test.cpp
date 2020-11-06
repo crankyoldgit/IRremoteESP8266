@@ -1028,6 +1028,13 @@ TEST(TestMideaACClass, SensorTemp) {
   EXPECT_NE(21, ac.getSensorTemp(true));
   EXPECT_FALSE(ac.getEnableSensorTemp());
 
+  // Fahrenheit
+  ac.setSensorTemp(74, false);
+  EXPECT_EQ(74, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be abled when set.
+
+  // Bounds checks
+  // Celsius
   ac.setSensorTemp(kMideaACMinSensorTempC, true);
   EXPECT_EQ(kMideaACMinSensorTempC, ac.getSensorTemp(true));
   EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
@@ -1036,6 +1043,19 @@ TEST(TestMideaACClass, SensorTemp) {
   EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
   ac.setSensorTemp(kMideaACMaxSensorTempC + 1, true);
   EXPECT_EQ(kMideaACMaxSensorTempC, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  // Fahrenheit
+  ac.setSensorTemp(kMideaACMinSensorTempF, false);
+  EXPECT_EQ(kMideaACMinSensorTempF, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMinSensorTempF - 1, false);
+  EXPECT_EQ(kMideaACMinSensorTempF, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMaxSensorTempF, false);
+  EXPECT_EQ(kMideaACMaxSensorTempF, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMaxSensorTempF + 1, false);
+  EXPECT_EQ(kMideaACMaxSensorTempF, ac.getSensorTemp(false));
   EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
 
   // Real examples
@@ -1059,5 +1079,12 @@ TEST(TestMideaACClass, SensorTemp) {
   EXPECT_EQ(
       "Power: On, Mode: 2 (Auto), Celsius: On, Temp: 23C/73F, "
       "SensorTemp: 37C/98F, Fan: 0 (Auto), Sleep: Off, Swing(V) Toggle: Off, "
+      "Econo Toggle: Off", ac.toString());
+  ac.setRaw(0xA482607F2B43);  // 74F
+  EXPECT_EQ(74, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Auto), Celsius: Off, Temp: 17C/62F, "
+      "SensorTemp: 23C/74F, Fan: 0 (Auto), Sleep: Off, Swing(V) Toggle: Off, "
       "Econo Toggle: Off", ac.toString());
 }
