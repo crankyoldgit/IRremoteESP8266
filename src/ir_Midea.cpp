@@ -201,6 +201,57 @@ uint8_t IRMideaAC::getTemp(const bool celsius) const {
   return temp;
 }
 
+/// Set the Sensor temperature.
+/// @param[in] temp The temperature in degrees celsius.
+/// @param[in] useCelsius true, use the Celsius temp scale. false, is Fahrenheit
+/// @note Also known as FollowMe
+void IRMideaAC::setSensorTemp(const uint8_t temp, const bool useCelsius) {
+  uint8_t max_temp = kMideaACMaxSensorTempF;
+  uint8_t min_temp = kMideaACMinSensorTempF;
+  if (useCelsius) {
+    max_temp = kMideaACMaxSensorTempC;
+    min_temp = kMideaACMinSensorTempC;
+  }
+  uint8_t new_temp = std::min(max_temp, std::max(min_temp, temp));
+  if (!_.useFahrenheit && !useCelsius)  // Native is in C, new_temp is in F
+    new_temp = fahrenheitToCelsius(new_temp) - kMideaACMinSensorTempC;
+  else if (_.useFahrenheit && useCelsius)  // Native is in F, new_temp is in C
+    new_temp = celsiusToFahrenheit(new_temp) - kMideaACMinSensorTempF;
+  else  // Native and desired are the same units.
+    new_temp -= min_temp;
+  // Set the actual data.
+  _.SensorTemp = new_temp + 1;
+  setEnableSensorTemp(true);
+}
+
+/// Get the current Sensor temperature setting.
+/// @param[in] celsius true, the results are in Celsius. false, in Fahrenheit.
+/// @return The current setting for temp. in the requested units/scale.
+/// @note Also known as FollowMe
+uint8_t IRMideaAC::getSensorTemp(const bool celsius) const {
+  uint8_t temp = _.SensorTemp - 1;
+  if (!_.useFahrenheit)
+    temp += kMideaACMinSensorTempC;
+  else
+    temp += kMideaACMinSensorTempF;
+  if (celsius && _.useFahrenheit) temp = fahrenheitToCelsius(temp) + 0.5;
+  if (!celsius && !_.useFahrenheit) temp = celsiusToFahrenheit(temp);
+  return temp;
+}
+
+/// Enable the remote's Sensor temperature.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @note Also known as FollowMe
+void IRMideaAC::setEnableSensorTemp(const bool on) {
+  _.disableSensor = !on;
+  if (!on) _.SensorTemp = kMideaACSensorTempOff;  // Apply special value if off.
+}
+
+/// Is the remote temperature sensor enabled?
+/// @return A boolean indicating if it is enabled or not.
+/// @note Also known as FollowMe
+bool IRMideaAC::getEnableSensorTemp(void) const { return !_.disableSensor; }
+
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting. 1-3 set the speed, 0 for auto.
 void IRMideaAC::setFan(const uint8_t fan) {
@@ -406,7 +457,7 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
 /// @return A human readable string.
 String IRMideaAC::toString(void) {
   String result = "";
-  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
   bool needComma = false;
   if (!isSwingVToggle() && !isEconoToggle()) {
     result += addBoolToString(_.Power, kPowerStr, false);
@@ -417,6 +468,14 @@ String IRMideaAC::toString(void) {
     result += '/';
     result += uint64ToString(getTemp(false));
     result += 'F';
+    if (getEnableSensorTemp()) {
+      result += kCommaSpaceStr;
+      result += kSensorStr;
+      result += addTempToString(getSensorTemp(true), true, false);
+      result += '/';
+      result += uint64ToString(getSensorTemp(false));
+      result += 'F';
+    }
     result += addFanToString(_.Fan, kMideaACFanHigh, kMideaACFanLow,
                              kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
     result += addBoolToString(_.Sleep, kSleepStr);

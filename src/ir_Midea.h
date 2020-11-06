@@ -43,8 +43,9 @@ union MideaProtocol{
   struct {
     // Byte 0
     uint8_t Sum;
-    // Byte 1
-    uint8_t :8;  // value=0xFF
+    // Byte 1 (value=0xFF when not in use.)
+    uint8_t SensorTemp:7;  ///< Degrees Celsius
+    uint8_t disableSensor:1;
     // Byte 2
     uint8_t :8;  // value=0xFF
     // Byte 3
@@ -63,10 +64,15 @@ union MideaProtocol{
 };
 
 // Constants
-const uint8_t kMideaACMinTempF = 62;  // Fahrenheit
-const uint8_t kMideaACMaxTempF = 86;  // Fahrenheit
-const uint8_t kMideaACMinTempC = 17;  // Celsius
-const uint8_t kMideaACMaxTempC = 30;  // Celsius
+const uint8_t kMideaACMinTempF = 62;        ///< Fahrenheit
+const uint8_t kMideaACMaxTempF = 86;        ///< Fahrenheit
+const uint8_t kMideaACMinTempC = 17;        ///< Celsius
+const uint8_t kMideaACMaxTempC = 30;        ///< Celsius
+const uint8_t kMideaACMinSensorTempC = 0;   ///< Celsius
+const uint8_t kMideaACMaxSensorTempC = 37;  ///< Celsius
+const uint8_t kMideaACMinSensorTempF = 32;  ///< Fahrenheit (Guess only!)
+const uint8_t kMideaACMaxSensorTempF = 99;  ///< Fahrenheit (Guess only!)
+const uint8_t kMideaACSensorTempOff = 0b1111111;
 const uint8_t kMideaACCool = 0;     // 0b000
 const uint8_t kMideaACDry = 1;      // 0b001
 const uint8_t kMideaACAuto = 2;     // 0b010
@@ -123,6 +129,10 @@ class IRMideaAC {
   void setUseCelsius(const bool celsius);
   void setTemp(const uint8_t temp, const bool useCelsius = false);
   uint8_t getTemp(const bool useCelsius = false) const;
+  void setSensorTemp(const uint8_t temp, const bool useCelsius = false);
+  uint8_t getSensorTemp(const bool useCelsius = false) const;
+  void setEnableSensorTemp(const bool on);
+  bool getEnableSensorTemp(void) const;
   void setFan(const uint8_t fan);
   uint8_t getFan(void) const;
   void setMode(const uint8_t mode);

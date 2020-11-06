@@ -989,7 +989,8 @@ TEST(TestDecodeMidea, Issue1318_self_decode) {
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Heat), Celsius: On, Temp: 24C/75F, Fan: 0 (Auto), "
+      "Power: On, Mode: 3 (Heat), Celsius: On, Temp: 24C/75F, "
+      "SensorTemp: 24C/75F, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
@@ -1011,4 +1012,52 @@ TEST(TestDecodeMidea, Issue1318_self_decode) {
       "m560s560m560s560m560s560m560s560m560s1680m560s1680m560s560"
       "m560s5600",
       irsend.outputStr());
+}
+
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-722655214
+TEST(TestMideaACClass, SensorTemp) {
+  IRMideaAC ac(kGpioUnused);
+  ASSERT_FALSE(ac.getEnableSensorTemp());  // Off by default.
+  ac.setSensorTemp(21, true);
+  EXPECT_EQ(21, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setEnableSensorTemp(true);  // Values shouldn't change when already on.
+  EXPECT_EQ(21, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be abled when set.
+  ac.setEnableSensorTemp(false);  // Old value should be cleared when disabled.
+  EXPECT_NE(21, ac.getSensorTemp(true));
+  EXPECT_FALSE(ac.getEnableSensorTemp());
+
+  ac.setSensorTemp(kMideaACMinSensorTempC, true);
+  EXPECT_EQ(kMideaACMinSensorTempC, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMaxSensorTempC, true);
+  EXPECT_EQ(kMideaACMaxSensorTempC, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMaxSensorTempC + 1, true);
+  EXPECT_EQ(kMideaACMaxSensorTempC, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+
+  // Real examples
+  ac.setRaw(0xA482467F015D);  // 0C
+  EXPECT_EQ(0, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Auto), Celsius: On, Temp: 23C/73F, "
+      "SensorTemp: 0C/32F, Fan: 0 (Auto), Sleep: Off, Swing(V) Toggle: Off, "
+      "Econo Toggle: Off", ac.toString());
+  ac.setRaw(0xA482467F134E);  // 18C
+  EXPECT_EQ(18, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Auto), Celsius: On, Temp: 23C/73F, "
+      "SensorTemp: 18C/64F, Fan: 0 (Auto), Sleep: Off, Swing(V) Toggle: Off, "
+      "Econo Toggle: Off", ac.toString());
+  ac.setRaw(0xA482467F266B);  // 37C
+  EXPECT_EQ(37, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Auto), Celsius: On, Temp: 23C/73F, "
+      "SensorTemp: 37C/98F, Fan: 0 (Auto), Sleep: Off, Swing(V) Toggle: Off, "
+      "Econo Toggle: Off", ac.toString());
 }
