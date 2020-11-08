@@ -1756,7 +1756,7 @@ bool parseStringAndSendPronto(IRsend *irsend, const String str,
 #endif  // SEND_PRONTO
 
 #if SEND_RAW
-// Parse an IRremote Raw Hex String/code and send it.
+// Parse an IRremote Raw String/code and send it.
 // Args:
 //   irsend: A ptr to the IRsend object to transmit via.
 //   str: A comma-separated String containing the freq and raw IR data.
