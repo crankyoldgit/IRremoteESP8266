@@ -112,7 +112,7 @@ class IRLgAc {
 #endif  // UNIT_TEST
   LGProtocol _;
   uint8_t _temp;
-  decode_type_t _protocol;  // _model
+  decode_type_t _protocol;  ///< model
   void checksum(void);
   void _setTemp(const uint8_t value);
 };
