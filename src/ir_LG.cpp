@@ -21,8 +21,6 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
-using irutils::setBit;
-using irutils::setBits;
 
 
 // Constants
@@ -215,7 +213,7 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t offset,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRLgAc::IRLgAc(const uint16_t pin, const bool inverted,
                const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the internals of the object to a known good state.
 void IRLgAc::stateReset(void) {
@@ -230,12 +228,12 @@ void IRLgAc::begin(void) { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRLgAc::send(const uint16_t repeat) {
-  if (this->getPower())
-    _irsend.send(this->_protocol, this->getRaw(), kLgBits, repeat);
+  if (getPower())
+    _irsend.send(_protocol, getRaw(), kLgBits, repeat);
   else
     // Always send the special Off command if the power is set to off.
     // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1008#issuecomment-570763580
-    _irsend.send(this->_protocol, kLgAcOffCommand, kLgBits, repeat);
+    _irsend.send(_protocol, kLgAcOffCommand, kLgBits, repeat);
 }
 #endif  // SEND_LG
 
@@ -255,7 +253,7 @@ void IRLgAc::setModel(const lg_ac_remote_model_t model) {
 
 /// Get the model of the A/C.
 /// @return The enum of the compatible model.
-lg_ac_remote_model_t IRLgAc::getModel(void) {
+lg_ac_remote_model_t IRLgAc::getModel(void) const {
   switch (_protocol) {
     case LG2:
       return lg_ac_remote_model_t::AKB75215403;
@@ -270,13 +268,13 @@ lg_ac_remote_model_t IRLgAc::getModel(void) {
 /// @return The code for this protocol based on the current internal state.
 uint32_t IRLgAc::getRaw(void) {
   checksum();
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRLgAc::setRaw(const uint32_t new_code) {
-  remote_state = new_code;
+  _.raw = new_code;
   _temp = 15;  // Ensure there is a "sane" previous temp.
   _temp = getTemp();
 }
@@ -292,14 +290,14 @@ uint8_t IRLgAc::calcChecksum(const uint32_t state) {
 /// @param[in] state The value to verify the checksum of.
 /// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRLgAc::validChecksum(const uint32_t state) {
-  return calcChecksum(state) == GETBITS32(state, kLgAcChecksumOffset,
-                                          kLgAcChecksumSize);
+  LGProtocol LGp;
+  LGp.raw = state;
+  return calcChecksum(state) == LGp.Sum;
 }
 
 /// Calculate and set the checksum values for the internal state.
 void IRLgAc::checksum(void) {
-  setBits(&remote_state, kLgAcChecksumOffset, kLgAcChecksumSize,
-          calcChecksum(remote_state));
+  _.Sum = calcChecksum(_.raw);
 }
 
 /// Change the power setting to On.
@@ -311,8 +309,7 @@ void IRLgAc::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRLgAc::setPower(const bool on) {
-  setBits(&remote_state, kLgAcPowerOffset, kLgAcPowerSize,
-          on ? kLgAcPowerOn : kLgAcPowerOff);
+  _.Power = (on ? kLgAcPowerOn : kLgAcPowerOff);
   if (on)
     setTemp(_temp);  // Reset the temp if we are on.
   else
@@ -321,16 +318,15 @@ void IRLgAc::setPower(const bool on) {
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRLgAc::getPower(void) {
-  return GETBITS32(remote_state, kLgAcPowerOffset, kLgAcPowerSize) ==
-      kLgAcPowerOn;
+bool IRLgAc::getPower(void) const {
+  return _.Power == kLgAcPowerOn;
 }
 
 /// Set the temperature.
 /// @param[in] value The native temperature.
 /// @note Internal use only.
-void IRLgAc::_setTemp(const uint8_t value) {
-  setBits(&remote_state, kLgAcTempOffset, kLgAcTempSize, value);
+inline void IRLgAc::_setTemp(const uint8_t value) {
+  _.Temp = value;
 }
 
 /// Set the temperature.
@@ -344,10 +340,9 @@ void IRLgAc::setTemp(const uint8_t degrees) {
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRLgAc::getTemp(void) {
+uint8_t IRLgAc::getTemp(void) const {
   if (getPower())
-    return GETBITS32(remote_state, kLgAcTempOffset, kLgAcTempSize) +
-        kLgAcTempAdjust;
+    return _.Temp + kLgAcTempAdjust;
   else
     return _temp;
 }
@@ -361,23 +356,23 @@ void IRLgAc::setFan(const uint8_t speed) {
     case kLgAcFanLow:
     case kLgAcFanMedium:
     case kLgAcFanHigh:
-      setBits(&remote_state, kLgAcFanOffset, kLgAcFanSize, speed);
+      _.Fan = speed;
       break;
     default:
-      setFan(kLgAcFanAuto);
+      _.Fan = kLgAcFanAuto;
   }
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRLgAc::getFan(void) {
-  return GETBITS32(remote_state, kLgAcFanOffset, kLgAcFanSize);
+uint8_t IRLgAc::getFan(void) const {
+  return _.Fan;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRLgAc::getMode(void) {
-  return GETBITS32(remote_state, kLgAcModeOffset, kLgAcModeSize);
+uint8_t IRLgAc::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -389,10 +384,10 @@ void IRLgAc::setMode(const uint8_t mode) {
     case kLgAcHeat:
     case kLgAcCool:
     case kLgAcFan:
-      setBits(&remote_state, kLgAcModeOffset, kLgAcModeSize, mode);
+      _.Mode = mode;
       break;
-    default:  // If we get an unexpected mode, default to AUTO.
-      this->setMode(kLgAcAuto);
+    default:
+      _.Mode = kLgAcAuto;
   }
 }
 
@@ -451,15 +446,15 @@ stdAc::fanspeed_t IRLgAc::toCommonFanSpeed(const uint8_t speed) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRLgAc::toCommon(void) {
+stdAc::state_t IRLgAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::LG;
-  result.model = this->getModel();
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.model = getModel();
+  result.power = getPower();
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
   // Not supported.
   result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
@@ -477,16 +472,16 @@ stdAc::state_t IRLgAc::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRLgAc::toString(void) {
+String IRLgAc::toString(void) const {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(_protocol, getModel(), false);
   result += addBoolToString(getPower(), kPowerStr);
   if (getPower()) {  // Only display the rest if is in power on state.
-    result += addModeToString(getMode(), kLgAcAuto, kLgAcCool,
+    result += addModeToString(_.Mode, kLgAcAuto, kLgAcCool,
                               kLgAcHeat, kLgAcDry, kLgAcFan);
     result += addTempToString(getTemp());
-    result += addFanToString(getFan(), kLgAcFanHigh, kLgAcFanLow,
+    result += addFanToString(_.Fan, kLgAcFanHigh, kLgAcFanLow,
                              kLgAcFanAuto, kLgAcFanLowest, kLgAcFanMedium);
   }
   return result;
@@ -494,8 +489,6 @@ String IRLgAc::toString(void) {
 
 /// Check if the internal state looks like a valid LG A/C message.
 /// @return true, the internal state is a valid LG A/C mesg. Otherwise, false.
-bool IRLgAc::isValidLgAc(void) {
-  return validChecksum(remote_state) &&
-      (GETBITS32(remote_state, kLgAcSignatureOffset, kLgAcSignatureSize) ==
-       kLgAcSignature);
+bool IRLgAc::isValidLgAc(void) const {
+  return validChecksum(_.raw) && (_.Sign == kLgAcSignature);
 }
