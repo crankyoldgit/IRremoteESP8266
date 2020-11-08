@@ -28,33 +28,36 @@
 #include "IRsend_test.h"
 #endif
 
-const uint8_t kLgAcChecksumOffset = 0;  // Nr. of bits
-const uint8_t kLgAcChecksumSize = kNibbleSize;  // Nr. of bits
-const uint8_t kLgAcFanOffset = 4;  // Nr. of bits
-const uint8_t kLgAcFanSize = 3;  // Nr. of bits
+/// Native representation of a LG A/C message.
+union LGProtocol{
+  uint32_t raw;  ///< The state of the IR remote in IR code form.
+  struct {
+    uint32_t Sum  :4;
+    uint32_t Fan  :3;
+    uint32_t      :1;
+    uint32_t Temp :4;
+    uint32_t Mode :3;
+    uint32_t      :3;
+    uint32_t Power:2;
+    uint32_t Sign :8;
+  };
+};
+
 const uint8_t kLgAcFanLowest = 0;  // 0b000
 const uint8_t kLgAcFanLow = 1;     // 0b001
 const uint8_t kLgAcFanMedium = 2;  // 0b010
 const uint8_t kLgAcFanHigh = 4;    // 0b100
 const uint8_t kLgAcFanAuto = 5;    // 0b101
-const uint8_t kLgAcTempOffset = 8;  // Nr. of bits
-const uint8_t kLgAcTempSize = 4;  // Nr. of bits
 const uint8_t kLgAcTempAdjust = 15;
 const uint8_t kLgAcMinTemp = 16;  // Celsius
 const uint8_t kLgAcMaxTemp = 30;  // Celsius
-const uint8_t kLgAcModeOffset = 12;  // Nr. of bits
-const uint8_t kLgAcModeSize = 3;  // Nr. of bits
 const uint8_t kLgAcCool = 0;  // 0b000
 const uint8_t kLgAcDry = 1;   // 0b001
 const uint8_t kLgAcFan = 2;   // 0b010
 const uint8_t kLgAcAuto = 3;  // 0b011
 const uint8_t kLgAcHeat = 4;  // 0b100
-const uint8_t kLgAcPowerOffset = 18;  // Nr. of bits
-const uint8_t kLgAcPowerSize = 2;  // Nr. of bits
 const uint8_t kLgAcPowerOff = 3;  // 0b11
 const uint8_t kLgAcPowerOn = 0;   // 0b00
-const uint8_t kLgAcSignatureOffset = 20;  // Nr. of bits
-const uint8_t kLgAcSignatureSize = 8;  // Nr. of bits
 const uint8_t kLgAcSignature = 0x88;
 
 const uint32_t kLgAcOffCommand = 0x88C0051;
@@ -68,7 +71,7 @@ class IRLgAc {
   void stateReset(void);
   static uint8_t calcChecksum(const uint32_t state);
   static bool validChecksum(const uint32_t state);
-  bool isValidLgAc(void);
+  bool isValidLgAc(void) const;
 #if SEND_LG
   void send(const uint16_t repeat = kLgDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
@@ -81,23 +84,23 @@ class IRLgAc {
   void on(void);
   void off(void);
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setTemp(const uint8_t degrees);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   uint32_t getRaw(void);
   void setRaw(const uint32_t new_code);
-  uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
   void setModel(const lg_ac_remote_model_t model);
-  lg_ac_remote_model_t getModel(void);
+  lg_ac_remote_model_t getModel(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -107,9 +110,9 @@ class IRLgAc {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint32_t remote_state;  ///< The state of the IR remote in IR code form.
+  LGProtocol _;
   uint8_t _temp;
-  decode_type_t _protocol;
+  decode_type_t _protocol;  ///< model
   void checksum(void);
   void _setTemp(const uint8_t value);
 };
