@@ -370,11 +370,11 @@ void electra(IRElectraAc *ac,
              const bool beep, const int16_t sleep = -1);
 #endif  // SEND_SANYO_AC
 #if SEND_SHARP_AC
-  void sharp(IRSharpAc *ac,
+  void sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
              const bool on, const bool prev_power, const stdAc::opmode_t mode,
              const float degrees, const stdAc::fanspeed_t fan,
-             const stdAc::swingv_t swingv, const bool turbo, const bool filter,
-             const bool clean);
+             const stdAc::swingv_t swingv, const bool turbo, const bool light,
+             const bool filter, const bool clean);
 #endif  // SEND_SHARP_AC
 #if SEND_TCL112AC
   void tcl112(IRTcl112Ac *ac,

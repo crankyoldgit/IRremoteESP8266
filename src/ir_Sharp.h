@@ -12,11 +12,12 @@
 
 // Supports:
 //   Brand: Sharp,  Model: LC-52D62U TV
-//   Brand: Sharp,  Model: AY-ZP40KR A/C
-//   Brand: Sharp,  Model: AH-AxSAY A/C
-//   Brand: Sharp,  Model: CRMC-A907 JBEZ remote
-//   Brand: Sharp,  Model: AH-XP10NRY A/C
-//   Brand: Sharp,  Model: CRMC-820JBEZ remote
+//   Brand: Sharp,  Model: AY-ZP40KR A/C (A907)
+//   Brand: Sharp,  Model: AH-AxSAY A/C (A907)
+//   Brand: Sharp,  Model: CRMC-A907 JBEZ remote (A907)
+//   Brand: Sharp,  Model: AH-XP10NRY A/C (A907)
+//   Brand: Sharp,  Model: CRMC-820 JBEZ remote (A907)
+//   Brand: Sharp,  Model: CRMC-A705 JBEZ remote (A705)
 
 #ifndef IR_SHARP_H_
 #define IR_SHARP_H_
@@ -41,6 +42,7 @@ const uint16_t kSharpAcOneSpace = 1400;
 const uint32_t kSharpAcGap = kDefaultMessageGap;
 
 // Byte[4]
+const uint8_t kSharpAcModelBit = 4;  // Mask 0b000x0000
 const uint8_t kSharpAcByteTemp = 4;
 const uint8_t kSharpAcMinTemp = 15;  // Celsius
 const uint8_t kSharpAcMaxTemp = 30;  // Celsius
@@ -58,10 +60,11 @@ const uint8_t kSharpAcPowerTimerSetting = 8;                // 0b1000
 // Byte[6]
 const uint8_t kSharpAcByteMode = 6;
 const uint8_t kSharpAcModeSize = 2;        // Mask 0b000000xx;
-const uint8_t kSharpAcAuto =                             0b00;
+const uint8_t kSharpAcAuto =                             0b00;  // A907 only
+const uint8_t kSharpAcFan =                              0b00;  // A705 only
 const uint8_t kSharpAcDry =                              0b11;
 const uint8_t kSharpAcCool =                             0b10;
-const uint8_t kSharpAcHeat =                             0b01;
+const uint8_t kSharpAcHeat =                             0b01;  // A907 only
 const uint8_t kSharpAcByteClean = kSharpAcByteMode;
 const uint8_t kSharpAcBitCleanOffset = 3;  // Mask 0b0000x000
 const uint8_t kSharpAcByteFan = kSharpAcByteMode;
@@ -70,7 +73,9 @@ const uint8_t kSharpAcFanSize = 3;  // Nr. of Bits
 const uint8_t kSharpAcFanAuto =                     0b010;  // 2
 const uint8_t kSharpAcFanMin =                      0b100;  // 4 (FAN1)
 const uint8_t kSharpAcFanMed =                      0b011;  // 3 (FAN2)
+const uint8_t kSharpAcFanA705Low =                  0b011;  // 3
 const uint8_t kSharpAcFanHigh =                     0b101;  // 5 (FAN3)
+const uint8_t kSharpAcFanA705Med =                  0b101;  // 5
 const uint8_t kSharpAcFanMax =                      0b111;  // 7 (FAN4)
 // Byte[7]
 const uint8_t kSharpAcByteTimer = 7;
@@ -118,6 +123,8 @@ class IRSharpAc {
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_SHARP_AC
   void begin(void);
+  void setModel(const sharp_ac_remote_model_t model);
+  sharp_ac_remote_model_t getModel(const bool raw = false);
   void on(void);
   void off(void);
   void setPower(const bool on, const bool prev_on = true);
@@ -139,6 +146,8 @@ class IRSharpAc {
   void setIon(const bool on);
   bool getEconoToggle(void);
   void setEconoToggle(const bool on);
+  bool getLightToggle(void);
+  void setLightToggle(const bool on);
   uint16_t getTimerTime(void);
   bool getTimerEnabled(void);
   bool getTimerType(void);
@@ -152,8 +161,8 @@ class IRSharpAc {
                             const uint16_t length = kSharpAcStateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
-  static stdAc::opmode_t toCommonMode(const uint8_t mode);
-  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::opmode_t toCommonMode(const uint8_t mode);
+  stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void);
   String toString(void);
 #ifndef UNIT_TEST
@@ -169,6 +178,7 @@ class IRSharpAc {
   uint8_t _temp;  ///< Saved copy of the desired temp.
   uint8_t _mode;  ///< Saved copy of the desired mode.
   uint8_t _fan;  ///< Saved copy of the desired fan speed.
+  sharp_ac_remote_model_t _model;  ///< Saved copy of the model.
   void stateReset(void);
   void checksum(void);
   static uint8_t calcChecksum(uint8_t state[],
@@ -176,6 +186,8 @@ class IRSharpAc {
   void setPowerSpecial(const uint8_t value);
   uint8_t getPowerSpecial(void);
   void clearPowerSpecial(void);
+  bool _getEconoToggle(void);
+  void _setEconoToggle(const bool on);
 };
 
 #endif  // IR_SHARP_H_
