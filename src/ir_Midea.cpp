@@ -363,6 +363,26 @@ void IRMideaAC::checksum(void) {
   _.Sum = calcChecksum(_.remote_state);
 }
 
+/// Get the message type setting of the A/C message.
+/// @return The message type setting.
+uint8_t IRMideaAC::getType(void) const { return _.Type; }
+
+/// Set the message type setting of the A/C message.
+/// @param[in] setting The desired message type setting.
+void IRMideaAC::setType(const uint8_t setting) {
+  switch (setting) {
+    case kMideaACTypeFollow:
+      _.BeepDisable = false;
+     // FALL-THRU
+    case kMideaACTypeSpecial:
+      _.Type = setting;
+      break;
+    default:
+      _.Type = kMideaACTypeCommand;
+      _.BeepDisable = true;
+  }
+}
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -457,10 +477,19 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
 /// @return A human readable string.
 String IRMideaAC::toString(void) {
   String result = "";
-  result.reserve(120);  // Reserve some heap for the string to reduce fragging.
-  bool needComma = false;
-  if (!isSwingVToggle() && !isEconoToggle()) {
-    result += addBoolToString(_.Power, kPowerStr, false);
+  const uint8_t message_type = getType();
+  result.reserve(170);  // Reserve some heap for the string to reduce fragging.
+  result += addIntToString(message_type, kTypeStr, false);
+  result += kSpaceLBraceStr;
+  switch (message_type) {
+    case kMideaACTypeCommand: result += kCommandStr; break;
+    case kMideaACTypeSpecial: result += kSpecialStr; break;
+    case kMideaACTypeFollow:  result += kFollowStr; break;
+    default: result += kUnknownStr;
+  }
+  result += ')';
+  if (message_type != kMideaACTypeSpecial) {
+    result += addBoolToString(_.Power, kPowerStr);
     result += addModeToString(_.Mode, kMideaACAuto, kMideaACCool,
                               kMideaACHeat, kMideaACDry, kMideaACFan);
     result += addBoolToString(!_.useFahrenheit, kCelsiusStr);
@@ -479,9 +508,8 @@ String IRMideaAC::toString(void) {
     result += addFanToString(_.Fan, kMideaACFanHigh, kMideaACFanLow,
                              kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
     result += addBoolToString(_.Sleep, kSleepStr);
-    needComma = true;
   }
-  result += addBoolToString(getSwingVToggle(), kSwingVToggleStr, needComma);
+  result += addBoolToString(getSwingVToggle(), kSwingVToggleStr);
   result += addBoolToString(getEconoToggle(), kEconoToggleStr);
   return result;
 }

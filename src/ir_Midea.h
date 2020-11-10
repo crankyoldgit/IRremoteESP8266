@@ -44,10 +44,11 @@ union MideaProtocol{
     // Byte 0
     uint8_t Sum;
     // Byte 1 (value=0xFF when not in use.)
-    uint8_t SensorTemp:7;  ///< Degrees Celsius
+    uint8_t SensorTemp:7;  ///< Degrees
     uint8_t disableSensor:1;
-    // Byte 2
-    uint8_t :8;  // value=0xFF
+    // Byte 2 (value=0xFF when not in use.)
+    uint8_t :7;  // 0x7F / 0b1111111
+    uint8_t BeepDisable:1;  ///< 0 = no beep in follow me messages, 1 = beep.
     // Byte 3
     uint8_t Temp:5;
     uint8_t useFahrenheit:1;
@@ -59,7 +60,8 @@ union MideaProtocol{
     uint8_t Sleep:1;
     uint8_t Power:1;
     // Byte 5
-    uint8_t :0;
+    uint8_t Type:3;    ///< Normal, Special, or FollowMe message type
+    uint8_t Header:5;  ///< Typically 0b10100
   };
 };
 
@@ -86,6 +88,9 @@ const uint64_t kMideaACToggleSwingV = 0x0000A201FFFFFF7C;
 // For Danby DAC unit, the Ionizer toggle is the same as ToggleSwingV
 // const uint64_t kMideaACToggleIonizer = 0x0000A201FFFFFF7C;
 const uint64_t kMideaACToggleEcono = 0x0000A202FFFFFF7E;
+const uint8_t kMideaACTypeCommand = 0b001;  ///< Message type
+const uint8_t kMideaACTypeSpecial = 0b010;  ///< Message type
+const uint8_t kMideaACTypeFollow =  0b100;  ///< Message type
 
 // Legacy defines. (Deprecated)
 #define MIDEA_AC_COOL kMideaACCool
@@ -148,6 +153,8 @@ class IRMideaAC {
   bool isEconoToggle(void) const;
   void setEconoToggle(const bool on);
   bool getEconoToggle(void);
+  void setType(const uint8_t type);
+  uint8_t getType(void) const;
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);

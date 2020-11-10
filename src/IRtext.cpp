@@ -95,6 +95,8 @@ const PROGMEM char* kCeilingStr = D_STR_CEILING;  ///< "Ceiling"
 const PROGMEM char* kWallStr = D_STR_WALL;  ///< "Wall"
 const PROGMEM char* kRoomStr = D_STR_ROOM;  ///< "Room"
 const PROGMEM char* k6thSenseStr = D_STR_6THSENSE;  ///< "6th Sense"
+const PROGMEM char* kTypeStr = D_STR_TYPE;  ///< "Type"
+const PROGMEM char* kSpecialStr = D_STR_SPECIAL;  ///< "Special"
 
 const PROGMEM char* kAutoStr = D_STR_AUTO;  ///< "Auto"
 const PROGMEM char* kAutomaticStr = D_STR_AUTOMATIC;  ///< "Automatic"

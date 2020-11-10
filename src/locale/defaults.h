@@ -264,6 +264,12 @@
 #ifndef D_STR_FIXED
 #define D_STR_FIXED "Fixed"
 #endif  // D_STR_FIXED
+#ifndef D_STR_TYPE
+#define D_STR_TYPE "Type"
+#endif  // D_STR_TYPE
+#ifndef D_STR_SPECIAL
+#define D_STR_SPECIAL "Special"
+#endif  // D_STR_SPECIAL
 
 #ifndef D_STR_AUTO
 #define D_STR_AUTO "Auto"
