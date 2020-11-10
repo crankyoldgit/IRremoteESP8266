@@ -44,7 +44,14 @@ union MideaProtocol{
     // Byte 0
     uint8_t Sum;
     // Byte 1 (value=0xFF when not in use.)
-    uint8_t SensorTemp:7;  ///< Degrees
+    // This byte gets dual usage as Sensor Temp and On Timer
+    // Depending on "Type" below.
+    // When in "OnTimer", the nr of half hours is stored with mask 0b01111110
+    // i.e.
+    //  uint8_t :1;
+    //  uint8_t OnTimerHalfHours:6;
+    //  uint8_t :1;
+    uint8_t SensorTemp:7;  ///< Degrees or OnTimer.
     uint8_t disableSensor:1;
     // Byte 2 (value=0xFF when not in use.)
     uint8_t :7;  // 0x7F / 0b1111111
@@ -74,7 +81,7 @@ const uint8_t kMideaACMinSensorTempC = 0;   ///< Celsius
 const uint8_t kMideaACMaxSensorTempC = 37;  ///< Celsius
 const uint8_t kMideaACMinSensorTempF = 32;  ///< Fahrenheit
 const uint8_t kMideaACMaxSensorTempF = 99;  ///< Fahrenheit (Guess only!)
-const uint8_t kMideaACSensorTempOff = 0b1111111;
+const uint8_t kMideaACSensorTempOnTimerOff = 0b1111111;
 const uint8_t kMideaACCool = 0;     // 0b000
 const uint8_t kMideaACDry = 1;      // 0b001
 const uint8_t kMideaACAuto = 2;     // 0b010
@@ -153,8 +160,10 @@ class IRMideaAC {
   bool isEconoToggle(void) const;
   void setEconoToggle(const bool on);
   bool getEconoToggle(void);
-  void setType(const uint8_t type);
   uint8_t getType(void) const;
+  bool isOnTimerEnabled(void) const;
+  uint16_t getOnTimer(void) const;
+  void setOnTimer(const uint16_t mins);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
@@ -175,6 +184,7 @@ class IRMideaAC {
   bool _EconoToggle;
   void checksum(void);
   static uint8_t calcChecksum(const uint64_t state);
+  void setType(const uint8_t type);
 };
 
 #endif  // IR_MIDEA_H_

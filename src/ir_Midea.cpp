@@ -42,6 +42,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::minsToString;
 
 #if SEND_MIDEA
 /// Send a Midea message
@@ -248,7 +249,7 @@ void IRMideaAC::setEnableSensorTemp(const bool on) {
     setType(kMideaACTypeFollow);
   } else {
     setType(kMideaACTypeCommand);
-    _.SensorTemp = kMideaACSensorTempOff;  // Apply special value if off.
+    _.SensorTemp = kMideaACSensorTempOnTimerOff;  // Apply special value if off.
   }
 }
 
@@ -388,6 +389,35 @@ void IRMideaAC::setType(const uint8_t setting) {
   }
 }
 
+/// Is the OnTimer is enabled?
+/// @return true for yes, false for no.
+bool IRMideaAC::isOnTimerEnabled(void) const {
+  return getType() == kMideaACTypeCommand &&
+      _.SensorTemp != kMideaACSensorTempOnTimerOff;
+}
+
+/// Get the value of the OnTimer is currently set to.
+/// @return The number of minutes.
+uint16_t IRMideaAC::getOnTimer(void) const {
+  return (_.SensorTemp >> 1) * 30 + 30;
+}
+
+/// Set the value of the On Timer.
+/// @param[in] mins The number of minutes for the timer.
+/// @note Time will be rounded down to nearest 30 min as that is the resolution
+///       of the actual device/protocol.
+/// @note A value of less than 30 will disable the On Timer.
+/// @warning On Timer is incompatible with Sensor Temp/Follow Me messages.
+///          Setting it will disable that mode/settings.
+void IRMideaAC::setOnTimer(const uint16_t mins) {
+  setEnableSensorTemp(false);
+  uint8_t halfhours = std::min((uint16_t)(24 * 60), mins) / 30;
+  if (halfhours)
+    _.SensorTemp = ((halfhours - 1) << 1) | 1;
+  else
+    _.SensorTemp = kMideaACSensorTempOnTimerOff;
+}
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -509,6 +539,10 @@ String IRMideaAC::toString(void) {
       result += '/';
       result += uint64ToString(getSensorTemp(false));
       result += 'F';
+    } else {
+      result += addLabeledString(
+          isOnTimerEnabled() ? minsToString(getOnTimer()) : kOffStr,
+          kOnTimerStr);
     }
     result += addFanToString(_.Fan, kMideaACFanHigh, kMideaACFanLow,
                              kMideaACFanAuto, kMideaACFanAuto, kMideaACFanMed);
