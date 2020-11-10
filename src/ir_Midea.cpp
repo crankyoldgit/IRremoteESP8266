@@ -244,7 +244,12 @@ uint8_t IRMideaAC::getSensorTemp(const bool celsius) const {
 /// @note Also known as FollowMe
 void IRMideaAC::setEnableSensorTemp(const bool on) {
   _.disableSensor = !on;
-  if (!on) _.SensorTemp = kMideaACSensorTempOff;  // Apply special value if off.
+  if (on) {
+    setType(kMideaACTypeFollow);
+  } else {
+    setType(kMideaACTypeCommand);
+    _.SensorTemp = kMideaACSensorTempOff;  // Apply special value if off.
+  }
 }
 
 /// Is the remote temperature sensor enabled?

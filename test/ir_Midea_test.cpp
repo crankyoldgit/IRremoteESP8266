@@ -1032,15 +1032,19 @@ TEST(TestDecodeMidea, Issue1318_self_decode) {
 TEST(TestMideaACClass, SensorTemp) {
   IRMideaAC ac(kGpioUnused);
   ASSERT_FALSE(ac.getEnableSensorTemp());  // Off by default.
+  ASSERT_NE(kMideaACTypeFollow, ac.getType());
   ac.setSensorTemp(21, true);
   EXPECT_EQ(21, ac.getSensorTemp(true));
   EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  EXPECT_EQ(kMideaACTypeFollow, ac.getType());
   ac.setEnableSensorTemp(true);  // Values shouldn't change when already on.
   EXPECT_EQ(21, ac.getSensorTemp(true));
   EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be abled when set.
   ac.setEnableSensorTemp(false);  // Old value should be cleared when disabled.
   EXPECT_NE(21, ac.getSensorTemp(true));
   EXPECT_FALSE(ac.getEnableSensorTemp());
+  ASSERT_NE(kMideaACTypeFollow, ac.getType());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
 
   // Fahrenheit
   ac.setSensorTemp(74, false);
@@ -1128,7 +1132,6 @@ TEST(TestMideaACClass, ConstructKnownMessage) {
   ac.setTemp(23, true);
   ac.setSensorTemp(25, true);
   ac.setFan(kMideaACFanAuto);
-  ac.setType(kMideaACTypeFollow);
   EXPECT_EQ(
       "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: On, "
       "Temp: 23C/73F, SensorTemp: 25C/77F, Fan: 0 (Auto), Sleep: Off, "
