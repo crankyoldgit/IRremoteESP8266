@@ -81,6 +81,7 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
       // to the original 'data' state.
       data = ~data;
     }
+    space(kDefaultMessageGap);
   }
 }
 #endif  // SEND_MIDEA
@@ -113,19 +114,23 @@ void IRMideaAC::begin(void) { _irsend.begin(); }
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRMideaAC::send(const uint16_t repeat) {
   _irsend.sendMidea(getRaw(), kMideaBits, repeat);
-  // Handle toggling the swing & econo mode if we need to.
+  // Handle the toggle/special "one-off" settings if we need to.
   if (_SwingVToggle && !isSwingVToggle())
     _irsend.sendMidea(kMideaACToggleSwingV, kMideaBits, repeat);
+  _SwingVToggle = false;
+#if KAYSUN_AC
+  if (_SwingVStep && !isSwingVStep())
+    _irsend.sendMidea(kMideaACSwingVStep, kMideaBits, repeat);
+  _SwingVStep = false;
+#endif  // KAYSUN_AC
   if (_EconoToggle && !isEconoToggle())
     _irsend.sendMidea(kMideaACToggleEcono, kMideaBits, repeat);
+  _EconoToggle = false;
   if (_TurboToggle && !isTurboToggle())
     _irsend.sendMidea(kMideaACToggleTurbo, kMideaBits, repeat);
+  _TurboToggle = false;
   if (_LightToggle && !isLightToggle())
     _irsend.sendMidea(kMideaACToggleLight, kMideaBits, repeat);
-  // The toggle messages has been sent, so reset.
-  _SwingVToggle = false;
-  _EconoToggle = false;
-  _TurboToggle = false;
   _LightToggle = false;
 }
 #endif  // SEND_MIDEA
@@ -331,6 +336,25 @@ bool IRMideaAC::getSwingVToggle(void) {
   _SwingVToggle |= isSwingVToggle();
   return _SwingVToggle;
 }
+
+#if KAYSUN_AC
+/// Set the A/C to step the vertical swing for the next send.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMideaAC::setSwingVStep(const bool on) { _SwingVStep = on; }
+
+/// Is the current state a step vertical swing message?
+/// @return true, it is. false, it isn't.
+bool IRMideaAC::isSwingVStep(void) const {
+  return _.remote_state == kMideaACStepVStep;
+}
+
+// Get the step vertical swing state of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRMideaAC::getSwingVStep(void) {
+  _SwingVStep |= isSwingVStep();
+  return _SwingVStep;
+}
+#endif  // KAYSUN_AC
 
 /// Set the A/C to toggle the Econo (energy saver) mode for the next send.
 /// @param[in] on true, the setting is on. false, the setting is off.
@@ -578,7 +602,7 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
 String IRMideaAC::toString(void) {
   String result = "";
   const uint8_t message_type = getType();
-  result.reserve(220);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(230);  // Reserve some heap for the string to reduce fragging.
   result += addIntToString(message_type, kTypeStr, false);
   result += kSpaceLBraceStr;
   switch (message_type) {
@@ -617,6 +641,9 @@ String IRMideaAC::toString(void) {
     result += addBoolToString(_.Sleep, kSleepStr);
   }
   result += addBoolToString(getSwingVToggle(), kSwingVToggleStr);
+#if KAYSUN_AC
+  result += addBoolToString(getSwingVStep(), kStepStr);
+#endif  // KAYSUN_AC
   result += addBoolToString(getEconoToggle(), kEconoToggleStr);
   result += addBoolToString(getTurboToggle(), kTurboToggleStr);
   result += addBoolToString(getLightToggle(), kLightToggleStr);
@@ -661,7 +688,9 @@ bool IRrecv::decodeMidea(decode_results *results, uint16_t offset,
                         kMideaHdrMark, kMideaHdrSpace,
                         kMideaBitMark, kMideaOneSpace,
                         kMideaBitMark, kMideaZeroSpace,
-                        kMideaBitMark, kMideaMinGap, false, kMideaTolerance);
+                        kMideaBitMark, kMideaMinGap,
+                        i % 2,  // No "atleast" on 1st part, but yes on the 2nd.
+                        kMideaTolerance);
     if (!used) return false;
     offset += used;
   }

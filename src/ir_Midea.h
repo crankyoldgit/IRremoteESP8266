@@ -32,9 +32,12 @@
 #include "IRsend_test.h"
 #endif
 
-#if DANBY_DAC
-    kSwingVToggleStr = kIonStr;
-#endif
+// Compile-time model specific overrides.
+// Uncomment one of these if you have such a devices to better match your A/C.
+// It changes some of the special commands/settings.
+//
+// #define DANBY_DAC true
+// #define KAYSUN_AC true
 
 /// Native representation of a Midea A/C message.
 union MideaProtocol{
@@ -93,12 +96,21 @@ const uint8_t kMideaACFanAuto = 0;  // 0b00
 const uint8_t kMideaACFanLow = 1;   // 0b01
 const uint8_t kMideaACFanMed = 2;   // 0b10
 const uint8_t kMideaACFanHigh = 3;  // 0b11
-const uint64_t kMideaACToggleSwingV = 0x0000A201FFFFFF7C;
-// For Danby DAC unit, the Ionizer toggle is the same as ToggleSwingV
-// const uint64_t kMideaACToggleIonizer = 0x0000A201FFFFFF7C;
-const uint64_t kMideaACToggleEcono = 0x0000A202FFFFFF7E;
-const uint64_t kMideaACToggleLight = 0x0000A208FFFFFF75;
-const uint64_t kMideaACToggleTurbo = 0x0000A209FFFFFF74;
+#if KAYSUN_AC
+  // For Kaysun AC units, Toggle SwingV is 0xA202FFFFFF7E
+  const uint64_t kMideaACToggleSwingV = 0xA202FFFFFF7E;
+  const uint64_t kMideaACSwingVStep =   0xA201FFFFFF7C;
+#else  // KAYSUN_AC
+  const uint64_t kMideaACToggleSwingV = 0xA201FFFFFF7C;
+#endif  // KAYSUN_AC
+#if DANBY_DAC
+  // For Danby DAC unit, the Ionizer toggle is the same as ToggleSwingV
+  // const uint64_t kMideaACToggleIonizer = 0xA201FFFFFF7C;
+  kSwingVToggleStr = kIonStr;
+#endif  // DANBY_DAC
+const uint64_t kMideaACToggleEcono = 0xA202FFFFFF7E;
+const uint64_t kMideaACToggleLight = 0xA208FFFFFF75;
+const uint64_t kMideaACToggleTurbo = 0xA209FFFFFF74;
 const uint8_t kMideaACTypeCommand = 0b001;  ///< Message type
 const uint8_t kMideaACTypeSpecial = 0b010;  ///< Message type
 const uint8_t kMideaACTypeFollow =  0b100;  ///< Message type
@@ -161,6 +173,11 @@ class IRMideaAC {
   bool isSwingVToggle(void) const;
   void setSwingVToggle(const bool on);
   bool getSwingVToggle(void);
+  #if KAYSUN_AC
+  bool isSwingVStep(void) const;
+  void setSwingVStep(const bool on);
+  bool getSwingVStep(void);
+  #endif  // KAYSUN_AC
   bool isEconoToggle(void) const;
   void setEconoToggle(const bool on);
   bool getEconoToggle(void);
@@ -194,6 +211,9 @@ class IRMideaAC {
 #endif  // UNIT_TEST
   MideaProtocol _;
   bool _SwingVToggle;
+  #if KAYSUN_AC
+  bool _SwingVStep;
+  #endif  // KAYSUN_AC
   bool _EconoToggle;
   bool _TurboToggle;
   bool _LightToggle;

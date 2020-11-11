@@ -32,7 +32,7 @@ TEST(TestSendMidea, SendDataOnly) {
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 
   irsend.reset();
@@ -54,7 +54,7 @@ TEST(TestSendMidea, SendDataOnly) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 
   irsend.reset();
@@ -76,7 +76,7 @@ TEST(TestSendMidea, SendDataOnly) {
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 }
 
@@ -104,7 +104,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600"
+      "m560s105600"
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -120,7 +120,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
   irsend.sendMidea(0x55AA55AA55AA, kMideaBits, 2);  // 2 repeats.
   EXPECT_EQ(
@@ -140,7 +140,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600"
+      "m560s105600"
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -156,7 +156,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600"
+      "m560s105600"
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -172,7 +172,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 }
 
@@ -190,7 +190,7 @@ TEST(TestSendMidea, SendUnusualSize) {
       "m560s5600"
       "m4480s4480"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 
   irsend.reset();
@@ -216,7 +216,7 @@ TEST(TestSendMidea, SendUnusualSize) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s560"
       "m560s560m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
       "m560s560m560s560m560s560m560s1680m560s560m560s560m560s560m560s560"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 
   // Bit sizes must be a multiple of 8.
@@ -1087,7 +1087,7 @@ TEST(TestDecodeMidea, Issue1318_self_decode) {
       "m560s560m560s560m560s560m560s560m560s560m560s1680m560s1680"
       "m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680"
       "m560s560m560s560m560s560m560s560m560s1680m560s1680m560s560"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 }
 
@@ -1278,4 +1278,31 @@ TEST(TestMideaACClass, OffTimer) {
       "Temp: 30C/86F, On Timer: Off, Off Timer: 24:00, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
       "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-725406813
+TEST(TestMideaACClass, SendingSwingV) {
+  IRMideaAC ac(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  ac.begin();
+  ac.setSwingVToggle(true);
+  ac.send();  // This should generate two messages back to back.
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+  EXPECT_EQ(MIDEA, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kMideaBits, ac._irsend.capture.bits);
+  EXPECT_EQ(
+    "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+    "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+    "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+    "Turbo Toggle: Off, Light Toggle: Off",
+    IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // Decode the second/following message which should be the swing toggle.
+  EXPECT_TRUE(irrecv.decodeMidea(&ac._irsend.capture, 201));
+  EXPECT_EQ(MIDEA, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kMideaBits, ac._irsend.capture.bits);
+  EXPECT_EQ(
+    "Type: 2 (Special), Swing(V) Toggle: On, Econo Toggle: Off, "
+    "Turbo Toggle: Off, Light Toggle: Off",
+    IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
