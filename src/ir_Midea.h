@@ -54,7 +54,8 @@ union MideaProtocol{
     uint8_t SensorTemp:7;  ///< Degrees or OnTimer.
     uint8_t disableSensor:1;
     // Byte 2 (value=0xFF when not in use.)
-    uint8_t :7;  // 0x7F / 0b1111111
+    uint8_t :1;  // 0b1
+    uint8_t OffTimer:6;  ///< Nr of Half hours. Off is 0b111111
     uint8_t BeepDisable:1;  ///< 0 = no beep in follow me messages, 1 = beep.
     // Byte 3
     uint8_t Temp:5;
@@ -82,6 +83,7 @@ const uint8_t kMideaACMaxSensorTempC = 37;  ///< Celsius
 const uint8_t kMideaACMinSensorTempF = 32;  ///< Fahrenheit
 const uint8_t kMideaACMaxSensorTempF = 99;  ///< Fahrenheit (Guess only!)
 const uint8_t kMideaACSensorTempOnTimerOff = 0b1111111;
+const uint8_t kMideaACTimerOff = 0b111111;
 const uint8_t kMideaACCool = 0;     // 0b000
 const uint8_t kMideaACDry = 1;      // 0b001
 const uint8_t kMideaACAuto = 2;     // 0b010
@@ -164,6 +166,9 @@ class IRMideaAC {
   bool isOnTimerEnabled(void) const;
   uint16_t getOnTimer(void) const;
   void setOnTimer(const uint16_t mins);
+  bool isOffTimerEnabled(void) const;
+  uint16_t getOffTimer(void) const;
+  void setOffTimer(const uint16_t mins);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);

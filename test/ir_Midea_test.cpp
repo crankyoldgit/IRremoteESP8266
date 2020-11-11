@@ -447,7 +447,7 @@ TEST(TestMideaACClass, HumanReadableOutput) {
   ac.setRaw(0xA1826FFFFF62);
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
-      "Temp: 25C/77F, On Timer: Off, Fan: 0 (Auto), "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.off();
   ac.setTemp(25, true);
@@ -456,18 +456,18 @@ TEST(TestMideaACClass, HumanReadableOutput) {
   ac.setSleep(true);
   EXPECT_EQ(
       "Type: 1 (Command), Power: Off, Mode: 1 (Dry), Celsius: Off, "
-      "Temp: 25C/77F, On Timer: Off, Fan: 3 (High), "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 3 (High), "
       "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.setUseCelsius(true);
   EXPECT_EQ(
       "Type: 1 (Command), Power: Off, Mode: 1 (Dry), Celsius: On, "
-      "Temp: 25C/77F, On Timer: Off, Fan: 3 (High), "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 3 (High), "
       "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
 
   ac.setRaw(0xA19867FFFF7E);
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 0 (Cool), Celsius: Off, "
-      "Temp: 21C/69F, On Timer: Off, Fan: 3 (High), "
+      "Temp: 21C/69F, On Timer: Off, Off Timer: Off, Fan: 3 (High), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
 }
 
@@ -676,7 +676,7 @@ TEST(TestDecodeMidea, DecodeRealExample) {
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
-      "Temp: 18C/65F, On Timer: Off, Fan: 0 (Auto), "
+      "Temp: 18C/65F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
@@ -727,14 +727,14 @@ TEST(TestMideaACClass, CelsiusRemoteTemp) {
   EXPECT_EQ(on_cool_low_17c, ac.getRaw());
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 0 (Cool), Celsius: On, "
-      "Temp: 17C/62F, On Timer: Off, Fan: 1 (Low), "
+      "Temp: 17C/62F, On Timer: Off, Off Timer: Off, Fan: 1 (Low), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.setRaw(on_cool_low_17c);
   EXPECT_EQ(17, ac.getTemp(true));
   EXPECT_EQ(62, ac.getTemp(false));
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 0 (Cool), Celsius: On, "
-      "Temp: 17C/62F, On Timer: Off, Fan: 1 (Low), "
+      "Temp: 17C/62F, On Timer: Off, Off Timer: Off, Fan: 1 (Low), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.setTemp(17, true);
   EXPECT_EQ(17, ac.getTemp(true));
@@ -744,7 +744,7 @@ TEST(TestMideaACClass, CelsiusRemoteTemp) {
   ac.setRaw(on_cool_low_30c);
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 0 (Cool), Celsius: On, "
-      "Temp: 30C/86F, On Timer: Off, Fan: 1 (Low), "
+      "Temp: 30C/86F, On Timer: Off, Off Timer: Off, Fan: 1 (Low), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
 }
 
@@ -757,14 +757,14 @@ TEST(TestMideaACClass, SwingV) {
   ASSERT_TRUE(ac.getSwingVToggle());
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
-      "Temp: 25C/77F, On Timer: Off, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V) Toggle: On, Econo Toggle: Off", ac.toString());
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: On, Econo Toggle: Off", ac.toString());
   ac.setSwingVToggle(false);
   ASSERT_FALSE(ac.getSwingVToggle());
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
-      "Temp: 25C/77F, On Timer: Off, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.setRaw(kMideaACToggleSwingV);
   EXPECT_EQ("Type: 2 (Special), Swing(V) Toggle: On, Econo Toggle: Off",
             ac.toString());
@@ -779,14 +779,14 @@ TEST(TestMideaACClass, Econo) {
   ASSERT_TRUE(ac.getEconoToggle());
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
-      "Temp: 25C/77F, On Timer: Off, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V) Toggle: Off, Econo Toggle: On", ac.toString());
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: On", ac.toString());
   ac.setEconoToggle(false);
   ASSERT_FALSE(ac.getEconoToggle());
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
-      "Temp: 25C/77F, On Timer: Off, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.setRaw(kMideaACToggleEcono);
   EXPECT_EQ("Type: 2 (Special), Swing(V) Toggle: Off, Econo Toggle: On",
             ac.toString());
@@ -1004,7 +1004,7 @@ TEST(TestDecodeMidea, Issue1318_self_decode) {
   EXPECT_EQ(0, irsend.capture.command);
   EXPECT_EQ(
       "Type: 4 (Follow), Power: On, Mode: 3 (Heat), Celsius: On, "
-      "Temp: 24C/75F, SensorTemp: 24C/75F, Fan: 0 (Auto), "
+      "Temp: 24C/75F, SensorTemp: 24C/75F, Off Timer: Off, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
@@ -1082,29 +1082,29 @@ TEST(TestMideaACClass, SensorTemp) {
   EXPECT_TRUE(ac.getEnableSensorTemp());
   EXPECT_EQ(
       "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: On, "
-      "Temp: 23C/73F, SensorTemp: 0C/32F, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Temp: 23C/73F, SensorTemp: 0C/32F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.setRaw(0xA482467F134E);  // 18C
   EXPECT_EQ(18, ac.getSensorTemp(true));
   EXPECT_TRUE(ac.getEnableSensorTemp());
   EXPECT_EQ(
       "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: On, "
-      "Temp: 23C/73F, SensorTemp: 18C/64F, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Temp: 23C/73F, SensorTemp: 18C/64F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.setRaw(0xA482467F266B);  // 37C
   EXPECT_EQ(37, ac.getSensorTemp(true));
   EXPECT_TRUE(ac.getEnableSensorTemp());
   EXPECT_EQ(
       "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: On, "
-      "Temp: 23C/73F, SensorTemp: 37C/98F, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Temp: 23C/73F, SensorTemp: 37C/98F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.setRaw(0xA482607F2B43);  // 74F
   EXPECT_EQ(74, ac.getSensorTemp(false));
   EXPECT_TRUE(ac.getEnableSensorTemp());
   EXPECT_EQ(
       "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: Off, "
-      "Temp: 17C/62F, SensorTemp: 23C/74F, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Temp: 17C/62F, SensorTemp: 23C/74F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
 }
 
 TEST(TestMideaACClass, MessageType) {
@@ -1134,8 +1134,8 @@ TEST(TestMideaACClass, ConstructKnownMessage) {
   ac.setFan(kMideaACFanAuto);
   EXPECT_EQ(
       "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: On, "
-      "Temp: 23C/73F, SensorTemp: 25C/77F, Fan: 0 (Auto), Sleep: Off, "
-      "Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Temp: 23C/73F, SensorTemp: 25C/77F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   EXPECT_EQ(followme_25C, ac.getRaw());
 }
 
@@ -1148,7 +1148,7 @@ TEST(TestMideaACClass, OnTimer) {
   EXPECT_EQ(7 * 60, ac.getOnTimer());
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
-      "Temp: 30C/86F, On Timer: 07:00, Fan: 0 (Auto), "
+      "Temp: 30C/86F, On Timer: 07:00, Off Timer: Off, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   ac.setOnTimer(0);  // Disable / Timer off.
   EXPECT_FALSE(ac.isOnTimerEnabled());
@@ -1159,7 +1159,7 @@ TEST(TestMideaACClass, OnTimer) {
   EXPECT_EQ(3 * 60 + 30, ac.getOnTimer());
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
-      "Temp: 30C/86F, On Timer: 03:30, Fan: 0 (Auto), "
+      "Temp: 30C/86F, On Timer: 03:30, Off Timer: Off, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
   // Limit to max time.
   ac.setOnTimer(25 * 60);  // 25h
@@ -1168,6 +1168,40 @@ TEST(TestMideaACClass, OnTimer) {
   EXPECT_EQ(24 * 60, ac.getOnTimer());
   EXPECT_EQ(
       "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
-      "Temp: 30C/86F, On Timer: 24:00, Fan: 0 (Auto), "
+      "Temp: 30C/86F, On Timer: 24:00, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+}
+
+
+TEST(TestMideaACClass, OffTimer) {
+  IRMideaAC ac(kGpioUnused);
+  EXPECT_FALSE(ac.isOffTimerEnabled());
+  // Data from: https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-723171666
+  ac.setRaw(0xA1A34D81FF21);  // 0.5 hours.
+  EXPECT_TRUE(ac.isOffTimerEnabled());
+  EXPECT_EQ(30, ac.getOffTimer());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 30C/86F, On Timer: Off, Off Timer: 00:30, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+  ac.setOffTimer(0);  // Disable / Timer off.
+  EXPECT_FALSE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  ac.setOffTimer(3 * 60 + 48);  // 3h48m
+  EXPECT_TRUE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  EXPECT_EQ(3 * 60 + 30, ac.getOffTimer());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 30C/86F, On Timer: Off, Off Timer: 03:30, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+  // Limit to max time.
+  ac.setOffTimer(25 * 60);  // 25h
+  EXPECT_TRUE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  EXPECT_EQ(24 * 60, ac.getOffTimer());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 30C/86F, On Timer: Off, Off Timer: 24:00, Fan: 0 (Auto), "
       "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
 }

@@ -957,8 +957,8 @@ TEST(TestIRac, Midea) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Type: 1 (Command), Power: On, Mode: 1 (Dry), Celsius: On, "
-      "Temp: 27C/80F, Fan: 2 (Medium), Sleep: On, Swing(V) Toggle: Off, "
-      "Econo Toggle: Off";
+      "Temp: 27C/80F, On Timer: Off, Off Timer: Off, Fan: 2 (Medium), "
+      "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off";
 
   ac.begin();
   irac.midea(&ac,
