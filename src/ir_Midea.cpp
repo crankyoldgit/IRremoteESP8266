@@ -578,7 +578,7 @@ stdAc::state_t IRMideaAC::toCommon(const stdAc::state_t *prev) {
 String IRMideaAC::toString(void) {
   String result = "";
   const uint8_t message_type = getType();
-  result.reserve(170);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(220);  // Reserve some heap for the string to reduce fragging.
   result += addIntToString(message_type, kTypeStr, false);
   result += kSpaceLBraceStr;
   switch (message_type) {
