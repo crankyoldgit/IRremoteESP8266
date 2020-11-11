@@ -101,6 +101,8 @@ void IRMideaAC::stateReset(void) {
   _.remote_state = 0xA1826FFFFF62;
   _SwingVToggle = false;
   _EconoToggle = false;
+  _TurboToggle = false;
+  _LightToggle = false;
 }
 
 /// Set up hardware to be able to send a message.
@@ -116,9 +118,15 @@ void IRMideaAC::send(const uint16_t repeat) {
     _irsend.sendMidea(kMideaACToggleSwingV, kMideaBits, repeat);
   if (_EconoToggle && !isEconoToggle())
     _irsend.sendMidea(kMideaACToggleEcono, kMideaBits, repeat);
+  if (_TurboToggle && !isTurboToggle())
+    _irsend.sendMidea(kMideaACToggleTurbo, kMideaBits, repeat);
+  if (_LightToggle && !isLightToggle())
+    _irsend.sendMidea(kMideaACToggleLight, kMideaBits, repeat);
   // The toggle messages has been sent, so reset.
   _SwingVToggle = false;
   _EconoToggle = false;
+  _TurboToggle = false;
+  _LightToggle = false;
 }
 #endif  // SEND_MIDEA
 
@@ -339,6 +347,40 @@ bool IRMideaAC::isEconoToggle(void) const {
 bool IRMideaAC::getEconoToggle(void) {
   _EconoToggle |= isEconoToggle();
   return _EconoToggle;
+}
+
+/// Set the A/C to toggle the Turbo mode for the next send.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMideaAC::setTurboToggle(const bool on) { _TurboToggle = on; }
+
+/// Is the current state a Turbo toggle message?
+/// @return true, it is. false, it isn't.
+bool IRMideaAC::isTurboToggle(void) const {
+  return _.remote_state == kMideaACToggleTurbo;
+}
+
+// Get the Turbo toggle state of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRMideaAC::getTurboToggle(void) {
+  _TurboToggle |= isTurboToggle();
+  return _TurboToggle;
+}
+
+/// Set the A/C to toggle the Light (LED) mode for the next send.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMideaAC::setLightToggle(const bool on) { _LightToggle = on; }
+
+/// Is the current state a Light (LED) toggle message?
+/// @return true, it is. false, it isn't.
+bool IRMideaAC::isLightToggle(void) const {
+  return _.remote_state == kMideaACToggleLight;
+}
+
+// Get the Light (LED) toggle state of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRMideaAC::getLightToggle(void) {
+  _LightToggle |= isLightToggle();
+  return _LightToggle;
 }
 
 /// Calculate the checksum for a given state.
@@ -576,6 +618,8 @@ String IRMideaAC::toString(void) {
   }
   result += addBoolToString(getSwingVToggle(), kSwingVToggleStr);
   result += addBoolToString(getEconoToggle(), kEconoToggleStr);
+  result += addBoolToString(getTurboToggle(), kTurboToggleStr);
+  result += addBoolToString(getLightToggle(), kLightToggleStr);
   return result;
 }
 

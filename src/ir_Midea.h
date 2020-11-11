@@ -97,6 +97,8 @@ const uint64_t kMideaACToggleSwingV = 0x0000A201FFFFFF7C;
 // For Danby DAC unit, the Ionizer toggle is the same as ToggleSwingV
 // const uint64_t kMideaACToggleIonizer = 0x0000A201FFFFFF7C;
 const uint64_t kMideaACToggleEcono = 0x0000A202FFFFFF7E;
+const uint64_t kMideaACToggleLight = 0x0000A208FFFFFF75;
+const uint64_t kMideaACToggleTurbo = 0x0000A209FFFFFF74;
 const uint8_t kMideaACTypeCommand = 0b001;  ///< Message type
 const uint8_t kMideaACTypeSpecial = 0b010;  ///< Message type
 const uint8_t kMideaACTypeFollow =  0b100;  ///< Message type
@@ -162,6 +164,12 @@ class IRMideaAC {
   bool isEconoToggle(void) const;
   void setEconoToggle(const bool on);
   bool getEconoToggle(void);
+  bool isTurboToggle(void) const;
+  void setTurboToggle(const bool on);
+  bool getTurboToggle(void);
+  bool isLightToggle(void) const;
+  void setLightToggle(const bool on);
+  bool getLightToggle(void);
   uint8_t getType(void) const;
   bool isOnTimerEnabled(void) const;
   uint16_t getOnTimer(void) const;
@@ -187,6 +195,8 @@ class IRMideaAC {
   MideaProtocol _;
   bool _SwingVToggle;
   bool _EconoToggle;
+  bool _TurboToggle;
+  bool _LightToggle;
   void checksum(void);
   static uint8_t calcChecksum(const uint64_t state);
   void setType(const uint8_t type);

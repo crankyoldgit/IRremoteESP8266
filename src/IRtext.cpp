@@ -148,6 +148,7 @@ const PROGMEM char* kSleepTimerStr = D_STR_SLEEP_TIMER;  ///< "Sleep Timer"
 const PROGMEM char* kSwingVModeStr = D_STR_SWINGVMODE;  ///< "Swing(V) Mode"
 const PROGMEM char* kSwingVToggleStr = D_STR_SWINGVTOGGLE;  ///<
 ///< "Swing(V) Toggle"
+const PROGMEM char* kTurboToggleStr = D_STR_TURBOTOGGLE;  ///< "Turbo Toggle"
 
 // Separators
 char kTimeSep = D_CHR_TIME_SEP;  ///< ':'

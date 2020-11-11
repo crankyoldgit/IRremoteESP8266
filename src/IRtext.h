@@ -148,6 +148,7 @@ extern const char* kToggleStr;
 extern const char* kTopStr;
 extern const char* kTrueStr;
 extern const char* kTurboStr;
+extern const char* kTurboToggleStr;
 extern const char* kTypeStr;
 extern const char* kUnknownStr;
 extern const char* kUpperStr;
