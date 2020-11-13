@@ -104,6 +104,9 @@ void IRMideaAC::stateReset(void) {
   _EconoToggle = false;
   _TurboToggle = false;
   _LightToggle = false;
+#if KAYSUN_AC
+  _SwingVStep = false;
+#endif  // KAYSUN_AC
 }
 
 /// Set up hardware to be able to send a message.
@@ -345,7 +348,7 @@ void IRMideaAC::setSwingVStep(const bool on) { _SwingVStep = on; }
 /// Is the current state a step vertical swing message?
 /// @return true, it is. false, it isn't.
 bool IRMideaAC::isSwingVStep(void) const {
-  return _.remote_state == kMideaACStepVStep;
+  return _.remote_state == kMideaACSwingVStep;
 }
 
 // Get the step vertical swing state of the A/C.
