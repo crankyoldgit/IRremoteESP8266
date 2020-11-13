@@ -9,14 +9,14 @@
 Diese Programmbibliothek ermöglicht das **Senden _und_ Empfangen** von Infrarotsignalen mit [ESP8266](https://github.com/esp8266/Arduino)- und
 [ESP32](https://github.com/espressif/arduino-esp32)-Mikrocontrollern mithilfe des [Arduino-Frameworks](https://www.arduino.cc/) und handelsüblichen 940nm Infrarot-LEDs undIR-Empfängermodulen, wie zum Beispiel TSOP{17,22,24,36,38,44,48}*-Demodulatoren.
 
-## v2.7.11 jetzt verfügbar
-Version 2.7.11 der Bibliothek ist nun [verfügbar](https://github.com/crankyoldgit/IRremoteESP8266/releases/latest). Die [Versionshinweise](ReleaseNotes.md) enthalten alle wichtigen Neuerungen.
+## v2.7.12 jetzt verfügbar
+Version 2.7.12 der Bibliothek ist nun [verfügbar](https://github.com/crankyoldgit/IRremoteESP8266/releases/latest). Die [Versionshinweise](ReleaseNotes.md) enthalten alle wichtigen Neuerungen.
 
 #### Hinweis für Nutzer von Versionen vor v2.0
 Die Benutzung der Bibliothek hat sich mit Version 2.0 leicht geändert. Einige Anpassungen im aufrufenden Code werden nötig sein, um mit Version ab 2.0 korrekt zu funktionieren. Mehr zu den Anpassungen finden sich auf unserer [Upgrade to v2.0](https://github.com/crankyoldgit/IRremoteESP8266/wiki/Upgrading-to-v2.0)-Seite.
 
 #### Hinweis für Nutzer von Versionen vor v2.5
-Die Bibliothek benutzt zur Konstantendefinition nun statt `#define` den [const](https://google.github.io/styleguide/cppguide.html#Constant_Names)-Ansatz mit der Benennung in Einklang mit dem [C++-Style-Guide](https://google.github.io/styleguide/cppguide.html). 
+Die Bibliothek benutzt zur Konstantendefinition nun statt `#define` den [const](https://google.github.io/styleguide/cppguide.html#Constant_Names)-Ansatz mit der Benennung in Einklang mit dem [C++-Style-Guide](https://google.github.io/styleguide/cppguide.html).
 Dies kann eventuell dazu führen, daß sich ältere Programme nicht mehr kompilieren lassen.
 Die mutmaßlich am häufigsten extern verwendeten `#define`s wurden daher ge_aliased_, um eine gewisse Rückwärts-Kompatibilität zu gewährleisten. In künftigen Protokollimplementationen wird nur noch der neue `kConstantName`-Stil unterstützt werden.
 

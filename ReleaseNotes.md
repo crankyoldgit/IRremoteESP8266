@@ -1,5 +1,36 @@
 # Release Notes
 
+## _v2.7.12 (20201113)_
+
+**[Bug Fixes]**
+- `defaultBits()` returned incorrect result for `PANASONIC_AC` (#1307 #1314)
+- Fix LG2 timings and refactor `decodeLG()` (#1298 #1304)
+
+**[Features]**
+- Midea: Add support for "Follow Me"/Sensor, Turbo, Light, & Timers (#1318 #1327)
+- SharpAc: Add model support for A705 (#1309 #1313)
+- Add basic support for Panasonic A/C 32bit/16bit protocol. (#1307 #1316)
+- Add support for Elite Screens protocol. (#1306 #1310)
+- IRrecvDumpV2+: Add tolerance setting. (#1292)
+- Add basic support for the Mirage Protocol. (#1289 #1291)
+- Internationalisation Support
+  - pt-BR: Add Portuguese/Brazilian support. (#1303)
+  - de-DE: Backfill missing strings (#1294)
+  - de-DE: update for recent addition of 'tolerance' (#1293)
+  - de-DE: Translate root README.md into German (#1297)
+
+**[Misc]**
+- refactor ir_LG (#1325)
+- refactor ir_Kelvinator (#1317)
+- refactor ir_Hitachi (#1308)
+- refactor ir_Goodweather (#1295)
+- refactor ir_Electra (#1290)
+- refactor ir_Daikin (#1288)
+- Update Kaysun supported models. (#1322)
+- fix typos/spelling mistakes (#1301)
+- Add some missing Doxygen class/data-type descriptions. (#1287)
+
+
 ## _v2.7.11 (20201002)_
 
 **[Features]**
