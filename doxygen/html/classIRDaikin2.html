@@ -81,8 +81,9 @@ Collaboration diagram for IRDaikin2:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRDaikin2__coll__graph.png" border="0" usemap="#IRDaikin2_coll__map" alt="Collaboration graph"/></div>
 <map name="IRDaikin2_coll__map" id="IRDaikin2_coll__map">
-<area shape="rect" title="Class for handling detailed Daikin 312&#45;bit A/C messages." alt="" coords="5,95,91,121"/>
-<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="15,5,81,32"/>
+<area shape="rect" title="Class for handling detailed Daikin 312&#45;bit A/C messages." alt="" coords="56,95,141,121"/>
+<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
+<area shape="rect" href="unionDaikin2Protocol.html" title="Native representation of a Daikin2 A/C message." alt="" coords="96,5,221,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -97,177 +98,177 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a96c62125bddf113c6524960062d05a57"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a96c62125bddf113c6524960062d05a57">calibrate</a> (void)</td></tr>
 <tr class="memdesc:a96c62125bddf113c6524960062d05a57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the calibration to calculate uSec timing offsets for this platform.  <a href="classIRDaikin2.html#a96c62125bddf113c6524960062d05a57">More...</a><br /></td></tr>
 <tr class="separator:a96c62125bddf113c6524960062d05a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a7b5c28feec523ee81e99a9c32da26e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a6a7b5c28feec523ee81e99a9c32da26e">begin</a> ()</td></tr>
-<tr class="memdesc:a6a7b5c28feec523ee81e99a9c32da26e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up hardware to be able to send a message.  <a href="classIRDaikin2.html#a6a7b5c28feec523ee81e99a9c32da26e">More...</a><br /></td></tr>
-<tr class="separator:a6a7b5c28feec523ee81e99a9c32da26e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a009ac70fd8b8695f3d931a42667fdb66"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a> ()</td></tr>
-<tr class="memdesc:a009ac70fd8b8695f3d931a42667fdb66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to On.  <a href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">More...</a><br /></td></tr>
-<tr class="separator:a009ac70fd8b8695f3d931a42667fdb66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84a48dfceb4d7137eb485e6897ccceac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a84a48dfceb4d7137eb485e6897ccceac">off</a> ()</td></tr>
-<tr class="memdesc:a84a48dfceb4d7137eb485e6897ccceac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to Off.  <a href="classIRDaikin2.html#a84a48dfceb4d7137eb485e6897ccceac">More...</a><br /></td></tr>
-<tr class="separator:a84a48dfceb4d7137eb485e6897ccceac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fc6c2ca326a1f3b3e4e2b87643d044b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a0fc6c2ca326a1f3b3e4e2b87643d044b">begin</a> (void)</td></tr>
+<tr class="memdesc:a0fc6c2ca326a1f3b3e4e2b87643d044b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up hardware to be able to send a message.  <a href="classIRDaikin2.html#a0fc6c2ca326a1f3b3e4e2b87643d044b">More...</a><br /></td></tr>
+<tr class="separator:a0fc6c2ca326a1f3b3e4e2b87643d044b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3bdd3aa29a4db32f04411cbab27e570"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a> (void)</td></tr>
+<tr class="memdesc:aa3bdd3aa29a4db32f04411cbab27e570"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to On.  <a href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">More...</a><br /></td></tr>
+<tr class="separator:aa3bdd3aa29a4db32f04411cbab27e570"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9eee92387d78dad68fc98efc9371ea0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ae9eee92387d78dad68fc98efc9371ea0">off</a> (void)</td></tr>
+<tr class="memdesc:ae9eee92387d78dad68fc98efc9371ea0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting to Off.  <a href="classIRDaikin2.html#ae9eee92387d78dad68fc98efc9371ea0">More...</a><br /></td></tr>
+<tr class="separator:ae9eee92387d78dad68fc98efc9371ea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3adfe1a80a702b7098ccd0e18225396e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a3adfe1a80a702b7098ccd0e18225396e">setPower</a> (const bool state)</td></tr>
 <tr class="memdesc:a3adfe1a80a702b7098ccd0e18225396e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRDaikin2.html#a3adfe1a80a702b7098ccd0e18225396e">More...</a><br /></td></tr>
 <tr class="separator:a3adfe1a80a702b7098ccd0e18225396e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f25c4ff097f82a91c062aacd5ebabfc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a2f25c4ff097f82a91c062aacd5ebabfc">getPower</a> ()</td></tr>
-<tr class="memdesc:a2f25c4ff097f82a91c062aacd5ebabfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRDaikin2.html#a2f25c4ff097f82a91c062aacd5ebabfc">More...</a><br /></td></tr>
-<tr class="separator:a2f25c4ff097f82a91c062aacd5ebabfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a742026c183ee2bf5be1aafd0b6bbec20"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a742026c183ee2bf5be1aafd0b6bbec20">getPower</a> (void) const</td></tr>
+<tr class="memdesc:a742026c183ee2bf5be1aafd0b6bbec20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRDaikin2.html#a742026c183ee2bf5be1aafd0b6bbec20">More...</a><br /></td></tr>
+<tr class="separator:a742026c183ee2bf5be1aafd0b6bbec20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f752c785fe180d5038e35bb07ff965a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a7f752c785fe180d5038e35bb07ff965a">setTemp</a> (const uint8_t temp)</td></tr>
 <tr class="memdesc:a7f752c785fe180d5038e35bb07ff965a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRDaikin2.html#a7f752c785fe180d5038e35bb07ff965a">More...</a><br /></td></tr>
 <tr class="separator:a7f752c785fe180d5038e35bb07ff965a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1d39acc14bff5d55e918cb123c66e83"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#aa1d39acc14bff5d55e918cb123c66e83">getTemp</a> ()</td></tr>
-<tr class="memdesc:aa1d39acc14bff5d55e918cb123c66e83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRDaikin2.html#aa1d39acc14bff5d55e918cb123c66e83">More...</a><br /></td></tr>
-<tr class="separator:aa1d39acc14bff5d55e918cb123c66e83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5c2f9113952e82329d943565445074c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ad5c2f9113952e82329d943565445074c">getTemp</a> (void) const</td></tr>
+<tr class="memdesc:ad5c2f9113952e82329d943565445074c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRDaikin2.html#ad5c2f9113952e82329d943565445074c">More...</a><br /></td></tr>
+<tr class="separator:ad5c2f9113952e82329d943565445074c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9f3ddbdd1f1d5d99c84846b73c5daa1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#af9f3ddbdd1f1d5d99c84846b73c5daa1">setFan</a> (const uint8_t fan)</td></tr>
 <tr class="memdesc:af9f3ddbdd1f1d5d99c84846b73c5daa1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRDaikin2.html#af9f3ddbdd1f1d5d99c84846b73c5daa1">More...</a><br /></td></tr>
 <tr class="separator:af9f3ddbdd1f1d5d99c84846b73c5daa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aafe89842b356c288dd38d256f9eb050c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#aafe89842b356c288dd38d256f9eb050c">getFan</a> ()</td></tr>
-<tr class="memdesc:aafe89842b356c288dd38d256f9eb050c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRDaikin2.html#aafe89842b356c288dd38d256f9eb050c">More...</a><br /></td></tr>
-<tr class="separator:aafe89842b356c288dd38d256f9eb050c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a681279a765159550ac1ec84895fff4d2"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a681279a765159550ac1ec84895fff4d2">getMode</a> ()</td></tr>
-<tr class="memdesc:a681279a765159550ac1ec84895fff4d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRDaikin2.html#a681279a765159550ac1ec84895fff4d2">More...</a><br /></td></tr>
-<tr class="separator:a681279a765159550ac1ec84895fff4d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ba2b2a1cd20916b3dc0f5f57dd265e3"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a5ba2b2a1cd20916b3dc0f5f57dd265e3">getFan</a> (void) const</td></tr>
+<tr class="memdesc:a5ba2b2a1cd20916b3dc0f5f57dd265e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRDaikin2.html#a5ba2b2a1cd20916b3dc0f5f57dd265e3">More...</a><br /></td></tr>
+<tr class="separator:a5ba2b2a1cd20916b3dc0f5f57dd265e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab89325df2b63faccaa82c7708cae894e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ab89325df2b63faccaa82c7708cae894e">getMode</a> (void) const</td></tr>
+<tr class="memdesc:ab89325df2b63faccaa82c7708cae894e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRDaikin2.html#ab89325df2b63faccaa82c7708cae894e">More...</a><br /></td></tr>
+<tr class="separator:ab89325df2b63faccaa82c7708cae894e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24ef3b53f22fe3557ed2dbc98a5bc6d2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a24ef3b53f22fe3557ed2dbc98a5bc6d2">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a24ef3b53f22fe3557ed2dbc98a5bc6d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRDaikin2.html#a24ef3b53f22fe3557ed2dbc98a5bc6d2">More...</a><br /></td></tr>
 <tr class="separator:a24ef3b53f22fe3557ed2dbc98a5bc6d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35e72dc8e7967ee8ca8e84a6344468f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a35e72dc8e7967ee8ca8e84a6344468f3">setSwingVertical</a> (const uint8_t position)</td></tr>
 <tr class="memdesc:a35e72dc8e7967ee8ca8e84a6344468f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Vertical Swing mode of the A/C.  <a href="classIRDaikin2.html#a35e72dc8e7967ee8ca8e84a6344468f3">More...</a><br /></td></tr>
 <tr class="separator:a35e72dc8e7967ee8ca8e84a6344468f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1d07be72001f06b6a8dfc279ffc40f5"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#aa1d07be72001f06b6a8dfc279ffc40f5">getSwingVertical</a> ()</td></tr>
-<tr class="memdesc:aa1d07be72001f06b6a8dfc279ffc40f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Vertical Swing mode of the A/C.  <a href="classIRDaikin2.html#aa1d07be72001f06b6a8dfc279ffc40f5">More...</a><br /></td></tr>
-<tr class="separator:aa1d07be72001f06b6a8dfc279ffc40f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a411a950d43da08070ef1ad744f7188f1"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a411a950d43da08070ef1ad744f7188f1">getSwingVertical</a> (void) const</td></tr>
+<tr class="memdesc:a411a950d43da08070ef1ad744f7188f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Vertical Swing mode of the A/C.  <a href="classIRDaikin2.html#a411a950d43da08070ef1ad744f7188f1">More...</a><br /></td></tr>
+<tr class="separator:a411a950d43da08070ef1ad744f7188f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75b6d6fb5bab0a9c951ad35e3e1d07c5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a75b6d6fb5bab0a9c951ad35e3e1d07c5">setSwingHorizontal</a> (const uint8_t position)</td></tr>
 <tr class="memdesc:a75b6d6fb5bab0a9c951ad35e3e1d07c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Horizontal Swing mode of the A/C.  <a href="classIRDaikin2.html#a75b6d6fb5bab0a9c951ad35e3e1d07c5">More...</a><br /></td></tr>
 <tr class="separator:a75b6d6fb5bab0a9c951ad35e3e1d07c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a338a70b5d7f71da467a0f32b4a057f13"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a338a70b5d7f71da467a0f32b4a057f13">getSwingHorizontal</a> ()</td></tr>
-<tr class="memdesc:a338a70b5d7f71da467a0f32b4a057f13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Horizontal Swing mode of the A/C.  <a href="classIRDaikin2.html#a338a70b5d7f71da467a0f32b4a057f13">More...</a><br /></td></tr>
-<tr class="separator:a338a70b5d7f71da467a0f32b4a057f13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a237eb163e3dd1bf8e45ae2324f0b7dcf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a237eb163e3dd1bf8e45ae2324f0b7dcf">getQuiet</a> ()</td></tr>
-<tr class="memdesc:a237eb163e3dd1bf8e45ae2324f0b7dcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Quiet mode status of the A/C.  <a href="classIRDaikin2.html#a237eb163e3dd1bf8e45ae2324f0b7dcf">More...</a><br /></td></tr>
-<tr class="separator:a237eb163e3dd1bf8e45ae2324f0b7dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61ca7e72f850d0f9600fa9d8a336a8ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a61ca7e72f850d0f9600fa9d8a336a8ef">setQuiet</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:adec30b33929a1cd219ae6d50eb44fe17"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#adec30b33929a1cd219ae6d50eb44fe17">getSwingHorizontal</a> (void) const</td></tr>
+<tr class="memdesc:adec30b33929a1cd219ae6d50eb44fe17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Horizontal Swing mode of the A/C.  <a href="classIRDaikin2.html#adec30b33929a1cd219ae6d50eb44fe17">More...</a><br /></td></tr>
+<tr class="separator:adec30b33929a1cd219ae6d50eb44fe17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae77c687b5e258baf941181ae0a261aae"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ae77c687b5e258baf941181ae0a261aae">getQuiet</a> (void) const</td></tr>
+<tr class="memdesc:ae77c687b5e258baf941181ae0a261aae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Quiet mode status of the A/C.  <a href="classIRDaikin2.html#ae77c687b5e258baf941181ae0a261aae">More...</a><br /></td></tr>
+<tr class="separator:ae77c687b5e258baf941181ae0a261aae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61ca7e72f850d0f9600fa9d8a336a8ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a61ca7e72f850d0f9600fa9d8a336a8ef">setQuiet</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:a61ca7e72f850d0f9600fa9d8a336a8ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Quiet mode of the A/C.  <a href="classIRDaikin2.html#a61ca7e72f850d0f9600fa9d8a336a8ef">More...</a><br /></td></tr>
 <tr class="separator:a61ca7e72f850d0f9600fa9d8a336a8ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abad28f7287f4d90d196eb0eb7f93ed43"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#abad28f7287f4d90d196eb0eb7f93ed43">getPowerful</a> ()</td></tr>
-<tr class="memdesc:abad28f7287f4d90d196eb0eb7f93ed43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Powerful (Turbo) mode of the A/C.  <a href="classIRDaikin2.html#abad28f7287f4d90d196eb0eb7f93ed43">More...</a><br /></td></tr>
-<tr class="separator:abad28f7287f4d90d196eb0eb7f93ed43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6538104cdcf1b55e480aaddd51116d9a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a6538104cdcf1b55e480aaddd51116d9a">setPowerful</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:a91ddd73b1b38fe74233765feecbd1055"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a91ddd73b1b38fe74233765feecbd1055">getPowerful</a> (void) const</td></tr>
+<tr class="memdesc:a91ddd73b1b38fe74233765feecbd1055"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Powerful (Turbo) mode of the A/C.  <a href="classIRDaikin2.html#a91ddd73b1b38fe74233765feecbd1055">More...</a><br /></td></tr>
+<tr class="separator:a91ddd73b1b38fe74233765feecbd1055"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6538104cdcf1b55e480aaddd51116d9a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a6538104cdcf1b55e480aaddd51116d9a">setPowerful</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:a6538104cdcf1b55e480aaddd51116d9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Powerful (Turbo) mode of the A/C.  <a href="classIRDaikin2.html#a6538104cdcf1b55e480aaddd51116d9a">More...</a><br /></td></tr>
 <tr class="separator:a6538104cdcf1b55e480aaddd51116d9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42a44a6cefa6bf6f45148d39c216ebc0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a42a44a6cefa6bf6f45148d39c216ebc0">setEcono</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:a42a44a6cefa6bf6f45148d39c216ebc0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a42a44a6cefa6bf6f45148d39c216ebc0">setEcono</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:a42a44a6cefa6bf6f45148d39c216ebc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Economy mode of the A/C.  <a href="classIRDaikin2.html#a42a44a6cefa6bf6f45148d39c216ebc0">More...</a><br /></td></tr>
 <tr class="separator:a42a44a6cefa6bf6f45148d39c216ebc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8098fa67e8808eebfad7611b6fc7881"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ad8098fa67e8808eebfad7611b6fc7881">getEcono</a> ()</td></tr>
-<tr class="memdesc:ad8098fa67e8808eebfad7611b6fc7881"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Economical mode of the A/C.  <a href="classIRDaikin2.html#ad8098fa67e8808eebfad7611b6fc7881">More...</a><br /></td></tr>
-<tr class="separator:ad8098fa67e8808eebfad7611b6fc7881"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ba8e5d5dd4aba45a90de1d450a7a88b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a5ba8e5d5dd4aba45a90de1d450a7a88b">setEye</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:aa0471ba51480c60af811b157c98945b8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#aa0471ba51480c60af811b157c98945b8">getEcono</a> (void) const</td></tr>
+<tr class="memdesc:aa0471ba51480c60af811b157c98945b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Economical mode of the A/C.  <a href="classIRDaikin2.html#aa0471ba51480c60af811b157c98945b8">More...</a><br /></td></tr>
+<tr class="separator:aa0471ba51480c60af811b157c98945b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ba8e5d5dd4aba45a90de1d450a7a88b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a5ba8e5d5dd4aba45a90de1d450a7a88b">setEye</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:a5ba8e5d5dd4aba45a90de1d450a7a88b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Eye (Sensor) mode of the A/C.  <a href="classIRDaikin2.html#a5ba8e5d5dd4aba45a90de1d450a7a88b">More...</a><br /></td></tr>
 <tr class="separator:a5ba8e5d5dd4aba45a90de1d450a7a88b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02fbd472d3c79b2391fc11da692c8998"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a02fbd472d3c79b2391fc11da692c8998">getEye</a> ()</td></tr>
-<tr class="memdesc:a02fbd472d3c79b2391fc11da692c8998"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Eye (Sensor) mode status of the A/C.  <a href="classIRDaikin2.html#a02fbd472d3c79b2391fc11da692c8998">More...</a><br /></td></tr>
-<tr class="separator:a02fbd472d3c79b2391fc11da692c8998"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a975c2fdb261d6d2b6c8e196fbd074899"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a975c2fdb261d6d2b6c8e196fbd074899">setEyeAuto</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:a7de3421d44db047fdbdfa6bad20a71e8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a7de3421d44db047fdbdfa6bad20a71e8">getEye</a> (void) const</td></tr>
+<tr class="memdesc:a7de3421d44db047fdbdfa6bad20a71e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Eye (Sensor) mode status of the A/C.  <a href="classIRDaikin2.html#a7de3421d44db047fdbdfa6bad20a71e8">More...</a><br /></td></tr>
+<tr class="separator:a7de3421d44db047fdbdfa6bad20a71e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a975c2fdb261d6d2b6c8e196fbd074899"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a975c2fdb261d6d2b6c8e196fbd074899">setEyeAuto</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:a975c2fdb261d6d2b6c8e196fbd074899"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Automatic Eye (Sensor) mode of the A/C.  <a href="classIRDaikin2.html#a975c2fdb261d6d2b6c8e196fbd074899">More...</a><br /></td></tr>
 <tr class="separator:a975c2fdb261d6d2b6c8e196fbd074899"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cae45648292bdee8092a30338975ed0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a0cae45648292bdee8092a30338975ed0">getEyeAuto</a> ()</td></tr>
-<tr class="memdesc:a0cae45648292bdee8092a30338975ed0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Automaitc Eye (Sensor) mode status of the A/C.  <a href="classIRDaikin2.html#a0cae45648292bdee8092a30338975ed0">More...</a><br /></td></tr>
-<tr class="separator:a0cae45648292bdee8092a30338975ed0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:accd4430e998a8c9be80b5a708be9337e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#accd4430e998a8c9be80b5a708be9337e">setPurify</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:ad3de9384586e091b85065a1f2c359295"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ad3de9384586e091b85065a1f2c359295">getEyeAuto</a> (void) const</td></tr>
+<tr class="memdesc:ad3de9384586e091b85065a1f2c359295"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Automaitc Eye (Sensor) mode status of the A/C.  <a href="classIRDaikin2.html#ad3de9384586e091b85065a1f2c359295">More...</a><br /></td></tr>
+<tr class="separator:ad3de9384586e091b85065a1f2c359295"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accd4430e998a8c9be80b5a708be9337e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#accd4430e998a8c9be80b5a708be9337e">setPurify</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:accd4430e998a8c9be80b5a708be9337e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Purify (Filter) mode of the A/C.  <a href="classIRDaikin2.html#accd4430e998a8c9be80b5a708be9337e">More...</a><br /></td></tr>
 <tr class="separator:accd4430e998a8c9be80b5a708be9337e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e2785832ae78bafa655aa61853a47bf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a3e2785832ae78bafa655aa61853a47bf">getPurify</a> ()</td></tr>
-<tr class="memdesc:a3e2785832ae78bafa655aa61853a47bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Purify (Filter) mode status of the A/C.  <a href="classIRDaikin2.html#a3e2785832ae78bafa655aa61853a47bf">More...</a><br /></td></tr>
-<tr class="separator:a3e2785832ae78bafa655aa61853a47bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad53e046e545f3b6c5418dfbaf58653ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ad53e046e545f3b6c5418dfbaf58653ca">setMold</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:a73b691ef3fa4a555f7557d0cad63ef02"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a73b691ef3fa4a555f7557d0cad63ef02">getPurify</a> (void) const</td></tr>
+<tr class="memdesc:a73b691ef3fa4a555f7557d0cad63ef02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Purify (Filter) mode status of the A/C.  <a href="classIRDaikin2.html#a73b691ef3fa4a555f7557d0cad63ef02">More...</a><br /></td></tr>
+<tr class="separator:a73b691ef3fa4a555f7557d0cad63ef02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad53e046e545f3b6c5418dfbaf58653ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ad53e046e545f3b6c5418dfbaf58653ca">setMold</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:ad53e046e545f3b6c5418dfbaf58653ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Mould (filter) mode of the A/C.  <a href="classIRDaikin2.html#ad53e046e545f3b6c5418dfbaf58653ca">More...</a><br /></td></tr>
 <tr class="separator:ad53e046e545f3b6c5418dfbaf58653ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a330b3a8f25bd2d053dab318126b32569"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a330b3a8f25bd2d053dab318126b32569">getMold</a> ()</td></tr>
-<tr class="memdesc:a330b3a8f25bd2d053dab318126b32569"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Mould (filter) mode status of the A/C.  <a href="classIRDaikin2.html#a330b3a8f25bd2d053dab318126b32569">More...</a><br /></td></tr>
-<tr class="separator:a330b3a8f25bd2d053dab318126b32569"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fdc34fe5e43a9df5677bb54315359fb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a6fdc34fe5e43a9df5677bb54315359fb">getMold</a> (void) const</td></tr>
+<tr class="memdesc:a6fdc34fe5e43a9df5677bb54315359fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Mould (filter) mode status of the A/C.  <a href="classIRDaikin2.html#a6fdc34fe5e43a9df5677bb54315359fb">More...</a><br /></td></tr>
+<tr class="separator:a6fdc34fe5e43a9df5677bb54315359fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91ec5f7c67cb87102a5eb030e0763b50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a91ec5f7c67cb87102a5eb030e0763b50">enableOnTimer</a> (const uint16_t starttime)</td></tr>
 <tr class="memdesc:a91ec5f7c67cb87102a5eb030e0763b50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the enable status &amp; time of the On Timer.  <a href="classIRDaikin2.html#a91ec5f7c67cb87102a5eb030e0763b50">More...</a><br /></td></tr>
 <tr class="separator:a91ec5f7c67cb87102a5eb030e0763b50"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0e77969a86af9637cb9aa4b4befd4aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ab0e77969a86af9637cb9aa4b4befd4aa">disableOnTimer</a> ()</td></tr>
-<tr class="memdesc:ab0e77969a86af9637cb9aa4b4befd4aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the On timer.  <a href="classIRDaikin2.html#ab0e77969a86af9637cb9aa4b4befd4aa">More...</a><br /></td></tr>
-<tr class="separator:ab0e77969a86af9637cb9aa4b4befd4aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad62f28698595be7717f0f29a5396853d"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ad62f28698595be7717f0f29a5396853d">getOnTime</a> ()</td></tr>
-<tr class="memdesc:ad62f28698595be7717f0f29a5396853d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the On Timer time to be sent to the A/C unit.  <a href="classIRDaikin2.html#ad62f28698595be7717f0f29a5396853d">More...</a><br /></td></tr>
-<tr class="separator:ad62f28698595be7717f0f29a5396853d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8921edb7885d728ee5294fa03cb13a87"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a8921edb7885d728ee5294fa03cb13a87">getOnTimerEnabled</a> ()</td></tr>
-<tr class="memdesc:a8921edb7885d728ee5294fa03cb13a87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the enable status of the On Timer.  <a href="classIRDaikin2.html#a8921edb7885d728ee5294fa03cb13a87">More...</a><br /></td></tr>
-<tr class="separator:a8921edb7885d728ee5294fa03cb13a87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a170a1e9ddb7873dc1392184a85387cc3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a170a1e9ddb7873dc1392184a85387cc3">disableOnTimer</a> (void)</td></tr>
+<tr class="memdesc:a170a1e9ddb7873dc1392184a85387cc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the On timer.  <a href="classIRDaikin2.html#a170a1e9ddb7873dc1392184a85387cc3">More...</a><br /></td></tr>
+<tr class="separator:a170a1e9ddb7873dc1392184a85387cc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e98e1f9211e7e8885c503a7f724030f"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a7e98e1f9211e7e8885c503a7f724030f">getOnTime</a> (void) const</td></tr>
+<tr class="memdesc:a7e98e1f9211e7e8885c503a7f724030f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the On Timer time to be sent to the A/C unit.  <a href="classIRDaikin2.html#a7e98e1f9211e7e8885c503a7f724030f">More...</a><br /></td></tr>
+<tr class="separator:a7e98e1f9211e7e8885c503a7f724030f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a635bd00eff13041b284566936af0d589"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a635bd00eff13041b284566936af0d589">getOnTimerEnabled</a> (void) const</td></tr>
+<tr class="memdesc:a635bd00eff13041b284566936af0d589"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the enable status of the On Timer.  <a href="classIRDaikin2.html#a635bd00eff13041b284566936af0d589">More...</a><br /></td></tr>
+<tr class="separator:a635bd00eff13041b284566936af0d589"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c86782a98a54818ae92419eec5a060b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a9c86782a98a54818ae92419eec5a060b">enableSleepTimer</a> (const uint16_t sleeptime)</td></tr>
 <tr class="memdesc:a9c86782a98a54818ae92419eec5a060b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the enable status &amp; time of the Sleep Timer.  <a href="classIRDaikin2.html#a9c86782a98a54818ae92419eec5a060b">More...</a><br /></td></tr>
 <tr class="separator:a9c86782a98a54818ae92419eec5a060b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5461cf51967d3fe67489384c82daac47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a5461cf51967d3fe67489384c82daac47">disableSleepTimer</a> ()</td></tr>
-<tr class="memdesc:a5461cf51967d3fe67489384c82daac47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the sleep timer.  <a href="classIRDaikin2.html#a5461cf51967d3fe67489384c82daac47">More...</a><br /></td></tr>
-<tr class="separator:a5461cf51967d3fe67489384c82daac47"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31af96f9a05b3adea2e2ae84d3d242b9"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a31af96f9a05b3adea2e2ae84d3d242b9">getSleepTime</a> ()</td></tr>
-<tr class="memdesc:a31af96f9a05b3adea2e2ae84d3d242b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep Timer time to be sent to the A/C unit.  <a href="classIRDaikin2.html#a31af96f9a05b3adea2e2ae84d3d242b9">More...</a><br /></td></tr>
-<tr class="separator:a31af96f9a05b3adea2e2ae84d3d242b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4944acaa5c9d381a1875f4d0b16590a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ae4944acaa5c9d381a1875f4d0b16590a">getSleepTimerEnabled</a> ()</td></tr>
-<tr class="memdesc:ae4944acaa5c9d381a1875f4d0b16590a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep timer enabled status of the A/C.  <a href="classIRDaikin2.html#ae4944acaa5c9d381a1875f4d0b16590a">More...</a><br /></td></tr>
-<tr class="separator:ae4944acaa5c9d381a1875f4d0b16590a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a152532ef9d905e26930ae145a9623877"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a152532ef9d905e26930ae145a9623877">disableSleepTimer</a> (void)</td></tr>
+<tr class="memdesc:a152532ef9d905e26930ae145a9623877"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the sleep timer.  <a href="classIRDaikin2.html#a152532ef9d905e26930ae145a9623877">More...</a><br /></td></tr>
+<tr class="separator:a152532ef9d905e26930ae145a9623877"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a267a7975e882ffc884eccbdc16a0df5f"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a267a7975e882ffc884eccbdc16a0df5f">getSleepTime</a> (void) const</td></tr>
+<tr class="memdesc:a267a7975e882ffc884eccbdc16a0df5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep Timer time to be sent to the A/C unit.  <a href="classIRDaikin2.html#a267a7975e882ffc884eccbdc16a0df5f">More...</a><br /></td></tr>
+<tr class="separator:a267a7975e882ffc884eccbdc16a0df5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a763e88c841fc6b32521787d3f1df32e4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a763e88c841fc6b32521787d3f1df32e4">getSleepTimerEnabled</a> (void) const</td></tr>
+<tr class="memdesc:a763e88c841fc6b32521787d3f1df32e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep timer enabled status of the A/C.  <a href="classIRDaikin2.html#a763e88c841fc6b32521787d3f1df32e4">More...</a><br /></td></tr>
+<tr class="separator:a763e88c841fc6b32521787d3f1df32e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc7ba7d7de2976e010a72778091d633a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#afc7ba7d7de2976e010a72778091d633a">enableOffTimer</a> (const uint16_t endtime)</td></tr>
 <tr class="memdesc:afc7ba7d7de2976e010a72778091d633a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the enable status &amp; time of the Off Timer.  <a href="classIRDaikin2.html#afc7ba7d7de2976e010a72778091d633a">More...</a><br /></td></tr>
 <tr class="separator:afc7ba7d7de2976e010a72778091d633a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c8ad4c34713d61942c80b6052e6283a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a6c8ad4c34713d61942c80b6052e6283a">disableOffTimer</a> ()</td></tr>
-<tr class="memdesc:a6c8ad4c34713d61942c80b6052e6283a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the Off timer.  <a href="classIRDaikin2.html#a6c8ad4c34713d61942c80b6052e6283a">More...</a><br /></td></tr>
-<tr class="separator:a6c8ad4c34713d61942c80b6052e6283a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3a47c7b99cec3b108b5173cf1ae7da4"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#af3a47c7b99cec3b108b5173cf1ae7da4">getOffTime</a> ()</td></tr>
-<tr class="memdesc:af3a47c7b99cec3b108b5173cf1ae7da4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Off Timer time to be sent to the A/C unit.  <a href="classIRDaikin2.html#af3a47c7b99cec3b108b5173cf1ae7da4">More...</a><br /></td></tr>
-<tr class="separator:af3a47c7b99cec3b108b5173cf1ae7da4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a413002b64497a5fce7cdcdd6924e8f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a7a413002b64497a5fce7cdcdd6924e8f">getOffTimerEnabled</a> ()</td></tr>
-<tr class="memdesc:a7a413002b64497a5fce7cdcdd6924e8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the enable status of the Off Timer.  <a href="classIRDaikin2.html#a7a413002b64497a5fce7cdcdd6924e8f">More...</a><br /></td></tr>
-<tr class="separator:a7a413002b64497a5fce7cdcdd6924e8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cbdbc0de31b14f974cd8cd87f3ca54a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a8cbdbc0de31b14f974cd8cd87f3ca54a">disableOffTimer</a> (void)</td></tr>
+<tr class="memdesc:a8cbdbc0de31b14f974cd8cd87f3ca54a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable the Off timer.  <a href="classIRDaikin2.html#a8cbdbc0de31b14f974cd8cd87f3ca54a">More...</a><br /></td></tr>
+<tr class="separator:a8cbdbc0de31b14f974cd8cd87f3ca54a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8556aa0c7343343efda80246aebd44cb"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a8556aa0c7343343efda80246aebd44cb">getOffTime</a> (void) const</td></tr>
+<tr class="memdesc:a8556aa0c7343343efda80246aebd44cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Off Timer time to be sent to the A/C unit.  <a href="classIRDaikin2.html#a8556aa0c7343343efda80246aebd44cb">More...</a><br /></td></tr>
+<tr class="separator:a8556aa0c7343343efda80246aebd44cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6c48355e0a0c80d3cd99ae276df80a5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ab6c48355e0a0c80d3cd99ae276df80a5">getOffTimerEnabled</a> (void) const</td></tr>
+<tr class="memdesc:ab6c48355e0a0c80d3cd99ae276df80a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the enable status of the Off Timer.  <a href="classIRDaikin2.html#ab6c48355e0a0c80d3cd99ae276df80a5">More...</a><br /></td></tr>
+<tr class="separator:ab6c48355e0a0c80d3cd99ae276df80a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b32b1b9a87c9b671af6aeedb709d520"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a8b32b1b9a87c9b671af6aeedb709d520">setCurrentTime</a> (const uint16_t time)</td></tr>
 <tr class="memdesc:a8b32b1b9a87c9b671af6aeedb709d520"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the clock on the A/C unit.  <a href="classIRDaikin2.html#a8b32b1b9a87c9b671af6aeedb709d520">More...</a><br /></td></tr>
 <tr class="separator:a8b32b1b9a87c9b671af6aeedb709d520"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94dc89b80dfdee2afa718314ec522b53"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a94dc89b80dfdee2afa718314ec522b53">getCurrentTime</a> ()</td></tr>
-<tr class="memdesc:a94dc89b80dfdee2afa718314ec522b53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the clock time to be sent to the A/C unit.  <a href="classIRDaikin2.html#a94dc89b80dfdee2afa718314ec522b53">More...</a><br /></td></tr>
-<tr class="separator:a94dc89b80dfdee2afa718314ec522b53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6350e7bc0af04e7a5e49b8d35c5883a"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ac6350e7bc0af04e7a5e49b8d35c5883a">getCurrentTime</a> (void) const</td></tr>
+<tr class="memdesc:ac6350e7bc0af04e7a5e49b8d35c5883a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the clock time to be sent to the A/C unit.  <a href="classIRDaikin2.html#ac6350e7bc0af04e7a5e49b8d35c5883a">More...</a><br /></td></tr>
+<tr class="separator:ac6350e7bc0af04e7a5e49b8d35c5883a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c0588887a45403a0a9f2cf95f847889"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a4c0588887a45403a0a9f2cf95f847889">setBeep</a> (const uint8_t beep)</td></tr>
 <tr class="memdesc:a4c0588887a45403a0a9f2cf95f847889"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Beep mode of the A/C.  <a href="classIRDaikin2.html#a4c0588887a45403a0a9f2cf95f847889">More...</a><br /></td></tr>
 <tr class="separator:a4c0588887a45403a0a9f2cf95f847889"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6cc9737950ac0ab476bb240897902ec"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ab6cc9737950ac0ab476bb240897902ec">getBeep</a> ()</td></tr>
-<tr class="memdesc:ab6cc9737950ac0ab476bb240897902ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Beep status of the A/C.  <a href="classIRDaikin2.html#ab6cc9737950ac0ab476bb240897902ec">More...</a><br /></td></tr>
-<tr class="separator:ab6cc9737950ac0ab476bb240897902ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac952fe406ec76350b80b94c1237d0db9"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ac952fe406ec76350b80b94c1237d0db9">getBeep</a> (void) const</td></tr>
+<tr class="memdesc:ac952fe406ec76350b80b94c1237d0db9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Beep status of the A/C.  <a href="classIRDaikin2.html#ac952fe406ec76350b80b94c1237d0db9">More...</a><br /></td></tr>
+<tr class="separator:ac952fe406ec76350b80b94c1237d0db9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ecadb3335e9b22729a89b4c41456242"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a7ecadb3335e9b22729a89b4c41456242">setLight</a> (const uint8_t light)</td></tr>
 <tr class="memdesc:a7ecadb3335e9b22729a89b4c41456242"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Light (LED) mode of the A/C.  <a href="classIRDaikin2.html#a7ecadb3335e9b22729a89b4c41456242">More...</a><br /></td></tr>
 <tr class="separator:a7ecadb3335e9b22729a89b4c41456242"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada92da390d8b4247a014057c3d6fa296"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ada92da390d8b4247a014057c3d6fa296">getLight</a> ()</td></tr>
-<tr class="memdesc:ada92da390d8b4247a014057c3d6fa296"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Light status of the A/C.  <a href="classIRDaikin2.html#ada92da390d8b4247a014057c3d6fa296">More...</a><br /></td></tr>
-<tr class="separator:ada92da390d8b4247a014057c3d6fa296"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21e09b867710a225d5cf53006f723326"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a21e09b867710a225d5cf53006f723326">setClean</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:a100812aedfaa32830dfb59c7857b4af5"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a100812aedfaa32830dfb59c7857b4af5">getLight</a> (void) const</td></tr>
+<tr class="memdesc:a100812aedfaa32830dfb59c7857b4af5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Light status of the A/C.  <a href="classIRDaikin2.html#a100812aedfaa32830dfb59c7857b4af5">More...</a><br /></td></tr>
+<tr class="separator:a100812aedfaa32830dfb59c7857b4af5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21e09b867710a225d5cf53006f723326"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a21e09b867710a225d5cf53006f723326">setClean</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:a21e09b867710a225d5cf53006f723326"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Auto clean mode of the A/C.  <a href="classIRDaikin2.html#a21e09b867710a225d5cf53006f723326">More...</a><br /></td></tr>
 <tr class="separator:a21e09b867710a225d5cf53006f723326"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7930bbca261f07ef1c129cd6a2c848b4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a7930bbca261f07ef1c129cd6a2c848b4">getClean</a> ()</td></tr>
-<tr class="memdesc:a7930bbca261f07ef1c129cd6a2c848b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Auto Clean mode status of the A/C.  <a href="classIRDaikin2.html#a7930bbca261f07ef1c129cd6a2c848b4">More...</a><br /></td></tr>
-<tr class="separator:a7930bbca261f07ef1c129cd6a2c848b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e0596c7b9f9b43b8d241340ae08e886"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a6e0596c7b9f9b43b8d241340ae08e886">setFreshAir</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:a742d3167334e11c6386906ed7f4ba044"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a742d3167334e11c6386906ed7f4ba044">getClean</a> (void) const</td></tr>
+<tr class="memdesc:a742d3167334e11c6386906ed7f4ba044"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Auto Clean mode status of the A/C.  <a href="classIRDaikin2.html#a742d3167334e11c6386906ed7f4ba044">More...</a><br /></td></tr>
+<tr class="separator:a742d3167334e11c6386906ed7f4ba044"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e0596c7b9f9b43b8d241340ae08e886"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a6e0596c7b9f9b43b8d241340ae08e886">setFreshAir</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:a6e0596c7b9f9b43b8d241340ae08e886"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Fresh Air mode of the A/C.  <a href="classIRDaikin2.html#a6e0596c7b9f9b43b8d241340ae08e886">More...</a><br /></td></tr>
 <tr class="separator:a6e0596c7b9f9b43b8d241340ae08e886"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad50061042e14f665e5ecbd85ac48741"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#aad50061042e14f665e5ecbd85ac48741">getFreshAir</a> ()</td></tr>
-<tr class="memdesc:aad50061042e14f665e5ecbd85ac48741"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Fresh Air mode status of the A/C.  <a href="classIRDaikin2.html#aad50061042e14f665e5ecbd85ac48741">More...</a><br /></td></tr>
-<tr class="separator:aad50061042e14f665e5ecbd85ac48741"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a044471f2298a1942bcc2f859f9459924"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a044471f2298a1942bcc2f859f9459924">setFreshAirHigh</a> (const bool <a class="el" href="classIRDaikin2.html#a009ac70fd8b8695f3d931a42667fdb66">on</a>)</td></tr>
+<tr class="memitem:a5a7f38e358d0968d9af6ffca76248330"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a5a7f38e358d0968d9af6ffca76248330">getFreshAir</a> (void) const</td></tr>
+<tr class="memdesc:a5a7f38e358d0968d9af6ffca76248330"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Fresh Air mode status of the A/C.  <a href="classIRDaikin2.html#a5a7f38e358d0968d9af6ffca76248330">More...</a><br /></td></tr>
+<tr class="separator:a5a7f38e358d0968d9af6ffca76248330"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a044471f2298a1942bcc2f859f9459924"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a044471f2298a1942bcc2f859f9459924">setFreshAirHigh</a> (const bool <a class="el" href="classIRDaikin2.html#aa3bdd3aa29a4db32f04411cbab27e570">on</a>)</td></tr>
 <tr class="memdesc:a044471f2298a1942bcc2f859f9459924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the (High) Fresh Air mode of the A/C.  <a href="classIRDaikin2.html#a044471f2298a1942bcc2f859f9459924">More...</a><br /></td></tr>
 <tr class="separator:a044471f2298a1942bcc2f859f9459924"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72c8d47c2e6664eb0e40efe6933e4ac1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a72c8d47c2e6664eb0e40efe6933e4ac1">getFreshAirHigh</a> ()</td></tr>
-<tr class="memdesc:a72c8d47c2e6664eb0e40efe6933e4ac1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the (High) Fresh Air mode status of the A/C.  <a href="classIRDaikin2.html#a72c8d47c2e6664eb0e40efe6933e4ac1">More...</a><br /></td></tr>
-<tr class="separator:a72c8d47c2e6664eb0e40efe6933e4ac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf2ac0fc5924829a1209bd5e0b608b5f"><td class="memItemLeft" align="right" valign="top">uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#aaf2ac0fc5924829a1209bd5e0b608b5f">getRaw</a> ()</td></tr>
-<tr class="memdesc:aaf2ac0fc5924829a1209bd5e0b608b5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a PTR to the internal state/code for this protocol.  <a href="classIRDaikin2.html#aaf2ac0fc5924829a1209bd5e0b608b5f">More...</a><br /></td></tr>
-<tr class="separator:aaf2ac0fc5924829a1209bd5e0b608b5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e1d1a46a38c722943bc212cdc09ab97"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a0e1d1a46a38c722943bc212cdc09ab97">getFreshAirHigh</a> (void) const</td></tr>
+<tr class="memdesc:a0e1d1a46a38c722943bc212cdc09ab97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the (High) Fresh Air mode status of the A/C.  <a href="classIRDaikin2.html#a0e1d1a46a38c722943bc212cdc09ab97">More...</a><br /></td></tr>
+<tr class="separator:a0e1d1a46a38c722943bc212cdc09ab97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4bcf5f856169761c9b0f1fb6607af21"><td class="memItemLeft" align="right" valign="top">uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#af4bcf5f856169761c9b0f1fb6607af21">getRaw</a> (void)</td></tr>
+<tr class="memdesc:af4bcf5f856169761c9b0f1fb6607af21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a PTR to the internal state/code for this protocol.  <a href="classIRDaikin2.html#af4bcf5f856169761c9b0f1fb6607af21">More...</a><br /></td></tr>
+<tr class="separator:af4bcf5f856169761c9b0f1fb6607af21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a132001e73eb5744a3a174c5517c9bbda"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a132001e73eb5744a3a174c5517c9bbda">setRaw</a> (const uint8_t new_code[])</td></tr>
 <tr class="memdesc:a132001e73eb5744a3a174c5517c9bbda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRDaikin2.html#a132001e73eb5744a3a174c5517c9bbda">More...</a><br /></td></tr>
 <tr class="separator:a132001e73eb5744a3a174c5517c9bbda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a090407aff4ef81714e31ef28ac41d8e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a090407aff4ef81714e31ef28ac41d8e2">toCommon</a> (void)</td></tr>
-<tr class="memdesc:a090407aff4ef81714e31ef28ac41d8e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRDaikin2.html#a090407aff4ef81714e31ef28ac41d8e2">More...</a><br /></td></tr>
-<tr class="separator:a090407aff4ef81714e31ef28ac41d8e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5804ef19f37ee7b8a525bc8db5146c73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a5804ef19f37ee7b8a525bc8db5146c73">toString</a> ()</td></tr>
-<tr class="memdesc:a5804ef19f37ee7b8a525bc8db5146c73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRDaikin2.html#a5804ef19f37ee7b8a525bc8db5146c73">More...</a><br /></td></tr>
-<tr class="separator:a5804ef19f37ee7b8a525bc8db5146c73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d6c439465779b8febe9eb977e4542c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a8d6c439465779b8febe9eb977e4542c0">toCommon</a> (void) const</td></tr>
+<tr class="memdesc:a8d6c439465779b8febe9eb977e4542c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRDaikin2.html#a8d6c439465779b8febe9eb977e4542c0">More...</a><br /></td></tr>
+<tr class="separator:a8d6c439465779b8febe9eb977e4542c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac714e4a88f2b129920a7813d3e1658b7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ac714e4a88f2b129920a7813d3e1658b7">toString</a> (void) const</td></tr>
+<tr class="memdesc:ac714e4a88f2b129920a7813d3e1658b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRDaikin2.html#ac714e4a88f2b129920a7813d3e1658b7">More...</a><br /></td></tr>
+<tr class="separator:ac714e4a88f2b129920a7813d3e1658b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -295,27 +296,26 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:a9b49e90604bf6b1abb93581eecfc6c88"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a9b49e90604bf6b1abb93581eecfc6c88">stateReset</a> ()</td></tr>
-<tr class="memdesc:a9b49e90604bf6b1abb93581eecfc6c88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state to a fixed known good state.  <a href="classIRDaikin2.html#a9b49e90604bf6b1abb93581eecfc6c88">More...</a><br /></td></tr>
-<tr class="separator:a9b49e90604bf6b1abb93581eecfc6c88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb8e4ad1f8c3ada4211541e5a6e23e64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#abb8e4ad1f8c3ada4211541e5a6e23e64">checksum</a> ()</td></tr>
-<tr class="memdesc:abb8e4ad1f8c3ada4211541e5a6e23e64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate and set the checksum values for the internal state.  <a href="classIRDaikin2.html#abb8e4ad1f8c3ada4211541e5a6e23e64">More...</a><br /></td></tr>
-<tr class="separator:abb8e4ad1f8c3ada4211541e5a6e23e64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3587ce954ba94e347d08d73974b50d72"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a3587ce954ba94e347d08d73974b50d72">clearOnTimerFlag</a> ()</td></tr>
-<tr class="memdesc:a3587ce954ba94e347d08d73974b50d72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the On Timer flag.  <a href="classIRDaikin2.html#a3587ce954ba94e347d08d73974b50d72">More...</a><br /></td></tr>
-<tr class="separator:a3587ce954ba94e347d08d73974b50d72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c165ff91a712e61910ef25e9728e066"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a0c165ff91a712e61910ef25e9728e066">clearSleepTimerFlag</a> ()</td></tr>
-<tr class="memdesc:a0c165ff91a712e61910ef25e9728e066"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the sleep timer flag.  <a href="classIRDaikin2.html#a0c165ff91a712e61910ef25e9728e066">More...</a><br /></td></tr>
-<tr class="separator:a0c165ff91a712e61910ef25e9728e066"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93928b703f9b72218f2a607879cb401d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a93928b703f9b72218f2a607879cb401d">stateReset</a> (void)</td></tr>
+<tr class="memdesc:a93928b703f9b72218f2a607879cb401d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state to a fixed known good state.  <a href="classIRDaikin2.html#a93928b703f9b72218f2a607879cb401d">More...</a><br /></td></tr>
+<tr class="separator:a93928b703f9b72218f2a607879cb401d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d418ae9490b2a24d680998209e5c7ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a0d418ae9490b2a24d680998209e5c7ea">checksum</a> (void)</td></tr>
+<tr class="memdesc:a0d418ae9490b2a24d680998209e5c7ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate and set the checksum values for the internal state.  <a href="classIRDaikin2.html#a0d418ae9490b2a24d680998209e5c7ea">More...</a><br /></td></tr>
+<tr class="separator:a0d418ae9490b2a24d680998209e5c7ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e6507bb20167547d175496ffc5ed39d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a1e6507bb20167547d175496ffc5ed39d">clearOnTimerFlag</a> (void)</td></tr>
+<tr class="memdesc:a1e6507bb20167547d175496ffc5ed39d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the On Timer flag.  <a href="classIRDaikin2.html#a1e6507bb20167547d175496ffc5ed39d">More...</a><br /></td></tr>
+<tr class="separator:a1e6507bb20167547d175496ffc5ed39d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e00f01a66257966c7a166d66d01de93"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a2e00f01a66257966c7a166d66d01de93">clearSleepTimerFlag</a> (void)</td></tr>
+<tr class="memdesc:a2e00f01a66257966c7a166d66d01de93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the sleep timer flag.  <a href="classIRDaikin2.html#a2e00f01a66257966c7a166d66d01de93">More...</a><br /></td></tr>
+<tr class="separator:a2e00f01a66257966c7a166d66d01de93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:aa8ba00ae2c09af098146452164c4cb3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#aa8ba00ae2c09af098146452164c4cb3b">_irsend</a></td></tr>
 <tr class="memdesc:aa8ba00ae2c09af098146452164c4cb3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">instance of the IR send class  <a href="classIRDaikin2.html#aa8ba00ae2c09af098146452164c4cb3b">More...</a><br /></td></tr>
 <tr class="separator:aa8ba00ae2c09af098146452164c4cb3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b28396956687a4009cab7c860b9ce4b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a0b28396956687a4009cab7c860b9ce4b">remote_state</a> [<a class="el" href="IRremoteESP8266_8h.html#a349e4d17f83bb3e707ff19c0255c1644">kDaikin2StateLength</a>]</td></tr>
-<tr class="memdesc:a0b28396956687a4009cab7c860b9ce4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state of the IR remote.  <a href="classIRDaikin2.html#a0b28396956687a4009cab7c860b9ce4b">More...</a><br /></td></tr>
-<tr class="separator:a0b28396956687a4009cab7c860b9ce4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a656fd69f0163ba8685e537d122355f13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionDaikin2Protocol.html">Daikin2Protocol</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a656fd69f0163ba8685e537d122355f13">_</a></td></tr>
+<tr class="separator:a656fd69f0163ba8685e537d122355f13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for handling detailed Daikin 312-bit A/C messages. </p>
@@ -374,8 +374,8 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a6a7b5c28feec523ee81e99a9c32da26e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a7b5c28feec523ee81e99a9c32da26e">&#9670;&nbsp;</a></span>begin()</h2>
+<a id="a0fc6c2ca326a1f3b3e4e2b87643d044b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fc6c2ca326a1f3b3e4e2b87643d044b">&#9670;&nbsp;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -383,6 +383,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::begin </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -423,8 +424,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="abb8e4ad1f8c3ada4211541e5a6e23e64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb8e4ad1f8c3ada4211541e5a6e23e64">&#9670;&nbsp;</a></span>checksum()</h2>
+<a id="a0d418ae9490b2a24d680998209e5c7ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d418ae9490b2a24d680998209e5c7ea">&#9670;&nbsp;</a></span>checksum()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -435,6 +436,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::checksum </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -450,8 +452,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a3587ce954ba94e347d08d73974b50d72"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3587ce954ba94e347d08d73974b50d72">&#9670;&nbsp;</a></span>clearOnTimerFlag()</h2>
+<a id="a1e6507bb20167547d175496ffc5ed39d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e6507bb20167547d175496ffc5ed39d">&#9670;&nbsp;</a></span>clearOnTimerFlag()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -462,6 +464,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::clearOnTimerFlag </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -477,8 +480,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a0c165ff91a712e61910ef25e9728e066"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0c165ff91a712e61910ef25e9728e066">&#9670;&nbsp;</a></span>clearSleepTimerFlag()</h2>
+<a id="a2e00f01a66257966c7a166d66d01de93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e00f01a66257966c7a166d66d01de93">&#9670;&nbsp;</a></span>clearSleepTimerFlag()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -489,6 +492,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::clearSleepTimerFlag </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -535,7 +539,7 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
 
 </div>
 </div>
@@ -570,7 +574,7 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
 
 </div>
 </div>
@@ -605,7 +609,7 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
 
 </div>
 </div>
@@ -640,12 +644,12 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
 
 </div>
 </div>
-<a id="a6c8ad4c34713d61942c80b6052e6283a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6c8ad4c34713d61942c80b6052e6283a">&#9670;&nbsp;</a></span>disableOffTimer()</h2>
+<a id="a8cbdbc0de31b14f974cd8cd87f3ca54a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8cbdbc0de31b14f974cd8cd87f3ca54a">&#9670;&nbsp;</a></span>disableOffTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -653,6 +657,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::disableOffTimer </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -663,8 +668,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab0e77969a86af9637cb9aa4b4befd4aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0e77969a86af9637cb9aa4b4befd4aa">&#9670;&nbsp;</a></span>disableOnTimer()</h2>
+<a id="a170a1e9ddb7873dc1392184a85387cc3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a170a1e9ddb7873dc1392184a85387cc3">&#9670;&nbsp;</a></span>disableOnTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -672,6 +677,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::disableOnTimer </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -682,8 +688,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5461cf51967d3fe67489384c82daac47"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5461cf51967d3fe67489384c82daac47">&#9670;&nbsp;</a></span>disableSleepTimer()</h2>
+<a id="a152532ef9d905e26930ae145a9623877"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a152532ef9d905e26930ae145a9623877">&#9670;&nbsp;</a></span>disableSleepTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -691,6 +697,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::disableSleepTimer </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -781,8 +788,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab6cc9737950ac0ab476bb240897902ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab6cc9737950ac0ab476bb240897902ec">&#9670;&nbsp;</a></span>getBeep()</h2>
+<a id="ac952fe406ec76350b80b94c1237d0db9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac952fe406ec76350b80b94c1237d0db9">&#9670;&nbsp;</a></span>getBeep()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -790,8 +797,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDaikin2::getBeep </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -801,8 +809,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a7930bbca261f07ef1c129cd6a2c848b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7930bbca261f07ef1c129cd6a2c848b4">&#9670;&nbsp;</a></span>getClean()</h2>
+<a id="a742d3167334e11c6386906ed7f4ba044"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a742d3167334e11c6386906ed7f4ba044">&#9670;&nbsp;</a></span>getClean()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -810,8 +818,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getClean </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -821,8 +830,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a94dc89b80dfdee2afa718314ec522b53"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94dc89b80dfdee2afa718314ec522b53">&#9670;&nbsp;</a></span>getCurrentTime()</h2>
+<a id="ac6350e7bc0af04e7a5e49b8d35c5883a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6350e7bc0af04e7a5e49b8d35c5883a">&#9670;&nbsp;</a></span>getCurrentTime()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -830,8 +839,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint16_t IRDaikin2::getCurrentTime </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -841,8 +851,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad8098fa67e8808eebfad7611b6fc7881"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8098fa67e8808eebfad7611b6fc7881">&#9670;&nbsp;</a></span>getEcono()</h2>
+<a id="aa0471ba51480c60af811b157c98945b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0471ba51480c60af811b157c98945b8">&#9670;&nbsp;</a></span>getEcono()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -850,8 +860,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getEcono </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -861,8 +872,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a02fbd472d3c79b2391fc11da692c8998"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02fbd472d3c79b2391fc11da692c8998">&#9670;&nbsp;</a></span>getEye()</h2>
+<a id="a7de3421d44db047fdbdfa6bad20a71e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7de3421d44db047fdbdfa6bad20a71e8">&#9670;&nbsp;</a></span>getEye()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -870,8 +881,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getEye </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -881,8 +893,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a0cae45648292bdee8092a30338975ed0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0cae45648292bdee8092a30338975ed0">&#9670;&nbsp;</a></span>getEyeAuto()</h2>
+<a id="ad3de9384586e091b85065a1f2c359295"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3de9384586e091b85065a1f2c359295">&#9670;&nbsp;</a></span>getEyeAuto()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -890,8 +902,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getEyeAuto </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -901,8 +914,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aafe89842b356c288dd38d256f9eb050c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aafe89842b356c288dd38d256f9eb050c">&#9670;&nbsp;</a></span>getFan()</h2>
+<a id="a5ba2b2a1cd20916b3dc0f5f57dd265e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ba2b2a1cd20916b3dc0f5f57dd265e3">&#9670;&nbsp;</a></span>getFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -910,8 +923,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDaikin2::getFan </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -921,8 +935,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aad50061042e14f665e5ecbd85ac48741"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aad50061042e14f665e5ecbd85ac48741">&#9670;&nbsp;</a></span>getFreshAir()</h2>
+<a id="a5a7f38e358d0968d9af6ffca76248330"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a7f38e358d0968d9af6ffca76248330">&#9670;&nbsp;</a></span>getFreshAir()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -930,8 +944,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getFreshAir </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -941,8 +956,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a72c8d47c2e6664eb0e40efe6933e4ac1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a72c8d47c2e6664eb0e40efe6933e4ac1">&#9670;&nbsp;</a></span>getFreshAirHigh()</h2>
+<a id="a0e1d1a46a38c722943bc212cdc09ab97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e1d1a46a38c722943bc212cdc09ab97">&#9670;&nbsp;</a></span>getFreshAirHigh()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -950,8 +965,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getFreshAirHigh </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -961,8 +977,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ada92da390d8b4247a014057c3d6fa296"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada92da390d8b4247a014057c3d6fa296">&#9670;&nbsp;</a></span>getLight()</h2>
+<a id="a100812aedfaa32830dfb59c7857b4af5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a100812aedfaa32830dfb59c7857b4af5">&#9670;&nbsp;</a></span>getLight()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -970,8 +986,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDaikin2::getLight </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -981,8 +998,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a681279a765159550ac1ec84895fff4d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a681279a765159550ac1ec84895fff4d2">&#9670;&nbsp;</a></span>getMode()</h2>
+<a id="ab89325df2b63faccaa82c7708cae894e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab89325df2b63faccaa82c7708cae894e">&#9670;&nbsp;</a></span>getMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -990,8 +1007,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDaikin2::getMode </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1001,8 +1019,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a330b3a8f25bd2d053dab318126b32569"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a330b3a8f25bd2d053dab318126b32569">&#9670;&nbsp;</a></span>getMold()</h2>
+<a id="a6fdc34fe5e43a9df5677bb54315359fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fdc34fe5e43a9df5677bb54315359fb">&#9670;&nbsp;</a></span>getMold()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1010,8 +1028,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getMold </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1021,8 +1040,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="af3a47c7b99cec3b108b5173cf1ae7da4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af3a47c7b99cec3b108b5173cf1ae7da4">&#9670;&nbsp;</a></span>getOffTime()</h2>
+<a id="a8556aa0c7343343efda80246aebd44cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8556aa0c7343343efda80246aebd44cb">&#9670;&nbsp;</a></span>getOffTime()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1030,8 +1049,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint16_t IRDaikin2::getOffTime </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1041,8 +1061,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a7a413002b64497a5fce7cdcdd6924e8f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a413002b64497a5fce7cdcdd6924e8f">&#9670;&nbsp;</a></span>getOffTimerEnabled()</h2>
+<a id="ab6c48355e0a0c80d3cd99ae276df80a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6c48355e0a0c80d3cd99ae276df80a5">&#9670;&nbsp;</a></span>getOffTimerEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1050,8 +1070,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getOffTimerEnabled </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1061,8 +1082,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad62f28698595be7717f0f29a5396853d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad62f28698595be7717f0f29a5396853d">&#9670;&nbsp;</a></span>getOnTime()</h2>
+<a id="a7e98e1f9211e7e8885c503a7f724030f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e98e1f9211e7e8885c503a7f724030f">&#9670;&nbsp;</a></span>getOnTime()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1070,8 +1091,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint16_t IRDaikin2::getOnTime </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1081,8 +1103,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a8921edb7885d728ee5294fa03cb13a87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8921edb7885d728ee5294fa03cb13a87">&#9670;&nbsp;</a></span>getOnTimerEnabled()</h2>
+<a id="a635bd00eff13041b284566936af0d589"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a635bd00eff13041b284566936af0d589">&#9670;&nbsp;</a></span>getOnTimerEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1090,8 +1112,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getOnTimerEnabled </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1101,8 +1124,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a2f25c4ff097f82a91c062aacd5ebabfc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f25c4ff097f82a91c062aacd5ebabfc">&#9670;&nbsp;</a></span>getPower()</h2>
+<a id="a742026c183ee2bf5be1aafd0b6bbec20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a742026c183ee2bf5be1aafd0b6bbec20">&#9670;&nbsp;</a></span>getPower()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1110,8 +1133,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getPower </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1121,8 +1145,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="abad28f7287f4d90d196eb0eb7f93ed43"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abad28f7287f4d90d196eb0eb7f93ed43">&#9670;&nbsp;</a></span>getPowerful()</h2>
+<a id="a91ddd73b1b38fe74233765feecbd1055"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91ddd73b1b38fe74233765feecbd1055">&#9670;&nbsp;</a></span>getPowerful()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1130,8 +1154,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getPowerful </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1141,8 +1166,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a3e2785832ae78bafa655aa61853a47bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3e2785832ae78bafa655aa61853a47bf">&#9670;&nbsp;</a></span>getPurify()</h2>
+<a id="a73b691ef3fa4a555f7557d0cad63ef02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73b691ef3fa4a555f7557d0cad63ef02">&#9670;&nbsp;</a></span>getPurify()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1150,8 +1175,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getPurify </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1161,8 +1187,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a237eb163e3dd1bf8e45ae2324f0b7dcf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a237eb163e3dd1bf8e45ae2324f0b7dcf">&#9670;&nbsp;</a></span>getQuiet()</h2>
+<a id="ae77c687b5e258baf941181ae0a261aae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae77c687b5e258baf941181ae0a261aae">&#9670;&nbsp;</a></span>getQuiet()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1170,8 +1196,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getQuiet </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1181,8 +1208,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aaf2ac0fc5924829a1209bd5e0b608b5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf2ac0fc5924829a1209bd5e0b608b5f">&#9670;&nbsp;</a></span>getRaw()</h2>
+<a id="af4bcf5f856169761c9b0f1fb6607af21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4bcf5f856169761c9b0f1fb6607af21">&#9670;&nbsp;</a></span>getRaw()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1190,6 +1217,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t * IRDaikin2::getRaw </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1201,8 +1229,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a31af96f9a05b3adea2e2ae84d3d242b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31af96f9a05b3adea2e2ae84d3d242b9">&#9670;&nbsp;</a></span>getSleepTime()</h2>
+<a id="a267a7975e882ffc884eccbdc16a0df5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a267a7975e882ffc884eccbdc16a0df5f">&#9670;&nbsp;</a></span>getSleepTime()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1210,8 +1238,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint16_t IRDaikin2::getSleepTime </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1221,8 +1250,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ae4944acaa5c9d381a1875f4d0b16590a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae4944acaa5c9d381a1875f4d0b16590a">&#9670;&nbsp;</a></span>getSleepTimerEnabled()</h2>
+<a id="a763e88c841fc6b32521787d3f1df32e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a763e88c841fc6b32521787d3f1df32e4">&#9670;&nbsp;</a></span>getSleepTimerEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1230,8 +1259,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">bool IRDaikin2::getSleepTimerEnabled </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1241,8 +1271,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a338a70b5d7f71da467a0f32b4a057f13"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a338a70b5d7f71da467a0f32b4a057f13">&#9670;&nbsp;</a></span>getSwingHorizontal()</h2>
+<a id="adec30b33929a1cd219ae6d50eb44fe17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adec30b33929a1cd219ae6d50eb44fe17">&#9670;&nbsp;</a></span>getSwingHorizontal()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1250,8 +1280,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDaikin2::getSwingHorizontal </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1261,8 +1292,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa1d07be72001f06b6a8dfc279ffc40f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa1d07be72001f06b6a8dfc279ffc40f5">&#9670;&nbsp;</a></span>getSwingVertical()</h2>
+<a id="a411a950d43da08070ef1ad744f7188f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a411a950d43da08070ef1ad744f7188f1">&#9670;&nbsp;</a></span>getSwingVertical()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1270,8 +1301,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDaikin2::getSwingVertical </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1281,8 +1313,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa1d39acc14bff5d55e918cb123c66e83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa1d39acc14bff5d55e918cb123c66e83">&#9670;&nbsp;</a></span>getTemp()</h2>
+<a id="ad5c2f9113952e82329d943565445074c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5c2f9113952e82329d943565445074c">&#9670;&nbsp;</a></span>getTemp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1290,8 +1322,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">uint8_t IRDaikin2::getTemp </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1301,8 +1334,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a84a48dfceb4d7137eb485e6897ccceac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a84a48dfceb4d7137eb485e6897ccceac">&#9670;&nbsp;</a></span>off()</h2>
+<a id="ae9eee92387d78dad68fc98efc9371ea0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9eee92387d78dad68fc98efc9371ea0">&#9670;&nbsp;</a></span>off()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1310,6 +1343,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::off </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1320,8 +1354,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a009ac70fd8b8695f3d931a42667fdb66"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a009ac70fd8b8695f3d931a42667fdb66">&#9670;&nbsp;</a></span>on()</h2>
+<a id="aa3bdd3aa29a4db32f04411cbab27e570"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3bdd3aa29a4db32f04411cbab27e570">&#9670;&nbsp;</a></span>on()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1329,6 +1363,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::on </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1886,8 +1921,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a9b49e90604bf6b1abb93581eecfc6c88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b49e90604bf6b1abb93581eecfc6c88">&#9670;&nbsp;</a></span>stateReset()</h2>
+<a id="a93928b703f9b72218f2a607879cb401d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93928b703f9b72218f2a607879cb401d">&#9670;&nbsp;</a></span>stateReset()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1898,6 +1933,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRDaikin2::stateReset </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -1913,8 +1949,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a090407aff4ef81714e31ef28ac41d8e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a090407aff4ef81714e31ef28ac41d8e2">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="a8d6c439465779b8febe9eb977e4542c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d6c439465779b8febe9eb977e4542c0">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1924,13 +1960,13 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant. </p>
-<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native settings. </dd></dl>
+<p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent. </p>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native settings. </dd></dl>
 
 </div>
 </div>
@@ -2004,8 +2040,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5804ef19f37ee7b8a525bc8db5146c73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5804ef19f37ee7b8a525bc8db5146c73">&#9670;&nbsp;</a></span>toString()</h2>
+<a id="ac714e4a88f2b129920a7813d3e1658b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac714e4a88f2b129920a7813d3e1658b7">&#9670;&nbsp;</a></span>toString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2013,8 +2049,9 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a> IRDaikin2::toString </td>
           <td>(</td>
+          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -2071,6 +2108,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a656fd69f0163ba8685e537d122355f13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a656fd69f0163ba8685e537d122355f13">&#9670;&nbsp;</a></span>_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="unionDaikin2Protocol.html">Daikin2Protocol</a> IRDaikin2::_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aa8ba00ae2c09af098146452164c4cb3b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa8ba00ae2c09af098146452164c4cb3b">&#9670;&nbsp;</a></span>_irsend</h2>
 
@@ -2092,30 +2151,6 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>instance of the IR send class </p>
-
-</div>
-</div>
-<a id="a0b28396956687a4009cab7c860b9ce4b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b28396956687a4009cab7c860b9ce4b">&#9670;&nbsp;</a></span>remote_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t IRDaikin2::remote_state[<a class="el" href="IRremoteESP8266_8h.html#a349e4d17f83bb3e707ff19c0255c1644">kDaikin2StateLength</a>]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The state of the IR remote. </p>
 
 </div>
 </div>

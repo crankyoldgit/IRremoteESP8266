@@ -182,19 +182,28 @@ $(function() {
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">#define D_STR_FALSE &quot;Falsch&quot;</span></div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">#define D_STR_REPEAT &quot;Wiederholen&quot;</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment">// IRrecvDumpV2+</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="preprocessor">#define D_STR_TIMESTAMP &quot;Zeitstempel&quot;</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="preprocessor">#define D_STR_LIBRARY &quot;Bibliothek&quot;</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#define D_STR_MESGDESC &quot;Nachr. Beschr.&quot;</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">#define D_STR_IRRECVDUMP_STARTUP \</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="preprocessor">    &quot;IRrecvDump läuft und wartet auf IR Eingabe auf Pin %d&quot;</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">#define D_WARN_BUFFERFULL \</span></div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor">    &quot;WARNUNG: IR Code ist zu gross für Buffer (&gt;= %d). &quot; \</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="preprocessor">    &quot;Dem Resultat sollte nicht vertraut werden bevor das behoben ist. &quot; \</span></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor">    &quot;Bearbeite &amp; vergrössere `kCaptureBufferSize`.&quot;</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">#endif  // LOCALE_DE_DE_H_</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor">#define D_STR_PREVIOUS &quot;Vorher&quot;</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor">#define D_STR_FAHRENHEIT &quot;Fahrenheit&quot;</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="preprocessor">#define D_STR_CELSIUS_FAHRENHEIT D_STR_CELSIUS &quot;/&quot; D_STR_FAHRENHEIT</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="preprocessor">#define D_STR_DISPLAY &quot;Anzeige&quot;</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#define D_STR_INSIDE &quot;Innen&quot;</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">#define D_STR_POWERBUTTON &quot;Netzschalter&quot;</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="preprocessor">#define D_STR_PREVIOUSPOWER &quot;Vorheriger Einschaltzustand&quot;</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">#define D_STR_DISPLAYTEMP &quot;Anzeigetemperatur&quot;</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="comment">// IRrecvDumpV2+</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor">#define D_STR_TIMESTAMP &quot;Zeitstempel&quot;</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="preprocessor">#define D_STR_LIBRARY &quot;Bibliothek&quot;</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">#define D_STR_TOLERANCE &quot;Toleranz&quot;</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">#define D_STR_MESGDESC &quot;Nachr. Beschr.&quot;</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">#define D_STR_IRRECVDUMP_STARTUP \</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">    &quot;IRrecvDump läuft und wartet auf IR Eingabe auf Pin %d&quot;</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="preprocessor">#define D_WARN_BUFFERFULL \</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">    &quot;WARNUNG: IR Code ist zu gross für Buffer (&gt;= %d). &quot; \</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="preprocessor">    &quot;Dem Resultat sollte nicht vertraut werden bevor das behoben ist. &quot; \</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="preprocessor">    &quot;Bearbeite &amp; vergrössere `kCaptureBufferSize`.&quot;</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="preprocessor">#endif  // LOCALE_DE_DE_H_</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

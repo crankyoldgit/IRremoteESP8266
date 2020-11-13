@@ -81,8 +81,9 @@ Collaboration diagram for IRLgAc:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRLgAc__coll__graph.png" border="0" usemap="#IRLgAc_coll__map" alt="Collaboration graph"/></div>
 <map name="IRLgAc_coll__map" id="IRLgAc_coll__map">
-<area shape="rect" title="Class for handling detailed LG A/C messages." alt="" coords="5,95,72,121"/>
+<area shape="rect" title="Class for handling detailed LG A/C messages." alt="" coords="57,95,124,121"/>
 <area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
+<area shape="rect" href="unionLGProtocol.html" title="Native representation of a LG A/C message." alt="" coords="97,5,189,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -94,9 +95,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5959000c9f0b2cf64742d6a2f1c4c9b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a5959000c9f0b2cf64742d6a2f1c4c9b9">stateReset</a> (void)</td></tr>
 <tr class="memdesc:a5959000c9f0b2cf64742d6a2f1c4c9b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internals of the object to a known good state.  <a href="classIRLgAc.html#a5959000c9f0b2cf64742d6a2f1c4c9b9">More...</a><br /></td></tr>
 <tr class="separator:a5959000c9f0b2cf64742d6a2f1c4c9b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5984041eb12603ac1a277c28b355322a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a5984041eb12603ac1a277c28b355322a">isValidLgAc</a> (void)</td></tr>
-<tr class="memdesc:a5984041eb12603ac1a277c28b355322a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the internal state looks like a valud LG A/C message.  <a href="classIRLgAc.html#a5984041eb12603ac1a277c28b355322a">More...</a><br /></td></tr>
-<tr class="separator:a5984041eb12603ac1a277c28b355322a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad35d47f590ee4bd51bfdf9d911bce242"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ad35d47f590ee4bd51bfdf9d911bce242">isValidLgAc</a> (void) const</td></tr>
+<tr class="memdesc:ad35d47f590ee4bd51bfdf9d911bce242"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the internal state looks like a valid LG A/C message.  <a href="classIRLgAc.html#ad35d47f590ee4bd51bfdf9d911bce242">More...</a><br /></td></tr>
+<tr class="separator:ad35d47f590ee4bd51bfdf9d911bce242"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea85c840161b48f2e8d31e7e6e7da532"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#aea85c840161b48f2e8d31e7e6e7da532">send</a> (const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a2d6832b3d214e0adad781c205993e461">kLgDefaultRepeat</a>)</td></tr>
 <tr class="memdesc:aea85c840161b48f2e8d31e7e6e7da532"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the current internal state as an IR message.  <a href="classIRLgAc.html#aea85c840161b48f2e8d31e7e6e7da532">More...</a><br /></td></tr>
 <tr class="separator:aea85c840161b48f2e8d31e7e6e7da532"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,48 +116,45 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a175e6482fd1565d43906c527f911b59e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a175e6482fd1565d43906c527f911b59e">setPower</a> (const bool <a class="el" href="classIRLgAc.html#a171358340c1ba8f90fef0c5454f2aa41">on</a>)</td></tr>
 <tr class="memdesc:a175e6482fd1565d43906c527f911b59e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRLgAc.html#a175e6482fd1565d43906c527f911b59e">More...</a><br /></td></tr>
 <tr class="separator:a175e6482fd1565d43906c527f911b59e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac09b8af7cc2d46881d3a710068acb5bd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ac09b8af7cc2d46881d3a710068acb5bd">getPower</a> (void)</td></tr>
-<tr class="memdesc:ac09b8af7cc2d46881d3a710068acb5bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRLgAc.html#ac09b8af7cc2d46881d3a710068acb5bd">More...</a><br /></td></tr>
-<tr class="separator:ac09b8af7cc2d46881d3a710068acb5bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a592403e1602a3b92f75d0e07756cc86e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a592403e1602a3b92f75d0e07756cc86e">getPower</a> (void) const</td></tr>
+<tr class="memdesc:a592403e1602a3b92f75d0e07756cc86e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRLgAc.html#a592403e1602a3b92f75d0e07756cc86e">More...</a><br /></td></tr>
+<tr class="separator:a592403e1602a3b92f75d0e07756cc86e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9924a8bc9737ec6007d76ec47b34142"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ad9924a8bc9737ec6007d76ec47b34142">setTemp</a> (const uint8_t degrees)</td></tr>
 <tr class="memdesc:ad9924a8bc9737ec6007d76ec47b34142"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRLgAc.html#ad9924a8bc9737ec6007d76ec47b34142">More...</a><br /></td></tr>
 <tr class="separator:ad9924a8bc9737ec6007d76ec47b34142"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a029399c5926bd4f1ff0b26175bc4af79"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a029399c5926bd4f1ff0b26175bc4af79">getTemp</a> (void)</td></tr>
-<tr class="memdesc:a029399c5926bd4f1ff0b26175bc4af79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRLgAc.html#a029399c5926bd4f1ff0b26175bc4af79">More...</a><br /></td></tr>
-<tr class="separator:a029399c5926bd4f1ff0b26175bc4af79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab31fa58db72e02efe836e398d8c4ac85"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ab31fa58db72e02efe836e398d8c4ac85">getTemp</a> (void) const</td></tr>
+<tr class="memdesc:ab31fa58db72e02efe836e398d8c4ac85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRLgAc.html#ab31fa58db72e02efe836e398d8c4ac85">More...</a><br /></td></tr>
+<tr class="separator:ab31fa58db72e02efe836e398d8c4ac85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f1901a21ffb93641d3481417d74bb4e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a0f1901a21ffb93641d3481417d74bb4e">setFan</a> (const uint8_t speed)</td></tr>
 <tr class="memdesc:a0f1901a21ffb93641d3481417d74bb4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRLgAc.html#a0f1901a21ffb93641d3481417d74bb4e">More...</a><br /></td></tr>
 <tr class="separator:a0f1901a21ffb93641d3481417d74bb4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10d666ca13c99696a53dca7f5773d7de"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a10d666ca13c99696a53dca7f5773d7de">getFan</a> (void)</td></tr>
-<tr class="memdesc:a10d666ca13c99696a53dca7f5773d7de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRLgAc.html#a10d666ca13c99696a53dca7f5773d7de">More...</a><br /></td></tr>
-<tr class="separator:a10d666ca13c99696a53dca7f5773d7de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38a3fed9066641cd80208d330c92ef9b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a38a3fed9066641cd80208d330c92ef9b">getFan</a> (void) const</td></tr>
+<tr class="memdesc:a38a3fed9066641cd80208d330c92ef9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRLgAc.html#a38a3fed9066641cd80208d330c92ef9b">More...</a><br /></td></tr>
+<tr class="separator:a38a3fed9066641cd80208d330c92ef9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e1b21d9121c6bf6507f615f470b5890"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a5e1b21d9121c6bf6507f615f470b5890">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a5e1b21d9121c6bf6507f615f470b5890"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRLgAc.html#a5e1b21d9121c6bf6507f615f470b5890">More...</a><br /></td></tr>
 <tr class="separator:a5e1b21d9121c6bf6507f615f470b5890"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19752b31eb74aad0cc9538a2f0af8b8c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a19752b31eb74aad0cc9538a2f0af8b8c">getMode</a> (void)</td></tr>
-<tr class="memdesc:a19752b31eb74aad0cc9538a2f0af8b8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRLgAc.html#a19752b31eb74aad0cc9538a2f0af8b8c">More...</a><br /></td></tr>
-<tr class="separator:a19752b31eb74aad0cc9538a2f0af8b8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a684e35c0c7f4dafbaf6d53230e7ee643"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a684e35c0c7f4dafbaf6d53230e7ee643">getMode</a> (void) const</td></tr>
+<tr class="memdesc:a684e35c0c7f4dafbaf6d53230e7ee643"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRLgAc.html#a684e35c0c7f4dafbaf6d53230e7ee643">More...</a><br /></td></tr>
+<tr class="separator:a684e35c0c7f4dafbaf6d53230e7ee643"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcb529d2f2c9016388264b80e6a99351"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#afcb529d2f2c9016388264b80e6a99351">getRaw</a> (void)</td></tr>
 <tr class="memdesc:afcb529d2f2c9016388264b80e6a99351"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a copy of the internal state/code for this protocol.  <a href="classIRLgAc.html#afcb529d2f2c9016388264b80e6a99351">More...</a><br /></td></tr>
 <tr class="separator:afcb529d2f2c9016388264b80e6a99351"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0da8ea4946826736f526386dc4d115cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a0da8ea4946826736f526386dc4d115cc">setRaw</a> (const uint32_t new_code)</td></tr>
 <tr class="memdesc:a0da8ea4946826736f526386dc4d115cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRLgAc.html#a0da8ea4946826736f526386dc4d115cc">More...</a><br /></td></tr>
 <tr class="separator:a0da8ea4946826736f526386dc4d115cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a114eca216b7c9c7be33d4527f848311e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a114eca216b7c9c7be33d4527f848311e">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
-<tr class="memdesc:a114eca216b7c9c7be33d4527f848311e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRLgAc.html#a114eca216b7c9c7be33d4527f848311e">More...</a><br /></td></tr>
-<tr class="separator:a114eca216b7c9c7be33d4527f848311e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75c52ef31270f25651521ae2be558faa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a75c52ef31270f25651521ae2be558faa">toCommon</a> (void)</td></tr>
-<tr class="memdesc:a75c52ef31270f25651521ae2be558faa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRLgAc.html#a75c52ef31270f25651521ae2be558faa">More...</a><br /></td></tr>
-<tr class="separator:a75c52ef31270f25651521ae2be558faa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4546e2e0f63aac0bb9bd54f4f93c5f6c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a4546e2e0f63aac0bb9bd54f4f93c5f6c">toString</a> (void)</td></tr>
-<tr class="memdesc:a4546e2e0f63aac0bb9bd54f4f93c5f6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRLgAc.html#a4546e2e0f63aac0bb9bd54f4f93c5f6c">More...</a><br /></td></tr>
-<tr class="separator:a4546e2e0f63aac0bb9bd54f4f93c5f6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7c25ce38605a54204f761f8aa7f24e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ab7c25ce38605a54204f761f8aa7f24e1">toCommon</a> (void) const</td></tr>
+<tr class="memdesc:ab7c25ce38605a54204f761f8aa7f24e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRLgAc.html#ab7c25ce38605a54204f761f8aa7f24e1">More...</a><br /></td></tr>
+<tr class="separator:ab7c25ce38605a54204f761f8aa7f24e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a8711f21c894afd2653835be5bcdd9f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a4a8711f21c894afd2653835be5bcdd9f">toString</a> (void) const</td></tr>
+<tr class="memdesc:a4a8711f21c894afd2653835be5bcdd9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRLgAc.html#a4a8711f21c894afd2653835be5bcdd9f">More...</a><br /></td></tr>
+<tr class="separator:a4a8711f21c894afd2653835be5bcdd9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4b8758ecf10bd7e25ed401593692821"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ae4b8758ecf10bd7e25ed401593692821">setModel</a> (const <a class="el" href="IRsend_8h.html#a50c54713e16502d280723334879dc83b">lg_ac_remote_model_t</a> model)</td></tr>
 <tr class="memdesc:ae4b8758ecf10bd7e25ed401593692821"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the model of the A/C to emulate.  <a href="classIRLgAc.html#ae4b8758ecf10bd7e25ed401593692821">More...</a><br /></td></tr>
 <tr class="separator:ae4b8758ecf10bd7e25ed401593692821"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa49cde438a42a5415e127cc95da465ac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRsend_8h.html#a50c54713e16502d280723334879dc83b">lg_ac_remote_model_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#aa49cde438a42a5415e127cc95da465ac">getModel</a> (void)</td></tr>
-<tr class="memdesc:aa49cde438a42a5415e127cc95da465ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the model of the A/C.  <a href="classIRLgAc.html#aa49cde438a42a5415e127cc95da465ac">More...</a><br /></td></tr>
-<tr class="separator:aa49cde438a42a5415e127cc95da465ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15f94c5fc2b4dfabe1ae0e0bad3f1f37"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRsend_8h.html#a50c54713e16502d280723334879dc83b">lg_ac_remote_model_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a15f94c5fc2b4dfabe1ae0e0bad3f1f37">getModel</a> (void) const</td></tr>
+<tr class="memdesc:a15f94c5fc2b4dfabe1ae0e0bad3f1f37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the model of the A/C.  <a href="classIRLgAc.html#a15f94c5fc2b4dfabe1ae0e0bad3f1f37">More...</a><br /></td></tr>
+<tr class="separator:a15f94c5fc2b4dfabe1ae0e0bad3f1f37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -166,11 +164,14 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a51748fa24de24049a2fafb4590e84176"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a51748fa24de24049a2fafb4590e84176">validChecksum</a> (const uint32_t state)</td></tr>
 <tr class="memdesc:a51748fa24de24049a2fafb4590e84176"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the checksum is valid for a given state.  <a href="classIRLgAc.html#a51748fa24de24049a2fafb4590e84176">More...</a><br /></td></tr>
 <tr class="separator:a51748fa24de24049a2fafb4590e84176"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a114eca216b7c9c7be33d4527f848311e"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a114eca216b7c9c7be33d4527f848311e">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
+<tr class="memdesc:a114eca216b7c9c7be33d4527f848311e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRLgAc.html#a114eca216b7c9c7be33d4527f848311e">More...</a><br /></td></tr>
+<tr class="separator:a114eca216b7c9c7be33d4527f848311e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3436968a4445f0210403c353d766b73"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ac3436968a4445f0210403c353d766b73">toCommonMode</a> (const uint8_t mode)</td></tr>
-<tr class="memdesc:ac3436968a4445f0210403c353d766b73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRLgAc.html#ac3436968a4445f0210403c353d766b73">More...</a><br /></td></tr>
+<tr class="memdesc:ac3436968a4445f0210403c353d766b73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRLgAc.html#ac3436968a4445f0210403c353d766b73">More...</a><br /></td></tr>
 <tr class="separator:ac3436968a4445f0210403c353d766b73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af47317ba139a4b1e5961b9a45db974df"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#af47317ba139a4b1e5961b9a45db974df">toCommonFanSpeed</a> (const uint8_t speed)</td></tr>
-<tr class="memdesc:af47317ba139a4b1e5961b9a45db974df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRLgAc.html#af47317ba139a4b1e5961b9a45db974df">More...</a><br /></td></tr>
+<tr class="memdesc:af47317ba139a4b1e5961b9a45db974df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRLgAc.html#af47317ba139a4b1e5961b9a45db974df">More...</a><br /></td></tr>
 <tr class="separator:af47317ba139a4b1e5961b9a45db974df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71ce8d1be4222ecae26fcea3b71a1ba6"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a71ce8d1be4222ecae26fcea3b71a1ba6">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
 <tr class="memdesc:a71ce8d1be4222ecae26fcea3b71a1ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRLgAc.html#a71ce8d1be4222ecae26fcea3b71a1ba6">More...</a><br /></td></tr>
@@ -190,12 +191,12 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a779f321b65db6ad05ab3e578b38cf093"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a779f321b65db6ad05ab3e578b38cf093">_irsend</a></td></tr>
 <tr class="memdesc:a779f321b65db6ad05ab3e578b38cf093"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRLgAc.html#a779f321b65db6ad05ab3e578b38cf093">More...</a><br /></td></tr>
 <tr class="separator:a779f321b65db6ad05ab3e578b38cf093"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a481133671657b13ecce1bd08f710089d"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a481133671657b13ecce1bd08f710089d">remote_state</a></td></tr>
-<tr class="memdesc:a481133671657b13ecce1bd08f710089d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state of the IR remote in IR code form.  <a href="classIRLgAc.html#a481133671657b13ecce1bd08f710089d">More...</a><br /></td></tr>
-<tr class="separator:a481133671657b13ecce1bd08f710089d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d337e8d615c8e526d5620206f7b45cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionLGProtocol.html">LGProtocol</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a2d337e8d615c8e526d5620206f7b45cf">_</a></td></tr>
+<tr class="separator:a2d337e8d615c8e526d5620206f7b45cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1eeb727ee96c26b784a607aabd4577c9"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a1eeb727ee96c26b784a607aabd4577c9">_temp</a></td></tr>
 <tr class="separator:a1eeb727ee96c26b784a607aabd4577c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bd32e865a7358bbf32830d888e2786a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">decode_type_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a9bd32e865a7358bbf32830d888e2786a">_protocol</a></td></tr>
+<tr class="memdesc:a9bd32e865a7358bbf32830d888e2786a"><td class="mdescLeft">&#160;</td><td class="mdescRight">model  <a href="classIRLgAc.html#a9bd32e865a7358bbf32830d888e2786a">More...</a><br /></td></tr>
 <tr class="separator:a9bd32e865a7358bbf32830d888e2786a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -273,7 +274,7 @@ Private Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -433,7 +434,7 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
 
 </div>
 </div>
@@ -442,6 +443,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRLgAc::convertMode </td>
@@ -451,6 +455,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode. </p>
@@ -460,12 +469,12 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
 
 </div>
 </div>
-<a id="a10d666ca13c99696a53dca7f5773d7de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a10d666ca13c99696a53dca7f5773d7de">&#9670;&nbsp;</a></span>getFan()</h2>
+<a id="a38a3fed9066641cd80208d330c92ef9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38a3fed9066641cd80208d330c92ef9b">&#9670;&nbsp;</a></span>getFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -475,7 +484,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -485,8 +494,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a19752b31eb74aad0cc9538a2f0af8b8c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19752b31eb74aad0cc9538a2f0af8b8c">&#9670;&nbsp;</a></span>getMode()</h2>
+<a id="a684e35c0c7f4dafbaf6d53230e7ee643"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a684e35c0c7f4dafbaf6d53230e7ee643">&#9670;&nbsp;</a></span>getMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -496,7 +505,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -506,8 +515,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa49cde438a42a5415e127cc95da465ac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa49cde438a42a5415e127cc95da465ac">&#9670;&nbsp;</a></span>getModel()</h2>
+<a id="a15f94c5fc2b4dfabe1ae0e0bad3f1f37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15f94c5fc2b4dfabe1ae0e0bad3f1f37">&#9670;&nbsp;</a></span>getModel()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -517,7 +526,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -527,8 +536,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac09b8af7cc2d46881d3a710068acb5bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac09b8af7cc2d46881d3a710068acb5bd">&#9670;&nbsp;</a></span>getPower()</h2>
+<a id="a592403e1602a3b92f75d0e07756cc86e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a592403e1602a3b92f75d0e07756cc86e">&#9670;&nbsp;</a></span>getPower()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -538,7 +547,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -569,8 +578,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a029399c5926bd4f1ff0b26175bc4af79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a029399c5926bd4f1ff0b26175bc4af79">&#9670;&nbsp;</a></span>getTemp()</h2>
+<a id="ab31fa58db72e02efe836e398d8c4ac85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab31fa58db72e02efe836e398d8c4ac85">&#9670;&nbsp;</a></span>getTemp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -580,7 +589,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -590,8 +599,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5984041eb12603ac1a277c28b355322a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5984041eb12603ac1a277c28b355322a">&#9670;&nbsp;</a></span>isValidLgAc()</h2>
+<a id="ad35d47f590ee4bd51bfdf9d911bce242"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad35d47f590ee4bd51bfdf9d911bce242">&#9670;&nbsp;</a></span>isValidLgAc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -601,12 +610,12 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Check if the internal state looks like a valud LG A/C message. </p>
+<p>Check if the internal state looks like a valid LG A/C message. </p>
 <dl class="section return"><dt>Returns</dt><dd>true, the internal state is a valid LG A/C mesg. Otherwise, false. </dd></dl>
 
 </div>
@@ -853,8 +862,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a75c52ef31270f25651521ae2be558faa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75c52ef31270f25651521ae2be558faa">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="ab7c25ce38605a54204f761f8aa7f24e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7c25ce38605a54204f761f8aa7f24e1">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -864,13 +873,13 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant. </p>
-<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native settings. </dd></dl>
+<p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent. </p>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native settings. </dd></dl>
 
 </div>
 </div>
@@ -898,14 +907,14 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant. </p>
+<p>Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The native setting to be converted. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native setting. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native setting. </dd></dl>
 
 </div>
 </div>
@@ -933,19 +942,19 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant. </p>
+<p>Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The native setting to be converted. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native setting. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native setting. </dd></dl>
 
 </div>
 </div>
-<a id="a4546e2e0f63aac0bb9bd54f4f93c5f6c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4546e2e0f63aac0bb9bd54f4f93c5f6c">&#9670;&nbsp;</a></span>toString()</h2>
+<a id="a4a8711f21c894afd2653835be5bcdd9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a8711f21c894afd2653835be5bcdd9f">&#9670;&nbsp;</a></span>toString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -955,7 +964,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1001,6 +1010,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a2d337e8d615c8e526d5620206f7b45cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d337e8d615c8e526d5620206f7b45cf">&#9670;&nbsp;</a></span>_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="unionLGProtocol.html">LGProtocol</a> IRLgAc::_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a779f321b65db6ad05ab3e578b38cf093"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a779f321b65db6ad05ab3e578b38cf093">&#9670;&nbsp;</a></span>_irsend</h2>
 
@@ -1045,6 +1076,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>model </p>
+
 </div>
 </div>
 <a id="a1eeb727ee96c26b784a607aabd4577c9"></a>
@@ -1066,30 +1099,6 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a id="a481133671657b13ecce1bd08f710089d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a481133671657b13ecce1bd08f710089d">&#9670;&nbsp;</a></span>remote_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t IRLgAc::remote_state</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The state of the IR remote in IR code form. </p>
 
 </div>
 </div>

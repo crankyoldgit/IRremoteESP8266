@@ -69,6 +69,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Native representation of a Gree A/C message.  
+ <a href="unionGreeProtocol.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="ir__Gree_8h_source.html">ir_Gree.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
@@ -76,69 +79,71 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:ae034ac3966312175d26fe1817108d7a4"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionGreeProtocol.html#ae034ac3966312175d26fe1817108d7a4">remote_state</a> [<a class="el" href="IRremoteESP8266_8h.html#a5558b24542873d8475e1ee0e2439839f">kGreeStateLength</a>]</td></tr>
 <tr class="memdesc:ae034ac3966312175d26fe1817108d7a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state in native IR code form.  <a href="unionGreeProtocol.html#ae034ac3966312175d26fe1817108d7a4">More...</a><br /></td></tr>
 <tr class="separator:ae034ac3966312175d26fe1817108d7a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8539ca60298aa3915b098e1a48152d3"><td class="memItemLeft" >struct {</td></tr>
-<tr class="memitem:a7987f22869889bcad620e34afaee3633"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#aacd25e508a37e0012295a87e712987ce">Mode</a>:3</td></tr>
-<tr class="separator:a7987f22869889bcad620e34afaee3633"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93fda497ee85890ffd8990117f5415ad"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#ab04d1d5bdaf8fb0b7129e210de14a772">Power</a>:1</td></tr>
-<tr class="separator:a93fda497ee85890ffd8990117f5415ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc642ae19bc3492cac51309fbb19dcac"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#af6f917228f457a24e70256d7c132289c">Fan</a>:2</td></tr>
-<tr class="separator:abc642ae19bc3492cac51309fbb19dcac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb72c9963af27884ef65d6e196dd4a35"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a866257731360d655ffa24ba3fbdfa3cc">SwingAuto</a>:1</td></tr>
-<tr class="separator:aeb72c9963af27884ef65d6e196dd4a35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a898c3ae067629e9e959d531811c007"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a1ea579a0c99eb1dc8fd72867519ab258">Sleep</a>:1</td></tr>
-<tr class="separator:a3a898c3ae067629e9e959d531811c007"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49ae46c660823fbac4a099aabfe48413"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a46075a9f5fbd0d3829a84cca3d4a9d4f">Temp</a>:4</td></tr>
-<tr class="separator:a49ae46c660823fbac4a099aabfe48413"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95f6a5d8fef3833b4c038feec816db59"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a3e9fe2455001daec79f687797842239c">TimerHalfHr</a>:1</td></tr>
-<tr class="separator:a95f6a5d8fef3833b4c038feec816db59"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57d6f985151a224dab9af1e576eba730"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a21cc20bf1a214a17c735e5997f236ee9">TimerTensHr</a>:2</td></tr>
-<tr class="separator:a57d6f985151a224dab9af1e576eba730"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f784395574144b0cbeec4bc035cc858"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a603b0bde826287c2ddddb4d17cf9acd0">TimerEnabled</a>:1</td></tr>
-<tr class="separator:a1f784395574144b0cbeec4bc035cc858"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93e60be9112c3beeb30b427376e4965b"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a7cc95f9868755876049dbe2b3ce4c730">TimerHours</a>:4</td></tr>
-<tr class="separator:a93e60be9112c3beeb30b427376e4965b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a696a207566e09ac10ceda5f1211c81d4"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a36add055a70df62e09bca1e031314a4d">Turbo</a>:1</td></tr>
-<tr class="separator:a696a207566e09ac10ceda5f1211c81d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab61f52957a82dfdefdfc3e35393f261e"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a72092768725667d3bce381a6e2900c66">Light</a>:1</td></tr>
-<tr class="separator:ab61f52957a82dfdefdfc3e35393f261e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af483125dcad23fe424ebf32b480f90fd"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a66fdedd8318541269f0ab9ae3b832813">ModelA</a>:1</td></tr>
-<tr class="separator:af483125dcad23fe424ebf32b480f90fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a704b5cc7a5a803dc6ba287dbdbcc6489"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a3fbf66dfc2043710c5e00f8230eddb48">Xfan</a>:1</td></tr>
-<tr class="separator:a704b5cc7a5a803dc6ba287dbdbcc6489"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02bea5d4e105e30fdc2276328f29889b"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a06baff7b648875f337ea4d099f8ba73d">__pad0__</a>:2</td></tr>
-<tr class="separator:a02bea5d4e105e30fdc2276328f29889b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2370f2438dd3c0c40c9cef17b842865"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#ae093878b66b84bbc4f5c5df5e59fd639">TempExtraDegreeF</a>:1</td></tr>
-<tr class="separator:af2370f2438dd3c0c40c9cef17b842865"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3cdaf69d6f0468817be85e8c79a9f86"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a47c79761efe40c00e6bb01b7712b272c">UseFahrenheit</a>:1</td></tr>
-<tr class="separator:aa3cdaf69d6f0468817be85e8c79a9f86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17ba1fa1df5f34dd7f2fe560499a2eff"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#ae973c1c723b7162959374e1fd8ecab61">unknown1</a>:4</td></tr>
-<tr class="separator:a17ba1fa1df5f34dd7f2fe560499a2eff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e13dd78306eacb9cc0b29dcfd40e9da"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a6ee1b2c7459fcd5ed839a7730a2c5931">Swing</a>:4</td></tr>
-<tr class="separator:a8e13dd78306eacb9cc0b29dcfd40e9da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01d105d1c8d6d8e8725f579413af0de2"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a094751746e21e5ae70ff7ace3b84c75d">__pad1__</a>:0</td></tr>
-<tr class="separator:a01d105d1c8d6d8e8725f579413af0de2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1323da03412eac2a21e601635d55d752"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#ad0756a64f9c90c9dd12ca6cd71c78bb2">DisplayTemp</a>:2</td></tr>
-<tr class="separator:a1323da03412eac2a21e601635d55d752"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a926ae11b47ffcf6e77b26d6b5ecff848"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a592364307a4b11064888bda76c403142">IFeel</a>:1</td></tr>
-<tr class="separator:a926ae11b47ffcf6e77b26d6b5ecff848"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e1cf180c6dada8b3c7b4d4d71c0700d"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#aa102f7d68c26f5b8644b13113a5b05f4">unknown2</a>:3</td></tr>
-<tr class="separator:a4e1cf180c6dada8b3c7b4d4d71c0700d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1bbbb775df6432cf95d3f251123ac01"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a6cf8e0a6c54a5d2b6f14074c6f3dcc92">WiFi</a>:1</td></tr>
-<tr class="separator:ad1bbbb775df6432cf95d3f251123ac01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54a040d837e214d7f290e40f09e6454b"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a715441faac2bdd5dc37d6a3efcc99c4f">__pad2__</a>:0</td></tr>
-<tr class="separator:a54a040d837e214d7f290e40f09e6454b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a207238b9d7eb3f1e180c79d57a693ebb"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a7291d729f3b5638cb160afbda37baba1">__pad3__</a>:8</td></tr>
-<tr class="separator:a207238b9d7eb3f1e180c79d57a693ebb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13a98819c0da7d8f905aa7508ab7df08"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a6caf58eb68a83c0686dbd65d7a35cb58">__pad4__</a>:4</td></tr>
-<tr class="separator:a13a98819c0da7d8f905aa7508ab7df08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8cc8f858e7fbee270eac3adaefc8ccfc"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a7502111538873c23d70129b77a26019e">Sum</a>:4</td></tr>
-<tr class="separator:a8cc8f858e7fbee270eac3adaefc8ccfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8539ca60298aa3915b098e1a48152d3"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:aa8539ca60298aa3915b098e1a48152d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37bd356c2b527dc77cc901158b936365"><td class="memItemLeft" >struct {</td></tr>
+<tr class="memitem:a69c1f59751a3504ca52cf001760b12bd"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#aacd25e508a37e0012295a87e712987ce">Mode</a>:3</td></tr>
+<tr class="separator:a69c1f59751a3504ca52cf001760b12bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef7c2950e9231c7e4360cd08ab1a7bf1"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#ab04d1d5bdaf8fb0b7129e210de14a772">Power</a>:1</td></tr>
+<tr class="separator:aef7c2950e9231c7e4360cd08ab1a7bf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72407743007db62e9560d50d1153026c"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#af6f917228f457a24e70256d7c132289c">Fan</a>:2</td></tr>
+<tr class="separator:a72407743007db62e9560d50d1153026c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a188f620ab8846a6a37e9528ffc6b69"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a866257731360d655ffa24ba3fbdfa3cc">SwingAuto</a>:1</td></tr>
+<tr class="separator:a3a188f620ab8846a6a37e9528ffc6b69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68536b0c524241e56773664958e593b2"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a1ea579a0c99eb1dc8fd72867519ab258">Sleep</a>:1</td></tr>
+<tr class="separator:a68536b0c524241e56773664958e593b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34627556041c8ab9f8bc9af77eb0e14d"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a46075a9f5fbd0d3829a84cca3d4a9d4f">Temp</a>:4</td></tr>
+<tr class="separator:a34627556041c8ab9f8bc9af77eb0e14d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2f1c669d8b225e98055ca3544a00c92"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a3e9fe2455001daec79f687797842239c">TimerHalfHr</a>:1</td></tr>
+<tr class="separator:af2f1c669d8b225e98055ca3544a00c92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ef254c17de36fcfb953217017e3c35b"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a21cc20bf1a214a17c735e5997f236ee9">TimerTensHr</a>:2</td></tr>
+<tr class="separator:a1ef254c17de36fcfb953217017e3c35b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79f6623e1f2796809d6d9ee4aec16e4e"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a603b0bde826287c2ddddb4d17cf9acd0">TimerEnabled</a>:1</td></tr>
+<tr class="separator:a79f6623e1f2796809d6d9ee4aec16e4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ec6cb24652bdafc8a2f787286d3f260"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a7cc95f9868755876049dbe2b3ce4c730">TimerHours</a>:4</td></tr>
+<tr class="separator:a9ec6cb24652bdafc8a2f787286d3f260"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28de3a4fe77c662e9fd6cb7e7cf0896f"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a36add055a70df62e09bca1e031314a4d">Turbo</a>:1</td></tr>
+<tr class="separator:a28de3a4fe77c662e9fd6cb7e7cf0896f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abefe12a9e7e36edff9df03d3c15e498c"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a72092768725667d3bce381a6e2900c66">Light</a>:1</td></tr>
+<tr class="separator:abefe12a9e7e36edff9df03d3c15e498c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa8141a47c5f4966538cba1642aef729"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a66fdedd8318541269f0ab9ae3b832813">ModelA</a>:1</td></tr>
+<tr class="separator:aaa8141a47c5f4966538cba1642aef729"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a455269b1093b5b2792d49a4cf109a053"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a3fbf66dfc2043710c5e00f8230eddb48">Xfan</a>:1</td></tr>
+<tr class="separator:a455269b1093b5b2792d49a4cf109a053"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf0833cd9962af53c335bd72b164e9eb"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a06baff7b648875f337ea4d099f8ba73d">__pad0__</a>:2</td></tr>
+<tr class="separator:aaf0833cd9962af53c335bd72b164e9eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a651189150d84002db7bf748d5eec7a89"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#ae093878b66b84bbc4f5c5df5e59fd639">TempExtraDegreeF</a>:1</td></tr>
+<tr class="separator:a651189150d84002db7bf748d5eec7a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf5016704b17c1ef78ce6507e63b8907"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a47c79761efe40c00e6bb01b7712b272c">UseFahrenheit</a>:1</td></tr>
+<tr class="separator:abf5016704b17c1ef78ce6507e63b8907"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a225d5ead9c644e30172bbaa8f34c07b8"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#ae973c1c723b7162959374e1fd8ecab61">unknown1</a>:4</td></tr>
+<tr class="separator:a225d5ead9c644e30172bbaa8f34c07b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af628cb307889853a90f7b148664906df"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a6ee1b2c7459fcd5ed839a7730a2c5931">Swing</a>:4</td></tr>
+<tr class="separator:af628cb307889853a90f7b148664906df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a2e680eebc18da655831b06432ae4f4"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a094751746e21e5ae70ff7ace3b84c75d">__pad1__</a>:0</td></tr>
+<tr class="separator:a6a2e680eebc18da655831b06432ae4f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fee17faa9e8e560efe0c57054da3439"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#ad0756a64f9c90c9dd12ca6cd71c78bb2">DisplayTemp</a>:2</td></tr>
+<tr class="separator:a7fee17faa9e8e560efe0c57054da3439"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b8cb3004e8434fea04702b578c5a5e6"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a592364307a4b11064888bda76c403142">IFeel</a>:1</td></tr>
+<tr class="separator:a3b8cb3004e8434fea04702b578c5a5e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afce2bb246f3743d95ea601003ec82968"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#aa102f7d68c26f5b8644b13113a5b05f4">unknown2</a>:3</td></tr>
+<tr class="separator:afce2bb246f3743d95ea601003ec82968"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a939c97857b1f52711e5774ffd82cfcd4"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a6cf8e0a6c54a5d2b6f14074c6f3dcc92">WiFi</a>:1</td></tr>
+<tr class="separator:a939c97857b1f52711e5774ffd82cfcd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ffc77ebaf896512fdbd5268a315ae3f"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a715441faac2bdd5dc37d6a3efcc99c4f">__pad2__</a>:0</td></tr>
+<tr class="separator:a1ffc77ebaf896512fdbd5268a315ae3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e65461ec0fbf489f0f5ea4d02691843"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a7291d729f3b5638cb160afbda37baba1">__pad3__</a>:8</td></tr>
+<tr class="separator:a4e65461ec0fbf489f0f5ea4d02691843"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af55ec3aa141a564078fbdb306cc2a655"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a6caf58eb68a83c0686dbd65d7a35cb58">__pad4__</a>:4</td></tr>
+<tr class="separator:af55ec3aa141a564078fbdb306cc2a655"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ba5466e2c8ad7e8f1715cc9fa97036e"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionGreeProtocol.html#a7502111538873c23d70129b77a26019e">Sum</a>:4</td></tr>
+<tr class="separator:a3ba5466e2c8ad7e8f1715cc9fa97036e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37bd356c2b527dc77cc901158b936365"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:a37bd356c2b527dc77cc901158b936365"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="aa8539ca60298aa3915b098e1a48152d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8539ca60298aa3915b098e1a48152d3">&#9670;&nbsp;</a></span>@13</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Native representation of a Gree A/C message. </p>
+</div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a37bd356c2b527dc77cc901158b936365"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37bd356c2b527dc77cc901158b936365">&#9670;&nbsp;</a></span>@35</h2>
 
 <div class="memitem">
 <div class="memproto">
