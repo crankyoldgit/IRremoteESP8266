@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['timerms_3816',['TimerMs',['../classTimerMs.html',1,'']]]
+  ['lgprotocol_3687',['LGProtocol',['../unionLGProtocol.html',1,'']]]
 ];
