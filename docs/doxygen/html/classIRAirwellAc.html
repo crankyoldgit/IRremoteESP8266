@@ -82,7 +82,7 @@ Collaboration diagram for IRAirwellAc:</div>
 <map name="IRAirwellAc_coll__map" id="IRAirwellAc_coll__map">
 <area shape="rect" title="Class for handling detailed Airwell A/C messages." alt="" coords="49,95,145,121"/>
 <area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
-<area shape="rect" href="unionAirwellProtocol.html" title=" " alt="" coords="96,5,216,32"/>
+<area shape="rect" href="unionAirwellProtocol.html" title="Native representation of a Airwell A/C message." alt="" coords="96,5,216,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -134,7 +134,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a56e90d8b7e902be15c5db12be872d0fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the raw state of the object.  <a href="classIRAirwellAc.html#a56e90d8b7e902be15c5db12be872d0fb">More...</a><br /></td></tr>
 <tr class="separator:a56e90d8b7e902be15c5db12be872d0fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a279b9cf59acf8462ea99ffcd7d08b919"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a279b9cf59acf8462ea99ffcd7d08b919">toCommon</a> (const <a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> *prev=NULL) const</td></tr>
-<tr class="memdesc:a279b9cf59acf8462ea99ffcd7d08b919"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant.  <a href="classIRAirwellAc.html#a279b9cf59acf8462ea99ffcd7d08b919">More...</a><br /></td></tr>
+<tr class="memdesc:a279b9cf59acf8462ea99ffcd7d08b919"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRAirwellAc.html#a279b9cf59acf8462ea99ffcd7d08b919">More...</a><br /></td></tr>
 <tr class="separator:a279b9cf59acf8462ea99ffcd7d08b919"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbd6772f93e897308db4f606d1f56eac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#acbd6772f93e897308db4f606d1f56eac">toString</a> () const</td></tr>
 <tr class="memdesc:acbd6772f93e897308db4f606d1f56eac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRAirwellAc.html#acbd6772f93e897308db4f606d1f56eac">More...</a><br /></td></tr>
@@ -149,10 +149,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a44091f4d58b8078df1a93170cb9900d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRAirwellAc.html#a44091f4d58b8078df1a93170cb9900d8">More...</a><br /></td></tr>
 <tr class="separator:a44091f4d58b8078df1a93170cb9900d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2c717b7750e43894197ee8b292ba23b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#ad2c717b7750e43894197ee8b292ba23b">toCommonMode</a> (const uint8_t mode)</td></tr>
-<tr class="memdesc:ad2c717b7750e43894197ee8b292ba23b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRAirwellAc.html#ad2c717b7750e43894197ee8b292ba23b">More...</a><br /></td></tr>
+<tr class="memdesc:ad2c717b7750e43894197ee8b292ba23b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRAirwellAc.html#ad2c717b7750e43894197ee8b292ba23b">More...</a><br /></td></tr>
 <tr class="separator:ad2c717b7750e43894197ee8b292ba23b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38a93fc115fbe4deb0a5ee82a913c166"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRAirwellAc.html#a38a93fc115fbe4deb0a5ee82a913c166">toCommonFanSpeed</a> (const uint8_t speed)</td></tr>
-<tr class="memdesc:a38a93fc115fbe4deb0a5ee82a913c166"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant.  <a href="classIRAirwellAc.html#a38a93fc115fbe4deb0a5ee82a913c166">More...</a><br /></td></tr>
+<tr class="memdesc:a38a93fc115fbe4deb0a5ee82a913c166"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRAirwellAc.html#a38a93fc115fbe4deb0a5ee82a913c166">More...</a><br /></td></tr>
 <tr class="separator:a38a93fc115fbe4deb0a5ee82a913c166"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
@@ -299,7 +299,7 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
 
 </div>
 </div>
@@ -334,7 +334,7 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The native equivilant of the enum. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
 
 </div>
 </div>
@@ -630,14 +630,14 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivilant. </p>
+<p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">prev</td><td>Ptr to the previous state if required. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native settings. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native settings. </dd></dl>
 
 </div>
 </div>
@@ -665,14 +665,14 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant. </p>
+<p>Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The native setting to be converted. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native setting. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native setting. </dd></dl>
 
 </div>
 </div>
@@ -700,14 +700,14 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant. </p>
+<p>Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The native setting to be converted. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivilant of the native setting. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native setting. </dd></dl>
 
 </div>
 </div>
