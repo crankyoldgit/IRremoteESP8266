@@ -95,6 +95,8 @@ const PROGMEM char* kCeilingStr = D_STR_CEILING;  ///< "Ceiling"
 const PROGMEM char* kWallStr = D_STR_WALL;  ///< "Wall"
 const PROGMEM char* kRoomStr = D_STR_ROOM;  ///< "Room"
 const PROGMEM char* k6thSenseStr = D_STR_6THSENSE;  ///< "6th Sense"
+const PROGMEM char* kTypeStr = D_STR_TYPE;  ///< "Type"
+const PROGMEM char* kSpecialStr = D_STR_SPECIAL;  ///< "Special"
 
 const PROGMEM char* kAutoStr = D_STR_AUTO;  ///< "Auto"
 const PROGMEM char* kAutomaticStr = D_STR_AUTOMATIC;  ///< "Automatic"
@@ -146,6 +148,7 @@ const PROGMEM char* kSleepTimerStr = D_STR_SLEEP_TIMER;  ///< "Sleep Timer"
 const PROGMEM char* kSwingVModeStr = D_STR_SWINGVMODE;  ///< "Swing(V) Mode"
 const PROGMEM char* kSwingVToggleStr = D_STR_SWINGVTOGGLE;  ///<
 ///< "Swing(V) Toggle"
+const PROGMEM char* kTurboToggleStr = D_STR_TURBOTOGGLE;  ///< "Turbo Toggle"
 
 // Separators
 char kTimeSep = D_CHR_TIME_SEP;  ///< ':'

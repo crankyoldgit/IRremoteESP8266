@@ -297,8 +297,8 @@ void electra(IRElectraAc *ac,
   void midea(IRMideaAC *ac,
              const bool on, const stdAc::opmode_t mode, const bool celsius,
              const float degrees, const stdAc::fanspeed_t fan,
-             const stdAc::swingv_t swingv, const bool econo,
-             const int16_t sleep = -1);
+             const stdAc::swingv_t swingv, const bool turbo, const bool econo,
+             const bool light, const int16_t sleep = -1);
 #endif  // SEND_MIDEA
 #if SEND_MITSUBISHI_AC
   void mitsubishi(IRMitsubishiAC *ac,

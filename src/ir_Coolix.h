@@ -10,7 +10,8 @@
 //   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
 //   Brand: Tokio, Model: AATOEMF17-12CHR1SW split-type RG51|50/BGE Remote
 //   Brand: Airwell, Model: RC08B remote
-//   Brand: Kaysun, Model: RG57A7/BGEF remote
+//   Brand: Kastron, Model: RG57A7/BGEF Inverter remote
+//   Brand: Kaysun, Model: Casual CF A/C
 
 #ifndef IR_COOLIX_H_
 #define IR_COOLIX_H_

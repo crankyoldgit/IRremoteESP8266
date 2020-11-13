@@ -32,7 +32,7 @@ TEST(TestSendMidea, SendDataOnly) {
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 
   irsend.reset();
@@ -54,7 +54,7 @@ TEST(TestSendMidea, SendDataOnly) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 
   irsend.reset();
@@ -76,7 +76,7 @@ TEST(TestSendMidea, SendDataOnly) {
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
       "m560s560m560s560m560s560m560s560m560s560m560s560m560s560m560s560"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 }
 
@@ -104,7 +104,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600"
+      "m560s105600"
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -120,7 +120,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
   irsend.sendMidea(0x55AA55AA55AA, kMideaBits, 2);  // 2 repeats.
   EXPECT_EQ(
@@ -140,7 +140,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600"
+      "m560s105600"
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -156,7 +156,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600"
+      "m560s105600"
       "m4480s4480"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
@@ -172,7 +172,7 @@ TEST(TestSendMidea, SendWithRepeats) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
       "m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560"
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 }
 
@@ -190,7 +190,7 @@ TEST(TestSendMidea, SendUnusualSize) {
       "m560s5600"
       "m4480s4480"
       "m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680m560s1680"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 
   irsend.reset();
@@ -216,7 +216,7 @@ TEST(TestSendMidea, SendUnusualSize) {
       "m560s560m560s1680m560s560m560s1680m560s560m560s1680m560s560m560s560"
       "m560s560m560s560m560s1680m560s1680m560s560m560s560m560s1680m560s560"
       "m560s560m560s560m560s560m560s1680m560s560m560s560m560s560m560s560"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
 
   // Bit sizes must be a multiple of 8.
@@ -446,25 +446,33 @@ TEST(TestMideaACClass, HumanReadableOutput) {
 
   ac.setRaw(0xA1826FFFFF62);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Auto), Celsius: Off, Temp: 25C/77F, Fan: 0 (Auto), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
   ac.off();
   ac.setTemp(25, true);
   ac.setFan(kMideaACFanHigh);
   ac.setMode(kMideaACDry);
   ac.setSleep(true);
   EXPECT_EQ(
-      "Power: Off, Mode: 1 (Dry), Celsius: Off, Temp: 25C/77F, Fan: 3 (High), "
-      "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: Off, Mode: 1 (Dry), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 3 (High), "
+      "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
   ac.setUseCelsius(true);
   EXPECT_EQ(
-      "Power: Off, Mode: 1 (Dry), Celsius: On, Temp: 25C/77F, Fan: 3 (High), "
-      "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: Off, Mode: 1 (Dry), Celsius: On, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 3 (High), "
+      "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
 
   ac.setRaw(0xA19867FFFF7E);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Cool), Celsius: Off, Temp: 21C/69F, Fan: 3 (High), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: On, Mode: 0 (Cool), Celsius: Off, "
+      "Temp: 21C/69F, On Timer: Off, Off Timer: Off, Fan: 3 (High), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
 }
 
 // Tests for decodeMidea().
@@ -671,8 +679,10 @@ TEST(TestDecodeMidea, DecodeRealExample) {
   EXPECT_EQ(kMideaBits, irsend.capture.bits);
   EXPECT_EQ(0xA18263FFFF6E, irsend.capture.value);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Auto), Celsius: Off, Temp: 18C/65F, Fan: 0 (Auto), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off",
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 18C/65F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -721,14 +731,18 @@ TEST(TestMideaACClass, CelsiusRemoteTemp) {
   EXPECT_TRUE(ac.getUseCelsius());
   EXPECT_EQ(on_cool_low_17c, ac.getRaw());
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Cool), Celsius: On, Temp: 17C/62F, Fan: 1 (Low), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: On, Mode: 0 (Cool), Celsius: On, "
+      "Temp: 17C/62F, On Timer: Off, Off Timer: Off, Fan: 1 (Low), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
   ac.setRaw(on_cool_low_17c);
   EXPECT_EQ(17, ac.getTemp(true));
   EXPECT_EQ(62, ac.getTemp(false));
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Cool), Celsius: On, Temp: 17C/62F, Fan: 1 (Low), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: On, Mode: 0 (Cool), Celsius: On, "
+      "Temp: 17C/62F, On Timer: Off, Off Timer: Off, Fan: 1 (Low), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
   ac.setTemp(17, true);
   EXPECT_EQ(17, ac.getTemp(true));
   EXPECT_EQ(62, ac.getTemp(false));
@@ -736,8 +750,10 @@ TEST(TestMideaACClass, CelsiusRemoteTemp) {
 
   ac.setRaw(on_cool_low_30c);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Cool), Celsius: On, Temp: 30C/86F, Fan: 1 (Low), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: On, Mode: 0 (Cool), Celsius: On, "
+      "Temp: 30C/86F, On Timer: Off, Off Timer: Off, Fan: 1 (Low), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
 }
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/819
@@ -748,15 +764,21 @@ TEST(TestMideaACClass, SwingV) {
   ac.setSwingVToggle(true);
   ASSERT_TRUE(ac.getSwingVToggle());
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Auto), Celsius: Off, Temp: 25C/77F, Fan: 0 (Auto), "
-      "Sleep: Off, Swing(V) Toggle: On, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: On, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
   ac.setSwingVToggle(false);
   ASSERT_FALSE(ac.getSwingVToggle());
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Auto), Celsius: Off, Temp: 25C/77F, Fan: 0 (Auto), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
   ac.setRaw(kMideaACToggleSwingV);
-  EXPECT_EQ("Swing(V) Toggle: On, Econo Toggle: Off", ac.toString());
+  EXPECT_EQ("Type: 2 (Special), Swing(V) Toggle: On, Econo Toggle: Off, "
+            "Turbo Toggle: Off, Light Toggle: Off",
+            ac.toString());
 }
 
 // https://github.com/crankyoldgit/IRremoteESP8266/pull/1213
@@ -767,15 +789,69 @@ TEST(TestMideaACClass, Econo) {
   ac.setEconoToggle(true);
   ASSERT_TRUE(ac.getEconoToggle());
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Auto), Celsius: Off, Temp: 25C/77F, Fan: 0 (Auto), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: On", ac.toString());
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: On, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
   ac.setEconoToggle(false);
   ASSERT_FALSE(ac.getEconoToggle());
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Auto), Celsius: Off, Temp: 25C/77F, Fan: 0 (Auto), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off", ac.toString());
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
   ac.setRaw(kMideaACToggleEcono);
-  EXPECT_EQ("Swing(V) Toggle: Off, Econo Toggle: On", ac.toString());
+  EXPECT_EQ("Type: 2 (Special), Swing(V) Toggle: Off, Econo Toggle: On, "
+            "Turbo Toggle: Off, Light Toggle: Off",
+            ac.toString());
+}
+
+TEST(TestMideaACClass, Turbo) {
+  IRMideaAC ac(kGpioUnused);
+  ac.setTurboToggle(false);
+  ASSERT_FALSE(ac.getTurboToggle());
+  ac.setTurboToggle(true);
+  ASSERT_TRUE(ac.getTurboToggle());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: On, Light Toggle: Off", ac.toString());
+  ac.setTurboToggle(false);
+  ASSERT_FALSE(ac.getTurboToggle());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  ac.setRaw(kMideaACToggleTurbo);
+  EXPECT_EQ("Type: 2 (Special), Swing(V) Toggle: Off, Econo Toggle: Off, "
+            "Turbo Toggle: On, Light Toggle: Off",
+            ac.toString());
+}
+
+TEST(TestMideaACClass, Light) {
+  IRMideaAC ac(kGpioUnused);
+  ac.setLightToggle(false);
+  ASSERT_FALSE(ac.getLightToggle());
+  ac.setLightToggle(true);
+  ASSERT_TRUE(ac.getLightToggle());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: On", ac.toString());
+  ac.setLightToggle(false);
+  ASSERT_FALSE(ac.getLightToggle());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  ac.setRaw(kMideaACToggleLight);
+  EXPECT_EQ("Type: 2 (Special), Swing(V) Toggle: Off, Econo Toggle: Off, "
+            "Turbo Toggle: Off, Light Toggle: On",
+            ac.toString());
 }
 
 // Test abusing the protocol for sending 6 arbitrary bytes.
@@ -786,7 +862,7 @@ TEST(TestDecodeMidea, Issue887) {
   irsend.begin();
   irsend.reset();
 
-  uint64_t hwaddr = 0x1234567890AB;  // 48bits doen't conform to Midea checksum
+  uint64_t hwaddr = 0x1234567890AB;  // 48bits doesn't conform to Midea checksum
 
   irsend.sendMidea(hwaddr);
   irsend.makeDecodeResult();
@@ -989,8 +1065,10 @@ TEST(TestDecodeMidea, Issue1318_self_decode) {
   EXPECT_EQ(0, irsend.capture.address);
   EXPECT_EQ(0, irsend.capture.command);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Heat), Celsius: On, Temp: 24C/75F, Fan: 0 (Auto), "
-      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off",
+      "Type: 4 (Follow), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 24C/75F, SensorTemp: 24C/75F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
       "f38000d50"
@@ -1009,6 +1087,222 @@ TEST(TestDecodeMidea, Issue1318_self_decode) {
       "m560s560m560s560m560s560m560s560m560s560m560s1680m560s1680"
       "m560s1680m560s560m560s560m560s1680m560s1680m560s560m560s1680"
       "m560s560m560s560m560s560m560s560m560s1680m560s1680m560s560"
-      "m560s5600",
+      "m560s105600",
       irsend.outputStr());
+}
+
+// https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-722655214
+TEST(TestMideaACClass, SensorTemp) {
+  IRMideaAC ac(kGpioUnused);
+  ASSERT_FALSE(ac.getEnableSensorTemp());  // Off by default.
+  ASSERT_NE(kMideaACTypeFollow, ac.getType());
+  ac.setSensorTemp(21, true);
+  EXPECT_EQ(21, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  EXPECT_EQ(kMideaACTypeFollow, ac.getType());
+  ac.setEnableSensorTemp(true);  // Values shouldn't change when already on.
+  EXPECT_EQ(21, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be abled when set.
+  ac.setEnableSensorTemp(false);  // Old value should be cleared when disabled.
+  EXPECT_NE(21, ac.getSensorTemp(true));
+  EXPECT_FALSE(ac.getEnableSensorTemp());
+  ASSERT_NE(kMideaACTypeFollow, ac.getType());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+
+  // Fahrenheit
+  ac.setSensorTemp(74, false);
+  EXPECT_EQ(74, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be abled when set.
+
+  // Bounds checks
+  // Celsius
+  ac.setSensorTemp(kMideaACMinSensorTempC, true);
+  EXPECT_EQ(kMideaACMinSensorTempC, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMaxSensorTempC, true);
+  EXPECT_EQ(kMideaACMaxSensorTempC, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMaxSensorTempC + 1, true);
+  EXPECT_EQ(kMideaACMaxSensorTempC, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  // Fahrenheit
+  ac.setSensorTemp(kMideaACMinSensorTempF, false);
+  EXPECT_EQ(kMideaACMinSensorTempF, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMinSensorTempF - 1, false);
+  EXPECT_EQ(kMideaACMinSensorTempF, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMaxSensorTempF, false);
+  EXPECT_EQ(kMideaACMaxSensorTempF, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+  ac.setSensorTemp(kMideaACMaxSensorTempF + 1, false);
+  EXPECT_EQ(kMideaACMaxSensorTempF, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());  // Should be enabled when set.
+
+  // Real examples
+  ac.setRaw(0xA482467F015D);  // 0C
+  EXPECT_EQ(0, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());
+  EXPECT_EQ(
+      "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: On, "
+      "Temp: 23C/73F, SensorTemp: 0C/32F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  ac.setRaw(0xA482467F134E);  // 18C
+  EXPECT_EQ(18, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());
+  EXPECT_EQ(
+      "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: On, "
+      "Temp: 23C/73F, SensorTemp: 18C/64F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  ac.setRaw(0xA482467F266B);  // 37C
+  EXPECT_EQ(37, ac.getSensorTemp(true));
+  EXPECT_TRUE(ac.getEnableSensorTemp());
+  EXPECT_EQ(
+      "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: On, "
+      "Temp: 23C/73F, SensorTemp: 37C/98F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  ac.setRaw(0xA482607F2B43);  // 74F
+  EXPECT_EQ(74, ac.getSensorTemp(false));
+  EXPECT_TRUE(ac.getEnableSensorTemp());
+  EXPECT_EQ(
+      "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: Off, "
+      "Temp: 17C/62F, SensorTemp: 23C/74F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+}
+
+TEST(TestMideaACClass, MessageType) {
+  IRMideaAC ac(kGpioUnused);
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  ac.setType(kMideaACTypeFollow);
+  EXPECT_EQ(kMideaACTypeFollow, ac.getType());
+  ac.setType(kMideaACTypeCommand);
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  ac.setType(kMideaACTypeSpecial);
+  EXPECT_EQ(kMideaACTypeSpecial, ac.getType());
+  ac.setType(0);
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  ac.setType(255);
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+}
+
+TEST(TestMideaACClass, ConstructKnownMessage) {
+  IRMideaAC ac(kGpioUnused);
+  const uint64_t followme_25C = 0xA482467F1A47;
+  ac.stateReset();
+  ac.on();
+  ac.setMode(kMideaACAuto);
+  ac.setUseCelsius(true);
+  ac.setTemp(23, true);
+  ac.setSensorTemp(25, true);
+  ac.setFan(kMideaACFanAuto);
+  EXPECT_EQ(
+      "Type: 4 (Follow), Power: On, Mode: 2 (Auto), Celsius: On, "
+      "Temp: 23C/73F, SensorTemp: 25C/77F, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  EXPECT_EQ(followme_25C, ac.getRaw());
+}
+
+TEST(TestMideaACClass, OnTimer) {
+  IRMideaAC ac(kGpioUnused);
+  EXPECT_FALSE(ac.isOnTimerEnabled());
+  // Data from: https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-723171666
+  ac.setRaw(0xA1A34DFF9B34);  // 7 hours.
+  EXPECT_TRUE(ac.isOnTimerEnabled());
+  EXPECT_EQ(7 * 60, ac.getOnTimer());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 30C/86F, On Timer: 07:00, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  ac.setOnTimer(0);  // Disable / Timer off.
+  EXPECT_FALSE(ac.isOnTimerEnabled());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  ac.setOnTimer(3 * 60 + 48);  // 3h48m
+  EXPECT_TRUE(ac.isOnTimerEnabled());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  EXPECT_EQ(3 * 60 + 30, ac.getOnTimer());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 30C/86F, On Timer: 03:30, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  // Limit to max time.
+  ac.setOnTimer(25 * 60);  // 25h
+  EXPECT_TRUE(ac.isOnTimerEnabled());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  EXPECT_EQ(24 * 60, ac.getOnTimer());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 30C/86F, On Timer: 24:00, Off Timer: Off, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+}
+
+
+TEST(TestMideaACClass, OffTimer) {
+  IRMideaAC ac(kGpioUnused);
+  EXPECT_FALSE(ac.isOffTimerEnabled());
+  // Data from: https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-723171666
+  ac.setRaw(0xA1A34D81FF21);  // 0.5 hours.
+  EXPECT_TRUE(ac.isOffTimerEnabled());
+  EXPECT_EQ(30, ac.getOffTimer());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 30C/86F, On Timer: Off, Off Timer: 00:30, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  ac.setOffTimer(0);  // Disable / Timer off.
+  EXPECT_FALSE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  ac.setOffTimer(3 * 60 + 48);  // 3h48m
+  EXPECT_TRUE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  EXPECT_EQ(3 * 60 + 30, ac.getOffTimer());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 30C/86F, On Timer: Off, Off Timer: 03:30, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+  // Limit to max time.
+  ac.setOffTimer(25 * 60);  // 25h
+  EXPECT_TRUE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kMideaACTypeCommand, ac.getType());
+  EXPECT_EQ(24 * 60, ac.getOffTimer());
+  EXPECT_EQ(
+      "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: On, "
+      "Temp: 30C/86F, On Timer: Off, Off Timer: 24:00, Fan: 0 (Auto), "
+      "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off", ac.toString());
+}
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-725406813
+TEST(TestMideaACClass, SendingSwingV) {
+  IRMideaAC ac(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  ac.begin();
+  ac.setSwingVToggle(true);
+  ac.send();  // This should generate two messages back to back.
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+  EXPECT_EQ(MIDEA, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kMideaBits, ac._irsend.capture.bits);
+  EXPECT_EQ(
+    "Type: 1 (Command), Power: On, Mode: 2 (Auto), Celsius: Off, "
+    "Temp: 25C/77F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), "
+    "Sleep: Off, Swing(V) Toggle: Off, Econo Toggle: Off, "
+    "Turbo Toggle: Off, Light Toggle: Off",
+    IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // Decode the second/following message which should be the swing toggle.
+  EXPECT_TRUE(irrecv.decodeMidea(&ac._irsend.capture, 201));
+  EXPECT_EQ(MIDEA, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kMideaBits, ac._irsend.capture.bits);
+  EXPECT_EQ(
+    "Type: 2 (Special), Swing(V) Toggle: On, Econo Toggle: Off, "
+    "Turbo Toggle: Off, Light Toggle: Off",
+    IRAcUtils::resultAcToString(&ac._irsend.capture));
 }

@@ -956,8 +956,10 @@ TEST(TestIRac, Midea) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Mode: 1 (Dry), Celsius: On, Temp: 27C/80F, Fan: 2 (Medium), "
-      "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off";
+      "Type: 1 (Command), Power: On, Mode: 1 (Dry), Celsius: On, "
+      "Temp: 27C/80F, On Timer: Off, Off Timer: Off, Fan: 2 (Medium), "
+      "Sleep: On, Swing(V) Toggle: Off, Econo Toggle: Off, "
+      "Turbo Toggle: Off, Light Toggle: Off";
 
   ac.begin();
   irac.midea(&ac,
@@ -967,7 +969,9 @@ TEST(TestIRac, Midea) {
              27,                          // Degrees
              stdAc::fanspeed_t::kMedium,  // Fan speed
              stdAc::swingv_t::kOff,       // Swing(V)
+             false,                       // Turbo
              false,                       // Econo
+             false,                       // Light
              8 * 60 + 0);                 // Sleep time
 
   ASSERT_EQ(expected, ac.toString());
