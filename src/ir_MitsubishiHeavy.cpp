@@ -35,8 +35,6 @@ using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::checkInvertedBytePairs;
 using irutils::invertBytePairs;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_MITSUBISHIHEAVY
 /// Send a MitsubishiHeavy 88-bit A/C message.
@@ -88,30 +86,30 @@ void IRMitsubishiHeavy152Ac::begin(void) { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRMitsubishiHeavy152Ac::send(const uint16_t repeat) {
-  _irsend.sendMitsubishiHeavy152(this->getRaw(), kMitsubishiHeavy152StateLength,
+  _irsend.sendMitsubishiHeavy152(getRaw(), kMitsubishiHeavy152StateLength,
                                  repeat);
 }
 #endif  // SEND_MITSUBISHIHEAVY
 
 /// Reset the state of the remote to a known good state/sequence.
 void IRMitsubishiHeavy152Ac::stateReset(void) {
-  memcpy(remote_state, kMitsubishiHeavyZmsSig, kMitsubishiHeavySigLength);
+  std::memcpy(_.raw, kMitsubishiHeavyZmsSig, kMitsubishiHeavySigLength);
   for (uint8_t i = kMitsubishiHeavySigLength;
-       i < kMitsubishiHeavy152StateLength - 3; i += 2) remote_state[i] = 0;
-  remote_state[17] = 0x80;
+       i < kMitsubishiHeavy152StateLength - 3; i += 2) _.raw[i] = 0;
+  _.raw[17] = 0x80;
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRMitsubishiHeavy152Ac::getRaw(void) {
   checksum();
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] data A valid code for this protocol.
 void IRMitsubishiHeavy152Ac::setRaw(const uint8_t *data) {
-  memcpy(remote_state, data, kMitsubishiHeavy152StateLength);
+  std::memcpy(_.raw, data, kMitsubishiHeavy152StateLength);
 }
 
 /// Set the requested power state of the A/C to on.
@@ -123,13 +121,13 @@ void IRMitsubishiHeavy152Ac::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setPower(const bool on) {
-  setBit(&remote_state[5], kMitsubishiHeavyPowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy152Ac::getPower(void) {
-  return GETBIT8(remote_state[5], kMitsubishiHeavyPowerOffset);
+bool IRMitsubishiHeavy152Ac::getPower(void) const {
+  return _.Power;
 }
 
 /// Set the temperature.
@@ -138,15 +136,13 @@ void IRMitsubishiHeavy152Ac::setTemp(const uint8_t temp) {
   uint8_t newtemp = temp;
   newtemp = std::min(newtemp, kMitsubishiHeavyMaxTemp);
   newtemp = std::max(newtemp, kMitsubishiHeavyMinTemp);
-  setBits(&remote_state[7], kLowNibble, kNibbleSize,
-          newtemp - kMitsubishiHeavyMinTemp);
+  _.Temp = newtemp - kMitsubishiHeavyMinTemp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRMitsubishiHeavy152Ac::getTemp(void) {
-  return GETBITS8(remote_state[7], kLowNibble, kNibbleSize) +
-      kMitsubishiHeavyMinTemp;
+uint8_t IRMitsubishiHeavy152Ac::getTemp(void) const {
+  return _.Temp + kMitsubishiHeavyMinTemp;
 }
 
 /// Set the speed of the fan.
@@ -162,13 +158,13 @@ void IRMitsubishiHeavy152Ac::setFan(const uint8_t speed) {
     case kMitsubishiHeavy152FanTurbo: break;
     default: newspeed = kMitsubishiHeavy152FanAuto;
   }
-  setBits(&remote_state[9], kLowNibble, kNibbleSize, newspeed);
+  _.Fan = newspeed;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed/mode.
-uint8_t IRMitsubishiHeavy152Ac::getFan(void) {
-  return GETBITS8(remote_state[9], kLowNibble, kNibbleSize);
+uint8_t IRMitsubishiHeavy152Ac::getFan(void) const {
+  return _.Fan;
 }
 
 /// Set the operating mode of the A/C.
@@ -184,133 +180,129 @@ void IRMitsubishiHeavy152Ac::setMode(const uint8_t mode) {
     default:
       newmode = kMitsubishiHeavyAuto;
   }
-  setBits(&remote_state[5], kMitsubishiHeavyModeOffset, kModeBitsSize, newmode);
+  _.Mode = newmode;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRMitsubishiHeavy152Ac::getMode(void) {
-  return GETBITS8(remote_state[5], kMitsubishiHeavyModeOffset, kModeBitsSize);
+uint8_t IRMitsubishiHeavy152Ac::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] pos The position/mode to set the swing to.
 void IRMitsubishiHeavy152Ac::setSwingVertical(const uint8_t pos) {
-  setBits(&remote_state[11], kMitsubishiHeavy152SwingVOffset,
-          kMitsubishiHeavy152SwingVSize,
-          std::min(pos, kMitsubishiHeavy152SwingVOff));
+  _.SwingV = std::min(pos, kMitsubishiHeavy152SwingVOff);
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRMitsubishiHeavy152Ac::getSwingVertical(void) {
-  return GETBITS8(remote_state[11], kMitsubishiHeavy152SwingVOffset,
-                  kMitsubishiHeavy152SwingVSize);
+uint8_t IRMitsubishiHeavy152Ac::getSwingVertical(void) const {
+  return _.SwingV;
 }
 
 /// Set the Horizontal Swing mode of the A/C.
 /// @param[in] pos The position/mode to set the swing to.
 void IRMitsubishiHeavy152Ac::setSwingHorizontal(const uint8_t pos) {
-  setBits(&remote_state[13], kLowNibble, kNibbleSize,
-          std::min(pos, kMitsubishiHeavy152SwingHOff));
+  _.SwingH = std::min(pos, kMitsubishiHeavy152SwingHOff);
 }
 
 /// Get the Horizontal Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRMitsubishiHeavy152Ac::getSwingHorizontal(void) {
-  return GETBITS8(remote_state[13], kLowNibble, kNibbleSize);
+uint8_t IRMitsubishiHeavy152Ac::getSwingHorizontal(void) const {
+  return _.SwingH;
 }
 
 /// Set the Night (Sleep) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setNight(const bool on) {
-  setBit(&remote_state[15], kMitsubishiHeavyNightOffset, on);
+  _.Night = on;
 }
 
 /// Get the Night (Sleep) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy152Ac::getNight(void) {
-  return GETBIT8(remote_state[15], kMitsubishiHeavyNightOffset);
+bool IRMitsubishiHeavy152Ac::getNight(void) const {
+  return _.Night;
 }
 
 /// Set the 3D mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::set3D(const bool on) {
   if (on)
-    remote_state[11] |= kMitsubishiHeavy3DMask;
+    { _.Three = 1; _.D = 1; }
   else
-    remote_state[11] &= ~kMitsubishiHeavy3DMask;
+    { _.Three = 0; _.D = 0; }
 }
 
 /// Get the 3D mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy152Ac::get3D(void) {
-  return (remote_state[11] & kMitsubishiHeavy3DMask) == kMitsubishiHeavy3DMask;
+bool IRMitsubishiHeavy152Ac::get3D(void) const {
+  return _.Three && _.D;
 }
 
 /// Set the Silent (Quiet) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setSilent(const bool on) {
-  setBit(&remote_state[15], kMitsubishiHeavySilentOffset, on);
+  _.Silent = on;
 }
 
 /// Get the Silent (Quiet) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy152Ac::getSilent(void) {
-  return GETBIT8(remote_state[15], kMitsubishiHeavySilentOffset);
+bool IRMitsubishiHeavy152Ac::getSilent(void) const {
+  return _.Silent;
 }
 
 /// Set the Filter mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setFilter(const bool on) {
-  setBit(&remote_state[5], kMitsubishiHeavyFilterOffset, on);
+  _.Filter = on;
 }
 
 /// Get the Filter mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy152Ac::getFilter(void) {
-  return GETBIT8(remote_state[5], kMitsubishiHeavyFilterOffset);
+bool IRMitsubishiHeavy152Ac::getFilter(void) const {
+  return _.Filter;
 }
 
 /// Set the Clean mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setClean(const bool on) {
-  this->setFilter(on);
-  setBit(&remote_state[5], kMitsubishiHeavyCleanOffset, on);
+  _.Filter = on;
+  _.Clean = on;
 }
 
 /// Get the Clean mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy152Ac::getClean(void) {
-  return GETBIT8(remote_state[5], kMitsubishiHeavyCleanOffset) && getFilter();
+bool IRMitsubishiHeavy152Ac::getClean(void) const {
+  return _.Clean && _.Filter;
 }
 
 /// Set the Turbo mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setTurbo(const bool on) {
   if (on)
-    this->setFan(kMitsubishiHeavy152FanTurbo);
-  else if (this->getTurbo()) this->setFan(kMitsubishiHeavy152FanAuto);
+    setFan(kMitsubishiHeavy152FanTurbo);
+  else if (getTurbo()) setFan(kMitsubishiHeavy152FanAuto);
 }
 
 /// Get the Turbo mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy152Ac::getTurbo(void) {
-  return this->getFan() == kMitsubishiHeavy152FanTurbo;
+bool IRMitsubishiHeavy152Ac::getTurbo(void) const {
+  return _.Fan == kMitsubishiHeavy152FanTurbo;
 }
 
 /// Set the Economical mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy152Ac::setEcono(const bool on) {
   if (on)
-    this->setFan(kMitsubishiHeavy152FanEcono);
-  else if (this->getEcono()) this->setFan(kMitsubishiHeavy152FanAuto);
+    setFan(kMitsubishiHeavy152FanEcono);
+  else if (getEcono()) setFan(kMitsubishiHeavy152FanAuto);
 }
 
 /// Get the Economical mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy152Ac::getEcono(void) {
-  return this->getFan() == kMitsubishiHeavy152FanEcono;
+bool IRMitsubishiHeavy152Ac::getEcono(void) const {
+  return _.Fan == kMitsubishiHeavy152FanEcono;
 }
 
 /// Verify the given state has a ZM-S signature.
@@ -326,8 +318,7 @@ bool IRMitsubishiHeavy152Ac::checkZmsSig(const uint8_t *state) {
 /// Note: Technically it has no checksum, but does have inverted byte pairs.
 void IRMitsubishiHeavy152Ac::checksum(void) {
   const uint8_t kOffset = kMitsubishiHeavySigLength - 2;
-  invertBytePairs(remote_state + kOffset,
-                  kMitsubishiHeavy152StateLength - kOffset);
+  invertBytePairs(_.raw + kOffset, kMitsubishiHeavy152StateLength - kOffset);
 }
 
 /// Verify the checksum is valid for a given state.
@@ -460,23 +451,23 @@ stdAc::swingv_t IRMitsubishiHeavy152Ac::toCommonSwingV(const uint8_t pos) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRMitsubishiHeavy152Ac::toCommon(void) {
+stdAc::state_t IRMitsubishiHeavy152Ac::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI_HEAVY_152;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->toCommonSwingV(this->getSwingVertical());
-  result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
-  result.turbo = this->getTurbo();
-  result.econo = this->getEcono();
-  result.clean = this->getClean();
-  result.quiet = this->getSilent();
-  result.filter = this->getFilter();
-  result.sleep = this->getNight() ? 0 : -1;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = toCommonSwingV(_.SwingV);
+  result.swingh = toCommonSwingH(_.SwingH);
+  result.turbo = getTurbo();
+  result.econo = getEcono();
+  result.clean = getClean();
+  result.quiet = _.Silent;
+  result.filter = _.Filter;
+  result.sleep = _.Night ? 0 : -1;
   // Not supported.
   result.light = false;
   result.beep = false;
@@ -486,17 +477,17 @@ stdAc::state_t IRMitsubishiHeavy152Ac::toCommon(void) {
 
 /// Convert the internal state into a human readable string.
 /// @return A string containing the settings in human-readable form.
-String IRMitsubishiHeavy152Ac::toString(void) {
+String IRMitsubishiHeavy152Ac::toString(void) const {
   String result = "";
   result.reserve(180);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kMitsubishiHeavyAuto,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kMitsubishiHeavyAuto,
                             kMitsubishiHeavyCool, kMitsubishiHeavyHeat,
                             kMitsubishiHeavyDry, kMitsubishiHeavyFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), kFanStr);
+  result += addIntToString(_.Fan, kFanStr);
   result += kSpaceLBraceStr;
-  switch (this->getFan()) {
+  switch (_.Fan) {
     case kMitsubishiHeavy152FanAuto:
       result += kAutoStr;
       break;
@@ -522,9 +513,9 @@ String IRMitsubishiHeavy152Ac::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getSwingVertical(), kSwingVStr);
+  result += addIntToString(_.SwingV, kSwingVStr);
   result += kSpaceLBraceStr;
-  switch (this->getSwingVertical()) {
+  switch (_.SwingV) {
     case kMitsubishiHeavy152SwingVAuto:
       result += kAutoStr;
       break;
@@ -550,9 +541,9 @@ String IRMitsubishiHeavy152Ac::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getSwingHorizontal(), kSwingHStr);
+  result += addIntToString(_.SwingH, kSwingHStr);
   result += kSpaceLBraceStr;
-  switch (this->getSwingHorizontal()) {
+  switch (_.SwingH) {
     case kMitsubishiHeavy152SwingHAuto:
       result += kAutoStr;
       break;
@@ -588,11 +579,11 @@ String IRMitsubishiHeavy152Ac::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getSilent(), kSilentStr);
+  result += addBoolToString(_.Silent, kSilentStr);
   result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getEcono(), kEconoStr);
-  result += addBoolToString(getNight(), kNightStr);
-  result += addBoolToString(getFilter(), kFilterStr);
+  result += addBoolToString(_.Night, kNightStr);
+  result += addBoolToString(_.Filter, kFilterStr);
   result += addBoolToString(get3D(), k3DStr);
   result += addBoolToString(getClean(), kCleanStr);
   return result;
@@ -617,29 +608,29 @@ void IRMitsubishiHeavy88Ac::begin(void) { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRMitsubishiHeavy88Ac::send(const uint16_t repeat) {
-  _irsend.sendMitsubishiHeavy88(this->getRaw(), kMitsubishiHeavy88StateLength,
+  _irsend.sendMitsubishiHeavy88(getRaw(), kMitsubishiHeavy88StateLength,
                                 repeat);
 }
 #endif  // SEND_MITSUBISHIHEAVY
 
 /// Reset the state of the remote to a known good state/sequence.
 void IRMitsubishiHeavy88Ac::stateReset(void) {
-  memcpy(remote_state, kMitsubishiHeavyZjsSig, kMitsubishiHeavySigLength);
+  std::memcpy(_.raw, kMitsubishiHeavyZjsSig, kMitsubishiHeavySigLength);
   for (uint8_t i = kMitsubishiHeavySigLength; i < kMitsubishiHeavy88StateLength;
-       i++) remote_state[i] = 0;
+       i++) _.raw[i] = 0;
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRMitsubishiHeavy88Ac::getRaw(void) {
   checksum();
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] data A valid code for this protocol.
 void IRMitsubishiHeavy88Ac::setRaw(const uint8_t *data) {
-  memcpy(remote_state, data, kMitsubishiHeavy88StateLength);
+  std::memcpy(_.raw, data, kMitsubishiHeavy88StateLength);
 }
 
 /// Set the requested power state of the A/C to on.
@@ -651,13 +642,13 @@ void IRMitsubishiHeavy88Ac::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy88Ac::setPower(const bool on) {
-  setBit(&remote_state[9], kMitsubishiHeavyPowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy88Ac::getPower(void) {
-  return GETBIT8(remote_state[9], kMitsubishiHeavyPowerOffset);
+bool IRMitsubishiHeavy88Ac::getPower(void) const {
+  return _.Power;
 }
 
 /// Set the temperature.
@@ -666,15 +657,13 @@ void IRMitsubishiHeavy88Ac::setTemp(const uint8_t temp) {
   uint8_t newtemp = temp;
   newtemp = std::min(newtemp, kMitsubishiHeavyMaxTemp);
   newtemp = std::max(newtemp, kMitsubishiHeavyMinTemp);
-  setBits(&remote_state[9], kHighNibble, kNibbleSize,
-          newtemp - kMitsubishiHeavyMinTemp);
+  _.Temp = newtemp - kMitsubishiHeavyMinTemp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRMitsubishiHeavy88Ac::getTemp(void) {
-  return GETBITS8(remote_state[9], kHighNibble, kNibbleSize) +
-      kMitsubishiHeavyMinTemp;
+uint8_t IRMitsubishiHeavy88Ac::getTemp(void) const {
+  return _.Temp + kMitsubishiHeavyMinTemp;
 }
 
 /// Set the speed of the fan.
@@ -689,15 +678,13 @@ void IRMitsubishiHeavy88Ac::setFan(const uint8_t speed) {
     case kMitsubishiHeavy88FanEcono: break;
     default: newspeed = kMitsubishiHeavy88FanAuto;
   }
-  setBits(&remote_state[7], kMitsubishiHeavy88FanOffset,
-          kMitsubishiHeavy88FanSize, newspeed);
+  _.Fan = newspeed;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed/mode.
-uint8_t IRMitsubishiHeavy88Ac::getFan(void) {
-  return GETBITS8(remote_state[7], kMitsubishiHeavy88FanOffset,
-                  kMitsubishiHeavy88FanSize);
+uint8_t IRMitsubishiHeavy88Ac::getFan(void) const {
+  return _.Fan;
 }
 
 /// Set the operating mode of the A/C.
@@ -713,13 +700,13 @@ void IRMitsubishiHeavy88Ac::setMode(const uint8_t mode) {
     default:
       newmode = kMitsubishiHeavyAuto;
   }
-  setBits(&remote_state[9], kMitsubishiHeavyModeOffset, kModeBitsSize, newmode);
+  _.Mode = newmode;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRMitsubishiHeavy88Ac::getMode(void) {
-  return GETBITS8(remote_state[9], kMitsubishiHeavyModeOffset, kModeBitsSize);
+uint8_t IRMitsubishiHeavy88Ac::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the Vertical Swing mode of the A/C.
@@ -735,21 +722,14 @@ void IRMitsubishiHeavy88Ac::setSwingVertical(const uint8_t pos) {
     case kMitsubishiHeavy88SwingVLowest: newpos = pos; break;
     default: newpos = kMitsubishiHeavy88SwingVOff;
   }
-  setBit(&remote_state[5], kMitsubishiHeavy88SwingVByte5Offset,
-         newpos & 1);
-  setBits(&remote_state[7], kMitsubishiHeavy88SwingVByte7Offset,
-          kMitsubishiHeavy88SwingVByte7Size,
-          newpos >> kMitsubishiHeavy88SwingVByte5Size);
+  _.SwingV5 = newpos;
+  _.SwingV7 = (newpos >> kMitsubishiHeavy88SwingVByte5Size);
 }
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRMitsubishiHeavy88Ac::getSwingVertical(void) {
-  return GETBITS8(remote_state[5], kMitsubishiHeavy88SwingVByte5Offset,
-                  kMitsubishiHeavy88SwingVByte5Size) |
-         (GETBITS8(remote_state[7], kMitsubishiHeavy88SwingVByte7Offset,
-                   kMitsubishiHeavy88SwingVByte7Size) <<
-          kMitsubishiHeavy88SwingVByte5Size);
+uint8_t IRMitsubishiHeavy88Ac::getSwingVertical(void) const {
+  return _.SwingV5 | (_.SwingV7 << kMitsubishiHeavy88SwingVByte5Size);
 }
 
 /// Set the Horizontal Swing mode of the A/C.
@@ -768,76 +748,69 @@ void IRMitsubishiHeavy88Ac::setSwingHorizontal(const uint8_t pos) {
     case kMitsubishiHeavy88SwingH3D: newpos = pos; break;
     default:                         newpos = kMitsubishiHeavy88SwingHOff;
   }
-  setBits(&remote_state[5], kMitsubishiHeavy88SwingHOffset1,
-                  kMitsubishiHeavy88SwingHSize, newpos);
-  setBits(&remote_state[5], kMitsubishiHeavy88SwingHOffset2,
-                  kMitsubishiHeavy88SwingHSize,
-                  newpos >> kMitsubishiHeavy88SwingHSize);
+  _.SwingH1 = newpos;
+  _.SwingH2 = (newpos >> kMitsubishiHeavy88SwingHSize);
 }
 
 /// Get the Horizontal Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRMitsubishiHeavy88Ac::getSwingHorizontal(void) {
-  return GETBITS8(remote_state[5], kMitsubishiHeavy88SwingHOffset1,
-                  kMitsubishiHeavy88SwingHSize) |
-         (GETBITS8(remote_state[5], kMitsubishiHeavy88SwingHOffset2,
-                   kMitsubishiHeavy88SwingHSize) <<
-          kMitsubishiHeavy88SwingHSize);
+uint8_t IRMitsubishiHeavy88Ac::getSwingHorizontal(void) const {
+  return _.SwingH1 | (_.SwingH2 << kMitsubishiHeavy88SwingHSize);
 }
 
 /// Set the Turbo mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy88Ac::setTurbo(const bool on) {
   if (on)
-    this->setFan(kMitsubishiHeavy88FanTurbo);
-  else if (this->getTurbo()) this->setFan(kMitsubishiHeavy88FanAuto);
+    setFan(kMitsubishiHeavy88FanTurbo);
+  else if (getTurbo()) setFan(kMitsubishiHeavy88FanAuto);
 }
 
 /// Get the Turbo mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy88Ac::getTurbo(void) {
-  return this->getFan() == kMitsubishiHeavy88FanTurbo;
+bool IRMitsubishiHeavy88Ac::getTurbo(void) const {
+  return _.Fan == kMitsubishiHeavy88FanTurbo;
 }
 
 /// Set the Economical mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy88Ac::setEcono(const bool on) {
   if (on)
-    this->setFan(kMitsubishiHeavy88FanEcono);
-  else if (this->getEcono()) this->setFan(kMitsubishiHeavy88FanAuto);
+    setFan(kMitsubishiHeavy88FanEcono);
+  else if (getEcono()) setFan(kMitsubishiHeavy88FanAuto);
 }
 
 /// Get the Economical mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy88Ac::getEcono(void) {
-  return this->getFan() == kMitsubishiHeavy88FanEcono;
+bool IRMitsubishiHeavy88Ac::getEcono(void) const {
+  return _.Fan == kMitsubishiHeavy88FanEcono;
 }
 
 /// Set the 3D mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy88Ac::set3D(const bool on) {
   if (on)
-    this->setSwingHorizontal(kMitsubishiHeavy88SwingH3D);
-  else if (this->get3D())
-    this->setSwingHorizontal(kMitsubishiHeavy88SwingHOff);
+    setSwingHorizontal(kMitsubishiHeavy88SwingH3D);
+  else if (get3D())
+    setSwingHorizontal(kMitsubishiHeavy88SwingHOff);
 }
 
 /// Get the 3D mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy88Ac::get3D(void) {
-  return this->getSwingHorizontal() == kMitsubishiHeavy88SwingH3D;
+bool IRMitsubishiHeavy88Ac::get3D(void) const {
+  return getSwingHorizontal() == kMitsubishiHeavy88SwingH3D;
 }
 
 /// Set the Clean mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiHeavy88Ac::setClean(const bool on) {
-  setBit(&remote_state[5], kMitsubishiHeavy88CleanOffset, on);
+  _.Clean = on;
 }
 
 /// Get the Clean mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiHeavy88Ac::getClean(void) {
-  return GETBIT8(remote_state[5], kMitsubishiHeavy88CleanOffset);
+bool IRMitsubishiHeavy88Ac::getClean(void) const {
+  return _.Clean;
 }
 
 /// Verify the given state has a ZJ-S signature.
@@ -853,8 +826,7 @@ bool IRMitsubishiHeavy88Ac::checkZjsSig(const uint8_t *state) {
 /// Note: Technically it has no checksum, but does have inverted byte pairs.
 void IRMitsubishiHeavy88Ac::checksum(void) {
   const uint8_t kOffset = kMitsubishiHeavySigLength - 2;
-  invertBytePairs(remote_state + kOffset,
-                  kMitsubishiHeavy88StateLength - kOffset);
+  invertBytePairs(_.raw + kOffset, kMitsubishiHeavy88StateLength - kOffset);
 }
 
 /// Verify the checksum is valid for a given state.
@@ -965,20 +937,20 @@ stdAc::swingv_t IRMitsubishiHeavy88Ac::toCommonSwingV(const uint8_t pos) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRMitsubishiHeavy88Ac::toCommon(void) {
+stdAc::state_t IRMitsubishiHeavy88Ac::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI_HEAVY_88;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = IRMitsubishiHeavy152Ac::toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = IRMitsubishiHeavy152Ac::toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->toCommonSwingV(this->getSwingVertical());
-  result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
-  result.turbo = this->getTurbo();
-  result.econo = this->getEcono();
-  result.clean = this->getClean();
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = toCommonSwingV(getSwingVertical());
+  result.swingh = toCommonSwingH(getSwingHorizontal());
+  result.turbo = getTurbo();
+  result.econo = getEcono();
+  result.clean = _.Clean;
   // Not supported.
   result.quiet = false;
   result.filter = false;
@@ -991,17 +963,17 @@ stdAc::state_t IRMitsubishiHeavy88Ac::toCommon(void) {
 
 /// Convert the internal state into a human readable string.
 /// @return A string containing the settings in human-readable form.
-String IRMitsubishiHeavy88Ac::toString(void) {
+String IRMitsubishiHeavy88Ac::toString(void) const {
   String result = "";
   result.reserve(140);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kMitsubishiHeavyAuto,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kMitsubishiHeavyAuto,
                             kMitsubishiHeavyCool, kMitsubishiHeavyHeat,
                             kMitsubishiHeavyDry, kMitsubishiHeavyFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), kFanStr);
+  result += addIntToString(_.Fan, kFanStr);
   result += kSpaceLBraceStr;
-  switch (this->getFan()) {
+  switch (_.Fan) {
     case kMitsubishiHeavy88FanAuto:
       result += kAutoStr;
       break;
@@ -1026,7 +998,7 @@ String IRMitsubishiHeavy88Ac::toString(void) {
   result += ')';
   result += addIntToString(getSwingVertical(), kSwingVStr);
   result += kSpaceLBraceStr;
-  switch (this->getSwingVertical()) {
+  switch (getSwingVertical()) {
     case kMitsubishiHeavy88SwingVAuto:
       result += kAutoStr;
       break;
@@ -1054,7 +1026,7 @@ String IRMitsubishiHeavy88Ac::toString(void) {
   result += ')';
   result += addIntToString(getSwingHorizontal(), kSwingHStr);
   result += kSpaceLBraceStr;
-  switch (this->getSwingHorizontal()) {
+  switch (getSwingHorizontal()) {
     case kMitsubishiHeavy88SwingHAuto:
       result += kAutoStr;
       break;
@@ -1096,7 +1068,7 @@ String IRMitsubishiHeavy88Ac::toString(void) {
   result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getEcono(), kEconoStr);
   result += addBoolToString(get3D(), k3DStr);
-  result += addBoolToString(getClean(), kCleanStr);
+  result += addBoolToString(_.Clean, kCleanStr);
   return result;
 }
 
