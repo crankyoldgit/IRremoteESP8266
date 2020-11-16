@@ -10,7 +10,7 @@
 
 // Test sending typical data only.
 TEST(TestSendCoolix, SendDataOnly) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -82,7 +82,7 @@ TEST(TestSendCoolix, SendDataOnly) {
 
 // Test sending with different repeats.
 TEST(TestSendCoolix, SendWithRepeats) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -138,7 +138,7 @@ TEST(TestSendCoolix, SendWithRepeats) {
 
 // Test sending an atypical data size.
 TEST(TestSendCoolix, SendUnusualSize) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -207,8 +207,8 @@ TEST(TestSendCoolix, SendUnusualSize) {
 
 // Decode normal Coolix messages.
 TEST(TestDecodeCoolix, NormalDecodeWithStrict) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Normal Coolix 24-bit message.
@@ -253,8 +253,8 @@ TEST(TestDecodeCoolix, NormalDecodeWithStrict) {
 
 // Decode normal repeated Coolix messages.
 TEST(TestDecodeCoolix, NormalDecodeWithRepeatAndStrict) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Normal Coolix 16-bit message with 2 repeats.
@@ -285,8 +285,8 @@ TEST(TestDecodeCoolix, NormalDecodeWithRepeatAndStrict) {
 
 // Decode unsupported Coolix messages.
 TEST(TestDecodeCoolix, DecodeWithNonStrictSizes) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -326,8 +326,8 @@ TEST(TestDecodeCoolix, DecodeWithNonStrictSizes) {
 
 // Decode (non-standard) 64-bit messages.
 TEST(TestDecodeCoolix, Decode64BitMessages) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -343,8 +343,8 @@ TEST(TestDecodeCoolix, Decode64BitMessages) {
 
 // Fail to decode a non-Coolix example via GlobalCache
 TEST(TestDecodeCoolix, FailToDecodeNonCoolixExample) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -538,9 +538,9 @@ TEST(TestCoolixACClass, Issue579FanAuto0) {
       ircoolix.toString());
 }
 
-TEST(TestCoolixACClass, RealCaptureExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+TEST(TestDecodeCoolix, RealCaptureExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
 
   // From Issue #579
   uint16_t powerOffRawData[199] = {
@@ -580,7 +580,7 @@ TEST(TestCoolixACClass, RealCaptureExample) {
 // Tests to debug/fix:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/624
 TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
-  IRCoolixAC ac(0);
+  IRCoolixAC ac(kGpioUnused);
   ac.begin();
   ac.setPower(true);
   // Default
@@ -627,7 +627,7 @@ TEST(TestCoolixACClass, Issue624HandleSpecialStatesBetter) {
 }
 
 TEST(TestCoolixACClass, toCommon) {
-  IRCoolixAC ac(0);
+  IRCoolixAC ac(kGpioUnused);
   ac.begin();
   ac.setPower(true);
   ac.setMode(kCoolixCool);
@@ -657,8 +657,8 @@ TEST(TestCoolixACClass, toCommon) {
 }
 
 TEST(TestCoolixACClass, Issue722) {
-  IRrecv irrecv(0);
-  IRCoolixAC ac(0);
+  IRrecv irrecv(kGpioUnused);
+  IRCoolixAC ac(kGpioUnused);
 
   // Auto 17C ON pressed
   uint32_t on_auto_17c_fan_auto0 = 0xB21F08;
@@ -758,8 +758,8 @@ TEST(TestCoolixACClass, Issue722) {
 }
 
 TEST(TestCoolixACClass, Issue985) {
-  IRrecv irrecv(0);
-  IRCoolixAC ac(0);
+  IRrecv irrecv(kGpioUnused);
+  IRCoolixAC ac(kGpioUnused);
 
   // Test that if we ONLY turn the power off, it only sends a "power off" mesg.
   // i.e. Code from: https://github.com/crankyoldgit/IRremoteESP8266/issues/985#issue-516210106
@@ -853,4 +853,32 @@ TEST(TestCoolixACClass, PowerStateWithSetRaw) {
   ac.setRaw(kCoolixOff);
   ASSERT_FALSE(ac.getPower());
   EXPECT_FALSE(ac.toCommon().power);
+}
+
+TEST(TestDecodeCoolix, Issue1318_DirectMessage) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+
+  // From https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-727611979
+  const uint16_t direct[99] = {
+      4386, 4366, 546, 1622, 520, 522, 548, 1622, 496, 1646, 520, 524, 548, 522,
+      548, 1622, 522, 522, 548, 520, 550, 1620, 520, 522, 548, 522, 546, 1622,
+      496, 1646, 522, 520, 526, 1646, 520, 522, 548, 522, 524, 546, 550, 520,
+      550, 1620, 498, 1644, 520, 1622, 522, 1622, 520, 1620, 522, 1620, 524,
+      1618, 524, 1618, 524, 520, 550, 520, 550, 522, 550, 518, 552, 1618, 524,
+      1618, 524, 1618, 524, 520, 550, 520, 550, 520, 550, 520, 550, 520, 552,
+      516, 552, 518, 550, 522, 550, 1618, 526, 1616, 524, 1618, 524, 1618, 524,
+      1618, 550};  // UNKNOWN B0473CC8
+
+  irsend.begin();
+  irsend.reset();
+
+  irsend.sendRaw(direct, 99, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(COOLIX, irsend.capture.decode_type);
+  EXPECT_EQ(kCoolixBits, irsend.capture.bits);
+  EXPECT_EQ(0xB20FE0, irsend.capture.value);
+  EXPECT_EQ(0x0, irsend.capture.address);
+  EXPECT_EQ(0x0, irsend.capture.command);
 }

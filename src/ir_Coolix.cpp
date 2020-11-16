@@ -79,7 +79,7 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
   }
   space(kDefaultMessageGap);
 }
-#endif
+#endif  // SEND_COOLIX
 
 /// Class constructor.
 /// @param[in] pin GPIO to be used when sending.
@@ -651,7 +651,7 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   // The protocol sends the data normal + inverted, alternating on
   // each byte. Hence twice the number of expected data bits.
-  if (results->rawlen <= 2 * 2 * nbits + kHeader + kFooter - 1 + offset)
+  if (results->rawlen < 2 * 2 * nbits + kHeader + kFooter - 1 + offset)
     return false;  // Can't possibly be a valid COOLIX message.
   if (strict && nbits != kCoolixBits)
     return false;      // Not strictly a COOLIX message.
@@ -716,4 +716,4 @@ bool IRrecv::decodeCOOLIX(decode_results *results, uint16_t offset,
   results->command = 0;
   return true;
 }
-#endif
+#endif  // DECODE_COOLIX
