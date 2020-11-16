@@ -878,7 +878,10 @@ TEST(TestDecodeCoolix, Issue1318_DirectMessage) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(COOLIX, irsend.capture.decode_type);
   EXPECT_EQ(kCoolixBits, irsend.capture.bits);
-  EXPECT_EQ(0xB20FE0, irsend.capture.value);
+  EXPECT_EQ(kCoolixSwingV, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
   EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(
+      "Power: On, Swing(V): Step",
+      IRAcUtils::resultAcToString(&irsend.capture));
 }

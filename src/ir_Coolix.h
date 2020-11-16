@@ -108,7 +108,7 @@ class IRCoolixAC {
  public:
   explicit IRCoolixAC(const uint16_t pin, const bool inverted = false,
                       const bool use_modulation = true);
-  void stateReset();
+  void stateReset(void);
 #if SEND_COOLIX
   void send(const uint16_t repeat = kCoolixDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
@@ -117,39 +117,41 @@ class IRCoolixAC {
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_COOLIX
-  void begin();
-  void on();
-  void off();
-  void setPower(const bool state);
-  bool getPower();
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void);
   void setTemp(const uint8_t temp);
-  uint8_t getTemp();
+  uint8_t getTemp(void);
   void setSensorTemp(const uint8_t desired);
-  uint8_t getSensorTemp();
-  void clearSensorTemp();
+  uint8_t getSensorTemp(void);
+  void clearSensorTemp(void);
   void setFan(const uint8_t speed, const bool modecheck = true);
-  uint8_t getFan();
+  uint8_t getFan(void);
   void setMode(const uint8_t mode);
-  uint8_t getMode();
-  void setSwing();
-  bool getSwing();
-  void setSleep();
-  bool getSleep();
-  void setTurbo();
-  bool getTurbo();
-  void setLed();
-  bool getLed();
-  void setClean();
-  bool getClean();
-  bool getZoneFollow();
-  uint32_t getRaw();
+  uint8_t getMode(void);
+  void setSwing(void);
+  bool getSwing(void);
+  void setSwingVStep(void);
+  bool getSwingVStep(void);
+  void setSleep(void);
+  bool getSleep(void);
+  void setTurbo(void);
+  bool getTurbo(void);
+  void setLed(void);
+  bool getLed(void);
+  void setClean(void);
+  bool getClean(void);
+  bool getZoneFollow(void);
+  uint32_t getRaw(void);
   void setRaw(const uint32_t new_code);
   uint8_t convertMode(const stdAc::opmode_t mode);
   uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
-  String toString();
+  String toString(void);
 #ifndef UNIT_TEST
 
  private:
@@ -173,7 +175,7 @@ class IRCoolixAC {
   uint32_t remote_state;  ///< The state of the IR remote in IR code form.
   uint32_t saved_state;   ///< Copy of the state if we required a special mode.
   void setTempRaw(const uint8_t code);
-  uint8_t getTempRaw();
+  uint8_t getTempRaw(void);
   void setSensorTempRaw(const uint8_t code);
   void setZoneFollow(const bool on);
   bool isSpecialState(void);

@@ -90,7 +90,7 @@ IRCoolixAC::IRCoolixAC(const uint16_t pin, const bool inverted,
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the internal state to a fixed known good state.
-void IRCoolixAC::stateReset() {
+void IRCoolixAC::stateReset(void) {
   setRaw(kCoolixDefaultState);
   clearSensorTemp();
   powerFlag = false;
@@ -104,7 +104,7 @@ void IRCoolixAC::stateReset() {
 }
 
 /// Set up hardware to be able to send a message.
-void IRCoolixAC::begin() { _irsend.begin(); }
+void IRCoolixAC::begin(void) { _irsend.begin(); }
 
 #if SEND_COOLIX
 /// Send the current internal state as an IR message.
@@ -119,7 +119,7 @@ void IRCoolixAC::send(const uint16_t repeat) {
 
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
-uint32_t IRCoolixAC::getRaw() { return remote_state; }
+uint32_t IRCoolixAC::getRaw(void) { return remote_state; }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
@@ -145,6 +145,7 @@ bool IRCoolixAC::isSpecialState(void) {
     case kCoolixLed:
     case kCoolixOff:
     case kCoolixSwing:
+    case kCoolixSwingV:
     case kCoolixSleep:
     case kCoolixTurbo: return true;
     default: return false;
@@ -209,7 +210,7 @@ void IRCoolixAC::setTempRaw(const uint8_t code) {
 
 /// Get the raw (native) temperature value.
 /// @return The native temperature value.
-uint8_t IRCoolixAC::getTempRaw() {
+uint8_t IRCoolixAC::getTempRaw(void) {
   return GETBITS32(remote_state, kCoolixTempOffset, kCoolixTempSize);
 }
 
@@ -224,7 +225,7 @@ void IRCoolixAC::setTemp(const uint8_t desired) {
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRCoolixAC::getTemp() {
+uint8_t IRCoolixAC::getTemp(void) {
   const uint8_t code = getTempRaw();
   for (uint8_t i = 0; i < kCoolixTempRange; i++)
     if (kCoolixTempMap[i] == code) return kCoolixTempMin + i;
@@ -250,14 +251,14 @@ void IRCoolixAC::setSensorTemp(const uint8_t desired) {
 
 /// Get the sensor temperature setting.
 /// @return The current setting for sensor temp. in degrees celsius.
-uint8_t IRCoolixAC::getSensorTemp() {
+uint8_t IRCoolixAC::getSensorTemp(void) {
   return GETBITS32(remote_state, kCoolixSensorTempOffset,
                    kCoolixSensorTempSize) + kCoolixSensorTempMin;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getPower() {
+bool IRCoolixAC::getPower(void) {
   // There is only an off state. Everything else is "on".
   return powerFlag;
 }
@@ -277,29 +278,39 @@ void IRCoolixAC::setPower(const bool on) {
 }
 
 /// Change the power setting to On.
-void IRCoolixAC::on(void) { this->setPower(true); }
+void IRCoolixAC::on(void) { setPower(true); }
 
 /// Change the power setting to Off.
-void IRCoolixAC::off(void) { this->setPower(false); }
+void IRCoolixAC::off(void) { setPower(false); }
 
 /// Get the Swing setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getSwing() { return swingFlag; }
+bool IRCoolixAC::getSwing(void) { return swingFlag; }
 
 /// Toggle the Swing mode of the A/C.
-void IRCoolixAC::setSwing() {
+void IRCoolixAC::setSwing(void) {
   // Assumes that repeated sending "swing" toggles the action on the device.
   updateSavedState();
   remote_state = kCoolixSwing;
   swingFlag = !swingFlag;
 }
 
+/// Get the Vertical Swing Step setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRCoolixAC::getSwingVStep(void) { return remote_state == kCoolixSwingV; }
+
+/// Set the Vertical Swing Step setting of the A/C.
+void IRCoolixAC::setSwingVStep(void) {
+  updateSavedState();
+  remote_state = kCoolixSwingV;
+}
+
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getSleep() { return sleepFlag; }
+bool IRCoolixAC::getSleep(void) { return sleepFlag; }
 
 /// Toggle the Sleep mode of the A/C.
-void IRCoolixAC::setSleep() {
+void IRCoolixAC::setSleep(void) {
   updateSavedState();
   remote_state = kCoolixSleep;
   sleepFlag = !sleepFlag;
@@ -307,10 +318,10 @@ void IRCoolixAC::setSleep() {
 
 /// Get the Turbo setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getTurbo() { return turboFlag; }
+bool IRCoolixAC::getTurbo(void) { return turboFlag; }
 
 /// Toggle the Turbo mode of the A/C.
-void IRCoolixAC::setTurbo() {
+void IRCoolixAC::setTurbo(void) {
   // Assumes that repeated sending "turbo" toggles the action on the device.
   updateSavedState();
   remote_state = kCoolixTurbo;
@@ -319,10 +330,10 @@ void IRCoolixAC::setTurbo() {
 
 /// Get the Led (light) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getLed() { return ledFlag; }
+bool IRCoolixAC::getLed(void) { return ledFlag; }
 
 /// Toggle the Led (light) mode of the A/C.
-void IRCoolixAC::setLed() {
+void IRCoolixAC::setLed(void) {
   // Assumes that repeated sending "Led" toggles the action on the device.
   updateSavedState();
   remote_state = kCoolixLed;
@@ -331,10 +342,10 @@ void IRCoolixAC::setLed() {
 
 /// Get the Clean setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getClean() { return cleanFlag; }
+bool IRCoolixAC::getClean(void) { return cleanFlag; }
 
 /// Toggle the Clean mode of the A/C.
-void IRCoolixAC::setClean() {
+void IRCoolixAC::setClean(void) {
   updateSavedState();
   remote_state = kCoolixClean;
   cleanFlag = !cleanFlag;
@@ -342,7 +353,7 @@ void IRCoolixAC::setClean() {
 
 /// Get the Zone Follow setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getZoneFollow() {
+bool IRCoolixAC::getZoneFollow(void) {
   return zoneFollowFlag;
 }
 
@@ -355,7 +366,7 @@ void IRCoolixAC::setZoneFollow(bool on) {
 }
 
 /// Clear the Sensor Temperature setting..
-void IRCoolixAC::clearSensorTemp() {
+void IRCoolixAC::clearSensorTemp(void) {
   setZoneFollow(false);
   setSensorTempRaw(kCoolixSensorTempIgnoreCode);
 }
@@ -390,7 +401,7 @@ void IRCoolixAC::setMode(const uint8_t mode) {
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRCoolixAC::getMode() {
+uint8_t IRCoolixAC::getMode(void) {
   uint8_t mode = GETBITS32(remote_state, kCoolixModeOffset,
                            kCoolixModeSize);
   if (mode == kCoolixDry)
@@ -400,7 +411,7 @@ uint8_t IRCoolixAC::getMode() {
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRCoolixAC::getFan() {
+uint8_t IRCoolixAC::getFan(void) {
   return GETBITS32(remote_state, kCoolixFanOffset, kCoolixFanSize);
 }
 
@@ -412,7 +423,7 @@ void IRCoolixAC::setFan(const uint8_t speed, const bool modecheck) {
   switch (speed) {
     case kCoolixFanAuto:  // Dry & Auto mode can't have this speed.
       if (modecheck) {
-        switch (this->getMode()) {
+        switch (getMode()) {
           case kCoolixAuto:
           case kCoolixDry:
             newspeed = kCoolixFanAuto0;
@@ -422,7 +433,7 @@ void IRCoolixAC::setFan(const uint8_t speed, const bool modecheck) {
       break;
     case kCoolixFanAuto0:  // Only Dry & Auto mode can have this speed.
       if (modecheck) {
-        switch (this->getMode()) {
+        switch (getMode()) {
           case kCoolixAuto:
           case kCoolixDry: break;
           default: newspeed = kCoolixFanAuto;
@@ -524,33 +535,33 @@ stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) {
   // Supported.
   result.protocol = decode_type_t::COOLIX;
   result.celsius = true;
-  result.power = this->getPower();
+  result.power = getPower();
   // Power off state no other state info. Use the previous state if we have it.
   if (!result.power) return result;
   // Handle the special single command (Swing/Turbo/Light/Clean/Sleep) toggle
   // messages. These have no other state info so use the rest of the previous
   // state if we have it for them.
-  if (this->getSwing()) {
+  if (getSwing()) {
     result.swingv = result.swingv != stdAc::swingv_t::kOff ?
         stdAc::swingv_t::kOff : stdAc::swingv_t::kAuto;  // Invert swing.
     return result;
-  } else if (this->getTurbo()) {
+  } else if (getTurbo()) {
     result.turbo = !result.turbo;
     return result;
-  } else if (this->getLed()) {
+  } else if (getLed()) {
     result.light = !result.light;
     return result;
-  } else if (this->getClean()) {
+  } else if (getClean()) {
     result.clean = !result.clean;
     return result;
-  } else if (this->getSleep()) {
+  } else if (getSleep()) {
     result.sleep = result.sleep >= 0 ? -1 : 0;  // Invert sleep.
     return result;
   }
   // Back to "normal" stateful messages.
-  result.mode = this->toCommonMode(this->getMode());
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.mode = toCommonMode(getMode());
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
   return result;
 }
 
@@ -561,40 +572,21 @@ String IRCoolixAC::toString(void) {
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   if (!getPower()) return result;  // If it's off, there is no other info.
-  // Special modes.
-  if (getSwing()) {
+  if (isSpecialState()) {
+    // Special modes.
     result += kCommaSpaceStr;
-    result += kSwingStr;
+    if (getSwing()) result += kSwingStr;
+    else if (getSwingVStep()) result += kSwingVStr;
+    else if (getSleep()) result += kSleepStr;
+    else if (getTurbo()) result += kTurboStr;
+    else if (getLed()) result += kLightStr;
+    else if (getClean()) result += kCleanStr;
+
     result += kColonSpaceStr;
-    result += kToggleStr;
-    return result;
-  }
-  if (getSleep()) {
-    result += kCommaSpaceStr;
-    result += kSleepStr;
-    result += kColonSpaceStr;
-    result += kToggleStr;
-    return result;
-  }
-  if (getTurbo()) {
-    result += kCommaSpaceStr;
-    result += kTurboStr;
-    result += kColonSpaceStr;
-    result += kToggleStr;
-    return result;
-  }
-  if (getLed()) {
-    result += kCommaSpaceStr;
-    result += kLightStr;
-    result += kColonSpaceStr;
-    result += kToggleStr;
-    return result;
-  }
-  if (getClean()) {
-    result += kCommaSpaceStr;
-    result += kCleanStr;
-    result += kColonSpaceStr;
-    result += kToggleStr;
+    if (getSwingVStep())
+      result += kStepStr;
+    else
+      result += kToggleStr;
     return result;
   }
   result += addModeToString(getMode(), kCoolixAuto, kCoolixCool, kCoolixHeat,
