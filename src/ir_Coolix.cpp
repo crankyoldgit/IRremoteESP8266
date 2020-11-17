@@ -110,7 +110,12 @@ void IRCoolixAC::begin(void) { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRCoolixAC::send(const uint16_t repeat) {
-  _irsend.sendCOOLIX(remote_state, kCoolixBits, repeat);
+  // SwingVStep (aka. Direct / Vane step) needs to be sent with `0` repeats.
+  // Typically repeat is `kCoolixDefaultRepeat` which is `1`, so this allows
+  // it to be 0 normally for this command, and allows additional repeats if
+  // requested rather always 0 for that command.
+  _irsend.sendCOOLIX(remote_state, kCoolixBits, repeat - (getSwingVStep() &&
+                                                          repeat > 0) ? 1 : 0);
   // make sure to remove special state from remote_state
   // after command has being transmitted.
   recoverSavedState();

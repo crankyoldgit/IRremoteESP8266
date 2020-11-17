@@ -885,3 +885,33 @@ TEST(TestDecodeCoolix, Issue1318_DirectMessage) {
       "Power: On, Swing(V): Step",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
+
+TEST(TestCoolixACClass, SendStep) {
+  IRrecv irrecv(kGpioUnused);
+  IRCoolixAC ac(kGpioUnused);
+
+  ac.setSwingVStep();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
+  EXPECT_EQ(COOLIX, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kCoolixBits, ac._irsend.capture.bits);
+  EXPECT_EQ(kCoolixSwingV, ac._irsend.capture.value);
+  EXPECT_EQ(
+      "Power: On, Swing(V): Step",
+      IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  EXPECT_EQ(
+      "f38000d50"
+      "m4692s4416"
+      "m552s1656m552s552m552s1656m552s1656m552s552m552s552m552s1656"
+      "m552s552m552s552m552s1656m552s552m552s552m552s1656m552s1656"
+      "m552s552m552s1656m552s552m552s552m552s552m552s552m552s1656"
+      "m552s1656m552s1656m552s1656m552s1656m552s1656m552s1656m552s1656"
+      "m552s552m552s552m552s552m552s552m552s1656m552s1656m552s1656"
+      "m552s552m552s552m552s552m552s552m552s552m552s552m552s552"
+      "m552s552m552s1656m552s1656m552s1656m552s1656m552s1656"
+      "m552s105244",
+      ac._irsend.outputStr());
+}
