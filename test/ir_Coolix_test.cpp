@@ -444,19 +444,17 @@ TEST(TestCoolixACClass, SetGetClearSensorTempAndZoneFollow) {
 
   ircoolix.setRaw(kCoolixDefaultState);
   EXPECT_FALSE(ircoolix.getZoneFollow());
-  EXPECT_LT(kCoolixSensorTempMax, ircoolix.getSensorTemp());
+  EXPECT_LE(kCoolixSensorTempMax, ircoolix.getSensorTemp());
 
   ircoolix.setSensorTemp(25);
   EXPECT_TRUE(ircoolix.getZoneFollow());
   EXPECT_EQ(25, ircoolix.getSensorTemp());
 
   // Lower bounds
-  ircoolix.setSensorTemp(kCoolixSensorTempMin);
+  ircoolix.setSensorTemp(0);
   EXPECT_TRUE(ircoolix.getZoneFollow());
-  EXPECT_EQ(kCoolixSensorTempMin, ircoolix.getSensorTemp());
-  ircoolix.setSensorTemp(kCoolixSensorTempMin - 1);
-  EXPECT_TRUE(ircoolix.getZoneFollow());
-  EXPECT_EQ(kCoolixSensorTempMin, ircoolix.getSensorTemp());
+  EXPECT_EQ(0, ircoolix.getSensorTemp());
+
   // Upper bounds
   ircoolix.setSensorTemp(kCoolixSensorTempMax);
   EXPECT_TRUE(ircoolix.getZoneFollow());

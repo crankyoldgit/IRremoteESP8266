@@ -70,9 +70,8 @@ const uint8_t kCoolixTempMap[kCoolixTempRange] = {
     0b1010,  // 29C
     0b1011   // 30C
 };
-const uint8_t kCoolixSensorTempMin = 16;  // Celsius
 const uint8_t kCoolixSensorTempMax = 30;  // Celsius
-const uint8_t kCoolixSensorTempIgnoreCode = 0b1111;
+const uint8_t kCoolixSensorTempIgnoreCode = 0b11111;  // 0x1F / 31 (DEC)
 // kCoolixSensorTempMask = 0b000000000000111100000000;  // 0xF00
 // Fixed states/messages.
 const uint32_t kCoolixOff    = 0b101100100111101111100000;  // 0xB27BE0
@@ -97,8 +96,7 @@ union CoolixProtocol {
     uint32_t Mode       :2;  ///< Operation mode.
     uint32_t Temp       :4;  ///< Desired temperature (Celsius)
     // Byte
-    uint32_t SensorTemp :4;  ///< The temperature sensor in the IR remote.
-    uint32_t            :1;  // Probably part of Sensor Temp.
+    uint32_t SensorTemp :5;  ///< The temperature sensor in the IR remote.
     uint32_t Fan        :3;  ///< Fan speed
     // Byte
     uint32_t            :3;  // Unknown
@@ -131,7 +129,7 @@ class IRCoolixAC {
   bool getPower(void) const;
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void) const;
-  void setSensorTemp(const uint8_t desired);
+  void setSensorTemp(const uint8_t temp);
   uint8_t getSensorTemp(void) const;
   void clearSensorTemp(void);
   void setFan(const uint8_t speed, const bool modecheck = true);

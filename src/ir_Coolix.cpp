@@ -239,20 +239,15 @@ uint8_t IRCoolixAC::getTemp(void) const {
 void IRCoolixAC::setSensorTempRaw(const uint8_t code) { _.SensorTemp = code; }
 
 /// Set the sensor temperature.
-/// @param[in] desired The temperature in degrees celsius.
-void IRCoolixAC::setSensorTemp(const uint8_t desired) {
-  uint8_t temp = desired;
-  temp = std::min(temp, kCoolixSensorTempMax);
-  temp = std::max(temp, kCoolixSensorTempMin);
-  setSensorTempRaw(temp - kCoolixSensorTempMin);
+/// @param[in] temp The temperature in degrees celsius.
+void IRCoolixAC::setSensorTemp(const uint8_t temp) {
+  setSensorTempRaw(std::min(temp, kCoolixSensorTempMax));
   setZoneFollow(true);  // Setting a Sensor temp means you want to Zone Follow.
 }
 
 /// Get the sensor temperature setting.
 /// @return The current setting for sensor temp. in degrees celsius.
-uint8_t IRCoolixAC::getSensorTemp(void) const {
-  return _.SensorTemp + kCoolixSensorTempMin;
-}
+uint8_t IRCoolixAC::getSensorTemp(void) const { return _.SensorTemp; }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
@@ -608,7 +603,7 @@ String IRCoolixAC::toString(void) const {
   if (getMode() != kCoolixFan) result += addTempToString(getTemp());
   result += addBoolToString(getZoneFollow(), kZoneFollowStr);
   result += addLabeledString(
-      (getSensorTemp() > kCoolixSensorTempMax)
+      (getSensorTemp() == kCoolixSensorTempIgnoreCode)
           ? kOffStr : uint64ToString(getSensorTemp()) + 'C', kSensorTempStr);
   return result;
 }
