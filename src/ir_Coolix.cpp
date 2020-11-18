@@ -38,8 +38,6 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_COOLIX
 /// Send a Coolix message
@@ -99,8 +97,6 @@ void IRCoolixAC::stateReset(void) {
   cleanFlag = false;
   sleepFlag = false;
   swingFlag = false;
-  swingHFlag = false;
-  swingVFlag = false;
 }
 
 /// Set up hardware to be able to send a message.
@@ -114,9 +110,9 @@ void IRCoolixAC::send(const uint16_t repeat) {
   // Typically repeat is `kCoolixDefaultRepeat` which is `1`, so this allows
   // it to be 0 normally for this command, and allows additional repeats if
   // requested rather always 0 for that command.
-  _irsend.sendCOOLIX(remote_state, kCoolixBits, repeat - (getSwingVStep() &&
+  _irsend.sendCOOLIX(getRaw(), kCoolixBits, repeat - (getSwingVStep() &&
                                                           repeat > 0) ? 1 : 0);
-  // make sure to remove special state from remote_state
+  // make sure to remove special state from the internal state
   // after command has being transmitted.
   recoverSavedState();
 }
@@ -124,7 +120,7 @@ void IRCoolixAC::send(const uint16_t repeat) {
 
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
-uint32_t IRCoolixAC::getRaw(void) { return remote_state; }
+uint32_t IRCoolixAC::getRaw(void) const { return _.raw; }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
@@ -139,13 +135,13 @@ void IRCoolixAC::setRaw(const uint32_t new_code) {
   }
   // must be a command changing Temp|Mode|Fan
   // it is safe to just copy to remote var
-  remote_state = new_code;
+  _.raw = new_code;
 }
 
 /// Is the current state is a special state?
 /// @return true, if it is. false if it isn't.
-bool IRCoolixAC::isSpecialState(void) {
-  switch (remote_state) {
+bool IRCoolixAC::isSpecialState(void) const {
+  switch (_.raw) {
     case kCoolixClean:
     case kCoolixLed:
     case kCoolixOff:
@@ -161,7 +157,8 @@ bool IRCoolixAC::isSpecialState(void) {
 ///   supplied. Does nothing if it isn't a special state.
 /// @param[in] data The state we need to act upon.
 /// @note Special state means commands that are not affecting
-/// Temperature/Mode/Fan
+/// Temperature/Mode/Fan, and they toggle a setting.
+/// e.g. Swing Step is not a special state by this definition.
 /// @return true, if it is a special state. false if it isn't.
 bool IRCoolixAC::handleSpecialState(const uint32_t data) {
   switch (data) {
@@ -189,19 +186,22 @@ bool IRCoolixAC::handleSpecialState(const uint32_t data) {
   return true;
 }
 
-/// Backup the current internal state as long as it isn't a special state.
+/// Backup the current internal state as long as it isn't a special state and
+/// set the new state.
 /// @note: Must be called before every special state to make sure the
-/// remote_state is safe
-void IRCoolixAC::updateSavedState(void) {
-  if (!isSpecialState()) saved_state = remote_state;
+/// internal state is safe.
+/// @param[in] raw_state A valid raw state/code for this protocol.
+void IRCoolixAC::updateAndSaveState(const uint32_t raw_state) {
+  if (!isSpecialState()) _saved = _;
+  _.raw = raw_state;
 }
 
 /// Restore the current internal state from backup as long as it isn't a
-///   special state.
+/// special state.
 void IRCoolixAC::recoverSavedState(void) {
   // If the current state is a special one, last known normal one.
-  if (isSpecialState()) remote_state = saved_state;
-  // If the saved_state was also a special state, reset as we expect a normal
+  if (isSpecialState()) _ = _saved;
+  // If the saved state was also a special state, reset as we expect a normal
   // state out of all this.
   if (isSpecialState()) stateReset();
 }
@@ -209,15 +209,11 @@ void IRCoolixAC::recoverSavedState(void) {
 /// Set the raw (native) temperature value.
 /// @note Bypasses any checks.
 /// @param[in] code The desired native temperature.
-void IRCoolixAC::setTempRaw(const uint8_t code) {
-  setBits(&remote_state, kCoolixTempOffset, kCoolixTempSize, code);
-}
+void IRCoolixAC::setTempRaw(const uint8_t code) { _.Temp = code; }
 
 /// Get the raw (native) temperature value.
 /// @return The native temperature value.
-uint8_t IRCoolixAC::getTempRaw(void) {
-  return GETBITS32(remote_state, kCoolixTempOffset, kCoolixTempSize);
-}
+uint8_t IRCoolixAC::getTempRaw(void) const { return _.Temp; }
 
 /// Set the temperature.
 /// @param[in] desired The temperature in degrees celsius.
@@ -230,7 +226,7 @@ void IRCoolixAC::setTemp(const uint8_t desired) {
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRCoolixAC::getTemp(void) {
+uint8_t IRCoolixAC::getTemp(void) const {
   const uint8_t code = getTempRaw();
   for (uint8_t i = 0; i < kCoolixTempRange; i++)
     if (kCoolixTempMap[i] == code) return kCoolixTempMin + i;
@@ -240,9 +236,7 @@ uint8_t IRCoolixAC::getTemp(void) {
 /// Set the raw (native) sensor temperature value.
 /// @note Bypasses any checks or additional actions.
 /// @param[in] code The desired native sensor temperature.
-void IRCoolixAC::setSensorTempRaw(const uint8_t code) {
-  setBits(&remote_state, kCoolixSensorTempOffset, kCoolixSensorTempSize, code);
-}
+void IRCoolixAC::setSensorTempRaw(const uint8_t code) { _.SensorTemp = code; }
 
 /// Set the sensor temperature.
 /// @param[in] desired The temperature in degrees celsius.
@@ -256,29 +250,24 @@ void IRCoolixAC::setSensorTemp(const uint8_t desired) {
 
 /// Get the sensor temperature setting.
 /// @return The current setting for sensor temp. in degrees celsius.
-uint8_t IRCoolixAC::getSensorTemp(void) {
-  return GETBITS32(remote_state, kCoolixSensorTempOffset,
-                   kCoolixSensorTempSize) + kCoolixSensorTempMin;
+uint8_t IRCoolixAC::getSensorTemp(void) const {
+  return _.SensorTemp + kCoolixSensorTempMin;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getPower(void) {
-  // There is only an off state. Everything else is "on".
-  return powerFlag;
-}
+/// @note There is only an "off" state. Everything else is "on".
+bool IRCoolixAC::getPower(void) const { return powerFlag; }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRCoolixAC::setPower(const bool on) {
-  if (!on) {
-    updateSavedState();
-    remote_state = kCoolixOff;
-  } else if (!powerFlag) {
-    // at this point remote_state must be ready
+  if (!on)
+    updateAndSaveState(kCoolixOff);
+  else if (!powerFlag)
+    // at this point state must be ready
     // to be transmitted
     recoverSavedState();
-  }
   powerFlag = on;
 }
 
@@ -290,85 +279,77 @@ void IRCoolixAC::off(void) { setPower(false); }
 
 /// Get the Swing setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getSwing(void) { return swingFlag; }
+bool IRCoolixAC::getSwing(void) const { return swingFlag; }
 
 /// Toggle the Swing mode of the A/C.
 void IRCoolixAC::setSwing(void) {
   // Assumes that repeated sending "swing" toggles the action on the device.
-  updateSavedState();
-  remote_state = kCoolixSwing;
+  updateAndSaveState(kCoolixSwing);
   swingFlag = !swingFlag;
 }
 
 /// Get the Vertical Swing Step setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getSwingVStep(void) { return remote_state == kCoolixSwingV; }
+bool IRCoolixAC::getSwingVStep(void) const { return _.raw == kCoolixSwingV; }
 
 /// Set the Vertical Swing Step setting of the A/C.
 void IRCoolixAC::setSwingVStep(void) {
-  updateSavedState();
-  remote_state = kCoolixSwingV;
+  updateAndSaveState(kCoolixSwingV);
 }
 
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getSleep(void) { return sleepFlag; }
+bool IRCoolixAC::getSleep(void) const { return sleepFlag; }
 
 /// Toggle the Sleep mode of the A/C.
 void IRCoolixAC::setSleep(void) {
-  updateSavedState();
-  remote_state = kCoolixSleep;
+  updateAndSaveState(kCoolixSleep);
   sleepFlag = !sleepFlag;
 }
 
 /// Get the Turbo setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getTurbo(void) { return turboFlag; }
+bool IRCoolixAC::getTurbo(void) const { return turboFlag; }
 
 /// Toggle the Turbo mode of the A/C.
 void IRCoolixAC::setTurbo(void) {
   // Assumes that repeated sending "turbo" toggles the action on the device.
-  updateSavedState();
-  remote_state = kCoolixTurbo;
+  updateAndSaveState(kCoolixTurbo);
   turboFlag = !turboFlag;
 }
 
 /// Get the Led (light) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getLed(void) { return ledFlag; }
+bool IRCoolixAC::getLed(void) const { return ledFlag; }
 
 /// Toggle the Led (light) mode of the A/C.
 void IRCoolixAC::setLed(void) {
   // Assumes that repeated sending "Led" toggles the action on the device.
-  updateSavedState();
-  remote_state = kCoolixLed;
+  updateAndSaveState(kCoolixLed);
   ledFlag = !ledFlag;
 }
 
 /// Get the Clean setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getClean(void) { return cleanFlag; }
+bool IRCoolixAC::getClean(void) const { return cleanFlag; }
 
 /// Toggle the Clean mode of the A/C.
 void IRCoolixAC::setClean(void) {
-  updateSavedState();
-  remote_state = kCoolixClean;
+  updateAndSaveState(kCoolixClean);
   cleanFlag = !cleanFlag;
 }
 
 /// Get the Zone Follow setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getZoneFollow(void) {
-  return zoneFollowFlag;
-}
+bool IRCoolixAC::getZoneFollow(void) const { return zoneFollowFlag; }
 
 /// Change the Zone Follow setting.
 /// @note Internal use only.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRCoolixAC::setZoneFollow(bool on) {
+void IRCoolixAC::setZoneFollow(const bool on) {
   zoneFollowFlag = on;
-  setBit(&remote_state, kCoolixZoneFollowMask1Offset, on);
-  setBit(&remote_state, kCoolixZoneFollowMask2Offset, on);
+  _.ZoneFollow1 = on;
+  _.ZoneFollow2 = on;
 }
 
 /// Clear the Sensor Temperature setting..
@@ -402,14 +383,13 @@ void IRCoolixAC::setMode(const uint8_t mode) {
     actualmode = kCoolixDry;
     setTempRaw(kCoolixFanTempCode);
   }
-  setBits(&remote_state, kCoolixModeOffset, kCoolixModeSize, actualmode);
+  _.Mode = actualmode;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRCoolixAC::getMode(void) {
-  uint8_t mode = GETBITS32(remote_state, kCoolixModeOffset,
-                           kCoolixModeSize);
+uint8_t IRCoolixAC::getMode(void) const {
+  const uint8_t mode = _.Mode;
   if (mode == kCoolixDry)
     if (getTempRaw() == kCoolixFanTempCode) return kCoolixFan;
   return mode;
@@ -417,9 +397,7 @@ uint8_t IRCoolixAC::getMode(void) {
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRCoolixAC::getFan(void) {
-  return GETBITS32(remote_state, kCoolixFanOffset, kCoolixFanSize);
-}
+uint8_t IRCoolixAC::getFan(void) const { return _.Fan; }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
@@ -456,7 +434,7 @@ void IRCoolixAC::setFan(const uint8_t speed, const bool modecheck) {
       newspeed = kCoolixFanAuto;
       break;
   }
-  setBits(&remote_state, kCoolixFanOffset, kCoolixFanSize, newspeed);
+  _.Fan = newspeed;
 }
 
 /// Convert a standard A/C mode into its native mode.
@@ -466,9 +444,9 @@ uint8_t IRCoolixAC::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kCoolixCool;
     case stdAc::opmode_t::kHeat: return kCoolixHeat;
-    case stdAc::opmode_t::kDry: return kCoolixDry;
-    case stdAc::opmode_t::kFan: return kCoolixFan;
-    default: return kCoolixAuto;
+    case stdAc::opmode_t::kDry:  return kCoolixDry;
+    case stdAc::opmode_t::kFan:  return kCoolixFan;
+    default:                     return kCoolixAuto;
   }
 }
 
@@ -478,11 +456,11 @@ uint8_t IRCoolixAC::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRCoolixAC::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow: return kCoolixFanMin;
+    case stdAc::fanspeed_t::kLow:    return kCoolixFanMin;
     case stdAc::fanspeed_t::kMedium: return kCoolixFanMed;
     case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax: return kCoolixFanMax;
-    default: return kCoolixFanAuto;
+    case stdAc::fanspeed_t::kMax:    return kCoolixFanMax;
+    default:                         return kCoolixFanAuto;
   }
 }
 
@@ -493,9 +471,9 @@ stdAc::opmode_t IRCoolixAC::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kCoolixCool: return stdAc::opmode_t::kCool;
     case kCoolixHeat: return stdAc::opmode_t::kHeat;
-    case kCoolixDry: return stdAc::opmode_t::kDry;
-    case kCoolixFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+    case kCoolixDry:  return stdAc::opmode_t::kDry;
+    case kCoolixFan:  return stdAc::opmode_t::kFan;
+    default:          return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -507,14 +485,14 @@ stdAc::fanspeed_t IRCoolixAC::toCommonFanSpeed(const uint8_t speed) {
     case kCoolixFanMax: return stdAc::fanspeed_t::kMax;
     case kCoolixFanMed: return stdAc::fanspeed_t::kMedium;
     case kCoolixFanMin: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+    default:            return stdAc::fanspeed_t::kAuto;
   }
 }
 
 /// Convert the A/C state to it's common stdAc::state_t equivalent.
 /// @param[in] prev Ptr to the previous state if required.
 /// @return A stdAc::state_t state.
-stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) {
+stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
   // Start with the previous state if given it.
   if (prev != NULL) {
@@ -573,7 +551,7 @@ stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) {
 
 /// Convert the internal state into a human readable string.
 /// @return The current internal state expressed as a human readable String.
-String IRCoolixAC::toString(void) {
+String IRCoolixAC::toString(void) const {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
