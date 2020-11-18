@@ -175,8 +175,8 @@ class IRCoolixAC {
   bool ledFlag;
   bool cleanFlag;
   bool sleepFlag;
-  bool zoneFollowFlag;
   bool swingFlag;
+  uint8_t savedFan;
 
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw(void) const;

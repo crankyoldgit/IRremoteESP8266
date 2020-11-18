@@ -90,6 +90,7 @@ IRCoolixAC::IRCoolixAC(const uint16_t pin, const bool inverted,
 /// Reset the internal state to a fixed known good state.
 void IRCoolixAC::stateReset(void) {
   setRaw(kCoolixDefaultState);
+  savedFan = getFan();
   clearSensorTemp();
   powerFlag = false;
   turboFlag = false;
@@ -240,6 +241,8 @@ void IRCoolixAC::setSensorTempRaw(const uint8_t code) { _.SensorTemp = code; }
 
 /// Set the sensor temperature.
 /// @param[in] temp The temperature in degrees celsius.
+/// @warning Do not send messages with a Sensor Temp more frequently than once
+///   per minute, otherwise the A/C unit will ignore them.
 void IRCoolixAC::setSensorTemp(const uint8_t temp) {
   setSensorTempRaw(std::min(temp, kCoolixSensorTempMax));
   setZoneFollow(true);  // Setting a Sensor temp means you want to Zone Follow.
@@ -336,15 +339,17 @@ void IRCoolixAC::setClean(void) {
 
 /// Get the Zone Follow setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRCoolixAC::getZoneFollow(void) const { return zoneFollowFlag; }
+bool IRCoolixAC::getZoneFollow(void) const {
+  return _.ZoneFollow1 && _.ZoneFollow2;
+}
 
 /// Change the Zone Follow setting.
 /// @note Internal use only.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRCoolixAC::setZoneFollow(const bool on) {
-  zoneFollowFlag = on;
   _.ZoneFollow1 = on;
   _.ZoneFollow2 = on;
+  setFan(on ? kCoolixFanZoneFollow : savedFan);
 }
 
 /// Clear the Sensor Temperature setting..
@@ -429,6 +434,8 @@ void IRCoolixAC::setFan(const uint8_t speed, const bool modecheck) {
       newspeed = kCoolixFanAuto;
       break;
   }
+  // Keep a copy of the last non-ZoneFollow fan setting.
+  savedFan = (_.Fan == kCoolixFanZoneFollow) ? savedFan : _.Fan;
   _.Fan = newspeed;
 }
 

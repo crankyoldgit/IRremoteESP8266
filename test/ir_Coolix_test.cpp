@@ -466,6 +466,13 @@ TEST(TestCoolixACClass, SetGetClearSensorTempAndZoneFollow) {
   ircoolix.clearSensorTemp();
   EXPECT_FALSE(ircoolix.getZoneFollow());
   EXPECT_LT(kCoolixSensorTempMax, ircoolix.getSensorTemp());
+
+  // toString.
+  // For https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-729663834
+  ircoolix.setRaw(0xBAD34E);
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Heat), Fan: 6 (Zone Follow), Temp: 24C, "
+      "Zone Follow: On, Sensor Temp: 19C", ircoolix.toString());
 }
 
 TEST(TestCoolixACClass, SpecialModesAndReset) {
