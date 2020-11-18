@@ -367,7 +367,8 @@ bool IRCoolixAC::getZoneFollow(void) {
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRCoolixAC::setZoneFollow(bool on) {
   zoneFollowFlag = on;
-  setBit(&remote_state, kCoolixZoneFollowMaskOffset, on);
+  setBit(&remote_state, kCoolixZoneFollowMask1Offset, on);
+  setBit(&remote_state, kCoolixZoneFollowMask2Offset, on);
 }
 
 /// Clear the Sensor Temperature setting..

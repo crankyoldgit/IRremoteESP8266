@@ -42,8 +42,9 @@ const uint8_t kCoolixFan = 0b100;                                 // Synthetic.
 // const uint32_t kCoolixModeMask = 0b000000000000000000001100;  // 0xC
 const uint8_t kCoolixModeOffset = 2;
 const uint8_t kCoolixModeSize = 2;
-// const uint32_t kCoolixZoneFollowMask = 0b000010000000000000000000  0x80000
-const uint8_t kCoolixZoneFollowMaskOffset = 19;
+// const uint32_t kCoolixZoneFollowMask = 0b000010000000000000000010  0x80002
+const uint8_t kCoolixZoneFollowMask1Offset = 19;
+const uint8_t kCoolixZoneFollowMask2Offset = 1;
 // Fan Control
 // const uint32_t kCoolixFanMask = 0b000000001110000000000000;  // 0x00E000
 const uint8_t kCoolixFanOffset = 13;
