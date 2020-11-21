@@ -1397,11 +1397,11 @@ TEST(TestMitsubishi136Class, SwingV) {
   ac.setSwingV(kMitsubishi136SwingVAuto);
   EXPECT_EQ(kMitsubishi136SwingVAuto, ac.getSwingV());
 
-  ac.setSwingV(kMitsubishi136SwingVAuto + 1);
-  EXPECT_EQ(kMitsubishi136SwingVAuto, ac.getSwingV());
-
   ac.setSwingV(kMitsubishi136SwingVLowest);
   EXPECT_EQ(kMitsubishi136SwingVLowest, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi136SwingVAuto + 1);
+  EXPECT_EQ(kMitsubishi136SwingVAuto, ac.getSwingV());
 
   ac.setSwingV(kMitsubishi136SwingVLow);
   EXPECT_EQ(kMitsubishi136SwingVLow, ac.getSwingV());
@@ -1624,11 +1624,11 @@ TEST(TestMitsubishi112Class, SwingV) {
   ac.setSwingV(kMitsubishi112SwingVAuto);
   EXPECT_EQ(kMitsubishi112SwingVAuto, ac.getSwingV());
 
-  ac.setSwingV(kMitsubishi112SwingVAuto + 1);
-  EXPECT_EQ(kMitsubishi112SwingVAuto, ac.getSwingV());
-
   ac.setSwingV(kMitsubishi112SwingVLowest);
   EXPECT_EQ(kMitsubishi112SwingVLowest, ac.getSwingV());
+
+  ac.setSwingV(kMitsubishi112SwingVAuto + 1);
+  EXPECT_EQ(kMitsubishi112SwingVAuto, ac.getSwingV());
 
   ac.setSwingV(kMitsubishi112SwingVLow);
   EXPECT_EQ(kMitsubishi112SwingVLow, ac.getSwingV());
