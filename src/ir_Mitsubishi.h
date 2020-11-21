@@ -85,7 +85,6 @@ const uint8_t kMitsubishiAcAuto = 0b100;
 const uint8_t kMitsubishiAcCool = 0b011;
 const uint8_t kMitsubishiAcDry =  0b010;
 const uint8_t kMitsubishiAcHeat = 0b001;
-const uint8_t kMitsubishiAcPower = 0x20;
 const uint8_t kMitsubishiAcFanAuto = 0;
 const uint8_t kMitsubishiAcFanMax = 5;
 const uint8_t kMitsubishiAcFanRealMax = 4;
@@ -204,7 +203,6 @@ const uint8_t kMitsubishi112SwingHAuto =                 0b1100;
 // Legacy defines (Deprecated)
 #define MITSUBISHI_AC_VANE_AUTO_MOVE kMitsubishiAcVaneAutoMove
 #define MITSUBISHI_AC_VANE_AUTO kMitsubishiAcVaneAuto
-#define MITSUBISHI_AC_POWER kMitsubishiAcPower
 #define MITSUBISHI_AC_MIN_TEMP kMitsubishiAcMinTemp
 #define MITSUBISHI_AC_MAX_TEMP kMitsubishiAcMaxTemp
 #define MITSUBISHI_AC_HEAT kMitsubishiAcHeat
