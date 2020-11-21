@@ -89,8 +89,6 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::minsToString;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_MITSUBISHI
 /// Send the supplied Mitsubishi 16-bit message.
@@ -382,7 +380,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t offset,
 /// @warning Consider this very alpha code. Seems to work, but not validated.
 IRMitsubishiAC::IRMitsubishiAC(const uint16_t pin, const bool inverted,
                                const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the state of the remote to a known good state/sequence.
 void IRMitsubishiAC::stateReset(void) {
@@ -408,19 +406,19 @@ void IRMitsubishiAC::send(const uint16_t repeat) {
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRMitsubishiAC::getRaw(void) {
-  this->checksum();
-  return remote_state;
+  checksum();
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] data A valid code for this protocol.
 void IRMitsubishiAC::setRaw(const uint8_t *data) {
-  memcpy(remote_state, data, kMitsubishiACStateLength);
+  std::memcpy(_.raw, data, kMitsubishiACStateLength);
 }
 
 /// Calculate and set the checksum values for the internal state.
 void IRMitsubishiAC::checksum(void) {
-  remote_state[kMitsubishiACStateLength - 1] = calculateChecksum(remote_state);
+  _.Sum = calculateChecksum(_.raw);
 }
 
 /// Verify the checksum is valid for a given state.
@@ -446,27 +444,27 @@ void IRMitsubishiAC::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishiAC::setPower(bool on) {
-  setBit(&remote_state[5], kMitsubishiAcPowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiAC::getPower(void) {
-  return GETBIT8(remote_state[5], kMitsubishiAcPowerOffset);
+bool IRMitsubishiAC::getPower(void) const {
+  return _.Power;
 }
 
 /// Set the temperature.
 /// @param[in] degrees The temperature in degrees celsius.
 void IRMitsubishiAC::setTemp(const uint8_t degrees) {
-  uint8_t temp = std::max((uint8_t)kMitsubishiAcMinTemp, degrees);
-  temp = std::min((uint8_t)kMitsubishiAcMaxTemp, temp);
-  remote_state[7] = temp - kMitsubishiAcMinTemp;
+  uint8_t temp = std::max(kMitsubishiAcMinTemp, degrees);
+  temp = std::min(kMitsubishiAcMaxTemp, temp);
+  _.Temp = temp - kMitsubishiAcMinTemp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRMitsubishiAC::getTemp(void) {
-  return (remote_state[7] + kMitsubishiAcMinTemp);
+uint8_t IRMitsubishiAC::getTemp(void) const {
+  return (_.Temp + kMitsubishiAcMinTemp);
 }
 
 /// Set the speed of the fan.
@@ -477,26 +475,24 @@ void IRMitsubishiAC::setFan(const uint8_t speed) {
   if (fan > kMitsubishiAcFanSilent)
     fan = kMitsubishiAcFanMax;        // Set the fan to maximum if out of range.
   // Auto has a special bit.
-  setBit(&remote_state[9], kMitsubishiAcFanAutoOffset,
-         fan == kMitsubishiAcFanAuto);
+  _.FanAuto = (fan == kMitsubishiAcFanAuto);
   if (fan >= kMitsubishiAcFanMax)
     fan--;  // There is no spoon^H^H^Heed 5 (max), pretend it doesn't exist.
-  setBits(&remote_state[9], kMitsubishiAcFanOffset, kMitsubishiAcFanSize, fan);
+  _.Fan = fan;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed/mode.
-uint8_t IRMitsubishiAC::getFan(void) {
-  uint8_t fan = GETBITS8(remote_state[9], kMitsubishiAcFanOffset,
-                         kMitsubishiAcFanSize);
+uint8_t IRMitsubishiAC::getFan(void) const {
+  uint8_t fan = _.Fan;
   if (fan == kMitsubishiAcFanMax) return kMitsubishiAcFanSilent;
   return fan;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRMitsubishiAC::getMode(void) {
-  return GETBITS8(remote_state[6], kMitsubishiAcModeOffset, kModeBitsSize);
+uint8_t IRMitsubishiAC::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -504,80 +500,78 @@ uint8_t IRMitsubishiAC::getMode(void) {
 void IRMitsubishiAC::setMode(const uint8_t mode) {
   // If we get an unexpected mode, default to AUTO.
   switch (mode) {
-    case kMitsubishiAcAuto: remote_state[8] = 0b00110000; break;
-    case kMitsubishiAcCool: remote_state[8] = 0b00110110; break;
-    case kMitsubishiAcDry:  remote_state[8] = 0b00110010; break;
-    case kMitsubishiAcHeat: remote_state[8] = 0b00110000; break;
+    case kMitsubishiAcAuto: _.raw[8] = 0b00110000; break;
+    case kMitsubishiAcCool: _.raw[8] = 0b00110110; break;
+    case kMitsubishiAcDry:  _.raw[8] = 0b00110010; break;
+    case kMitsubishiAcHeat: _.raw[8] = 0b00110000; break;
     default:
-      this->setMode(kMitsubishiAcAuto);
+      _.raw[8] = 0b00110000;
+      _.Mode = kMitsubishiAcAuto;
       return;
   }
-  setBits(&remote_state[6], kMitsubishiAcModeOffset, kModeBitsSize, mode);
+  _.Mode = mode;
 }
 
 /// Set the requested vane (Vertical Swing) operation mode of the a/c unit.
 /// @param[in] position The position/mode to set the vane to.
 void IRMitsubishiAC::setVane(const uint8_t position) {
   uint8_t pos = std::min(position, kMitsubishiAcVaneAutoMove);  // bounds check
-  setBit(&remote_state[9], kMitsubishiAcVaneBitOffset);
-  setBits(&remote_state[9], kMitsubishiAcVaneOffset, kMitsubishiAcVaneSize,
-          pos);
+  _.VaneBit = 1;
+  _.Vane = pos;
 }
 
 /// Set the requested wide-vane (Horizontal Swing) operation mode of the a/c.
 /// @param[in] position The position/mode to set the wide vane to.
 void IRMitsubishiAC::setWideVane(const uint8_t position) {
-  setBits(&remote_state[8], kHighNibble, kNibbleSize,
-          std::min(position, kMitsubishiAcWideVaneAuto));
+  _.WideVane = std::min(position, kMitsubishiAcWideVaneAuto);
 }
 
 /// Get the Vane (Vertical Swing) mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRMitsubishiAC::getVane(void) {
-  return GETBITS8(remote_state[9], kMitsubishiAcVaneOffset,
-                  kMitsubishiAcVaneSize);
+uint8_t IRMitsubishiAC::getVane(void) const {
+  return _.Vane;
 }
 
 /// Get the Wide Vane (Horizontal Swing) mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRMitsubishiAC::getWideVane(void) {
-  return GETBITS8(remote_state[8], kHighNibble, kNibbleSize);
+uint8_t IRMitsubishiAC::getWideVane(void) const {
+  return _.WideVane;
 }
 
 /// Get the clock time of the A/C unit.
 /// @return Nr. of 10 minute increments past midnight.
 /// @note 1 = 1/6 hour (10 minutes). e.g. 4pm = 48.
-uint8_t IRMitsubishiAC::getClock(void) { return remote_state[10]; }
+uint8_t IRMitsubishiAC::getClock(void) const { return _.Clock; }
 
 /// Set the clock time on the A/C unit.
 /// @param[in] clock Nr. of 10 minute increments past midnight.
 /// @note 1 = 1/6 hour (10 minutes). e.g. 6am = 36.
 void IRMitsubishiAC::setClock(const uint8_t clock) {
-  remote_state[10] = clock;
+  _.Clock = clock;
 }
 
 /// Get the desired start time of the A/C unit.
 /// @return Nr. of 10 minute increments past midnight.
 /// @note 1 = 1/6 hour (10 minutes). e.g. 4pm = 48.
-uint8_t IRMitsubishiAC::getStartClock(void) { return remote_state[12]; }
+uint8_t IRMitsubishiAC::getStartClock(void) const { return _.StartClock; }
 
 /// Set the desired start time of the A/C unit.
 /// @param[in] clock Nr. of 10 minute increments past midnight.
 /// @note 1 = 1/6 hour (10 minutes). e.g. 8pm = 120.
 void IRMitsubishiAC::setStartClock(const uint8_t clock) {
-  remote_state[12] = clock;
+  _.StartClock = clock;
 }
 
 /// Get the desired stop time of the A/C unit.
 /// @return Nr. of 10 minute increments past midnight.
 /// @note 1 = 1/6 hour (10 minutes). e.g. 10pm = 132.
-uint8_t IRMitsubishiAC::getStopClock(void) { return remote_state[11]; }
+uint8_t IRMitsubishiAC::getStopClock(void) const { return _.StopClock; }
 
 /// Set the desired stop time of the A/C unit.
 /// @param[in] clock Nr. of 10 minute increments past midnight.
 /// @note 1 = 1/6 hour (10 minutes). e.g. 10pm = 132.
 void IRMitsubishiAC::setStopClock(const uint8_t clock) {
-  remote_state[11] = clock;
+  _.StopClock = clock;
 }
 
 /// Get the timers active setting of the A/C.
@@ -585,8 +579,8 @@ void IRMitsubishiAC::setStopClock(const uint8_t clock) {
 /// @note Possible values: kMitsubishiAcNoTimer,
 ///   kMitsubishiAcStartTimer, kMitsubishiAcStopTimer,
 ///   kMitsubishiAcStartStopTimer
-uint8_t IRMitsubishiAC::getTimer(void) {
-  return GETBITS8(remote_state[13], 0, 3);
+uint8_t IRMitsubishiAC::getTimer(void) const {
+  return _.Timer;
 }
 
 /// Set the timers active setting of the A/C.
@@ -594,8 +588,8 @@ uint8_t IRMitsubishiAC::getTimer(void) {
 /// @note Possible values: kMitsubishiAcNoTimer,
 ///   kMitsubishiAcStartTimer, kMitsubishiAcStopTimer,
 ///   kMitsubishiAcStartStopTimer
-void IRMitsubishiAC::setTimer(uint8_t timer) {
-  setBits(&remote_state[13], 0, 3, timer);
+void IRMitsubishiAC::setTimer(const uint8_t timer) {
+  _.Timer = timer;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -713,18 +707,18 @@ stdAc::swingh_t IRMitsubishiAC::toCommonSwingH(const uint8_t pos) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRMitsubishiAC::toCommon(void) {
+stdAc::state_t IRMitsubishiAC::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI_AC;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->toCommonSwingV(this->getVane());
-  result.swingh = this->toCommonSwingH(this->getWideVane());
-  result.quiet = this->getFan() == kMitsubishiAcFanSilent;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = toCommonSwingV(_.Vane);
+  result.swingh = toCommonSwingH(_.WideVane);
+  result.quiet = getFan() == kMitsubishiAcFanSilent;
   // Not supported.
   result.turbo = false;
   result.clean = false;
@@ -739,11 +733,11 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) {
 
 /// Convert the internal state into a human readable string.
 /// @return A string containing the settings in human-readable form.
-String IRMitsubishiAC::toString(void) {
+String IRMitsubishiAC::toString(void) const {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kMitsubishiAcAuto, kMitsubishiAcCool,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kMitsubishiAcAuto, kMitsubishiAcCool,
                             kMitsubishiAcHeat, kMitsubishiAcDry,
                             kMitsubishiAcAuto);
   result += addTempToString(getTemp());
@@ -751,9 +745,9 @@ String IRMitsubishiAC::toString(void) {
                            kMitsubishiAcFanRealMax - 3,
                            kMitsubishiAcFanAuto, kMitsubishiAcFanQuiet,
                            kMitsubishiAcFanRealMax - 2);
-  result += addIntToString(this->getVane(), kSwingVStr);
+  result += addIntToString(_.Vane, kSwingVStr);
   result += kSpaceLBraceStr;
-  switch (this->getVane()) {
+  switch (_.Vane) {
     case kMitsubishiAcVaneAuto:
       result += kAutoStr;
       break;
@@ -766,20 +760,20 @@ String IRMitsubishiAC::toString(void) {
       result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(this->getWideVane(), kSwingHStr);
+  result += addIntToString(_.WideVane, kSwingHStr);
   result += kSpaceLBraceStr;
-  switch (this->getWideVane()) {
+  switch (_.WideVane) {
     case kMitsubishiAcWideVaneAuto: result += kAutoStr; break;
     default:                        result += kUnknownStr;
   }
   result += ')';
-  result += addLabeledString(minsToString(getClock() * 10), kClockStr);
-  result += addLabeledString(minsToString(getStartClock() * 10), kOnTimerStr);
-  result += addLabeledString(minsToString(getStopClock() * 10), kOffTimerStr);
+  result += addLabeledString(minsToString(_.Clock * 10), kClockStr);
+  result += addLabeledString(minsToString(_.StartClock * 10), kOnTimerStr);
+  result += addLabeledString(minsToString(_.StopClock * 10), kOffTimerStr);
   result += kCommaSpaceStr;
   result += kTimerStr;
   result += kColonSpaceStr;
-  switch (this->getTimer()) {
+  switch (_.Timer) {
     case kMitsubishiAcNoTimer:
       result += '-';
       break;
@@ -796,7 +790,7 @@ String IRMitsubishiAC::toString(void) {
       break;
     default:
       result += F("? (");
-      result += this->getTimer();
+      result += _.Timer;
       result += ')';
   }
   return result;
@@ -868,7 +862,7 @@ bool IRrecv::decodeMitsubishi136(decode_results *results, uint16_t offset,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRMitsubishi136::IRMitsubishi136(const uint16_t pin, const bool inverted,
                                  const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the state of the remote to a known good state/sequence.
 void IRMitsubishi136::stateReset(void) {
@@ -877,14 +871,14 @@ void IRMitsubishi136::stateReset(void) {
   //   https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=312397579&range=A10
   static const uint8_t kReset[kMitsubishi136StateLength] = {
       0x23, 0xCB, 0x26, 0x21, 0x00, 0x40, 0xC2, 0xC7, 0x04};
-  memcpy(remote_state, kReset, kMitsubishi136StateLength);
+  std::memcpy(_.raw, kReset, kMitsubishi136StateLength);
 }
 
 /// Calculate the checksum for the current internal state of the remote.
 void IRMitsubishi136::checksum(void) {
   for (uint8_t i = 0; i < 6; i++)
-    remote_state[kMitsubishi136PowerByte + 6 + i] =
-        ~remote_state[kMitsubishi136PowerByte + i];
+    _.raw[kMitsubishi136PowerByte + 6 + i] =
+        ~_.raw[kMitsubishi136PowerByte + i];
 }
 
 /// Verify the checksum is valid for a given state.
@@ -918,13 +912,13 @@ void IRMitsubishi136::send(const uint16_t repeat) {
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRMitsubishi136::getRaw(void) {
   checksum();
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] data A valid code for this protocol.
 void IRMitsubishi136::setRaw(const uint8_t *data) {
-  memcpy(remote_state, data, kMitsubishi136StateLength);
+  std::memcpy(_.raw, data, kMitsubishi136StateLength);
 }
 
 /// Set the requested power state of the A/C to on.
@@ -936,14 +930,13 @@ void IRMitsubishi136::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishi136::setPower(bool on) {
-  setBit(&remote_state[kMitsubishi136PowerByte], kMitsubishi136PowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishi136::getPower(void) {
-  return GETBIT8(remote_state[kMitsubishi136PowerByte],
-                 kMitsubishi136PowerOffset);
+bool IRMitsubishi136::getPower(void) const {
+  return _.Power;
 }
 
 /// Set the temperature.
@@ -951,36 +944,31 @@ bool IRMitsubishi136::getPower(void) {
 void IRMitsubishi136::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max((uint8_t)kMitsubishi136MinTemp, degrees);
   temp = std::min((uint8_t)kMitsubishi136MaxTemp, temp);
-  setBits(&remote_state[kMitsubishi136TempByte], kHighNibble, kNibbleSize,
-          temp - kMitsubishiAcMinTemp);
+  _.Temp = temp - kMitsubishiAcMinTemp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRMitsubishi136::getTemp(void) {
-  return GETBITS8(remote_state[kMitsubishi136TempByte], kHighNibble,
-                  kNibbleSize) + kMitsubishiAcMinTemp;
+uint8_t IRMitsubishi136::getTemp(void) const {
+  return _.Temp + kMitsubishiAcMinTemp;
 }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
 void IRMitsubishi136::setFan(const uint8_t speed) {
-  setBits(&remote_state[kMitsubishi136FanByte], kMitsubishi136FanOffset,
-          kMitsubishi136FanSize, std::min(speed, kMitsubishi136FanMax));
+  _.Fan = std::min(speed, kMitsubishi136FanMax);
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed/mode.
-uint8_t IRMitsubishi136::getFan(void) {
-  return GETBITS8(remote_state[kMitsubishi136FanByte], kMitsubishi136FanOffset,
-                  kMitsubishi136FanSize);
+uint8_t IRMitsubishi136::getFan(void) const {
+  return _.Fan;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRMitsubishi136::getMode(void) {
-  return GETBITS8(remote_state[kMitsubishi136ModeByte],
-                  kMitsubishi136ModeOffset, kModeBitsSize);
+uint8_t IRMitsubishi136::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -993,11 +981,10 @@ void IRMitsubishi136::setMode(const uint8_t mode) {
     case kMitsubishi136Heat:
     case kMitsubishi136Auto:
     case kMitsubishi136Dry:
-      setBits(&remote_state[kMitsubishi136ModeByte], kMitsubishi136ModeOffset,
-              kModeBitsSize, mode);
+      _.Mode = mode;
       break;
     default:
-      setMode(kMitsubishi136Auto);
+      _.Mode = kMitsubishi136Auto;
   }
 }
 
@@ -1011,8 +998,7 @@ void IRMitsubishi136::setSwingV(const uint8_t position) {
     case kMitsubishi136SwingVHigh:
     case kMitsubishi136SwingVHighest:
     case kMitsubishi136SwingVAuto:
-      setBits(&remote_state[kMitsubishi136SwingVByte], kHighNibble, kNibbleSize,
-              position);
+      _.SwingV = position;
       break;
     default:
       setMode(kMitsubishi136SwingVAuto);
@@ -1021,9 +1007,8 @@ void IRMitsubishi136::setSwingV(const uint8_t position) {
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRMitsubishi136::getSwingV(void) {
-  return GETBITS8(remote_state[kMitsubishi136SwingVByte], kHighNibble,
-                  kNibbleSize);
+uint8_t IRMitsubishi136::getSwingV(void) const {
+  return _.SwingV;
 }
 
 /// Set the Quiet mode of the A/C.
@@ -1036,8 +1021,8 @@ void IRMitsubishi136::setQuiet(bool on) {
 
 /// Get the Quiet mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishi136::getQuiet(void) {
-  return getFan() == kMitsubishi136FanQuiet;
+bool IRMitsubishi136::getQuiet(void) const {
+  return _.Fan == kMitsubishi136FanQuiet;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -1121,17 +1106,17 @@ stdAc::swingv_t IRMitsubishi136::toCommonSwingV(const uint8_t pos) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRMitsubishi136::toCommon(void) {
+stdAc::state_t IRMitsubishi136::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI136;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->toCommonSwingV(this->getSwingV());
-  result.quiet = this->getQuiet();
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = toCommonSwingV(_.SwingV);
+  result.quiet = getQuiet();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;
@@ -1147,20 +1132,20 @@ stdAc::state_t IRMitsubishi136::toCommon(void) {
 
 /// Convert the internal state into a human readable string.
 /// @return A string containing the settings in human-readable form.
-String IRMitsubishi136::toString(void) {
+String IRMitsubishi136::toString(void) const {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kMitsubishi136Auto, kMitsubishi136Cool,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kMitsubishi136Auto, kMitsubishi136Cool,
                             kMitsubishi136Heat, kMitsubishi136Dry,
                             kMitsubishi136Fan);
   result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kMitsubishi136FanMax,
+  result += addFanToString(_.Fan, kMitsubishi136FanMax,
                            kMitsubishi136FanLow,  kMitsubishi136FanMax,
                            kMitsubishi136FanQuiet, kMitsubishi136FanMed);
-  result += addIntToString(getSwingV(), kSwingVStr);
+  result += addIntToString(_.SwingV, kSwingVStr);
   result += kSpaceLBraceStr;
-  switch (getSwingV()) {
+  switch (_.SwingV) {
     case kMitsubishi136SwingVHighest: result += kHighestStr; break;
     case kMitsubishi136SwingVHigh: result += kHighStr; break;
     case kMitsubishi136SwingVLow: result += kLowStr; break;
@@ -1289,7 +1274,7 @@ bool IRrecv::decodeMitsubishi112(decode_results *results, uint16_t offset,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRMitsubishi112::IRMitsubishi112(const uint16_t pin, const bool inverted,
                                  const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the state of the remote to a known good state/sequence.
 void IRMitsubishi112::stateReset(void) {
@@ -1301,8 +1286,7 @@ void IRMitsubishi112::stateReset(void) {
 
 /// Calculate the checksum for the current internal state of the remote.
 void IRMitsubishi112::checksum(void) {
-  remote_state[kMitsubishi112StateLength - 1] = IRTcl112Ac::calcChecksum(
-      remote_state, kMitsubishi112StateLength);
+  _.Sum = IRTcl112Ac::calcChecksum(_.raw, kMitsubishi112StateLength);
 }
 
 /// Set up hardware to be able to send a message.
@@ -1320,13 +1304,13 @@ void IRMitsubishi112::send(const uint16_t repeat) {
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRMitsubishi112::getRaw(void) {
   checksum();
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] data A valid code for this protocol.
 void IRMitsubishi112::setRaw(const uint8_t *data) {
-  memcpy(remote_state, data, kMitsubishi112StateLength);
+  std::memcpy(_.raw, data, kMitsubishi112StateLength);
 }
 
 /// Set the requested power state of the A/C to off.
@@ -1338,14 +1322,13 @@ void IRMitsubishi112::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMitsubishi112::setPower(bool on) {
-  setBit(&remote_state[kMitsubishi112PowerByte], kMitsubishi112PowerOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishi112::getPower(void) {
-  return GETBIT8(remote_state[kMitsubishi112PowerByte],
-                 kMitsubishi112PowerOffset);
+bool IRMitsubishi112::getPower(void) const {
+  return _.Power;
 }
 
 /// Set the temperature.
@@ -1353,15 +1336,13 @@ bool IRMitsubishi112::getPower(void) {
 void IRMitsubishi112::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max((uint8_t)kMitsubishi112MinTemp, degrees);
   temp = std::min((uint8_t)kMitsubishi112MaxTemp, temp);
-  setBits(&remote_state[kMitsubishi112TempByte], kLowNibble,
-          kMitsubishi112TempSize, kMitsubishiAcMaxTemp - temp);
+  _.Temp = kMitsubishiAcMaxTemp - temp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRMitsubishi112::getTemp(void) {
-  return kMitsubishiAcMaxTemp - GETBITS8(remote_state[kMitsubishi112TempByte],
-                                         kLowNibble, kMitsubishi112TempSize);
+uint8_t IRMitsubishi112::getTemp(void) const {
+  return kMitsubishiAcMaxTemp - _.Temp;
 }
 
 /// Set the speed of the fan.
@@ -1372,26 +1353,23 @@ void IRMitsubishi112::setFan(const uint8_t speed) {
     case kMitsubishi112FanLow:
     case kMitsubishi112FanMed:
     case kMitsubishi112FanMax:
-      setBits(&remote_state[kMitsubishi112FanByte], kMitsubishi112FanOffset,
-              kMitsubishi112FanSize, speed);
+      _.Fan = speed;
       break;
     default:
-      setFan(kMitsubishi112FanMax);
+      _.Fan = kMitsubishi112FanMax;
   }
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed/mode.
-uint8_t IRMitsubishi112::getFan(void) {
-  return GETBITS8(remote_state[kMitsubishi112FanByte], kMitsubishi112FanOffset,
-                  kMitsubishi112FanSize);
+uint8_t IRMitsubishi112::getFan(void) const {
+  return _.Fan;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRMitsubishi112::getMode(void) {
-  return GETBITS8(remote_state[kMitsubishi112ModeByte],
-                  kMitsubishi112ModeOffset, kModeBitsSize);
+uint8_t IRMitsubishi112::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -1404,11 +1382,10 @@ void IRMitsubishi112::setMode(const uint8_t mode) {
     case kMitsubishi112Heat:
     case kMitsubishi112Auto:
     case kMitsubishi112Dry:
-      setBits(&remote_state[kMitsubishi112ModeByte], kMitsubishi112ModeOffset,
-              kModeBitsSize, mode);
+      _.Mode = mode;
       break;
     default:
-      setMode(kMitsubishi112Auto);
+      _.Mode = kMitsubishi112Auto;
   }
 }
 
@@ -1423,8 +1400,7 @@ void IRMitsubishi112::setSwingV(const uint8_t position) {
     case kMitsubishi112SwingVHigh:
     case kMitsubishi112SwingVHighest:
     case kMitsubishi112SwingVAuto:
-      setBits(&remote_state[kMitsubishi112SwingVByte],
-              kMitsubishi112SwingVOffset, kMitsubishi112SwingVSize, position);
+      _.SwingV = position;
       break;
     default:
       setMode(kMitsubishi112SwingVAuto);
@@ -1433,9 +1409,8 @@ void IRMitsubishi112::setSwingV(const uint8_t position) {
 
 /// Get the Vertical Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRMitsubishi112::getSwingV(void) {
-  return GETBITS8(remote_state[kMitsubishi112SwingVByte],
-                  kMitsubishi112SwingVOffset, kMitsubishi112SwingVSize);
+uint8_t IRMitsubishi112::getSwingV(void) const {
+  return _.SwingV;
 }
 
 /// Set the Horizontal Swing mode of the A/C.
@@ -1450,20 +1425,18 @@ void IRMitsubishi112::setSwingH(const uint8_t position) {
     case kMitsubishi112SwingHRightMax:
     case kMitsubishi112SwingHWide:
     case kMitsubishi112SwingHAuto:
-      setBits(&remote_state[kMitsubishi112SwingHByte],
-              kMitsubishi112SwingHOffset, kMitsubishi112SwingHSize, position);
+      _.SwingH = position;
       break;
     default:
-      setSwingH(kMitsubishi112SwingHAuto);
+      _.SwingH = kMitsubishi112SwingHAuto;
   }
 }
 
 
 /// Get the Horizontal Swing mode of the A/C.
 /// @return The native position/mode setting.
-uint8_t IRMitsubishi112::getSwingH(void) {
-  return GETBITS8(remote_state[kMitsubishi112SwingHByte],
-                  kMitsubishi112SwingHOffset, kMitsubishi112SwingHSize);
+uint8_t IRMitsubishi112::getSwingH(void) const {
+  return _.SwingH;
 }
 
 /// Set the Quiet mode of the A/C.
@@ -1479,8 +1452,8 @@ void IRMitsubishi112::setQuiet(bool on) {
 /// Get the Quiet mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 /// @note There is no true quiet setting on this A/C.
-bool IRMitsubishi112::getQuiet(void) {
-  return getFan() == kMitsubishi112FanQuiet;
+bool IRMitsubishi112::getQuiet(void) const {
+  return _.Fan == kMitsubishi112FanQuiet;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -1596,18 +1569,18 @@ stdAc::swingh_t IRMitsubishi112::toCommonSwingH(const uint8_t pos) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRMitsubishi112::toCommon(void) {
+stdAc::state_t IRMitsubishi112::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::MITSUBISHI112;
   result.model = -1;  // No models used.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->toCommonSwingV(this->getSwingV());
-  result.swingh = this->toCommonSwingH(this->getSwingH());;
-  result.quiet = this->getQuiet();
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = toCommonSwingV(_.SwingV);
+  result.swingh = toCommonSwingH(_.SwingH);;
+  result.quiet = getQuiet();
   // Not supported.
   result.econo = false;  // Need to figure this part from stdAc
   result.clock = -1;
@@ -1624,20 +1597,20 @@ stdAc::state_t IRMitsubishi112::toCommon(void) {
 
 /// Convert the internal state into a human readable string.
 /// @return A string containing the settings in human-readable form.
-String IRMitsubishi112::toString(void) {
+String IRMitsubishi112::toString(void) const {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kMitsubishi112Auto, kMitsubishi112Cool,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kMitsubishi112Auto, kMitsubishi112Cool,
                             kMitsubishi112Heat, kMitsubishi112Dry,
                             kMitsubishi112Auto);
   result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kMitsubishi112FanMax,
+  result += addFanToString(_.Fan, kMitsubishi112FanMax,
                            kMitsubishi112FanLow,  kMitsubishi112FanMax,
                            kMitsubishi112FanQuiet, kMitsubishi112FanMed);
-  result += addIntToString(getSwingV(), kSwingVStr);
+  result += addIntToString(_.SwingV, kSwingVStr);
   result += kSpaceLBraceStr;
-  switch (getSwingV()) {
+  switch (_.SwingV) {
     case kMitsubishi112SwingVHighest: result += kHighestStr; break;
     case kMitsubishi112SwingVHigh:    result += kHighStr; break;
     case kMitsubishi112SwingVMiddle:  result += kMiddleStr; break;
@@ -1647,9 +1620,9 @@ String IRMitsubishi112::toString(void) {
     default:                          result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getSwingH(), kSwingHStr);
+  result += addIntToString(_.SwingH, kSwingHStr);
   result += kSpaceLBraceStr;
-  switch (getSwingH()) {
+  switch (_.SwingH) {
     case kMitsubishi112SwingHLeftMax:  result += kLeftMaxStr; break;
     case kMitsubishi112SwingHLeft:     result += kLeftStr; break;
     case kMitsubishi112SwingHMiddle:   result += kMiddleStr; break;
