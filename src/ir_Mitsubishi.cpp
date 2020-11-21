@@ -1001,7 +1001,7 @@ void IRMitsubishi136::setSwingV(const uint8_t position) {
       _.SwingV = position;
       break;
     default:
-      setMode(kMitsubishi136SwingVAuto);
+      _.SwingV = kMitsubishi136SwingVAuto;
   }
 }
 
@@ -1403,7 +1403,7 @@ void IRMitsubishi112::setSwingV(const uint8_t position) {
       _.SwingV = position;
       break;
     default:
-      setMode(kMitsubishi112SwingVAuto);
+      _.SwingV = kMitsubishi112SwingVAuto;
   }
 }
 
