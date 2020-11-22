@@ -920,3 +920,24 @@ TEST(TestCoolixACClass, SendStep) {
       "m552s105244",
       ac._irsend.outputStr());
 }
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1318#issuecomment-731578060
+// Confirm ZoneFollow Fan is being set correctly when SensorTemp is set.
+TEST(TestCoolixACClass, VerifyZoneFollowFan) {
+  IRCoolixAC ac(kGpioUnused);
+  EXPECT_NE(kCoolixFanZoneFollow, ac.getFan());
+  EXPECT_FALSE(ac.getZoneFollow());
+  ac.setPower(true);
+  ac.setMode(kCoolixHeat);
+  ac.setTemp(24);  // C
+  EXPECT_NE(kCoolixFanZoneFollow, ac.getFan());
+  EXPECT_FALSE(ac.getZoneFollow());
+  ac.setSensorTemp(19);  // C
+  EXPECT_EQ(kCoolixFanZoneFollow, ac.getFan());
+  EXPECT_TRUE(ac.getZoneFollow());
+  EXPECT_EQ(0xBAD34E, ac.getRaw());
+  EXPECT_EQ(
+      "Power: On, Mode: 3 (Heat), Fan: 6 (Zone Follow), Temp: 24C, "
+      "Zone Follow: On, Sensor Temp: 19C",
+      ac.toString());
+}
