@@ -14,6 +14,7 @@
 //   Brand: Kelvinator,  Model: KSV70HRC A/C
 //   Brand: Kelvinator,  Model: KSV80HRC A/C
 //   Brand: Green,  Model: YAPOF3 remote
+//   Brand: Sharp,  Model: YB1FA remote
 
 #ifndef IR_KELVINATOR_H_
 #define IR_KELVINATOR_H_
