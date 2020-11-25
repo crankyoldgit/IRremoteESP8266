@@ -73,10 +73,16 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>Support for Coolix A/C protocols.  
+<a href="#details">More...</a></p>
+
 <p><a href="ir__Coolix_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionCoolixProtocol.html">CoolixProtocol</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Coolix A/C message.  <a href="unionCoolixProtocol.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html">IRCoolixAC</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Coolix A/C messages.  <a href="classIRCoolixAC.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -93,16 +99,6 @@ Variables</h2></td></tr>
 <tr class="separator:a234b39696f0b2fac6b37aa309082505e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e050321c994844f2ff6668ba6973ac4"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a2e050321c994844f2ff6668ba6973ac4">kCoolixFan</a> = 0b100</td></tr>
 <tr class="separator:a2e050321c994844f2ff6668ba6973ac4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd17067177e1cc6776b7932afd9fbdb2"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#acd17067177e1cc6776b7932afd9fbdb2">kCoolixModeOffset</a> = 2</td></tr>
-<tr class="separator:acd17067177e1cc6776b7932afd9fbdb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69e5ee4c5eb95ca3346d9d9186a688a8"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a69e5ee4c5eb95ca3346d9d9186a688a8">kCoolixModeSize</a> = 2</td></tr>
-<tr class="separator:a69e5ee4c5eb95ca3346d9d9186a688a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5da4da07b9d1bb715102cafd4a0105e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#ae5da4da07b9d1bb715102cafd4a0105e">kCoolixZoneFollowMaskOffset</a> = 19</td></tr>
-<tr class="separator:ae5da4da07b9d1bb715102cafd4a0105e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1656f488974bd12db4049dfa8ff43a4e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a1656f488974bd12db4049dfa8ff43a4e">kCoolixFanOffset</a> = 13</td></tr>
-<tr class="separator:a1656f488974bd12db4049dfa8ff43a4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f4649b5b73766245bc82191cdc0e596"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a5f4649b5b73766245bc82191cdc0e596">kCoolixFanSize</a> = 3</td></tr>
-<tr class="separator:a5f4649b5b73766245bc82191cdc0e596"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c0086075cce1698c48cc30e045ab5bf"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a6c0086075cce1698c48cc30e045ab5bf">kCoolixFanMin</a> = 0b100</td></tr>
 <tr class="separator:a6c0086075cce1698c48cc30e045ab5bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2750626cda2e389df901b459805e09bd"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a2750626cda2e389df901b459805e09bd">kCoolixFanMed</a> = 0b010</td></tr>
@@ -125,26 +121,12 @@ Variables</h2></td></tr>
 <tr class="separator:a74e3e75466fd27672968d660e3fddc9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d2d6f2fd8f5e9a4491623b9351efcba"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a6d2d6f2fd8f5e9a4491623b9351efcba">kCoolixFanTempCode</a> = 0b1110</td></tr>
 <tr class="separator:a6d2d6f2fd8f5e9a4491623b9351efcba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac49173b671af51026e378d65c7bc696b"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#ac49173b671af51026e378d65c7bc696b">kCoolixTempOffset</a> = 4</td></tr>
-<tr class="separator:ac49173b671af51026e378d65c7bc696b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a22c5c9bdd23ef80ffe9d6760c0650e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a7a22c5c9bdd23ef80ffe9d6760c0650e">kCoolixTempSize</a> = 4</td></tr>
-<tr class="separator:a7a22c5c9bdd23ef80ffe9d6760c0650e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c8931df1dbed38c8119f6605266c710"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a9c8931df1dbed38c8119f6605266c710">kCoolixTempMap</a> [<a class="el" href="ir__Coolix_8h.html#a74e3e75466fd27672968d660e3fddc9a">kCoolixTempRange</a>]</td></tr>
 <tr class="separator:a9c8931df1dbed38c8119f6605266c710"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48f3f3ad79a53e0758270647db0b089c"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a48f3f3ad79a53e0758270647db0b089c">kCoolixSensorTempMin</a> = 16</td></tr>
-<tr class="separator:a48f3f3ad79a53e0758270647db0b089c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71641b1240ee439e77128165cedf899f"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a71641b1240ee439e77128165cedf899f">kCoolixSensorTempMax</a> = 30</td></tr>
 <tr class="separator:a71641b1240ee439e77128165cedf899f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3aba531b0c0053424786ec4bb2be934"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#ae3aba531b0c0053424786ec4bb2be934">kCoolixSensorTempIgnoreCode</a> = 0b1111</td></tr>
+<tr class="memitem:ae3aba531b0c0053424786ec4bb2be934"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#ae3aba531b0c0053424786ec4bb2be934">kCoolixSensorTempIgnoreCode</a> = 0b11111</td></tr>
 <tr class="separator:ae3aba531b0c0053424786ec4bb2be934"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03edec58ad078d7de7436929c463898a"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a03edec58ad078d7de7436929c463898a">kCoolixSensorTempOffset</a> = 8</td></tr>
-<tr class="separator:a03edec58ad078d7de7436929c463898a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a979d1d4f84432afc29ac3fcc78353d6c"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a979d1d4f84432afc29ac3fcc78353d6c">kCoolixSensorTempSize</a> = 4</td></tr>
-<tr class="separator:a979d1d4f84432afc29ac3fcc78353d6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b88ef6651189ba330d8e2847528964b"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a1b88ef6651189ba330d8e2847528964b">kCoolixPrefix</a> = 0b1011</td></tr>
-<tr class="separator:a1b88ef6651189ba330d8e2847528964b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2913e31a9dc5b89cbcae940cd5d59497"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a2913e31a9dc5b89cbcae940cd5d59497">kCoolixUnknown</a> = 0xFF</td></tr>
-<tr class="separator:a2913e31a9dc5b89cbcae940cd5d59497"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef6f59b83a14b8505f395b2eb8d8ad39"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#aef6f59b83a14b8505f395b2eb8d8ad39">kCoolixOff</a> = 0b101100100111101111100000</td></tr>
 <tr class="separator:aef6f59b83a14b8505f395b2eb8d8ad39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a799ad5ab7cf43f0aac3c342305f14b90"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#a799ad5ab7cf43f0aac3c342305f14b90">kCoolixSwing</a> = 0b101100100110101111100000</td></tr>
@@ -166,7 +148,13 @@ Variables</h2></td></tr>
 <tr class="memitem:ad54ebf20658c33e5ad54fc54a513511e"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Coolix_8h.html#ad54ebf20658c33e5ad54fc54a513511e">kCoolixDefaultState</a> = 0b101100100001111111001000</td></tr>
 <tr class="separator:ad54ebf20658c33e5ad54fc54a513511e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Variable Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Support for Coolix A/C protocols. </p>
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/484">https://github.com/crankyoldgit/IRremoteESP8266/issues/484</a> </dd>
+<dd>
+<a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1318">https://github.com/crankyoldgit/IRremoteESP8266/issues/1318</a> </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Kudos: Hamper: For the breakdown and mapping of the bit values. fraschizzato: For additional ZoneFollow &amp; SwingVStep analysis. </dd></dl>
+</div><h2 class="groupheader">Variable Documentation</h2>
 <a id="a73c1ef7c2c80c861256a14a9f256b125"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a73c1ef7c2c80c861256a14a9f256b125">&#9670;&nbsp;</a></span>kCoolixAuto</h2>
 
@@ -349,34 +337,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a1656f488974bd12db4049dfa8ff43a4e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1656f488974bd12db4049dfa8ff43a4e">&#9670;&nbsp;</a></span>kCoolixFanOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixFanOffset = 13</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5f4649b5b73766245bc82191cdc0e596"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f4649b5b73766245bc82191cdc0e596">&#9670;&nbsp;</a></span>kCoolixFanSize</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixFanSize = 3</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a6d2d6f2fd8f5e9a4491623b9351efcba"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6d2d6f2fd8f5e9a4491623b9351efcba">&#9670;&nbsp;</a></span>kCoolixFanTempCode</h2>
 
@@ -433,34 +393,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="acd17067177e1cc6776b7932afd9fbdb2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd17067177e1cc6776b7932afd9fbdb2">&#9670;&nbsp;</a></span>kCoolixModeOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixModeOffset = 2</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a69e5ee4c5eb95ca3346d9d9186a688a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69e5ee4c5eb95ca3346d9d9186a688a8">&#9670;&nbsp;</a></span>kCoolixModeSize</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixModeSize = 2</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="aef6f59b83a14b8505f395b2eb8d8ad39"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aef6f59b83a14b8505f395b2eb8d8ad39">&#9670;&nbsp;</a></span>kCoolixOff</h2>
 
@@ -475,20 +407,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a1b88ef6651189ba330d8e2847528964b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b88ef6651189ba330d8e2847528964b">&#9670;&nbsp;</a></span>kCoolixPrefix</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixPrefix = 0b1011</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="ae3aba531b0c0053424786ec4bb2be934"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae3aba531b0c0053424786ec4bb2be934">&#9670;&nbsp;</a></span>kCoolixSensorTempIgnoreCode</h2>
 
@@ -496,7 +414,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const uint8_t kCoolixSensorTempIgnoreCode = 0b1111</td>
+          <td class="memname">const uint8_t kCoolixSensorTempIgnoreCode = 0b11111</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -511,48 +429,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint8_t kCoolixSensorTempMax = 30</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a48f3f3ad79a53e0758270647db0b089c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48f3f3ad79a53e0758270647db0b089c">&#9670;&nbsp;</a></span>kCoolixSensorTempMin</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixSensorTempMin = 16</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a03edec58ad078d7de7436929c463898a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03edec58ad078d7de7436929c463898a">&#9670;&nbsp;</a></span>kCoolixSensorTempOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixSensorTempOffset = 8</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a979d1d4f84432afc29ac3fcc78353d6c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a979d1d4f84432afc29ac3fcc78353d6c">&#9670;&nbsp;</a></span>kCoolixSensorTempSize</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixSensorTempSize = 4</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -673,20 +549,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ac49173b671af51026e378d65c7bc696b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac49173b671af51026e378d65c7bc696b">&#9670;&nbsp;</a></span>kCoolixTempOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixTempOffset = 4</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a74e3e75466fd27672968d660e3fddc9a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a74e3e75466fd27672968d660e3fddc9a">&#9670;&nbsp;</a></span>kCoolixTempRange</h2>
 
@@ -701,20 +563,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a7a22c5c9bdd23ef80ffe9d6760c0650e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a22c5c9bdd23ef80ffe9d6760c0650e">&#9670;&nbsp;</a></span>kCoolixTempSize</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixTempSize = 4</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="ade957b6f4a6cdb064c709972a5c31a4b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ade957b6f4a6cdb064c709972a5c31a4b">&#9670;&nbsp;</a></span>kCoolixTurbo</h2>
 
@@ -723,34 +571,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint32_t kCoolixTurbo = 0b101101011111010110100010</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2913e31a9dc5b89cbcae940cd5d59497"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2913e31a9dc5b89cbcae940cd5d59497">&#9670;&nbsp;</a></span>kCoolixUnknown</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixUnknown = 0xFF</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae5da4da07b9d1bb715102cafd4a0105e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae5da4da07b9d1bb715102cafd4a0105e">&#9670;&nbsp;</a></span>kCoolixZoneFollowMaskOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kCoolixZoneFollowMaskOffset = 19</td>
         </tr>
       </table>
 </div><div class="memdoc">
