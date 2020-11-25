@@ -2199,7 +2199,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   stdAc::state_t send = this->handleToggles(this->cleanState(desired), prev);
   // Some protocols expect a previous state for power.
   // Construct a pointer-safe previous power state incase prev is NULL/NULLPTR.
+#if (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
   const bool prev_power = (prev != NULL) ? prev->power : !send.power;
+#endif
   // Per vendor settings & setup.
   switch (send.protocol) {
 #if SEND_AIRWELL
