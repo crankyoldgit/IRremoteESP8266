@@ -2197,6 +2197,11 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       desired.celsius ? desired.degrees : fahrenheitToCelsius(desired.degrees);
   // special `state_t` that is required to be sent based on that.
   stdAc::state_t send = this->handleToggles(this->cleanState(desired), prev);
+  // Some protocols expect a previous state for power.
+  // Construct a pointer-safe previous power state incase prev is NULL/NULLPTR.
+#if (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
+  const bool prev_power = (prev != NULL) ? prev->power : !send.power;
+#endif
   // Per vendor settings & setup.
   switch (send.protocol) {
 #if SEND_AIRWELL
@@ -2534,7 +2539,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRSamsungAc ac(_pin, _inverted, _modulation);
       samsung(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
               send.quiet, send.turbo, send.light, send.filter, send.clean,
-              send.beep, prev->power);
+              send.beep, prev_power);
       break;
     }
 #endif  // SEND_SAMSUNG_AC
@@ -2551,8 +2556,6 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case SHARP_AC:
     {
       IRSharpAc ac(_pin, _inverted, _modulation);
-      bool prev_power = !send.power;
-      if (prev != NULL) prev_power = prev->power;
       sharp(&ac, (sharp_ac_remote_model_t)send.model, send.power, prev_power,
             send.mode, degC, send.fanspeed, send.swingv, send.turbo, send.light,
             send.filter, send.clean);
