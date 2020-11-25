@@ -65,8 +65,10 @@ $(function() {
 
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>saved_state
-: <a class="el" href="classIRCoolixAC.html#aec0bce8019d7d49a30915394bee56b9a">IRCoolixAC</a>
-, <a class="el" href="classIRTranscoldAc.html#a3f5f493caff4eaff466b050fd6f5c9e1">IRTranscoldAc</a>
+: <a class="el" href="classIRTranscoldAc.html#a3f5f493caff4eaff466b050fd6f5c9e1">IRTranscoldAc</a>
+</li>
+<li>savedFan
+: <a class="el" href="classIRCoolixAC.html#a5645cc98a1b1c509729544c09dc77fbf">IRCoolixAC</a>
 </li>
 <li>scrap
 : <a class="el" href="unionmagiquest.html#afd0bcf9a87f0fa2db87b68b211952a73">magiquest</a>
@@ -79,10 +81,18 @@ $(function() {
 , <a class="el" href="unionDaikinESPProtocol.html#a9cdca7efde034c19bc1bd3da5c204ec9">DaikinESPProtocol</a>
 </li>
 <li>SensorTemp
-: <a class="el" href="unionMideaProtocol.html#a2ce21157e61749f4d1c3b14fd0b6cfe8">MideaProtocol</a>
+: <a class="el" href="unionCoolixProtocol.html#a3213a8e821e4f8dc89240b1aa429ab9d">CoolixProtocol</a>
+, <a class="el" href="unionMideaProtocol.html#a2ce21157e61749f4d1c3b14fd0b6cfe8">MideaProtocol</a>
+</li>
+<li>Sig
+: <a class="el" href="unionMitsubishi152Protocol.html#a3e212768123e252ab4c17cec54084ddc">Mitsubishi152Protocol</a>
+, <a class="el" href="unionMitsubishi88Protocol.html#a7334ae1a2beac4e7db68817d715780f8">Mitsubishi88Protocol</a>
 </li>
 <li>Sign
 : <a class="el" href="unionLGProtocol.html#a0ce79a58c9afe05d8f88a246f1e4e38c">LGProtocol</a>
+</li>
+<li>Silent
+: <a class="el" href="unionMitsubishi152Protocol.html#af3a374268ed6de973571de1104a1e3b6">Mitsubishi152Protocol</a>
 </li>
 <li>Sleep
 : <a class="el" href="unionCarrierProtocol.html#a957ac027dec4e1942d88ac8f7bcbc767">CarrierProtocol</a>
@@ -112,8 +122,14 @@ $(function() {
 : <a class="el" href="classIRtimer.html#aaa087b8688ff8150e0fc1ec6d5c4a52a">IRtimer</a>
 , <a class="el" href="classTimerMs.html#a15ad2e08a5931397391d48f040722f65">TimerMs</a>
 </li>
+<li>StartClock
+: <a class="el" href="unionMitsubishi144Protocol.html#a2b3fcf0371639b6c73c152c671ae3b66">Mitsubishi144Protocol</a>
+</li>
 <li>state
 : <a class="el" href="classdecode__results.html#aaeb4b1b2e950bdd181582c385b2f4305">decode_results</a>
+</li>
+<li>StopClock
+: <a class="el" href="unionMitsubishi144Protocol.html#a827da42e7df246a6849223430412e051">Mitsubishi144Protocol</a>
 </li>
 <li>success
 : <a class="el" href="structmatch__result__t.html#a13fe18ae6cf89364df443a64295b2f90">match_result_t</a>
@@ -133,6 +149,8 @@ $(function() {
 , <a class="el" href="unionHitachiProtocol.html#a7917d5fe64dc17c4240286d113edffbf">HitachiProtocol</a>
 , <a class="el" href="unionLGProtocol.html#a8f527a8f4b6235ca01bb96ed9cce8fcd">LGProtocol</a>
 , <a class="el" href="unionMideaProtocol.html#a3d4afe5411a769c48e8bfaa3a9e8e84c">MideaProtocol</a>
+, <a class="el" href="unionMitsubishi112Protocol.html#a167d9e324351844304624224ebd6c54e">Mitsubishi112Protocol</a>
+, <a class="el" href="unionMitsubishi144Protocol.html#a50ccc136c9cb813e62731c0e91e1bb18">Mitsubishi144Protocol</a>
 </li>
 <li>Sum1
 : <a class="el" href="unionDaikin128Protocol.html#a72cbe31d6a6efa72c3be3a5f97a33d9a">Daikin128Protocol</a>
@@ -178,6 +196,8 @@ $(function() {
 , <a class="el" href="unionHitachi424Protocol.html#aca9d734f4809828027727ba0ec5fb56f">Hitachi424Protocol</a>
 , <a class="el" href="unionHitachiProtocol.html#adc2e2a72df76b96392db614103476ad1">HitachiProtocol</a>
 , <a class="el" href="unionKelvinatorProtocol.html#aa00bcaec92896c766d0c59edfd19fa0c">KelvinatorProtocol</a>
+, <a class="el" href="unionMitsubishi112Protocol.html#a06f3c53c43e8e12a171570bcbc44b722">Mitsubishi112Protocol</a>
+, <a class="el" href="unionMitsubishi152Protocol.html#a6ff8b8c4309663ca8abffc6d5022e13a">Mitsubishi152Protocol</a>
 </li>
 <li>swingh
 : <a class="el" href="structstdAc_1_1state__t.html#a761bb702891ed1fa35906929a4c8a3f8">stdAc::state_t</a>
@@ -185,12 +205,17 @@ $(function() {
 <li>SwingH
 : <a class="el" href="unionVoltasProtocol.html#a55094a8796bf95e81eb7dd9a91d7a127">VoltasProtocol</a>
 </li>
+<li>SwingH1
+: <a class="el" href="unionMitsubishi88Protocol.html#a25360a714725166199b45ee26ddbe6d7">Mitsubishi88Protocol</a>
+</li>
+<li>SwingH2
+: <a class="el" href="unionMitsubishi88Protocol.html#ad175a3bea6aa442e1de553be6f352b32">Mitsubishi88Protocol</a>
+</li>
 <li>SwingHChange
 : <a class="el" href="unionVoltasProtocol.html#a32c53808a0f8b6574025f2b3c721ae47">VoltasProtocol</a>
 </li>
 <li>swingHFlag
-: <a class="el" href="classIRCoolixAC.html#a1c5fb27fb58d4d1a1fd8c9931eba58c4">IRCoolixAC</a>
-, <a class="el" href="classIRTranscoldAc.html#a15da6840a234b2ff739a86d19f15c58d">IRTranscoldAc</a>
+: <a class="el" href="classIRTranscoldAc.html#a15da6840a234b2ff739a86d19f15c58d">IRTranscoldAc</a>
 </li>
 <li>SwingToggle
 : <a class="el" href="unionHitachi1Protocol.html#a479a73b38e4f079d7d0e221bb6814a45">Hitachi1Protocol</a>
@@ -209,6 +234,9 @@ $(function() {
 , <a class="el" href="unionHitachi424Protocol.html#afa4ca85beef441434700d09a09fb60c7">Hitachi424Protocol</a>
 , <a class="el" href="unionHitachiProtocol.html#a31530689da10bfae60d005039c6ab596">HitachiProtocol</a>
 , <a class="el" href="unionKelvinatorProtocol.html#abd01a8f9d88b44f59484955107d9b7bb">KelvinatorProtocol</a>
+, <a class="el" href="unionMitsubishi112Protocol.html#a4de8c60641ea95f8f2b875d13f87f594">Mitsubishi112Protocol</a>
+, <a class="el" href="unionMitsubishi136Protocol.html#a24b4d22d88ac7630c1fcdccd964d013b">Mitsubishi136Protocol</a>
+, <a class="el" href="unionMitsubishi152Protocol.html#a3ae158a863e0ade1d64cc62a9cc7a374">Mitsubishi152Protocol</a>
 </li>
 <li>swingv
 : <a class="el" href="structstdAc_1_1state__t.html#a35477d368350d8981ad8b7b09505857e">stdAc::state_t</a>
@@ -216,9 +244,14 @@ $(function() {
 <li>SwingV
 : <a class="el" href="unionVoltasProtocol.html#ac2a240ab6b19af0e472c3134331a6e68">VoltasProtocol</a>
 </li>
+<li>SwingV5
+: <a class="el" href="unionMitsubishi88Protocol.html#aaa1b4fc42a673c7437373d85b2e22c26">Mitsubishi88Protocol</a>
+</li>
+<li>SwingV7
+: <a class="el" href="unionMitsubishi88Protocol.html#aa56bc52d2d6ec0d2f76aea923e084856">Mitsubishi88Protocol</a>
+</li>
 <li>swingVFlag
-: <a class="el" href="classIRCoolixAC.html#adf18ad8494466f6301176ce10aa3a075">IRCoolixAC</a>
-, <a class="el" href="classIRTranscoldAc.html#ae2aa4d5a19dd9056606ca20d03c893df">IRTranscoldAc</a>
+: <a class="el" href="classIRTranscoldAc.html#ae2aa4d5a19dd9056606ca20d03c893df">IRTranscoldAc</a>
 </li>
 <li>SwingVToggle
 : <a class="el" href="unionCoronaProtocol.html#a3b21dc7f46b2153be56daeca1b0b40e8">CoronaProtocol</a>
