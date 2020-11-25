@@ -1,5 +1,21 @@
 # Release Notes
 
+## _v2.7.13 (20201125)_
+
+**[Bug Fixes]**
+- Fix crash when IRac::sendAc(state_t, *state_t) called with SAMSUNG_AC & NULL (#1341 #1339)
+- Mitsubishi112 & 136: `setSwingV()` incorrectly sets mode. (#1337)
+- Typo preventing RC6 from compiling when other protocols disabled. (#1332 #1331)
+
+**[Features]**
+- Coolix: Improve Sensor(ZoneFollow) and add Vane Step support. (#1340 #1318)
+
+**[Misc]**
+- refactor ir_Coolix (#1340)
+- refactor ir_Mitsubishi (#1336)
+- refactor ir_MitsubishiHeavy (#1333)
+
+
 ## _v2.7.12 (20201113)_
 
 **[Bug Fixes]**
