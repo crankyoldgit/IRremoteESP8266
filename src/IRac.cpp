@@ -2109,6 +2109,10 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
       case decode_type_t::ELECTRA_AC:
         result.light = desired.light ^ prev->light;
         break;
+      case decode_type_t::FUJITSU_AC:
+        result.turbo = desired.turbo ^ prev->turbo;
+        result.econo = desired.econo ^ prev->econo;
+        break;
       case decode_type_t::MIDEA:
         result.turbo = desired.turbo ^ prev->turbo;
         result.econo = desired.econo ^ prev->econo;
