@@ -1306,3 +1306,39 @@ TEST(TestMideaACClass, SendingSwingV) {
     "Turbo Toggle: Off, Light Toggle: Off",
     IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
+
+// Reconstruct a Midea known raw code for an odd Pioneer System A/C.
+TEST(TestMideaACClass, Issue1342) {
+  IRMideaAC ac(kGpioUnused);
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1342#issuecomment-733721085
+  ASSERT_TRUE((1ULL<<37) & 0xA1A368FFFF45);  // Confirm the special bit is set.
+
+  ac.setRaw(0xA1A368FFFF45);
+  EXPECT_EQ(
+    "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: Off, "
+    "Temp: 21C/70F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), Sleep: Off, "
+    "Swing(V) Toggle: Off, Econo Toggle: Off, Turbo Toggle: Off, "
+    "Light Toggle: Off",
+    ac.toString());
+  ac.stateReset();  // Remove any existing info so we can build from scratch.
+  ASSERT_NE(0xA1A368FFFF45, ac.getRaw());
+  // Some Pioneer Systems have required a special bit to be set in order
+  // for the A/C unit to accept the message. We don't currently understand what
+  // this bit does. See the link for details of how to set this if needed.
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1342#issuecomment-733721085
+  ac.setRaw((1ULL<<37) | ac.getRaw());
+  ASSERT_TRUE((1ULL<<37) & ac.getRaw());  // Confirm the special bit is set.
+
+  ac.setPower(true);
+  ac.setMode(kMideaACHeat);
+  ac.setTemp(70);
+  ac.setFan(kMideaACFanAuto);
+  EXPECT_EQ(
+    "Type: 1 (Command), Power: On, Mode: 3 (Heat), Celsius: Off, "
+    "Temp: 21C/70F, On Timer: Off, Off Timer: Off, Fan: 0 (Auto), Sleep: Off, "
+    "Swing(V) Toggle: Off, Econo Toggle: Off, Turbo Toggle: Off, "
+    "Light Toggle: Off",
+    ac.toString());
+  EXPECT_EQ(0xA1A368FFFF45, ac.getRaw());
+}
