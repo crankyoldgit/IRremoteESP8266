@@ -4,10 +4,15 @@
 /// @brief Support for Midea protocols.
 /// Midea added by crankyoldgit & bwze
 /// @see https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1342#issuecomment-733721085
 
 // Supports:
 //   Brand: Pioneer System,  Model: RYBO12GMFILCAD A/C (12K BTU) (MIDEA)
 //   Brand: Pioneer System,  Model: RUBO18GMFILCAD A/C (18K BTU) (MIDEA)
+//   Brand: Pioneer System,  Model: WS012GMFI22HLD A/C (12K BTU) (MIDEA)
+//   Brand: Pioneer System,  Model: WS018GMFI22HLD A/C (12K BTU) (MIDEA)
+//   Brand: Pioneer System,  Model: UB018GMFILCFHD A/C (12K BTU) (MIDEA)
+//   Brand: Pioneer System,  Model: RG66B6(B)/BGEFU1 remote (MIDEA)
 //   Brand: Comfee, Model: MPD1-12CRN7 A/C (MIDEA)
 //   Brand: Kaysun, Model: Casual CF A/C (MIDEA)
 //   Brand: Keystone, Model: RG57H4(B)BGEF remote (MIDEA)
@@ -32,12 +37,18 @@
 #include "IRsend_test.h"
 #endif
 
-// Compile-time model specific overrides.
-// Uncomment one of these if you have such a devices to better match your A/C.
-// It changes some of the special commands/settings.
+/// @note
+/// Compile-time model specific overrides.
+/// Uncomment one of these if you have such a devices to better match your A/C.
+/// It changes some of the special commands/settings.
 //
 // #define DANBY_DAC true
 // #define KAYSUN_AC true
+
+/// @note Some Pioneer Systems have required a special bit to be set in order
+/// for the A/C unit to accept the message. We don't currently understand what
+/// this bit does. See the link for details of how to set this if needed.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1342#issuecomment-733721085
 
 /// Native representation of a Midea A/C message.
 union MideaProtocol{
@@ -67,7 +78,9 @@ union MideaProtocol{
     // Byte 4
     uint8_t Mode:3;
     uint8_t Fan:2;
-    uint8_t :1;
+    /// @todo Find out what this bit controls.
+    /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1342#issuecomment-733721085
+    uint8_t :1;  ///< Unknown, but set on _some_ Pioneer System A/Cs.
     uint8_t Sleep:1;
     uint8_t Power:1;
     // Byte 5
