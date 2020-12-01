@@ -47,7 +47,7 @@ extern "C" {
 // Globals
 #ifndef UNIT_TEST
 #if defined(ESP8266)
-static ETSTimer _irISRtimer;
+static ETSTimer timer;
 #endif  // ESP8266
 #if defined(ESP32)
 // Required structs/types from:
@@ -113,7 +113,7 @@ typedef struct hw_timer_s {
 } hw_timer_t;
 // End of Horrible Hack.
 
-static hw_timer_t * _irISRtimer = NULL;
+static hw_timer_t * timer = NULL;
 #endif  // ESP32
 #endif  // UNIT_TEST
 
@@ -156,7 +156,7 @@ static void USE_IRAM_ATTR gpio_intr() {
 
 #if defined(ESP8266)
   uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
-  os_timer_disarm(&_irISRtimer);
+  os_timer_disarm(&timer);
   GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
 #endif  // ESP8266
 
@@ -189,26 +189,26 @@ static void USE_IRAM_ATTR gpio_intr() {
   start = now;
 
 #if defined(ESP8266)
-  os_timer_arm(&_irISRtimer, irparams.timeout, ONCE);
+  os_timer_arm(&timer, irparams.timeout, ONCE);
 #endif  // ESP8266
 #if defined(ESP32)
   // Reset the timeout.
   //
   // The following three lines of code are the equiv of:
-  //   `timerWrite(_irISRtimer, 0);`
+  //   `timerWrite(timer, 0);`
   // We can't call that routine safely from inside an ISR as that procedure
   // is not stored in IRAM. Hence, we do it manually so that it's covered by
   // USE_IRAM_ATTR in this ISR.
   // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L106-L110
-  _irISRtimer->dev->load_high = (uint32_t) 0;  // timerWrite(_irISRtimer, 0);
-  _irISRtimer->dev->load_low = (uint32_t) 0;   // timerWrite(_irISRtimer, 0);
-  _irISRtimer->dev->reload = 1;                // timerWrite(_irISRtimer, 0);
+  timer->dev->load_high = (uint32_t) 0;  // timerWrite(timer, 0);
+  timer->dev->load_low = (uint32_t) 0;   // timerWrite(timer, 0);
+  timer->dev->reload = 1;                // timerWrite(timer, 0);
   // The next line is the same, but instead replaces:
-  //   `timerAlarmEnable(_irISRtimer);`
+  //   `timerAlarmEnable(timer);`
   // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L176-L178
-  _irISRtimer->dev->config.alarm_en = 1;       // timerAlarmEnable(_irISRtimer);
+  timer->dev->config.alarm_en = 1;       // timerAlarmEnable(timer);
 #endif  // ESP32
 }
 #endif  // UNIT_TEST
@@ -291,8 +291,8 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 IRrecv::~IRrecv(void) {
   disableIRIn();
 #if defined(ESP32)
-  if (_irISRtimer != NULL)
-    timerEnd(_irISRtimer);  // Cleanup the ESP32 timeout timer.
+  if (timer != NULL)
+    timerEnd(timer);  // Cleanup the ESP32 timeout timer.
 #endif  // ESP32
   delete[] irparams.rawbuf;
   if (irparams_save != NULL) {
@@ -317,11 +317,11 @@ void IRrecv::enableIRIn(const bool pullup) {
 #if defined(ESP32)
   // Initialise the ESP32 timer.
   // 80MHz / 80 = 1 uSec granularity.
-  _irISRtimer = timerBegin(_timer_num, 80, true);
+  timer = timerBegin(_timer_num, 80, true);
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
-  timerAlarmWrite(_irISRtimer, MS_TO_USEC(irparams.timeout), ONCE);
+  timerAlarmWrite(timer, MS_TO_USEC(irparams.timeout), ONCE);
   // Note: Interrupt needs to be attached before it can be enabled or disabled.
-  timerAttachInterrupt(_irISRtimer, &read_timeout, true);
+  timerAttachInterrupt(timer, &read_timeout, true);
 #endif  // ESP32
 
   // Initialise state machine variables
@@ -330,8 +330,8 @@ void IRrecv::enableIRIn(const bool pullup) {
 #ifndef UNIT_TEST
 #if defined(ESP8266)
   // Initialise ESP8266 timer.
-  os_timer_disarm(&_irISRtimer);
-  os_timer_setfn(&_irISRtimer,
+  os_timer_disarm(&timer);
+  os_timer_setfn(&timer,
                  reinterpret_cast<os_timer_func_t *>(read_timeout), NULL);
 #endif  // ESP8266
   // Attach Interrupt
@@ -344,10 +344,10 @@ void IRrecv::enableIRIn(const bool pullup) {
 void IRrecv::disableIRIn(void) {
 #ifndef UNIT_TEST
 #if defined(ESP8266)
-  os_timer_disarm(&_irISRtimer);
+  os_timer_disarm(&timer);
 #endif  // ESP8266
 #if defined(ESP32)
-  timerAlarmDisable(_irISRtimer);
+  timerAlarmDisable(timer);
 #endif  // ESP32
   detachInterrupt(irparams.recvpin);
 #endif  // UNIT_TEST
@@ -362,7 +362,7 @@ void IRrecv::resume(void) {
   irparams.rawlen = 0;
   irparams.overflow = false;
 #if defined(ESP32)
-  timerAlarmDisable(_irISRtimer);
+  timerAlarmDisable(timer);
 #endif  // ESP32
 }
 
