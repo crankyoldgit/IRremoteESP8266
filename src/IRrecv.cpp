@@ -50,6 +50,69 @@ extern "C" {
 static ETSTimer timer;
 #endif  // ESP8266
 #if defined(ESP32)
+// Required structs/types from:
+// https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L28-L58
+// These are needed to be able to directly manipulate the timer registers from
+// inside an ISR. This is very very ugly.
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
+// Note: This will need to be updated if it ever changes.
+//
+// Start of Horrible Hack!
+typedef struct {
+    union {
+        struct {
+            uint32_t reserved0:   10;
+            uint32_t alarm_en:     1;
+            /*When set  alarm is enabled*/
+            uint32_t level_int_en: 1;
+            /*When set  level type interrupt will be generated during alarm*/
+            uint32_t edge_int_en:  1;
+            /*When set  edge type interrupt will be generated during alarm*/
+            uint32_t divider:     16;
+            /*Timer clock (T0/1_clk) pre-scale value.*/
+            uint32_t autoreload:   1;
+            /*When set  timer 0/1 auto-reload at alarming is enabled*/
+            uint32_t increase:     1;
+            /*When set  timer 0/1 time-base counter increment.
+              When cleared timer 0 time-base counter decrement.*/
+            uint32_t enable:       1;
+            /*When set  timer 0/1 time-base counter is enabled*/
+        };
+        uint32_t val;
+    } config;
+    uint32_t cnt_low;
+    /*Register to store timer 0/1 time-base counter current value lower 32
+      bits.*/
+    uint32_t cnt_high;
+    /*Register to store timer 0 time-base counter current value higher 32
+      bits.*/
+    uint32_t update;
+    /*Write any value will trigger a timer 0 time-base counter value update
+      (timer 0 current value will be stored in registers above)*/
+    uint32_t alarm_low;
+    /*Timer 0 time-base counter value lower 32 bits that will trigger the
+      alarm*/
+    uint32_t alarm_high;
+    /*Timer 0 time-base counter value higher 32 bits that will trigger the
+      alarm*/
+    uint32_t load_low;
+    /*Lower 32 bits of the value that will load into timer 0 time-base counter*/
+    uint32_t load_high;
+    /*higher 32 bits of the value that will load into timer 0 time-base
+      counter*/
+    uint32_t reload;
+    /*Write any value will trigger timer 0 time-base counter reload*/
+} hw_timer_reg_t;
+
+typedef struct hw_timer_s {
+        hw_timer_reg_t * dev;
+        uint8_t num;
+        uint8_t group;
+        uint8_t timer;
+        portMUX_TYPE lock;
+} hw_timer_t;
+// End of Horrible Hack.
+
 static hw_timer_t * timer = NULL;
 #endif  // ESP32
 #endif  // UNIT_TEST
@@ -129,8 +192,23 @@ static void USE_IRAM_ATTR gpio_intr() {
   os_timer_arm(&timer, irparams.timeout, ONCE);
 #endif  // ESP8266
 #if defined(ESP32)
-  timerWrite(timer, 0);  // Reset the timeout.
-  timerAlarmEnable(timer);
+  // Reset the timeout.
+  //
+  // The following three lines of code are the equiv of:
+  //   `timerWrite(timer, 0);`
+  // We can't call that routine safely from inside an ISR as that procedure
+  // is not stored in IRAM. Hence, we do it manually so that it's covered by
+  // USE_IRAM_ATTR in this ISR.
+  // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
+  // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L106-L110
+  timer->dev->load_high = (uint32_t) 0;  // timerWrite(timer, 0);
+  timer->dev->load_low = (uint32_t) 0;   // timerWrite(timer, 0);
+  timer->dev->reload = 1;                // timerWrite(timer, 0);
+  // The next line is the same, but instead replaces:
+  //   `timerAlarmEnable(timer);`
+  // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
+  // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L176-L178
+  timer->dev->config.alarm_en = 1;       // timerAlarmEnable(timer);
 #endif  // ESP32
 }
 #endif  // UNIT_TEST
@@ -213,7 +291,8 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 IRrecv::~IRrecv(void) {
   disableIRIn();
 #if defined(ESP32)
-  if (timer != NULL) timerEnd(timer);  // Cleanup the ESP32 timeout timer.
+  if (timer != NULL)
+    timerEnd(timer);  // Cleanup the ESP32 timeout timer.
 #endif  // ESP32
   delete[] irparams.rawbuf;
   if (irparams_save != NULL) {
@@ -237,7 +316,8 @@ void IRrecv::enableIRIn(const bool pullup) {
   }
 #if defined(ESP32)
   // Initialise the ESP32 timer.
-  timer = timerBegin(_timer_num, 80, true);  // 80MHz / 80 = 1 uSec granularity.
+  // 80MHz / 80 = 1 uSec granularity.
+  timer = timerBegin(_timer_num, 80, true);
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
   timerAlarmWrite(timer, MS_TO_USEC(irparams.timeout), ONCE);
   // Note: Interrupt needs to be attached before it can be enabled or disabled.
@@ -251,8 +331,8 @@ void IRrecv::enableIRIn(const bool pullup) {
 #if defined(ESP8266)
   // Initialise ESP8266 timer.
   os_timer_disarm(&timer);
-  os_timer_setfn(&timer, reinterpret_cast<os_timer_func_t *>(read_timeout),
-                 NULL);
+  os_timer_setfn(&timer,
+                 reinterpret_cast<os_timer_func_t *>(read_timeout), NULL);
 #endif  // ESP8266
   // Attach Interrupt
   attachInterrupt(irparams.recvpin, gpio_intr, CHANGE);
