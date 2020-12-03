@@ -47,7 +47,9 @@ extern "C" {
 // Globals
 #ifndef UNIT_TEST
 #if defined(ESP8266)
+namespace _IRrecv {
 static ETSTimer timer;
+}  // namespace _IRrecv
 #endif  // ESP8266
 #if defined(ESP32)
 // Required structs/types from:
@@ -113,15 +115,26 @@ typedef struct hw_timer_s {
 } hw_timer_t;
 // End of Horrible Hack.
 
+namespace _IRrecv {
 static hw_timer_t * timer = NULL;
+}  // namespace _IRrecv
 #endif  // ESP32
+using _IRrecv::timer;
 #endif  // UNIT_TEST
 
+namespace _IRrecv {  // Namespace extension
 #if defined(ESP32)
-portMUX_TYPE irremote_mux = portMUX_INITIALIZER_UNLOCKED;
+portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #endif  // ESP32
-volatile irparams_t irparams;
-irparams_t *irparams_save;  // A copy of the interrupt state while decoding.
+volatile irparams_t params;
+irparams_t *params_save;  // A copy of the interrupt state while decoding.
+}  // namespace _IRrecv
+
+#if defined(ESP32)
+using _IRrecv::mux;
+#endif  // ESP32
+using _IRrecv::params;
+using _IRrecv::params_save;
 
 #ifndef UNIT_TEST
 #if defined(ESP8266)
@@ -138,14 +151,14 @@ static void USE_IRAM_ATTR read_timeout(void *arg __attribute__((unused))) {
 /// @note ESP32 version
 static void USE_IRAM_ATTR read_timeout(void) {
 /// @endcond
-  portENTER_CRITICAL(&irremote_mux);
+  portENTER_CRITICAL(&mux);
 #endif  // ESP32
-  if (irparams.rawlen) irparams.rcvstate = kStopState;
+  if (params.rawlen) params.rcvstate = kStopState;
 #if defined(ESP8266)
   os_intr_unlock();
 #endif  // ESP8266
 #if defined(ESP32)
-  portEXIT_CRITICAL(&irremote_mux);
+  portEXIT_CRITICAL(&mux);
 #endif  // ESP32
 }
 
@@ -166,30 +179,30 @@ static void USE_IRAM_ATTR gpio_intr() {
   // It seems referencing the value via the structure uses more instructions.
   // Less instructions means faster and less IRAM used.
   // N.B. It saves about 13 bytes of IRAM.
-  uint16_t rawlen = irparams.rawlen;
+  uint16_t rawlen = params.rawlen;
 
-  if (rawlen >= irparams.bufsize) {
-    irparams.overflow = true;
-    irparams.rcvstate = kStopState;
+  if (rawlen >= params.bufsize) {
+    params.overflow = true;
+    params.rcvstate = kStopState;
   }
 
-  if (irparams.rcvstate == kStopState) return;
+  if (params.rcvstate == kStopState) return;
 
-  if (irparams.rcvstate == kIdleState) {
-    irparams.rcvstate = kMarkState;
-    irparams.rawbuf[rawlen] = 1;
+  if (params.rcvstate == kIdleState) {
+    params.rcvstate = kMarkState;
+    params.rawbuf[rawlen] = 1;
   } else {
     if (now < start)
-      irparams.rawbuf[rawlen] = (UINT32_MAX - start + now) / kRawTick;
+      params.rawbuf[rawlen] = (UINT32_MAX - start + now) / kRawTick;
     else
-      irparams.rawbuf[rawlen] = (now - start) / kRawTick;
+      params.rawbuf[rawlen] = (now - start) / kRawTick;
   }
-  irparams.rawlen++;
+  params.rawlen++;
 
   start = now;
 
 #if defined(ESP8266)
-  os_timer_arm(&timer, irparams.timeout, ONCE);
+  os_timer_arm(&timer, params.timeout, ONCE);
 #endif  // ESP8266
 #if defined(ESP32)
   // Reset the timeout.
@@ -201,14 +214,14 @@ static void USE_IRAM_ATTR gpio_intr() {
   // USE_IRAM_ATTR in this ISR.
   // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L106-L110
-  timer->dev->load_high = (uint32_t) 0;  // timerWrite(timer, 0);
-  timer->dev->load_low = (uint32_t) 0;   // timerWrite(timer, 0);
-  timer->dev->reload = 1;                // timerWrite(timer, 0);
+  timer->dev->load_high = (uint32_t) 0;
+  timer->dev->load_low = (uint32_t) 0;
+  timer->dev->reload = 1;
   // The next line is the same, but instead replaces:
   //   `timerAlarmEnable(timer);`
   // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L176-L178
-  timer->dev->config.alarm_en = 1;       // timerAlarmEnable(timer);
+  timer->dev->config.alarm_en = 1;
 #endif  // ESP32
 }
 #endif  // UNIT_TEST
@@ -248,13 +261,13 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer) {
 /// @endcond
 #endif  // ESP32
-  irparams.recvpin = recvpin;
-  irparams.bufsize = bufsize;
+  params.recvpin = recvpin;
+  params.bufsize = bufsize;
   // Ensure we are going to be able to store all possible values in the
   // capture buffer.
-  irparams.timeout = std::min(timeout, (uint8_t)kMaxTimeoutMs);
-  irparams.rawbuf = new uint16_t[bufsize];
-  if (irparams.rawbuf == NULL) {
+  params.timeout = std::min(timeout, (uint8_t)kMaxTimeoutMs);
+  params.rawbuf = new uint16_t[bufsize];
+  if (params.rawbuf == NULL) {
     DPRINTLN(
         "Could not allocate memory for the primary IR buffer.\n"
         "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!");
@@ -264,10 +277,10 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
   }
   // If we have been asked to use a save buffer (for decoding), then create one.
   if (save_buffer) {
-    irparams_save = new irparams_t;
-    irparams_save->rawbuf = new uint16_t[bufsize];
+    params_save = new irparams_t;
+    params_save->rawbuf = new uint16_t[bufsize];
     // Check we allocated the memory successfully.
-    if (irparams_save->rawbuf == NULL) {
+    if (params_save->rawbuf == NULL) {
       DPRINTLN(
           "Could not allocate memory for the second IR buffer.\n"
           "Try a smaller size for CAPTURE_BUFFER_SIZE.\nRebooting!");
@@ -276,7 +289,7 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 #endif
     }
   } else {
-    irparams_save = NULL;
+    params_save = NULL;
   }
 #if DECODE_HASH
   _unknown_threshold = kUnknownThreshold;
@@ -291,13 +304,12 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 IRrecv::~IRrecv(void) {
   disableIRIn();
 #if defined(ESP32)
-  if (timer != NULL)
-    timerEnd(timer);  // Cleanup the ESP32 timeout timer.
+  if (timer != NULL) timerEnd(timer);  // Cleanup the ESP32 timeout timer.
 #endif  // ESP32
-  delete[] irparams.rawbuf;
-  if (irparams_save != NULL) {
-    delete[] irparams_save->rawbuf;
-    delete irparams_save;
+  delete[] params.rawbuf;
+  if (params_save != NULL) {
+    delete[] params_save->rawbuf;
+    delete params_save;
   }
 }
 
@@ -309,9 +321,9 @@ void IRrecv::enableIRIn(const bool pullup) {
   // This wasn't required on the ESP8266s, but it shouldn't hurt to make sure.
   if (pullup) {
 #ifndef UNIT_TEST
-    pinMode(irparams.recvpin, INPUT_PULLUP);
+    pinMode(params.recvpin, INPUT_PULLUP);
   } else {
-    pinMode(irparams.recvpin, INPUT);
+    pinMode(params.recvpin, INPUT);
 #endif  // UNIT_TEST
   }
 #if defined(ESP32)
@@ -319,7 +331,7 @@ void IRrecv::enableIRIn(const bool pullup) {
   // 80MHz / 80 = 1 uSec granularity.
   timer = timerBegin(_timer_num, 80, true);
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
-  timerAlarmWrite(timer, MS_TO_USEC(irparams.timeout), ONCE);
+  timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
   // Note: Interrupt needs to be attached before it can be enabled or disabled.
   timerAttachInterrupt(timer, &read_timeout, true);
 #endif  // ESP32
@@ -331,11 +343,11 @@ void IRrecv::enableIRIn(const bool pullup) {
 #if defined(ESP8266)
   // Initialise ESP8266 timer.
   os_timer_disarm(&timer);
-  os_timer_setfn(&timer,
-                 reinterpret_cast<os_timer_func_t *>(read_timeout), NULL);
+  os_timer_setfn(&timer, reinterpret_cast<os_timer_func_t *>(read_timeout),
+                 NULL);
 #endif  // ESP8266
   // Attach Interrupt
-  attachInterrupt(irparams.recvpin, gpio_intr, CHANGE);
+  attachInterrupt(params.recvpin, gpio_intr, CHANGE);
 #endif  // UNIT_TEST
 }
 
@@ -349,7 +361,7 @@ void IRrecv::disableIRIn(void) {
 #if defined(ESP32)
   timerAlarmDisable(timer);
 #endif  // ESP32
-  detachInterrupt(irparams.recvpin);
+  detachInterrupt(params.recvpin);
 #endif  // UNIT_TEST
 }
 
@@ -358,9 +370,9 @@ void IRrecv::disableIRIn(void) {
 ///   not set when the class was instanciated.
 /// @see IRrecv class constructor
 void IRrecv::resume(void) {
-  irparams.rcvstate = kIdleState;
-  irparams.rawlen = 0;
-  irparams.overflow = false;
+  params.rcvstate = kIdleState;
+  params.rawlen = 0;
+  params.overflow = false;
 #if defined(ESP32)
   timerAlarmDisable(timer);
 #endif  // ESP32
@@ -396,7 +408,7 @@ void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
 /// Obtain the maximum number of entries possible in the capture buffer.
 /// i.e. It's size.
 /// @return The size of the buffer that is in use by the object.
-uint16_t IRrecv::getBufSize(void) { return irparams.bufsize; }
+uint16_t IRrecv::getBufSize(void) { return params.bufsize; }
 
 #if DECODE_HASH
 /// Set the minimum length we will consider for reporting UNKNOWN message types.
@@ -490,7 +502,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
                     uint8_t max_skip, uint16_t noise_floor) {
   // Proceed only if an IR message been received.
 #ifndef UNIT_TEST
-  if (irparams.rcvstate != kStopState) return false;
+  if (params.rcvstate != kStopState) return false;
 #endif
 
   // Clear the entry we are currently pointing to when we got the timeout.
@@ -501,22 +513,22 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   // interrupt. decode() is not stored in ICACHE_RAM.
   // Another better option would be to zero the entire irparams.rawbuf[] on
   // resume() but that is a much more expensive operation compare to this.
-  irparams.rawbuf[irparams.rawlen] = 0;
+  params.rawbuf[params.rawlen] = 0;
 
   bool resumed = false;  // Flag indicating if we have resumed.
 
   // If we were requested to use a save buffer previously, do so.
-  if (save == NULL) save = irparams_save;
+  if (save == NULL) save = params_save;
 
   if (save == NULL) {
     // We haven't been asked to copy it so use the existing memory.
 #ifndef UNIT_TEST
-    results->rawbuf = irparams.rawbuf;
-    results->rawlen = irparams.rawlen;
-    results->overflow = irparams.overflow;
+    results->rawbuf = params.rawbuf;
+    results->rawlen = params.rawlen;
+    results->overflow = params.overflow;
 #endif
   } else {
-    copyIrParams(&irparams, save);  // Duplicate the interrupt's memory.
+    copyIrParams(&params, save);  // Duplicate the interrupt's memory.
     resume();  // It's now safe to rearm. The IR message won't be overridden.
     resumed = true;
     // Point the results at the saved copy.
@@ -1065,12 +1077,12 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   DPRINT(". Matching: ");
   DPRINT(measured);
   DPRINT(" >= ");
-  DPRINT(ticksLow(std::min(desired, MS_TO_USEC(irparams.timeout)), tolerance,
+  DPRINT(ticksLow(std::min(desired, MS_TO_USEC(params.timeout)), tolerance,
                   delta));
   DPRINT(" [min(");
   DPRINT(ticksLow(desired, tolerance, delta));
   DPRINT(", ");
-  DPRINT(ticksLow(MS_TO_USEC(irparams.timeout), tolerance, delta));
+  DPRINT(ticksLow(MS_TO_USEC(params.timeout), tolerance, delta));
   DPRINTLN(")]");
 #ifdef UNIT_TEST
   // Sanity checks that we don't have values that cause integer over/underflow.
@@ -1086,7 +1098,7 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   // We really should never get a value of 0, except as the last value
   // in the buffer. If that is the case, then assume infinity and return true.
   if (measured == 0) return true;
-  return measured >= ticksLow(std::min(desired, MS_TO_USEC(irparams.timeout)),
+  return measured >= ticksLow(std::min(desired, MS_TO_USEC(params.timeout)),
                               tolerance, delta);
 }
 
