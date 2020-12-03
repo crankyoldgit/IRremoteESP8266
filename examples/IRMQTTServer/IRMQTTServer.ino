@@ -674,6 +674,14 @@ String htmlMenu(void) {
   return html;
 }
 
+String htmlOptionItem(const String value, const String text, bool selected) {
+  String html = F("<option value='");
+  html += value + '\'';
+  if (selected) html += F(" selected='selected'");
+  html += '>' + text + F("</option>");
+  return html;
+}
+
 String htmlSelectAcStateProtocol(const String name, const decode_type_t def,
                                  const bool simple) {
   String html = "<select name='" + name + "'>";
@@ -884,14 +892,6 @@ void handleExamples(void) {
   server.send(200, "text/html", html);
 }
 #endif  // EXAMPLES_ENABLE
-
-String htmlOptionItem(const String value, const String text, bool selected) {
-  String html = F("<option value='");
-  html += value + '\'';
-  if (selected) html += F(" selected='selected'");
-  html += '>' + text + F("</option>");
-  return html;
-}
 
 String htmlSelectBool(const String name, const bool def) {
   String html = "<select name='" + name + "'>";
