@@ -411,6 +411,7 @@ void handleRoot(void);
 String addJsReloadUrl(const String url, const uint16_t timeout_s,
                       const bool notify);
 void handleExamples(void);
+String htmlOptionItem(const String value, const String text, bool selected);
 String htmlSelectBool(const String name, const bool def);
 String htmlSelectClimateProtocol(const String name, const decode_type_t def);
 String htmlSelectAcStateProtocol(const String name, const decode_type_t def,
