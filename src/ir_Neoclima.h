@@ -26,20 +26,57 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Neoclima A/C message.
+union NeoclimaProtocol {
+  uint8_t raw[kNeoclimaStateLength];  ///< State of the remote in code.
+  struct {
+    // Byte 0
+    uint8_t       :8;
+    // Byte 1
+    uint8_t       :1;
+    uint8_t CHeat :1;
+    uint8_t Ion   :1;
+    uint8_t       :5;
+    // Byte 2
+    uint8_t       :8;
+    // Byte 3
+    uint8_t Light :1;
+    uint8_t       :1;
+    uint8_t Hold  :1;
+    uint8_t Turbo :1;
+    uint8_t Econo :1;
+    uint8_t       :1;
+    uint8_t Eye   :1;
+    uint8_t       :1;
+    // Byte 4
+    uint8_t       :8;
+    // Byte 5
+    uint8_t Button  :5;
+    uint8_t         :2;
+    uint8_t Fresh   :1;
+    // Byte 6
+    uint8_t         :8;
+    // Byte 7
+    uint8_t Sleep   :1;
+    uint8_t Power   :1;
+    uint8_t SwingV  :2;
+    uint8_t SwingH  :1;
+    uint8_t Fan     :2;
+    uint8_t UseFah  :1;
+    // Byte 8
+    uint8_t Follow  :8;
+    // Byte 9
+    uint8_t Temp  :5;
+    uint8_t Mode  :3;
+    // Byte 10
+    uint8_t     :8;
+    // Byte 11
+    uint8_t Sum :8;
+  };
+};
+
 // Constants
-// state[1]
-const uint8_t kNeoclima8CHeatOffset = 1;
-const uint8_t kNeoclimaIonOffset = 2;
-// state[3]
-const uint8_t kNeoclimaLightOffset = 0;   ///< Mask 0b0000000x
-const uint8_t kNeoclimaHoldOffset = 2;    ///< Mask 0b00000x00
-const uint8_t kNeoclimaTurboOffset = 3;   ///< Mask 0b0000x000
-const uint8_t kNeoclimaEconoOffset = 4;   ///< Mask 0b000x0000
-const uint8_t kNeoclimaEyeOffset = 6;     ///< Mask 0b0x000000
-// state[5]
-const uint8_t kNeoclimaFreshOffset = 7;   ///< Mask 0bx0000000
-const uint8_t kNeoclimaButtonOffset = 0;  ///< Mask 0b000xxxxx
-const uint8_t kNeoclimaButtonSize = 5;    ///< Mask 0b000xxxxx
+
 const uint8_t kNeoclimaButtonPower =    0x00;
 const uint8_t kNeoclimaButtonMode =     0x01;
 const uint8_t kNeoclimaButtonTempUp =   0x02;
@@ -58,31 +95,20 @@ const uint8_t kNeoclimaButtonIon =      0x14;
 const uint8_t kNeoclimaButtonFresh =    0x15;
 const uint8_t kNeoclimaButton8CHeat =   0x1D;
 const uint8_t kNeoclimaButtonTempUnit = 0x1E;
-// state[7]
-const uint8_t kNeoclimaSleepOffset = 0;          // Mask 0b0000000x
-const uint8_t kNeoclimaPowerOffset = 1;          // Mask 0b000000x0
-const uint8_t kNeoclimaSwingVOffset = 2;         // Mask 0b0000xx00
-const uint8_t kNeoclimaSwingVSize = 2;  // Bits
+
 const uint8_t kNeoclimaSwingVOn =                            0b01;
 const uint8_t kNeoclimaSwingVOff =                           0b10;
-const uint8_t kNeoclimaSwingHOffset = 4;         // Mask 0b000x0000
-const uint8_t kNeoclimaFanOffest = 5;            // Mask 0b0xx00000
-const uint8_t kNeoclimaFanSize = 2;  // Bits
 const uint8_t kNeoclimaFanAuto =                          0b00;
 const uint8_t kNeoclimaFanHigh =                          0b01;
 const uint8_t kNeoclimaFanMed =                           0b10;
 const uint8_t kNeoclimaFanLow =                           0b11;
-const uint8_t kNeoclimaUseFahrenheitOffset = 7;  // Mask 0bx0000000
-// state[8]
+
 const uint8_t kNeoclimaFollowMe = 0x5D;  // Also 0x5F
-// state[9]
-const uint8_t kNeoclimaTempOffset = 0;  // Mask 0b000xxxxx
-const uint8_t kNeoclimaTempSize = 5;  // Bits
+
 const uint8_t kNeoclimaMinTempC = 16;   // 16C
 const uint8_t kNeoclimaMaxTempC = 32;   // 32C
 const uint8_t kNeoclimaMinTempF = 61;   // 61F
 const uint8_t kNeoclimaMaxTempF = 90;   // 90F
-const uint8_t kNeoclimaModeOffset = 5;  // Mask 0bxxx00000
 const uint8_t kNeoclimaAuto =     0b000;
 const uint8_t kNeoclimaCool =     0b001;
 const uint8_t kNeoclimaDry =      0b010;
@@ -106,43 +132,43 @@ class IRNeoclimaAc {
 #endif  // SEND_NEOCLIMA
   void begin(void);
   void setButton(const uint8_t button);
-  uint8_t getButton(void);
+  uint8_t getButton(void) const;
   void on(void);
   void off(void);
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   void setTemp(const uint8_t temp, const bool celsius = true);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setSwingV(const bool on);
-  bool getSwingV(void);
+  bool getSwingV(void) const;
   void setSwingH(const bool on);
-  bool getSwingH(void);
+  bool getSwingH(void) const;
   void setSleep(const bool on);
-  bool getSleep(void);
+  bool getSleep(void) const;
   void setTurbo(const bool on);
-  bool getTurbo(void);
+  bool getTurbo(void) const;
   void setEcono(const bool on);
-  bool getEcono(void);
+  bool getEcono(void) const;
   void setFresh(const bool on);
-  bool getFresh(void);
+  bool getFresh(void) const;
   void setHold(const bool on);
-  bool getHold(void);
+  bool getHold(void) const;
   void setIon(const bool on);
-  bool getIon(void);
+  bool getIon(void) const;
   void setLight(const bool on);
-  bool getLight(void);
+  bool getLight(void) const;
   void set8CHeat(const bool on);
-  bool get8CHeat(void);
+  bool get8CHeat(void) const;
   void setEye(const bool on);
-  bool getEye(void);
-  bool getTempUnits(void);
+  bool getEye(void) const;
+  bool getTempUnits(void) const;
   // DISABLED: See TODO in ir_Neoclima.cpp
   // void setFollow(const bool on);
-  bool getFollow(void);
+  bool getFollow(void) const;
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kNeoclimaStateLength);
@@ -150,12 +176,12 @@ class IRNeoclimaAc {
                             const uint16_t length = kNeoclimaStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kNeoclimaStateLength);
-  String toString(void);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  String toString(void) const;
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
+  stdAc::state_t toCommon(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -165,7 +191,7 @@ class IRNeoclimaAc {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kNeoclimaStateLength];  ///< State of the remote in code.
+  NeoclimaProtocol _;
   void checksum(const uint16_t length = kNeoclimaStateLength);
 };
 
