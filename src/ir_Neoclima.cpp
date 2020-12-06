@@ -197,6 +197,7 @@ void IRNeoclimaAc::setMode(const uint8_t mode) {
     default:
       // If we get an unexpected mode, default to AUTO.
       _.Mode = kNeoclimaAuto;
+      _.Button = kNeoclimaButtonMode;
   }
 }
 
