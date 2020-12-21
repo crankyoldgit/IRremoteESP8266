@@ -18,7 +18,7 @@ const uint16_t kLasertagTick = 333;
 const uint32_t kLasertagMinGap = kDefaultMessageGap;  // Just a guess.
 const uint8_t kLasertagTolerance = 0;     // Percentage error margin.
 const uint16_t kLasertagExcess = 0;       // See kMarkExcess.
-const uint16_t kLasertagDelta = 150;  // Use instead of Excess and Tolerance.
+const uint16_t kLasertagDelta = 165;  // Use instead of Excess and Tolerance.
 const int16_t kSpace = 1;
 const int16_t kMark = 0;
 
