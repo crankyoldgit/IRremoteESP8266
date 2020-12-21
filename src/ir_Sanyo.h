@@ -46,7 +46,7 @@ union SanyoProtocol{
     uint8_t      :3;
     // Byte 2
     uint8_t SensorTemp :5;
-    uint8_t            :1;
+    uint8_t Sensor     :1;  ///< Sensor location (0 = remote, 1 = A/C)
     uint8_t Beep       :1;
     uint8_t            :1;
     // Byte 3
@@ -70,13 +70,6 @@ union SanyoProtocol{
     uint8_t :8;
     // Byte 8
     uint8_t Sum :8;
-  };
-  struct {
-    uint8_t :8;
-    uint8_t :8;
-    // Byte 2
-    uint8_t        :2;
-    uint8_t Sensor :1;
   };
 };
 
