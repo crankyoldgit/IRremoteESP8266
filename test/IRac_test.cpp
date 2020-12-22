@@ -1264,7 +1264,7 @@ TEST(TestIRac, Sanyo) {
   char expected[] =
       "Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), "
       "Swing(V): 7 (Highest), Sleep: On, Beep: On, "
-      "Sensor: Wall, Sensor Temp: 28C, Off Timer: Off";
+      "Sensor: Room, Sensor Temp: 28C, Off Timer: Off";
 
   ac.begin();
   irac.sanyo(&ac,
