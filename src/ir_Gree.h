@@ -13,6 +13,8 @@
 //   Brand: Green,  Model: YBOFB2 remote
 //   Brand: Gree,  Model: YAA1FBF remote
 //   Brand: Gree,  Model: YB1F2F remote
+//   Brand: Amana,  Model: PBC093G00CC A/C
+//   Brand: Amana,  Model: YX1FF remote
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
