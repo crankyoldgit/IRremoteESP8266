@@ -30,8 +30,6 @@ using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::minsToString;
 using irutils::sumNibbles;
-using irutils::setBit;
-using irutils::setBits;
 
 // Constants
 // Sanyo SA 8650B
@@ -311,7 +309,7 @@ IRSanyoAc::IRSanyoAc(const uint16_t pin, const bool inverted,
 void IRSanyoAc::stateReset(void) {
   static const uint8_t kReset[kSanyoAcStateLength] = {
     0x6A, 0x6D, 0x51, 0x00, 0x10, 0x45, 0x00, 0x00, 0x33};
-  memcpy(remote_state, kReset, kSanyoAcStateLength);
+  std::memcpy(_.raw, kReset, kSanyoAcStateLength);
 }
 
 /// Set up hardware to be able to send a message.
@@ -330,13 +328,13 @@ void IRSanyoAc::send(const uint16_t repeat) {
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRSanyoAc::getRaw(void) {
   checksum();
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] newState A valid code for this protocol.
 void IRSanyoAc::setRaw(const uint8_t newState[]) {
-  memcpy(remote_state, newState, kSanyoAcStateLength);
+  std::memcpy(_.raw, newState, kSanyoAcStateLength);
 }
 
 /// Calculate the checksum for a given state.
@@ -359,7 +357,7 @@ bool IRSanyoAc::validChecksum(const uint8_t state[], const uint16_t length) {
 /// Calculate & set the checksum for the current internal state of the remote.
 void IRSanyoAc::checksum(void) {
   // Stored the checksum value in the last byte.
-  remote_state[kSanyoAcStateLength - 1] = calcChecksum(remote_state);
+  _.Sum = calcChecksum(_.raw);
 }
 
 
@@ -372,22 +370,19 @@ void IRSanyoAc::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSanyoAc::setPower(const bool on) {
-  setBits(&remote_state[kSanyoAcPowerByte], kSanyoAcPowerOffset,
-          kSanyoAcPowerSize, on ? kSanyoAcPowerOn : kSanyoAcPowerOff);
+  _.Power = (on ? kSanyoAcPowerOn : kSanyoAcPowerOff);
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSanyoAc::getPower(void) {
-  return GETBITS8(remote_state[kSanyoAcPowerByte], kSanyoAcPowerOffset,
-                  kSanyoAcPowerSize) == kSanyoAcPowerOn;
+bool IRSanyoAc::getPower(void) const {
+  return _.Power == kSanyoAcPowerOn;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRSanyoAc::getMode(void) {
-  return GETBITS8(remote_state[kSanyoAcModeByte], kSanyoAcModeOffset,
-                  kSanyoAcModeSize);
+uint8_t IRSanyoAc::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -399,10 +394,9 @@ void IRSanyoAc::setMode(const uint8_t mode) {
     case kSanyoAcCool:
     case kSanyoAcDry:
     case kSanyoAcHeat:
-      setBits(&remote_state[kSanyoAcModeByte], kSanyoAcModeOffset,
-              kSanyoAcModeSize, mode);
+      _.Mode = mode;
       break;
-    default: setMode(kSanyoAcAuto);
+    default: _.Mode = kSanyoAcAuto;
   }
 }
 
@@ -430,59 +424,44 @@ stdAc::opmode_t IRSanyoAc::toCommonMode(const uint8_t mode) {
   }
 }
 
-/// Set the temperature at a given location.
-/// @param[out] ptr A pointer to a temperature byte.
-/// @param[in] degrees The temperature in degrees celsius.
-void IRSanyoAc::_setTemp(uint8_t *ptr, const uint8_t degrees) {
-  uint8_t temp = std::max((uint8_t)kSanyoAcTempMin, degrees);
-  temp = std::min((uint8_t)kSanyoAcTempMax, temp);
-  setBits(ptr, kSanyoAcTempOffset, kSanyoAcTempSize, temp - kSanyoAcTempDelta);
-}
-
-/// Get the temperature from a given location.
-/// @param[in] ptr A pointer to a temperature byte.
-/// @return The current setting for temp. in degrees celsius.
-uint8_t IRSanyoAc::_getTemp(uint8_t *ptr) {
-  return GETBITS8(*ptr, kSanyoAcTempOffset, kSanyoAcTempSize) +
-      kSanyoAcTempDelta;
-}
-
 /// Set the desired temperature.
 /// @param[in] degrees The temperature in degrees celsius.
 void IRSanyoAc::setTemp(const uint8_t degrees) {
-  _setTemp(&remote_state[kSanyoAcTempByte], degrees);
+  uint8_t temp = std::max((uint8_t)kSanyoAcTempMin, degrees);
+  temp = std::min((uint8_t)kSanyoAcTempMax, temp);
+  _.Temp = temp - kSanyoAcTempDelta;
 }
 
 /// Get the current desired temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRSanyoAc::getTemp(void) {
-  return _getTemp(&remote_state[kSanyoAcTempByte]);
+uint8_t IRSanyoAc::getTemp(void) const {
+  return _.Temp + kSanyoAcTempDelta;
 }
 
 /// Set the sensor temperature.
 /// @param[in] degrees The temperature in degrees celsius.
 void IRSanyoAc::setSensorTemp(const uint8_t degrees) {
-  _setTemp(&remote_state[kSanyoAcSensorByte], degrees);
+  uint8_t temp = std::max((uint8_t)kSanyoAcTempMin, degrees);
+  temp = std::min((uint8_t)kSanyoAcTempMax, temp);
+  _.SensorTemp = temp - kSanyoAcTempDelta;
 }
 
 /// Get the current sensor temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRSanyoAc::getSensorTemp(void) {
-  return _getTemp(&remote_state[kSanyoAcSensorByte]);
+uint8_t IRSanyoAc::getSensorTemp(void) const {
+  return _.SensorTemp + kSanyoAcTempDelta;
 }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
 void IRSanyoAc::setFan(const uint8_t speed) {
-  setBits(&remote_state[kSanyoAcModeByte], kSanyoAcFanOffset, kSanyoAcFanSize,
-          speed);
+  _.Fan = speed;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed/mode.
-uint8_t IRSanyoAc::getFan(void) {
-  return GETBITS8(remote_state[kSanyoAcModeByte], kSanyoAcFanOffset,
-                  kSanyoAcFanSize);
+uint8_t IRSanyoAc::getFan(void) const {
+  return _.Fan;
 }
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
@@ -513,9 +492,8 @@ stdAc::fanspeed_t IRSanyoAc::toCommonFanSpeed(const uint8_t spd) {
 
 /// Get the vertical swing setting of the A/C.
 /// @return The current swing mode setting.
-uint8_t IRSanyoAc::getSwingV(void) {
-  return GETBITS8(remote_state[kSanyoAcPowerByte], kSanyoAcSwingVOffset,
-                  kSanyoAcSwingVSize);
+uint8_t IRSanyoAc::getSwingV(void) const {
+  return _.SwingV;
 }
 
 /// Set the vertical swing setting of the A/C.
@@ -523,11 +501,9 @@ uint8_t IRSanyoAc::getSwingV(void) {
 void IRSanyoAc::setSwingV(const uint8_t setting) {
   if (setting == kSanyoAcSwingVAuto ||
       (setting >= kSanyoAcSwingVLowest && setting <= kSanyoAcSwingVHighest))
-    setBits(&remote_state[kSanyoAcPowerByte], kSanyoAcSwingVOffset,
-            kSanyoAcSwingVSize, setting);
-
+    _.SwingV = setting;
   else
-    setSwingV(kSanyoAcSwingVAuto);
+    _.SwingV = kSanyoAcSwingVAuto;
 }
 
 /// Convert a stdAc::swingv_t enum into it's native setting.
@@ -562,49 +538,48 @@ stdAc::swingv_t IRSanyoAc::toCommonSwingV(const uint8_t setting) {
 /// Set the Sleep (Night Setback) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSanyoAc::setSleep(const bool on) {
-  setBit(&remote_state[kSanyoAcSleepByte], kSanyoAcSleepBit, on);
+  _.Sleep = on;
 }
 
 /// Get the Sleep (Night Setback) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSanyoAc::getSleep(void) {
-  return GETBIT8(remote_state[kSanyoAcSleepByte], kSanyoAcSleepBit);
+bool IRSanyoAc::getSleep(void) const {
+  return _.Sleep;
 }
 
 /// Set the Sensor Location setting of the A/C.
 /// i.e. Where the ambient temperature is measured.
 /// @param[in] location true is Unit/Wall, false is Remote/Room.
 void IRSanyoAc::setSensor(const bool location) {
-  setBit(&remote_state[kSanyoAcSensorByte], kSanyoAcSensorBit, location);
+  _.Sensor = location;
 }
 
 /// Get the Sensor Location setting of the A/C.
 /// i.e. Where the ambient temperature is measured.
 /// @return true is Unit/Wall, false is Remote/Room.
-bool IRSanyoAc::getSensor(void) {
-  return GETBIT8(remote_state[kSanyoAcSensorByte], kSanyoAcSensorBit);
+bool IRSanyoAc::getSensor(void) const {
+  return _.Sensor;
 }
 
 /// Set the Beep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSanyoAc::setBeep(const bool on) {
-  setBit(&remote_state[kSanyoAcSensorByte], kSanyoAcBeepBit, on);
+  _.Beep = on;
 }
 
 /// Get the Beep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSanyoAc::getBeep(void) {
-  return GETBIT8(remote_state[kSanyoAcSensorByte], kSanyoAcBeepBit);
+bool IRSanyoAc::getBeep(void) const {
+  return _.Beep;
 }
 
 /// Get the nr of minutes the Off Timer is set to.
 /// @return The timer time expressed as the number of minutes.
 ///   A value of 0 means the Off Timer is off/disabled.
 /// @note The internal precission has a resolution of 1 hour.
-uint16_t IRSanyoAc::getOffTimer(void) {
-  if (GETBIT8(remote_state[kSanyoAcModeByte], kSanyoAcOffTimerEnableBit))
-    return GETBITS8(remote_state[kSanyoAcOffHourByte], kSanyoAcOffHourOffset,
-                    kSanyoAcOffHourSize) * 60;
+uint16_t IRSanyoAc::getOffTimer(void) const {
+  if (_.OffTimer)
+    return _.OffHour * 60;
   else
     return 0;
 }
@@ -615,25 +590,24 @@ uint16_t IRSanyoAc::getOffTimer(void) {
 /// @note The internal precission has a resolution of 1 hour.
 void IRSanyoAc::setOffTimer(const uint16_t mins) {
   const uint8_t hours = std::min((uint8_t)(mins / 60), kSanyoAcHourMax);
-  setBit(&remote_state[kSanyoAcModeByte], kSanyoAcOffTimerEnableBit, hours > 0);
-  setBits(&remote_state[kSanyoAcOffHourByte], kSanyoAcOffHourOffset,
-          kSanyoAcOffHourSize, hours);
+  _.OffTimer = (hours > 0);
+  _.OffHour = hours;
 }
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRSanyoAc::toCommon(void) {
+stdAc::state_t IRSanyoAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::SANYO_AC;
   result.model = -1;  // Not supported.
   result.power = getPower();
-  result.mode = toCommonMode(getMode());
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
-  result.sleep = getSleep() ? 0 : -1;
-  result.swingv = toCommonSwingV(getSwingV());
-  result.beep = getBeep();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.sleep = _.Sleep ? 0 : -1;
+  result.swingv = toCommonSwingV(_.SwingV);
+  result.beep = _.Beep;
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;
@@ -648,19 +622,19 @@ stdAc::state_t IRSanyoAc::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRSanyoAc::toString(void) {
+String IRSanyoAc::toString(void) const {
   String result = "";
   result.reserve(140);
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kSanyoAcAuto, kSanyoAcCool,
+  result += addModeToString(_.Mode, kSanyoAcAuto, kSanyoAcCool,
                             kSanyoAcHeat, kSanyoAcDry, kSanyoAcAuto);
   result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kSanyoAcFanHigh, kSanyoAcFanLow,
+  result += addFanToString(_.Fan, kSanyoAcFanHigh, kSanyoAcFanLow,
                            kSanyoAcFanAuto, kSanyoAcFanAuto,
                            kSanyoAcFanMedium);
-  result += addIntToString(getSwingV(), kSwingVStr);
+  result += addIntToString(_.SwingV, kSwingVStr);
   result += kSpaceLBraceStr;
-  switch (getSwingV()) {
+  switch (_.SwingV) {
     case kSanyoAcSwingVHighest: result += kHighestStr; break;
     case kSanyoAcSwingVHigh:    result += kHighStr; break;
     case kSanyoAcSwingVUpperMiddle:
@@ -679,9 +653,9 @@ String IRSanyoAc::toString(void) {
     default:                    result += kUnknownStr;
   }
   result += ')';
-  result += addBoolToString(getSleep(), kSleepStr);
-  result += addBoolToString(getBeep(), kBeepStr);
-  result += addLabeledString(getSensor() ? kRoomStr : kWallStr, kSensorStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
+  result += addBoolToString(_.Beep, kBeepStr);
+  result += addLabeledString(_.Sensor ? kRoomStr : kWallStr, kSensorStr);
   result += kCommaSpaceStr;
   result += kSensorStr;
   result += ' ';

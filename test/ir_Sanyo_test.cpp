@@ -310,7 +310,7 @@ TEST(TestDecodeSanyoAc, DecodeRealExamples) {
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
-      "Swing(V): 5 (Upper Middle), Sleep: Off, Beep: On, Sensor: Room, "
+      "Swing(V): 5 (Upper Middle), Sleep: Off, Beep: On, Sensor: Wall, "
       "Sensor Temp: 11C, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -332,7 +332,7 @@ TEST(TestDecodeSanyoAc, SyntheticSelfDecode) {
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
-      "Swing(V): 5 (Upper Middle), Sleep: Off, Beep: On, Sensor: Room, "
+      "Swing(V): 5 (Upper Middle), Sleep: Off, Beep: On, Sensor: Wall, "
       "Sensor Temp: 11C, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
@@ -506,7 +506,7 @@ TEST(TestSanyoAcClass, Timers) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Heat), Temp: 17C, Fan: 0 (Auto), "
       "Swing(V): 5 (Upper Middle), Sleep: Off, Beep: On, "
-      "Sensor: Room, Sensor Temp: 19C, Off Timer: 02:00",
+      "Sensor: Wall, Sensor Temp: 19C, Off Timer: 02:00",
       ac.toString());
 }
 

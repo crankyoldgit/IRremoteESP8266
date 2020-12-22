@@ -34,52 +34,65 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Sanyo A/C message.
+union SanyoProtocol{
+  uint8_t raw[kSanyoAcStateLength];  ///< The state in IR code form.
+  // Ref: https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?usp=sharing
+  struct {
+    // Byte 0
+    uint8_t :8;  // 0x6A (Fixed?)
+    // Byte 1
+    uint8_t Temp :5;
+    uint8_t      :3;
+    // Byte 2
+    uint8_t SensorTemp :5;
+    uint8_t Sensor     :1;  ///< Sensor location (0 = remote, 1 = A/C)
+    uint8_t Beep       :1;
+    uint8_t            :1;
+    // Byte 3
+    uint8_t OffHour :4;
+    uint8_t         :4;
+    // Byte 4
+    uint8_t Fan      :2;
+    uint8_t OffTimer :1;
+    uint8_t          :1;
+    uint8_t Mode     :3;
+    uint8_t          :1;
+    // Byte 5
+    uint8_t SwingV :3;
+    uint8_t        :3;
+    uint8_t Power  :2;
+    // Byte 6
+    uint8_t       :3;
+    uint8_t Sleep :1;
+    uint8_t       :4;
+    // Byte 7
+    uint8_t :8;
+    // Byte 8
+    uint8_t Sum :8;
+  };
+};
+
 // Constants
 
-// Sanyo A/C
-// Ref: https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?usp=sharing
-// Byte[0] - 0x6A (Fixed?)
-// Byte[1] - Address + Temperature
-const uint8_t kSanyoAcTempByte = 1;    ///< Index
-const uint8_t kSanyoAcTempOffset = 0;  ///< Mask 0b000xxxxx
-const uint8_t kSanyoAcTempSize = 5;    ///< Mask 0b000xxxxx
 const uint8_t kSanyoAcTempMin = 16;    ///< Celsius
 const uint8_t kSanyoAcTempMax = 30;    ///< Celsius
 const uint8_t kSanyoAcTempDelta = 4;   ///< Celsius to Native Temp difference.
-// Byte[2] - Ambient Temp + Sensor
-const uint8_t kSanyoAcSensorByte = 2;       ///< Index
-const uint8_t kSanyoAcSensorBit = 2;  ///< Mask 0b00x00000
-// Ambient Temp Mask                            0b000xxxxx
-const uint8_t kSanyoAcBeepBit = 6;    ///< Mask 0b0x000000
-// Byte[3] - Off Hour
-const uint8_t kSanyoAcOffHourByte = 3;    ///< Index
-const uint8_t kSanyoAcOffHourOffset = 0;  ///< Mask 0b0000xxxx
-const uint8_t kSanyoAcOffHourSize = 4;    ///< Mask 0b0000xxxx
+
 const uint8_t kSanyoAcHourMax = 15;       ///<          0b1111
-// Byte[4] - Mode + Fan + Timer Enables
-const uint8_t kSanyoAcModeByte = 4;    ///< Index
-const uint8_t kSanyoAcModeOffset = 4;  ///< Mask 0b0xxx0000
-const uint8_t kSanyoAcModeSize =   3;  ///< Mask 0b0xxx0000
+
 const uint8_t kSanyoAcHeat = 1;        ///<       0b001
 const uint8_t kSanyoAcCool = 2;        ///<       0b010
 const uint8_t kSanyoAcDry =  3;        ///<       0b011
 const uint8_t kSanyoAcAuto = 4;        ///<       0b100
-const uint8_t kSanyoAcOffTimerEnableBit = 2;  ///< Mask 0b00000x00
-const uint8_t kSanyoAcFanOffset = 0;   ///< Mask 0b000000xx
-const uint8_t kSanyoAcFanSize =   2;   ///< Mask 0b000000xx
 const uint8_t kSanyoAcFanAuto =   0;   ///<            0b00
 const uint8_t kSanyoAcFanHigh =   1;   ///<            0b01
 const uint8_t kSanyoAcFanLow =    2;   ///<            0b10
 const uint8_t kSanyoAcFanMedium = 3;   ///<            0b11
-// Byte[5] - Power + SwingV
-const uint8_t kSanyoAcPowerByte = 5;    ///< Index
-const uint8_t kSanyoAcPowerOffset = 6;  ///< Mask 0bxx000000
-const uint8_t kSanyoAcPowerSize = 2;    ///< Mask 0bxx000000
+
 // const uint8_t kSanyoAcPowerStandby =           0b00;  ///< Standby?
 const uint8_t kSanyoAcPowerOff =                  0b01;  ///< Off
 const uint8_t kSanyoAcPowerOn =                   0b10;  ///< On
-const uint8_t kSanyoAcSwingVOffset = 0;  ///< Mask 0b00000xxx
-const uint8_t kSanyoAcSwingVSize = 3;    ///< Mask 0b00000xxx
 const uint8_t kSanyoAcSwingVAuto =         0;  ///<     0b000
 const uint8_t kSanyoAcSwingVLowest =       2;  ///<     0b010
 const uint8_t kSanyoAcSwingVLow =          3;  ///<     0b011
@@ -87,11 +100,6 @@ const uint8_t kSanyoAcSwingVLowerMiddle =  4;  ///<     0b100
 const uint8_t kSanyoAcSwingVUpperMiddle =  5;  ///<     0b101
 const uint8_t kSanyoAcSwingVHigh =         6;  ///<     0b110
 const uint8_t kSanyoAcSwingVHighest =      7;  ///<     0b111
-// Byte[6] - Sleep
-const uint8_t kSanyoAcSleepByte = 6;    ///< Index
-const uint8_t kSanyoAcSleepBit = 3;  ///< Mask 0b0000x000
-// Byte[8] - Checksum (8-bit Sum of all preceeding nibbles)
-
 
 // Classes
 /// Class for handling detailed Sanyo A/C messages.
@@ -112,37 +120,37 @@ class IRSanyoAc {
   void on(void);
   void off(void);
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setTemp(const uint8_t degrees);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setSensorTemp(const uint8_t degrees);
-  uint8_t getSensorTemp(void);
+  uint8_t getSensorTemp(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   void setSleep(const bool on);
-  bool getSleep(void);
+  bool getSleep(void) const;
   void setSensor(const bool location);
-  bool getSensor(void);
+  bool getSensor(void) const;
   void setBeep(const bool on);
-  bool getBeep(void);
+  bool getBeep(void) const;
   void setSwingV(const uint8_t setting);
-  uint8_t getSwingV(void);
+  uint8_t getSwingV(void) const;
   void setRaw(const uint8_t newState[]);
   uint8_t* getRaw(void);
-  uint16_t getOffTimer(void);
+  uint16_t getOffTimer(void) const;
   void setOffTimer(const uint16_t mins);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kSanyoAcStateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
-  uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -152,12 +160,10 @@ class IRSanyoAc {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kSanyoAcStateLength];  ///< The state in IR code form.
+  SanyoProtocol _;
   void checksum(void);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kSanyoAcStateLength);
-  void _setTemp(uint8_t *ptr, const uint8_t degrees);
-  uint8_t _getTemp(uint8_t *ptr);
 };
 
 #endif  // IR_SANYO_H_
