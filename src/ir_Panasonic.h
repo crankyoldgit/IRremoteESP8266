@@ -102,14 +102,14 @@ class IRPanasonicAc {
   explicit IRPanasonicAc(const uint16_t pin, const bool inverted = false,
                          const bool use_modulation = true);
   void stateReset(void);
-#if SEND_PANASONIC
+#if SEND_PANASONIC_AC
   void send(const uint16_t repeat = kPanasonicAcDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
   /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
-#endif  // SEND_PANASONIC
+#endif  // SEND_PANASONIC_AC
   void begin(void);
   void on(void);
   void off(void);
@@ -177,6 +177,88 @@ class IRPanasonicAc {
   static uint16_t _getTime(const uint8_t ptr[]);
   static void _setTime(uint8_t * const ptr, const uint16_t mins_since_midnight,
                        const bool round_down);
+};
+
+/// Native representation of a Panasonic 32-bit A/C message.
+union PanasonicAc32Protocol {
+  uint32_t raw;  ///< The state in IR code form.
+  struct {
+    // Byte 0
+    uint8_t        :3;
+    uint8_t SwingH :1;
+    uint8_t SwingV :3;
+    uint8_t        :1;  ///< Always appears to be set. (1)
+    // Byte 1
+    uint8_t :8;  // Always seems to be 0x36.
+    // Byte 2
+    uint8_t Temp   :4;
+    uint8_t Fan    :4;
+    // Byte 3
+    uint8_t Mode   :3;
+    uint8_t        :5;
+  };
+};
+
+const uint8_t kPanasonicAc32Fan =  1;  // 0b001
+const uint8_t kPanasonicAc32Cool = 2;  // 0b010
+const uint8_t kPanasonicAc32Dry =  3;  // 0b011
+const uint8_t kPanasonicAc32Heat = 4;  // 0b010
+const uint8_t kPanasonicAc32Auto = 6;  // 0b110
+
+const uint8_t kPanasonicAc32FanMin =  2;
+const uint8_t kPanasonicAc32FanLow =  3;
+const uint8_t kPanasonicAc32FanMed =  4;
+const uint8_t kPanasonicAc32FanHigh = 5;
+const uint8_t kPanasonicAc32FanMax =  6;
+const uint8_t kPanasonicAc32FanAuto = 0xF;
+const uint8_t kPanasonicAc32SwingVAuto = 0x7;   // 0b111
+const uint32_t kPanasonicAc32KnownGood = 0x0AF136FC;  ///< Cool, Auto, 16C
+
+/// Class for handling detailed Panasonic 32bit A/C messages.
+class IRPanasonicAc32 {
+ public:
+  explicit IRPanasonicAc32(const uint16_t pin, const bool inverted = false,
+                           const bool use_modulation = true);
+  void stateReset(void);
+#if SEND_PANASONIC_AC32
+  void send(const uint16_t repeat = kPanasonicAcDefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
+  int8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_PANASONIC_AC32
+  void begin(void);
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp(void) const;
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void) const;
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void) const;
+  void setRaw(const uint32_t state);
+  uint32_t getRaw(void) const;
+  void setSwingVertical(const uint8_t pos);
+  uint8_t getSwingVertical(void) const;
+  void setSwingHorizontal(const bool on);
+  bool getSwingHorizontal(void) const;
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+  PanasonicAc32Protocol _;  ///< The state in code form.
 };
 
 #endif  // IR_PANASONIC_H_

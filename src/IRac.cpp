@@ -3266,6 +3266,16 @@ namespace IRAcUtils {
         return "";
       }
 #endif  // DECODE_PANASONIC_AC
+#if DECODE_PANASONIC_AC32
+      case decode_type_t::PANASONIC_AC32: {
+        if (result->bits >= kPanasonicAc32Bits) {
+          IRPanasonicAc32 ac(kGpioUnused);
+          ac.setRaw(result->value);  // Uses value instead of state.
+          return ac.toString();
+        }
+        return "";
+      }
+#endif  // DECODE_PANASONIC_AC
 #if DECODE_HITACHI_AC
       case decode_type_t::HITACHI_AC: {
         IRHitachiAc ac(kGpioUnused);
@@ -3667,6 +3677,18 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_PANASONIC_AC
+#if DECODE_PANASONIC_AC32
+      case decode_type_t::PANASONIC_AC32: {
+        IRPanasonicAc32 ac(kGpioUnused);
+        if (decode->bits >= kPanasonicAc32Bits) {
+          ac.setRaw(decode->value);  // Uses value instead of state.
+          *result = ac.toCommon();
+        } else {
+          return false;
+        }
+        break;
+      }
+#endif  // DECODE_PANASONIC_AC32
 #if DECODE_SAMSUNG_AC
       case decode_type_t::SAMSUNG_AC: {
         IRSamsungAc ac(kGpioUnused);

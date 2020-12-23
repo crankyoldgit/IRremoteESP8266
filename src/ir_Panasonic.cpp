@@ -192,7 +192,7 @@ void IRsend::sendPanasonicAC(const uint8_t data[], const uint16_t nbytes,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRPanasonicAc::IRPanasonicAc(const uint16_t pin, const bool inverted,
                              const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the state of the remote to a known good state/sequence.
 void IRPanasonicAc::stateReset(void) {
@@ -226,7 +226,7 @@ uint8_t IRPanasonicAc::calcChecksum(const uint8_t *state,
 /// Calculate and set the checksum values for the internal state.
 /// @param[in] length The size/length of the state.
 void IRPanasonicAc::fixChecksum(const uint16_t length) {
-  remote_state[length - 1] = this->calcChecksum(remote_state, length);
+  remote_state[length - 1] = calcChecksum(remote_state, length);
 }
 
 #if SEND_PANASONIC_AC
@@ -266,7 +266,7 @@ void IRPanasonicAc::setModel(const panasonic_ac_remote_model_t model) {
       remote_state[23] = 0x01;
       remote_state[25] = 0x06;
       // Has to be done last as setSwingHorizontal has model check built-in
-      this->setSwingHorizontal(_swingh);
+      setSwingHorizontal(_swingh);
       break;
     case kPanasonicNke:
       remote_state[17] = 0x06;
@@ -309,7 +309,7 @@ panasonic_ac_remote_model_t IRPanasonicAc::getModel(void) {
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t *IRPanasonicAc::getRaw(void) {
-  this->fixChecksum();
+  fixChecksum();
   return remote_state;
 }
 
@@ -360,7 +360,7 @@ void IRPanasonicAc::setMode(const uint8_t desired) {
   switch (desired) {
     case kPanasonicAcFan:
       // Allegedly Fan mode has a temperature of 27.
-      this->setTemp(kPanasonicAcFanModeTemp, false);
+      setTemp(kPanasonicAcFanModeTemp, false);
       mode = desired;
       break;
     case kPanasonicAcAuto:
@@ -369,7 +369,7 @@ void IRPanasonicAc::setMode(const uint8_t desired) {
     case kPanasonicAcDry:
       mode = desired;
       // Set the temp to the saved temp, just incase our previous mode was Fan.
-      this->setTemp(_temp);
+      setTemp(_temp);
       break;
   }
   remote_state[13] &= 0x0F;  // Clear the previous mode bits.
@@ -434,7 +434,7 @@ void IRPanasonicAc::setSwingHorizontal(const uint8_t desired_direction) {
   }
   _swingh = desired_direction;  // Store the direction for later.
   uint8_t direction = desired_direction;
-  switch (this->getModel()) {
+  switch (getModel()) {
     case kPanasonicDke:
     case kPanasonicRkr:
       break;
@@ -473,7 +473,7 @@ uint8_t IRPanasonicAc::getFan(void) {
 /// Get the Quiet setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRPanasonicAc::getQuiet(void) {
-  switch (this->getModel()) {
+  switch (getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
       return GETBIT8(remote_state[21], kPanasonicAcQuietCkpOffset);
@@ -486,19 +486,19 @@ bool IRPanasonicAc::getQuiet(void) {
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRPanasonicAc::setQuiet(const bool on) {
   uint8_t offset;
-  switch (this->getModel()) {
+  switch (getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp: offset = kPanasonicAcQuietCkpOffset; break;
     default:            offset = kPanasonicAcQuietOffset;
   }
-  if (on) this->setPowerful(false);  // Powerful is mutually exclusive.
+  if (on) setPowerful(false);  // Powerful is mutually exclusive.
   setBit(&remote_state[21], offset, on);
 }
 
 /// Get the Powerful (Turbo) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRPanasonicAc::getPowerful(void) {
-  switch (this->getModel()) {
+  switch (getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp:
       return GETBIT8(remote_state[21], kPanasonicAcPowerfulCkpOffset);
@@ -511,13 +511,13 @@ bool IRPanasonicAc::getPowerful(void) {
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRPanasonicAc::setPowerful(const bool on) {
   uint8_t offset;
-  switch (this->getModel()) {
+  switch (getModel()) {
     case kPanasonicRkr:
     case kPanasonicCkp: offset = kPanasonicAcPowerfulCkpOffset; break;
     default:            offset = kPanasonicAcPowerfulOffset;
   }
 
-  if (on) this->setQuiet(false);  // Quiet is mutually exclusive.
+  if (on) setQuiet(false);  // Quiet is mutually exclusive.
   setBit(&remote_state[21], offset, on);
 }
 
@@ -584,7 +584,7 @@ void IRPanasonicAc::setOnTimer(const uint16_t mins_since_midnight,
 }
 
 /// Cancel the On Timer.
-void IRPanasonicAc::cancelOnTimer(void) { this->setOnTimer(0, false); }
+void IRPanasonicAc::cancelOnTimer(void) { setOnTimer(0, false); }
 
 /// Check if the On Timer is Enabled.
 /// @return true, the setting is on. false, the setting is off.
@@ -619,7 +619,7 @@ void IRPanasonicAc::setOffTimer(const uint16_t mins_since_midnight,
 }
 
 /// Cancel the Off Timer.
-void IRPanasonicAc::cancelOffTimer(void) { this->setOffTimer(0, false); }
+void IRPanasonicAc::cancelOffTimer(void) { setOffTimer(0, false); }
 
 /// Check if the Off Timer is Enabled.
 /// @return true, the setting is on. false, the setting is off.
@@ -630,7 +630,7 @@ bool IRPanasonicAc::isOffTimerEnabled(void) {
 /// Get the Ion (filter) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRPanasonicAc::getIon(void) {
-  switch (this->getModel()) {
+  switch (getModel()) {
     case kPanasonicDke:
       return GETBIT8(remote_state[kPanasonicAcIonFilterByte],
                      kPanasonicAcIonFilterOffset);
@@ -642,7 +642,7 @@ bool IRPanasonicAc::getIon(void) {
 /// Set the Ion (filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRPanasonicAc::setIon(const bool on) {
-  if (this->getModel() == kPanasonicDke)
+  if (getModel() == kPanasonicDke)
     setBit(&remote_state[kPanasonicAcIonFilterByte],
            kPanasonicAcIonFilterOffset, on);
 }
@@ -758,17 +758,17 @@ stdAc::swingv_t IRPanasonicAc::toCommonSwingV(const uint8_t pos) {
 stdAc::state_t IRPanasonicAc::toCommon(void) {
   stdAc::state_t result;
   result.protocol = decode_type_t::PANASONIC_AC;
-  result.model = this->getModel();
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.model = getModel();
+  result.power = getPower();
+  result.mode = toCommonMode(getMode());
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->toCommonSwingV(this->getSwingVertical());
-  result.swingh = this->toCommonSwingH(this->getSwingHorizontal());
-  result.quiet = this->getQuiet();
-  result.turbo = this->getPowerful();
-  result.filter = this->getIon();
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = toCommonSwingV(getSwingVertical());
+  result.swingh = toCommonSwingH(getSwingHorizontal());
+  result.quiet = getQuiet();
+  result.turbo = getPowerful();
+  result.filter = getIon();
   // Not supported.
   result.econo = false;
   result.clean = false;
@@ -1103,3 +1103,218 @@ bool IRrecv::decodePanasonicAC32(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_PANASONIC_AC32
+
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+IRPanasonicAc32::IRPanasonicAc32(const uint16_t pin, const bool inverted,
+                                 const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+/// Set up hardware to be able to send a message.
+void IRPanasonicAc32::begin(void) { _irsend.begin(); }
+
+/// Get a copy of the internal state/code for this protocol.
+/// @return The code for this protocol based on the current internal state.
+uint32_t IRPanasonicAc32::getRaw(void) const { return _.raw; }
+
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] state A valid code for this protocol.
+void IRPanasonicAc32::setRaw(const uint32_t state) {  _.raw = state; }
+
+/// Reset the state of the remote to a known good state/sequence.
+void IRPanasonicAc32::stateReset(void) { setRaw(kPanasonicAc32KnownGood); }
+
+/// Set the desired temperature.
+/// @param[in] degrees The temperature in degrees celsius.
+void IRPanasonicAc32::setTemp(const uint8_t degrees) {
+  uint8_t temp = std::max((uint8_t)kPanasonicAcMinTemp, degrees);
+  temp = std::min((uint8_t)kPanasonicAcMaxTemp, temp);
+  _.Temp = temp - (kPanasonicAcMinTemp - 1);
+}
+
+/// Get the current desired temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRPanasonicAc32::getTemp(void) const {
+  return _.Temp + (kPanasonicAcMinTemp - 1);
+}
+
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
+uint8_t IRPanasonicAc32::getMode(void) const { return _.Mode; }
+
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
+/// @note If we get an unexpected mode, default to AUTO.
+void IRPanasonicAc32::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kPanasonicAc32Auto:
+    case kPanasonicAc32Cool:
+    case kPanasonicAc32Dry:
+    case kPanasonicAc32Heat:
+    case kPanasonicAc32Fan:
+      _.Mode = mode;
+      break;
+    default: _.Mode = kPanasonicAc32Auto;
+  }
+}
+
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRPanasonicAc32::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool: return kPanasonicAc32Cool;
+    case stdAc::opmode_t::kHeat: return kPanasonicAc32Heat;
+    case stdAc::opmode_t::kDry:  return kPanasonicAc32Dry;
+    case stdAc::opmode_t::kFan:  return kPanasonicAc32Fan;
+    default:                     return kPanasonicAc32Auto;
+  }
+}
+
+/// Convert a native mode into its stdAc equivalent.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::opmode_t IRPanasonicAc32::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kPanasonicAc32Cool: return stdAc::opmode_t::kCool;
+    case kPanasonicAc32Heat: return stdAc::opmode_t::kHeat;
+    case kPanasonicAc32Dry:  return stdAc::opmode_t::kDry;
+    case kPanasonicAc32Fan:  return stdAc::opmode_t::kFan;
+    default:                 return stdAc::opmode_t::kAuto;
+  }
+}
+
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
+void IRPanasonicAc32::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kPanasonicAc32FanMin:
+    case kPanasonicAc32FanLow:
+    case kPanasonicAc32FanMed:
+    case kPanasonicAc32FanHigh:
+    case kPanasonicAc32FanMax:
+    case kPanasonicAc32FanAuto:
+      _.Fan = speed;
+      break;
+    default: _.Fan = kPanasonicAc32FanAuto;
+  }
+}
+
+/// Get the current fan speed setting.
+/// @return The current fan speed.
+uint8_t IRPanasonicAc32::getFan(void) const { return _.Fan; }
+
+/// Convert a native fan speed into its stdAc equivalent.
+/// @param[in] spd The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::fanspeed_t IRPanasonicAc32::toCommonFanSpeed(const uint8_t spd) {
+  switch (spd) {
+    case kPanasonicAc32FanMax:     return stdAc::fanspeed_t::kMax;
+    case kPanasonicAc32FanHigh:    return stdAc::fanspeed_t::kHigh;
+    case kPanasonicAc32FanMed:     return stdAc::fanspeed_t::kMedium;
+    case kPanasonicAc32FanLow:     return stdAc::fanspeed_t::kLow;
+    case kPanasonicAc32FanMin:     return stdAc::fanspeed_t::kMin;
+    default:                       return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+/// Get the current horizontal swing setting.
+/// @return The current position it is set to.
+bool IRPanasonicAc32::getSwingHorizontal(void) const { return _.SwingH; }
+
+/// Control the horizontal swing setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRPanasonicAc32::setSwingHorizontal(const bool on) { _.SwingH = on; }
+
+/// Get the current vertical swing setting.
+/// @return The current position it is set to.
+uint8_t IRPanasonicAc32::getSwingVertical(void) const { return _.SwingV; }
+
+/// Control the vertical swing setting.
+/// @param[in] pos The position to set the vertical swing to.
+void IRPanasonicAc32::setSwingVertical(const uint8_t pos) {
+  uint8_t elevation = pos;
+  if (elevation != kPanasonicAc32SwingVAuto) {
+    elevation = std::max(elevation, kPanasonicAcSwingVHighest);
+    elevation = std::min(elevation, kPanasonicAcSwingVLowest);
+  }
+  _.SwingV = elevation;
+}
+
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] pos A native position to convert.
+/// @return The common vertical swing position.
+stdAc::swingv_t IRPanasonicAc32::toCommonSwingV(const uint8_t pos) {
+  return IRPanasonicAc::toCommonSwingV(pos);
+}
+
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
+String IRPanasonicAc32::toString(void) const {
+  String result = "";
+  result.reserve(80);
+  result += addTempToString(getTemp(), true, false);
+  result += addModeToString(_.Mode, kPanasonicAc32Auto, kPanasonicAc32Cool,
+                            kPanasonicAc32Heat, kPanasonicAc32Dry,
+                            kPanasonicAc32Fan);
+  result += addFanToString(_.Fan, kPanasonicAc32FanHigh, kPanasonicAc32FanLow,
+                           kPanasonicAc32FanAuto, kPanasonicAc32FanMin,
+                           kPanasonicAc32FanMed);
+  result += addBoolToString(_.SwingH, kSwingHStr);
+  result += addIntToString(getSwingVertical(), kSwingVStr);
+  result += kSpaceLBraceStr;
+  switch (getSwingVertical()) {
+    case kPanasonicAc32SwingVAuto:
+      result += kAutoStr;
+      break;
+    case kPanasonicAcSwingVHighest:
+      result += kHighestStr;
+      break;
+    case kPanasonicAcSwingVHigh:
+      result += kHighStr;
+      break;
+    case kPanasonicAcSwingVMiddle:
+      result += kMiddleStr;
+      break;
+    case kPanasonicAcSwingVLow:
+      result += kLowStr;
+      break;
+    case kPanasonicAcSwingVLowest:
+      result += kLowestStr;
+      break;
+    default:
+      result += kUnknownStr;
+      break;
+  }
+  result += ')';
+  return result;
+}
+
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
+stdAc::state_t IRPanasonicAc32::toCommon(void) const {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::PANASONIC_AC32;
+  result.model = -1;
+  result.mode = toCommonMode(getMode());
+  result.celsius = true;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = toCommonSwingV(getSwingVertical());
+  result.swingh = getSwingHorizontal() ? stdAc::swingh_t::kAuto
+                                       : stdAc::swingh_t::kOff;
+  // Not supported.
+  result.power = true;
+  result.quiet = false;
+  result.turbo = false;
+  result.filter = false;
+  result.econo = false;
+  result.clean = false;
+  result.light = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
