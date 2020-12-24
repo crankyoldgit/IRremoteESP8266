@@ -795,27 +795,13 @@ String IRPanasonicAc::toString(void) {
   result += addIntToString(getSwingVertical(), kSwingVStr);
   result += kSpaceLBraceStr;
   switch (getSwingVertical()) {
-    case kPanasonicAcSwingVAuto:
-      result += kAutoStr;
-      break;
-    case kPanasonicAcSwingVHighest:
-      result += kHighestStr;
-      break;
-    case kPanasonicAcSwingVHigh:
-      result += kHighStr;
-      break;
-    case kPanasonicAcSwingVMiddle:
-      result += kMiddleStr;
-      break;
-    case kPanasonicAcSwingVLow:
-      result += kLowStr;
-      break;
-    case kPanasonicAcSwingVLowest:
-      result += kLowestStr;
-      break;
-    default:
-      result += kUnknownStr;
-      break;
+    case kPanasonicAcSwingVAuto:    result += kAutoStr; break;
+    case kPanasonicAcSwingVHighest: result += kHighestStr; break;
+    case kPanasonicAcSwingVHigh:    result += kHighStr; break;
+    case kPanasonicAcSwingVMiddle:  result += kMiddleStr; break;
+    case kPanasonicAcSwingVLow:     result += kLowStr; break;
+    case kPanasonicAcSwingVLowest:  result += kLowestStr; break;
+    default:                        result += kUnknownStr; break;
   }
   result += ')';
   switch (getModel()) {
@@ -1306,32 +1292,18 @@ String IRPanasonicAc32::toString(void) const {
   result += addTempToString(getTemp());
   result += addFanToString(_.Fan, kPanasonicAc32FanHigh, kPanasonicAc32FanLow,
                            kPanasonicAc32FanAuto, kPanasonicAc32FanMin,
-                           kPanasonicAc32FanMed);
+                           kPanasonicAc32FanMed, kPanasonicAc32FanMax);
   result += addBoolToString(_.SwingH, kSwingHStr);
   result += addIntToString(getSwingVertical(), kSwingVStr);
   result += kSpaceLBraceStr;
   switch (getSwingVertical()) {
-    case kPanasonicAc32SwingVAuto:
-      result += kAutoStr;
-      break;
-    case kPanasonicAcSwingVHighest:
-      result += kHighestStr;
-      break;
-    case kPanasonicAcSwingVHigh:
-      result += kHighStr;
-      break;
-    case kPanasonicAcSwingVMiddle:
-      result += kMiddleStr;
-      break;
-    case kPanasonicAcSwingVLow:
-      result += kLowStr;
-      break;
-    case kPanasonicAcSwingVLowest:
-      result += kLowestStr;
-      break;
-    default:
-      result += kUnknownStr;
-      break;
+    case kPanasonicAc32SwingVAuto:  result += kAutoStr; break;
+    case kPanasonicAcSwingVHighest: result += kHighestStr; break;
+    case kPanasonicAcSwingVHigh:    result += kHighStr; break;
+    case kPanasonicAcSwingVMiddle:  result += kMiddleStr; break;
+    case kPanasonicAcSwingVLow:     result += kLowStr; break;
+    case kPanasonicAcSwingVLowest:  result += kLowestStr; break;
+    default:                        result += kUnknownStr; break;
   }
   result += ')';
   return result;
