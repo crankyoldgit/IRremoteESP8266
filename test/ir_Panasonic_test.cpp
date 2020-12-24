@@ -904,6 +904,7 @@ TEST(TestDecodePanasonicAC, SyntheticExample) {
 TEST(TestGeneralPanasonic, hasACState) {
   EXPECT_TRUE(hasACState(PANASONIC_AC));
   ASSERT_FALSE(hasACState(PANASONIC));
+  ASSERT_FALSE(hasACState(PANASONIC_AC32));
 }
 
 TEST(TestGeneralPanasonic, typeToString) {
@@ -1273,7 +1274,7 @@ TEST(TestPanasonic, Housekeeping) {
   ASSERT_EQ(decode_type_t::PANASONIC_AC32,
             strToDecodeType(D_STR_PANASONIC_AC32));
   ASSERT_FALSE(hasACState(decode_type_t::PANASONIC_AC32));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::PANASONIC_AC32));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::PANASONIC_AC32));
   ASSERT_EQ(kPanasonicAc32Bits,
             IRsend::defaultBits(decode_type_t::PANASONIC_AC32));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::PANASONIC_AC32));
@@ -1341,7 +1342,7 @@ TEST(TestDecodePanasonicAC32, RealMessage) {
   EXPECT_FALSE(irsend.capture.repeat);
 
   EXPECT_EQ(
-      "Temp: 17C, Mode: 5 (UNKNOWN), Fan: 15 (Auto), "
+      "Power Toggle: Off, Mode: 5 (UNKNOWN), Temp: 17C, Fan: 15 (Auto), "
       "Swing(H): On, Swing(V): 7 (Auto)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
@@ -1474,6 +1475,19 @@ TEST(TestDecodePanasonicAC32, SyntheticShortMessage) {
       irsend.outputStr());
 }
 
+TEST(TestIRPanasonicAc32Class, SetAndGetPower) {
+  IRPanasonicAc32 ac(kGpioUnused);
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
+  ac.setPowerToggle(true);
+  EXPECT_TRUE(ac.getPowerToggle());
+  ac.setPowerToggle(false);
+  EXPECT_FALSE(ac.getPowerToggle());
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1364#issuecomment-750427966
+  ac.setRaw(0x04FF36A0);
+  EXPECT_TRUE(ac.getPowerToggle());
+}
+
 TEST(TestIRPanasonicAc32Class, SetAndGetFan) {
   IRPanasonicAc32 ac(kGpioUnused);
   ac.setFan(kPanasonicAc32FanAuto);
@@ -1557,7 +1571,7 @@ TEST(TestIRPanasonicAc32Class, HumanReadable) {
   IRPanasonicAc32 ac(kGpioUnused);
 
   EXPECT_EQ(
-      "Temp: 16C, Mode: 2 (Cool), Fan: 15 (Auto), "
+      "Power Toggle: Off, Mode: 2 (Cool), Temp: 16C, Fan: 15 (Auto), "
       "Swing(H): On, Swing(V): 7 (Auto)",
       ac.toString());
 
@@ -1566,8 +1580,9 @@ TEST(TestIRPanasonicAc32Class, HumanReadable) {
   ac.setFan(kPanasonicAc32FanMed);
   ac.setSwingHorizontal(false);
   ac.setSwingVertical(kPanasonicAcSwingVLowest);
+  ac.setPowerToggle(true);
   EXPECT_EQ(
-      "Temp: 24C, Mode: 4 (Heat), Fan: 4 (Medium), "
+      "Power Toggle: On, Mode: 4 (Heat), Temp: 24C, Fan: 4 (Medium), "
       "Swing(H): Off, Swing(V): 5 (Lowest)",
       ac.toString());
 }

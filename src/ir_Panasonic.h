@@ -184,18 +184,19 @@ union PanasonicAc32Protocol {
   uint32_t raw;  ///< The state in IR code form.
   struct {
     // Byte 0
-    uint8_t        :3;
-    uint8_t SwingH :1;
-    uint8_t SwingV :3;
-    uint8_t        :1;  ///< Always appears to be set. (1)
+    uint8_t             :3;
+    uint8_t SwingH      :1;
+    uint8_t SwingV      :3;
+    uint8_t             :1;  ///< Always appears to be set. (1)
     // Byte 1
-    uint8_t :8;  // Always seems to be 0x36.
+    uint8_t             :8;  // Always seems to be 0x36.
     // Byte 2
-    uint8_t Temp   :4;
-    uint8_t Fan    :4;
+    uint8_t Temp        :4;
+    uint8_t Fan         :4;
     // Byte 3
-    uint8_t Mode   :3;
-    uint8_t        :5;
+    uint8_t Mode        :3;
+    uint8_t PowerToggle :1;  // 0 means toggle, 1 = keep the same.
+    uint8_t             :4;
   };
 };
 
@@ -229,6 +230,8 @@ class IRPanasonicAc32 {
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_PANASONIC_AC32
   void begin(void);
+  void setPowerToggle(const bool on);
+  bool getPowerToggle(void) const;
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void) const;
   void setFan(const uint8_t fan);
@@ -247,7 +250,7 @@ class IRPanasonicAc32 {
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
-  stdAc::state_t toCommon(void) const;
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL) const;
   String toString(void) const;
 #ifndef UNIT_TEST
 
