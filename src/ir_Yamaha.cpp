@@ -80,10 +80,10 @@ uint32_t IRsend::encodeYamaha(uint32_t yamahaCode) {
 		addressHigh = reverseBits(addressHigh, 8);
 		//the second byte could be either address or command
 		uint8_t unknownValue = (yamahaCode >> 8) & 0xFF;
+		unknownValue = reverseBits(unknownValue, 8);
 		if(addressHigh + unknownValue == 0xFF) {
 			//in this case, the unknown value is a match for an inverse address, so we have a 2-byte address, 1-byte command
 			uint8_t addressLow = unknownValue;
-			addressLow = reverseBits(addressLow, 8);
 			uint8_t command = yamahaCode & 0xFF;
 			uint8_t commandHigh = command;
 			commandHigh = reverseBits(commandHigh, 8);
@@ -116,6 +116,7 @@ uint32_t IRsend::encodeYamaha(uint32_t yamahaCode) {
 /// @param[in] altCommand Whether to use the alternate command option; certain commands utilise this. Defaults to false.
 /// @param[in] remoteID The remote ID to emulate; determines part of the breaks in parity. Set false to use ID 1; set true to use ID 2. Defaults to false (ID 1).
 /// @return A raw 32-bit message suitable for use with `sendYamaha()`.
+/// @note How to determine if a command requires the altCommand value: looking at a remote code, the fifth and seventh values should add to hex F. Therefore, a code 7F01-609F makes 0 plus F equals F; altCommand is false. Code 7F01-611E: 6 + 1 = 7, not F. altCommand is true.
 uint32_t IRsend::encodeYamaha(uint16_t address, uint8_t command, bool altCommand = false, bool remoteID = false) {
 	//All extra commands act upon the low byte of the command
 	uint8_t commandHigh = command & 0xFF;
@@ -140,7 +141,7 @@ uint32_t IRsend::encodeYamaha(uint16_t address, uint8_t command, bool altCommand
 
 #if (DECODE_YAMAHA)
 /// Decode the supplied Yamaha message.
-/// Status: STABLE / Known good.
+/// Status: BETA / All known good, except for the effects of disabling the checking for a repeat code. If all goes to plan, repeats should show as being on the NEC protocol.
 /// @param[in,out] results Ptr to the data to decode & where to store the result
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
