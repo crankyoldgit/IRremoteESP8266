@@ -4,7 +4,9 @@
 /// @file
 /// @brief Support for Yamaha extensions to (Renesas) protocols.
 /// NEC originally added from https://github.com/shirriff/Arduino-IRremote/
+/// Yamaha protocol used in documents found around the web, such as the linked ir_vx81.xlsx spreadsheet
 /// @see http://www.sbprojects.com/knowledge/ir/nec.php
+/// @see https://planet.neeo.com/t/18kann?r=y7jn46
 
 //Requires SEND_NEC to be available as an upstream capability for broadcasting.
 #define __STDC_LIMIT_MACROS
@@ -37,11 +39,11 @@ void IRsend::sendYamaha(uint64_t data, uint16_t nbits, uint16_t repeat) {
 /// @return A raw 32-bit NEC message suitable for use with `sendNEC()`.
 /// @see http://www.sbprojects.com/knowledge/ir/nec.php
 uint32_t IRsend::encodeYamaha(uint16_t address, uint16_t command) {
-  command &= 0xFFFF;  // Yamaha commands are two bytes, with the second byte being a potentially modified inversion of the first.
+  // Yamaha commands are two bytes, with the second byte being a potentially modified inversion of the first.
   // sendNEC() sends MSB first, but protocol says this is LSB first.
-  uint16_t commandHigh = (command>>8) & 0xFF;
+  uint8_t commandHigh = (command>>8) & 0xFF;
   commandHigh = reverseBits(commandHigh, 8);
-  uint16_t commandLow = command & 0xFF;
+  uint8_t commandLow = command & 0xFF;
   commandLow = reverseBits(commandLow, 8);
 
   if (address > 0xFF) {                         // Is it Extended NEC?
@@ -54,40 +56,76 @@ uint32_t IRsend::encodeYamaha(uint16_t address, uint16_t command) {
 }
 
 /// Calculate the raw Yamaha data based on a code in the published Yamaha format.
-/// Status: STABLE / Expected to work.
+/// Status: BETA / Expected to work with 32-bit codes; 16 and 8-bit codes are untested.
 /// @param[in] yamahaCode A code as documented by Yamaha. This includes the address and command, along with any modifications in the lower byte.
 /// @return A raw 32-bit NEC message suitable for use with `sendNEC()`.
+/// @see https://planet.neeo.com/t/18kann?r=y7jn46
+/// @see https://nobbin.net/tag/yamahanec-ir-codes/
 uint32_t IRsend::encodeYamaha(uint32_t yamahaCode) {
-	uint16_t addressHigh = (yamahaCode >> 24) & 0xFF; //high 16 bytes are an NEC address. Parity is not checked or calculated, as the low byte is defined as part of the code.
-	addressHigh = reverseBits(addressHigh, 8)
-	uint16_t addressLow = (yamahaCode >> 16) & 0xFF;
-	addressLow = reverseBits(addressLow, 8)
-	uint32_t command = yamahaCode & 0xFFFF; // low 16 bits are the command, including address bit flip and command bit flip.
-	uint16_t commandHigh = (command >> 8) & 0xFF;
-	commandHigh = reverseBits(commandHigh, 8);
-	uint16_t commandLow = command & 0xFF;
-	commandLow = reverseBits(commandLow, 8);
-	
+	if(yamahaCode > 0xFFFFFF) {
+	//32-bit Yamaha code
+		uint8_t addressHigh = (yamahaCode >> 24) & 0xFF; //high 16 bytes are an NEC address. Parity is not checked or calculated, as the low byte is defined as part of the code.
+		addressHigh = reverseBits(addressHigh, 8);
+		uint8_t addressLow = (yamahaCode >> 16) & 0xFF;
+		addressLow = reverseBits(addressLow, 8);
+		uint16_t command = yamahaCode & 0xFFFF; // low 16 bits are the command, including address bit flip and command bit flip.
+		uint8_t commandHigh = (command >> 8) & 0xFF;
+		commandHigh = reverseBits(commandHigh, 8);
+		uint8_t commandLow = command & 0xFF;
+		commandLow = reverseBits(commandLow, 8);
+	} else if(yamahaCode > 0xFFFF) {
+		//24-bit Yamaha code; need to determine which one, ie 1-byte address, 2-byte command OR 2-byte address, 1-byte command
+		//the first byte will always be part of the address
+		uint8_t addressHigh = (yamahaCode >> 16) & 0xFF;
+		addressHigh = reverseBits(addressHigh, 8);
+		//the second byte could be either address or command
+		uint8_t unknownValue = (yamahaCode >> 8) & 0xFF;
+		if(addressHigh + unknownValue == 0xFF) {
+			//in this case, the unknown value is a match for an inverse address, so we have a 2-byte address, 1-byte command
+			uint8_t addressLow = unknownValue;
+			addressLow = reverseBits(addressLow, 8);
+			uint8_t command = yamahaCode & 0xFF;
+			uint8_t commandHigh = command;
+			commandHigh = reverseBits(commandHigh, 8);
+			uint8_t commandLow = 0xFF - commandHigh;
+		} else {
+			//the addresses don't match up, so we have a 1-byte address, 2 byte command
+			uint8_t addressLow = 0xFF - addressHigh;
+			uint16_t command = yamahaCode & 0xFFFF; // low 16 bits are the command, including address bit flip and command bit flip.
+			uint8_t commandHigh = (command >> 8) & 0xFF;
+			commandHigh = reverseBits(commandHigh, 8);
+			uint8_t commandLow = command & 0xFF;
+			commandLow = reverseBits(commandLow, 8);
+		}
+	} else {
+		//16-bit Yamaha command
+		uint8_t addressHigh = (yamahaCode >> 8) & 0xFF;
+		addressHigh = reverseBits(addressHigh, 8);
+		uint8_t addressLow = addressHigh ^ 0xFF;
+		uint8_t commandHigh = yamahaCode & 0xFF;
+		commandHigh = reverseBits(commandHigh, 8);
+		uint8_t commandLow = commandHigh ^ 0xFF;
+	}		
 	return (addressHigh << 24) + (addressLow << 16) + (commandHigh << 8) + commandLow;
 }
 
 /// Calculate the raw Yamaha data based on a command
 /// Status: BETA / Expected to work, but could be incorrect per testing.
-/// @param[in] address An address value. Yamaha utilises normal NEC address values.
-/// @param[in] command A one-byte command
-/// @param[in] altCommand Whether to use the alternate command option; certain commands utilise this
-/// @param[in] remoteID The remote ID to emulate; determines part of the breaks in parity. Set false to use ID 1; set true to use ID 2. 
+/// @param[in] address An address value. Yamaha utilises normal NEC address values. Maximum of two bytes; will automatically transform one-byte addresses.
+/// @param[in] command A one-byte command. This does not include space for any alterations, as they are covered in the following parameters.
+/// @param[in] altCommand Whether to use the alternate command option; certain commands utilise this. Defaults to false.
+/// @param[in] remoteID The remote ID to emulate; determines part of the breaks in parity. Set false to use ID 1; set true to use ID 2. Defaults to false (ID 1).
 /// @return A raw 32-bit message suitable for use with `sendYamaha()`.
-uint32_t IRsend::encodeYamaha(uint16_t address, uint8_t command, bool altCommand, bool remoteID) {
+uint32_t IRsend::encodeYamaha(uint16_t address, uint8_t command, bool altCommand = false, bool remoteID = false) {
 	//All extra commands act upon the low byte of the command
-	uint16_t commandHigh = command & 0xFF;
+	uint8_t commandHigh = command & 0xFF;
 	commandHigh = reverseBits(commandHigh, 8);
-	uint16_t commandLow = commandHigh ^ 0xFF; //true parity at this point
+	uint8_t commandLow = commandHigh ^ 0xFF; //true parity at this point
 	if (remoteID == true) {
 		commandLow = commandLow ^ 0x80; // alter high bit for remote ID, since we've already gone to LSB order
 	}
 	if (altCommand == true) {
-		commandLow = commandLow ^ 0x01; //alter low bit, since we've already gone to LSB order
+		commandLow = commandLow ^ 0x01; // alter low bit, since we've already gone to LSB order
 	}
 	
   if (address > 0xFF) {                         // Is it Extended NEC?
@@ -114,7 +152,7 @@ uint32_t IRsend::encodeYamaha(uint16_t address, uint8_t command, bool altCommand
 ///             i.e. address + inverted(address) + command + inverted(command)
 ///   Extended: a 16 bit address & an 8 bit command in 32 bit data form.
 ///             i.e. address + command + inverted(command)
-///   Yamaha:   an address (either normal or extended) and an 8-bit command, with potentially incorrect parity.
+///   Yamaha:   an address (either normal or extended) and an 8-bit command, with potentially deliberately incorrect parity.
 ///             i.e. address + command + alteredinverted(command)
 ///   Repeat:   a 0-bit code. i.e. No data bits. Just the header + footer.
 /// @see http://www.sbprojects.com/knowledge/ir/nec.php
@@ -130,7 +168,9 @@ bool IRrecv::decodeYamaha(decode_results *results, uint16_t offset,
   // Header - All NEC messages have this Header Mark.
   if (!matchMark(results->rawbuf[offset++], kNecHdrMark)) return false;
   // Check if it is a repeat code.
-  if (matchSpace(results->rawbuf[offset], kNecRptSpace) &&
+  // Disabled due to being a direct copy of the NEC code, which would be overriden and cause all repeats to show up as being Yamaha protocol. 
+  // Since this is implemented as an extension of the NEC protocol, it is better to defer in this case to the NEC handling.
+  /*if (matchSpace(results->rawbuf[offset], kNecRptSpace) &&
       matchMark(results->rawbuf[offset + 1], kNecBitMark) &&
       (offset + 2 <= results->rawlen ||
        matchAtLeast(results->rawbuf[offset + 2], kNecMinGap))) {
@@ -141,7 +181,7 @@ bool IRrecv::decodeYamaha(decode_results *results, uint16_t offset,
     results->command = 0;
     results->repeat = true;
     return true;
-  }
+  }*/
 
   // Match Header (cont.) + Data + Footer
   if (!matchGeneric(results->rawbuf + offset, &data,
