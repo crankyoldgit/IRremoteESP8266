@@ -1,4 +1,4 @@
-# IRremoteESP8266 Library
+![IRremoteESP8266 Library](./assets/images/banner.png)
 
 [![Build-Status](https://travis-ci.org/crankyoldgit/IRremoteESP8266.svg?branch=master)](https://travis-ci.org/crankyoldgit/IRremoteESP8266)
 [![Arduino-Bibliothek-Abzeichen](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)

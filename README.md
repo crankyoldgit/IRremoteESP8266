@@ -1,4 +1,4 @@
-![IRremoteESP8266 Banner](https://user-images.githubusercontent.com/11258286/103334782-b52c5d00-4a98-11eb-89c1-33671e2a9720.png)
+![IRremoteESP8266 Library](./assets/images/banner.png)
 
 [![Build Status](https://travis-ci.org/crankyoldgit/IRremoteESP8266.svg?branch=master)](https://travis-ci.org/crankyoldgit/IRremoteESP8266)
 [![arduino-library-badge](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
