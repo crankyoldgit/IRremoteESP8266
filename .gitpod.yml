@@ -1,0 +1,9 @@
+tasks:
+  - command: platformio run -e tasmota
+
+image:
+  file: .gitpod.Dockerfile
+
+vscode:
+  extensions:
+    - ms-vscode.cpptools@0.26.3:u3GsZ5PK12Ddr79vh4TWgQ==
