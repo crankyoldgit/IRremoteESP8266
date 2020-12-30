@@ -1,5 +1,5 @@
 tasks:
-  - command: platformio run -e tasmota
+  - command: platformio run
 
 image:
   file: .gitpod.Dockerfile
