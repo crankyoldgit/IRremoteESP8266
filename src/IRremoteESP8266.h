@@ -719,6 +719,13 @@
 #define SEND_ELITESCREENS      _IR_ENABLE_DEFAULT_
 #endif  // SEND_ELITESCREENS
 
+#ifndef DECODE_LUMENE
+#define DECODE_LUMENE    _IR_ENABLE_DEFAULT_
+#endif  // DECODE_LUMENE
+#ifndef SEND_LUMENE
+#define SEND_LUMENE      _IR_ENABLE_DEFAULT_
+#endif  // SEND_LUMENE
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -867,6 +874,7 @@ enum decode_type_t {
   MIRAGE,
   ELITESCREENS,  // 95
   PANASONIC_AC32,
+  LUMENE,
   // Add new entries before this one, and update it to point to the last entry.
   kLastDecodeType = PANASONIC_AC32,
 };
@@ -986,6 +994,8 @@ const uint16_t kLegoPfMinRepeat = kNoRepeat;
 const uint16_t kLgBits = 28;
 const uint16_t kLg32Bits = 32;
 const uint16_t kLgDefaultRepeat = kNoRepeat;
+const uint16_t kLumeneBits = 32;
+const uint16_t kLumeneDefaultRepeat = kSingleRepeat;
 const uint16_t kLutronBits = 35;
 const uint16_t kMagiquestBits = 56;
 const uint16_t kMetzBits = 19;

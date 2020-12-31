@@ -707,6 +707,12 @@ class IRrecv {
                           const uint16_t nbits = kEliteScreensBits,
                           const bool strict = true);
 #endif  // DECODE_ELITESCREENS
+#if DECODE_LUMENE
+  bool decodeLumene(decode_results *results,
+                    uint16_t offset = kStartOffset,
+                    const uint16_t nbits = kLumeneBits,
+                    const bool strict = true);
+#endif  // DECODE_LUMENE
 };
 
 #endif  // IRRECV_H_

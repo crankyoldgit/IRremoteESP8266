@@ -563,6 +563,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case ELITESCREENS:
     case GICABLE:
     case INAX:
+    case LUMENE:
     case MIDEA24:
     case MITSUBISHI:
     case MITSUBISHI2:
@@ -637,6 +638,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case CARRIER_AC:
     case ELITESCREENS:
     case EPSON:
+    case LUMENE:
     case NEC:
     case NEC_LIKE:
     case PANASONIC_AC32:
@@ -872,6 +874,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendLG2(data, nbits, min_repeat);
       break;
 #endif
+#if SEND_LUMENE
+    case LUMENE:
+      sendLumene(data, nbits, min_repeat);
+      break;
+#endif  // SEND_LUMENE
 #if SEND_LUTRON
     case LUTRON:
       sendLutron(data, nbits, min_repeat);

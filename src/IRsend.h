@@ -682,6 +682,11 @@ class IRsend {
                         const uint16_t nbits = kEliteScreensBits,
                         const uint16_t repeat = kEliteScreensDefaultRepeat);
 #endif  // SEND_ELITESCREENS
+#if SEND_LUMENE
+  void sendLumene(const uint64_t data,
+                  const uint16_t nbits = kLumeneBits,
+                  const uint16_t repeat = kLumeneDefaultRepeat);
+#endif  // SEND_LUMENE
 
  protected:
 #ifdef UNIT_TEST

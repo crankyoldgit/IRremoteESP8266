@@ -983,6 +983,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     if (decodePanasonicAC32(results, offset, kPanasonicAc32Bits / 2))
       return true;
 #endif  // DECODE_PANASONIC_AC32
+#if DECODE_LUMENE
+    DPRINTLN("Attempting Lumene decode");
+    if (decodeLumene(results, offset)) return true;
+#endif  // DECODE_LUMENE
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

@@ -613,6 +613,9 @@
 #ifndef D_STR_LG2
 #define D_STR_LG2 "LG2"
 #endif  // D_STR_LG2
+#ifndef D_STR_LUMENE
+#define D_STR_LUMENE "LUMENE"
+#endif  // D_STR_LUMENE
 #ifndef D_STR_LUTRON
 #define D_STR_LUTRON "LUTRON"
 #endif  // D_STR_LUTRON
