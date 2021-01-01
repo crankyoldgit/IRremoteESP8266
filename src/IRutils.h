@@ -61,7 +61,8 @@ namespace irutils {
                          const uint8_t dry, const uint8_t fan);
   String addFanToString(const uint8_t speed, const uint8_t high,
                         const uint8_t low, const uint8_t automatic,
-                        const uint8_t quiet, const uint8_t medium);
+                        const uint8_t quiet, const uint8_t medium,
+                        const uint8_t maximum = 0xFF);
   String addDayToString(const uint8_t day_of_week, const int8_t offset = 0,
                         const bool precomma = true);
   String htmlEscape(const String unescaped);

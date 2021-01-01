@@ -654,19 +654,22 @@ namespace irutils {
   /// @param[in] automatic The numeric value for Auto speed.
   /// @param[in] quiet The numeric value for Quiet speed.
   /// @param[in] medium The numeric value for Medium speed.
+  /// @param[in] maximum The numeric value for Highest speed. (if > high)
   /// @return The resulting String.
   String addFanToString(const uint8_t speed, const uint8_t high,
                         const uint8_t low, const uint8_t automatic,
-                        const uint8_t quiet, const uint8_t medium) {
+                        const uint8_t quiet, const uint8_t medium,
+                        const uint8_t maximum) {
     String result = addIntToString(speed, kFanStr);
     result += kSpaceLBraceStr;
-    if (speed == high) result += kHighStr;
-    else if (speed == low) result += kLowStr;
+    if (speed == high)           result += kHighStr;
+    else if (speed == low)       result += kLowStr;
     else if (speed == automatic) result += kAutoStr;
-    else if (speed == quiet) result += kQuietStr;
-    else if (speed == medium) result += kMediumStr;
+    else if (speed == quiet)     result += kQuietStr;
+    else if (speed == medium)    result += kMediumStr;
+    else if (speed == maximum)   result += kMaximumStr;
     else
-     result += kUnknownStr;
+      result += kUnknownStr;
     return result + ')';
   }
 

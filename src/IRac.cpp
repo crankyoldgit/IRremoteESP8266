@@ -241,6 +241,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_PANASONIC_AC
     case decode_type_t::PANASONIC_AC:
 #endif
+#if SEND_PANASONIC_AC32
+    case decode_type_t::PANASONIC_AC32:
+#endif
 #if SEND_SAMSUNG_AC
     case decode_type_t::SAMSUNG_AC:
 #endif
@@ -1583,6 +1586,40 @@ void IRac::panasonic(IRPanasonicAc *ac, const panasonic_ac_remote_model_t model,
 }
 #endif  // SEND_PANASONIC_AC
 
+#if SEND_PANASONIC_AC32
+/// Send a Panasonic A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRPanasonicAc32 object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
+void IRac::panasonic32(IRPanasonicAc32 *ac,
+                       const bool on, const stdAc::opmode_t mode,
+                       const float degrees, const stdAc::fanspeed_t fan,
+                       const stdAc::swingv_t swingv,
+                       const stdAc::swingh_t swingh) {
+  ac->begin();
+  ac->setPowerToggle(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(ac->convertSwingV(swingv));
+  ac->setSwingHorizontal(swingh != stdAc::swingh_t::kOff);
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Filter setting available.
+  // No Light setting available.
+  // No Econo setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_PANASONIC_AC32
+
 #if SEND_SAMSUNG_AC
 /// Send a Samsung A/C message with the supplied settings.
 /// @note Multiple IR messages may be generated & sent.
@@ -2137,6 +2174,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         break;
       case decode_type_t::AIRWELL:
       case decode_type_t::DAIKIN64:
+      case decode_type_t::PANASONIC_AC32:
       case decode_type_t::WHIRLPOOL_AC:
         result.power = desired.power ^ prev->power;
         break;
@@ -2537,6 +2575,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_PANASONIC_AC
+#if SEND_PANASONIC_AC32
+    case PANASONIC_AC32:
+    {
+      IRPanasonicAc32 ac(_pin, _inverted, _modulation);
+      panasonic32(&ac, send.power, send.mode, degC, send.fanspeed,
+                  send.swingv, send.swingh);
+      break;
+    }
+#endif  // SEND_PANASONIC_AC32
 #if SEND_SAMSUNG_AC
     case SAMSUNG_AC:
     {
@@ -3266,6 +3313,16 @@ namespace IRAcUtils {
         return "";
       }
 #endif  // DECODE_PANASONIC_AC
+#if DECODE_PANASONIC_AC32
+      case decode_type_t::PANASONIC_AC32: {
+        if (result->bits >= kPanasonicAc32Bits) {
+          IRPanasonicAc32 ac(kGpioUnused);
+          ac.setRaw(result->value);  // Uses value instead of state.
+          return ac.toString();
+        }
+        return "";
+      }
+#endif  // DECODE_PANASONIC_AC
 #if DECODE_HITACHI_AC
       case decode_type_t::HITACHI_AC: {
         IRHitachiAc ac(kGpioUnused);
@@ -3667,6 +3724,18 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_PANASONIC_AC
+#if DECODE_PANASONIC_AC32
+      case decode_type_t::PANASONIC_AC32: {
+        IRPanasonicAc32 ac(kGpioUnused);
+        if (decode->bits >= kPanasonicAc32Bits) {
+          ac.setRaw(decode->value);  // Uses value instead of state.
+          *result = ac.toCommon(prev);
+        } else {
+          return false;
+        }
+        break;
+      }
+#endif  // DECODE_PANASONIC_AC32
 #if DECODE_SAMSUNG_AC
       case decode_type_t::SAMSUNG_AC: {
         IRSamsungAc ac(kGpioUnused);
