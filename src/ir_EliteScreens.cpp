@@ -11,11 +11,19 @@
 //   Brand: Elite Screens,  Model: Home2 / Home3 series
 //   Brand: Elite Screens,  Model: CineTension2 / CineTension3 series
 //   Brand: Elite Screens,  Model: ZSP-IR-B / ZSP-IR-W remote
+//   Brand: Lumene Screens,  Model: Embassy
 
 // Known Elite Screens commands:
 // 0xFEA3387 (STOP)
 // 0xFDA2256 (UP)
 // 0xFBA1136 (DOWN)
+
+// Known Lumene Screens commands:
+// 0xFDE3322 (STOP)
+// 0xFEE2221 (UP)
+// 0xFBE11E0 (DOWN)
+// 0xF7E2EBD (STEP UP)
+// 0xEFE1E2C (STEP DOWN)
 
 #include "IRrecv.h"
 #include "IRsend.h"
