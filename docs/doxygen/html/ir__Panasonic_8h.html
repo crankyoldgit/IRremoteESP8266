@@ -83,6 +83,12 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRPanasonicAc.html">IRPanasonicAc</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Panasonic A/C messages.  <a href="classIRPanasonicAc.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionPanasonicAc32Protocol.html">PanasonicAc32Protocol</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Panasonic 32-bit A/C message.  <a href="unionPanasonicAc32Protocol.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRPanasonicAc32.html">IRPanasonicAc32</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Panasonic 32bit A/C messages.  <a href="classIRPanasonicAc32.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -176,11 +182,222 @@ Variables</h2></td></tr>
 <tr class="separator:a5c1b18d1b834e9d46cbd29c74a1b8269"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88a9678f8b00efa173b800b0b8441f87"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#a88a9678f8b00efa173b800b0b8441f87">kPanasonicKnownGoodState</a> [<a class="el" href="IRremoteESP8266_8h.html#ab21d86545b57738354e7a3b833d38f94">kPanasonicAcStateLength</a>]</td></tr>
 <tr class="separator:a88a9678f8b00efa173b800b0b8441f87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab18e968771c2ace0b2e053ea61a0327a"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#ab18e968771c2ace0b2e053ea61a0327a">kPanasonicAc32Fan</a> = 1</td></tr>
+<tr class="separator:ab18e968771c2ace0b2e053ea61a0327a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb25de760b1210efd2b6d34ddc1dcee8"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#afb25de760b1210efd2b6d34ddc1dcee8">kPanasonicAc32Cool</a> = 2</td></tr>
+<tr class="separator:afb25de760b1210efd2b6d34ddc1dcee8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92592f6e966de10510e8547e3863445a"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#a92592f6e966de10510e8547e3863445a">kPanasonicAc32Dry</a> = 3</td></tr>
+<tr class="separator:a92592f6e966de10510e8547e3863445a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91581c58624da05d36e3807a4eecfd8a"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#a91581c58624da05d36e3807a4eecfd8a">kPanasonicAc32Heat</a> = 4</td></tr>
+<tr class="separator:a91581c58624da05d36e3807a4eecfd8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ddd918dd9ccd97fc591a795c665f275"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#a3ddd918dd9ccd97fc591a795c665f275">kPanasonicAc32Auto</a> = 6</td></tr>
+<tr class="separator:a3ddd918dd9ccd97fc591a795c665f275"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cc712e4dbf4d8ab9b60b4338a1c6831"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#a3cc712e4dbf4d8ab9b60b4338a1c6831">kPanasonicAc32FanMin</a> = 2</td></tr>
+<tr class="separator:a3cc712e4dbf4d8ab9b60b4338a1c6831"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af395ea1be8216b63320e7669f582e399"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#af395ea1be8216b63320e7669f582e399">kPanasonicAc32FanLow</a> = 3</td></tr>
+<tr class="separator:af395ea1be8216b63320e7669f582e399"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad43a603c7c5d6d52ec7af7b6aa7258af"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#ad43a603c7c5d6d52ec7af7b6aa7258af">kPanasonicAc32FanMed</a> = 4</td></tr>
+<tr class="separator:ad43a603c7c5d6d52ec7af7b6aa7258af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a010754f8844452de684b2d346f6beb79"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#a010754f8844452de684b2d346f6beb79">kPanasonicAc32FanHigh</a> = 5</td></tr>
+<tr class="separator:a010754f8844452de684b2d346f6beb79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fa3122beae91071e2fde235a6b76da5"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#a7fa3122beae91071e2fde235a6b76da5">kPanasonicAc32FanMax</a> = 6</td></tr>
+<tr class="separator:a7fa3122beae91071e2fde235a6b76da5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa093ff0443bb37cecd19331b2147ddb6"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#aa093ff0443bb37cecd19331b2147ddb6">kPanasonicAc32FanAuto</a> = 0xF</td></tr>
+<tr class="separator:aa093ff0443bb37cecd19331b2147ddb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a705b34ad74e271656bf8986740658321"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#a705b34ad74e271656bf8986740658321">kPanasonicAc32SwingVAuto</a> = 0x7</td></tr>
+<tr class="separator:a705b34ad74e271656bf8986740658321"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeeca2ce0d19ad601e762a9f1858c2d50"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Panasonic_8h.html#aeeca2ce0d19ad601e762a9f1858c2d50">kPanasonicAc32KnownGood</a> = 0x0AF136FC</td></tr>
+<tr class="memdesc:aeeca2ce0d19ad601e762a9f1858c2d50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cool, Auto, 16C.  <a href="ir__Panasonic_8h.html#aeeca2ce0d19ad601e762a9f1858c2d50">More...</a><br /></td></tr>
+<tr class="separator:aeeca2ce0d19ad601e762a9f1858c2d50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support for Panasonic protocols. </p>
 <dl class="section see"><dt>See also</dt><dd>Panasonic A/C support heavily influenced by <a href="https://github.com/ToniA/ESPEasy/blob/HeatpumpIR/lib/HeatpumpIR/PanasonicHeatpumpIR.cpp">https://github.com/ToniA/ESPEasy/blob/HeatpumpIR/lib/HeatpumpIR/PanasonicHeatpumpIR.cpp</a> </dd></dl>
 </div><h2 class="groupheader">Variable Documentation</h2>
+<a id="a3ddd918dd9ccd97fc591a795c665f275"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ddd918dd9ccd97fc591a795c665f275">&#9670;&nbsp;</a></span>kPanasonicAc32Auto</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32Auto = 6</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afb25de760b1210efd2b6d34ddc1dcee8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb25de760b1210efd2b6d34ddc1dcee8">&#9670;&nbsp;</a></span>kPanasonicAc32Cool</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32Cool = 2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a92592f6e966de10510e8547e3863445a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92592f6e966de10510e8547e3863445a">&#9670;&nbsp;</a></span>kPanasonicAc32Dry</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32Dry = 3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab18e968771c2ace0b2e053ea61a0327a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab18e968771c2ace0b2e053ea61a0327a">&#9670;&nbsp;</a></span>kPanasonicAc32Fan</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32Fan = 1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa093ff0443bb37cecd19331b2147ddb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa093ff0443bb37cecd19331b2147ddb6">&#9670;&nbsp;</a></span>kPanasonicAc32FanAuto</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32FanAuto = 0xF</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a010754f8844452de684b2d346f6beb79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a010754f8844452de684b2d346f6beb79">&#9670;&nbsp;</a></span>kPanasonicAc32FanHigh</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32FanHigh = 5</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af395ea1be8216b63320e7669f582e399"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af395ea1be8216b63320e7669f582e399">&#9670;&nbsp;</a></span>kPanasonicAc32FanLow</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32FanLow = 3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7fa3122beae91071e2fde235a6b76da5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fa3122beae91071e2fde235a6b76da5">&#9670;&nbsp;</a></span>kPanasonicAc32FanMax</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32FanMax = 6</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad43a603c7c5d6d52ec7af7b6aa7258af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad43a603c7c5d6d52ec7af7b6aa7258af">&#9670;&nbsp;</a></span>kPanasonicAc32FanMed</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32FanMed = 4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3cc712e4dbf4d8ab9b60b4338a1c6831"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cc712e4dbf4d8ab9b60b4338a1c6831">&#9670;&nbsp;</a></span>kPanasonicAc32FanMin</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32FanMin = 2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a91581c58624da05d36e3807a4eecfd8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91581c58624da05d36e3807a4eecfd8a">&#9670;&nbsp;</a></span>kPanasonicAc32Heat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32Heat = 4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aeeca2ce0d19ad601e762a9f1858c2d50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeeca2ce0d19ad601e762a9f1858c2d50">&#9670;&nbsp;</a></span>kPanasonicAc32KnownGood</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint32_t kPanasonicAc32KnownGood = 0x0AF136FC</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Cool, Auto, 16C. </p>
+
+</div>
+</div>
+<a id="a705b34ad74e271656bf8986740658321"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a705b34ad74e271656bf8986740658321">&#9670;&nbsp;</a></span>kPanasonicAc32SwingVAuto</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kPanasonicAc32SwingVAuto = 0x7</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aa7c839a4342205c384870e8a4f5ec36b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa7c839a4342205c384870e8a4f5ec36b">&#9670;&nbsp;</a></span>kPanasonicAcAuto</h2>
 

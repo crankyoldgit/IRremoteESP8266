@@ -1,11 +1,11 @@
 var searchData=
 [
-  ['a705_87',['A705',['../IRsend_8h.html#a258e4af12642d613587149fa734e45e7a7478bee154c89b576fd478d9623d9281',1,'IRsend.h']]],
+  ['a705_87',['A705',['../unionSharpProtocol.html#a17a7db01f34cacdc975e64e738233d72',1,'SharpProtocol::A705()'],['../IRsend_8h.html#a258e4af12642d613587149fa734e45e7a7478bee154c89b576fd478d9623d9281',1,'A705():&#160;IRsend.h']]],
   ['a907_88',['A907',['../IRsend_8h.html#a258e4af12642d613587149fa734e45e7a11c3296670bdeab9ddd87e4edb875e64',1,'IRsend.h']]],
   ['add_89',['add',['../classIRtimer.html#aa8e3ff975ae5468b4727790c828fa032',1,'IRtimer::add()'],['../classTimerMs.html#a77bfc23a029a9172c3dbac03f746b0cb',1,'TimerMs::add()']]],
   ['addbooltostring_90',['addBoolToString',['../namespaceirutils.html#a12ba9cf1830a886649a80c3cc5fdce2b',1,'irutils']]],
   ['adddaytostring_91',['addDayToString',['../namespaceirutils.html#a6ead1d10578c64627f8a24b5d8a7444f',1,'irutils']]],
-  ['addfantostring_92',['addFanToString',['../namespaceirutils.html#ae023bbabc452173d348c14eac7d86ab4',1,'irutils']]],
+  ['addfantostring_92',['addFanToString',['../namespaceirutils.html#af222d5a977e2cd2c979184c449d3c2f8',1,'irutils']]],
   ['addinttostring_93',['addIntToString',['../namespaceirutils.html#a772e623c4b60208200e02afbaec66651',1,'irutils']]],
   ['addlabeledstring_94',['addLabeledString',['../namespaceirutils.html#ac98793392d1e65c1b8d6895eb9d9b75b',1,'irutils']]],
   ['addmodeltostring_95',['addModelToString',['../namespaceirutils.html#a06e5a5c2b6f6649035dfa5eb19801367',1,'irutils']]],
