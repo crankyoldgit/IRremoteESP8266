@@ -1,5 +1,30 @@
 # Release Notes
 
+## _v2.7.14 (20210103)_
+
+**[Bug Fixes]**
+- SanyoAc: Fix Sensor Location error (#1359)
+- IRMQTTServer: Compiler error under PlatformIO on Windows. (#1353 #1354)
+- Workaround for ESP32 hw timer library calls not in IRAM. (#1350 #1351)
+
+**[Features]**
+- PANASONIC_AC32: Add limited detailed support. (#1364 #1366)
+- Move global vars in IRrecv into a namespace. (#1350 #1352)
+- Fujitsu: Handle toggles of Econo & Turbo when `IRac` interface is used. (#1334 #1345)
+
+**[Misc]**
+- Elitescreens: Update supported brands/models (#1375)
+- refactor ir_Sharp (#1374)
+- refactor ir_Sanyo (#1359)
+- Gree: List Amana as supported. (#1361 #1363)
+- Lasertag: Increase matching tolerance. (#1360 #1362)
+- refactor ir_Samsung (#1358)
+- refactor ir_Neoclima (#1349)
+- Update issue templates (#1348 #1355)
+- Midea: Update supported devices & add notes for an odd Pioneer System. (#1342 #1344)
+- Kelvinator: Update supported models. (#1335 #1346)
+
+
 ## _v2.7.13 (20201125)_
 
 **[Bug Fixes]**
