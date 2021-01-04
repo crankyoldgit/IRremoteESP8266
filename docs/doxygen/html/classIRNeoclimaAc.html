@@ -81,8 +81,9 @@ Collaboration diagram for IRNeoclimaAc:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRNeoclimaAc__coll__graph.png" border="0" usemap="#IRNeoclimaAc_coll__map" alt="Collaboration graph"/></div>
 <map name="IRNeoclimaAc_coll__map" id="IRNeoclimaAc_coll__map">
-<area shape="rect" title="Class for handling detailed Neoclima A/C messages." alt="" coords="5,95,119,121"/>
-<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="29,5,95,32"/>
+<area shape="rect" title="Class for handling detailed Neoclima A/C messages." alt="" coords="45,95,158,121"/>
+<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
+<area shape="rect" href="unionNeoclimaProtocol.html" title="Native representation of a Neoclima A/C message." alt="" coords="97,5,234,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -106,9 +107,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7e2e6e646411b4f5ea3c1ce1e944581c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a7e2e6e646411b4f5ea3c1ce1e944581c">setButton</a> (const uint8_t button)</td></tr>
 <tr class="memdesc:a7e2e6e646411b4f5ea3c1ce1e944581c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Button/Command pressed setting of the A/C.  <a href="classIRNeoclimaAc.html#a7e2e6e646411b4f5ea3c1ce1e944581c">More...</a><br /></td></tr>
 <tr class="separator:a7e2e6e646411b4f5ea3c1ce1e944581c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a747fec9ea02220e6cf7465f5f9bb800a"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a747fec9ea02220e6cf7465f5f9bb800a">getButton</a> (void)</td></tr>
-<tr class="memdesc:a747fec9ea02220e6cf7465f5f9bb800a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Button/Command setting of the A/C.  <a href="classIRNeoclimaAc.html#a747fec9ea02220e6cf7465f5f9bb800a">More...</a><br /></td></tr>
-<tr class="separator:a747fec9ea02220e6cf7465f5f9bb800a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21c11784fc1504688164b2c8a01a8e06"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a21c11784fc1504688164b2c8a01a8e06">getButton</a> (void) const</td></tr>
+<tr class="memdesc:a21c11784fc1504688164b2c8a01a8e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Button/Command setting of the A/C.  <a href="classIRNeoclimaAc.html#a21c11784fc1504688164b2c8a01a8e06">More...</a><br /></td></tr>
+<tr class="separator:a21c11784fc1504688164b2c8a01a8e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4a23cefef02351883dc4088dec51071"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a> (void)</td></tr>
 <tr class="memdesc:ab4a23cefef02351883dc4088dec51071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the requested power state of the A/C to on.  <a href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">More...</a><br /></td></tr>
 <tr class="separator:ab4a23cefef02351883dc4088dec51071"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -118,117 +119,111 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac19bea3b79cdfc868bd137b0a70c0718"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#ac19bea3b79cdfc868bd137b0a70c0718">setPower</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:ac19bea3b79cdfc868bd137b0a70c0718"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRNeoclimaAc.html#ac19bea3b79cdfc868bd137b0a70c0718">More...</a><br /></td></tr>
 <tr class="separator:ac19bea3b79cdfc868bd137b0a70c0718"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a635e81f673155eb123dab84a78ff86d5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a635e81f673155eb123dab84a78ff86d5">getPower</a> (void)</td></tr>
-<tr class="memdesc:a635e81f673155eb123dab84a78ff86d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRNeoclimaAc.html#a635e81f673155eb123dab84a78ff86d5">More...</a><br /></td></tr>
-<tr class="separator:a635e81f673155eb123dab84a78ff86d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bca526fcbe79a1ef3a6f281ef0f916b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a0bca526fcbe79a1ef3a6f281ef0f916b">getPower</a> (void) const</td></tr>
+<tr class="memdesc:a0bca526fcbe79a1ef3a6f281ef0f916b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRNeoclimaAc.html#a0bca526fcbe79a1ef3a6f281ef0f916b">More...</a><br /></td></tr>
+<tr class="separator:a0bca526fcbe79a1ef3a6f281ef0f916b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adabd715c4a2ec34dd88330b97a1f0ecd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#adabd715c4a2ec34dd88330b97a1f0ecd">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:adabd715c4a2ec34dd88330b97a1f0ecd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRNeoclimaAc.html#adabd715c4a2ec34dd88330b97a1f0ecd">More...</a><br /></td></tr>
 <tr class="separator:adabd715c4a2ec34dd88330b97a1f0ecd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2a43e0405a44787bb177bf13a324dde"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#ad2a43e0405a44787bb177bf13a324dde">getMode</a> (void)</td></tr>
-<tr class="memdesc:ad2a43e0405a44787bb177bf13a324dde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRNeoclimaAc.html#ad2a43e0405a44787bb177bf13a324dde">More...</a><br /></td></tr>
-<tr class="separator:ad2a43e0405a44787bb177bf13a324dde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a305db84bf11bd9f226db7dbec73e7dd3"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a305db84bf11bd9f226db7dbec73e7dd3">getMode</a> (void) const</td></tr>
+<tr class="memdesc:a305db84bf11bd9f226db7dbec73e7dd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRNeoclimaAc.html#a305db84bf11bd9f226db7dbec73e7dd3">More...</a><br /></td></tr>
+<tr class="separator:a305db84bf11bd9f226db7dbec73e7dd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9d6cd2de77ac324550d69cfc80b0e3f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#ae9d6cd2de77ac324550d69cfc80b0e3f">setTemp</a> (const uint8_t temp, const bool celsius=true)</td></tr>
 <tr class="memdesc:ae9d6cd2de77ac324550d69cfc80b0e3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRNeoclimaAc.html#ae9d6cd2de77ac324550d69cfc80b0e3f">More...</a><br /></td></tr>
 <tr class="separator:ae9d6cd2de77ac324550d69cfc80b0e3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa1a625af6cf094823b58f1fe43deb3a"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#aaa1a625af6cf094823b58f1fe43deb3a">getTemp</a> (void)</td></tr>
-<tr class="memdesc:aaa1a625af6cf094823b58f1fe43deb3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRNeoclimaAc.html#aaa1a625af6cf094823b58f1fe43deb3a">More...</a><br /></td></tr>
-<tr class="separator:aaa1a625af6cf094823b58f1fe43deb3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08bf660c8662806e60cf1024eb219b60"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a08bf660c8662806e60cf1024eb219b60">getTemp</a> (void) const</td></tr>
+<tr class="memdesc:a08bf660c8662806e60cf1024eb219b60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRNeoclimaAc.html#a08bf660c8662806e60cf1024eb219b60">More...</a><br /></td></tr>
+<tr class="separator:a08bf660c8662806e60cf1024eb219b60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8db9d2d446e8614b2fc4583a454d7cee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a8db9d2d446e8614b2fc4583a454d7cee">setFan</a> (const uint8_t speed)</td></tr>
 <tr class="memdesc:a8db9d2d446e8614b2fc4583a454d7cee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRNeoclimaAc.html#a8db9d2d446e8614b2fc4583a454d7cee">More...</a><br /></td></tr>
 <tr class="separator:a8db9d2d446e8614b2fc4583a454d7cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8690eda2de7b00029f70304131388890"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a8690eda2de7b00029f70304131388890">getFan</a> (void)</td></tr>
-<tr class="memdesc:a8690eda2de7b00029f70304131388890"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRNeoclimaAc.html#a8690eda2de7b00029f70304131388890">More...</a><br /></td></tr>
-<tr class="separator:a8690eda2de7b00029f70304131388890"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60c4e4b50c2bcd07991eaff73c031834"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a60c4e4b50c2bcd07991eaff73c031834">getFan</a> (void) const</td></tr>
+<tr class="memdesc:a60c4e4b50c2bcd07991eaff73c031834"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRNeoclimaAc.html#a60c4e4b50c2bcd07991eaff73c031834">More...</a><br /></td></tr>
+<tr class="separator:a60c4e4b50c2bcd07991eaff73c031834"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6e5f6f092f52c5c289642c9576c8bc0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#aa6e5f6f092f52c5c289642c9576c8bc0">setSwingV</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:aa6e5f6f092f52c5c289642c9576c8bc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the vertical swing setting of the A/C.  <a href="classIRNeoclimaAc.html#aa6e5f6f092f52c5c289642c9576c8bc0">More...</a><br /></td></tr>
 <tr class="separator:aa6e5f6f092f52c5c289642c9576c8bc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3007ed9857bb212de05b7757ee0691e3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a3007ed9857bb212de05b7757ee0691e3">getSwingV</a> (void)</td></tr>
-<tr class="memdesc:a3007ed9857bb212de05b7757ee0691e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vertical swing setting of the A/C.  <a href="classIRNeoclimaAc.html#a3007ed9857bb212de05b7757ee0691e3">More...</a><br /></td></tr>
-<tr class="separator:a3007ed9857bb212de05b7757ee0691e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaaac3278cfe3120e3973b38ade87b904"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#aaaac3278cfe3120e3973b38ade87b904">getSwingV</a> (void) const</td></tr>
+<tr class="memdesc:aaaac3278cfe3120e3973b38ade87b904"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vertical swing setting of the A/C.  <a href="classIRNeoclimaAc.html#aaaac3278cfe3120e3973b38ade87b904">More...</a><br /></td></tr>
+<tr class="separator:aaaac3278cfe3120e3973b38ade87b904"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1aeebc60d7bbd0fb801ad88f639cb6a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a1aeebc60d7bbd0fb801ad88f639cb6a0">setSwingH</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:a1aeebc60d7bbd0fb801ad88f639cb6a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the horizontal swing setting of the A/C.  <a href="classIRNeoclimaAc.html#a1aeebc60d7bbd0fb801ad88f639cb6a0">More...</a><br /></td></tr>
 <tr class="separator:a1aeebc60d7bbd0fb801ad88f639cb6a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a133fb28183fc33702bd8afb7c8886cb2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a133fb28183fc33702bd8afb7c8886cb2">getSwingH</a> (void)</td></tr>
-<tr class="memdesc:a133fb28183fc33702bd8afb7c8886cb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the horizontal swing (Air Flow) setting of the A/C.  <a href="classIRNeoclimaAc.html#a133fb28183fc33702bd8afb7c8886cb2">More...</a><br /></td></tr>
-<tr class="separator:a133fb28183fc33702bd8afb7c8886cb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0e598394a411e627a684525053a6500"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#aa0e598394a411e627a684525053a6500">getSwingH</a> (void) const</td></tr>
+<tr class="memdesc:aa0e598394a411e627a684525053a6500"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the horizontal swing (Air Flow) setting of the A/C.  <a href="classIRNeoclimaAc.html#aa0e598394a411e627a684525053a6500">More...</a><br /></td></tr>
+<tr class="separator:aa0e598394a411e627a684525053a6500"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad01a62fb369c6894333adb2fe0f52b79"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#ad01a62fb369c6894333adb2fe0f52b79">setSleep</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:ad01a62fb369c6894333adb2fe0f52b79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Sleep setting of the A/C.  <a href="classIRNeoclimaAc.html#ad01a62fb369c6894333adb2fe0f52b79">More...</a><br /></td></tr>
 <tr class="separator:ad01a62fb369c6894333adb2fe0f52b79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8565f8f39127ed51eec7f7883319da61"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a8565f8f39127ed51eec7f7883319da61">getSleep</a> (void)</td></tr>
-<tr class="memdesc:a8565f8f39127ed51eec7f7883319da61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep setting of the A/C.  <a href="classIRNeoclimaAc.html#a8565f8f39127ed51eec7f7883319da61">More...</a><br /></td></tr>
-<tr class="separator:a8565f8f39127ed51eec7f7883319da61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a139adc7789bcbc3914906331759fac48"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a139adc7789bcbc3914906331759fac48">getSleep</a> (void) const</td></tr>
+<tr class="memdesc:a139adc7789bcbc3914906331759fac48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep setting of the A/C.  <a href="classIRNeoclimaAc.html#a139adc7789bcbc3914906331759fac48">More...</a><br /></td></tr>
+<tr class="separator:a139adc7789bcbc3914906331759fac48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2a9563d9e3c5c95dfa512c0bb87e16f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#aa2a9563d9e3c5c95dfa512c0bb87e16f">setTurbo</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:aa2a9563d9e3c5c95dfa512c0bb87e16f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Turbo setting of the A/C.  <a href="classIRNeoclimaAc.html#aa2a9563d9e3c5c95dfa512c0bb87e16f">More...</a><br /></td></tr>
 <tr class="separator:aa2a9563d9e3c5c95dfa512c0bb87e16f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6cf241f0392744a91b703475ee88bfa1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a6cf241f0392744a91b703475ee88bfa1">getTurbo</a> (void)</td></tr>
-<tr class="memdesc:a6cf241f0392744a91b703475ee88bfa1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Turbo setting of the A/C.  <a href="classIRNeoclimaAc.html#a6cf241f0392744a91b703475ee88bfa1">More...</a><br /></td></tr>
-<tr class="separator:a6cf241f0392744a91b703475ee88bfa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95af8bbe9500fc2f99d30214e38fae85"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a95af8bbe9500fc2f99d30214e38fae85">getTurbo</a> (void) const</td></tr>
+<tr class="memdesc:a95af8bbe9500fc2f99d30214e38fae85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Turbo setting of the A/C.  <a href="classIRNeoclimaAc.html#a95af8bbe9500fc2f99d30214e38fae85">More...</a><br /></td></tr>
+<tr class="separator:a95af8bbe9500fc2f99d30214e38fae85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6748510814a39756263916913890844"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#af6748510814a39756263916913890844">setEcono</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:af6748510814a39756263916913890844"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Economy (Energy Saver) setting of the A/C.  <a href="classIRNeoclimaAc.html#af6748510814a39756263916913890844">More...</a><br /></td></tr>
 <tr class="separator:af6748510814a39756263916913890844"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af70450c0ff5e55bea3127de7e23f4f4f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#af70450c0ff5e55bea3127de7e23f4f4f">getEcono</a> (void)</td></tr>
-<tr class="memdesc:af70450c0ff5e55bea3127de7e23f4f4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Economy (Energy Saver) setting of the A/C.  <a href="classIRNeoclimaAc.html#af70450c0ff5e55bea3127de7e23f4f4f">More...</a><br /></td></tr>
-<tr class="separator:af70450c0ff5e55bea3127de7e23f4f4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed7b9c7b8a1686a1e2850c9b9347d868"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#aed7b9c7b8a1686a1e2850c9b9347d868">getEcono</a> (void) const</td></tr>
+<tr class="memdesc:aed7b9c7b8a1686a1e2850c9b9347d868"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Economy (Energy Saver) setting of the A/C.  <a href="classIRNeoclimaAc.html#aed7b9c7b8a1686a1e2850c9b9347d868">More...</a><br /></td></tr>
+<tr class="separator:aed7b9c7b8a1686a1e2850c9b9347d868"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6354d8b902ffc1e7c044a61185504404"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a6354d8b902ffc1e7c044a61185504404">setFresh</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:a6354d8b902ffc1e7c044a61185504404"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Fresh (air) setting of the A/C.  <a href="classIRNeoclimaAc.html#a6354d8b902ffc1e7c044a61185504404">More...</a><br /></td></tr>
 <tr class="separator:a6354d8b902ffc1e7c044a61185504404"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c411cf55667339ff8e3664a6d0ee843"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a2c411cf55667339ff8e3664a6d0ee843">getFresh</a> (void)</td></tr>
-<tr class="memdesc:a2c411cf55667339ff8e3664a6d0ee843"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Fresh (air) setting of the A/C.  <a href="classIRNeoclimaAc.html#a2c411cf55667339ff8e3664a6d0ee843">More...</a><br /></td></tr>
-<tr class="separator:a2c411cf55667339ff8e3664a6d0ee843"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad22722bde267db7ecfd99298bde0165e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#ad22722bde267db7ecfd99298bde0165e">getFresh</a> (void) const</td></tr>
+<tr class="memdesc:ad22722bde267db7ecfd99298bde0165e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Fresh (air) setting of the A/C.  <a href="classIRNeoclimaAc.html#ad22722bde267db7ecfd99298bde0165e">More...</a><br /></td></tr>
+<tr class="separator:ad22722bde267db7ecfd99298bde0165e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2eb4e0a2ff39ceb1b6b571998d91b31e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a2eb4e0a2ff39ceb1b6b571998d91b31e">setHold</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:a2eb4e0a2ff39ceb1b6b571998d91b31e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Hold setting of the A/C.  <a href="classIRNeoclimaAc.html#a2eb4e0a2ff39ceb1b6b571998d91b31e">More...</a><br /></td></tr>
 <tr class="separator:a2eb4e0a2ff39ceb1b6b571998d91b31e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63045d768858265ed1bbc4c337de79eb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a63045d768858265ed1bbc4c337de79eb">getHold</a> (void)</td></tr>
-<tr class="memdesc:a63045d768858265ed1bbc4c337de79eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Hold setting of the A/C.  <a href="classIRNeoclimaAc.html#a63045d768858265ed1bbc4c337de79eb">More...</a><br /></td></tr>
-<tr class="separator:a63045d768858265ed1bbc4c337de79eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbbd41de5f5f4cd7fb89ebc6e20e81cd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#adbbd41de5f5f4cd7fb89ebc6e20e81cd">getHold</a> (void) const</td></tr>
+<tr class="memdesc:adbbd41de5f5f4cd7fb89ebc6e20e81cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Hold setting of the A/C.  <a href="classIRNeoclimaAc.html#adbbd41de5f5f4cd7fb89ebc6e20e81cd">More...</a><br /></td></tr>
+<tr class="separator:adbbd41de5f5f4cd7fb89ebc6e20e81cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a504fc5e371746fda8e7eb7cc0abf137a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a504fc5e371746fda8e7eb7cc0abf137a">setIon</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:a504fc5e371746fda8e7eb7cc0abf137a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Ion (filter) setting of the A/C.  <a href="classIRNeoclimaAc.html#a504fc5e371746fda8e7eb7cc0abf137a">More...</a><br /></td></tr>
 <tr class="separator:a504fc5e371746fda8e7eb7cc0abf137a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a908a65189ba6eb8141d50da000feec0a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a908a65189ba6eb8141d50da000feec0a">getIon</a> (void)</td></tr>
-<tr class="memdesc:a908a65189ba6eb8141d50da000feec0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Ion (filter) setting of the A/C.  <a href="classIRNeoclimaAc.html#a908a65189ba6eb8141d50da000feec0a">More...</a><br /></td></tr>
-<tr class="separator:a908a65189ba6eb8141d50da000feec0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e76b4f123a6138712834c12ef8a6f50"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a4e76b4f123a6138712834c12ef8a6f50">getIon</a> (void) const</td></tr>
+<tr class="memdesc:a4e76b4f123a6138712834c12ef8a6f50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Ion (filter) setting of the A/C.  <a href="classIRNeoclimaAc.html#a4e76b4f123a6138712834c12ef8a6f50">More...</a><br /></td></tr>
+<tr class="separator:a4e76b4f123a6138712834c12ef8a6f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d7a6ec6d319544bee907a23a1d14084"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a1d7a6ec6d319544bee907a23a1d14084">setLight</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:a1d7a6ec6d319544bee907a23a1d14084"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Light(LED display) setting of the A/C.  <a href="classIRNeoclimaAc.html#a1d7a6ec6d319544bee907a23a1d14084">More...</a><br /></td></tr>
 <tr class="separator:a1d7a6ec6d319544bee907a23a1d14084"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad87fc87e34c3de56c4bbe35443e92226"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#ad87fc87e34c3de56c4bbe35443e92226">getLight</a> (void)</td></tr>
-<tr class="memdesc:ad87fc87e34c3de56c4bbe35443e92226"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Light (LED display) setting of the A/C.  <a href="classIRNeoclimaAc.html#ad87fc87e34c3de56c4bbe35443e92226">More...</a><br /></td></tr>
-<tr class="separator:ad87fc87e34c3de56c4bbe35443e92226"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c1cd7460cd82b302f9e1373c7ffe738"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a2c1cd7460cd82b302f9e1373c7ffe738">getLight</a> (void) const</td></tr>
+<tr class="memdesc:a2c1cd7460cd82b302f9e1373c7ffe738"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Light (LED display) setting of the A/C.  <a href="classIRNeoclimaAc.html#a2c1cd7460cd82b302f9e1373c7ffe738">More...</a><br /></td></tr>
+<tr class="separator:a2c1cd7460cd82b302f9e1373c7ffe738"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3176c5fe3251bd6a31a3a0ddc2c294be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a3176c5fe3251bd6a31a3a0ddc2c294be">set8CHeat</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:a3176c5fe3251bd6a31a3a0ddc2c294be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the 8°C Heat setting of the A/C.  <a href="classIRNeoclimaAc.html#a3176c5fe3251bd6a31a3a0ddc2c294be">More...</a><br /></td></tr>
 <tr class="separator:a3176c5fe3251bd6a31a3a0ddc2c294be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee5b855ce2decb455eaaceb6b4913368"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#aee5b855ce2decb455eaaceb6b4913368">get8CHeat</a> (void)</td></tr>
-<tr class="memdesc:aee5b855ce2decb455eaaceb6b4913368"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the 8°C Heat setting of the A/C.  <a href="classIRNeoclimaAc.html#aee5b855ce2decb455eaaceb6b4913368">More...</a><br /></td></tr>
-<tr class="separator:aee5b855ce2decb455eaaceb6b4913368"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abebfca9eeb51d23d194162a6570b1d39"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#abebfca9eeb51d23d194162a6570b1d39">get8CHeat</a> (void) const</td></tr>
+<tr class="memdesc:abebfca9eeb51d23d194162a6570b1d39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the 8°C Heat setting of the A/C.  <a href="classIRNeoclimaAc.html#abebfca9eeb51d23d194162a6570b1d39">More...</a><br /></td></tr>
+<tr class="separator:abebfca9eeb51d23d194162a6570b1d39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf433cab785db382c55a420e68e7d7ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#aaf433cab785db382c55a420e68e7d7ec">setEye</a> (const bool <a class="el" href="classIRNeoclimaAc.html#ab4a23cefef02351883dc4088dec51071">on</a>)</td></tr>
 <tr class="memdesc:aaf433cab785db382c55a420e68e7d7ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Eye (Sensor) setting of the A/C.  <a href="classIRNeoclimaAc.html#aaf433cab785db382c55a420e68e7d7ec">More...</a><br /></td></tr>
 <tr class="separator:aaf433cab785db382c55a420e68e7d7ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15b91e2c854537d94cbabd7cd9bd30e4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a15b91e2c854537d94cbabd7cd9bd30e4">getEye</a> (void)</td></tr>
-<tr class="memdesc:a15b91e2c854537d94cbabd7cd9bd30e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Eye (Sensor) setting of the A/C.  <a href="classIRNeoclimaAc.html#a15b91e2c854537d94cbabd7cd9bd30e4">More...</a><br /></td></tr>
-<tr class="separator:a15b91e2c854537d94cbabd7cd9bd30e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada35185b6f095d36013adacc705e9861"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#ada35185b6f095d36013adacc705e9861">getTempUnits</a> (void)</td></tr>
-<tr class="memdesc:ada35185b6f095d36013adacc705e9861"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the A/C unit using Fahrenheit or Celsius for temperature units.  <a href="classIRNeoclimaAc.html#ada35185b6f095d36013adacc705e9861">More...</a><br /></td></tr>
-<tr class="separator:ada35185b6f095d36013adacc705e9861"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4ed34fe7b151bcc5ff6922a54427da0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#af4ed34fe7b151bcc5ff6922a54427da0">getFollow</a> (void)</td></tr>
-<tr class="memdesc:af4ed34fe7b151bcc5ff6922a54427da0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Follow Me setting of the A/C.  <a href="classIRNeoclimaAc.html#af4ed34fe7b151bcc5ff6922a54427da0">More...</a><br /></td></tr>
-<tr class="separator:af4ed34fe7b151bcc5ff6922a54427da0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a5d21b3109a9105db9e2445bf8358b4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a2a5d21b3109a9105db9e2445bf8358b4">getEye</a> (void) const</td></tr>
+<tr class="memdesc:a2a5d21b3109a9105db9e2445bf8358b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Eye (Sensor) setting of the A/C.  <a href="classIRNeoclimaAc.html#a2a5d21b3109a9105db9e2445bf8358b4">More...</a><br /></td></tr>
+<tr class="separator:a2a5d21b3109a9105db9e2445bf8358b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14074dc932bd554c3c1746e6b0ecf43c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a14074dc932bd554c3c1746e6b0ecf43c">getTempUnits</a> (void) const</td></tr>
+<tr class="memdesc:a14074dc932bd554c3c1746e6b0ecf43c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the A/C unit using Fahrenheit or Celsius for temperature units.  <a href="classIRNeoclimaAc.html#a14074dc932bd554c3c1746e6b0ecf43c">More...</a><br /></td></tr>
+<tr class="separator:a14074dc932bd554c3c1746e6b0ecf43c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7223965174db938d90b5324e3d601d4e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a7223965174db938d90b5324e3d601d4e">getFollow</a> (void) const</td></tr>
+<tr class="memdesc:a7223965174db938d90b5324e3d601d4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Follow Me setting of the A/C.  <a href="classIRNeoclimaAc.html#a7223965174db938d90b5324e3d601d4e">More...</a><br /></td></tr>
+<tr class="separator:a7223965174db938d90b5324e3d601d4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f67329cad92d4252b0d33effce6380e"><td class="memItemLeft" align="right" valign="top">uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a1f67329cad92d4252b0d33effce6380e">getRaw</a> (void)</td></tr>
 <tr class="memdesc:a1f67329cad92d4252b0d33effce6380e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a PTR to the internal state/code for this protocol.  <a href="classIRNeoclimaAc.html#a1f67329cad92d4252b0d33effce6380e">More...</a><br /></td></tr>
 <tr class="separator:a1f67329cad92d4252b0d33effce6380e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a607ea7df35572578ef86da7f505ab407"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a607ea7df35572578ef86da7f505ab407">setRaw</a> (const uint8_t new_code[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#a5a871ed6d145c5ea3d50e96600c02e31">kNeoclimaStateLength</a>)</td></tr>
 <tr class="memdesc:a607ea7df35572578ef86da7f505ab407"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRNeoclimaAc.html#a607ea7df35572578ef86da7f505ab407">More...</a><br /></td></tr>
 <tr class="separator:a607ea7df35572578ef86da7f505ab407"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e6a036411583bad6daf1ef2e60e013c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a9e6a036411583bad6daf1ef2e60e013c">toString</a> (void)</td></tr>
-<tr class="memdesc:a9e6a036411583bad6daf1ef2e60e013c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRNeoclimaAc.html#a9e6a036411583bad6daf1ef2e60e013c">More...</a><br /></td></tr>
-<tr class="separator:a9e6a036411583bad6daf1ef2e60e013c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61335773816ecbbeb949e5da78d07e50"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a61335773816ecbbeb949e5da78d07e50">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
-<tr class="memdesc:a61335773816ecbbeb949e5da78d07e50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRNeoclimaAc.html#a61335773816ecbbeb949e5da78d07e50">More...</a><br /></td></tr>
-<tr class="separator:a61335773816ecbbeb949e5da78d07e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c3ac622428f118b28d53a3a82740993"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a8c3ac622428f118b28d53a3a82740993">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
-<tr class="memdesc:a8c3ac622428f118b28d53a3a82740993"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRNeoclimaAc.html#a8c3ac622428f118b28d53a3a82740993">More...</a><br /></td></tr>
-<tr class="separator:a8c3ac622428f118b28d53a3a82740993"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a455397211c7cb8074f6b7358dc6a5b9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a455397211c7cb8074f6b7358dc6a5b9e">toCommon</a> (void)</td></tr>
-<tr class="memdesc:a455397211c7cb8074f6b7358dc6a5b9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRNeoclimaAc.html#a455397211c7cb8074f6b7358dc6a5b9e">More...</a><br /></td></tr>
-<tr class="separator:a455397211c7cb8074f6b7358dc6a5b9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f285a0eb02b57ae0f8dc6d29e7aba83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a5f285a0eb02b57ae0f8dc6d29e7aba83">toString</a> (void) const</td></tr>
+<tr class="memdesc:a5f285a0eb02b57ae0f8dc6d29e7aba83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRNeoclimaAc.html#a5f285a0eb02b57ae0f8dc6d29e7aba83">More...</a><br /></td></tr>
+<tr class="separator:a5f285a0eb02b57ae0f8dc6d29e7aba83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a068f762e89180f80011b25323a0b5c1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a068f762e89180f80011b25323a0b5c1a">toCommon</a> (void) const</td></tr>
+<tr class="memdesc:a068f762e89180f80011b25323a0b5c1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRNeoclimaAc.html#a068f762e89180f80011b25323a0b5c1a">More...</a><br /></td></tr>
+<tr class="separator:a068f762e89180f80011b25323a0b5c1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -238,6 +233,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ac75f316cd1813cdb4e8a6d45d10ddd57"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#ac75f316cd1813cdb4e8a6d45d10ddd57">calcChecksum</a> (const uint8_t state[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#a5a871ed6d145c5ea3d50e96600c02e31">kNeoclimaStateLength</a>)</td></tr>
 <tr class="memdesc:ac75f316cd1813cdb4e8a6d45d10ddd57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the checksum for a given state.  <a href="classIRNeoclimaAc.html#ac75f316cd1813cdb4e8a6d45d10ddd57">More...</a><br /></td></tr>
 <tr class="separator:ac75f316cd1813cdb4e8a6d45d10ddd57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61335773816ecbbeb949e5da78d07e50"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a61335773816ecbbeb949e5da78d07e50">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
+<tr class="memdesc:a61335773816ecbbeb949e5da78d07e50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRNeoclimaAc.html#a61335773816ecbbeb949e5da78d07e50">More...</a><br /></td></tr>
+<tr class="separator:a61335773816ecbbeb949e5da78d07e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c3ac622428f118b28d53a3a82740993"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a8c3ac622428f118b28d53a3a82740993">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
+<tr class="memdesc:a8c3ac622428f118b28d53a3a82740993"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRNeoclimaAc.html#a8c3ac622428f118b28d53a3a82740993">More...</a><br /></td></tr>
+<tr class="separator:a8c3ac622428f118b28d53a3a82740993"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a220b673c96e54e675d8296aa8b2303"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a2a220b673c96e54e675d8296aa8b2303">toCommonMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a2a220b673c96e54e675d8296aa8b2303"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRNeoclimaAc.html#a2a220b673c96e54e675d8296aa8b2303">More...</a><br /></td></tr>
 <tr class="separator:a2a220b673c96e54e675d8296aa8b2303"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -256,9 +257,8 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a43e42b1c7e68e5a85ed10454c6210be5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a43e42b1c7e68e5a85ed10454c6210be5">_irsend</a></td></tr>
 <tr class="memdesc:a43e42b1c7e68e5a85ed10454c6210be5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRNeoclimaAc.html#a43e42b1c7e68e5a85ed10454c6210be5">More...</a><br /></td></tr>
 <tr class="separator:a43e42b1c7e68e5a85ed10454c6210be5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a336507e0635ede3b9ebf53881ece50bb"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a336507e0635ede3b9ebf53881ece50bb">remote_state</a> [<a class="el" href="IRremoteESP8266_8h.html#a5a871ed6d145c5ea3d50e96600c02e31">kNeoclimaStateLength</a>]</td></tr>
-<tr class="memdesc:a336507e0635ede3b9ebf53881ece50bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">State of the remote in code.  <a href="classIRNeoclimaAc.html#a336507e0635ede3b9ebf53881ece50bb">More...</a><br /></td></tr>
-<tr class="separator:a336507e0635ede3b9ebf53881ece50bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46453121ea930c6b356dd752fdaaec51"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionNeoclimaProtocol.html">NeoclimaProtocol</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRNeoclimaAc.html#a46453121ea930c6b356dd752fdaaec51">_</a></td></tr>
+<tr class="separator:a46453121ea930c6b356dd752fdaaec51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for handling detailed Neoclima A/C messages. </p>
@@ -451,6 +451,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRNeoclimaAc::convertFan </td>
@@ -460,6 +463,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed. </p>
@@ -478,6 +486,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRNeoclimaAc::convertMode </td>
@@ -487,6 +498,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode. </p>
@@ -500,8 +516,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aee5b855ce2decb455eaaceb6b4913368"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee5b855ce2decb455eaaceb6b4913368">&#9670;&nbsp;</a></span>get8CHeat()</h2>
+<a id="abebfca9eeb51d23d194162a6570b1d39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abebfca9eeb51d23d194162a6570b1d39">&#9670;&nbsp;</a></span>get8CHeat()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -511,7 +527,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -521,8 +537,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a747fec9ea02220e6cf7465f5f9bb800a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a747fec9ea02220e6cf7465f5f9bb800a">&#9670;&nbsp;</a></span>getButton()</h2>
+<a id="a21c11784fc1504688164b2c8a01a8e06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21c11784fc1504688164b2c8a01a8e06">&#9670;&nbsp;</a></span>getButton()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -532,7 +548,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -542,8 +558,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="af70450c0ff5e55bea3127de7e23f4f4f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af70450c0ff5e55bea3127de7e23f4f4f">&#9670;&nbsp;</a></span>getEcono()</h2>
+<a id="aed7b9c7b8a1686a1e2850c9b9347d868"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed7b9c7b8a1686a1e2850c9b9347d868">&#9670;&nbsp;</a></span>getEcono()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -553,7 +569,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -563,8 +579,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a15b91e2c854537d94cbabd7cd9bd30e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a15b91e2c854537d94cbabd7cd9bd30e4">&#9670;&nbsp;</a></span>getEye()</h2>
+<a id="a2a5d21b3109a9105db9e2445bf8358b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a5d21b3109a9105db9e2445bf8358b4">&#9670;&nbsp;</a></span>getEye()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -574,7 +590,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -584,8 +600,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a8690eda2de7b00029f70304131388890"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8690eda2de7b00029f70304131388890">&#9670;&nbsp;</a></span>getFan()</h2>
+<a id="a60c4e4b50c2bcd07991eaff73c031834"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60c4e4b50c2bcd07991eaff73c031834">&#9670;&nbsp;</a></span>getFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -595,7 +611,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -605,8 +621,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="af4ed34fe7b151bcc5ff6922a54427da0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4ed34fe7b151bcc5ff6922a54427da0">&#9670;&nbsp;</a></span>getFollow()</h2>
+<a id="a7223965174db938d90b5324e3d601d4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7223965174db938d90b5324e3d601d4e">&#9670;&nbsp;</a></span>getFollow()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -616,7 +632,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -626,8 +642,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a2c411cf55667339ff8e3664a6d0ee843"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c411cf55667339ff8e3664a6d0ee843">&#9670;&nbsp;</a></span>getFresh()</h2>
+<a id="ad22722bde267db7ecfd99298bde0165e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad22722bde267db7ecfd99298bde0165e">&#9670;&nbsp;</a></span>getFresh()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -637,7 +653,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -647,8 +663,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a63045d768858265ed1bbc4c337de79eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a63045d768858265ed1bbc4c337de79eb">&#9670;&nbsp;</a></span>getHold()</h2>
+<a id="adbbd41de5f5f4cd7fb89ebc6e20e81cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbbd41de5f5f4cd7fb89ebc6e20e81cd">&#9670;&nbsp;</a></span>getHold()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -658,7 +674,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -668,8 +684,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a908a65189ba6eb8141d50da000feec0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a908a65189ba6eb8141d50da000feec0a">&#9670;&nbsp;</a></span>getIon()</h2>
+<a id="a4e76b4f123a6138712834c12ef8a6f50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e76b4f123a6138712834c12ef8a6f50">&#9670;&nbsp;</a></span>getIon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -679,7 +695,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -689,8 +705,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad87fc87e34c3de56c4bbe35443e92226"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad87fc87e34c3de56c4bbe35443e92226">&#9670;&nbsp;</a></span>getLight()</h2>
+<a id="a2c1cd7460cd82b302f9e1373c7ffe738"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c1cd7460cd82b302f9e1373c7ffe738">&#9670;&nbsp;</a></span>getLight()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -700,7 +716,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -710,8 +726,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad2a43e0405a44787bb177bf13a324dde"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2a43e0405a44787bb177bf13a324dde">&#9670;&nbsp;</a></span>getMode()</h2>
+<a id="a305db84bf11bd9f226db7dbec73e7dd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a305db84bf11bd9f226db7dbec73e7dd3">&#9670;&nbsp;</a></span>getMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -721,7 +737,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -731,8 +747,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a635e81f673155eb123dab84a78ff86d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a635e81f673155eb123dab84a78ff86d5">&#9670;&nbsp;</a></span>getPower()</h2>
+<a id="a0bca526fcbe79a1ef3a6f281ef0f916b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0bca526fcbe79a1ef3a6f281ef0f916b">&#9670;&nbsp;</a></span>getPower()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -742,7 +758,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -773,8 +789,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a8565f8f39127ed51eec7f7883319da61"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8565f8f39127ed51eec7f7883319da61">&#9670;&nbsp;</a></span>getSleep()</h2>
+<a id="a139adc7789bcbc3914906331759fac48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a139adc7789bcbc3914906331759fac48">&#9670;&nbsp;</a></span>getSleep()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -784,7 +800,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -794,8 +810,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a133fb28183fc33702bd8afb7c8886cb2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a133fb28183fc33702bd8afb7c8886cb2">&#9670;&nbsp;</a></span>getSwingH()</h2>
+<a id="aa0e598394a411e627a684525053a6500"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0e598394a411e627a684525053a6500">&#9670;&nbsp;</a></span>getSwingH()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -805,7 +821,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -815,8 +831,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a3007ed9857bb212de05b7757ee0691e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3007ed9857bb212de05b7757ee0691e3">&#9670;&nbsp;</a></span>getSwingV()</h2>
+<a id="aaaac3278cfe3120e3973b38ade87b904"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaaac3278cfe3120e3973b38ade87b904">&#9670;&nbsp;</a></span>getSwingV()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -826,7 +842,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -836,8 +852,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aaa1a625af6cf094823b58f1fe43deb3a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa1a625af6cf094823b58f1fe43deb3a">&#9670;&nbsp;</a></span>getTemp()</h2>
+<a id="a08bf660c8662806e60cf1024eb219b60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08bf660c8662806e60cf1024eb219b60">&#9670;&nbsp;</a></span>getTemp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -847,19 +863,19 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Get the current temperature setting. </p>
 <dl class="section return"><dt>Returns</dt><dd>The current setting for temp. in degrees. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>The units of the temperature (F/C) is determined by <code><a class="el" href="classIRNeoclimaAc.html#ada35185b6f095d36013adacc705e9861" title="Is the A/C unit using Fahrenheit or Celsius for temperature units.">getTempUnits()</a></code>. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The units of the temperature (F/C) is determined by <code><a class="el" href="classIRNeoclimaAc.html#a14074dc932bd554c3c1746e6b0ecf43c" title="Is the A/C unit using Fahrenheit or Celsius for temperature units.">getTempUnits()</a></code>. </dd></dl>
 
 </div>
 </div>
-<a id="ada35185b6f095d36013adacc705e9861"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada35185b6f095d36013adacc705e9861">&#9670;&nbsp;</a></span>getTempUnits()</h2>
+<a id="a14074dc932bd554c3c1746e6b0ecf43c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14074dc932bd554c3c1746e6b0ecf43c">&#9670;&nbsp;</a></span>getTempUnits()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -869,7 +885,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -879,8 +895,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a6cf241f0392744a91b703475ee88bfa1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6cf241f0392744a91b703475ee88bfa1">&#9670;&nbsp;</a></span>getTurbo()</h2>
+<a id="a95af8bbe9500fc2f99d30214e38fae85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95af8bbe9500fc2f99d30214e38fae85">&#9670;&nbsp;</a></span>getTurbo()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -890,7 +906,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1451,8 +1467,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a455397211c7cb8074f6b7358dc6a5b9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a455397211c7cb8074f6b7358dc6a5b9e">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="a068f762e89180f80011b25323a0b5c1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a068f762e89180f80011b25323a0b5c1a">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1462,7 +1478,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1542,8 +1558,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a9e6a036411583bad6daf1ef2e60e013c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e6a036411583bad6daf1ef2e60e013c">&#9670;&nbsp;</a></span>toString()</h2>
+<a id="a5f285a0eb02b57ae0f8dc6d29e7aba83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f285a0eb02b57ae0f8dc6d29e7aba83">&#9670;&nbsp;</a></span>toString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1553,7 +1569,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1610,6 +1626,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a46453121ea930c6b356dd752fdaaec51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46453121ea930c6b356dd752fdaaec51">&#9670;&nbsp;</a></span>_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="unionNeoclimaProtocol.html">NeoclimaProtocol</a> IRNeoclimaAc::_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a43e42b1c7e68e5a85ed10454c6210be5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a43e42b1c7e68e5a85ed10454c6210be5">&#9670;&nbsp;</a></span>_irsend</h2>
 
@@ -1631,30 +1669,6 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Instance of the IR send class. </p>
-
-</div>
-</div>
-<a id="a336507e0635ede3b9ebf53881ece50bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a336507e0635ede3b9ebf53881ece50bb">&#9670;&nbsp;</a></span>remote_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t IRNeoclimaAc::remote_state[<a class="el" href="IRremoteESP8266_8h.html#a5a871ed6d145c5ea3d50e96600c02e31">kNeoclimaStateLength</a>]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>State of the remote in code. </p>
 
 </div>
 </div>

@@ -97,9 +97,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a6ead1d10578c64627f8a24b5d8a7444f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#a6ead1d10578c64627f8a24b5d8a7444f">addDayToString</a> (const uint8_t day_of_week, const int8_t offset, const bool precomma)</td></tr>
 <tr class="memdesc:a6ead1d10578c64627f8a24b5d8a7444f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a String of the 3-letter day of the week from a numerical day of the week. e.g. "Day: 1 (Mon)".  <a href="namespaceirutils.html#a6ead1d10578c64627f8a24b5d8a7444f">More...</a><br /></td></tr>
 <tr class="separator:a6ead1d10578c64627f8a24b5d8a7444f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae023bbabc452173d348c14eac7d86ab4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#ae023bbabc452173d348c14eac7d86ab4">addFanToString</a> (const uint8_t speed, const uint8_t high, const uint8_t low, const uint8_t automatic, const uint8_t quiet, const uint8_t medium)</td></tr>
-<tr class="memdesc:ae023bbabc452173d348c14eac7d86ab4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a String of human output for the given fan speed. e.g. "Fan: 0 (Auto)".  <a href="namespaceirutils.html#ae023bbabc452173d348c14eac7d86ab4">More...</a><br /></td></tr>
-<tr class="separator:ae023bbabc452173d348c14eac7d86ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af222d5a977e2cd2c979184c449d3c2f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#af222d5a977e2cd2c979184c449d3c2f8">addFanToString</a> (const uint8_t speed, const uint8_t high, const uint8_t low, const uint8_t automatic, const uint8_t quiet, const uint8_t medium, const uint8_t maximum)</td></tr>
+<tr class="memdesc:af222d5a977e2cd2c979184c449d3c2f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a String of human output for the given fan speed. e.g. "Fan: 0 (Auto)".  <a href="namespaceirutils.html#af222d5a977e2cd2c979184c449d3c2f8">More...</a><br /></td></tr>
+<tr class="separator:af222d5a977e2cd2c979184c449d3c2f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e55c6fdcc82e1ef8bd5f73df83609a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#a6e55c6fdcc82e1ef8bd5f73df83609a7">htmlEscape</a> (const <a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a> unescaped)</td></tr>
 <tr class="memdesc:a6e55c6fdcc82e1ef8bd5f73df83609a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Escape any special HTML (unsafe) characters in a string. e.g. anti-XSS.  <a href="namespaceirutils.html#a6e55c6fdcc82e1ef8bd5f73df83609a7">More...</a><br /></td></tr>
 <tr class="separator:a6e55c6fdcc82e1ef8bd5f73df83609a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -254,8 +254,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ae023bbabc452173d348c14eac7d86ab4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae023bbabc452173d348c14eac7d86ab4">&#9670;&nbsp;</a></span>addFanToString()</h2>
+<a id="af222d5a977e2cd2c979184c449d3c2f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af222d5a977e2cd2c979184c449d3c2f8">&#9670;&nbsp;</a></span>addFanToString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -294,7 +294,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const uint8_t&#160;</td>
-          <td class="paramname"><em>medium</em>&#160;</td>
+          <td class="paramname"><em>medium</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>maximum</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -313,6 +319,7 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">automatic</td><td>The numeric value for Auto speed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">quiet</td><td>The numeric value for Quiet speed. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">medium</td><td>The numeric value for Medium speed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">maximum</td><td>The numeric value for Highest speed. (if &gt; high) </td></tr>
   </table>
   </dd>
 </dl>
