@@ -81,8 +81,9 @@ Collaboration diagram for IRSamsungAc:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRSamsungAc__coll__graph.png" border="0" usemap="#IRSamsungAc_coll__map" alt="Collaboration graph"/></div>
 <map name="IRSamsungAc_coll__map" id="IRSamsungAc_coll__map">
-<area shape="rect" title="Class for handling detailed Samsung A/C messages." alt="" coords="5,95,116,121"/>
-<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="27,5,94,32"/>
+<area shape="rect" title="Class for handling detailed Samsung A/C messages." alt="" coords="80,95,191,121"/>
+<area shape="rect" href="unionSamsungProtocol.html" title="Native representation of a Samsung A/C message." alt="" coords="5,5,140,32"/>
+<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="165,5,231,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -121,93 +122,87 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4af21fa0dcbf5595386f67db676a443c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a4af21fa0dcbf5595386f67db676a443c">setPower</a> (const bool <a class="el" href="classIRSamsungAc.html#a68cf52997489a1c835662c7cdf23463c">on</a>)</td></tr>
 <tr class="memdesc:a4af21fa0dcbf5595386f67db676a443c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRSamsungAc.html#a4af21fa0dcbf5595386f67db676a443c">More...</a><br /></td></tr>
 <tr class="separator:a4af21fa0dcbf5595386f67db676a443c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26fb214fdf3af4d39a898a1721583cf3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a26fb214fdf3af4d39a898a1721583cf3">getPower</a> (void)</td></tr>
-<tr class="memdesc:a26fb214fdf3af4d39a898a1721583cf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRSamsungAc.html#a26fb214fdf3af4d39a898a1721583cf3">More...</a><br /></td></tr>
-<tr class="separator:a26fb214fdf3af4d39a898a1721583cf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecb2a7187ea08433bed9c6a6f5dfc7e2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#aecb2a7187ea08433bed9c6a6f5dfc7e2">getPower</a> (void) const</td></tr>
+<tr class="memdesc:aecb2a7187ea08433bed9c6a6f5dfc7e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRSamsungAc.html#aecb2a7187ea08433bed9c6a6f5dfc7e2">More...</a><br /></td></tr>
+<tr class="separator:aecb2a7187ea08433bed9c6a6f5dfc7e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94a71e82321343220836aa614b231bd0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a94a71e82321343220836aa614b231bd0">setTemp</a> (const uint8_t temp)</td></tr>
 <tr class="memdesc:a94a71e82321343220836aa614b231bd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRSamsungAc.html#a94a71e82321343220836aa614b231bd0">More...</a><br /></td></tr>
 <tr class="separator:a94a71e82321343220836aa614b231bd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11a6c86f2e4a918e1587ef564c63dddd"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a11a6c86f2e4a918e1587ef564c63dddd">getTemp</a> (void)</td></tr>
-<tr class="memdesc:a11a6c86f2e4a918e1587ef564c63dddd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRSamsungAc.html#a11a6c86f2e4a918e1587ef564c63dddd">More...</a><br /></td></tr>
-<tr class="separator:a11a6c86f2e4a918e1587ef564c63dddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e770b7736fe5602bb49d82a5c3b0dd2"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a1e770b7736fe5602bb49d82a5c3b0dd2">getTemp</a> (void) const</td></tr>
+<tr class="memdesc:a1e770b7736fe5602bb49d82a5c3b0dd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRSamsungAc.html#a1e770b7736fe5602bb49d82a5c3b0dd2">More...</a><br /></td></tr>
+<tr class="separator:a1e770b7736fe5602bb49d82a5c3b0dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c7571e14fe6629348273a2b49a0a824"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a6c7571e14fe6629348273a2b49a0a824">setFan</a> (const uint8_t speed)</td></tr>
 <tr class="memdesc:a6c7571e14fe6629348273a2b49a0a824"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRSamsungAc.html#a6c7571e14fe6629348273a2b49a0a824">More...</a><br /></td></tr>
 <tr class="separator:a6c7571e14fe6629348273a2b49a0a824"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6461c72b2598d1bdc14263552b5b0c98"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a6461c72b2598d1bdc14263552b5b0c98">getFan</a> (void)</td></tr>
-<tr class="memdesc:a6461c72b2598d1bdc14263552b5b0c98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRSamsungAc.html#a6461c72b2598d1bdc14263552b5b0c98">More...</a><br /></td></tr>
-<tr class="separator:a6461c72b2598d1bdc14263552b5b0c98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a924701fc0a10c1bae8a93749658abff5"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a924701fc0a10c1bae8a93749658abff5">getFan</a> (void) const</td></tr>
+<tr class="memdesc:a924701fc0a10c1bae8a93749658abff5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRSamsungAc.html#a924701fc0a10c1bae8a93749658abff5">More...</a><br /></td></tr>
+<tr class="separator:a924701fc0a10c1bae8a93749658abff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a708d9c6c91d774d6eeadbc0bd7f350af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a708d9c6c91d774d6eeadbc0bd7f350af">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a708d9c6c91d774d6eeadbc0bd7f350af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRSamsungAc.html#a708d9c6c91d774d6eeadbc0bd7f350af">More...</a><br /></td></tr>
 <tr class="separator:a708d9c6c91d774d6eeadbc0bd7f350af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a740a874ee2c492027623943043a1ebf6"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a740a874ee2c492027623943043a1ebf6">getMode</a> (void)</td></tr>
-<tr class="memdesc:a740a874ee2c492027623943043a1ebf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRSamsungAc.html#a740a874ee2c492027623943043a1ebf6">More...</a><br /></td></tr>
-<tr class="separator:a740a874ee2c492027623943043a1ebf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcfed1f2123c48715cb6f3623ecf3f58"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#adcfed1f2123c48715cb6f3623ecf3f58">getMode</a> (void) const</td></tr>
+<tr class="memdesc:adcfed1f2123c48715cb6f3623ecf3f58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRSamsungAc.html#adcfed1f2123c48715cb6f3623ecf3f58">More...</a><br /></td></tr>
+<tr class="separator:adcfed1f2123c48715cb6f3623ecf3f58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa7aaca1134e1565f527fcaa96a2fa6e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#aaa7aaca1134e1565f527fcaa96a2fa6e">setSwing</a> (const bool <a class="el" href="classIRSamsungAc.html#a68cf52997489a1c835662c7cdf23463c">on</a>)</td></tr>
 <tr class="memdesc:aaa7aaca1134e1565f527fcaa96a2fa6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the vertical swing setting of the A/C.  <a href="classIRSamsungAc.html#aaa7aaca1134e1565f527fcaa96a2fa6e">More...</a><br /></td></tr>
 <tr class="separator:aaa7aaca1134e1565f527fcaa96a2fa6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e6a7caccfdcb23cdb7d1341376c2343"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a5e6a7caccfdcb23cdb7d1341376c2343">getSwing</a> (void)</td></tr>
-<tr class="memdesc:a5e6a7caccfdcb23cdb7d1341376c2343"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vertical swing setting of the A/C.  <a href="classIRSamsungAc.html#a5e6a7caccfdcb23cdb7d1341376c2343">More...</a><br /></td></tr>
-<tr class="separator:a5e6a7caccfdcb23cdb7d1341376c2343"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5627d39ea3af4d1e948fc4b8339baf9b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a5627d39ea3af4d1e948fc4b8339baf9b">getSwing</a> (void) const</td></tr>
+<tr class="memdesc:a5627d39ea3af4d1e948fc4b8339baf9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vertical swing setting of the A/C.  <a href="classIRSamsungAc.html#a5627d39ea3af4d1e948fc4b8339baf9b">More...</a><br /></td></tr>
+<tr class="separator:a5627d39ea3af4d1e948fc4b8339baf9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a092ccbea031dd4be747076530117649d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a092ccbea031dd4be747076530117649d">setBeep</a> (const bool <a class="el" href="classIRSamsungAc.html#a68cf52997489a1c835662c7cdf23463c">on</a>)</td></tr>
 <tr class="memdesc:a092ccbea031dd4be747076530117649d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Beep setting of the A/C.  <a href="classIRSamsungAc.html#a092ccbea031dd4be747076530117649d">More...</a><br /></td></tr>
 <tr class="separator:a092ccbea031dd4be747076530117649d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab13b10f80e8e1169f0b01239f357b3ba"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#ab13b10f80e8e1169f0b01239f357b3ba">getBeep</a> (void)</td></tr>
-<tr class="memdesc:ab13b10f80e8e1169f0b01239f357b3ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Beep setting of the A/C.  <a href="classIRSamsungAc.html#ab13b10f80e8e1169f0b01239f357b3ba">More...</a><br /></td></tr>
-<tr class="separator:ab13b10f80e8e1169f0b01239f357b3ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17412aeb213d2800fa106b7af6c3933f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a17412aeb213d2800fa106b7af6c3933f">getBeep</a> (void) const</td></tr>
+<tr class="memdesc:a17412aeb213d2800fa106b7af6c3933f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Beep setting of the A/C.  <a href="classIRSamsungAc.html#a17412aeb213d2800fa106b7af6c3933f">More...</a><br /></td></tr>
+<tr class="separator:a17412aeb213d2800fa106b7af6c3933f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a911ca57dfb0e6787cba330e8d49b2496"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a911ca57dfb0e6787cba330e8d49b2496">setClean</a> (const bool <a class="el" href="classIRSamsungAc.html#a68cf52997489a1c835662c7cdf23463c">on</a>)</td></tr>
 <tr class="memdesc:a911ca57dfb0e6787cba330e8d49b2496"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Clean setting of the A/C.  <a href="classIRSamsungAc.html#a911ca57dfb0e6787cba330e8d49b2496">More...</a><br /></td></tr>
 <tr class="separator:a911ca57dfb0e6787cba330e8d49b2496"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a789edd6c6b0cb291753204d1e9c78fc8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a789edd6c6b0cb291753204d1e9c78fc8">getClean</a> (void)</td></tr>
-<tr class="memdesc:a789edd6c6b0cb291753204d1e9c78fc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Clean setting of the A/C.  <a href="classIRSamsungAc.html#a789edd6c6b0cb291753204d1e9c78fc8">More...</a><br /></td></tr>
-<tr class="separator:a789edd6c6b0cb291753204d1e9c78fc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8980cc9a230a78ec76a190056a8b9be6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a8980cc9a230a78ec76a190056a8b9be6">getClean</a> (void) const</td></tr>
+<tr class="memdesc:a8980cc9a230a78ec76a190056a8b9be6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Clean setting of the A/C.  <a href="classIRSamsungAc.html#a8980cc9a230a78ec76a190056a8b9be6">More...</a><br /></td></tr>
+<tr class="separator:a8980cc9a230a78ec76a190056a8b9be6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b3dd7d83c613a06f3499f1c8b26a67b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a6b3dd7d83c613a06f3499f1c8b26a67b">setQuiet</a> (const bool <a class="el" href="classIRSamsungAc.html#a68cf52997489a1c835662c7cdf23463c">on</a>)</td></tr>
 <tr class="memdesc:a6b3dd7d83c613a06f3499f1c8b26a67b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Quiet setting of the A/C.  <a href="classIRSamsungAc.html#a6b3dd7d83c613a06f3499f1c8b26a67b">More...</a><br /></td></tr>
 <tr class="separator:a6b3dd7d83c613a06f3499f1c8b26a67b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0baaf3d40419bb744204bdb30d4aa9b9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a0baaf3d40419bb744204bdb30d4aa9b9">getQuiet</a> (void)</td></tr>
-<tr class="memdesc:a0baaf3d40419bb744204bdb30d4aa9b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Quiet setting of the A/C.  <a href="classIRSamsungAc.html#a0baaf3d40419bb744204bdb30d4aa9b9">More...</a><br /></td></tr>
-<tr class="separator:a0baaf3d40419bb744204bdb30d4aa9b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4296eb88c1b349206d7a0bd551d33ee6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a4296eb88c1b349206d7a0bd551d33ee6">getQuiet</a> (void) const</td></tr>
+<tr class="memdesc:a4296eb88c1b349206d7a0bd551d33ee6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Quiet setting of the A/C.  <a href="classIRSamsungAc.html#a4296eb88c1b349206d7a0bd551d33ee6">More...</a><br /></td></tr>
+<tr class="separator:a4296eb88c1b349206d7a0bd551d33ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab657b79740e0f84c09611ea3b10d06f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#ab657b79740e0f84c09611ea3b10d06f0">setPowerful</a> (const bool <a class="el" href="classIRSamsungAc.html#a68cf52997489a1c835662c7cdf23463c">on</a>)</td></tr>
 <tr class="memdesc:ab657b79740e0f84c09611ea3b10d06f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Powerful (Turbo) setting of the A/C.  <a href="classIRSamsungAc.html#ab657b79740e0f84c09611ea3b10d06f0">More...</a><br /></td></tr>
 <tr class="separator:ab657b79740e0f84c09611ea3b10d06f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac43367d5aec71e1dcb5b178427268412"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#ac43367d5aec71e1dcb5b178427268412">getPowerful</a> (void)</td></tr>
-<tr class="memdesc:ac43367d5aec71e1dcb5b178427268412"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Powerful (Turbo) setting of the A/C.  <a href="classIRSamsungAc.html#ac43367d5aec71e1dcb5b178427268412">More...</a><br /></td></tr>
-<tr class="separator:ac43367d5aec71e1dcb5b178427268412"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acea93892d56221b2563d0db1c09589d1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#acea93892d56221b2563d0db1c09589d1">getPowerful</a> (void) const</td></tr>
+<tr class="memdesc:acea93892d56221b2563d0db1c09589d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Powerful (Turbo) setting of the A/C.  <a href="classIRSamsungAc.html#acea93892d56221b2563d0db1c09589d1">More...</a><br /></td></tr>
+<tr class="separator:acea93892d56221b2563d0db1c09589d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a310a73f15a0274fbaf15b981abaae592"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a310a73f15a0274fbaf15b981abaae592">setBreeze</a> (const bool <a class="el" href="classIRSamsungAc.html#a68cf52997489a1c835662c7cdf23463c">on</a>)</td></tr>
 <tr class="memdesc:a310a73f15a0274fbaf15b981abaae592"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes the vanes over the fan outlet, to stop direct wind. Aka. WindFree.  <a href="classIRSamsungAc.html#a310a73f15a0274fbaf15b981abaae592">More...</a><br /></td></tr>
 <tr class="separator:a310a73f15a0274fbaf15b981abaae592"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad46fed65fb1375bf3a3940aa2cb311d5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#ad46fed65fb1375bf3a3940aa2cb311d5">getBreeze</a> (void)</td></tr>
-<tr class="memdesc:ad46fed65fb1375bf3a3940aa2cb311d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Are the vanes closed over the fan outlet, to stop direct wind? Aka. WindFree.  <a href="classIRSamsungAc.html#ad46fed65fb1375bf3a3940aa2cb311d5">More...</a><br /></td></tr>
-<tr class="separator:ad46fed65fb1375bf3a3940aa2cb311d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae442d9d84a1058196620ab6f0c994cc7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#ae442d9d84a1058196620ab6f0c994cc7">getBreeze</a> (void) const</td></tr>
+<tr class="memdesc:ae442d9d84a1058196620ab6f0c994cc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Are the vanes closed over the fan outlet, to stop direct wind? Aka. WindFree.  <a href="classIRSamsungAc.html#ae442d9d84a1058196620ab6f0c994cc7">More...</a><br /></td></tr>
+<tr class="separator:ae442d9d84a1058196620ab6f0c994cc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad20199bed3a01208ec694b9d4eb7ef98"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#ad20199bed3a01208ec694b9d4eb7ef98">setDisplay</a> (const bool <a class="el" href="classIRSamsungAc.html#a68cf52997489a1c835662c7cdf23463c">on</a>)</td></tr>
 <tr class="memdesc:ad20199bed3a01208ec694b9d4eb7ef98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Display (Light/LED) setting of the A/C.  <a href="classIRSamsungAc.html#ad20199bed3a01208ec694b9d4eb7ef98">More...</a><br /></td></tr>
 <tr class="separator:ad20199bed3a01208ec694b9d4eb7ef98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a890aa3cab0918fda56daf0bf84ecc5c1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a890aa3cab0918fda56daf0bf84ecc5c1">getDisplay</a> (void)</td></tr>
-<tr class="memdesc:a890aa3cab0918fda56daf0bf84ecc5c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Display (Light/LED) setting of the A/C.  <a href="classIRSamsungAc.html#a890aa3cab0918fda56daf0bf84ecc5c1">More...</a><br /></td></tr>
-<tr class="separator:a890aa3cab0918fda56daf0bf84ecc5c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05e2c47fc5c63782f2420feb1337014c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a05e2c47fc5c63782f2420feb1337014c">getDisplay</a> (void) const</td></tr>
+<tr class="memdesc:a05e2c47fc5c63782f2420feb1337014c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Display (Light/LED) setting of the A/C.  <a href="classIRSamsungAc.html#a05e2c47fc5c63782f2420feb1337014c">More...</a><br /></td></tr>
+<tr class="separator:a05e2c47fc5c63782f2420feb1337014c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeee65ca6d2100635a517077f01053bed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#aeee65ca6d2100635a517077f01053bed">setIon</a> (const bool <a class="el" href="classIRSamsungAc.html#a68cf52997489a1c835662c7cdf23463c">on</a>)</td></tr>
 <tr class="memdesc:aeee65ca6d2100635a517077f01053bed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Ion (Filter) setting of the A/C.  <a href="classIRSamsungAc.html#aeee65ca6d2100635a517077f01053bed">More...</a><br /></td></tr>
 <tr class="separator:aeee65ca6d2100635a517077f01053bed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab1ebb523ca45431a0127b82cb4ce36f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#aab1ebb523ca45431a0127b82cb4ce36f">getIon</a> (void)</td></tr>
-<tr class="memdesc:aab1ebb523ca45431a0127b82cb4ce36f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Ion (Filter) setting of the A/C.  <a href="classIRSamsungAc.html#aab1ebb523ca45431a0127b82cb4ce36f">More...</a><br /></td></tr>
-<tr class="separator:aab1ebb523ca45431a0127b82cb4ce36f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b29304810f8e619123553ffd40b35c1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a4b29304810f8e619123553ffd40b35c1">getIon</a> (void) const</td></tr>
+<tr class="memdesc:a4b29304810f8e619123553ffd40b35c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Ion (Filter) setting of the A/C.  <a href="classIRSamsungAc.html#a4b29304810f8e619123553ffd40b35c1">More...</a><br /></td></tr>
+<tr class="separator:a4b29304810f8e619123553ffd40b35c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96c6ac410053f0f2804160040d9fcf12"><td class="memItemLeft" align="right" valign="top">uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a96c6ac410053f0f2804160040d9fcf12">getRaw</a> (void)</td></tr>
 <tr class="memdesc:a96c6ac410053f0f2804160040d9fcf12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a PTR to the internal state/code for this protocol.  <a href="classIRSamsungAc.html#a96c6ac410053f0f2804160040d9fcf12">More...</a><br /></td></tr>
 <tr class="separator:a96c6ac410053f0f2804160040d9fcf12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95377e8c73b51e73e78b51a2b2fa16d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a95377e8c73b51e73e78b51a2b2fa16d4">setRaw</a> (const uint8_t new_code[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#a2d07d8c8917fee072a261d00e67e0d36">kSamsungAcStateLength</a>)</td></tr>
 <tr class="memdesc:a95377e8c73b51e73e78b51a2b2fa16d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRSamsungAc.html#a95377e8c73b51e73e78b51a2b2fa16d4">More...</a><br /></td></tr>
 <tr class="separator:a95377e8c73b51e73e78b51a2b2fa16d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76f7fed436bdfcd9c9a9da8dd99cb9f7"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a76f7fed436bdfcd9c9a9da8dd99cb9f7">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
-<tr class="memdesc:a76f7fed436bdfcd9c9a9da8dd99cb9f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRSamsungAc.html#a76f7fed436bdfcd9c9a9da8dd99cb9f7">More...</a><br /></td></tr>
-<tr class="separator:a76f7fed436bdfcd9c9a9da8dd99cb9f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6be52cc6980ad0bf80261c2a48eb3c87"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a6be52cc6980ad0bf80261c2a48eb3c87">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
-<tr class="memdesc:a6be52cc6980ad0bf80261c2a48eb3c87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRSamsungAc.html#a6be52cc6980ad0bf80261c2a48eb3c87">More...</a><br /></td></tr>
-<tr class="separator:a6be52cc6980ad0bf80261c2a48eb3c87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01e9279d541f64ebfa433c35a3651796"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a01e9279d541f64ebfa433c35a3651796">toCommon</a> (void)</td></tr>
-<tr class="memdesc:a01e9279d541f64ebfa433c35a3651796"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRSamsungAc.html#a01e9279d541f64ebfa433c35a3651796">More...</a><br /></td></tr>
-<tr class="separator:a01e9279d541f64ebfa433c35a3651796"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82de7f9c7b4984f002ea3849b4e95ff2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a82de7f9c7b4984f002ea3849b4e95ff2">toString</a> (void)</td></tr>
-<tr class="memdesc:a82de7f9c7b4984f002ea3849b4e95ff2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRSamsungAc.html#a82de7f9c7b4984f002ea3849b4e95ff2">More...</a><br /></td></tr>
-<tr class="separator:a82de7f9c7b4984f002ea3849b4e95ff2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47fb72f99ca6dfba378e2ce60e4c1246"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a47fb72f99ca6dfba378e2ce60e4c1246">toCommon</a> (void) const</td></tr>
+<tr class="memdesc:a47fb72f99ca6dfba378e2ce60e4c1246"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRSamsungAc.html#a47fb72f99ca6dfba378e2ce60e4c1246">More...</a><br /></td></tr>
+<tr class="separator:a47fb72f99ca6dfba378e2ce60e4c1246"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e1b126cbbd3a90e275e632aaa8fd506"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a9e1b126cbbd3a90e275e632aaa8fd506">toString</a> (void) const</td></tr>
+<tr class="memdesc:a9e1b126cbbd3a90e275e632aaa8fd506"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRSamsungAc.html#a9e1b126cbbd3a90e275e632aaa8fd506">More...</a><br /></td></tr>
+<tr class="separator:a9e1b126cbbd3a90e275e632aaa8fd506"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -217,6 +212,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a00f9b2a1480d2ed45bdea5d236c77d0f"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a00f9b2a1480d2ed45bdea5d236c77d0f">calcChecksum</a> (const uint8_t state[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#a2d07d8c8917fee072a261d00e67e0d36">kSamsungAcStateLength</a>)</td></tr>
 <tr class="memdesc:a00f9b2a1480d2ed45bdea5d236c77d0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the checksum for a given state.  <a href="classIRSamsungAc.html#a00f9b2a1480d2ed45bdea5d236c77d0f">More...</a><br /></td></tr>
 <tr class="separator:a00f9b2a1480d2ed45bdea5d236c77d0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76f7fed436bdfcd9c9a9da8dd99cb9f7"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a76f7fed436bdfcd9c9a9da8dd99cb9f7">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
+<tr class="memdesc:a76f7fed436bdfcd9c9a9da8dd99cb9f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRSamsungAc.html#a76f7fed436bdfcd9c9a9da8dd99cb9f7">More...</a><br /></td></tr>
+<tr class="separator:a76f7fed436bdfcd9c9a9da8dd99cb9f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6be52cc6980ad0bf80261c2a48eb3c87"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a6be52cc6980ad0bf80261c2a48eb3c87">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
+<tr class="memdesc:a6be52cc6980ad0bf80261c2a48eb3c87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRSamsungAc.html#a6be52cc6980ad0bf80261c2a48eb3c87">More...</a><br /></td></tr>
+<tr class="separator:a6be52cc6980ad0bf80261c2a48eb3c87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39820a05a9650e9da8a44109234a8d87"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a39820a05a9650e9da8a44109234a8d87">toCommonMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a39820a05a9650e9da8a44109234a8d87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRSamsungAc.html#a39820a05a9650e9da8a44109234a8d87">More...</a><br /></td></tr>
 <tr class="separator:a39820a05a9650e9da8a44109234a8d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -235,9 +236,8 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a5815878dbebe512c41c26924cf9f5eeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a5815878dbebe512c41c26924cf9f5eeb">_irsend</a></td></tr>
 <tr class="memdesc:a5815878dbebe512c41c26924cf9f5eeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRSamsungAc.html#a5815878dbebe512c41c26924cf9f5eeb">More...</a><br /></td></tr>
 <tr class="separator:a5815878dbebe512c41c26924cf9f5eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5966a3b665ce034de807de1955396e10"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a5966a3b665ce034de807de1955396e10">remote_state</a> [<a class="el" href="IRremoteESP8266_8h.html#a28039071f1130e9bc86efddd8265cbf9">kSamsungAcExtendedStateLength</a>]</td></tr>
-<tr class="memdesc:a5966a3b665ce034de807de1955396e10"><td class="mdescLeft">&#160;</td><td class="mdescRight">State in code form.  <a href="classIRSamsungAc.html#a5966a3b665ce034de807de1955396e10">More...</a><br /></td></tr>
-<tr class="separator:a5966a3b665ce034de807de1955396e10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ac33928a62f2f4e487509490ed64814"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionSamsungProtocol.html">SamsungProtocol</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a7ac33928a62f2f4e487509490ed64814">_</a></td></tr>
+<tr class="separator:a7ac33928a62f2f4e487509490ed64814"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a022c96bfab671b1d0b6b5b331be31993"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSamsungAc.html#a022c96bfab671b1d0b6b5b331be31993">_forcepower</a></td></tr>
 <tr class="memdesc:a022c96bfab671b1d0b6b5b331be31993"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hack to know when we need to send a special power mesg.  <a href="classIRSamsungAc.html#a022c96bfab671b1d0b6b5b331be31993">More...</a><br /></td></tr>
 <tr class="separator:a022c96bfab671b1d0b6b5b331be31993"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -435,6 +435,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRSamsungAc::convertFan </td>
@@ -444,6 +447,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed. </p>
@@ -462,6 +470,9 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRSamsungAc::convertMode </td>
@@ -471,6 +482,11 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode. </p>
@@ -484,8 +500,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab13b10f80e8e1169f0b01239f357b3ba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab13b10f80e8e1169f0b01239f357b3ba">&#9670;&nbsp;</a></span>getBeep()</h2>
+<a id="a17412aeb213d2800fa106b7af6c3933f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17412aeb213d2800fa106b7af6c3933f">&#9670;&nbsp;</a></span>getBeep()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -495,7 +511,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -505,8 +521,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad46fed65fb1375bf3a3940aa2cb311d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad46fed65fb1375bf3a3940aa2cb311d5">&#9670;&nbsp;</a></span>getBreeze()</h2>
+<a id="ae442d9d84a1058196620ab6f0c994cc7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae442d9d84a1058196620ab6f0c994cc7">&#9670;&nbsp;</a></span>getBreeze()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -516,7 +532,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -527,8 +543,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a789edd6c6b0cb291753204d1e9c78fc8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a789edd6c6b0cb291753204d1e9c78fc8">&#9670;&nbsp;</a></span>getClean()</h2>
+<a id="a8980cc9a230a78ec76a190056a8b9be6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8980cc9a230a78ec76a190056a8b9be6">&#9670;&nbsp;</a></span>getClean()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -538,7 +554,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -548,8 +564,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a890aa3cab0918fda56daf0bf84ecc5c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a890aa3cab0918fda56daf0bf84ecc5c1">&#9670;&nbsp;</a></span>getDisplay()</h2>
+<a id="a05e2c47fc5c63782f2420feb1337014c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05e2c47fc5c63782f2420feb1337014c">&#9670;&nbsp;</a></span>getDisplay()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -559,7 +575,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -569,8 +585,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a6461c72b2598d1bdc14263552b5b0c98"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6461c72b2598d1bdc14263552b5b0c98">&#9670;&nbsp;</a></span>getFan()</h2>
+<a id="a924701fc0a10c1bae8a93749658abff5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a924701fc0a10c1bae8a93749658abff5">&#9670;&nbsp;</a></span>getFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -580,7 +596,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -590,8 +606,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aab1ebb523ca45431a0127b82cb4ce36f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab1ebb523ca45431a0127b82cb4ce36f">&#9670;&nbsp;</a></span>getIon()</h2>
+<a id="a4b29304810f8e619123553ffd40b35c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b29304810f8e619123553ffd40b35c1">&#9670;&nbsp;</a></span>getIon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -601,7 +617,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -611,8 +627,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a740a874ee2c492027623943043a1ebf6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a740a874ee2c492027623943043a1ebf6">&#9670;&nbsp;</a></span>getMode()</h2>
+<a id="adcfed1f2123c48715cb6f3623ecf3f58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcfed1f2123c48715cb6f3623ecf3f58">&#9670;&nbsp;</a></span>getMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -622,7 +638,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -632,8 +648,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a26fb214fdf3af4d39a898a1721583cf3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26fb214fdf3af4d39a898a1721583cf3">&#9670;&nbsp;</a></span>getPower()</h2>
+<a id="aecb2a7187ea08433bed9c6a6f5dfc7e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecb2a7187ea08433bed9c6a6f5dfc7e2">&#9670;&nbsp;</a></span>getPower()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -643,7 +659,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -653,8 +669,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac43367d5aec71e1dcb5b178427268412"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac43367d5aec71e1dcb5b178427268412">&#9670;&nbsp;</a></span>getPowerful()</h2>
+<a id="acea93892d56221b2563d0db1c09589d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acea93892d56221b2563d0db1c09589d1">&#9670;&nbsp;</a></span>getPowerful()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -664,7 +680,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -674,8 +690,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a0baaf3d40419bb744204bdb30d4aa9b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0baaf3d40419bb744204bdb30d4aa9b9">&#9670;&nbsp;</a></span>getQuiet()</h2>
+<a id="a4296eb88c1b349206d7a0bd551d33ee6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4296eb88c1b349206d7a0bd551d33ee6">&#9670;&nbsp;</a></span>getQuiet()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -685,7 +701,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -716,8 +732,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5e6a7caccfdcb23cdb7d1341376c2343"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e6a7caccfdcb23cdb7d1341376c2343">&#9670;&nbsp;</a></span>getSwing()</h2>
+<a id="a5627d39ea3af4d1e948fc4b8339baf9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5627d39ea3af4d1e948fc4b8339baf9b">&#9670;&nbsp;</a></span>getSwing()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -727,19 +743,19 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Get the vertical swing setting of the A/C. </p>
 <dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000007">Todo:</a></b></dt><dd>(Hollako) Explain why sometimes the LSB of remote_state[9] is a 1. e.g. 0xAE or 0XAF for swing move. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000008">Todo:</a></b></dt><dd>(Hollako) Explain why sometimes the LSB of remote_state[9] is a 1. e.g. 0xAE or 0XAF for swing move. </dd></dl>
 
 </div>
 </div>
-<a id="a11a6c86f2e4a918e1587ef564c63dddd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11a6c86f2e4a918e1587ef564c63dddd">&#9670;&nbsp;</a></span>getTemp()</h2>
+<a id="a1e770b7736fe5602bb49d82a5c3b0dd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e770b7736fe5602bb49d82a5c3b0dd2">&#9670;&nbsp;</a></span>getTemp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -749,7 +765,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1250,7 +1266,7 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000008">Todo:</a></b></dt><dd>(Hollako) Explain why sometimes the LSB of remote_state[9] is a 1. e.g. 0xAE or 0XAF for swing move. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000009">Todo:</a></b></dt><dd>(Hollako) Explain why sometimes the LSB of remote_state[9] is a 1. e.g. 0xAE or 0XAF for swing move. </dd></dl>
 
 </div>
 </div>
@@ -1317,8 +1333,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a01e9279d541f64ebfa433c35a3651796"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01e9279d541f64ebfa433c35a3651796">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="a47fb72f99ca6dfba378e2ce60e4c1246"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47fb72f99ca6dfba378e2ce60e4c1246">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1328,7 +1344,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1408,8 +1424,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a82de7f9c7b4984f002ea3849b4e95ff2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82de7f9c7b4984f002ea3849b4e95ff2">&#9670;&nbsp;</a></span>toString()</h2>
+<a id="a9e1b126cbbd3a90e275e632aaa8fd506"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e1b126cbbd3a90e275e632aaa8fd506">&#9670;&nbsp;</a></span>toString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1419,7 +1435,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1476,6 +1492,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a7ac33928a62f2f4e487509490ed64814"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ac33928a62f2f4e487509490ed64814">&#9670;&nbsp;</a></span>_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="unionSamsungProtocol.html">SamsungProtocol</a> IRSamsungAc::_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a022c96bfab671b1d0b6b5b331be31993"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a022c96bfab671b1d0b6b5b331be31993">&#9670;&nbsp;</a></span>_forcepower</h2>
 
@@ -1543,30 +1581,6 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5966a3b665ce034de807de1955396e10"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5966a3b665ce034de807de1955396e10">&#9670;&nbsp;</a></span>remote_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t IRSamsungAc::remote_state[<a class="el" href="IRremoteESP8266_8h.html#a28039071f1130e9bc86efddd8265cbf9">kSamsungAcExtendedStateLength</a>]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>State in code form. </p>
 
 </div>
 </div>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['timerms_3660',['TimerMs',['../classTimerMs.html',1,'']]]
+  ['panasonicac32protocol_3618',['PanasonicAc32Protocol',['../unionPanasonicAc32Protocol.html',1,'']]]
 ];
