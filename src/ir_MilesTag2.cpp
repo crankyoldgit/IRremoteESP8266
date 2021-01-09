@@ -60,10 +60,21 @@ void IRsend::_sendMiles(const uint64_t data, const uint16_t nbits,
 
     // Header
     mark(kMilesHdrMark);
-    space(kMilesSpace);
-
+    //space(kMilesSpace);
     // Data
-    sendData(kMilesOneMark, kMilesSpace, kMilesZeroMark,kMilesSpace, data, nbits,true);    
+    if (nbits == 0)  // If we are asked to send nothing, just return.
+      return;
+    // Send the MSB first.    
+    // Send the supplied data.
+    for (uint64_t mask = 1ULL << (nbits - 1); mask; mask >>= 1)
+      if (data & mask) {  // Send a 1
+        space(kMilesSpace);
+        mark(kMilesOneMark);        
+      } else {  // Send a 0        
+        space(kMilesSpace);
+        mark(kMilesZeroMark);
+      }
+      space(kMilesRptLength);
   }
 }
 #endif  // SEND_MILESTAG2
@@ -87,20 +98,29 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
       case 24:      
         break;
       default:
+        DPRINT("incorrect nbits:");
+        DPRINTLN(nbits);
         return false;  // The request doesn't strictly match the protocol defn.
     }
   }
   uint64_t data = 0;
-
-  // Match Header + Data
-  if (!matchGeneric(results->rawbuf + offset, &data,
-                    results->rawlen - offset, nbits,
-                    kMilesHdrMark, kMilesSpace,
-                    kMilesOneMark, kMilesSpace,
-                    kMilesZeroMark, kMilesSpace,
-                    0, 0, true)) return false;
+  // Header
+  if (!matchMark(*(results->rawbuf + offset++), kMilesHdrMark, kUseDefTol, kMarkExcess)) return 0;
+  // Data
+  uint16_t shift = 0;
+  for (shift = 0; shift < nbits * 2;shift += 2) {
+    // Is the bit a '1'?
+    if (matchMark(*(results->rawbuf + 1 + offset + shift), kMilesOneMark, kUseDefTol, kMarkExcess) &&
+        matchSpace(*(results->rawbuf + offset + shift), kMilesSpace, kUseDefTol, kMarkExcess)) {
+      data = (data << 1) | 1;
+    } else if (matchMark(*(results->rawbuf + 1 + offset + shift), kMilesZeroMark, kUseDefTol, kMarkExcess) &&
+               matchSpace(*(results->rawbuf + offset + shift), kMilesSpace, kUseDefTol, kMarkExcess)) {
+      data <<= 1;  // The bit is a '0'.
+    } else {      
+      return false;  // It's neither, so fail.
+    }
+  }  
   // Success
-
   results->bits = nbits;
   results->value = data;
   switch (nbits)
