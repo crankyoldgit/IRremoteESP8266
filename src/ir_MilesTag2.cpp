@@ -39,8 +39,19 @@ const uint16_t kMilesStdFreq = 38000;  // kHz
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
+void IRsend::sendMilesShot(const uint64_t data, const uint16_t nbits,
+                      const uint16_t repeat)
+{
+    _sendMiles(data, nbits,repeat);
+}
 
-void IRsend::sendMiles(const uint64_t data, const uint16_t nbits,
+void IRsend::sendMilesMsg(const uint64_t data, const uint16_t nbits,
+                      const uint16_t repeat)
+{
+    _sendMiles(data, nbits,repeat);
+}
+
+void IRsend::_sendMiles(const uint64_t data, const uint16_t nbits,
                       const uint16_t repeat) {
   sendGeneric(kMilesHdrMark, kMilesSpace,
               kMilesOneMark, kMilesSpace,
@@ -71,6 +82,7 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
       default:
         return false;  // The request doesn't strictly match the protocol defn.
     }
+  }
   uint64_t data = 0;
 
   // Match Header + Data
@@ -81,9 +93,20 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
                     kMilesZeroMark, kMilesSpace,
                     0, 0, true)) return false;
   // Success
+
   results->bits = nbits;
   results->value = data;
-  results->decode_type = decode_type_t::MILESTAG2;
+  switch (nbits)
+  {
+    case 14:
+      results->decode_type = decode_type_t::MILESTAG2SHOT;
+      break;
+    case 24:
+      results->decode_type = decode_type_t::MILESTAG2MSG;
+      break;
+    default:
+      return false;
+  }  
   results->command = 0;
   results->address = 0;
   return true;

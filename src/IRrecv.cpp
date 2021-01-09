@@ -983,6 +983,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     if (decodePanasonicAC32(results, offset, kPanasonicAc32Bits / 2))
       return true;
 #endif  // DECODE_PANASONIC_AC32
+#if DECODE_MILESTAG2
+    DPRINTLN("Attempting MilesTag2 decode");
+    if (decodeMiles(results, offset)) return true;
+#endif
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
