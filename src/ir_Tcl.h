@@ -19,6 +19,43 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a TCL 112 A/C message.
+union Tcl112Protocol{
+  uint8_t raw[kTcl112AcStateLength];  ///< The State in IR code form.
+  struct {
+    // Byte 0~4
+    uint8_t pad0[5];
+    // Byte 5
+    uint8_t       :2;
+    uint8_t Power :1;
+    uint8_t       :3;
+    uint8_t Light :1;
+    uint8_t Econo :1;
+    // Byte 6
+    uint8_t Mode    :4;
+    uint8_t Health  :1;
+    uint8_t Turbo   :1;
+    uint8_t         :2;
+    // Byte 7
+    uint8_t Temp  :4;
+    uint8_t       :4;
+    // Byte 8
+    uint8_t Fan     :3;
+    uint8_t SwingV  :3;
+    uint8_t         :2;
+    // Byte 9~11
+    uint8_t pad1[3];
+    // Byte 12
+    uint8_t             :3;
+    uint8_t SwingH      :1;
+    uint8_t             :1;
+    uint8_t HalfDegree  :1;
+    uint8_t             :2;
+    // Byte 13
+    uint8_t Sum :8;
+  };
+};
+
 // Constants
 const uint16_t kTcl112AcHdrMark = 3000;
 const uint16_t kTcl112AcHdrSpace = 1650;
@@ -35,28 +72,17 @@ const uint8_t kTcl112AcDry =  2;
 const uint8_t kTcl112AcCool = 3;
 const uint8_t kTcl112AcFan =  7;
 const uint8_t kTcl112AcAuto = 8;
-const uint8_t kTcl112AcModeSize = 4;  // Nr. of Bits
 
-const uint8_t kTcl112AcFanSize = 3;  // Nr. of Bits. Mask = 0b00000111
 const uint8_t kTcl112AcFanAuto = 0b000;
 const uint8_t kTcl112AcFanLow  = 0b010;
 const uint8_t kTcl112AcFanMed  = 0b011;
 const uint8_t kTcl112AcFanHigh = 0b101;
 
-const uint8_t kTcl112AcHalfDegreeOffset = 5;
 const float   kTcl112AcTempMax    = 31.0;
 const float   kTcl112AcTempMin    = 16.0;
 
-const uint8_t kTcl112AcPowerOffset = 2;
-const uint8_t kTcl112AcBitEconoOffset = 7;
-const uint8_t kTcl112AcBitLightOffset = 6;
-const uint8_t kTcl112AcBitHealthOffset = 4;
-const uint8_t kTcl112AcBitSwingHOffset = 3;
-const uint8_t kTcl112AcSwingVOffset = 3;  // Mask 0b00111000
-const uint8_t kTcl112AcSwingVSize = 3;  // Nr. of bits.
 const uint8_t kTcl112AcSwingVOn =    0b111;
 const uint8_t kTcl112AcSwingVOff =   0b000;
-const uint8_t kTcl112AcBitTurboOffset = 6;
 
 // Classes
 /// Class for handling detailed TCL A/C messages.
@@ -80,35 +106,35 @@ class IRTcl112Ac {
   void on(void);
   void off(void);
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setTemp(const float celsius);  // Celsius in 0.5 increments
-  float getTemp(void);
+  float getTemp(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   static uint8_t calcChecksum(uint8_t state[],
                               const uint16_t length = kTcl112AcStateLength);
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kTcl112AcStateLength);
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setEcono(const bool on);
-  bool getEcono(void);
+  bool getEcono(void) const;
   void setHealth(const bool on);
-  bool getHealth(void);
+  bool getHealth(void) const;
   void setLight(const bool on);
-  bool getLight(void);
+  bool getLight(void) const;
   void setSwingHorizontal(const bool on);
-  bool getSwingHorizontal(void);
+  bool getSwingHorizontal(void) const;
   void setSwingVertical(const bool on);
-  bool getSwingVertical(void);
+  bool getSwingVertical(void) const;
   void setTurbo(const bool on);
-  bool getTurbo(void);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  bool getTurbo(void) const;
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -118,7 +144,7 @@ class IRTcl112Ac {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kTcl112AcStateLength];  ///< The State in IR code form.
+  Tcl112Protocol _;
   void checksum(const uint16_t length = kTcl112AcStateLength);
 };
 
