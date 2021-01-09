@@ -25,11 +25,12 @@ const uint16_t kMilesOneMarkTicks = 6;
 const uint16_t kMilesOneMark = kMilesOneMarkTicks * kMilesTick;
 const uint16_t kMilesZeroMarkTicks = 3;
 const uint16_t kMilesZeroMark = kMilesZeroMarkTicks * kMilesTick;
-const uint16_t kMilesRptLengthTicks = 225;
+const uint16_t kMilesRptLengthTicks = 500;
 const uint16_t kMilesRptLength = kMilesRptLengthTicks * kMilesTick;
-const uint16_t kMilesMinGapTicks = 50;
+const uint16_t kMilesMinGapTicks = 500;
 const uint16_t kMilesMinGap = kMilesMinGapTicks * kMilesTick;
 const uint16_t kMilesStdFreq = 38000;  // kHz
+const uint16_t kMilesStdDuty = 50;
 
 
 
@@ -53,11 +54,17 @@ void IRsend::sendMilesMsg(const uint64_t data, const uint16_t nbits,
 
 void IRsend::_sendMiles(const uint64_t data, const uint16_t nbits,
                       const uint16_t repeat) {
-  sendGeneric(kMilesHdrMark, kMilesSpace,
-              kMilesOneMark, kMilesSpace,
-              kMilesZeroMark, kMilesSpace,
-              0, kMilesMinGap,
-              data, nbits, kMilesStdFreq, true, repeat, kDutyDefault);
+  enableIROut(kMilesStdFreq, kMilesStdDuty);
+    // We always send a message, even for repeat=0, hence '<= repeat'.
+  for (uint16_t r = 0; r <= repeat; r++) {
+
+    // Header
+    mark(kMilesHdrMark);
+    space(kMilesSpace);
+
+    // Data
+    sendData(kMilesOneMark, kMilesSpace, kMilesZeroMark,kMilesSpace, data, nbits,true);    
+  }
 }
 #endif  // SEND_MILESTAG2
 

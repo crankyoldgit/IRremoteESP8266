@@ -1107,7 +1107,8 @@ const uint16_t kVoltasBits = 80;
 const uint16_t kVoltasStateLength = 10;
 const uint16_t kMilesTag14Bits = 14;
 const uint16_t kMilesTag24Bits = 24;
-const uint16_t kMilesMinRepeat = 1;
+const uint16_t kMilesMinRepeat = 0;
+
 
 
 // Legacy defines. (Deprecated)
