@@ -16,19 +16,12 @@
 // Constants
 // Constants are similar to Sony SIRC protocol, bassically they are very similar, just nbits are varying
 
-const uint16_t kMilesTick = 200;
-const uint16_t kMilesHdrMarkTicks = 12;
-const uint16_t kMilesHdrMark = kMilesHdrMarkTicks * kMilesTick;
-const uint16_t kMilesSpaceTicks = 3;
-const uint16_t kMilesSpace = kMilesSpaceTicks * kMilesTick;
-const uint16_t kMilesOneMarkTicks = 6;
-const uint16_t kMilesOneMark = kMilesOneMarkTicks * kMilesTick;
-const uint16_t kMilesZeroMarkTicks = 3;
-const uint16_t kMilesZeroMark = kMilesZeroMarkTicks * kMilesTick;
-const uint16_t kMilesRptLengthTicks = 500;
-const uint16_t kMilesRptLength = kMilesRptLengthTicks * kMilesTick;
-const uint16_t kMilesMinGapTicks = 500;
-const uint16_t kMilesMinGap = kMilesMinGapTicks * kMilesTick;
+const uint16_t kMilesHdrMark = 2400;
+const uint16_t kMilesSpace = 600;
+const uint16_t kMilesOneMark = 1200;
+const uint16_t kMilesZeroMark = 600;
+const uint16_t kMilesRptLength = 100000;
+const uint16_t kMilesMinGap = 100000;
 const uint16_t kMilesStdFreq = 38000;  // kHz
 const uint16_t kMilesStdDuty = 25;
 
