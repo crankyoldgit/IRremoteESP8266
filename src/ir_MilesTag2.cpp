@@ -30,7 +30,7 @@ const uint16_t kMilesRptLength = kMilesRptLengthTicks * kMilesTick;
 const uint16_t kMilesMinGapTicks = 500;
 const uint16_t kMilesMinGap = kMilesMinGapTicks * kMilesTick;
 const uint16_t kMilesStdFreq = 38000;  // kHz
-const uint16_t kMilesStdDuty = 50;
+const uint16_t kMilesStdDuty = 25;
 
 
 
@@ -91,6 +91,19 @@ void IRsend::_sendMiles(const uint64_t data, const uint16_t nbits,
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/706
 bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
+  /*
+  uint16_t gap_pos = 0;
+  if (results->rawlen >= (2 * nbits + 1)) //we got alot more data than we thought, let's find last GAP and work from it
+  {
+      for (uint16_t ind = 0 ; ind < results->rawlen; ind++)
+      {
+          if (matchAtLeast(*(results->rawbuf+ind),34000)) gap_pos = ind;
+      }
+  }
+
+  if (results->rawlen>gap_pos) offset = gap_pos+1;
+  */
+  
   // Compliance
   if (strict) {
     switch (nbits) {  // Check we've been called with a correct bit size.
