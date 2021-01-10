@@ -20,8 +20,8 @@ const uint16_t kMilesHdrMark = 2400;
 const uint16_t kMilesSpace = 600;
 const uint16_t kMilesOneMark = 1200;
 const uint16_t kMilesZeroMark = 600;
-const uint16_t kMilesRptLength = 100000;
-const uint16_t kMilesMinGap = 100000;
+const uint16_t kMilesRptLength = 32000;
+const uint16_t kMilesMinGap = 32000;
 const uint16_t kMilesStdFreq = 38000;  // kHz
 const uint16_t kMilesStdDuty = 25;
 
