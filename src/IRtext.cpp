@@ -278,6 +278,7 @@ const PROGMEM char *kAllProtocolNamesStr =
     D_STR_MIRAGE "\x0"
     D_STR_ELITESCREENS "\x0"
     D_STR_PANASONIC_AC32 "\x0"
-    D_STR_MILESTAG2 "\x0"
+    D_STR_MILESTAG2SHOT "\x0"
+    D_STR_MILESTAG2MSG "\x0"
     ///< New protocol strings should be added just above this line.
     "\x0";  ///< This string requires double null termination.

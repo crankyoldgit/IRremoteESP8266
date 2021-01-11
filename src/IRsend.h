@@ -237,7 +237,7 @@ class IRsend {
   void sendNEC(uint64_t data, uint16_t nbits = kNECBits,
                uint16_t repeat = kNoRepeat);
   uint32_t encodeNEC(uint16_t address, uint16_t command);
-#endif  
+#endif
 #if SEND_SONY
   // sendSony() should typically be called with repeat=2 as Sony devices
   // expect the code to be sent at least 3 times. (code + 2 repeats = 3 codes)
@@ -683,13 +683,17 @@ class IRsend {
                         const uint16_t repeat = kEliteScreensDefaultRepeat);
 #endif  // SEND_ELITESCREENS
 #if SEND_MILESTAG2
-  // Since There 2 types of transmissions (14bit for Shoting,24 bit for msg delivery) we use 2 separate functions
-  void sendMilesShot(const uint64_t data, const uint16_t nbits = kMilesTag14Bits,
-                const uint16_t repeat = kMilesMinRepeat);
-  void sendMilesMsg(const uint64_t data, const uint16_t nbits = kMilesTag24Bits,
-                  const uint16_t repeat = kMilesMinRepeat);
-  void _sendMiles(const uint64_t data, const uint16_t nbits = kMilesTag24Bits,
-                  const uint16_t repeat = kMilesMinRepeat);
+  // Since There 2 types of transmissions
+  // (14bit for Shoting,24 bit for msg delivery) we use 2 separate functions
+  void sendMilesShot(const uint64_t data,
+                    const uint16_t nbits = kMilesTag14Bits,
+                    const uint16_t repeat = kMilesMinRepeat);
+  void sendMilesMsg(const uint64_t data,
+                   const uint16_t nbits = kMilesTag24Bits,
+                   const uint16_t repeat = kMilesMinRepeat);
+  void _sendMiles(const uint64_t data,
+                 const uint16_t nbits = kMilesTag24Bits,
+                 const uint16_t repeat = kMilesMinRepeat);
 #endif  // SEND_MILESTAG2
 
  protected:

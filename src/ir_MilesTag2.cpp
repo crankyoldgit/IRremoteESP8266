@@ -3,10 +3,12 @@
 /// @brief Support for the MilesTag2 IR protocol for LaserTag gaming
 /// @see http://hosting.cmalton.me.uk/chrism/lasertag/MT2Proto.pdf
 
-// Supports:
-//   Brand: Theoretically MilesTag2 supported hardware
+// Supports: 
+//   Brand: Theoretically, MilesTag2 supported hardware
 
-//TODO: This implementation would support only short SHOT packets(14bits) and MSGs = 24bits. Support for long MSGs > 24bits is TODO
+// TODO(vitos1k): This implementation would support only 
+// short SHOT packets(14bits) and MSGs = 24bits. Support
+// for long MSGs > 24bits is TODO
 
 #include <algorithm>
 #include "IRrecv.h"
@@ -14,7 +16,8 @@
 #include "IRutils.h"
 
 // Constants
-// Constants are similar to Sony SIRC protocol, bassically they are very similar, just nbits are varying
+// Constants are similar to Sony SIRC protocol, bassically they are very
+// similar, just nbits are varying
 
 const uint16_t kMilesHdrMark = 2400;
 const uint16_t kMilesSpace = 600;
@@ -28,21 +31,24 @@ const uint16_t kMilesStdDuty = 25;
 
 
 #if SEND_MILESTAG2
-/// Send a MilesTag2 formatted message.
+/// Send a MilesTag2 formatted Shot packet.
 /// Status: NEEDS TESTING
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendMilesShot(const uint64_t data, const uint16_t nbits,
-                      const uint16_t repeat)
-{
-    _sendMiles(data, nbits,repeat);
+                      const uint16_t repeat) {
+    _sendMiles(data, nbits, repeat);
 }
 
+/// Send a MilesTag2 formatted MESSAGE packet.
+/// Status: NEEDS TESTING
+/// @param[in] data The message to be sent.
+/// @param[in] nbits The number of bits of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendMilesMsg(const uint64_t data, const uint16_t nbits,
-                      const uint16_t repeat)
-{
-    _sendMiles(data, nbits,repeat);
+                      const uint16_t repeat) {
+    _sendMiles(data, nbits, repeat);
 }
 
 void IRsend::_sendMiles(const uint64_t data, const uint16_t nbits,
@@ -50,20 +56,18 @@ void IRsend::_sendMiles(const uint64_t data, const uint16_t nbits,
   enableIROut(kMilesStdFreq, kMilesStdDuty);
     // We always send a message, even for repeat=0, hence '<= repeat'.
   for (uint16_t r = 0; r <= repeat; r++) {
-
     // Header
     mark(kMilesHdrMark);
-    //space(kMilesSpace);
     // Data
     if (nbits == 0)  // If we are asked to send nothing, just return.
       return;
-    // Send the MSB first.    
+    // Send the MSB first.
     // Send the supplied data.
     for (uint64_t mask = 1ULL << (nbits - 1); mask; mask >>= 1)
       if (data & mask) {  // Send a 1
         space(kMilesSpace);
-        mark(kMilesOneMark);        
-      } else {  // Send a 0        
+        mark(kMilesOneMark);
+      } else {  // Send a 0
         space(kMilesSpace);
         mark(kMilesZeroMark);
       }
@@ -86,7 +90,8 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
   /*
   uint16_t gap_pos = 0;
-  if (results->rawlen >= (2 * nbits + 1)) //we got alot more data than we thought, let's find last GAP and work from it
+  // we got alot more data than we thought, let's find last GAP and work from it
+  if (results->rawlen >= (2 * nbits + 1)) 
   {
       for (uint16_t ind = 0 ; ind < results->rawlen; ind++)
       {
@@ -95,13 +100,12 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
   }
 
   if (results->rawlen>gap_pos) offset = gap_pos+1;
-  */
-  
+  */  
   // Compliance
   if (strict) {
     switch (nbits) {  // Check we've been called with a correct bit size.
       case 14:
-      case 24:      
+      case 24:
         break;
       default:
         DPRINT("incorrect nbits:");
@@ -111,26 +115,30 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
   }
   uint64_t data = 0;
   // Header
-  if (!matchMark(*(results->rawbuf + offset++), kMilesHdrMark, kUseDefTol, kMarkExcess)) return 0;
+  if (!matchMark(*(results->rawbuf + offset++),
+                  kMilesHdrMark, kUseDefTol, kMarkExcess)) return 0;
   // Data
   uint16_t shift = 0;
-  for (shift = 0; shift < nbits * 2;shift += 2) {
+  for (shift = 0; shift < nbits * 2; shift += 2) {
     // Is the bit a '1'?
-    if (matchMark(*(results->rawbuf + 1 + offset + shift), kMilesOneMark, kUseDefTol, kMarkExcess) &&
-        matchSpace(*(results->rawbuf + offset + shift), kMilesSpace, kUseDefTol, kMarkExcess)) {
+    if (matchMark(*(results->rawbuf + 1 + offset + shift),
+                 kMilesOneMark, kUseDefTol, kMarkExcess) &&
+        matchSpace(*(results->rawbuf + offset + shift),
+                  kMilesSpace, kUseDefTol, kMarkExcess)) {
       data = (data << 1) | 1;
-    } else if (matchMark(*(results->rawbuf + 1 + offset + shift), kMilesZeroMark, kUseDefTol, kMarkExcess) &&
-               matchSpace(*(results->rawbuf + offset + shift), kMilesSpace, kUseDefTol, kMarkExcess)) {
+    } else if (matchMark(*(results->rawbuf + 1 + offset + shift),
+                        kMilesZeroMark, kUseDefTol, kMarkExcess) &&
+               matchSpace(*(results->rawbuf + offset + shift),
+                         kMilesSpace, kUseDefTol, kMarkExcess)) {
       data <<= 1;  // The bit is a '0'.
-    } else {      
+    } else {
       return false;  // It's neither, so fail.
     }
-  }  
+  }
   // Success
   results->bits = nbits;
   results->value = data;
-  switch (nbits)
-  {
+  switch (nbits) {
     case 14:
       results->decode_type = decode_type_t::MILESTAG2SHOT;
       break;
@@ -139,7 +147,7 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
       break;
     default:
       return false;
-  }  
+  }
   results->command = 0;
   results->address = 0;
   return true;

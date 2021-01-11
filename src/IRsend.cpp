@@ -627,10 +627,6 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case COOLIX:
     case INAX:
     case MIDEA24:
-    case MILESTAG2SHOT:
-      return kMilesTag14Bits;
-    case MILESTAG2MSG:
-      return kMilesTag24Bits;
     case NIKAI:
     case RCMM:
     case TRANSCOLD:
@@ -661,7 +657,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kDoshishaBits;  // 40
     case SANYO_LC7461:
       return kSanyoLC7461Bits;  // 42
-    case GOODWEATHER:    
+    case GOODWEATHER:
     case MIDEA:
     case PANASONIC:
       return 48;
@@ -715,7 +711,11 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case HITACHI_AC424:
       return kHitachiAc424Bits;
     case KELVINATOR:
-      return kKelvinatorBits;    
+      return kKelvinatorBits;
+    case MILESTAG2SHOT:
+      return kMilesTag14Bits;
+    case MILESTAG2MSG:
+      return kMilesTag24Bits;
     case MIRAGE:
       return kMirageBits;
     case MITSUBISHI_AC:
@@ -903,13 +903,12 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #endif  // SEND_MIDEA24
 #if SEND_MILESTAG2
       case MILESTAG2SHOT:
-        sendMilesShot(data,nbits,min_repeat);
+        sendMilesShot(data, nbits, min_repeat);
         break;
       case MILESTAG2MSG:
-        sendMilesMsg(data,nbits,min_repeat);
+        sendMilesMsg(data, nbits, min_repeat);
         break;
-#endif //SEND_MILESTAG2
-
+#endif  // SEND_MILESTAG2
 #if SEND_MITSUBISHI
     case MITSUBISHI:
       sendMitsubishi(data, nbits, min_repeat);
