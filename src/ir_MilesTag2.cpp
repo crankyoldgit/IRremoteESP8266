@@ -3,10 +3,10 @@
 /// @brief Support for the MilesTag2 IR protocol for LaserTag gaming
 /// @see http://hosting.cmalton.me.uk/chrism/lasertag/MT2Proto.pdf
 
-// Supports: 
+// Supports:
 //   Brand: Theoretically, MilesTag2 supported hardware
 
-// TODO(vitos1k): This implementation would support only 
+// TODO(vitos1k): This implementation would support only
 // short SHOT packets(14bits) and MSGs = 24bits. Support
 // for long MSGs > 24bits is TODO
 
