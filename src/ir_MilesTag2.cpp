@@ -4,7 +4,7 @@
 /// @see http://hosting.cmalton.me.uk/chrism/lasertag/MT2Proto.pdf
 
 // Supports:
-//   Brand: Theoretically, MilesTag2 supported hardware
+//   Brand: Theoretically,  Model: MILESTAG2 SUPPORTED HARDWARE
 
 // TODO(vitos1k): This implementation would support only
 // short SHOT packets(14bits) and MSGs = 24bits. Support
