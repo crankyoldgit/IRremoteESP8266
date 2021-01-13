@@ -124,7 +124,7 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
   // Success
   results->bits = nbits;
   results->value = data;
-  results->decode_type = decode_type_t::MILESTAG2;   
+  results->decode_type = decode_type_t::MILESTAG2;
   results->command = 0;
   results->address = 0;
   return true;
