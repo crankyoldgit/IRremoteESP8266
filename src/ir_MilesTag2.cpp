@@ -4,7 +4,7 @@
 /// @see http://hosting.cmalton.me.uk/chrism/lasertag/MT2Proto.pdf
 
 // Supports:
-//   Brand: Theoretically,  Model: MILESTAG2 SUPPORTED HARDWARE
+//   Brand: Milestag2,  Model: Various
 
 // TODO(vitos1k): This implementation would support only
 // short SHOT packets(14bits) and MSGs = 24bits. Support
@@ -36,22 +36,8 @@ const uint16_t kMilesStdDuty = 25;
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
-void IRsend::sendMilesShot(const uint64_t data, const uint16_t nbits,
-                      const uint16_t repeat) {
-    _sendMiles(data, nbits, repeat);
-}
 
-/// Send a MilesTag2 formatted MESSAGE packet.
-/// Status: NEEDS TESTING
-/// @param[in] data The message to be sent.
-/// @param[in] nbits The number of bits of message to be sent.
-/// @param[in] repeat The number of times the command is to be repeated.
-void IRsend::sendMilesMsg(const uint64_t data, const uint16_t nbits,
-                      const uint16_t repeat) {
-    _sendMiles(data, nbits, repeat);
-}
-
-void IRsend::_sendMiles(const uint64_t data, const uint16_t nbits,
+void IRsend::sendMilestag2(const uint64_t data, const uint16_t nbits,
                       const uint16_t repeat) {
   enableIROut(kMilesStdFreq, kMilesStdDuty);
     // We always send a message, even for repeat=0, hence '<= repeat'.
@@ -138,16 +124,7 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
   // Success
   results->bits = nbits;
   results->value = data;
-  switch (nbits) {
-    case 14:
-      results->decode_type = decode_type_t::MILESTAG2SHOT;
-      break;
-    case 24:
-      results->decode_type = decode_type_t::MILESTAG2MSG;
-      break;
-    default:
-      return false;
-  }
+  results->decode_type = decode_type_t::MILESTAG2;   
   results->command = 0;
   results->address = 0;
   return true;

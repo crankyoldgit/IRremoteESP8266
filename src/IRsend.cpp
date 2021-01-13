@@ -712,10 +712,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kHitachiAc424Bits;
     case KELVINATOR:
       return kKelvinatorBits;
-    case MILESTAG2SHOT:
-      return kMilesTag14Bits;
-    case MILESTAG2MSG:
-      return kMilesTag24Bits;
+    case MILESTAG2:
+      return kMilesTag2ShotBits;
     case MIRAGE:
       return kMirageBits;
     case MITSUBISHI_AC:
@@ -902,12 +900,9 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       break;
 #endif  // SEND_MIDEA24
 #if SEND_MILESTAG2
-      case MILESTAG2SHOT:
-        sendMilesShot(data, nbits, min_repeat);
-        break;
-      case MILESTAG2MSG:
-        sendMilesMsg(data, nbits, min_repeat);
-        break;
+    case MILESTAG2:
+      sendMilestag2(data, nbits, min_repeat);
+      break;
 #endif  // SEND_MILESTAG2
 #if SEND_MITSUBISHI
     case MITSUBISHI:

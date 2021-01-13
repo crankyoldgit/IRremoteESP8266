@@ -684,15 +684,9 @@ class IRsend {
 #endif  // SEND_ELITESCREENS
 #if SEND_MILESTAG2
   // Since There 2 types of transmissions
-  // (14bit for Shoting,24 bit for msg delivery) we use 2 separate functions
-  void sendMilesShot(const uint64_t data,
-                    const uint16_t nbits = kMilesTag14Bits,
-                    const uint16_t repeat = kMilesMinRepeat);
-  void sendMilesMsg(const uint64_t data,
-                   const uint16_t nbits = kMilesTag24Bits,
-                   const uint16_t repeat = kMilesMinRepeat);
-  void _sendMiles(const uint64_t data,
-                 const uint16_t nbits = kMilesTag24Bits,
+  // (14bits for Shooting by default, you can set 24 bit for msg delivery)
+  void sendMilestag2(const uint64_t data,
+                 const uint16_t nbits = kMilesTag2ShotBits,
                  const uint16_t repeat = kMilesMinRepeat);
 #endif  // SEND_MILESTAG2
 
