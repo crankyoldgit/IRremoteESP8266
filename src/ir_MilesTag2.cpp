@@ -39,26 +39,13 @@ const uint16_t kMilesStdDuty = 25;
 
 void IRsend::sendMilestag2(const uint64_t data, const uint16_t nbits,
                       const uint16_t repeat) {
-  enableIROut(kMilesStdFreq, kMilesStdDuty);
-    // We always send a message, even for repeat=0, hence '<= repeat'.
-  for (uint16_t r = 0; r <= repeat; r++) {
-    // Header
-    mark(kMilesHdrMark);
-    // Data
-    if (nbits == 0)  // If we are asked to send nothing, just return.
-      return;
-    // Send the MSB first.
-    // Send the supplied data.
-    for (uint64_t mask = 1ULL << (nbits - 1); mask; mask >>= 1)
-      if (data & mask) {  // Send a 1
-        space(kMilesSpace);
-        mark(kMilesOneMark);
-      } else {  // Send a 0
-        space(kMilesSpace);
-        mark(kMilesZeroMark);
-      }
-      space(kMilesRptLength);
-  }
+  sendGeneric(
+    kMilesHdrMark, kMilesSpace,  // Header
+    kMilesOneMark, kMilesSpace,  // 1 bit
+    kMilesZeroMark, kMilesSpace,  // 0 bit
+    0,  // No footer mark
+    kMilesRptLength, data, nbits, kMilesStdFreq, true,  // MSB First
+    repeat, kMilesStdDuty);
 }
 #endif  // SEND_MILESTAG2
 
@@ -76,7 +63,8 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
   /*
   uint16_t gap_pos = 0;
-  // we got alot more data than we thought, let's find last GAP and work from it
+  // we got alot more data than we thought, 
+  // let's find last GAP and work from it
   if (results->rawlen >= (2 * nbits + 1)) 
   {
       for (uint16_t ind = 0 ; ind < results->rawlen; ind++)
@@ -86,7 +74,7 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
   }
 
   if (results->rawlen>gap_pos) offset = gap_pos+1;
-  */  
+  */ 
   // Compliance
   if (strict) {
     switch (nbits) {  // Check we've been called with a correct bit size.
@@ -100,27 +88,12 @@ bool IRrecv::decodeMiles(decode_results *results, uint16_t offset,
     }
   }
   uint64_t data = 0;
-  // Header
-  if (!matchMark(*(results->rawbuf + offset++),
-                  kMilesHdrMark, kUseDefTol, kMarkExcess)) return 0;
-  // Data
-  uint16_t shift = 0;
-  for (shift = 0; shift < nbits * 2; shift += 2) {
-    // Is the bit a '1'?
-    if (matchMark(*(results->rawbuf + 1 + offset + shift),
-                 kMilesOneMark, kUseDefTol, kMarkExcess) &&
-        matchSpace(*(results->rawbuf + offset + shift),
-                  kMilesSpace, kUseDefTol, kMarkExcess)) {
-      data = (data << 1) | 1;
-    } else if (matchMark(*(results->rawbuf + 1 + offset + shift),
-                        kMilesZeroMark, kUseDefTol, kMarkExcess) &&
-               matchSpace(*(results->rawbuf + offset + shift),
-                         kMilesSpace, kUseDefTol, kMarkExcess)) {
-      data <<= 1;  // The bit is a '0'.
-    } else {
-      return false;  // It's neither, so fail.
-    }
-  }
+  if (!matchGeneric(results->rawbuf + offset, &data,
+                  results->rawlen - offset, nbits,
+                  kMilesHdrMark, kMilesSpace,
+                  kMilesOneMark, kMilesSpace,
+                  kMilesZeroMark, kMilesSpace,
+                  0, kMilesRptLength, true)) return false;
   // Success
   results->bits = nbits;
   results->value = data;
