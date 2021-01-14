@@ -6,7 +6,7 @@
 /// RC-5 & RC-6 support added from https://github.com/z3t0/Arduino-IRremote
 /// RC-5X support added by David Conran
 /// @see https://en.wikipedia.org/wiki/RC-5
-/// @see http://www.sbprojects.com/knowledge/ir/rc5.php
+/// @see http://www.sbprojects.net/knowledge/ir/rc5.php
 /// @see https://en.wikipedia.org/wiki/Manchester_code
 /// @see https://en.wikipedia.org/wiki/RC-6
 /// @see https://www.sbprojects.net/knowledge/ir/rc6.php

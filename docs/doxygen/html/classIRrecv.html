@@ -1089,7 +1089,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Aiwa RC T501 appears to be a 42 bit variant of the NEC1 protocol. However, we historically (original Arduino IRremote project) treats it as a 15 bit (data) protocol. So, we expect nbits to typically be 15, and we will remove the prefix and postfix from the raw data, and use that as the result. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.com/knowledge/ir/nec.php">http://www.sbprojects.com/knowledge/ir/nec.php</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.net/knowledge/ir/nec.php">http://www.sbprojects.net/knowledge/ir/nec.php</a> </dd>
 <dd>
 <a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1069">https://github.com/crankyoldgit/IRremoteESP8266/issues/1069</a> </dd></dl>
 
@@ -3189,7 +3189,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>JVC repeat codes don't have a header. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.com/knowledge/ir/jvc.php">http://www.sbprojects.com/knowledge/ir/jvc.php</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.net/knowledge/ir/jvc.php">http://www.sbprojects.net/knowledge/ir/jvc.php</a> </dd></dl>
 
 </div>
 </div>
@@ -3311,7 +3311,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This protocol is pretty much just raw Manchester encoding. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.com/knowledge/ir/rc5.php">http://www.sbprojects.com/knowledge/ir/rc5.php</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.net/knowledge/ir/rc5.php">http://www.sbprojects.net/knowledge/ir/rc5.php</a> </dd>
 <dd>
 <a href="https://en.wikipedia.org/wiki/RC-5">https://en.wikipedia.org/wiki/RC-5</a> </dd>
 <dd>
@@ -4352,7 +4352,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>NEC protocol has three variants/forms. Normal: an 8 bit address &amp; an 8 bit command in 32 bit data form. i.e. address + inverted(address) + command + inverted(command) Extended: a 16 bit address &amp; an 8 bit command in 32 bit data form. i.e. address + command + inverted(command) Repeat: a 0-bit code. i.e. No data bits. Just the header + footer. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.com/knowledge/ir/nec.php">http://www.sbprojects.com/knowledge/ir/nec.php</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.net/knowledge/ir/nec.php">http://www.sbprojects.net/knowledge/ir/nec.php</a> </dd></dl>
 
 </div>
 </div>

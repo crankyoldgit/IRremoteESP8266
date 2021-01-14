@@ -3,7 +3,7 @@
 
 /// @file
 /// @brief Support for Sharp protocols.
-/// @see http://www.sbprojects.com/knowledge/ir/sharp.htm
+/// @see http://www.sbprojects.net/knowledge/ir/sharp.htm
 /// @see http://lirc.sourceforge.net/remotes/sharp/GA538WJSA
 /// @see http://www.mwftr.com/ucF08/LEC14%20PIC%20IR.pdf
 /// @see http://www.hifi-remote.com/johnsfine/DecodeIR.html#Sharp

@@ -4,7 +4,7 @@
 /// @file
 /// @brief Support for NEC (Renesas) protocols.
 /// NEC originally added from https://github.com/shirriff/Arduino-IRremote/
-/// @see http://www.sbprojects.com/knowledge/ir/nec.php
+/// @see http://www.sbprojects.net/knowledge/ir/nec.php
 
 // Supports:
 //   Brand: Yamaha,   Model: RAV561 remote
