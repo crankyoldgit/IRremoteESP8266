@@ -686,8 +686,8 @@ class IRsend {
   // Since There 2 types of transmissions
   // (14bits for Shooting by default, you can set 24 bit for msg delivery)
   void sendMilestag2(const uint64_t data,
-                 const uint16_t nbits = kMilesTag2ShotBits,
-                 const uint16_t repeat = kMilesMinRepeat);
+                     const uint16_t nbits = kMilesTag2ShotBits,
+                     const uint16_t repeat = kMilesMinRepeat);
 #endif  // SEND_MILESTAG2
 
  protected:

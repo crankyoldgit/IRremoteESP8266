@@ -16,9 +16,6 @@
 #include "IRutils.h"
 
 // Constants
-// Constants are similar to Sony SIRC protocol, bassically they are very
-// similar, just nbits are varying
-
 const uint16_t kMilesHdrMark = 2400;
 const uint16_t kMilesSpace = 600;
 const uint16_t kMilesOneMark = 1200;

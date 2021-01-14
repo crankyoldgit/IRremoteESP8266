@@ -596,6 +596,14 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting NEC decode");
     if (decodeNEC(results, offset)) return true;
 #endif
+#if DECODE_MILESTAG2
+    DPRINTLN("Attempting MilesTag2 decode");
+  // Try decodeMiles() before decodeSony() because the protocols are
+  // similar in timings & structure, but the Miles one differs in nbits
+  // so this one should be tried first to try to reduce false detection
+    if (decodeMiles(results, offset, kMilesTag2ShotBits) ||
+       decodeMiles(results, offset, kMilesTag2MsgBits)) return true;
+#endif
 #if DECODE_SONY
     DPRINTLN("Attempting Sony decode");
     if (decodeSony(results, offset)) return true;
@@ -983,11 +991,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     if (decodePanasonicAC32(results, offset, kPanasonicAc32Bits / 2))
       return true;
 #endif  // DECODE_PANASONIC_AC32
-#if DECODE_MILESTAG2
-    DPRINTLN("Attempting MilesTag2 decode");
-    if (decodeMiles(results, offset, kMilesTag2ShotBits) ||
-       decodeMiles(results, offset, kMilesTag2MsgBits)) return true;
-#endif
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

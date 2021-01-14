@@ -511,8 +511,8 @@ class IRrecv {
 #endif
 #if DECODE_MILESTAG2
   bool decodeMiles(decode_results *results, uint16_t offset = kStartOffset,
-                  const uint16_t nbits = kMilesTag2ShotBits,
-                  const bool strict = true);
+                   const uint16_t nbits = kMilesTag2ShotBits,
+                   const bool strict = true);
 #endif
 #if DECODE_CARRIER_AC
   bool decodeCarrierAC(decode_results *results, uint16_t offset = kStartOffset,
