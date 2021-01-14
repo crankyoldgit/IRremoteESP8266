@@ -16,7 +16,7 @@
 #include "IRutils.h"
 
 // Constants
-const uint16_t kMilesShotMask = 1 << (kMilesTag2ShotBits - 1); // Shot packets
+const uint16_t kMilesShotMask = 1 << (kMilesTag2ShotBits - 1);  // Shot packets
                                                                // have this bit
                                                                // as `0`
 const uint32_t kMilesMsgMask = 1 << (kMilesTag2MsgBits - 1);  // Msg packets
@@ -25,8 +25,8 @@ const uint32_t kMilesMsgMask = 1 << (kMilesTag2MsgBits - 1);  // Msg packets
 const uint8_t  kMilesMsgTerminator = 0xE8;
 const uint16_t kMilesHdrMark = 2400;  // Header
 const uint16_t kMilesSpace = 600;  // Space
-const uint16_t kMilesOneMark = 1200;  //One Mark
-const uint16_t kMilesZeroMark = 600;  //Zero Mark
+const uint16_t kMilesOneMark = 1200;  // One Mark
+const uint16_t kMilesZeroMark = 600;  // Zero Mark
 const uint16_t kMilesRptLength = 32000;
 const uint16_t kMilesMinGap = 32000;
 const uint16_t kMilesStdFreq = 38000;  // kHz
