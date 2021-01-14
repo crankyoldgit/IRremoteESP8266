@@ -4,7 +4,7 @@
 /// @file
 /// @brief Support for NEC (Renesas) protocols.
 /// NEC originally added from https://github.com/shirriff/Arduino-IRremote/
-/// @see http://www.sbprojects.com/knowledge/ir/nec.php
+/// @see http://www.sbprojects.net/knowledge/ir/nec.php
 
 #define __STDC_LIMIT_MACROS
 #include "ir_NEC.h"
@@ -24,7 +24,7 @@
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
 /// @note This protocol appears to have no header.
-/// @see http://www.sbprojects.com/knowledge/ir/nec.php
+/// @see http://www.sbprojects.net/knowledge/ir/nec.php
 void IRsend::sendNEC(uint64_t data, uint16_t nbits, uint16_t repeat) {
   sendGeneric(kNecHdrMark, kNecHdrSpace, kNecBitMark, kNecOneSpace, kNecBitMark,
               kNecZeroSpace, kNecBitMark, kNecMinGap, kNecMinCommandLength,
@@ -44,7 +44,7 @@ void IRsend::sendNEC(uint64_t data, uint16_t nbits, uint16_t repeat) {
 /// @param[in] address An address value.
 /// @param[in] command An 8-bit command value.
 /// @return A raw 32-bit NEC message suitable for use with `sendNEC()`.
-/// @see http://www.sbprojects.com/knowledge/ir/nec.php
+/// @see http://www.sbprojects.net/knowledge/ir/nec.php
 uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
   command &= 0xFF;  // We only want the least significant byte of command.
   // sendNEC() sends MSB first, but protocol says this is LSB first.
@@ -77,7 +77,7 @@ uint32_t IRsend::encodeNEC(uint16_t address, uint16_t command) {
 ///   Extended: a 16 bit address & an 8 bit command in 32 bit data form.
 ///             i.e. address + command + inverted(command)
 ///   Repeat:   a 0-bit code. i.e. No data bits. Just the header + footer.
-/// @see http://www.sbprojects.com/knowledge/ir/nec.php
+/// @see http://www.sbprojects.net/knowledge/ir/nec.php
 bool IRrecv::decodeNEC(decode_results *results, uint16_t offset,
                        const uint16_t nbits, const bool strict) {
   if (results->rawlen < kNecRptLength + offset - 1)

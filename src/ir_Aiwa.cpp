@@ -56,7 +56,7 @@ void IRsend::sendAiwaRCT501(uint64_t data, uint16_t nbits, uint16_t repeat) {
 ///  a 15 bit (data) protocol. So, we expect nbits to typically be 15, and we
 ///  will remove the prefix and postfix from the raw data, and use that as
 ///  the result.
-/// @see http://www.sbprojects.com/knowledge/ir/nec.php
+/// @see http://www.sbprojects.net/knowledge/ir/nec.php
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1069
 bool IRrecv::decodeAiwaRCT501(decode_results *results, uint16_t offset,
                               const uint16_t nbits, const bool strict) {

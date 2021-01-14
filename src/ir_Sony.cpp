@@ -6,7 +6,7 @@
 /// @brief Support for Sony SIRC(Serial Infra-Red Control) protocols.
 /// Sony originally added from https://github.com/shirriff/Arduino-IRremote/
 /// Updates from marcosamarinho
-/// @see http://www.sbprojects.com/knowledge/ir/sirc.php
+/// @see http://www.sbprojects.net/knowledge/ir/sirc.php
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1018
 
 // Supports:

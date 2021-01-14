@@ -2,7 +2,7 @@
 
 /// @file
 /// @brief Support for the Phillips RC-MM protocol.
-/// @see http://www.sbprojects.com/knowledge/ir/rcmm.php
+/// @see http://www.sbprojects.net/knowledge/ir/rcmm.php
 
 // Supports:
 //   Brand: Microsoft,  Model: XBOX 360

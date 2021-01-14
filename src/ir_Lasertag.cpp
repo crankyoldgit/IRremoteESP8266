@@ -63,7 +63,7 @@ void IRsend::sendLasertag(uint64_t data, uint16_t nbits, uint16_t repeat) {
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return True if it can decode it, false if it can't.
 /// @note This protocol is pretty much just raw Manchester encoding.
-/// @see http://www.sbprojects.com/knowledge/ir/rc5.php
+/// @see http://www.sbprojects.net/knowledge/ir/rc5.php
 /// @see https://en.wikipedia.org/wiki/RC-5
 /// @see https://en.wikipedia.org/wiki/Manchester_code
 /// @todo Convert to using `matchManchester()` if we can.
