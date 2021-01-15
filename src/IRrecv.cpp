@@ -598,11 +598,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
 #endif
 #if DECODE_MILESTAG2
     DPRINTLN("Attempting MilesTag2 decode");
-  // Try decodeMiles() before decodeSony() because the protocols are
+  // Try decodeMilestag2() before decodeSony() because the protocols are
   // similar in timings & structure, but the Miles one differs in nbits
   // so this one should be tried first to try to reduce false detection
-    if (decodeMiles(results, offset, kMilesTag2ShotBits) ||
-       decodeMiles(results, offset, kMilesTag2MsgBits)) return true;
+    if (decodeMilestag2(results, offset, kMilesTag2MsgBits) ||
+        decodeMilestag2(results, offset, kMilesTag2ShotBits)) return true;
 #endif
 #if DECODE_SONY
     DPRINTLN("Attempting Sony decode");
