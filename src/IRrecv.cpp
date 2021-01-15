@@ -1272,20 +1272,23 @@ match_result_t IRrecv::matchData(
 /// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
 /// @param[in] MSBfirst Bit order to save the data in. (Def: true)
 ///   true is Most Significant Bit First Order, false is Least Significant First
+/// @param[in] expectlastspace Do we expect a space at the end of the message?
 /// @return If successful, how many buffer entries were used. Otherwise 0.
 uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
                             const uint16_t remaining, const uint16_t nbytes,
                             const uint16_t onemark, const uint32_t onespace,
                             const uint16_t zeromark, const uint32_t zerospace,
                             const uint8_t tolerance, const int16_t excess,
-                            const bool MSBfirst) {
+                            const bool MSBfirst, const bool expectlastspace) {
   // Check if there is enough capture buffer to possibly have the desired bytes.
-  if (remaining < nbytes * 8 * 2) return 0;  // Nope, so abort.
+  if (remaining + expectlastspace < (nbytes * 8 * 2) + 1)
+    return 0;  // Nope, so abort.
   uint16_t offset = 0;
   for (uint16_t byte_pos = 0; byte_pos < nbytes; byte_pos++) {
+    bool lastspace = (byte_pos + 1 == nbytes) ? expectlastspace : true;
     match_result_t result = matchData(data_ptr + offset, 8, onemark, onespace,
                                       zeromark, zerospace, tolerance, excess,
-                                      MSBfirst);
+                                      MSBfirst, lastspace);
     if (result.success == false) return 0;  // Fail
     result_ptr[byte_pos] = (uint8_t)result.data;
     offset += result.used;
@@ -1363,8 +1366,8 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
     return 0;
 
   // Data
+  bool expectspace = footermark || (onespace != zerospace);
   if (use_bits) {  // Bits.
-    bool expectspace = footermark || (onespace != zerospace);
     match_result_t result = IRrecv::matchData(data_ptr + offset, nbits,
                                               onemark, onespace,
                                               zeromark, zerospace, tolerance,
@@ -1377,7 +1380,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                                             remaining - offset, nbits / 8,
                                             onemark, onespace,
                                             zeromark, zerospace, tolerance,
-                                            excess, MSBfirst);
+                                            excess, MSBfirst, expectspace);
     if (!data_used) return 0;
     offset += data_used;
   }

@@ -200,7 +200,8 @@ class IRrecv {
                       const uint16_t zeromark, const uint32_t zerospace,
                       const uint8_t tolerance = kUseDefTol,
                       const int16_t excess = kMarkExcess,
-                      const bool MSBfirst = true);
+                      const bool MSBfirst = true,
+                      const bool expectlastspace = true);
   uint16_t matchGeneric(volatile uint16_t *data_ptr,
                         uint64_t *result_ptr,
                         const uint16_t remaining, const uint16_t nbits,
