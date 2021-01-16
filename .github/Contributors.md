@@ -18,6 +18,7 @@
 - [Mark Kuchel](https://github.com/kuchel77)
 - [Christian Nilsson](https://github.com/NiKiZe)
 - [Zhongxian Li](https://github.com/siriuslzx)
+- [Darsh Patel](https://github.com/darshkpatel) : Logo 🎉
 
 All contributors can be found on the [contributors site](https://github.com/crankyoldgit/IRremoteESP8266/graphs/contributors).
 
