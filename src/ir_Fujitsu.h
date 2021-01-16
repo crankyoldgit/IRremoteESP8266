@@ -4,6 +4,11 @@
 /// @file
 /// @brief Support for Fujitsu A/C protocols.
 /// Fujitsu A/C support added by Jonny Graham
+/// @warning Use of incorrect model may cause the A/C unit to lock up.
+/// e.g. An A/C that uses an AR-RAH1U remote may lock up requiring a physical
+///      power rest, if incorrect model (ARRAH2E) is used with a Swing command.
+///      The correct model for it is ARREB1E.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1376
 
 // Supports:
 //   Brand: Fujitsu,  Model: AR-RAH2E remote (ARRAH2E)
@@ -23,6 +28,7 @@
 //   Brand: Fujitsu General,  Model: AR-JW2 remote (ARJW2)
 //   Brand: Fujitsu,  Model: AR-DL10 remote (ARDB1)
 //   Brand: Fujitsu,  Model: ASU30C1 A/C (ARDB1)
+//   Brand: Fujitsu,  Model: AR-RAH1U remote (ARREB1E)
 
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_
