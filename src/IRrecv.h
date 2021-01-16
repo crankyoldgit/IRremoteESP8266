@@ -192,14 +192,16 @@ class IRrecv {
                            const uint16_t zeromark, const uint32_t zerospace,
                            const uint8_t tolerance = kUseDefTol,
                            const int16_t excess = kMarkExcess,
-                           const bool MSBfirst = true);
+                           const bool MSBfirst = true,
+                           const bool expectlastspace = true);
   uint16_t matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
                       const uint16_t remaining, const uint16_t nbytes,
                       const uint16_t onemark, const uint32_t onespace,
                       const uint16_t zeromark, const uint32_t zerospace,
                       const uint8_t tolerance = kUseDefTol,
                       const int16_t excess = kMarkExcess,
-                      const bool MSBfirst = true);
+                      const bool MSBfirst = true,
+                      const bool expectlastspace = true);
   uint16_t matchGeneric(volatile uint16_t *data_ptr,
                         uint64_t *result_ptr,
                         const uint16_t remaining, const uint16_t nbits,
@@ -508,6 +510,11 @@ class IRrecv {
   bool decodeLasertag(decode_results *results, uint16_t offset = kStartOffset,
                       const uint16_t nbits = kLasertagBits,
                       const bool strict = true);
+#endif
+#if DECODE_MILESTAG2
+  bool decodeMilestag2(decode_results *results, uint16_t offset = kStartOffset,
+                       const uint16_t nbits = kMilesTag2ShotBits,
+                       const bool strict = true);
 #endif
 #if DECODE_CARRIER_AC
   bool decodeCarrierAC(decode_results *results, uint16_t offset = kStartOffset,

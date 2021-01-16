@@ -596,6 +596,14 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting NEC decode");
     if (decodeNEC(results, offset)) return true;
 #endif
+#if DECODE_MILESTAG2
+    DPRINTLN("Attempting MilesTag2 decode");
+  // Try decodeMilestag2() before decodeSony() because the protocols are
+  // similar in timings & structure, but the Miles one differs in nbits
+  // so this one should be tried first to try to reduce false detection
+    if (decodeMilestag2(results, offset, kMilesTag2MsgBits) ||
+        decodeMilestag2(results, offset, kMilesTag2ShotBits)) return true;
+#endif
 #if DECODE_SONY
     DPRINTLN("Attempting Sony decode");
     if (decodeSony(results, offset)) return true;
@@ -1202,30 +1210,49 @@ bool IRrecv::decodeHash(decode_results *results) {
 /// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
 /// @param[in] MSBfirst Bit order to save the data in. (Def: true)
 ///   true is Most Significant Bit First Order, false is Least Significant First
+/// @param[in] expectlastspace Do we expect a space at the end of the message?
 /// @return A match_result_t structure containing the success (or not), the
 ///   data value, and how many buffer entries were used.
 match_result_t IRrecv::matchData(
     volatile uint16_t *data_ptr, const uint16_t nbits, const uint16_t onemark,
     const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace,
-    const uint8_t tolerance, const int16_t excess, const bool MSBfirst) {
+    const uint8_t tolerance, const int16_t excess, const bool MSBfirst,
+    const bool expectlastspace) {
   match_result_t result;
   result.success = false;  // Fail by default.
   result.data = 0;
-  for (result.used = 0; result.used < nbits * 2;
-       result.used += 2, data_ptr += 2) {
-    // Is the bit a '1'?
-    if (matchMark(*data_ptr, onemark, tolerance, excess) &&
-        matchSpace(*(data_ptr + 1), onespace, tolerance, excess)) {
-      result.data = (result.data << 1) | 1;
-    } else if (matchMark(*data_ptr, zeromark, tolerance, excess) &&
-               matchSpace(*(data_ptr + 1), zerospace, tolerance, excess)) {
-      result.data <<= 1;  // The bit is a '0'.
-    } else {
-      if (!MSBfirst) result.data = reverseBits(result.data, result.used / 2);
-      return result;  // It's neither, so fail.
+  if (expectlastspace) {  // We are expecting data with a final space.
+    for (result.used = 0; result.used < nbits * 2;
+         result.used += 2, data_ptr += 2) {
+      // Is the bit a '1'?
+      if (matchMark(*data_ptr, onemark, tolerance, excess) &&
+          matchSpace(*(data_ptr + 1), onespace, tolerance, excess)) {
+        result.data = (result.data << 1) | 1;
+      } else if (matchMark(*data_ptr, zeromark, tolerance, excess) &&
+                 matchSpace(*(data_ptr + 1), zerospace, tolerance, excess)) {
+        result.data <<= 1;  // The bit is a '0'.
+      } else {
+        if (!MSBfirst) result.data = reverseBits(result.data, result.used / 2);
+        return result;  // It's neither, so fail.
+      }
+    }
+    result.success = true;
+  } else {  // We are expecting data without a final space.
+    // Match all but the last bit, as it may not match easily.
+    result = matchData(data_ptr, nbits ? nbits - 1 : 0, onemark, onespace,
+                       zeromark, zerospace, tolerance, excess, true, true);
+    if (result.success) {
+      // Is the bit a '1'?
+      if (matchMark(*(data_ptr + result.used), onemark, tolerance, excess))
+        result.data = (result.data << 1) | 1;
+      else if (matchMark(*(data_ptr + result.used), zeromark, tolerance,
+               excess))
+        result.data <<= 1;  // The bit is a '0'.
+      else
+        result.success = false;
+      if (result.success) result.used++;
     }
   }
-  result.success = true;
   if (!MSBfirst) result.data = reverseBits(result.data, nbits);
   return result;
 }
@@ -1245,20 +1272,23 @@ match_result_t IRrecv::matchData(
 /// @param[in] excess Nr. of uSeconds. (Def: kMarkExcess)
 /// @param[in] MSBfirst Bit order to save the data in. (Def: true)
 ///   true is Most Significant Bit First Order, false is Least Significant First
+/// @param[in] expectlastspace Do we expect a space at the end of the message?
 /// @return If successful, how many buffer entries were used. Otherwise 0.
 uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
                             const uint16_t remaining, const uint16_t nbytes,
                             const uint16_t onemark, const uint32_t onespace,
                             const uint16_t zeromark, const uint32_t zerospace,
                             const uint8_t tolerance, const int16_t excess,
-                            const bool MSBfirst) {
+                            const bool MSBfirst, const bool expectlastspace) {
   // Check if there is enough capture buffer to possibly have the desired bytes.
-  if (remaining < nbytes * 8 * 2) return 0;  // Nope, so abort.
+  if (remaining + expectlastspace < (nbytes * 8 * 2) + 1)
+    return 0;  // Nope, so abort.
   uint16_t offset = 0;
   for (uint16_t byte_pos = 0; byte_pos < nbytes; byte_pos++) {
+    bool lastspace = (byte_pos + 1 == nbytes) ? expectlastspace : true;
     match_result_t result = matchData(data_ptr + offset, 8, onemark, onespace,
                                       zeromark, zerospace, tolerance, excess,
-                                      MSBfirst);
+                                      MSBfirst, lastspace);
     if (result.success == false) return 0;  // Fail
     result_ptr[byte_pos] = (uint8_t)result.data;
     offset += result.used;
@@ -1316,8 +1346,10 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                               const bool MSBfirst) {
   // If we are expecting byte sizes, check it's a factor of 8 or fail.
   if (!use_bits && nbits % 8 != 0)  return 0;
+  // Calculate if we expect a trailing space in the data section.
+  const bool kexpectspace = footermark || (onespace != zerospace);
   // Calculate how much remaining buffer is required.
-  uint16_t min_remaining = nbits * 2;
+  uint16_t min_remaining = nbits * 2 - (kexpectspace ? 0 : 1);
 
   if (hdrmark) min_remaining++;
   if (hdrspace) min_remaining++;
@@ -1340,7 +1372,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
     match_result_t result = IRrecv::matchData(data_ptr + offset, nbits,
                                               onemark, onespace,
                                               zeromark, zerospace, tolerance,
-                                              excess, MSBfirst);
+                                              excess, MSBfirst, kexpectspace);
     if (!result.success) return 0;
     *result_bits_ptr = result.data;
     offset += result.used;
@@ -1349,7 +1381,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                                             remaining - offset, nbits / 8,
                                             onemark, onespace,
                                             zeromark, zerospace, tolerance,
-                                            excess, MSBfirst);
+                                            excess, MSBfirst, kexpectspace);
     if (!data_used) return 0;
     offset += data_used;
   }

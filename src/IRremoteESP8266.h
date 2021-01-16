@@ -719,6 +719,13 @@
 #define SEND_ELITESCREENS      _IR_ENABLE_DEFAULT_
 #endif  // SEND_ELITESCREENS
 
+#ifndef DECODE_MILESTAG2
+#define DECODE_MILESTAG2    _IR_ENABLE_DEFAULT_
+#endif  // DECODE_MILESTAG2
+#ifndef SEND_MILESTAG2
+#define SEND_MILESTAG2      _IR_ENABLE_DEFAULT_
+#endif  // SEND_MILESTAG2
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -867,8 +874,9 @@ enum decode_type_t {
   MIRAGE,
   ELITESCREENS,  // 95
   PANASONIC_AC32,
+  MILESTAG2,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = PANASONIC_AC32,
+  kLastDecodeType = MILESTAG2,
 };
 
 // Message lengths & required repeat values
@@ -1094,6 +1102,9 @@ const uint16_t kZepealBits = 16;
 const uint16_t kZepealMinRepeat = 4;
 const uint16_t kVoltasBits = 80;
 const uint16_t kVoltasStateLength = 10;
+const uint16_t kMilesTag2ShotBits = 14;
+const uint16_t kMilesTag2MsgBits = 24;
+const uint16_t kMilesMinRepeat = 0;
 
 
 // Legacy defines. (Deprecated)

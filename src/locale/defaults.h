@@ -628,6 +628,9 @@
 #ifndef D_STR_MIDEA24
 #define D_STR_MIDEA24 "MIDEA24"
 #endif  // D_STR_MIDEA24
+#ifndef D_STR_MILESTAG2
+#define D_STR_MILESTAG2 "MILESTAG2"
+#endif  // D_STR_MILESTAG2
 #ifndef D_STR_MIRAGE
 #define D_STR_MIRAGE "MIRAGE"
 #endif  // D_STR_MIRAGE

@@ -682,6 +682,13 @@ class IRsend {
                         const uint16_t nbits = kEliteScreensBits,
                         const uint16_t repeat = kEliteScreensDefaultRepeat);
 #endif  // SEND_ELITESCREENS
+#if SEND_MILESTAG2
+  // Since There 2 types of transmissions
+  // (14bits for Shooting by default, you can set 24 bit for msg delivery)
+  void sendMilestag2(const uint64_t data,
+                     const uint16_t nbits = kMilesTag2ShotBits,
+                     const uint16_t repeat = kMilesMinRepeat);
+#endif  // SEND_MILESTAG2
 
  protected:
 #ifdef UNIT_TEST
