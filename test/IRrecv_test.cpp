@@ -1014,6 +1014,74 @@ TEST(TestMatchGeneric, MissingHeaderFooter) {
   EXPECT_EQ(kentries - 2, entries_used);
 }
 
+TEST(TestMatchGeneric, MissingFooterMarkEncoded) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(1);
+  irsend.begin();
+
+  const uint16_t kentries = 10;
+  uint16_t data[kentries] = {  // Mark encoded data.
+      8000,  // Header mark
+      4000,  // Header space
+      2000, 500,   // Bit #0 (1)
+      1000, 500,   // Bit #1 (0)
+      2000, 500,   // Bit #2 (1)
+      1000, 500};  // Bit #3 (0)
+                   // (No Footer)
+
+  uint16_t offset = kStartOffset;
+  irsend.reset();
+
+  // Send it with the "trailing data space."
+  irsend.sendRaw(data, kentries, 38000);
+  irsend.makeDecodeResult();
+  uint16_t entries_used = 0;
+
+  uint64_t result_data = 0;
+
+  // No footer match
+  entries_used = irrecv.matchGeneric(
+      irsend.capture.rawbuf + offset, &result_data,
+      irsend.capture.rawlen - offset,
+      4,  // nbits
+      8000, 4000,  // Header
+      2000, 500,  // one mark & space
+      1000, 500,  // zero mark & space
+      0, 0,  // NO Footer
+      true,  // atleast on the footer space.
+      1,  // 1% Tolerance
+      0,  // No excess margin
+      true);  // MSB first.
+  ASSERT_NE(0, entries_used);
+  EXPECT_EQ(0b1010, result_data);
+  EXPECT_EQ(irsend.capture.rawlen- kStartOffset, kentries);
+  EXPECT_EQ(irsend.capture.rawlen - kStartOffset - 1, entries_used);
+  EXPECT_EQ(kentries - 1, entries_used);
+
+  // Now send it again, but make it appear like a real capture.
+  // i.e. The trailing space is removed.
+  irsend.reset();
+  irsend.sendRaw(data, kentries - 1, 38000);
+  irsend.makeDecodeResult();
+  entries_used = irrecv.matchGeneric(
+      irsend.capture.rawbuf + offset, &result_data,
+      irsend.capture.rawlen - offset,
+      4,  // nbits
+      8000, 4000,  // Header
+      2000, 500,  // one mark & space
+      1000, 500,  // zero mark & space
+      0, 0,  // NO Footer
+      true,  // atleast on the footer space.
+      1,  // 1% Tolerance
+      0,  // No excess margin
+      true);  // MSB first.
+  ASSERT_NE(0, entries_used);
+  EXPECT_EQ(0b1010, result_data);
+  EXPECT_EQ(irsend.capture.rawlen - kStartOffset, kentries - 1);
+  EXPECT_EQ(irsend.capture.rawlen - kStartOffset, entries_used);
+  EXPECT_EQ(kentries - 1, entries_used);
+}
+
 TEST(TestMatchGeneric, BitOrdering) {
   IRsendTest irsend(0);
   IRrecv irrecv(1);

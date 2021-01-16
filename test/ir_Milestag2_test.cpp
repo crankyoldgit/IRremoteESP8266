@@ -106,3 +106,24 @@ TEST(TestDecodeMilestag2, FailToDecodeBadData) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_NE(MILESTAG2, irsend.capture.decode_type);
 }
+
+TEST(TestDecodeMilestag2, RealSelfDecodeExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/pull/1380#issuecomment-761159985
+  const uint16_t rawData[29] = {
+      2440, 602,
+      608, 600, 606, 600, 606, 600, 602, 606, 1208, 602, 1216, 596, 604, 600,
+      1214, 598, 1212, 600, 1208, 604, 1208, 602, 606, 600, 610, 596, 1210};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 29, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MILESTAG2, irsend.capture.decode_type);
+  EXPECT_EQ(kMilesTag2ShotBits, irsend.capture.bits);
+  EXPECT_EQ(0x379, irsend.capture.value);
+  EXPECT_EQ(0xD, irsend.capture.address);
+  EXPECT_EQ(0x39, irsend.capture.command);
+}

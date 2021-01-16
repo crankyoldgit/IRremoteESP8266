@@ -1346,8 +1346,10 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                               const bool MSBfirst) {
   // If we are expecting byte sizes, check it's a factor of 8 or fail.
   if (!use_bits && nbits % 8 != 0)  return 0;
+  // Calculate if we expect a trailing space in the data section.
+  const bool kexpectspace = footermark || (onespace != zerospace);
   // Calculate how much remaining buffer is required.
-  uint16_t min_remaining = nbits * 2;
+  uint16_t min_remaining = nbits * 2 - (kexpectspace ? 0 : 1);
 
   if (hdrmark) min_remaining++;
   if (hdrspace) min_remaining++;
@@ -1366,12 +1368,11 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
     return 0;
 
   // Data
-  bool expectspace = footermark || (onespace != zerospace);
   if (use_bits) {  // Bits.
     match_result_t result = IRrecv::matchData(data_ptr + offset, nbits,
                                               onemark, onespace,
                                               zeromark, zerospace, tolerance,
-                                              excess, MSBfirst, expectspace);
+                                              excess, MSBfirst, kexpectspace);
     if (!result.success) return 0;
     *result_bits_ptr = result.data;
     offset += result.used;
@@ -1380,7 +1381,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                                             remaining - offset, nbits / 8,
                                             onemark, onespace,
                                             zeromark, zerospace, tolerance,
-                                            excess, MSBfirst, expectspace);
+                                            excess, MSBfirst, kexpectspace);
     if (!data_used) return 0;
     offset += data_used;
   }
