@@ -6,12 +6,12 @@
 	</defs>
 	<style>
 		tspan { white-space:pre }
-		.shp0 { fill: none;stroke: #4f3ee6;stroke-width: 20 } 
-		.shp1 { fill: none;stroke: #4f3ee6;stroke-linecap:round;stroke-width: 28 } 
-		.shp2 { fill: none;stroke: #4f3ee6;stroke-linecap:round;stroke-linejoin:round;stroke-width: 28 } 
-		.shp3 { fill: none;stroke: #4f3ee6;stroke-linecap:round;stroke-linejoin:round;stroke-width: 16 } 
-		.shp4 { fill: #ffffff;stroke: #4f3ee6;stroke-width: 28 } 
-		.shp5 { fill: #ffffff;stroke: #4f3ee6;stroke-width: 18 } 
+		.shp0 { fill: none;stroke: #4f3ee6;stroke-width: 20 }
+		.shp1 { fill: none;stroke: #4f3ee6;stroke-linecap:round;stroke-width: 28 }
+		.shp2 { fill: none;stroke: #4f3ee6;stroke-linecap:round;stroke-linejoin:round;stroke-width: 28 }
+		.shp3 { fill: none;stroke: #4f3ee6;stroke-linecap:round;stroke-linejoin:round;stroke-width: 16 }
+		.shp4 { fill: #ffffff;stroke: #4f3ee6;stroke-width: 28 }
+		.shp5 { fill: #ffffff;stroke: #4f3ee6;stroke-width: 18 }
 	</style>
 	<g id="Artboard 1" clip-path="url(#cp1)">
 		<g id="IR">
@@ -37,7 +37,7 @@
 			<path id="Shape 7" class="shp2" d="M602 534L764 539" />
 			<path id="Shape 8" class="shp2" d="M597 594L694 598L740 653" />
 		</g>
-		<path id="Rounded Rectangle 1" class="shp4" d="M360.84 337.08L532.7 337.08C560.31 337.08 582.7 359.46 582.7 387.08L582.7 714.14C582.7 741.75 560.31 764.14 532.7 764.14L360.84 764.14C333.23 764.14 310.84 741.75 310.84 714.14L310.84 387.08C310.84 359.46 333.23 337.08 360.84 337.08ZM378 489C389.6 489 399 498.4 399 510C399 521.6 389.6 531 378 531C366.4 531 357 521.6 357 510C357 498.4 366.4 489 378 489Z" />
+		<path id="Rounded Rectangle 1" class="shp4" d="M360.84 337.08L532.7 337.08C560.31 337.08 582.7 359.46 582.7 387.08L582.7 714.14C582.7 741.75 560.31 764.14 532.7 764.14L360.84 764.14C333.23 764.14 310.84 741.75 310.84 714.14L310.84 387.08C310.84 359.46 333.23 337.08 360.84 337.08ZM378 489Z" />
 		<g id="Buttons">
 			<path id="Ellipse 4" class="shp5" d="M378 489C389.6 489 399 498.4 399 510C399 521.6 389.6 531 378 531C366.4 531 357 521.6 357 510C357 498.4 366.4 489 378 489ZM378 489C389.6 489 399 498.4 399 510C399 521.6 389.6 531 378 531C366.4 531 357 521.6 357 510C357 498.4 366.4 489 378 489ZM378 489C389.6 489 399 498.4 399 510C399 521.6 389.6 531 378 531C366.4 531 357 521.6 357 510C357 498.4 366.4 489 378 489Z" />
 			<path id="Ellipse 4" class="shp5" d="M514 488C525.6 488 535 497.4 535 509C535 520.6 525.6 530 514 530C502.4 530 493 520.6 493 509C493 497.4 502.4 488 514 488ZM514 488C525.6 488 535 497.4 535 509C535 520.6 525.6 530 514 530C502.4 530 493 520.6 493 509C493 497.4 502.4 488 514 488ZM514 488C525.6 488 535 497.4 535 509C535 520.6 525.6 530 514 530C502.4 530 493 520.6 493 509C493 497.4 502.4 488 514 488Z" />
