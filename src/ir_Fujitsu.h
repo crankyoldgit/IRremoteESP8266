@@ -29,6 +29,7 @@
 //   Brand: Fujitsu,  Model: AR-DL10 remote (ARDB1)
 //   Brand: Fujitsu,  Model: ASU30C1 A/C (ARDB1)
 //   Brand: Fujitsu,  Model: AR-RAH1U remote (ARREB1E)
+//   Brand: Fujitsu,  Model: ASU12RLF A/C (ARREB1E)
 
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_
