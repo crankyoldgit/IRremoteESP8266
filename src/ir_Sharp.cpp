@@ -312,12 +312,15 @@ void IRSharpAc::setRaw(const uint8_t new_code[], const uint16_t length) {
 void IRSharpAc::setModel(const sharp_ac_remote_model_t model) {
   switch (model) {
     case sharp_ac_remote_model_t::A705:
+    case sharp_ac_remote_model_t::A903:
       _model = model;
+      _.Model = true;
       break;
     default:
       _model = sharp_ac_remote_model_t::A907;
+      _.Model = false;
   }
-  _.A705 = (_model == sharp_ac_remote_model_t::A705);
+  _.Model2 = (_model != sharp_ac_remote_model_t::A907);
   // Redo the operating mode as some models don't support all modes.
   setMode(_.Mode);
 }
@@ -326,9 +329,16 @@ void IRSharpAc::setModel(const sharp_ac_remote_model_t model) {
 /// @param[in] raw Try to determine the model from the raw code only.
 /// @return The enum of the compatible model.
 sharp_ac_remote_model_t IRSharpAc::getModel(const bool raw) const {
-  if (raw)
-    return (_.A705 && _.Model) ? sharp_ac_remote_model_t::A705
-                               : sharp_ac_remote_model_t::A907;
+  if (raw) {
+    if (_.Model2) {
+      if (_.Model)
+        return sharp_ac_remote_model_t::A705;
+      else
+        return sharp_ac_remote_model_t::A903;
+    } else {
+      return sharp_ac_remote_model_t::A907;
+    }
+  }
   return _model;
 }
 

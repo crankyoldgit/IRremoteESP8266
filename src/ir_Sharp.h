@@ -9,14 +9,18 @@
 /// @see GlobalCache's IR Control Tower data.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/638
 /// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/SharpHeatpumpIR.cpp
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1091
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1387
 
 // Supports:
 //   Brand: Sharp,  Model: LC-52D62U TV
 //   Brand: Sharp,  Model: AY-ZP40KR A/C (A907)
 //   Brand: Sharp,  Model: AH-AxSAY A/C (A907)
 //   Brand: Sharp,  Model: CRMC-A907 JBEZ remote (A907)
-//   Brand: Sharp,  Model: AH-XP10NRY A/C (A907)
-//   Brand: Sharp,  Model: CRMC-820 JBEZ remote (A907)
+//   Brand: Sharp,  Model: AH-PR13 A/C (A903)
+//   Brand: Sharp,  Model: CRMC-A903 remote (A903)
+//   Brand: Sharp,  Model: AH-XP10NRY A/C (A903)
+//   Brand: Sharp,  Model: CRMC-820 JBEZ remote (A903)
 //   Brand: Sharp,  Model: CRMC-A705 JBEZ remote (A705)
 
 #ifndef IR_SHARP_H_
@@ -65,11 +69,11 @@ union SharpProtocol{
     // Byte 10
     uint8_t Special :8;
     // Byte 11
-    uint8_t     :2;
-    uint8_t Ion :1;
-    uint8_t     :1;
-    uint8_t A705:1;
-    uint8_t     :3;
+    uint8_t        :2;
+    uint8_t Ion    :1;
+    uint8_t        :1;
+    uint8_t Model2 :1;
+    uint8_t        :3;
     // Byte 12
     uint8_t     :4;
     uint8_t Sum :4;

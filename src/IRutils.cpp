@@ -538,6 +538,7 @@ namespace irutils {
         switch (model) {
           case sharp_ac_remote_model_t::A907: return F("A907");
           case sharp_ac_remote_model_t::A705: return F("A705");
+          case sharp_ac_remote_model_t::A903: return F("A903");
           default: return kUnknownStr;
         }
         break;
