@@ -17,8 +17,8 @@
 //   Brand: Sharp,  Model: AY-ZP40KR A/C (A907)
 //   Brand: Sharp,  Model: AH-AxSAY A/C (A907)
 //   Brand: Sharp,  Model: CRMC-A907 JBEZ remote (A907)
-//   Brand: Sharp,  Model: AH-PR13 A/C (A903)
-//   Brand: Sharp,  Model: CRMC-A903 remote (A903)
+//   Brand: Sharp,  Model: AH-PR13-GL A/C (A903)
+//   Brand: Sharp,  Model: CRMC-A903JBEZ remote (A903)
 //   Brand: Sharp,  Model: AH-XP10NRY A/C (A903)
 //   Brand: Sharp,  Model: CRMC-820 JBEZ remote (A903)
 //   Brand: Sharp,  Model: CRMC-A705 JBEZ remote (A705)
@@ -108,9 +108,9 @@ const uint8_t kSharpAcHeat =                             0b01;  // A907 only
 const uint8_t kSharpAcFanAuto =                     0b010;  // 2
 const uint8_t kSharpAcFanMin =                      0b100;  // 4 (FAN1)
 const uint8_t kSharpAcFanMed =                      0b011;  // 3 (FAN2)
-const uint8_t kSharpAcFanA705Low =                  0b011;  // 3
+const uint8_t kSharpAcFanA705Low =                  0b011;  // 3 (A903 too)
 const uint8_t kSharpAcFanHigh =                     0b101;  // 5 (FAN3)
-const uint8_t kSharpAcFanA705Med =                  0b101;  // 5
+const uint8_t kSharpAcFanA705Med =                  0b101;  // 5 (A903 too)
 const uint8_t kSharpAcFanMax =                      0b111;  // 7 (FAN4)
 
 const uint8_t kSharpAcTimerIncrement = 30;  // Mins

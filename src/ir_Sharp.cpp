@@ -464,9 +464,16 @@ uint8_t IRSharpAc::getMode(void) const {
 /// @param[in] save Do we save this setting as a user set one?
 void IRSharpAc::setMode(const uint8_t mode, const bool save) {
   uint8_t realMode = mode;
-  if (mode == kSharpAcHeat && getModel() == sharp_ac_remote_model_t::A705) {
-    // A705 has no heat mode, use Fan mode instead.
-    realMode = kSharpAcFan;
+  if (mode == kSharpAcHeat) {
+    switch (getModel()) {
+      case sharp_ac_remote_model_t::A705:
+      case sharp_ac_remote_model_t::A903:
+        // These models have no heat mode, use Fan mode instead.
+        realMode = kSharpAcFan;
+        break;
+      default:
+        break;
+    }
   }
 
   switch (realMode) {
@@ -584,16 +591,16 @@ void IRSharpAc::_setEconoToggle(const bool on) {
 /// Set the Economical mode toggle setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @warning Probably incompatible with `setTurbo()`
-/// @note Not available on the A705 model.
+/// @note Available on the A907 models.
 void IRSharpAc::setEconoToggle(const bool on) {
-  if (_model != sharp_ac_remote_model_t::A705) _setEconoToggle(on);
+  if (_model == sharp_ac_remote_model_t::A907) _setEconoToggle(on);
 }
 
 /// Get the Economical mode toggle setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-/// @note Not available on the A705 model.
+/// @note Available on the A907 models.
 bool IRSharpAc::getEconoToggle(void) const {
-  return _model != sharp_ac_remote_model_t::A705 && _getEconoToggle();
+  return _model == sharp_ac_remote_model_t::A907 && _getEconoToggle();
 }
 
 /// Set the Light mode toggle setting of the A/C.
@@ -601,7 +608,7 @@ bool IRSharpAc::getEconoToggle(void) const {
 /// @warning Probably incompatible with `setTurbo()`
 /// @note Not available on the A907 model.
 void IRSharpAc::setLightToggle(const bool on) {
-  if (_model != sharp_ac_remote_model_t::A705) _setEconoToggle(on);
+  if (_model != sharp_ac_remote_model_t::A907) _setEconoToggle(on);
 }
 
 /// Get the Light toggle setting of the A/C.
@@ -727,6 +734,7 @@ stdAc::opmode_t IRSharpAc::toCommonMode(const uint8_t mode) const {
 stdAc::fanspeed_t IRSharpAc::toCommonFanSpeed(const uint8_t speed) const {
   switch (getModel()) {
     case sharp_ac_remote_model_t::A705:
+    case sharp_ac_remote_model_t::A903:
       switch (speed) {
         case kSharpAcFanA705Low:  return stdAc::fanspeed_t::kLow;
         case kSharpAcFanA705Med:  return stdAc::fanspeed_t::kMedium;
@@ -784,11 +792,12 @@ String IRSharpAc::toString(void) const {
   result += addModeToString(
       _.Mode,
       // Make the value invalid if the model doesn't support an Auto mode.
-      (model != sharp_ac_remote_model_t::A705) ? kSharpAcAuto : 255,
+      (model == sharp_ac_remote_model_t::A907) ? kSharpAcAuto : 255,
       kSharpAcCool, kSharpAcHeat, kSharpAcDry, kSharpAcFan);
   result += addTempToString(getTemp());
   switch (model) {
     case sharp_ac_remote_model_t::A705:
+    case sharp_ac_remote_model_t::A903:
       result += addFanToString(_.Fan, kSharpAcFanMax, kSharpAcFanA705Low,
                                kSharpAcFanAuto, kSharpAcFanAuto,
                                kSharpAcFanA705Med);
@@ -803,6 +812,7 @@ String IRSharpAc::toString(void) const {
   result += addBoolToString(_.Ion, kIonStr);
   switch (model) {
     case sharp_ac_remote_model_t::A705:
+    case sharp_ac_remote_model_t::A903:
       result += addLabeledString(getLightToggle() ? kToggleStr : "-",
                                  kLightStr);
       break;

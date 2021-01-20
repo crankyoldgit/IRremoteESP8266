@@ -1730,7 +1730,6 @@ void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
                  const bool light, const bool filter, const bool clean) {
   ac->begin();
   ac->setModel(model);
-  ac->setPower(on, prev_power);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -1753,6 +1752,7 @@ void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
     ac->send();
   }
   ac->setClean(clean);
+  ac->setPower(on, prev_power);
   if (turbo) {
     ac->send();  // Send the current state.
     // Set up turbo mode as it needs to be sent after everything else.
