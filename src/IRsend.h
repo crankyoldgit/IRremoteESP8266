@@ -154,8 +154,9 @@ enum panasonic_ac_remote_model_t {
 
 /// Sharp A/C model numbers
 enum sharp_ac_remote_model_t {
-  A907 = 1,  // 802 too.
+  A907 = 1,
   A705 = 2,
+  A903 = 3,  // 820 too
 };
 
 /// Voltas A/C model numbers

@@ -867,17 +867,17 @@ TEST(TestSharpAcClass, Turbo) {
   EXPECT_TRUE(ac.getTurbo());
   EXPECT_EQ(kSharpAcFanMax, ac.getFan());
   EXPECT_EQ(
-      "Model: 1 (A907), "
+      "Model: 3 (A903), "
       "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: On, "
-      "Swing(V) Toggle: Off, Ion: On, Econo: -, Clean: Off",
+      "Swing(V) Toggle: Off, Ion: On, Light: -, Clean: Off",
       ac.toString());
 
   ac.setRaw(off_state);
   EXPECT_FALSE(ac.getTurbo());
   EXPECT_EQ(
-      "Model: 1 (A907), "
+      "Model: 3 (A903), "
       "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
-      "Swing(V) Toggle: Off, Ion: On, Econo: -, Clean: Off",
+      "Swing(V) Toggle: Off, Ion: On, Light: -, Clean: Off",
       ac.toString());
 }
 
@@ -1004,9 +1004,9 @@ TEST(TestSharpAcClass, Timers) {
   EXPECT_EQ(8 * 60 + 30, ac.getTimerTime());
   EXPECT_TRUE(ac.isPowerSpecial());
   EXPECT_EQ(
-      "Model: 1 (A907), "
+      "Model: 3 (A903), "
       "Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), Turbo: Off, "
-      "Swing(V) Toggle: Off, Ion: On, Econo: -, Clean: Off, Off Timer: 08:30",
+      "Swing(V) Toggle: Off, Ion: On, Light: -, Clean: Off, Off Timer: 08:30",
       ac.toString());
 
   // ref: https://docs.google.com/spreadsheets/d/1otzVFM5_tegrZ4ROCLgQ_jvJaWCDlZs1vC-YuR1FFXM/edit#gid=0&range=E80
@@ -1019,8 +1019,8 @@ TEST(TestSharpAcClass, Timers) {
   EXPECT_EQ(12 * 60, ac.getTimerTime());
   EXPECT_TRUE(ac.isPowerSpecial());
   EXPECT_EQ(
-      "Model: 1 (A907), Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), "
-      "Turbo: Off, Swing(V) Toggle: Off, Ion: On, Econo: -, Clean: Off, "
+      "Model: 3 (A903), Power: -, Mode: 2 (Cool), Temp: 21C, Fan: 7 (High), "
+      "Turbo: Off, Swing(V) Toggle: Off, Ion: On, Light: -, Clean: Off, "
       "On Timer: 12:00",
       ac.toString());
 }
@@ -1057,14 +1057,14 @@ TEST(TestSharpAcClass, Clean) {
   ac.setRaw(clean_on_state);
   EXPECT_TRUE(ac.getClean());
   EXPECT_EQ(
-    "Model: 1 (A907), Power: On, Mode: 3 (Dry), Temp: 15C, Fan: 2 (Auto), "
-    "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: On",
+    "Model: 3 (A903), Power: On, Mode: 3 (Dry), Temp: 15C, Fan: 2 (Auto), "
+    "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Light: -, Clean: On",
     ac.toString());
   ac.setRaw(clean_off_state);
   EXPECT_FALSE(ac.getClean());
   EXPECT_EQ(
-    "Model: 1 (A907), Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 7 (High), "
-    "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Econo: -, Clean: Off",
+    "Model: 3 (A903), Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 7 (High), "
+    "Turbo: Off, Swing(V) Toggle: Off, Ion: Off, Light: -, Clean: Off",
     ac.toString());
 
   // Try constructing the clean on state.
@@ -1156,6 +1156,9 @@ TEST(TestSharpAcClass, Models) {
   const uint8_t A705_on[13] = {
       0xAA, 0x5A, 0xCF, 0x10, 0xD1, 0x11, 0x22,
       0x00, 0x08, 0x80, 0x00, 0xF0, 0xF1};
+  const uint8_t A903_on[13] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCC, 0x11, 0x32,
+      0x00, 0x08, 0x80, 0x00, 0xF4, 0x61};
   ac.stateReset();
 
   EXPECT_EQ(sharp_ac_remote_model_t::A907, ac.getModel());
@@ -1165,7 +1168,45 @@ TEST(TestSharpAcClass, Models) {
   EXPECT_EQ(sharp_ac_remote_model_t::A705, ac.getModel());
   EXPECT_EQ(sharp_ac_remote_model_t::A705, ac.getModel(true));
 
+  ac.setRaw(A903_on);
+  EXPECT_EQ(sharp_ac_remote_model_t::A903, ac.getModel());
+  EXPECT_EQ(sharp_ac_remote_model_t::A903, ac.getModel(true));
+
   ac.setModel(sharp_ac_remote_model_t::A907);
   EXPECT_EQ(sharp_ac_remote_model_t::A907, ac.getModel());
   EXPECT_EQ(sharp_ac_remote_model_t::A907, ac.getModel(true));
+}
+
+TEST(TestSharpAcClass, Issue1387Power) {
+  IRSharpAc ac(kGpioUnused);
+  const uint8_t real_off[13] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCC, 0x21, 0x32,
+      0x00, 0x08, 0x80, 0x00, 0xF4, 0x51};
+  const uint8_t real_on[13] = {
+      0xAA, 0x5A, 0xCF, 0x10, 0xCC, 0x11, 0x32,
+      0x00, 0x08, 0x80, 0x00, 0xF4, 0x61};
+  // Create the same off state.
+  ac.stateReset();
+  ac.setModel(sharp_ac_remote_model_t::A903);
+  ac.setMode(kSharpAcCool);
+  ac.setTemp(27);
+  ac.setFan(kSharpAcFanMed);
+  ac.setTurbo(false);
+  ac.setIon(true);
+  ac.setClean(false);
+  ac.setSwingToggle(false);
+  ac.setClean(false);
+  ac.setPower(false);
+  EXPECT_STATE_EQ(real_off, ac.getRaw(), kSharpAcBits);
+  EXPECT_EQ(
+    "Model: 3 (A903), Power: Off, Mode: 2 (Cool), Temp: 27C, Fan: 3 (Low), "
+    "Turbo: Off, Swing(V) Toggle: Off, Ion: On, Light: -, Clean: Off",
+    ac.toString());
+  // Create the same off state.
+  ac.setPower(true, ac.getPower());
+  EXPECT_STATE_EQ(real_on, ac.getRaw(), kSharpAcBits);
+  EXPECT_EQ(
+    "Model: 3 (A903), Power: On, Mode: 2 (Cool), Temp: 27C, Fan: 3 (Low), "
+    "Turbo: Off, Swing(V) Toggle: Off, Ion: On, Light: -, Clean: Off",
+    ac.toString());
 }

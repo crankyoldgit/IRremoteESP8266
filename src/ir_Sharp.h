@@ -9,15 +9,21 @@
 /// @see GlobalCache's IR Control Tower data.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/638
 /// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/SharpHeatpumpIR.cpp
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1091
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1387
 
 // Supports:
 //   Brand: Sharp,  Model: LC-52D62U TV
 //   Brand: Sharp,  Model: AY-ZP40KR A/C (A907)
 //   Brand: Sharp,  Model: AH-AxSAY A/C (A907)
 //   Brand: Sharp,  Model: CRMC-A907 JBEZ remote (A907)
-//   Brand: Sharp,  Model: AH-XP10NRY A/C (A907)
-//   Brand: Sharp,  Model: CRMC-820 JBEZ remote (A907)
+//   Brand: Sharp,  Model: AH-PR13-GL A/C (A903)
+//   Brand: Sharp,  Model: CRMC-A903JBEZ remote (A903)
+//   Brand: Sharp,  Model: AH-XP10NRY A/C (A903)
+//   Brand: Sharp,  Model: CRMC-820 JBEZ remote (A903)
 //   Brand: Sharp,  Model: CRMC-A705 JBEZ remote (A705)
+//   Brand: Sharp,  Model: AH-A12REVP-1 A/C (A903)
+//   Brand: Sharp,  Model: CRMC-A863 JBEZ remote (A903)
 
 #ifndef IR_SHARP_H_
 #define IR_SHARP_H_
@@ -65,11 +71,11 @@ union SharpProtocol{
     // Byte 10
     uint8_t Special :8;
     // Byte 11
-    uint8_t     :2;
-    uint8_t Ion :1;
-    uint8_t     :1;
-    uint8_t A705:1;
-    uint8_t     :3;
+    uint8_t        :2;
+    uint8_t Ion    :1;
+    uint8_t        :1;
+    uint8_t Model2 :1;
+    uint8_t        :3;
     // Byte 12
     uint8_t     :4;
     uint8_t Sum :4;
@@ -104,9 +110,9 @@ const uint8_t kSharpAcHeat =                             0b01;  // A907 only
 const uint8_t kSharpAcFanAuto =                     0b010;  // 2
 const uint8_t kSharpAcFanMin =                      0b100;  // 4 (FAN1)
 const uint8_t kSharpAcFanMed =                      0b011;  // 3 (FAN2)
-const uint8_t kSharpAcFanA705Low =                  0b011;  // 3
+const uint8_t kSharpAcFanA705Low =                  0b011;  // 3 (A903 too)
 const uint8_t kSharpAcFanHigh =                     0b101;  // 5 (FAN3)
-const uint8_t kSharpAcFanA705Med =                  0b101;  // 5
+const uint8_t kSharpAcFanA705Med =                  0b101;  // 5 (A903 too)
 const uint8_t kSharpAcFanMax =                      0b111;  // 7 (FAN4)
 
 const uint8_t kSharpAcTimerIncrement = 30;  // Mins
@@ -178,7 +184,9 @@ class IRSharpAc {
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kSharpAcStateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
-  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed,
+                            const sharp_ac_remote_model_t model =
+                                sharp_ac_remote_model_t::A907);
   stdAc::opmode_t toCommonMode(const uint8_t mode) const;
   stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed) const;
   stdAc::state_t toCommon(void) const;
