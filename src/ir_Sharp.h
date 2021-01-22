@@ -22,6 +22,8 @@
 //   Brand: Sharp,  Model: AH-XP10NRY A/C (A903)
 //   Brand: Sharp,  Model: CRMC-820 JBEZ remote (A903)
 //   Brand: Sharp,  Model: CRMC-A705 JBEZ remote (A705)
+//   Brand: Sharp,  Model: AH-A12REVP-1 A/C (A903)
+//   Brand: Sharp,  Model: CRMC-A863 JBEZ remote (A903)
 
 #ifndef IR_SHARP_H_
 #define IR_SHARP_H_
