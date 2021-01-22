@@ -698,15 +698,29 @@ uint8_t IRSharpAc::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
+/// @param[in] model The enum of the appropriate model.
 /// @return The native equivalent of the enum.
-uint8_t IRSharpAc::convertFan(const stdAc::fanspeed_t speed) {
-  switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:    return kSharpAcFanMin;
-    case stdAc::fanspeed_t::kMedium: return kSharpAcFanMed;
-    case stdAc::fanspeed_t::kHigh:   return kSharpAcFanHigh;
-    case stdAc::fanspeed_t::kMax:    return kSharpAcFanMax;
-    default:                         return kSharpAcFanAuto;
+uint8_t IRSharpAc::convertFan(const stdAc::fanspeed_t speed,
+                              const sharp_ac_remote_model_t model) {
+  switch (model) {
+    case sharp_ac_remote_model_t::A705:
+    case sharp_ac_remote_model_t::A903:
+      switch (speed) {
+        case stdAc::fanspeed_t::kLow:    return kSharpAcFanA705Low;
+        case stdAc::fanspeed_t::kMedium: return kSharpAcFanA705Med;
+        default: {};  // Fall thru to the next/default clause if not the above
+                      // special cases.
+      }
+    // FALL THRU
+    default:
+      switch (speed) {
+        case stdAc::fanspeed_t::kMin:
+        case stdAc::fanspeed_t::kLow:    return kSharpAcFanMin;
+        case stdAc::fanspeed_t::kMedium: return kSharpAcFanMed;
+        case stdAc::fanspeed_t::kHigh:   return kSharpAcFanHigh;
+        case stdAc::fanspeed_t::kMax:    return kSharpAcFanMax;
+        default:                         return kSharpAcFanAuto;
+      }
   }
 }
 

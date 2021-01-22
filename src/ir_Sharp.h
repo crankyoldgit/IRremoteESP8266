@@ -182,7 +182,9 @@ class IRSharpAc {
   static bool validChecksum(uint8_t state[],
                             const uint16_t length = kSharpAcStateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
-  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed,
+                            const sharp_ac_remote_model_t model =
+                                sharp_ac_remote_model_t::A907);
   stdAc::opmode_t toCommonMode(const uint8_t mode) const;
   stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed) const;
   stdAc::state_t toCommon(void) const;
