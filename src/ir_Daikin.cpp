@@ -41,6 +41,8 @@ using irutils::addDayToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addSwingHToString;
+using irutils::addSwingVToString;
 using irutils::addTempToString;
 using irutils::addFanToString;
 using irutils::bcdToUint8;
@@ -862,13 +864,13 @@ uint8_t IRDaikin2::getFan(void) const {
 /// @param[in] position The position/mode to set the swing to.
 void IRDaikin2::setSwingVertical(const uint8_t position) {
   switch (position) {
+    case kDaikin2SwingVHighest:
     case kDaikin2SwingVHigh:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
+    case kDaikin2SwingVUpperMiddle:
+    case kDaikin2SwingVLowerMiddle:
     case kDaikin2SwingVLow:
-    case kDaikin2SwingVSwing:
+    case kDaikin2SwingVLowest:
+    case kDaikin2SwingVOff:
     case kDaikin2SwingVBreeze:
     case kDaikin2SwingVCirculate:
     case kDaikin2SwingVAuto:
@@ -892,9 +894,11 @@ uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
     case stdAc::swingv_t::kMiddle:
     case stdAc::swingv_t::kLow:
     case stdAc::swingv_t::kLowest:
-      return (uint8_t)position + kDaikin2SwingVHigh;
-    case stdAc::swingv_t::kAuto: return kDaikin2SwingVSwing;
-    default: return kDaikin2SwingVAuto;
+      return (uint8_t)position + kDaikin2SwingVHighest;
+    case stdAc::swingv_t::kOff:
+      return kDaikin2SwingVOff;
+    default:
+      return kDaikin2SwingVAuto;
   }
 }
 
@@ -903,14 +907,14 @@ uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
 /// @return The common vertical swing position.
 stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
   switch (setting) {
-    case kDaikin2SwingVHigh: return stdAc::swingv_t::kHighest;
-    case kDaikin2SwingVHigh + 1: return stdAc::swingv_t::kHigh;
-    case kDaikin2SwingVHigh + 2:
-    case kDaikin2SwingVHigh + 3: return stdAc::swingv_t::kMiddle;
-    case kDaikin2SwingVLow - 1: return stdAc::swingv_t::kLow;
-    case kDaikin2SwingVLow: return stdAc::swingv_t::kLowest;
-    case kDaikin2SwingVAuto: return stdAc::swingv_t::kOff;
-    default: return stdAc::swingv_t::kAuto;
+    case kDaikin2SwingVHighest:     return stdAc::swingv_t::kHighest;
+    case kDaikin2SwingVHigh:        return stdAc::swingv_t::kHigh;
+    case kDaikin2SwingVUpperMiddle:
+    case kDaikin2SwingVLowerMiddle: return stdAc::swingv_t::kMiddle;
+    case kDaikin2SwingVLow:         return stdAc::swingv_t::kLow;
+    case kDaikin2SwingVLowest:      return stdAc::swingv_t::kLowest;
+    case kDaikin2SwingVOff:         return stdAc::swingv_t::kOff;
+    default:                        return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -1196,14 +1200,14 @@ uint8_t IRDaikin2::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin2::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
-    case stdAc::swingh_t::kAuto: return kDaikin2SwingHSwing;
-    case stdAc::swingh_t::kLeftMax: return kDaikin2SwingHLeftMax;
-    case stdAc::swingh_t::kLeft: return kDaikin2SwingHLeft;
-    case stdAc::swingh_t::kMiddle: return kDaikin2SwingHMiddle;
-    case stdAc::swingh_t::kRight: return kDaikin2SwingHRight;
+    case stdAc::swingh_t::kAuto:     return kDaikin2SwingHSwing;
+    case stdAc::swingh_t::kLeftMax:  return kDaikin2SwingHLeftMax;
+    case stdAc::swingh_t::kLeft:     return kDaikin2SwingHLeft;
+    case stdAc::swingh_t::kMiddle:   return kDaikin2SwingHMiddle;
+    case stdAc::swingh_t::kRight:    return kDaikin2SwingHRight;
     case stdAc::swingh_t::kRightMax: return kDaikin2SwingHRightMax;
-    case stdAc::swingh_t::kWide: return kDaikin2SwingHWide;
-    default: return kDaikin2SwingHAuto;
+    case stdAc::swingh_t::kWide:     return kDaikin2SwingHWide;
+    default:                         return kDaikin2SwingHAuto;
   }
 }
 
@@ -1212,14 +1216,14 @@ uint8_t IRDaikin2::convertSwingH(const stdAc::swingh_t position) {
 /// @return The common horizontal swing position.
 stdAc::swingh_t IRDaikin2::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
-    case kDaikin2SwingHSwing: return stdAc::swingh_t::kAuto;
-    case kDaikin2SwingHLeftMax: return stdAc::swingh_t::kLeftMax;
-    case kDaikin2SwingHLeft: return stdAc::swingh_t::kLeft;
-    case kDaikin2SwingHMiddle: return stdAc::swingh_t::kMiddle;
-    case kDaikin2SwingHRight: return stdAc::swingh_t::kRight;
+    case kDaikin2SwingHSwing:    return stdAc::swingh_t::kAuto;
+    case kDaikin2SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;
+    case kDaikin2SwingHLeft:     return stdAc::swingh_t::kLeft;
+    case kDaikin2SwingHMiddle:   return stdAc::swingh_t::kMiddle;
+    case kDaikin2SwingHRight:    return stdAc::swingh_t::kRight;
     case kDaikin2SwingHRightMax: return stdAc::swingh_t::kRightMax;
-    case kDaikin2SwingHWide: return stdAc::swingh_t::kWide;
-    default: return stdAc::swingh_t::kOff;
+    case kDaikin2SwingHWide:     return stdAc::swingh_t::kWide;
+    default:                     return stdAc::swingh_t::kOff;
   }
 }
 
@@ -1260,57 +1264,26 @@ String IRDaikin2::toString(void) const {
   result += addTempToString(_.Temp);
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
-  result += addIntToString(_.SwingV, kSwingVStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingV) {
-    case kDaikin2SwingVHigh:
-      result += kHighestStr;
-      break;
-    case 2:
-      result += kHighStr;
-      break;
-    case 3:
-      result += kUpperStr;
-      result += kMiddleStr;
-      break;
-    case 4:
-      result += kLowerStr;
-      result += kMiddleStr;
-      break;
-    case 5:
-      result += kLowStr;
-      break;
-    case kDaikin2SwingVLow:
-      result += kLowestStr;
-      break;
-    case kDaikin2SwingVBreeze:
-      result += kBreezeStr;
-      break;
-    case kDaikin2SwingVCirculate:
-      result += kCirculateStr;
-      break;
-    case kDaikin2SwingVAuto:
-      result += kAutoStr;
-      break;
-    case kDaikin2SwingVSwing:
-      result += kSwingStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
-  result += addIntToString(_.SwingH, kSwingHStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingH) {
-    case kDaikin2SwingHAuto:
-      result += kAutoStr;
-      break;
-    case kDaikin2SwingHSwing:
-      result += kSwingStr;
-      break;
-    default: result += kUnknownStr;
-  }
-  result += ')';
+  result += addSwingVToString(_.SwingV, kDaikin2SwingVAuto,
+                              kDaikin2SwingVHighest, kDaikin2SwingVHigh,
+                              kDaikin2SwingVUpperMiddle,
+                              kDaikin2SwingVAuto,  // Middle is unused.
+                              kDaikin2SwingVLowerMiddle,
+                              kDaikin2SwingVLow, kDaikin2SwingVLowest,
+                              kDaikin2SwingVOff,  // Off is unused
+                              kDaikin2SwingVSwing, kDaikin2SwingVBreeze,
+                              kDaikin2SwingVCirculate);
+  result += addSwingHToString(_.SwingH, kDaikin2SwingHAuto,
+                              kDaikin2SwingHLeftMax,
+                              kDaikin2SwingHLeft,
+                              kDaikin2SwingHMiddle,
+                              kDaikin2SwingHRight,
+                              kDaikin2SwingHRightMax,
+                              kDaikin2SwingHOff,
+                              kDaikin2SwingHAuto,  // Unused
+                              kDaikin2SwingHAuto,  // Unused
+                              kDaikin2SwingHAuto,  // Unused
+                              kDaikin2SwingHWide);
   result += addLabeledString(minsToString(_.CurrentTime), kClockStr);
   result += addLabeledString(
       _.OnTimer ? minsToString(_.OnTime) : kOffStr, kOnTimerStr);
@@ -2471,19 +2444,18 @@ String IRDaikin176::toString(void) const {
   result += addTempToString(getTemp());
   result += addFanToString(_.Fan, kDaikin176FanMax, kDaikinFanMin,
                            kDaikinFanMin, kDaikinFanMin, kDaikinFanMin);
-  result += addIntToString(_.SwingH, kSwingHStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingH) {
-    case kDaikin176SwingHAuto:
-      result += kAutoStr;
-      break;
-    case kDaikin176SwingHOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
+  result += addSwingHToString(_.SwingH, kDaikin176SwingHAuto,
+                              kDaikin176SwingHAuto,  // maxleft Unused
+                              kDaikin176SwingHAuto,  // left Unused
+                              kDaikin176SwingHAuto,  // middle Unused
+                              kDaikin176SwingHAuto,  // right Unused
+                              kDaikin176SwingHAuto,  // maxright Unused
+                              kDaikin176SwingHOff,
+                              // Below are unused.
+                              kDaikin176SwingHAuto,
+                              kDaikin176SwingHAuto,
+                              kDaikin176SwingHAuto,
+                              kDaikin176SwingHAuto);
   return result;
 }
 

@@ -32,6 +32,8 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addSwingHToString;
+using irutils::addSwingVToString;
 using irutils::addTempToString;
 using irutils::checkInvertedBytePairs;
 using irutils::invertBytePairs;
@@ -513,72 +515,31 @@ String IRMitsubishiHeavy152Ac::toString(void) const {
       result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(_.SwingV, kSwingVStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingV) {
-    case kMitsubishiHeavy152SwingVAuto:
-      result += kAutoStr;
-      break;
-    case kMitsubishiHeavy152SwingVHighest:
-      result += kHighestStr;
-      break;
-    case kMitsubishiHeavy152SwingVHigh:
-      result += kHighStr;
-      break;
-    case kMitsubishiHeavy152SwingVMiddle:
-      result += kMiddleStr;
-      break;
-    case kMitsubishiHeavy152SwingVLow:
-      result += kLowStr;
-      break;
-    case kMitsubishiHeavy152SwingVLowest:
-      result += kLowestStr;
-      break;
-    case kMitsubishiHeavy152SwingVOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
-  result += addIntToString(_.SwingH, kSwingHStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingH) {
-    case kMitsubishiHeavy152SwingHAuto:
-      result += kAutoStr;
-      break;
-    case kMitsubishiHeavy152SwingHLeftMax:
-      result += kMaxLeftStr;
-      break;
-    case kMitsubishiHeavy152SwingHLeft:
-      result += kLeftStr;
-      break;
-    case kMitsubishiHeavy152SwingHMiddle:
-      result += kMiddleStr;
-      break;
-    case kMitsubishiHeavy152SwingHRight:
-      result += kRightStr;
-      break;
-    case kMitsubishiHeavy152SwingHRightMax:
-      result += kMaxRightStr;
-      break;
-    case kMitsubishiHeavy152SwingHLeftRight:
-      result += kLeftStr;
-      result += ' ';
-      result += kRightStr;
-      break;
-    case kMitsubishiHeavy152SwingHRightLeft:
-      result += kRightStr;
-      result += ' ';
-      result += kLeftStr;
-      break;
-    case kMitsubishiHeavy152SwingHOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
+  result += addSwingVToString(_.SwingV, kMitsubishiHeavy152SwingVAuto,
+                              kMitsubishiHeavy152SwingVHighest,
+                              kMitsubishiHeavy152SwingVHigh,
+                              kMitsubishiHeavy152SwingVAuto,  // UpperMid unused
+                              kMitsubishiHeavy152SwingVMiddle,
+                              kMitsubishiHeavy152SwingVAuto,  // LowerMid unused
+                              kMitsubishiHeavy152SwingVLow,
+                              kMitsubishiHeavy152SwingVLowest,
+                              kMitsubishiHeavy152SwingVOff,
+                              // Below are unused.
+                              kMitsubishiHeavy152SwingVAuto,
+                              kMitsubishiHeavy152SwingVAuto,
+                              kMitsubishiHeavy152SwingVAuto);
+  result += addSwingHToString(_.SwingH, kMitsubishiHeavy152SwingHAuto,
+                              kMitsubishiHeavy152SwingHLeftMax,
+                              kMitsubishiHeavy152SwingHLeft,
+                              kMitsubishiHeavy152SwingHMiddle,
+                              kMitsubishiHeavy152SwingHRight,
+                              kMitsubishiHeavy152SwingHRightMax,
+                              kMitsubishiHeavy152SwingHOff,
+                              kMitsubishiHeavy152SwingHLeftRight,
+                              kMitsubishiHeavy152SwingHRightLeft,
+                              // Below are unused.
+                              kMitsubishiHeavy152SwingHAuto,
+                              kMitsubishiHeavy152SwingHAuto);
   result += addBoolToString(_.Silent, kSilentStr);
   result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getEcono(), kEconoStr);
@@ -996,75 +957,32 @@ String IRMitsubishiHeavy88Ac::toString(void) const {
       result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(getSwingVertical(), kSwingVStr);
-  result += kSpaceLBraceStr;
-  switch (getSwingVertical()) {
-    case kMitsubishiHeavy88SwingVAuto:
-      result += kAutoStr;
-      break;
-    case kMitsubishiHeavy88SwingVHighest:
-      result += kHighestStr;
-      break;
-    case kMitsubishiHeavy88SwingVHigh:
-      result += kHighStr;
-      break;
-    case kMitsubishiHeavy88SwingVMiddle:
-      result += kMiddleStr;
-      break;
-    case kMitsubishiHeavy88SwingVLow:
-      result += kLowStr;
-      break;
-    case kMitsubishiHeavy88SwingVLowest:
-      result += kLowestStr;
-      break;
-    case kMitsubishiHeavy88SwingVOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
-  result += addIntToString(getSwingHorizontal(), kSwingHStr);
-  result += kSpaceLBraceStr;
-  switch (getSwingHorizontal()) {
-    case kMitsubishiHeavy88SwingHAuto:
-      result += kAutoStr;
-      break;
-    case kMitsubishiHeavy88SwingHLeftMax:
-      result += kMaxLeftStr;
-      break;
-    case kMitsubishiHeavy88SwingHLeft:
-      result += kLeftStr;
-      break;
-    case kMitsubishiHeavy88SwingHMiddle:
-      result += kMiddleStr;
-      break;
-    case kMitsubishiHeavy88SwingHRight:
-      result += kRightStr;
-      break;
-    case kMitsubishiHeavy88SwingHRightMax:
-      result += kMaxRightStr;
-      break;
-    case kMitsubishiHeavy88SwingHLeftRight:
-      result += kLeftStr;
-      result += ' ';
-      result += kRightStr;
-      break;
-    case kMitsubishiHeavy88SwingHRightLeft:
-      result += kRightStr;
-      result += ' ';
-      result += kLeftStr;
-      break;
-    case kMitsubishiHeavy88SwingH3D:
-      result += k3DStr;
-      break;
-    case kMitsubishiHeavy88SwingHOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
+  result += addSwingVToString(getSwingVertical(), kMitsubishiHeavy88SwingVAuto,
+                              kMitsubishiHeavy88SwingVHighest,
+                              kMitsubishiHeavy88SwingVHigh,
+                              kMitsubishiHeavy88SwingVAuto,  // UpperMid unused
+                              kMitsubishiHeavy88SwingVMiddle,
+                              kMitsubishiHeavy88SwingVAuto,  // LowerMid unused
+                              kMitsubishiHeavy88SwingVLow,
+                              kMitsubishiHeavy88SwingVLowest,
+                              kMitsubishiHeavy88SwingVOff,
+                              // Below are unused.
+                              kMitsubishiHeavy88SwingVAuto,
+                              kMitsubishiHeavy88SwingVAuto,
+                              kMitsubishiHeavy88SwingVAuto);
+  result += addSwingHToString(getSwingHorizontal(),
+                              kMitsubishiHeavy88SwingHAuto,
+                              kMitsubishiHeavy88SwingHLeftMax,
+                              kMitsubishiHeavy88SwingHLeft,
+                              kMitsubishiHeavy88SwingHMiddle,
+                              kMitsubishiHeavy88SwingHRight,
+                              kMitsubishiHeavy88SwingHRightMax,
+                              kMitsubishiHeavy88SwingHOff,
+                              kMitsubishiHeavy88SwingHLeftRight,
+                              kMitsubishiHeavy88SwingHRightLeft,
+                              kMitsubishiHeavy88SwingH3D,
+                              // Below are unused.
+                              kMitsubishiHeavy88SwingHAuto);
   result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getEcono(), kEconoStr);
   result += addBoolToString(get3D(), k3DStr);

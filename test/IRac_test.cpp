@@ -394,7 +394,7 @@ TEST(TestIRac, Daikin2) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 3 (Cool), Temp: 19C, Fan: 1 (Low), "
-      "Swing(V): 14 (Auto), Swing(H): 170 (UNKNOWN), Clock: 00:00, "
+      "Swing(V): 14 (Off), Swing(H): 170 (Middle), Clock: 00:00, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
       "Light: 1 (High), Mould: On, Clean: On, Fresh: Off, Eye: Off, "
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off";

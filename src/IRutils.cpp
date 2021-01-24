@@ -674,6 +674,122 @@ namespace irutils {
     return result + ')';
   }
 
+  /// Create a String of human output for the given horizontal swing setting.
+  /// e.g. "Swing(H): 0 (Auto)"
+  /// @param[in] position The numeric position of the swing to display.
+  /// @param[in] automatic The numeric value for Auto position.
+  /// @param[in] maxleft The numeric value for most left position.
+  /// @param[in] left The numeric value for Left position.
+  /// @param[in] middle The numeric value for Middle position.
+  /// @param[in] right The numeric value for Right position.
+  /// @param[in] maxright The numeric value for most right position.
+  /// @param[in] off The numeric value for Off position.
+  /// @param[in] leftright The numeric value for "left right" position.
+  /// @param[in] rightleft The numeric value for "right left" position.
+  /// @param[in] threed The numeric value for 3D setting.
+  /// @param[in] wide The numeric value for Wide position.
+  /// @return The resulting String.
+  String addSwingHToString(const uint8_t position, const uint8_t automatic,
+                           const uint8_t maxleft, const uint8_t left,
+                           const uint8_t middle,
+                           const uint8_t right, const uint8_t maxright,
+                           const uint8_t off,
+                           const uint8_t leftright, const uint8_t rightleft,
+                           const uint8_t threed, const uint8_t wide) {
+    String result = addIntToString(position, kSwingHStr);
+    result += kSpaceLBraceStr;
+    if (position == automatic) {
+      result += kAutoStr;
+    } else if (position == left) {
+      result += kLeftStr;
+    } else if (position == middle) {
+      result += kMiddleStr;
+    } else if (position == right) {
+      result += kRightStr;
+    } else if (position == maxleft) {
+      result += kMaxLeftStr;
+    } else if (position == maxright) {
+      result += kMaxRightStr;
+    } else if (position == off) {
+      result += kOffStr;
+    } else if (position == leftright) {
+      result += kLeftStr;
+      result += ' ';
+      result += kRightStr;
+    } else if (position == rightleft) {
+      result += kRightStr;
+      result += ' ';
+      result += kLeftStr;
+    } else if (position == threed) {
+      result += k3DStr;
+    } else if (position == wide) {
+      result += kWideStr;
+    } else {
+      result += kUnknownStr;
+    }
+    return result + ')';
+  }
+
+  /// Create a String of human output for the given vertical swing setting.
+  /// e.g. "Swing(V): 0 (Auto)"
+  /// @param[in] position The numeric position of the swing to display.
+  /// @param[in] automatic The numeric value for Auto position.
+  /// @param[in] highest The numeric value for Highest position.
+  /// @param[in] high The numeric value for High position.
+  /// @param[in] uppermiddle The numeric value for Upper Middle position.
+  /// @param[in] middle The numeric value for Middle position.
+  /// @param[in] lowermiddle The numeric value for Lower Middle position.
+  /// @param[in] low The numeric value for Low position.
+  /// @param[in] lowest The numeric value for Low position.
+  /// @param[in] off The numeric value for Off position.
+  /// @param[in] swing The numeric value for Swing setting.
+  /// @param[in] breeze The numeric value for Breeze setting.
+  /// @param[in] circulate The numeric value for Circulate setting.
+  /// @return The resulting String.
+  String addSwingVToString(const uint8_t position, const uint8_t automatic,
+                           const uint8_t highest, const uint8_t high,
+                           const uint8_t uppermiddle,
+                           const uint8_t middle,
+                           const uint8_t lowermiddle,
+                           const uint8_t low, const uint8_t lowest,
+                           const uint8_t off, const uint8_t swing,
+                           const uint8_t breeze, const uint8_t circulate) {
+    String result = addIntToString(position, kSwingVStr);
+    result += kSpaceLBraceStr;
+    if (position == automatic) {
+      result += kAutoStr;
+    } else if (position == highest) {
+      result += kHighestStr;
+    } else if (position == high) {
+      result += kHighStr;
+    } else if (position == middle) {
+      result += kMiddleStr;
+    } else if (position == low) {
+      result += kLowStr;
+    } else if (position == lowest) {
+      result += kLowestStr;
+    } else if (position == off) {
+      result += kOffStr;
+    } else if (position == uppermiddle) {
+      result += kUpperStr;
+      result += ' ';
+      result += kMiddleStr;
+    } else if (position == lowermiddle) {
+      result += kLowerStr;
+      result += ' ';
+      result += kMiddleStr;
+    } else if (position == swing) {
+      result += kSwingStr;
+    } else if (position == breeze) {
+      result += kBreezeStr;
+    } else if (position == circulate) {
+      result += kCirculateStr;
+    } else {
+      result += kUnknownStr;
+    }
+    return result + ')';
+  }
+
   /// Escape any special HTML (unsafe) characters in a string. e.g. anti-XSS.
   /// @param[in] unescaped A String containing text to make HTML safe.
   /// @return A string that is HTML safe.
