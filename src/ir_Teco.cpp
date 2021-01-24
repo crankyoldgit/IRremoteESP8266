@@ -220,7 +220,7 @@ inline bool IRTecoAc::getTimerEnabled(void) const {
 uint16_t IRTecoAc::getTimer(void) const {
   uint16_t mins = 0;
   if (getTimerEnabled()) {
-    mins = _.TensHours * 60 * 10 + _.UnitHours * 60;
+    mins = (_.TensHours * 10 + _.UnitHours) * 60;
     if (_.HalfHour) mins += 30;
   }
   return mins;
@@ -302,8 +302,7 @@ stdAc::state_t IRTecoAc::toCommon(void) const {
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
-  result.swingv = _.Swing ? stdAc::swingv_t::kAuto :
-                                     stdAc::swingv_t::kOff;
+  result.swingv = _.Swing ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
   result.sleep = _.Sleep ? 0 : -1;
   result.light = _.Light;
   // Not supported.

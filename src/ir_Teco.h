@@ -37,6 +37,8 @@ union TecoProtocol{
     uint8_t Light :1;
     uint8_t :1;  // "Tree with bubbles" / Filter?? (Not Implemented)
     uint8_t Save  :1;
+    uint8_t :8;  // Cst 0x50
+    uint8_t :8;  // Cst 0x02
   };
 };
 
@@ -54,14 +56,6 @@ const uint8_t kTecoMinTemp = 16;   // 16C
 const uint8_t kTecoMaxTemp = 30;   // 30C
 
 const uint64_t kTecoReset =      0b01001010000000000000010000000000000;
-/*
-  (header mark and space)
-        Teco AC map read and to be sent in LSB with number of bits
-
-  byte 0 = Cst 0x02
-  byte 1 = Cst 0x50
-    b6-7 = "AIR" 0, 1, 2 (Not Implemented)
-*/
 
 // Classes
 /// Class for handling detailed Teco A/C messages.
