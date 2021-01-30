@@ -1,3 +1,4 @@
+dist: bionic
 language: c
 addons:
   apt:
@@ -5,7 +6,7 @@ addons:
     - jq
     - doxygen
     - graphviz
-    - python3
+    - python3.8
     - python3-pip
     - pylint3
     - python3-setuptools
