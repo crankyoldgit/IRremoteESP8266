@@ -16,14 +16,14 @@
 #include "IRutils.h"
 
 // Constants
+const uint8_t  kEcoclimSections = 3;
 const uint16_t kEcoclimHdrMark = 5730;
 const uint16_t kEcoclimHdrSpace = 1935;
 const uint16_t kEcoclimBitMark = 440;
 const uint16_t kEcoclimOneSpace = 1739;
 const uint16_t kEcoclimZeroSpace = 637;
 const uint16_t kEcoclimFooterMark = 7820;
-const uint32_t kEcoclimGap = kDefaultMessageGap;
-const uint8_t  kEcoclimSections = 3;
+const uint32_t kEcoclimGap = kDefaultMessageGap;  // Just a guess.
 
 #if SEND_ECOCLIM
 /// Send a EcoClim A/C formatted message.
@@ -62,8 +62,15 @@ bool IRrecv::decodeEcoclim(decode_results *results, uint16_t offset,
   if (results->rawlen < (2 * nbits + kHeader) * kEcoclimSections +
       kFooter - 1 + offset)
     return false;  // Can't possibly be a valid Ecoclim message.
-  if (strict && nbits != kEcoclimBits)
-    return false;  // Unexpected bit size.
+  if (strict) {
+    switch (nbits) {
+      case kEcoclimShortBits:
+      case kEcoclimBits:
+        break;
+      default:
+        return false;  // Unexpected bit size.
+    }
+  }
 
   for (uint8_t section = 0; section < kEcoclimSections; section++) {
     uint16_t used;

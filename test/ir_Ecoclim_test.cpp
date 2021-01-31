@@ -52,12 +52,29 @@ TEST(TestSendEcoclim, SendDataOnly) {
       "m440s637m440s1739m440s1739m440s1739m440s637m440s637m440s1739m440s637"
       "m7820s100000",
       irsend.outputStr());
+
+  irsend.reset();
+  irsend.sendEcoclim(0x93B, kEcoclimShortBits);
+  EXPECT_EQ(
+      "f38000d50"
+      "m5730s1935"
+      "m440s637m440s637m440s637m440s1739m440s637m440s637m440s1739m440s637"
+      "m440s637m440s1739m440s1739m440s1739m440s637m440s1739m440s1739"
+      "m5730s1935"
+      "m440s637m440s637m440s637m440s1739m440s637m440s637m440s1739m440s637"
+      "m440s637m440s1739m440s1739m440s1739m440s637m440s1739m440s1739"
+      "m5730s1935"
+      "m440s637m440s637m440s637m440s1739m440s637m440s637m440s1739m440s637"
+      "m440s637m440s1739m440s1739m440s1739m440s637m440s1739m440s1739"
+      "m7820s100000",
+      irsend.outputStr());
 }
 
 TEST(TestDecodeEcoclim, SyntheticSelfDecode) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
 
+  // Long (normal) message. i.e. 56 bits.
   irsend.begin();
   irsend.reset();
   irsend.sendEcoclim(0x110673AEFFFF72);
@@ -66,15 +83,25 @@ TEST(TestDecodeEcoclim, SyntheticSelfDecode) {
   EXPECT_EQ(ECOCLIM, irsend.capture.decode_type);
   EXPECT_EQ(kEcoclimBits, irsend.capture.bits);
   EXPECT_EQ(0x110673AEFFFF72, irsend.capture.value);
+
+  // Short (automated) message. i.e. 15 bits.
+  irsend.reset();
+  irsend.sendEcoclim(0x93B, kEcoclimShortBits);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(ECOCLIM, irsend.capture.decode_type);
+  EXPECT_EQ(kEcoclimShortBits, irsend.capture.bits);
+  EXPECT_EQ(0x93B, irsend.capture.value);
 }
 
 TEST(TestDecodeEcoclim, RealExample) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
+  stdAc::state_t r, p;
   irsend.begin();
 
   // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1397#issuecomment-770376241
-  uint16_t rawData[343] = {
+  const uint16_t long_rawData[343] = {
       5834, 1950, 482, 580, 506, 614, 480, 612, 456, 1738, 482, 562, 532, 582,
       508, 608, 430, 1760, 456, 642, 456, 608, 484, 638, 458, 634, 456, 634,
       456, 1734, 482, 1704, 402, 690, 456, 638, 404, 1786, 458, 1730, 430, 1762,
@@ -102,16 +129,37 @@ TEST(TestDecodeEcoclim, RealExample) {
       464, 1724, 462, 1726, 460, 1730, 464, 630, 464, 632, 464, 1728, 462, 596,
       7862};  // UNKNOWN 842242BF
 
+  const uint16_t short_rawData[97] = {
+      5778, 1940, 458, 662, 432, 664, 428, 666, 430, 1756, 430, 664, 430, 664,
+      430, 1756, 430, 664, 428, 668, 428, 1758, 430, 1760, 428, 1758, 430, 668,
+      430, 1756, 430, 1768, 5672, 1988, 456, 610, 456, 658, 430, 670, 456, 1732,
+      430, 610, 506, 636, 456, 1738, 458, 636, 482, 584, 506, 1708, 430, 1758,
+      482, 1708, 456, 638, 430, 1754, 456, 1738, 5674, 1982, 430, 668, 458, 632,
+      456, 638, 456, 1736, 450, 646, 480, 588, 482, 1728, 426, 666, 428, 666,
+      426, 1764, 426, 1760, 454, 1744, 452, 608, 452, 1762, 424, 1766,
+      7770};  // UNKNOWN C0071146
+
   irsend.reset();
-  irsend.sendRaw(rawData, 343, 38000);
+  irsend.sendRaw(long_rawData, 343, 38000);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeEcoclim(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(ECOCLIM, irsend.capture.decode_type);
   EXPECT_EQ(kEcoclimBits, irsend.capture.bits);
   EXPECT_EQ(0x110673AEFFFF72, irsend.capture.value);
   EXPECT_EQ(
       "",
       IRAcUtils::resultAcToString(&irsend.capture));
-  stdAc::state_t r, p;
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+
+  irsend.reset();
+  irsend.sendRaw(short_rawData, 97, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(ECOCLIM, irsend.capture.decode_type);
+  EXPECT_EQ(kEcoclimShortBits, irsend.capture.bits);
+  EXPECT_EQ(0x93B, irsend.capture.value);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
   ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }

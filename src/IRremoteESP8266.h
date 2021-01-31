@@ -950,6 +950,7 @@ const uint16_t kDishBits = 16;
 const uint16_t kDishMinRepeat = 3;
 const uint16_t kDoshishaBits = 40;
 const uint16_t kEcoclimBits = 56;
+const uint16_t kEcoclimShortBits = 15;
 const uint16_t kEpsonBits = 32;
 const uint16_t kEpsonMinRepeat = 2;
 const uint16_t kElectraAcStateLength = 13;

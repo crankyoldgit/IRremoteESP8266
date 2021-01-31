@@ -993,7 +993,8 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
 #endif  // DECODE_PANASONIC_AC32
 #if DECODE_ECOCLIM
     DPRINTLN("Attempting Ecoclim decode");
-    if (decodeEcoclim(results, offset)) return true;
+    if (decodeEcoclim(results, offset, kEcoclimBits) ||
+        decodeEcoclim(results, offset, kEcoclimShortBits)) return true;
 #endif  // DECODE_ECOCLIM
   // Typically new protocols are added above this line.
   }
