@@ -726,6 +726,13 @@
 #define SEND_MILESTAG2      _IR_ENABLE_DEFAULT_
 #endif  // SEND_MILESTAG2
 
+#ifndef DECODE_ECOCLIM
+#define DECODE_ECOCLIM      _IR_ENABLE_DEFAULT_
+#endif  // DECODE_ECOCLIM
+#ifndef SEND_ECOCLIM
+#define SEND_ECOCLIM        _IR_ENABLE_DEFAULT_
+#endif  // SEND_ECOCLIM
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -875,8 +882,9 @@ enum decode_type_t {
   ELITESCREENS,  // 95
   PANASONIC_AC32,
   MILESTAG2,
+  ECOCLIM,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = MILESTAG2,
+  kLastDecodeType = ECOCLIM,
 };
 
 // Message lengths & required repeat values
@@ -941,6 +949,7 @@ const uint16_t kDenonLegacyBits = 14;
 const uint16_t kDishBits = 16;
 const uint16_t kDishMinRepeat = 3;
 const uint16_t kDoshishaBits = 40;
+const uint16_t kEcoclimBits = 56;
 const uint16_t kEpsonBits = 32;
 const uint16_t kEpsonMinRepeat = 2;
 const uint16_t kElectraAcStateLength = 13;

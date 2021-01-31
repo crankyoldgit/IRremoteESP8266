@@ -714,6 +714,11 @@ class IRrecv {
                           const uint16_t nbits = kEliteScreensBits,
                           const bool strict = true);
 #endif  // DECODE_ELITESCREENS
+#if DECODE_ECOCLIM
+  bool decodeEcoclim(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kEcoclimBits,
+                     const bool strict = true);
+#endif  // DECODE_ECOCLIM
 };
 
 #endif  // IRRECV_H_

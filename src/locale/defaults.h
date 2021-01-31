@@ -544,6 +544,9 @@
 #ifndef D_STR_DOSHISHA
 #define D_STR_DOSHISHA "DOSHISHA"
 #endif  // D_STR_DOSHISHA
+#ifndef D_STR_ECOCLIM
+#define D_STR_ECOCLIM "ECOCLIM"
+#endif  // D_STR_ECOCLIM
 #ifndef D_STR_ELECTRA_AC
 #define D_STR_ELECTRA_AC "ELECTRA_AC"
 #endif  // D_STR_ELECTRA_AC

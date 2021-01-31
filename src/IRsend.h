@@ -694,6 +694,10 @@ class IRsend {
                      const uint16_t nbits = kMilesTag2ShotBits,
                      const uint16_t repeat = kMilesMinRepeat);
 #endif  // SEND_MILESTAG2
+#if SEND_ECOCLIM
+  void sendEcoclim(const uint64_t data, const uint16_t nbits = kEcoclimBits,
+                   const uint16_t repeat = kNoRepeat);
+#endif  // SEND_ECOCLIM
 
  protected:
 #ifdef UNIT_TEST
