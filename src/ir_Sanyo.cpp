@@ -27,6 +27,7 @@ using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addSwingVToString;
 using irutils::addTempToString;
 using irutils::minsToString;
 using irutils::sumNibbles;
@@ -632,27 +633,17 @@ String IRSanyoAc::toString(void) const {
   result += addFanToString(_.Fan, kSanyoAcFanHigh, kSanyoAcFanLow,
                            kSanyoAcFanAuto, kSanyoAcFanAuto,
                            kSanyoAcFanMedium);
-  result += addIntToString(_.SwingV, kSwingVStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingV) {
-    case kSanyoAcSwingVHighest: result += kHighestStr; break;
-    case kSanyoAcSwingVHigh:    result += kHighStr; break;
-    case kSanyoAcSwingVUpperMiddle:
-      result += kUpperStr;
-      result += ' ';
-      result += kMiddleStr;
-      break;
-    case kSanyoAcSwingVLowerMiddle:
-      result += kLowerStr;
-      result += ' ';
-      result += kMiddleStr;
-      break;
-    case kSanyoAcSwingVLow:     result += kLowStr; break;
-    case kSanyoAcSwingVLowest:  result += kLowestStr; break;
-    case kSanyoAcSwingVAuto:    result += kAutoStr;   break;
-    default:                    result += kUnknownStr;
-  }
-  result += ')';
+  result += addSwingVToString(_.SwingV, kSanyoAcSwingVAuto,
+                              kSanyoAcSwingVHighest, kSanyoAcSwingVHigh,
+                              kSanyoAcSwingVUpperMiddle,
+                              kSanyoAcSwingVAuto,  // Middle is unused
+                              kSanyoAcSwingVLowerMiddle,
+                              kSanyoAcSwingVLow, kSanyoAcSwingVLowest,
+                              // Below are unused.
+                              kSanyoAcSwingVAuto,
+                              kSanyoAcSwingVAuto,
+                              kSanyoAcSwingVAuto,
+                              kSanyoAcSwingVAuto);
   result += addBoolToString(_.Sleep, kSleepStr);
   result += addBoolToString(_.Beep, kBeepStr);
   result += addLabeledString(_.Sensor ? kRoomStr : kWallStr, kSensorStr);
