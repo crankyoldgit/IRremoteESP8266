@@ -20,7 +20,7 @@ using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
-using irutils::addTempToString;
+using irutils::addTempFloatToString;
 
 #if SEND_TCL112AC
 /// Send a TCL 112-bit A/C message.
@@ -361,10 +361,7 @@ String IRTcl112Ac::toString(void) const {
   result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, kTcl112AcAuto, kTcl112AcCool,
                             kTcl112AcHeat, kTcl112AcDry, kTcl112AcFan);
-  uint16_t nrHalfDegrees = getTemp() * 2;
-  result += addIntToString(nrHalfDegrees / 2, kTempStr);
-  if (nrHalfDegrees & 1) result += F(".5");
-  result += 'C';
+  result += addTempFloatToString(getTemp());
   result += addFanToString(_.Fan, kTcl112AcFanHigh, kTcl112AcFanLow,
                            kTcl112AcFanAuto, kTcl112AcFanAuto, kTcl112AcFanMed);
   result += addBoolToString(_.Econo, kEconoStr);

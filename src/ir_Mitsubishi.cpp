@@ -88,6 +88,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::addTempFloatToString;
 using irutils::minsToString;
 
 #if SEND_MITSUBISHI
@@ -455,16 +456,23 @@ bool IRMitsubishiAC::getPower(void) const {
 
 /// Set the temperature.
 /// @param[in] degrees The temperature in degrees celsius.
-void IRMitsubishiAC::setTemp(const uint8_t degrees) {
-  uint8_t temp = std::max(kMitsubishiAcMinTemp, degrees);
-  temp = std::min(kMitsubishiAcMaxTemp, temp);
-  _.Temp = temp - kMitsubishiAcMinTemp;
+/// @note The temperature resolution is 0.5 of a degree.
+void IRMitsubishiAC::setTemp(const float degrees) {
+  // Make sure we have desired temp in the correct range.
+  float celsius = std::max(degrees, kMitsubishiAcMinTemp);
+  celsius = std::min(celsius, kMitsubishiAcMaxTemp);
+  // Convert to integer nr. of half degrees.
+  uint8_t nrHalfDegrees = celsius * 2;
+  // Do we have a half degree celsius?
+  _.HalfDegree = nrHalfDegrees & 1;
+  _.Temp = static_cast<uint8_t>(nrHalfDegrees / 2 - kMitsubishiAcMinTemp);
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRMitsubishiAC::getTemp(void) const {
-  return (_.Temp + kMitsubishiAcMinTemp);
+/// @note The temperature resolution is 0.5 of a degree.
+float IRMitsubishiAC::getTemp(void) const {
+  return _.Temp + kMitsubishiAcMinTemp + (_.HalfDegree ? 0.5 : 0);
 }
 
 /// Set the speed of the fan.
@@ -740,7 +748,7 @@ String IRMitsubishiAC::toString(void) const {
   result += addModeToString(_.Mode, kMitsubishiAcAuto, kMitsubishiAcCool,
                             kMitsubishiAcHeat, kMitsubishiAcDry,
                             kMitsubishiAcAuto);
-  result += addTempToString(getTemp());
+  result += addTempFloatToString(getTemp());
   result += addFanToString(getFan(), kMitsubishiAcFanRealMax,
                            kMitsubishiAcFanRealMax - 3,
                            kMitsubishiAcFanAuto, kMitsubishiAcFanQuiet,
