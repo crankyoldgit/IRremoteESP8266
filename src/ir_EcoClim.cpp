@@ -17,12 +17,13 @@
 
 // Constants
 const uint8_t  kEcoclimSections = 3;
-const uint16_t kEcoclimHdrMark = 5730;
-const uint16_t kEcoclimHdrSpace = 1935;
-const uint16_t kEcoclimBitMark = 440;
-const uint16_t kEcoclimOneSpace = 1739;
-const uint16_t kEcoclimZeroSpace = 637;
-const uint16_t kEcoclimFooterMark = 7820;
+const uint8_t  kEcoclimExtraTolerance = 5;  ///< Percentage (extra)
+const uint16_t kEcoclimHdrMark = 5730;     ///< uSeconds
+const uint16_t kEcoclimHdrSpace = 1935;    ///< uSeconds
+const uint16_t kEcoclimBitMark = 440;      ///< uSeconds
+const uint16_t kEcoclimOneSpace = 1739;    ///< uSeconds
+const uint16_t kEcoclimZeroSpace = 637;    ///< uSeconds
+const uint16_t kEcoclimFooterMark = 7820;  ///< uSeconds
 const uint32_t kEcoclimGap = kDefaultMessageGap;  // Just a guess.
 
 #if SEND_ECOCLIM
@@ -35,12 +36,13 @@ void IRsend::sendEcoclim(const uint64_t data, const uint16_t nbits,
                          const uint16_t repeat) {
   enableIROut(38, kDutyDefault);
   for (uint16_t r = 0; r <= repeat; r++) {
-    for (uint8_t section = 0; section < kEcoclimSections; section++)
+    for (uint8_t section = 0; section < kEcoclimSections; section++) {
       // Header + Data
       sendGeneric(kEcoclimHdrMark, kEcoclimHdrSpace,
                   kEcoclimBitMark, kEcoclimOneSpace,
                   kEcoclimBitMark, kEcoclimZeroSpace,
                   0, 0, data, nbits, 38, true, 0, kDutyDefault);
+    }
     mark(kEcoclimFooterMark);
     space(kEcoclimGap);
   }
@@ -49,7 +51,7 @@ void IRsend::sendEcoclim(const uint64_t data, const uint16_t nbits,
 
 #if DECODE_ECOCLIM
 /// Decode the supplied EcoClim A/C message.
-/// Status: BETA / Probably works.
+/// Status: STABLE / Confirmed working on real remote.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
@@ -81,7 +83,8 @@ bool IRrecv::decodeEcoclim(decode_results *results, uint16_t offset,
                         kEcoclimHdrMark, kEcoclimHdrSpace,
                         kEcoclimBitMark, kEcoclimOneSpace,
                         kEcoclimBitMark, kEcoclimZeroSpace,
-                        0, 0);  // Note: No footer.
+                        0, 0,  // No footer.
+                        false, _tolerance + kEcoclimExtraTolerance);
     if (!used) return false;
     DPRINTLN("DEBUG: Data section matched okay.");
     offset += used;
@@ -96,7 +99,9 @@ bool IRrecv::decodeEcoclim(decode_results *results, uint16_t offset,
   }
 
   // Footer
-  if (!matchMark(results->rawbuf[offset++], kEcoclimFooterMark)) return false;
+  if (!matchMark(results->rawbuf[offset++], kEcoclimFooterMark,
+                 _tolerance + kEcoclimExtraTolerance))
+    return false;
   if (results->rawlen <= offset && !matchAtLeast(results->rawbuf[offset++],
                                                  kEcoclimGap))
     return false;
