@@ -13,7 +13,7 @@
 
 // Test sending typical data only.
 TEST(TestSendMitsubishi, SendDataOnly) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -55,7 +55,7 @@ TEST(TestSendMitsubishi, SendDataOnly) {
 
 // Test sending with different repeats.
 TEST(TestSendMitsubishi, SendWithRepeats) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -95,7 +95,7 @@ TEST(TestSendMitsubishi, SendWithRepeats) {
 
 // Test sending an atypical data size.
 TEST(TestSendMitsubishi, SendUnusualSize) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -135,8 +135,8 @@ TEST(TestSendMitsubishi, SendUnusualSize) {
 
 // Decode normal Mitsubishi messages.
 TEST(TestDecodeMitsubishi, NormalDecodeWithStrict) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Normal Mitsubishi 16-bit message.
@@ -203,8 +203,8 @@ TEST(TestDecodeMitsubishi, NormalDecodeWithStrict) {
 
 // Decode normal repeated Mitsubishi messages.
 TEST(TestDecodeMitsubishi, NormalDecodeWithRepeatAndStrict) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Normal Mitsubishi 16-bit message with 2 repeats.
@@ -236,8 +236,8 @@ TEST(TestDecodeMitsubishi, NormalDecodeWithRepeatAndStrict) {
 
 // Decode unsupported Mitsubishi messages.
 TEST(TestDecodeMitsubishi, DecodeWithNonStrictValues) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -278,8 +278,8 @@ TEST(TestDecodeMitsubishi, DecodeWithNonStrictValues) {
 
 // Decode a 'real' example via GlobalCache
 TEST(TestDecodeMitsubishi, DecodeGlobalCacheExample) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -301,8 +301,8 @@ TEST(TestDecodeMitsubishi, DecodeGlobalCacheExample) {
 
 // Fail to decode a non-Mitsubishi example via GlobalCache
 TEST(TestDecodeMitsubishi, FailToDecodeNonMitsubishiExample) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -324,7 +324,7 @@ TEST(TestDecodeMitsubishi, FailToDecodeNonMitsubishiExample) {
 
 // Test sending typical data only.
 TEST(TestSendMitsubishiAC, SendDataOnly) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   uint8_t mitsub_code[kMitsubishiACStateLength] = {
@@ -379,7 +379,7 @@ TEST(TestSendMitsubishiAC, SendDataOnly) {
 
 // Test sending with repeats.
 TEST(TestSendMitsubishiAC, SendWithRepeats) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -481,7 +481,7 @@ TEST(TestSendMitsubishiAC, SendWithRepeats) {
 
 // Test sending atypical sizes.
 TEST(TestSendMitsubishiAC, SendUnexpectedSizes) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   uint8_t mitsub_short_code[17] = {0x23, 0xCB, 0x26, 0x01, 0x00, 0x20,
@@ -546,156 +546,168 @@ TEST(TestSendMitsubishiAC, SendUnexpectedSizes) {
 // Tests for IRMitsubishiAC class.
 
 TEST(TestMitsubishiACClass, Power) {
-  IRMitsubishiAC mitsub(0);
-  mitsub.begin();
+  IRMitsubishiAC ac(kGpioUnused);
+  ac.begin();
 
-  mitsub.on();
-  EXPECT_TRUE(mitsub.getPower());
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
 
-  mitsub.off();
-  EXPECT_FALSE(mitsub.getPower());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
 
-  mitsub.setPower(true);
-  EXPECT_TRUE(mitsub.getPower());
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
 
-  mitsub.setPower(false);
-  EXPECT_FALSE(mitsub.getPower());
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
 }
 
 TEST(TestMitsubishiACClass, Temperature) {
-  IRMitsubishiAC mitsub(0);
-  mitsub.begin();
+  IRMitsubishiAC ac(kGpioUnused);
+  ac.begin();
 
-  mitsub.setTemp(0);
-  EXPECT_EQ(kMitsubishiAcMinTemp, mitsub.getTemp());
+  ac.setTemp(0);
+  EXPECT_EQ(kMitsubishiAcMinTemp, ac.getTemp());
 
-  mitsub.setTemp(255);
-  EXPECT_EQ(kMitsubishiAcMaxTemp, mitsub.getTemp());
+  ac.setTemp(255);
+  EXPECT_EQ(kMitsubishiAcMaxTemp, ac.getTemp());
 
-  mitsub.setTemp(kMitsubishiAcMinTemp);
-  EXPECT_EQ(kMitsubishiAcMinTemp, mitsub.getTemp());
+  ac.setTemp(kMitsubishiAcMinTemp);
+  EXPECT_EQ(kMitsubishiAcMinTemp, ac.getTemp());
 
-  mitsub.setTemp(kMitsubishiAcMaxTemp);
-  EXPECT_EQ(kMitsubishiAcMaxTemp, mitsub.getTemp());
+  ac.setTemp(kMitsubishiAcMaxTemp);
+  EXPECT_EQ(kMitsubishiAcMaxTemp, ac.getTemp());
 
-  mitsub.setTemp(kMitsubishiAcMinTemp - 1);
-  EXPECT_EQ(kMitsubishiAcMinTemp, mitsub.getTemp());
+  ac.setTemp(kMitsubishiAcMinTemp - 1);
+  EXPECT_EQ(kMitsubishiAcMinTemp, ac.getTemp());
 
-  mitsub.setTemp(kMitsubishiAcMaxTemp + 1);
-  EXPECT_EQ(kMitsubishiAcMaxTemp, mitsub.getTemp());
+  ac.setTemp(kMitsubishiAcMaxTemp + 1);
+  EXPECT_EQ(kMitsubishiAcMaxTemp, ac.getTemp());
 
-  mitsub.setTemp(17);
-  EXPECT_EQ(17, mitsub.getTemp());
+  ac.setTemp(17);
+  EXPECT_EQ(17, ac.getTemp());
 
-  mitsub.setTemp(21);
-  EXPECT_EQ(21, mitsub.getTemp());
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
 
-  mitsub.setTemp(25);
-  EXPECT_EQ(25, mitsub.getTemp());
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
 
-  mitsub.setTemp(30);
-  EXPECT_EQ(30, mitsub.getTemp());
+  ac.setTemp(30);
+  EXPECT_EQ(30, ac.getTemp());
+
+  // Tests for half degrees.
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1398#issuecomment-770879423
+  const uint8_t deg18_5C[kMitsubishiACStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x12, 0x00,
+      0xC0, 0x7C, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x93};
+  ac.setRaw(deg18_5C);
+  EXPECT_EQ(18.5, ac.getTemp());
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(30.5);
+  EXPECT_EQ(30.5, ac.getTemp());
 }
 
 TEST(TestMitsubishiACClass, OperatingMode) {
-  IRMitsubishiAC mitsub(0);
-  mitsub.begin();
+  IRMitsubishiAC ac(kGpioUnused);
+  ac.begin();
 
-  mitsub.setMode(kMitsubishiAcAuto);
-  EXPECT_EQ(kMitsubishiAcAuto, mitsub.getMode());
+  ac.setMode(kMitsubishiAcAuto);
+  EXPECT_EQ(kMitsubishiAcAuto, ac.getMode());
 
-  mitsub.setMode(kMitsubishiAcCool);
-  EXPECT_EQ(kMitsubishiAcCool, mitsub.getMode());
+  ac.setMode(kMitsubishiAcCool);
+  EXPECT_EQ(kMitsubishiAcCool, ac.getMode());
 
-  mitsub.setMode(kMitsubishiAcHeat);
-  EXPECT_EQ(kMitsubishiAcHeat, mitsub.getMode());
+  ac.setMode(kMitsubishiAcHeat);
+  EXPECT_EQ(kMitsubishiAcHeat, ac.getMode());
 
-  mitsub.setMode(kMitsubishiAcDry);
-  EXPECT_EQ(kMitsubishiAcDry, mitsub.getMode());
+  ac.setMode(kMitsubishiAcDry);
+  EXPECT_EQ(kMitsubishiAcDry, ac.getMode());
 
-  mitsub.setMode(kMitsubishiAcAuto + 1);
-  EXPECT_EQ(kMitsubishiAcAuto, mitsub.getMode());
+  ac.setMode(kMitsubishiAcAuto + 1);
+  EXPECT_EQ(kMitsubishiAcAuto, ac.getMode());
 
-  mitsub.setMode(255);
-  EXPECT_EQ(kMitsubishiAcAuto, mitsub.getMode());
+  ac.setMode(255);
+  EXPECT_EQ(kMitsubishiAcAuto, ac.getMode());
 }
 
 TEST(TestMitsubishiACClass, VaneMode) {
-  IRMitsubishiAC mitsub(0);
-  mitsub.begin();
+  IRMitsubishiAC ac(kGpioUnused);
+  ac.begin();
 
-  mitsub.setVane(kMitsubishiAcVaneAuto);
-  EXPECT_EQ(kMitsubishiAcVaneAuto, mitsub.getVane());
+  ac.setVane(kMitsubishiAcVaneAuto);
+  EXPECT_EQ(kMitsubishiAcVaneAuto, ac.getVane());
 
-  mitsub.setVane(kMitsubishiAcVaneAuto + 1);
-  EXPECT_EQ(kMitsubishiAcVaneAuto + 1, mitsub.getVane());
+  ac.setVane(kMitsubishiAcVaneAuto + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAuto + 1, ac.getVane());
 
-  mitsub.setVane(kMitsubishiAcVaneAutoMove);
-  EXPECT_EQ(kMitsubishiAcVaneAutoMove, mitsub.getVane());
+  ac.setVane(kMitsubishiAcVaneAutoMove);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, ac.getVane());
 
-  mitsub.setVane(kMitsubishiAcVaneAutoMove + 1);
-  EXPECT_EQ(kMitsubishiAcVaneAutoMove, mitsub.getVane());
+  ac.setVane(kMitsubishiAcVaneAutoMove + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, ac.getVane());
 
-  mitsub.setVane(kMitsubishiAcVaneAutoMove - 1);
-  EXPECT_EQ(kMitsubishiAcVaneAutoMove - 1, mitsub.getVane());
+  ac.setVane(kMitsubishiAcVaneAutoMove - 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove - 1, ac.getVane());
 }
 
 TEST(TestMitsubishiACClass, FanSpeed) {
-  IRMitsubishiAC mitsub(0);
-  mitsub.begin();
+  IRMitsubishiAC ac(kGpioUnused);
+  ac.begin();
 
-  mitsub.setFan(kMitsubishiAcFanAuto);
-  EXPECT_EQ(kMitsubishiAcFanAuto, mitsub.getFan());
+  ac.setFan(kMitsubishiAcFanAuto);
+  EXPECT_EQ(kMitsubishiAcFanAuto, ac.getFan());
 
-  mitsub.setFan(255);
-  EXPECT_EQ(kMitsubishiAcFanRealMax, mitsub.getFan());
+  ac.setFan(255);
+  EXPECT_EQ(kMitsubishiAcFanRealMax, ac.getFan());
 
-  mitsub.setFan(kMitsubishiAcFanMax);
-  EXPECT_EQ(kMitsubishiAcFanRealMax, mitsub.getFan());
+  ac.setFan(kMitsubishiAcFanMax);
+  EXPECT_EQ(kMitsubishiAcFanRealMax, ac.getFan());
 
-  mitsub.setFan(kMitsubishiAcFanMax - 1);
-  EXPECT_EQ(kMitsubishiAcFanMax - 1, mitsub.getFan());
+  ac.setFan(kMitsubishiAcFanMax - 1);
+  EXPECT_EQ(kMitsubishiAcFanMax - 1, ac.getFan());
 
-  mitsub.setFan(1);
-  EXPECT_EQ(1, mitsub.getFan());
+  ac.setFan(1);
+  EXPECT_EQ(1, ac.getFan());
 
-  mitsub.setFan(2);
-  EXPECT_EQ(2, mitsub.getFan());
+  ac.setFan(2);
+  EXPECT_EQ(2, ac.getFan());
 
-  mitsub.setFan(3);
-  EXPECT_EQ(3, mitsub.getFan());
+  ac.setFan(3);
+  EXPECT_EQ(3, ac.getFan());
 
-  mitsub.setFan(4);
-  EXPECT_EQ(4, mitsub.getFan());
+  ac.setFan(4);
+  EXPECT_EQ(4, ac.getFan());
 
-  mitsub.setFan(kMitsubishiAcFanSilent);
-  EXPECT_EQ(kMitsubishiAcFanSilent, mitsub.getFan());
+  ac.setFan(kMitsubishiAcFanSilent);
+  EXPECT_EQ(kMitsubishiAcFanSilent, ac.getFan());
 
-  mitsub.setFan(kMitsubishiAcFanSilent + 1);
-  EXPECT_EQ(kMitsubishiAcFanRealMax, mitsub.getFan());
+  ac.setFan(kMitsubishiAcFanSilent + 1);
+  EXPECT_EQ(kMitsubishiAcFanRealMax, ac.getFan());
 }
 
 TEST(TestMitsubishiACClass, MessageConstuction) {
-  IRMitsubishiAC mitsub(0);
-  IRsendTest irsend(4);
-  mitsub.begin();
+  IRMitsubishiAC ac(kGpioUnused);
+  IRsendTest irsend(kGpioUnused);
+  ac.begin();
   irsend.begin();
 
-  mitsub.setFan(1);
-  mitsub.setMode(kMitsubishiAcCool);
-  mitsub.setTemp(27);
-  mitsub.setVane(3);
-  mitsub.on();
+  ac.setFan(1);
+  ac.setMode(kMitsubishiAcCool);
+  ac.setTemp(27);
+  ac.setVane(3);
+  ac.on();
 
   // Check everything for kicks.
-  EXPECT_EQ(1, mitsub.getFan());
-  EXPECT_EQ(kMitsubishiAcCool, mitsub.getMode());
-  EXPECT_EQ(27, mitsub.getTemp());
-  EXPECT_EQ(3, mitsub.getVane());
-  EXPECT_TRUE(mitsub.getPower());
+  EXPECT_EQ(1, ac.getFan());
+  EXPECT_EQ(kMitsubishiAcCool, ac.getMode());
+  EXPECT_EQ(27, ac.getTemp());
+  EXPECT_EQ(3, ac.getVane());
+  EXPECT_TRUE(ac.getPower());
 
   irsend.reset();
-  irsend.sendMitsubishiAC(mitsub.getRaw());
+  irsend.sendMitsubishiAC(ac.getRaw());
   EXPECT_EQ(
       "f38000d50"
       "m3400s1750"
@@ -743,8 +755,8 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
 
 // Tests for decodeMitsubishiAC() with real captured example.
 TEST(TestDecodeMitsubishiAC, DecodeRealExample) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -814,8 +826,8 @@ TEST(TestDecodeMitsubishiAC, DecodeRealExample) {
 
 // Tests for decodeMitsubishiAC() when the first payload has an error.
 TEST(TestDecodeMitsubishiAC, DecodeRealExampleRepeatNeeded) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -878,8 +890,8 @@ TEST(TestDecodeMitsubishiAC, DecodeRealExampleRepeatNeeded) {
 
 // Tests for decodeMitsubishiAC() when the repeat mark is wrong.
 TEST(TestDecodeMitsubishiAC, DecodeRealExampleRepeatMarkError) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -943,8 +955,8 @@ TEST(TestDecodeMitsubishiAC, DecodeRealExampleRepeatMarkError) {
 // Tests for decodeMitsubishiAC() when first payload has an error and the
 //   repeat mark is wrong.
 TEST(TestDecodeMitsubishiAC, DecodeRealExampleRepeatNeededButError) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -1002,17 +1014,23 @@ TEST(TestDecodeMitsubishiAC, DecodeRealExampleRepeatNeededButError) {
 }
 
 TEST(TestMitsubishiACClass, HumanReadable) {
-  IRMitsubishiAC irMitsu(0);
+  IRMitsubishiAC ac(kGpioUnused);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Heat), Temp: 22C, Fan: 6 (Quiet), "
       "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
       "Clock: 17:10, On Timer: 00:00, Off Timer: 00:00, Timer: -",
-      irMitsu.toString());
+      ac.toString());
+  ac.setTemp(21.5);
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Heat), Temp: 21.5C, Fan: 6 (Quiet), "
+      "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
+      "Clock: 17:10, On Timer: 00:00, Off Timer: 00:00, Timer: -",
+      ac.toString());
 }
 
 // Test sending typical data only.
 TEST(TestSendMitsubishi2, SendDataOnly) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -1050,7 +1068,7 @@ TEST(TestSendMitsubishi2, SendDataOnly) {
 
 // Test sending odd repeats.
 TEST(TestSendMitsubishi2, Repeats) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -1090,8 +1108,8 @@ TEST(TestSendMitsubishi2, Repeats) {
 
 // Decode synthetic examples.
 TEST(TestDecodeMitsubishi2, DecodeSyntheticExamples) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -1129,8 +1147,8 @@ TEST(TestDecodeMitsubishi2, DecodeSyntheticExamples) {
 
 // Decode a 'real' example from Issue #441
 TEST(TestDecodeMitsubishi2, DecodeRealExample) {
-  IRsendTest irsend(4);
-  IRrecv irrecv(4);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -1156,7 +1174,7 @@ TEST(TestDecodeMitsubishi2, DecodeRealExample) {
 }
 
 TEST(TestMitsubishiACClass, toCommon) {
-  IRMitsubishiAC ac(0);
+  IRMitsubishiAC ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kMitsubishiAcCool);
   ac.setTemp(20);
@@ -1188,8 +1206,8 @@ TEST(TestMitsubishiACClass, toCommon) {
 // Decode a 'real' example.
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/888
 TEST(TestDecodeMitsubishi136, DecodeRealExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -1237,8 +1255,8 @@ TEST(TestDecodeMitsubishi136, DecodeRealExample) {
 // Self decode a synthetic example.
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/888
 TEST(TestDecodeMitsubishi136, SyntheticExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -1278,7 +1296,7 @@ TEST(TestMitsubishi, Housekeeping) {
 // Tests for IRMitsubishi136 class.
 
 TEST(TestMitsubishi136Class, Power) {
-  IRMitsubishi136 ac(0);
+  IRMitsubishi136 ac(kGpioUnused);
   ac.begin();
 
   ac.on();
@@ -1295,7 +1313,7 @@ TEST(TestMitsubishi136Class, Power) {
 }
 
 TEST(TestMitsubishi136Class, Temperature) {
-  IRMitsubishi136 ac(0);
+  IRMitsubishi136 ac(kGpioUnused);
   ac.begin();
 
   ac.setTemp(0);
@@ -1330,7 +1348,7 @@ TEST(TestMitsubishi136Class, Temperature) {
 }
 
 TEST(TestMitsubishi136Class, OperatingMode) {
-  IRMitsubishi136 ac(0);
+  IRMitsubishi136 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kMitsubishi136Auto);
@@ -1356,7 +1374,7 @@ TEST(TestMitsubishi136Class, OperatingMode) {
 }
 
 TEST(TestMitsubishi136Class, FanSpeed) {
-  IRMitsubishi136 ac(0);
+  IRMitsubishi136 ac(kGpioUnused);
   ac.begin();
 
   ac.setFan(kMitsubishi136FanMax);
@@ -1379,7 +1397,7 @@ TEST(TestMitsubishi136Class, FanSpeed) {
 }
 
 TEST(TestMitsubishi136Class, Quiet) {
-  IRMitsubishi136 ac(0);
+  IRMitsubishi136 ac(kGpioUnused);
   ac.begin();
 
   ac.setQuiet(true);
@@ -1391,7 +1409,7 @@ TEST(TestMitsubishi136Class, Quiet) {
 }
 
 TEST(TestMitsubishi136Class, SwingV) {
-  IRMitsubishi136 ac(0);
+  IRMitsubishi136 ac(kGpioUnused);
   ac.begin();
 
   ac.setSwingV(kMitsubishi136SwingVAuto);
@@ -1414,7 +1432,7 @@ TEST(TestMitsubishi136Class, SwingV) {
 }
 
 TEST(TestMitsubishi136Class, toCommon) {
-  IRMitsubishi136 ac(0);
+  IRMitsubishi136 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kMitsubishi136Dry);
   ac.setTemp(22);
@@ -1455,8 +1473,8 @@ TEST(TestMitsubishi136Class, toCommonMode) {
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/891#issuecomment-531484295
 TEST(TestDecodeMitsubishiAC, Issue891) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -1513,7 +1531,7 @@ TEST(TestDecodeMitsubishiAC, Issue891) {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x00, 0x18, 0x08, 0x36,
       0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xAB};
   EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishiACBits);
-  IRMitsubishiAC ac(0);
+  IRMitsubishiAC ac(kGpioUnused);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 3 (Cool), Temp: 24C, Fan: 0 (Auto), "
@@ -1525,7 +1543,7 @@ TEST(TestDecodeMitsubishiAC, Issue891) {
 // Tests for IRMitsubishi112 class.
 
 TEST(TestMitsubishi112Class, Power) {
-  IRMitsubishi112 ac(0);
+  IRMitsubishi112 ac(kGpioUnused);
   ac.begin();
 
   ac.on();
@@ -1542,7 +1560,7 @@ TEST(TestMitsubishi112Class, Power) {
 }
 
 TEST(TestMitsubishi112Class, Temperature) {
-  IRMitsubishi112 ac(0);
+  IRMitsubishi112 ac(kGpioUnused);
   ac.begin();
 
   ac.setTemp(0);
@@ -1577,7 +1595,7 @@ TEST(TestMitsubishi112Class, Temperature) {
 }
 
 TEST(TestMitsubishi112Class, OperatingMode) {
-  IRMitsubishi112 ac(0);
+  IRMitsubishi112 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kMitsubishi112Auto);
@@ -1594,7 +1612,7 @@ TEST(TestMitsubishi112Class, OperatingMode) {
 }
 
 TEST(TestMitsubishi112Class, FanSpeed) {
-  IRMitsubishi112 ac(0);
+  IRMitsubishi112 ac(kGpioUnused);
   ac.begin();
 
   ac.setFan(kMitsubishi112FanMax);
@@ -1618,7 +1636,7 @@ TEST(TestMitsubishi112Class, FanSpeed) {
 
 
 TEST(TestMitsubishi112Class, SwingV) {
-  IRMitsubishi112 ac(0);
+  IRMitsubishi112 ac(kGpioUnused);
   ac.begin();
 
   ac.setSwingV(kMitsubishi112SwingVAuto);
@@ -1641,7 +1659,7 @@ TEST(TestMitsubishi112Class, SwingV) {
 }
 
 TEST(TestMitsubishi112Class, toCommon) {
-  IRMitsubishi112 ac(0);
+  IRMitsubishi112 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kMitsubishi112Dry);
   ac.setTemp(22);
@@ -1683,8 +1701,8 @@ TEST(TestMitsubishi112Class, toCommonMode) {
 
 // Decode a 'real' example.
 TEST(TestDecodeMitsubishi112, DecodeRealExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -1727,8 +1745,8 @@ TEST(TestDecodeMitsubishi112, DecodeRealExample) {
 
 // Self decode a synthetic example.
 TEST(TestDecodeMitsubishi112, SyntheticExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();

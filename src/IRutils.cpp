@@ -598,6 +598,22 @@ namespace irutils {
     return result;
   }
 
+  /// Create a String of human output for a given temperature.
+  /// e.g. "Temp: 25.5C"
+  /// @param[in] degrees The temperature in degrees.
+  /// @param[in] celsius Is the temp Celsius or Fahrenheit.
+  ///  true is C, false is F
+  /// @param[in] precomma Should the output string start with ", " or not?
+  /// @return The resulting String.
+  String addTempFloatToString(const float degrees, const bool celsius,
+                              const bool precomma) {
+    String result = addIntToString(degrees, kTempStr, precomma);
+    // Is it a half degree?
+    if (((uint16_t)(2 * degrees)) & 1) result += F(".5");
+    result += celsius ? 'C' : 'F';
+    return result;
+  }
+
   /// Create a String of human output for the given operating mode.
   /// e.g. "Mode: 1 (Cool)"
   /// @param[in] mode The operating mode to display.

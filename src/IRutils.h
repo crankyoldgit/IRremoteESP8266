@@ -56,6 +56,8 @@ namespace irutils {
                           const bool precomma = true);
   String addTempToString(const uint16_t degrees, const bool celsius = true,
                          const bool precomma = true);
+  String addTempFloatToString(const float degrees, const bool celsius = true,
+                              const bool precomma = true);
   String addModeToString(const uint8_t mode, const uint8_t automatic,
                          const uint8_t cool, const uint8_t heat,
                          const uint8_t dry, const uint8_t fan);
