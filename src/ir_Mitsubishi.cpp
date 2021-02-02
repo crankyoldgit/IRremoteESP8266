@@ -1,5 +1,5 @@
 // Copyright 2009 Ken Shirriff
-// Copyright 2017-2019 David Conran
+// Copyright 2017-2021 David Conran
 // Copyright 2019 Mark Kuchel
 // Copyright 2018 Denes Varga
 
@@ -14,6 +14,8 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/619
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/888
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/947
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1398
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1399
 /// @see https://github.com/kuchel77
 
 #include "ir_Mitsubishi.h"
@@ -87,6 +89,8 @@ using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addSwingHToString;
+using irutils::addSwingVToString;
 using irutils::addTempToString;
 using irutils::addTempFloatToString;
 using irutils::minsToString;
@@ -632,12 +636,12 @@ uint8_t IRMitsubishiAC::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The native equivalent of the enum.
 uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
-    case stdAc::swingv_t::kHighest: return kMitsubishiAcVaneAutoMove - 6;
-    case stdAc::swingv_t::kHigh:    return kMitsubishiAcVaneAutoMove - 5;
-    case stdAc::swingv_t::kMiddle:  return kMitsubishiAcVaneAutoMove - 4;
-    case stdAc::swingv_t::kLow:     return kMitsubishiAcVaneAutoMove - 3;
-    case stdAc::swingv_t::kLowest:  return kMitsubishiAcVaneAutoMove - 2;
-    case stdAc::swingv_t::kAuto:    return kMitsubishiAcVaneAutoMove;
+    case stdAc::swingv_t::kHighest: return kMitsubishiAcVaneHighest;
+    case stdAc::swingv_t::kHigh:    return kMitsubishiAcVaneHigh;
+    case stdAc::swingv_t::kMiddle:  return kMitsubishiAcVaneMiddle;
+    case stdAc::swingv_t::kLow:     return kMitsubishiAcVaneLow;
+    case stdAc::swingv_t::kLowest:  return kMitsubishiAcVaneLowest;
+    case stdAc::swingv_t::kAuto:    return kMitsubishiAcVaneSwing;
     default:                        return kMitsubishiAcVaneAuto;
   }
 }
@@ -647,14 +651,14 @@ uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
 /// @return The native equivalent of the enum.
 uint8_t IRMitsubishiAC::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
-    case stdAc::swingh_t::kLeftMax:  return kMitsubishiAcWideVaneAuto - 7;
-    case stdAc::swingh_t::kLeft:     return kMitsubishiAcWideVaneAuto - 6;
-    case stdAc::swingh_t::kMiddle:   return kMitsubishiAcWideVaneAuto - 5;
-    case stdAc::swingh_t::kRight:    return kMitsubishiAcWideVaneAuto - 4;
-    case stdAc::swingh_t::kRightMax: return kMitsubishiAcWideVaneAuto - 3;
-    case stdAc::swingh_t::kWide:     return kMitsubishiAcWideVaneAuto - 2;
+    case stdAc::swingh_t::kLeftMax:  return kMitsubishiAcWideVaneLeftMax;
+    case stdAc::swingh_t::kLeft:     return kMitsubishiAcWideVaneLeft;
+    case stdAc::swingh_t::kMiddle:   return kMitsubishiAcWideVaneMiddle;
+    case stdAc::swingh_t::kRight:    return kMitsubishiAcWideVaneRight;
+    case stdAc::swingh_t::kRightMax: return kMitsubishiAcWideVaneRightMax;
+    case stdAc::swingh_t::kWide:     return kMitsubishiAcWideVaneWide;
     case stdAc::swingh_t::kAuto:     return kMitsubishiAcWideVaneAuto;
-    default:                         return kMitsubishiAcWideVaneAuto - 5;
+    default:                         return kMitsubishiAcWideVaneMiddle;
   }
 }
 
@@ -689,12 +693,13 @@ stdAc::fanspeed_t IRMitsubishiAC::toCommonFanSpeed(const uint8_t speed) {
 /// @return The common vertical swing position.
 stdAc::swingv_t IRMitsubishiAC::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
-    case 1:  return stdAc::swingv_t::kHighest;
-    case 2:  return stdAc::swingv_t::kHigh;
-    case 3:  return stdAc::swingv_t::kMiddle;
-    case 4:  return stdAc::swingv_t::kLow;
-    case 5:  return stdAc::swingv_t::kLowest;
-    default: return stdAc::swingv_t::kAuto;
+    case kMitsubishiAcVaneHighest: return stdAc::swingv_t::kHighest;
+    case kMitsubishiAcVaneHigh:    return stdAc::swingv_t::kHigh;
+    case kMitsubishiAcVaneMiddle:  return stdAc::swingv_t::kMiddle;
+    case kMitsubishiAcVaneLow:     return stdAc::swingv_t::kLow;
+    case kMitsubishiAcVaneLowest:  return stdAc::swingv_t::kLowest;
+    case kMitsubishiAcVaneAuto:    return stdAc::swingv_t::kOff;
+    default:                       return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -703,13 +708,13 @@ stdAc::swingv_t IRMitsubishiAC::toCommonSwingV(const uint8_t pos) {
 /// @return The common horizontal swing position.
 stdAc::swingh_t IRMitsubishiAC::toCommonSwingH(const uint8_t pos) {
   switch (pos) {
-    case 1:  return stdAc::swingh_t::kLeftMax;
-    case 2:  return stdAc::swingh_t::kLeft;
-    case 3:  return stdAc::swingh_t::kMiddle;
-    case 4:  return stdAc::swingh_t::kRight;
-    case 5:  return stdAc::swingh_t::kRightMax;
-    case 6:  return stdAc::swingh_t::kWide;
-    default: return stdAc::swingh_t::kAuto;
+    case kMitsubishiAcWideVaneLeftMax:  return stdAc::swingh_t::kLeftMax;
+    case kMitsubishiAcWideVaneLeft:     return stdAc::swingh_t::kLeft;
+    case kMitsubishiAcWideVaneMiddle:   return stdAc::swingh_t::kMiddle;
+    case kMitsubishiAcWideVaneRight:    return stdAc::swingh_t::kRight;
+    case kMitsubishiAcWideVaneRightMax: return stdAc::swingh_t::kRightMax;
+    case kMitsubishiAcWideVaneWide:     return stdAc::swingh_t::kWide;
+    default:                            return stdAc::swingh_t::kAuto;
   }
 }
 
@@ -753,28 +758,26 @@ String IRMitsubishiAC::toString(void) const {
                            kMitsubishiAcFanRealMax - 3,
                            kMitsubishiAcFanAuto, kMitsubishiAcFanQuiet,
                            kMitsubishiAcFanRealMax - 2);
-  result += addIntToString(_.Vane, kSwingVStr);
-  result += kSpaceLBraceStr;
-  switch (_.Vane) {
-    case kMitsubishiAcVaneAuto:
-      result += kAutoStr;
-      break;
-    case kMitsubishiAcVaneAutoMove:
-      result += kAutoStr;
-      result += ' ';
-      result += kMoveStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
-  result += addIntToString(_.WideVane, kSwingHStr);
-  result += kSpaceLBraceStr;
-  switch (_.WideVane) {
-    case kMitsubishiAcWideVaneAuto: result += kAutoStr; break;
-    default:                        result += kUnknownStr;
-  }
-  result += ')';
+  result += addSwingVToString(_.Vane, kMitsubishiAcVaneAuto,
+                              kMitsubishiAcVaneHighest, kMitsubishiAcVaneHigh,
+                              kMitsubishiAcVaneAuto,  // Upper Middle unused.
+                              kMitsubishiAcVaneMiddle,
+                              kMitsubishiAcVaneAuto,  // Lower Middle unused.
+                              kMitsubishiAcVaneLow, kMitsubishiAcVaneLowest,
+                              kMitsubishiAcVaneAuto, kMitsubishiAcVaneSwing,
+                              // Below are unused.
+                              kMitsubishiAcVaneAuto, kMitsubishiAcVaneAuto);
+  result += addSwingHToString(_.WideVane, kMitsubishiAcWideVaneAuto,
+                              kMitsubishiAcWideVaneLeftMax,
+                              kMitsubishiAcWideVaneLeft,
+                              kMitsubishiAcWideVaneMiddle,
+                              kMitsubishiAcWideVaneRight,
+                              kMitsubishiAcWideVaneRightMax,
+                              kMitsubishiAcWideVaneAuto,  // Unused
+                              kMitsubishiAcWideVaneAuto,  // Unused
+                              kMitsubishiAcWideVaneAuto,  // Unused
+                              kMitsubishiAcWideVaneAuto,  // Unused
+                              kMitsubishiAcWideVaneWide);
   result += addLabeledString(minsToString(_.Clock * 10), kClockStr);
   result += addLabeledString(minsToString(_.StartClock * 10), kOnTimerStr);
   result += addLabeledString(minsToString(_.StopClock * 10), kOffTimerStr);
@@ -1151,17 +1154,19 @@ String IRMitsubishi136::toString(void) const {
   result += addFanToString(_.Fan, kMitsubishi136FanMax,
                            kMitsubishi136FanLow,  kMitsubishi136FanMax,
                            kMitsubishi136FanQuiet, kMitsubishi136FanMed);
-  result += addIntToString(_.SwingV, kSwingVStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingV) {
-    case kMitsubishi136SwingVHighest: result += kHighestStr; break;
-    case kMitsubishi136SwingVHigh: result += kHighStr; break;
-    case kMitsubishi136SwingVLow: result += kLowStr; break;
-    case kMitsubishi136SwingVLowest: result += kLowestStr; break;
-    case kMitsubishi136SwingVAuto: result += kAutoStr; break;
-    default: result += kUnknownStr;
-  }
-  result += ')';
+  result += addSwingVToString(_.SwingV, kMitsubishi136SwingVAuto,
+                              kMitsubishi136SwingVHighest,
+                              kMitsubishi136SwingVHigh,
+                              kMitsubishi136SwingVAuto,  // Unused
+                              kMitsubishi136SwingVAuto,  // Unused
+                              kMitsubishi136SwingVAuto,  // Unused
+                              kMitsubishi136SwingVLow,
+                              kMitsubishi136SwingVLow,
+                              // Below are unused.
+                              kMitsubishi136SwingVAuto,
+                              kMitsubishi136SwingVAuto,
+                              kMitsubishi136SwingVAuto,
+                              kMitsubishi136SwingVAuto);
   result += addBoolToString(getQuiet(), kQuietStr);
   return result;
 }
@@ -1616,31 +1621,30 @@ String IRMitsubishi112::toString(void) const {
   result += addFanToString(_.Fan, kMitsubishi112FanMax,
                            kMitsubishi112FanLow,  kMitsubishi112FanMax,
                            kMitsubishi112FanQuiet, kMitsubishi112FanMed);
-  result += addIntToString(_.SwingV, kSwingVStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingV) {
-    case kMitsubishi112SwingVHighest: result += kHighestStr; break;
-    case kMitsubishi112SwingVHigh:    result += kHighStr; break;
-    case kMitsubishi112SwingVMiddle:  result += kMiddleStr; break;
-    case kMitsubishi112SwingVLow:     result += kLowStr; break;
-    case kMitsubishi112SwingVLowest:  result += kLowestStr; break;
-    case kMitsubishi112SwingVAuto:    result += kAutoStr; break;
-    default:                          result += kUnknownStr;
-  }
-  result += ')';
-  result += addIntToString(_.SwingH, kSwingHStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingH) {
-    case kMitsubishi112SwingHLeftMax:  result += kLeftMaxStr; break;
-    case kMitsubishi112SwingHLeft:     result += kLeftStr; break;
-    case kMitsubishi112SwingHMiddle:   result += kMiddleStr; break;
-    case kMitsubishi112SwingHRight:    result += kRightStr; break;
-    case kMitsubishi112SwingHRightMax: result += kRightMaxStr; break;
-    case kMitsubishi112SwingHWide:     result += kWideStr; break;
-    case kMitsubishi112SwingHAuto:     result += kAutoStr; break;
-    default:                           result += kUnknownStr;
-  }
-  result += ')';
+  result += addSwingVToString(_.SwingV, kMitsubishi112SwingVAuto,
+                             kMitsubishi112SwingVHighest,
+                             kMitsubishi112SwingVHigh,
+                             kMitsubishi112SwingVAuto,  // Upper Middle unused.
+                             kMitsubishi112SwingVMiddle,
+                             kMitsubishi112SwingVAuto,  // Lower Middle unused.
+                             kMitsubishi112SwingVLow,
+                             kMitsubishi112SwingVLowest,
+                             // Below are unused.
+                             kMitsubishi112SwingVAuto,
+                             kMitsubishi112SwingVAuto,
+                             kMitsubishi112SwingVAuto,
+                             kMitsubishi112SwingVAuto);
+  result += addSwingHToString(_.SwingH, kMitsubishi112SwingHAuto,
+                              kMitsubishi112SwingHLeftMax,
+                              kMitsubishi112SwingHLeft,
+                              kMitsubishi112SwingHMiddle,
+                              kMitsubishi112SwingHRight,
+                              kMitsubishi112SwingHRightMax,
+                              kMitsubishi112SwingHAuto,  // Unused
+                              kMitsubishi112SwingHAuto,  // Unused
+                              kMitsubishi112SwingHAuto,  // Unused
+                              kMitsubishi112SwingHAuto,  // Unused
+                              kMitsubishi112SwingHWide);
   result += addBoolToString(getQuiet(), kQuietStr);
   return result;
 }
