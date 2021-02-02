@@ -37,8 +37,6 @@ using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::checkInvertedBytePairs;
 using irutils::invertBytePairs;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_TOSHIBA_AC
 /// Send a Toshiba A/C message.
@@ -68,10 +66,10 @@ IRToshibaAC::IRToshibaAC(const uint16_t pin, const bool inverted,
 void IRToshibaAC::stateReset(void) {
   static const uint8_t kReset[kToshibaACStateLength] = {
       0xF2, 0x0D, 0x03, 0xFC, 0x01};
-  memcpy(remote_state, kReset, kToshibaACStateLength);
+  memcpy(_.raw, kReset, kToshibaACStateLength);
   setTemp(22);  // Remote defaults to 22C after factory reset. So do the same.
   setSwing(kToshibaAcSwingOff);
-  prev_mode = getMode();
+  _prev_mode = getMode();
 }
 
 /// Set up hardware to be able to send a message.
@@ -109,25 +107,25 @@ uint16_t IRToshibaAC::getInternalStateLength(const uint8_t state[],
 
 /// Get the length of the current internal state per the protocol structure.
 /// @return Nr. of bytes in use for the current internal state message.
-uint16_t IRToshibaAC::getStateLength(void) {
-  return getInternalStateLength(remote_state, kToshibaACStateLengthLong);
+uint16_t IRToshibaAC::getStateLength(void) const {
+  return getInternalStateLength(_.raw, kToshibaACStateLengthLong);
 }
 
 /// Set the internal length of the current internal state per the protocol.
 /// @param[in] size Nr. of bytes in use for the current internal state message.
 void IRToshibaAC::setStateLength(const uint16_t size) {
   if (size < kToshibaAcMinLength) return;
-  remote_state[kToshibaAcLengthByte] = size - kToshibaAcMinLength;
+  _.Length = size - kToshibaAcMinLength;
 }
 
 /// Make a copy of the internal code-form A/C state.
 void IRToshibaAC::_backupState(void) {
-  memcpy(backup, remote_state, kToshibaACStateLengthLong);
+  memcpy(backup, _.raw, kToshibaACStateLengthLong);
 }
 
 /// Recover the internal code-form A/C state from the backup.
 void IRToshibaAC::_restoreState(void) {
-  memcpy(remote_state, backup, kToshibaACStateLengthLong);
+  memcpy(_.raw, backup, kToshibaACStateLengthLong);
 }
 
 /// Get a PTR to the internal state/code for this protocol with all integrity
@@ -135,14 +133,14 @@ void IRToshibaAC::_restoreState(void) {
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRToshibaAC::getRaw(void) {
   checksum(getStateLength());
-  return remote_state;
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] newState A valid code for this protocol.
 void IRToshibaAC::setRaw(const uint8_t newState[]) {
-  memcpy(remote_state, newState, kToshibaACStateLength);
-  prev_mode = getMode();
+  memcpy(_.raw, newState, kToshibaACStateLength);
+  _prev_mode = getMode();
   _send_swing = true;
 }
 
@@ -172,14 +170,12 @@ void IRToshibaAC::checksum(const uint16_t length) {
   // Stored the checksum value in the last byte.
   if (length >= kToshibaAcMinLength) {
     // Set/clear the short msg bit.
-    setBit(&remote_state[4], kToshibaAcShortMsgBit,
-           getStateLength() == kToshibaACStateLengthShort);
+    _.ShortMsg = (getStateLength() == kToshibaACStateLengthShort);
     // Set/clear the long msg bit.
-    setBit(&remote_state[4], kToshibaAcLongMsgBit,
-          getStateLength() == kToshibaACStateLengthLong);
-    invertBytePairs(remote_state, kToshibaAcInvertedLength);
+    _.LongMsg = (getStateLength() == kToshibaACStateLengthLong);
+    invertBytePairs(_.raw, kToshibaAcInvertedLength);
     // Always do the Xor checksum LAST!
-    remote_state[length - 1] = calcChecksum(remote_state, length);
+    _.raw[length - 1] = calcChecksum(_.raw, length);
   }
 }
 
@@ -194,7 +190,7 @@ void IRToshibaAC::off(void) { setPower(false); }
 void IRToshibaAC::setPower(const bool on) {
   if (on) {  // On
     // If not already on, pick the last non-off mode used
-    if (!getPower()) setMode(prev_mode);
+    if (!getPower()) setMode(_prev_mode);
   } else {  // Off
     setMode(kToshibaAcOff);
   }
@@ -202,24 +198,22 @@ void IRToshibaAC::setPower(const bool on) {
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRToshibaAC::getPower(void) {
+bool IRToshibaAC::getPower(void) const {
   return getMode(true) != kToshibaAcOff;
 }
 
 /// Set the temperature.
 /// @param[in] degrees The temperature in degrees celsius.
 void IRToshibaAC::setTemp(const uint8_t degrees) {
-  uint8_t temp = std::max((uint8_t)kToshibaAcMinTemp, degrees);
-  temp = std::min((uint8_t)kToshibaAcMaxTemp, temp);
-  setBits(&remote_state[5], kToshibaAcTempOffset, kToshibaAcTempSize,
-          temp - kToshibaAcMinTemp);
+  uint8_t temp = std::max(kToshibaAcMinTemp, degrees);
+  temp = std::min(kToshibaAcMaxTemp, temp);
+  _.Temp = temp - kToshibaAcMinTemp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRToshibaAC::getTemp(void) {
-  return GETBITS8(remote_state[5], kToshibaAcTempOffset, kToshibaAcTempSize) +
-      kToshibaAcMinTemp;
+uint8_t IRToshibaAC::getTemp(void) const {
+  return _.Temp + kToshibaAcMinTemp;
 }
 
 /// Set the speed of the fan.
@@ -230,14 +224,13 @@ void IRToshibaAC::setFan(const uint8_t speed) {
   if (fan > kToshibaAcFanMax)
     fan = kToshibaAcFanMax;  // Set the fan to maximum if out of range.
   if (fan > kToshibaAcFanAuto) fan++;
-  setBits(&remote_state[6], kToshibaAcFanOffset, kToshibaAcFanSize, fan);
+  _.Fan = fan;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed/mode.
-uint8_t IRToshibaAC::getFan(void) {
-  uint8_t fan = GETBITS8(remote_state[6], kToshibaAcFanOffset,
-                         kToshibaAcFanSize);
+uint8_t IRToshibaAC::getFan(void) const {
+  uint8_t fan = _.Fan;
   if (fan == kToshibaAcFanAuto) return kToshibaAcFanAuto;
   return --fan;
 }
@@ -245,9 +238,8 @@ uint8_t IRToshibaAC::getFan(void) {
 /// Get the swing setting of the A/C.
 /// @param[in] raw Calculate the answer from just the state data.
 /// @return The current swing mode setting.
-uint8_t IRToshibaAC::getSwing(const bool raw) {
-  return raw ? GETBITS8(remote_state[5], kToshibaAcSwingOffset,
-                        kToshibaAcSwingSize) : _swing_mode;
+uint8_t IRToshibaAC::getSwing(const bool raw) const {
+  return raw ? _.Swing : _swing_mode;
 }
 
 /// Set the swing setting of the A/C.
@@ -260,20 +252,18 @@ void IRToshibaAC::setSwing(const uint8_t setting) {
       _send_swing = true;
       _swing_mode = setting;
       if (getStateLength() == kToshibaACStateLengthShort)
-        setBits(&remote_state[5], kToshibaAcSwingOffset, kToshibaAcSwingSize,
-                setting);
+        _.Swing = setting;
   }
 }
 
 /// Get the operating mode setting of the A/C.
 /// @param[in] raw Get the value without any intelligent processing.
 /// @return The current operating mode setting.
-uint8_t IRToshibaAC::getMode(const bool raw) {
-  const uint8_t mode = GETBITS8(remote_state[6], kToshibaAcModeOffset,
-                                kToshibaAcModeSize);
+uint8_t IRToshibaAC::getMode(const bool raw) const {
+  const uint8_t mode = _.Mode;
   if (raw) return mode;
   switch (mode) {
-    case kToshibaAcOff: return prev_mode;
+    case kToshibaAcOff: return _prev_mode;
     default:            return mode;
   }
 }
@@ -283,7 +273,7 @@ uint8_t IRToshibaAC::getMode(const bool raw) {
 /// @note If we get an unexpected mode, default to AUTO.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1205#issuecomment-654446771
 void IRToshibaAC::setMode(const uint8_t mode) {
-  if (mode != prev_mode)
+  if (mode != _prev_mode)
       // Changing mode or power turns Econo & Turbo to off on a real remote.
       // Setting the internal message length to "normal" will do that.
       setStateLength(kToshibaACStateLength);
@@ -293,21 +283,22 @@ void IRToshibaAC::setMode(const uint8_t mode) {
     case kToshibaAcDry:
     case kToshibaAcHeat:
     case kToshibaAcFan:
-      prev_mode = mode;
+      _prev_mode = mode;
       // FALL-THRU
     case kToshibaAcOff:
-      setBits(&remote_state[6], kToshibaAcModeOffset, kToshibaAcModeSize,
-              mode);
+      _.Mode = mode;
       break;
-    default: setMode(kToshibaAcAuto);
+    default:
+      _prev_mode = kToshibaAcAuto;
+      _.Mode = kToshibaAcAuto;
   }
 }
 
 /// Get the Turbo (Powerful) setting of the A/C.
 /// @return true, if the current setting is on. Otherwise, false.
-bool IRToshibaAC::getTurbo(void) {
+bool IRToshibaAC::getTurbo(void) const {
   if (getStateLength() == kToshibaACStateLengthLong)
-    return remote_state[8] == kToshibaAcTurboOn;
+    return _.EcoTurbo == kToshibaAcTurboOn;
   return false;
 }
 
@@ -316,7 +307,7 @@ bool IRToshibaAC::getTurbo(void) {
 /// Note: Turbo mode is mutually exclusive with Economy mode.
 void IRToshibaAC::setTurbo(const bool on) {
   if (on) {
-    remote_state[8] = kToshibaAcTurboOn;
+    _.EcoTurbo = kToshibaAcTurboOn;
     setStateLength(kToshibaACStateLengthLong);
   } else {
     if (!getEcono()) setStateLength(kToshibaACStateLength);
@@ -325,9 +316,9 @@ void IRToshibaAC::setTurbo(const bool on) {
 
 /// Get the Economy mode setting of the A/C.
 /// @return true, if the current setting is on. Otherwise, false.
-bool IRToshibaAC::getEcono(void) {
+bool IRToshibaAC::getEcono(void) const {
   if (getStateLength() == kToshibaACStateLengthLong)
-    return remote_state[8] == kToshibaAcEconoOn;
+    return _.EcoTurbo == kToshibaAcEconoOn;
   return false;
 }
 
@@ -336,7 +327,7 @@ bool IRToshibaAC::getEcono(void) {
 /// Note: Economy mode is mutually exclusive with Turbo mode.
 void IRToshibaAC::setEcono(const bool on) {
   if (on) {
-    remote_state[8] = kToshibaAcEconoOn;
+    _.EcoTurbo = kToshibaAcEconoOn;
     setStateLength(kToshibaACStateLengthLong);
   } else {
     if (!getTurbo()) setStateLength(kToshibaACStateLength);
@@ -401,15 +392,15 @@ stdAc::fanspeed_t IRToshibaAC::toCommonFanSpeed(const uint8_t spd) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRToshibaAC::toCommon(void) {
+stdAc::state_t IRToshibaAC::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::TOSHIBA_AC;
   result.model = -1;  // Not supported.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = getPower();
+  result.mode = toCommonMode(getMode());
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
   result.swingv = (getSwing() == kToshibaAcSwingOn) ? stdAc::swingv_t::kAuto
                                                     : stdAc::swingv_t::kOff;
   result.turbo = getTurbo();
@@ -428,7 +419,7 @@ stdAc::state_t IRToshibaAC::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRToshibaAC::toString(void) {
+String IRToshibaAC::toString(void) const {
   String result = "";
   result.reserve(80);
   result += addTempToString(getTemp(), true, false);
