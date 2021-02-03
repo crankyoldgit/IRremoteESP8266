@@ -1017,13 +1017,13 @@ TEST(TestMitsubishiACClass, HumanReadable) {
   IRMitsubishiAC ac(kGpioUnused);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Heat), Temp: 22C, Fan: 6 (Quiet), "
-      "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
+      "Swing(V): 0 (Auto), Swing(H): 3 (Middle), "
       "Clock: 17:10, On Timer: 00:00, Off Timer: 00:00, Timer: -",
       ac.toString());
   ac.setTemp(21.5);
   EXPECT_EQ(
       "Power: On, Mode: 1 (Heat), Temp: 21.5C, Fan: 6 (Quiet), "
-      "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
+      "Swing(V): 0 (Auto), Swing(H): 3 (Middle), "
       "Clock: 17:10, On Timer: 00:00, Off Timer: 00:00, Timer: -",
       ac.toString());
 }
@@ -1179,7 +1179,7 @@ TEST(TestMitsubishiACClass, toCommon) {
   ac.setMode(kMitsubishiAcCool);
   ac.setTemp(20);
   ac.setFan(kMitsubishiAcFanSilent);
-  ac.setVane(kMitsubishiAcVaneAuto);
+  ac.setVane(kMitsubishiAcVaneAuto);  // Aka "Off", not "Swing".
   ac.setWideVane(kMitsubishiAcWideVaneAuto);
   // Now test it.
   ASSERT_EQ(decode_type_t::MITSUBISHI_AC, ac.toCommon().protocol);
@@ -1189,7 +1189,7 @@ TEST(TestMitsubishiACClass, toCommon) {
   ASSERT_EQ(20, ac.toCommon().degrees);
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
-  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
   ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
   ASSERT_TRUE(ac.toCommon().quiet);
   // Unsupported.
@@ -1535,7 +1535,7 @@ TEST(TestDecodeMitsubishiAC, Issue891) {
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 3 (Cool), Temp: 24C, Fan: 0 (Auto), "
-      "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
+      "Swing(V): 0 (Auto), Swing(H): 3 (Middle), "
       "Clock: 00:00, On Timer: 00:00, Off Timer: 00:00, Timer: -",
       ac.toString());
 }
@@ -1761,4 +1761,25 @@ TEST(TestDecodeMitsubishi112, SyntheticExample) {
   ASSERT_EQ(MITSUBISHI112, irsend.capture.decode_type);
   EXPECT_EQ(kMitsubishi112Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, kMitsubishi112Bits);
+}
+
+TEST(TestMitsubishiACClass, Issue1399) {
+  IRMitsubishiAC ac(kGpioUnused);
+  const uint8_t swingv_auto[kMitsubishiACStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x04, 0x00,
+      0x80, 0x8B, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x54};
+  ac.setRaw(swingv_auto);
+  EXPECT_EQ(kMitsubishiAcVaneAuto, ac.getVane());
+  // Yes, we expect off from the stdAc interface, when the native is Auto.
+  EXPECT_EQ(stdAc::swingv_t::kOff, ac.toCommonSwingV(ac.getVane()));
+  EXPECT_EQ(kMitsubishiAcVaneAuto, ac.convertSwingV(stdAc::swingv_t::kOff));
+
+  const uint8_t swingv_swing[kMitsubishiACStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x20, 0x08, 0x04, 0x00,
+      0xF8, 0x8B, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0xCC};
+  ac.setRaw(swingv_swing);
+  EXPECT_EQ(kMitsubishiAcVaneSwing, ac.getVane());
+  // Yes, we expect auto from the stdAc interface, when the native is Swing.
+  EXPECT_EQ(stdAc::swingv_t::kAuto, ac.toCommonSwingV(ac.getVane()));
+  EXPECT_EQ(kMitsubishiAcVaneSwing, ac.convertSwingV(stdAc::swingv_t::kAuto));
 }

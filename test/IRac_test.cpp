@@ -1,4 +1,4 @@
-// Copyright 2019 David Conran
+// Copyright 2019-2021 David Conran
 
 #include <string>
 #include "ir_Airwell.h"
@@ -990,7 +990,7 @@ TEST(TestIRac, Mitsubishi) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 3 (Cool), Temp: 20C, Fan: 2 (Medium), "
-      "Swing(V): 0 (Auto), Swing(H): 3 (UNKNOWN), "
+      "Swing(V): 0 (Auto), Swing(H): 3 (Middle), "
       "Clock: 14:30, On Timer: 00:00, Off Timer: 00:00, Timer: -";
 
   ac.begin();
