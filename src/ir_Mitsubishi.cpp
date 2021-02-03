@@ -634,6 +634,8 @@ uint8_t IRMitsubishiAC::convertFan(const stdAc::fanspeed_t speed) {
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
 /// @return The native equivalent of the enum.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1399
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/1401
 uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest: return kMitsubishiAcVaneHighest;
@@ -641,7 +643,14 @@ uint8_t IRMitsubishiAC::convertSwingV(const stdAc::swingv_t position) {
     case stdAc::swingv_t::kMiddle:  return kMitsubishiAcVaneMiddle;
     case stdAc::swingv_t::kLow:     return kMitsubishiAcVaneLow;
     case stdAc::swingv_t::kLowest:  return kMitsubishiAcVaneLowest;
+    // These model Mitsubishi A/C have two automatic settings.
+    // 1. A typical up & down oscillation. (Native Swing)
+    // 2. The A/C determines where the best placement for the vanes, outside of
+    //    user control. (Native Auto)
+    // Native "Swing" is what we consider "Auto" in stdAc. (Case 1)
     case stdAc::swingv_t::kAuto:    return kMitsubishiAcVaneSwing;
+    // Native "Auto" doesn't have a good match for this in stdAc. (Case 2)
+    // So we repurpose stdAc's "Off" (and anything else) to be Native Auto.
     default:                        return kMitsubishiAcVaneAuto;
   }
 }
@@ -691,6 +700,8 @@ stdAc::fanspeed_t IRMitsubishiAC::toCommonFanSpeed(const uint8_t speed) {
 /// Convert a native vertical swing postion to it's common equivalent.
 /// @param[in] pos A native position to convert.
 /// @return The common vertical swing position.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1399
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/1401
 stdAc::swingv_t IRMitsubishiAC::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
     case kMitsubishiAcVaneHighest: return stdAc::swingv_t::kHighest;
@@ -698,7 +709,14 @@ stdAc::swingv_t IRMitsubishiAC::toCommonSwingV(const uint8_t pos) {
     case kMitsubishiAcVaneMiddle:  return stdAc::swingv_t::kMiddle;
     case kMitsubishiAcVaneLow:     return stdAc::swingv_t::kLow;
     case kMitsubishiAcVaneLowest:  return stdAc::swingv_t::kLowest;
+    // These model Mitsubishi A/C have two automatic settings.
+    // 1. A typical up & down oscillation. (Native Swing)
+    // 2. The A/C determines where the best placement for the vanes, outside of
+    //    user control. (Native Auto)
+    // Native "Auto" doesn't have a good match for this in stdAc. (Case 2)
+    // So we repurpose stdAc's "Off" to be Native Auto.
     case kMitsubishiAcVaneAuto:    return stdAc::swingv_t::kOff;
+    // Native "Swing" is what we consider "Auto" in stdAc. (Case 1)
     default:                       return stdAc::swingv_t::kAuto;
   }
 }
