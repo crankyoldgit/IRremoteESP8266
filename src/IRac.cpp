@@ -1334,6 +1334,8 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
                       const stdAc::swingh_t swingh,
                       const bool quiet, const int16_t clock) {
   ac->begin();
+  // Uncomment next line if you *really* need the weekly timer enabled via IRac.
+  // ac->setWeeklyTimerEnabled(true);  // Weekly Timer is disabled by default.
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);

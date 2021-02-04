@@ -762,6 +762,16 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) const {
   return result;
 }
 
+/// Change the Weekly Timer Enabled setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMitsubishiAC::setWeeklyTimerEnabled(const bool on) {
+  _.WeeklyTimer = on;
+}
+
+/// Get the value of the WeeklyTimer Enabled setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRMitsubishiAC::getWeeklyTimerEnabled(void) const { return _.WeeklyTimer; }
+
 /// Convert the internal state into a human readable string.
 /// @return A string containing the settings in human-readable form.
 String IRMitsubishiAC::toString(void) const {
@@ -822,6 +832,7 @@ String IRMitsubishiAC::toString(void) const {
       result += _.Timer;
       result += ')';
   }
+  result += addBoolToString(_.WeeklyTimer, kWeeklyTimerStr);
   return result;
 }
 

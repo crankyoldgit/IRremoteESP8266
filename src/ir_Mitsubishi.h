@@ -79,8 +79,9 @@ union Mitsubishi144Protocol{
     // Byte 12
     uint8_t StartClock:8;
     // Byte 13
-    uint8_t Timer :3;
-    uint8_t       :5;
+    uint8_t Timer       :3;
+    uint8_t WeeklyTimer :1;
+    uint8_t             :4;
     // Byte 14~16
     uint8_t pad1[3];
     // Byte 17
@@ -277,6 +278,8 @@ class IRMitsubishiAC {
   void setStopClock(const uint8_t clock);
   uint8_t getTimer(void) const;
   void setTimer(const uint8_t timer);
+  bool getWeeklyTimerEnabled(void) const;
+  void setWeeklyTimerEnabled(const bool on);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static uint8_t convertSwingV(const stdAc::swingv_t position);
