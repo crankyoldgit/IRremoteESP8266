@@ -1,5 +1,6 @@
 // Copyright 2020 Chandrashekar Shetty (iamDshetty)
 // Copyright 2020 crankyoldgit
+// Copyright 2021 siriuslzx
 
 /// @file
 /// @brief Support for Transcold A/C protocols.
@@ -68,6 +69,19 @@ temp 	16	Auto	cool	close (right)	11101111000100000110011110011000010101001010101
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Transcold A/C message.
+union TranscoldProtocol{
+  uint32_t raw;  ///< The state of the IR remote in IR code form.
+  struct {
+    uint8_t       :8;
+    uint8_t Temp  :4;
+    uint8_t Mode  :4;
+    uint8_t Fan   :4;
+    uint8_t       :4;
+    uint8_t       :8;
+  };
+};
+
 // Constants
 // Modes
 const uint8_t kTranscoldCool = 0b0110;
@@ -75,12 +89,8 @@ const uint8_t kTranscoldDry = 0b1100;
 const uint8_t kTranscoldAuto = 0b1110;
 const uint8_t kTranscoldHeat = 0b1010;
 const uint8_t kTranscoldFan = 0b0010;
-const uint8_t kTranscoldModeOffset = 12;
-const uint8_t kTranscoldModeSize = 4;
 
 // Fan Control
-const uint8_t kTranscoldFanOffset = 16;
-const uint8_t kTranscoldFanSize = 4;
 const uint8_t kTranscoldFanMin = 0b1001;
 const uint8_t kTranscoldFanMed = 0b1101;
 const uint8_t kTranscoldFanMax = 0b1011;
@@ -93,7 +103,6 @@ const uint8_t kTranscoldFanFixed = 0b1100;
 const uint8_t kTranscoldTempMin = 18;  // Celsius
 const uint8_t kTranscoldTempMax = 30;  // Celsius
 const uint8_t kTranscoldFanTempCode = 0b1111;  // Part of Fan Mode.
-const uint8_t kTranscoldTempOffset = 8;
 const uint8_t kTranscoldTempSize = 4;
 
 const uint8_t kTranscoldPrefix = 0b0000;
@@ -112,7 +121,7 @@ class IRTranscoldAc {
  public:
   explicit IRTranscoldAc(const uint16_t pin, const bool inverted = false,
                       const bool use_modulation = true);
-  void stateReset();
+  void stateReset(void);
 #if SEND_TRANSCOLD
   void send(const uint16_t repeat = kTranscoldDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
@@ -121,27 +130,27 @@ class IRTranscoldAc {
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_TRANSCOLD
-  void begin();
-  void on();
-  void off();
+  void begin(void);
+  void on(void);
+  void off(void);
   void setPower(const bool state);
-  bool getPower();
+  bool getPower(void) const;
   void setTemp(const uint8_t temp);
-  uint8_t getTemp();
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed, const bool modecheck = true);
-  uint8_t getFan();
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode();
-  void setSwing();
-  bool getSwing();
-  uint32_t getRaw();
+  uint8_t getMode(void) const;
+  void setSwing(void);
+  bool getSwing(void) const;
+  uint32_t getRaw(void) const;
   void setRaw(const uint32_t new_code);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
-  String toString();
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -152,20 +161,14 @@ class IRTranscoldAc {
   /// @endcond
 #endif
   // internal state
-  bool    powerFlag;
   bool    swingFlag;
   bool    swingHFlag;
   bool    swingVFlag;
 
-  uint32_t remote_state;  ///< The state of the IR remote in IR code form.
-  uint32_t saved_state;   ///< Copy of the state if we required a special mode.
-  void setTempRaw(const uint8_t code);
-  uint8_t getTempRaw();
-  bool isSpecialState(void);
+  TranscoldProtocol _;
+  uint32_t special_state;   ///< special mode.
+  bool isSpecialState(void) const;
   bool handleSpecialState(const uint32_t data);
-  void updateSavedState(void);
-  void recoverSavedState(void);
-  uint32_t getNormalState(void);
 };
 
 #endif  // IR_TRANSCOLD_H_

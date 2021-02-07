@@ -1,5 +1,6 @@
 // Copyright 2020 Chandrashekar Shetty (iamDshetty)
 // Copyright 2020 crankyoldgit
+// Copyright 2021 siriuslzx
 
 /// @file
 /// @brief Support for Transcold A/C protocols.
@@ -28,8 +29,6 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
-using irutils::setBit;
-using irutils::setBits;
 
 
 #if SEND_TRANSCOLD
@@ -77,53 +76,61 @@ IRTranscoldAc::IRTranscoldAc(const uint16_t pin, const bool inverted,
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the internal state to a fixed known good state.
-void IRTranscoldAc::stateReset() {
+void IRTranscoldAc::stateReset(void) {
   setRaw(kTranscoldKnownGoodState);
-  saved_state = kTranscoldKnownGoodState;
-  powerFlag = false;
+  special_state = kTranscoldOff;
   swingFlag = false;
   swingHFlag = false;
   swingVFlag = false;
 }
 
 /// Set up hardware to be able to send a message.
-void IRTranscoldAc::begin() { _irsend.begin(); }
+void IRTranscoldAc::begin(void) { _irsend.begin(); }
 
 #if SEND_TRANSCOLD
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRTranscoldAc::send(uint16_t repeat) {
-  _irsend.sendTranscold(remote_state, kTranscoldBits, repeat);
-  // make sure to remove special state from remote_state
-  // after command has being transmitted.
-  recoverSavedState();
+    _irsend.sendTranscold(getRaw(), kTranscoldBits, repeat);
+  if (isSpecialState()) {
+    // make sure to remove special state from special_state
+    // after command has being transmitted.
+    special_state = kTranscoldKnownGoodState;
+  }
 }
 #endif  // SEND_TRANSCOLD
 
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
-uint32_t IRTranscoldAc::getRaw() { return remote_state; }
+uint32_t IRTranscoldAc::getRaw(void) const {
+    if (isSpecialState()) {
+      return special_state;
+    }
+    return _.raw;
+  }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRTranscoldAc::setRaw(const uint32_t new_code) {
-  powerFlag = true;  // Everything that is not the special power off mesg is On.
-  if (!handleSpecialState(new_code)) {
+  if (handleSpecialState(new_code)) {
+    special_state = new_code;
+    _.raw = kTranscoldKnownGoodState;
+  } else {
+    // must be a command changing Temp|Mode|Fan
+    // it is safe to just copy to remote var
+    _.raw = new_code;
+    special_state = kTranscoldKnownGoodState;
     // it isn`t special so might affect Temp|mode|Fan
     if (new_code == kTranscoldCmdFan) {
       setMode(kTranscoldFan);
-      return;
     }
   }
-  // must be a command changing Temp|Mode|Fan
-  // it is safe to just copy to remote var
-  remote_state = new_code;
 }
 
 /// Is the current state is a special state?
 /// @return true, if it is. false if it isn't.
-bool IRTranscoldAc::isSpecialState(void) {
-  switch (remote_state) {
+bool IRTranscoldAc::isSpecialState(void) const {
+  switch (special_state) {
     case kTranscoldOff:
     case kTranscoldSwing: return true;
     default: return false;
@@ -139,7 +146,6 @@ bool IRTranscoldAc::isSpecialState(void) {
 bool IRTranscoldAc::handleSpecialState(const uint32_t data) {
   switch (data) {
     case kTranscoldOff:
-      powerFlag = false;
       break;
     case kTranscoldSwing:
       swingFlag = !swingFlag;
@@ -150,72 +156,38 @@ bool IRTranscoldAc::handleSpecialState(const uint32_t data) {
   return true;
 }
 
-/// Backup the current internal state as long as it isn't a special state.
-/// @note: Must be called before every special state to make sure the
-/// remote_state is safe
-void IRTranscoldAc::updateSavedState(void) {
-  if (!isSpecialState()) saved_state = remote_state;
-}
-
-/// Restore the current internal state from backup as long as it isn't a
-///   special state.
-void IRTranscoldAc::recoverSavedState(void) {
-  // If the current state is a special one, last known normal one.
-  if (isSpecialState()) remote_state = saved_state;
-  // If the saved_state was also a special state, reset as we expect a normal
-  // state out of all this.
-  if (isSpecialState()) stateReset();
-}
-
-/// Set the raw (native) temperature value.
-/// @note Bypasses any checks.
-/// @param[in] code The desired native temperature.
-void IRTranscoldAc::setTempRaw(const uint8_t code) {
-  setBits(&remote_state, kTranscoldTempOffset, kTranscoldTempSize, code);
-}
-
-/// Get the raw (native) temperature value.
-/// @return The native temperature value.
-uint8_t IRTranscoldAc::getTempRaw() {
-  return GETBITS32(remote_state, kTranscoldTempOffset, kTranscoldTempSize);
-}
-
 /// Set the temperature.
 /// @param[in] desired The temperature in degrees celsius.
 void IRTranscoldAc::setTemp(const uint8_t desired) {
   // Range check.
   uint8_t temp = std::min(desired, kTranscoldTempMax);
   temp = std::max(temp, kTranscoldTempMin) - kTranscoldTempMin + 1;
-  setTempRaw(reverseBits(invertBits(temp, kTranscoldTempSize),
-                         kTranscoldTempSize));
+  _.Temp = reverseBits(invertBits(temp, kTranscoldTempSize),
+                       kTranscoldTempSize);
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRTranscoldAc::getTemp() {
-  return reverseBits(invertBits(getTempRaw(), kTranscoldTempSize),
+uint8_t IRTranscoldAc::getTemp(void) const {
+  return reverseBits(invertBits(_.Temp, kTranscoldTempSize),
                      kTranscoldTempSize) + kTranscoldTempMin - 1;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRTranscoldAc::getPower() {
+bool IRTranscoldAc::getPower(void) const {
   // There is only an off state. Everything else is "on".
-  return powerFlag;
+  return special_state != kTranscoldOff;
 }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRTranscoldAc::setPower(const bool on) {
   if (!on) {
-    updateSavedState();
-    remote_state = kTranscoldOff;
-  } else if (!powerFlag) {
-    // at this point remote_state must be ready
-    // to be transmitted
-    recoverSavedState();
+    special_state = kTranscoldOff;
+  } else {
+    special_state = kTranscoldKnownGoodState;
   }
-  powerFlag = on;
 }
 
 /// Change the power setting to On.
@@ -226,13 +198,13 @@ void IRTranscoldAc::off(void) { setPower(false); }
 
 /// Get the Swing setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRTranscoldAc::getSwing() { return swingFlag; }
+bool IRTranscoldAc::getSwing(void) const { return swingFlag; }
 
 /// Toggle the Swing mode of the A/C.
-void IRTranscoldAc::setSwing() {
+void IRTranscoldAc::setSwing(void) {
   // Assumes that repeated sending "swing" toggles the action on the device.
-  updateSavedState();
-  remote_state = kTranscoldSwing;
+  // if not, the variable "swingFlag" can be removed.
+  special_state = kTranscoldSwing;
   swingFlag = !swingFlag;
 }
 
@@ -243,41 +215,39 @@ void IRTranscoldAc::setMode(const uint8_t mode) {
   switch (actualmode) {
     case kTranscoldAuto:
     case kTranscoldDry:
-      setFan(kTranscoldFanAuto0, false);
+      _.Fan = kTranscoldFanAuto0;
       break;
     case kTranscoldCool:
     case kTranscoldHeat:
     case kTranscoldFan:
-      setFan(kTranscoldFanAuto, false);
+      _.Fan = kTranscoldFanAuto;
       break;
     default:  // Anything else, go with Auto mode.
-      setMode(kTranscoldAuto);
-      setFan(kTranscoldFanAuto0, false);
-      return;
+      actualmode = kTranscoldAuto;
+      _.Fan = kTranscoldFanAuto0;
   }
   setTemp(getTemp());
   // Fan mode is a special case of Dry.
-  if (mode == kTranscoldFan) {
+  if (actualmode == kTranscoldFan) {
     actualmode = kTranscoldDry;
-    setTempRaw(kTranscoldFanTempCode);
+    _.Temp = kTranscoldFanTempCode;
   }
-  setBits(&remote_state, kTranscoldModeOffset, kTranscoldModeSize, actualmode);
+  _.Mode = actualmode;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRTranscoldAc::getMode() {
-  uint8_t mode = GETBITS32(remote_state, kTranscoldModeOffset,
-                           kTranscoldModeSize);
+uint8_t IRTranscoldAc::getMode(void) const {
+  uint8_t mode = _.Mode;
   if (mode == kTranscoldDry)
-    if (getTempRaw() == kTranscoldFanTempCode) return kTranscoldFan;
+    if (_.Temp == kTranscoldFanTempCode) return kTranscoldFan;
   return mode;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRTranscoldAc::getFan() {
-  return GETBITS32(remote_state, kTranscoldFanOffset, kTranscoldFanSize);
+uint8_t IRTranscoldAc::getFan(void) const {
+  return _.Fan;
 }
 
 /// Set the speed of the fan.
@@ -285,26 +255,21 @@ uint8_t IRTranscoldAc::getFan() {
 /// @param[in] modecheck Do we enforce any mode limitations before setting?
 void IRTranscoldAc::setFan(const uint8_t speed, const bool modecheck) {
   uint8_t newspeed = speed;
+  if (modecheck) {
+    switch (getMode()) {
+      case kTranscoldAuto:
+      case kTranscoldDry:  // Dry & Auto mode can't have speed Auto.
+        if (speed == kTranscoldFanAuto)
+          newspeed = kTranscoldFanAuto0;
+        break;
+      default:  // Only Dry & Auto mode can have speed Auto0.
+        if (speed == kTranscoldFanAuto0)
+          newspeed = kTranscoldFanAuto;
+    }
+  }
   switch (speed) {
-    case kTranscoldFanAuto:  // Dry & Auto mode can't have this speed.
-      if (modecheck) {
-        switch (getMode()) {
-          case kTranscoldAuto:
-          case kTranscoldDry:
-            newspeed = kTranscoldFanAuto0;
-          break;
-        }
-      }
-      break;
-    case kTranscoldFanAuto0:  // Only Dry & Auto mode can have this speed.
-      if (modecheck) {
-        switch (getMode()) {
-          case kTranscoldAuto:
-          case kTranscoldDry: break;
-          default: newspeed = kTranscoldFanAuto;
-        }
-      }
-      break;
+    case kTranscoldFanAuto:
+    case kTranscoldFanAuto0:
     case kTranscoldFanMin:
     case kTranscoldFanMed:
     case kTranscoldFanMax:
@@ -315,7 +280,7 @@ void IRTranscoldAc::setFan(const uint8_t speed, const bool modecheck) {
       newspeed = kTranscoldFanAuto;
       break;
   }
-  setBits(&remote_state, kTranscoldFanOffset, kTranscoldFanSize, newspeed);
+  _.Fan = newspeed;
 }
 
 /// Convert a standard A/C mode into its native mode.
@@ -373,7 +338,7 @@ stdAc::fanspeed_t IRTranscoldAc::toCommonFanSpeed(const uint8_t speed) {
 /// Convert the A/C state to it's common stdAc::state_t equivalent.
 /// @param[in] prev Ptr to the previous state if required.
 /// @return A stdAc::state_t state.
-stdAc::state_t IRTranscoldAc::toCommon(const stdAc::state_t *prev) {
+stdAc::state_t IRTranscoldAc::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
   // Start with the previous state if given it.
   if (prev != NULL) {
@@ -414,13 +379,13 @@ stdAc::state_t IRTranscoldAc::toCommon(const stdAc::state_t *prev) {
   // Back to "normal" stateful messages.
   result.mode = toCommonMode(getMode());
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
+  result.fanspeed = toCommonFanSpeed(_.Fan);
   return result;
 }
 
 /// Convert the internal state into a human readable string.
 /// @return The current internal state expressed as a human readable String.
-String IRTranscoldAc::toString(void) {
+String IRTranscoldAc::toString(void) const {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
@@ -435,9 +400,9 @@ String IRTranscoldAc::toString(void) {
   }
   result += addModeToString(getMode(), kTranscoldAuto, kTranscoldCool,
                             kTranscoldHeat, kTranscoldDry, kTranscoldFan);
-  result += addIntToString(getFan(), kFanStr);
+  result += addIntToString(_.Fan, kFanStr);
   result += kSpaceLBraceStr;
-  switch (getFan()) {
+  switch (_.Fan) {
     case kTranscoldFanAuto:
       result += kAutoStr;
       break;
