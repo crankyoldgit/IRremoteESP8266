@@ -1,5 +1,6 @@
 // Copyright 2020 Chandrashekar Shetty (iamDshetty)
 // Copyright 2020 crankyoldgit
+// Copyright 2021 siriuslzx
 
 /// @file
 /// @brief Support for Transcold A/C protocols.

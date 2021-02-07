@@ -1,5 +1,6 @@
 // Copyright 2020 Chandrashekar Shetty (iamDshetty)
 // Copyright 2020 crankyoldgit
+// Copyright 2021 siriuslzx
 
 /// @file
 /// @brief Support for Transcold A/C protocols.
@@ -90,13 +91,11 @@ void IRTranscoldAc::begin(void) { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRTranscoldAc::send(uint16_t repeat) {
+    _irsend.sendTranscold(getRaw(), kTranscoldBits, repeat);
   if (isSpecialState()) {
-    _irsend.sendTranscold(special_state, kTranscoldBits, repeat);
     // make sure to remove special state from special_state
     // after command has being transmitted.
     special_state = kTranscoldKnownGoodState;
-  } else {
-    _irsend.sendTranscold(_.raw, kTranscoldBits, repeat);
   }
 }
 #endif  // SEND_TRANSCOLD
