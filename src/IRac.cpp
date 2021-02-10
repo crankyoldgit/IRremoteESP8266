@@ -2197,6 +2197,8 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
 /// @param[in] model The A/C model if applicable.
 /// @param[in] power The power setting.
 /// @param[in] mode The operation mode setting.
+/// @note Changing mode from "Off" to something else does NOT turn on a device.
+/// You need to use `power` for that.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
 /// @param[in] fan The speed setting for the fan.
@@ -2234,6 +2236,8 @@ bool IRac::sendAc(const decode_type_t vendor, const int16_t model,
 /// Send A/C message for a given device using state_t structures.
 /// @param[in] desired The state_t structure describing the desired new ac state
 /// @param[in] prev A Ptr to the state_t structure containing the previous state
+/// @note Changing mode from "Off" to something else does NOT turn on a device.
+/// You need to use `power` for that.
 /// @return True, if accepted/converted/attempted etc. False, if unsupported.
 bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   // Convert the temp from Fahrenheit to Celsius if we are not in Celsius mode.
