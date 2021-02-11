@@ -661,6 +661,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case MIDEA:
     case PANASONIC:
       return 48;
+    case ECOCLIM:
     case MAGIQUEST:
     case VESTEL_AC:
     case TECHNIBEL_AC:
@@ -821,6 +822,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendDoshisha(data, nbits, min_repeat);
       break;
 #endif
+#if SEND_ECOCLIM
+    case ECOCLIM:
+      sendEcoclim(data, nbits, min_repeat);
+      break;
+#endif  // SEND_ECOCLIM
 #if SEND_ELITESCREENS
     case ELITESCREENS:
       sendElitescreens(data, nbits, min_repeat);
