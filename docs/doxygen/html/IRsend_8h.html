@@ -185,7 +185,8 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:a1b797a5e5176ac0eef49810bf7f40e6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Panasonic A/C model numbers.  <a href="IRsend_8h.html#a1b797a5e5176ac0eef49810bf7f40e6f">More...</a><br /></td></tr>
 <tr class="separator:a1b797a5e5176ac0eef49810bf7f40e6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a258e4af12642d613587149fa734e45e7"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7">sharp_ac_remote_model_t</a> { <a class="el" href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7a11c3296670bdeab9ddd87e4edb875e64">A907</a> = 1, 
-<a class="el" href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7a7478bee154c89b576fd478d9623d9281">A705</a> = 2
+<a class="el" href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7a7478bee154c89b576fd478d9623d9281">A705</a> = 2, 
+<a class="el" href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7a2357513b74e874971927b6b08dcc1655">A903</a> = 3
  }</td></tr>
 <tr class="memdesc:a258e4af12642d613587149fa734e45e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sharp A/C model numbers.  <a href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7">More...</a><br /></td></tr>
 <tr class="separator:a258e4af12642d613587149fa734e45e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,11 +234,16 @@ Variables</h2></td></tr>
 
 <p>Fujitsu A/C model numbers. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0a6ccf47af1067e794e02e21f03389297b"></a>ARRAH2E&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0a6f6fcd0be917d91b71c1b80b5446ee5b"></a>ARDB1&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0a2443ff6f0181dbc1af275c709d67147a"></a>ARREB1E&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0acbca1f3d199103d8cb9d856b9089cdc4"></a>ARJW2&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0aee3994c5a4a8447463d67df2cdf5a946"></a>ARRY4&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0a6ccf47af1067e794e02e21f03389297b"></a>ARRAH2E&#160;</td><td class="fielddoc"><p>(1) AR-RAH2E, AR-RAC1E, AR-RAE1E, AR-RCE1E (Default) Warning: Use on incorrect models can cause the A/C to lock up, requring the A/C to be physically powered off to fix. e.g. AR-RAH1U may lock up with a Swing command. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0a6f6fcd0be917d91b71c1b80b5446ee5b"></a>ARDB1&#160;</td><td class="fielddoc"><p>(2) AR-DB1, AR-DL10 (AR-DL10 swing doesn't work) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0a2443ff6f0181dbc1af275c709d67147a"></a>ARREB1E&#160;</td><td class="fielddoc"><p>(3) AR-REB1E, AR-RAH1U (Similar to ARRAH2E but no horiz control) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0acbca1f3d199103d8cb9d856b9089cdc4"></a>ARJW2&#160;</td><td class="fielddoc"><p>(4) AR-JW2 (Same as ARDB1 but with horiz control) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7204e78a1fe37a819c0b66f87a685dc0aee3994c5a4a8447463d67df2cdf5a946"></a>ARRY4&#160;</td><td class="fielddoc"><p>(5) AR-RY4 (Same as AR-RAH2E but with clean &amp; filter) </p>
+</td></tr>
 </table>
 
 </div>
@@ -343,6 +349,7 @@ Variables</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a258e4af12642d613587149fa734e45e7a11c3296670bdeab9ddd87e4edb875e64"></a>A907&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a258e4af12642d613587149fa734e45e7a7478bee154c89b576fd478d9623d9281"></a>A705&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a258e4af12642d613587149fa734e45e7a2357513b74e874971927b6b08dcc1655"></a>A903&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>

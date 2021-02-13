@@ -1,5 +1,32 @@
 # Release Notes
 
+## _v2.7.15 (20210213)_
+
+**[BREAKING CHANGES]**
+- Some Daikin2 constants have been changed. (#1393)
+
+**[Features]**
+- Experimental basic support for EcoClim 56 & 15 bit protocols. (#1397 #1410)
+- MITSUBISHI_AC: Add support for enabling Weekly Timer. (#1403 #1404)
+- Mitsubishi ACs: Improve handling swing/vane settings. (#1399 #1401)
+- MITSUBISHI_AC: Add support for half degrees. (#1398 #1400)
+- Add `irutils::addSwing[V|H]ToString()` and adjust some constants (#1365 #1393)
+- SharpAc: Add support for model A903, and improve `IRac` fan & power control. (#1387 #1390)
+- Experimental support for Milestag2 (#1360 #1380)
+
+**[Misc]**
+- Improve `IRac::sendAc()` documentation. (#1408 #1409)
+- refactor ir_Transcold (#1407)
+- refactor ir_Toshiba (#1395)
+- Fix Travis-CI build issues. (#1396)
+- refactor ir_Teco (#1392)
+- Fujitsu A/C: Add warning/suggestions for AR-RAH1U devices (#1376 #1386)
+- refactor ir_Technibel (#1385)
+- Add the new logo and banner :tada: (#1371 #1372)
+- Update references to sbprojects website. (#1381 #1383)
+- refactor ir_Tcl (#1379)
+
+
 ## _v2.7.14 (20210103)_
 
 **[Bug Fixes]**
