@@ -222,9 +222,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a340d60b4b24c10479b3fed4409e0834b"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSharpAc.html#a340d60b4b24c10479b3fed4409e0834b">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
 <tr class="memdesc:a340d60b4b24c10479b3fed4409e0834b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRSharpAc.html#a340d60b4b24c10479b3fed4409e0834b">More...</a><br /></td></tr>
 <tr class="separator:a340d60b4b24c10479b3fed4409e0834b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b58f12bc44639694a8422a2b9b78a88"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSharpAc.html#a9b58f12bc44639694a8422a2b9b78a88">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
-<tr class="memdesc:a9b58f12bc44639694a8422a2b9b78a88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRSharpAc.html#a9b58f12bc44639694a8422a2b9b78a88">More...</a><br /></td></tr>
-<tr class="separator:a9b58f12bc44639694a8422a2b9b78a88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b332ac755592ee643ac698654a63270"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRSharpAc.html#a7b332ac755592ee643ac698654a63270">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed, const <a class="el" href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7">sharp_ac_remote_model_t</a> model=<a class="el" href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7a11c3296670bdeab9ddd87e4edb875e64">sharp_ac_remote_model_t::A907</a>)</td></tr>
+<tr class="memdesc:a7b332ac755592ee643ac698654a63270"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRSharpAc.html#a7b332ac755592ee643ac698654a63270">More...</a><br /></td></tr>
+<tr class="separator:a7b332ac755592ee643ac698654a63270"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -550,8 +550,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a9b58f12bc44639694a8422a2b9b78a88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b58f12bc44639694a8422a2b9b78a88">&#9670;&nbsp;</a></span>convertFan()</h2>
+<a id="a7b332ac755592ee643ac698654a63270"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b332ac755592ee643ac698654a63270">&#9670;&nbsp;</a></span>convertFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -563,8 +563,18 @@ Private Attributes</h2></td></tr>
           <td class="memname">uint8_t IRSharpAc::convertFan </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td>
-          <td class="paramname"><em>speed</em></td><td>)</td>
+          <td class="paramname"><em>speed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7">sharp_ac_remote_model_t</a>&#160;</td>
+          <td class="paramname"><em>model</em> = <code><a class="el" href="IRsend_8h.html#a258e4af12642d613587149fa734e45e7a11c3296670bdeab9ddd87e4edb875e64">sharp_ac_remote_model_t::A907</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -578,6 +588,7 @@ Private Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The enum to be converted. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">model</td><td>The enum of the appropriate model. </td></tr>
   </table>
   </dd>
 </dl>
@@ -659,7 +670,7 @@ Private Attributes</h2></td></tr>
 
 <p>Get the Economical mode toggle setting of the A/C. </p>
 <dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Not available on the A705 model. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Available on the A907 models. </dd></dl>
 
 </div>
 </div>
@@ -1131,7 +1142,7 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>Probably incompatible with <code><a class="el" href="classIRSharpAc.html#a8a184ae8eeb07704b9b69849421e3172" title="Set the Turbo setting of the A/C.">setTurbo()</a></code> </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Not available on the A705 model. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Available on the A907 models. </dd></dl>
 
 </div>
 </div>

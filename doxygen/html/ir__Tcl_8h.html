@@ -80,6 +80,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionTcl112Protocol.html">Tcl112Protocol</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a TCL 112 A/C message.  <a href="unionTcl112Protocol.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html">IRTcl112Ac</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed TCL A/C messages.  <a href="classIRTcl112Ac.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -112,10 +115,6 @@ Variables</h2></td></tr>
 <tr class="separator:ae07f3dd0a84be27bcb13ba60f4fd025b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11a982cc182e446d53ded658cb7a08b6"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a11a982cc182e446d53ded658cb7a08b6">kTcl112AcAuto</a> = 8</td></tr>
 <tr class="separator:a11a982cc182e446d53ded658cb7a08b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07e49881d14cb1c84cfbf3695ae64580"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a07e49881d14cb1c84cfbf3695ae64580">kTcl112AcModeSize</a> = 4</td></tr>
-<tr class="separator:a07e49881d14cb1c84cfbf3695ae64580"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a802bbb6258edf6dcdd05a383db28e9d3"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a802bbb6258edf6dcdd05a383db28e9d3">kTcl112AcFanSize</a> = 3</td></tr>
-<tr class="separator:a802bbb6258edf6dcdd05a383db28e9d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a099935d6d2bf6ebb28332005036c59c0"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a099935d6d2bf6ebb28332005036c59c0">kTcl112AcFanAuto</a> = 0b000</td></tr>
 <tr class="separator:a099935d6d2bf6ebb28332005036c59c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5114fe3f978672fc62c0cd16f6d46dd7"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a5114fe3f978672fc62c0cd16f6d46dd7">kTcl112AcFanLow</a> = 0b010</td></tr>
@@ -124,32 +123,14 @@ Variables</h2></td></tr>
 <tr class="separator:ad8f34f1972da347a169e2eb4ddf3d835"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab9672bac3e83b2e3b3d2cc5f1aa0e1f"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#aab9672bac3e83b2e3b3d2cc5f1aa0e1f">kTcl112AcFanHigh</a> = 0b101</td></tr>
 <tr class="separator:aab9672bac3e83b2e3b3d2cc5f1aa0e1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ba7d7fa8df2243330eafce097209651"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a1ba7d7fa8df2243330eafce097209651">kTcl112AcHalfDegreeOffset</a> = 5</td></tr>
-<tr class="separator:a1ba7d7fa8df2243330eafce097209651"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60efbe31031e1e9c3a17c7d80cac54cb"><td class="memItemLeft" align="right" valign="top">const float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a60efbe31031e1e9c3a17c7d80cac54cb">kTcl112AcTempMax</a> = 31.0</td></tr>
 <tr class="separator:a60efbe31031e1e9c3a17c7d80cac54cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30fe65ec015bc4d91cd35ead9cc43dcc"><td class="memItemLeft" align="right" valign="top">const float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a30fe65ec015bc4d91cd35ead9cc43dcc">kTcl112AcTempMin</a> = 16.0</td></tr>
 <tr class="separator:a30fe65ec015bc4d91cd35ead9cc43dcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad36204b310ec8a069f631322d806aa7f"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#ad36204b310ec8a069f631322d806aa7f">kTcl112AcPowerOffset</a> = 2</td></tr>
-<tr class="separator:ad36204b310ec8a069f631322d806aa7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97c8948de72d702b859a7abccfbc423e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a97c8948de72d702b859a7abccfbc423e">kTcl112AcBitEconoOffset</a> = 7</td></tr>
-<tr class="separator:a97c8948de72d702b859a7abccfbc423e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad87c878f7a30a05418a5babfc52c0e9e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#ad87c878f7a30a05418a5babfc52c0e9e">kTcl112AcBitLightOffset</a> = 6</td></tr>
-<tr class="separator:ad87c878f7a30a05418a5babfc52c0e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2acb2c5cd2f8b729047f9eecf93f96af"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a2acb2c5cd2f8b729047f9eecf93f96af">kTcl112AcBitHealthOffset</a> = 4</td></tr>
-<tr class="separator:a2acb2c5cd2f8b729047f9eecf93f96af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad807894f92249e44d1725f18de013369"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#ad807894f92249e44d1725f18de013369">kTcl112AcBitSwingHOffset</a> = 3</td></tr>
-<tr class="separator:ad807894f92249e44d1725f18de013369"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0412b0d865eaf788a5672300575b1d8"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#ab0412b0d865eaf788a5672300575b1d8">kTcl112AcSwingVOffset</a> = 3</td></tr>
-<tr class="separator:ab0412b0d865eaf788a5672300575b1d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bacb40b18b280da13b2d1b781c825e5"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a7bacb40b18b280da13b2d1b781c825e5">kTcl112AcSwingVSize</a> = 3</td></tr>
-<tr class="separator:a7bacb40b18b280da13b2d1b781c825e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5406fbabd66478d601aebc6939a3788f"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a5406fbabd66478d601aebc6939a3788f">kTcl112AcSwingVOn</a> = 0b111</td></tr>
 <tr class="separator:a5406fbabd66478d601aebc6939a3788f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa78e1b544f392c251093d458e5d21e12"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#aa78e1b544f392c251093d458e5d21e12">kTcl112AcSwingVOff</a> = 0b000</td></tr>
 <tr class="separator:aa78e1b544f392c251093d458e5d21e12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a6e09c1b4620e96820b3b3c54fb0e18"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Tcl_8h.html#a7a6e09c1b4620e96820b3b3c54fb0e18">kTcl112AcBitTurboOffset</a> = 6</td></tr>
-<tr class="separator:a7a6e09c1b4620e96820b3b3c54fb0e18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support for TCL protocols. </p>
@@ -168,48 +149,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a97c8948de72d702b859a7abccfbc423e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97c8948de72d702b859a7abccfbc423e">&#9670;&nbsp;</a></span>kTcl112AcBitEconoOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcBitEconoOffset = 7</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2acb2c5cd2f8b729047f9eecf93f96af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2acb2c5cd2f8b729047f9eecf93f96af">&#9670;&nbsp;</a></span>kTcl112AcBitHealthOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcBitHealthOffset = 4</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad87c878f7a30a05418a5babfc52c0e9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad87c878f7a30a05418a5babfc52c0e9e">&#9670;&nbsp;</a></span>kTcl112AcBitLightOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcBitLightOffset = 6</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a45360de532d2262246bf57cb7c08604d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a45360de532d2262246bf57cb7c08604d">&#9670;&nbsp;</a></span>kTcl112AcBitMark</h2>
 
@@ -218,34 +157,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint16_t kTcl112AcBitMark = 500</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad807894f92249e44d1725f18de013369"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad807894f92249e44d1725f18de013369">&#9670;&nbsp;</a></span>kTcl112AcBitSwingHOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcBitSwingHOffset = 3</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7a6e09c1b4620e96820b3b3c54fb0e18"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a6e09c1b4620e96820b3b3c54fb0e18">&#9670;&nbsp;</a></span>kTcl112AcBitTurboOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcBitTurboOffset = 6</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -350,20 +261,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a802bbb6258edf6dcdd05a383db28e9d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a802bbb6258edf6dcdd05a383db28e9d3">&#9670;&nbsp;</a></span>kTcl112AcFanSize</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcFanSize = 3</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a9ccdf5ce9ce325b9813dadbdc855a469"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9ccdf5ce9ce325b9813dadbdc855a469">&#9670;&nbsp;</a></span>kTcl112AcGap</h2>
 
@@ -372,20 +269,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint32_t kTcl112AcGap = <a class="el" href="IRsend_8h.html#ad49e9828319afbad49fd5082c50ef4a7">kDefaultMessageGap</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a1ba7d7fa8df2243330eafce097209651"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1ba7d7fa8df2243330eafce097209651">&#9670;&nbsp;</a></span>kTcl112AcHalfDegreeOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcHalfDegreeOffset = 5</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -448,20 +331,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a07e49881d14cb1c84cfbf3695ae64580"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a07e49881d14cb1c84cfbf3695ae64580">&#9670;&nbsp;</a></span>kTcl112AcModeSize</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcModeSize = 4</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="af1e67019978260ba3f514cd895b54dad"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af1e67019978260ba3f514cd895b54dad">&#9670;&nbsp;</a></span>kTcl112AcOneSpace</h2>
 
@@ -470,20 +339,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint16_t kTcl112AcOneSpace = 1050</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad36204b310ec8a069f631322d806aa7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad36204b310ec8a069f631322d806aa7f">&#9670;&nbsp;</a></span>kTcl112AcPowerOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcPowerOffset = 2</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -504,20 +359,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ab0412b0d865eaf788a5672300575b1d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0412b0d865eaf788a5672300575b1d8">&#9670;&nbsp;</a></span>kTcl112AcSwingVOffset</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcSwingVOffset = 3</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a5406fbabd66478d601aebc6939a3788f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5406fbabd66478d601aebc6939a3788f">&#9670;&nbsp;</a></span>kTcl112AcSwingVOn</h2>
 
@@ -526,20 +367,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint8_t kTcl112AcSwingVOn = 0b111</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7bacb40b18b280da13b2d1b781c825e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7bacb40b18b280da13b2d1b781c825e5">&#9670;&nbsp;</a></span>kTcl112AcSwingVSize</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint8_t kTcl112AcSwingVSize = 3</td>
         </tr>
       </table>
 </div><div class="memdoc">

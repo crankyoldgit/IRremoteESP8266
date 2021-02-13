@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kelvinatorprotocol_3607',['KelvinatorProtocol',['../unionKelvinatorProtocol.html',1,'']]]
+  ['kelvinatorprotocol_3620',['KelvinatorProtocol',['../unionKelvinatorProtocol.html',1,'']]]
 ];

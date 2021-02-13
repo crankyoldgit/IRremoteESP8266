@@ -152,12 +152,12 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:af0b300fe6fdff58324525e8208be3024"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#af0b300fe6fdff58324525e8208be3024">_matchGeneric</a> (volatile uint16_t *data_ptr, uint64_t *result_bits_ptr, uint8_t *result_ptr, const bool use_bits, const uint16_t remaining, const uint16_t required, const uint16_t hdrmark, const uint32_t hdrspace, const uint16_t onemark, const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace, const uint16_t footermark, const uint32_t footerspace, const bool atleast=false, const uint8_t tolerance=<a class="el" href="IRrecv_8h.html#a05025e8bd724ae2d0c7fea6e924ca84c">kUseDefTol</a>, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>, const bool MSBfirst=true)</td></tr>
 <tr class="memdesc:af0b300fe6fdff58324525e8208be3024"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match &amp; decode a generic/typical IR message. The data is stored in result_bits_ptr or result_bytes_ptr depending on flag <code>use_bits</code>.  <a href="classIRrecv.html#af0b300fe6fdff58324525e8208be3024">More...</a><br /></td></tr>
 <tr class="separator:af0b300fe6fdff58324525e8208be3024"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5361439cb69b1069553544e486502d2e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmatch__result__t.html">match_result_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a5361439cb69b1069553544e486502d2e">matchData</a> (volatile uint16_t *data_ptr, const uint16_t nbits, const uint16_t onemark, const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace, const uint8_t tolerance=<a class="el" href="IRrecv_8h.html#a05025e8bd724ae2d0c7fea6e924ca84c">kUseDefTol</a>, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>, const bool MSBfirst=true)</td></tr>
-<tr class="memdesc:a5361439cb69b1069553544e486502d2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match &amp; decode the typical data section of an IR message. The data value is stored in the least significant bits reguardless of the bit ordering requested.  <a href="classIRrecv.html#a5361439cb69b1069553544e486502d2e">More...</a><br /></td></tr>
-<tr class="separator:a5361439cb69b1069553544e486502d2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc2c9bc4c4e5741cfac7468126bf8ca6"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#adc2c9bc4c4e5741cfac7468126bf8ca6">matchBytes</a> (volatile uint16_t *data_ptr, uint8_t *result_ptr, const uint16_t remaining, const uint16_t nbytes, const uint16_t onemark, const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace, const uint8_t tolerance=<a class="el" href="IRrecv_8h.html#a05025e8bd724ae2d0c7fea6e924ca84c">kUseDefTol</a>, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>, const bool MSBfirst=true)</td></tr>
-<tr class="memdesc:adc2c9bc4c4e5741cfac7468126bf8ca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match &amp; decode the typical data section of an IR message. The bytes are stored at result_ptr. The first byte in the result equates to the first byte encountered, and so on.  <a href="classIRrecv.html#adc2c9bc4c4e5741cfac7468126bf8ca6">More...</a><br /></td></tr>
-<tr class="separator:adc2c9bc4c4e5741cfac7468126bf8ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d8b50fcac074e71e9a92a62f62f0be7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmatch__result__t.html">match_result_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a1d8b50fcac074e71e9a92a62f62f0be7">matchData</a> (volatile uint16_t *data_ptr, const uint16_t nbits, const uint16_t onemark, const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace, const uint8_t tolerance=<a class="el" href="IRrecv_8h.html#a05025e8bd724ae2d0c7fea6e924ca84c">kUseDefTol</a>, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>, const bool MSBfirst=true, const bool expectlastspace=true)</td></tr>
+<tr class="memdesc:a1d8b50fcac074e71e9a92a62f62f0be7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match &amp; decode the typical data section of an IR message. The data value is stored in the least significant bits reguardless of the bit ordering requested.  <a href="classIRrecv.html#a1d8b50fcac074e71e9a92a62f62f0be7">More...</a><br /></td></tr>
+<tr class="separator:a1d8b50fcac074e71e9a92a62f62f0be7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97534938349b52b46395be1d3e2f59fa"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a97534938349b52b46395be1d3e2f59fa">matchBytes</a> (volatile uint16_t *data_ptr, uint8_t *result_ptr, const uint16_t remaining, const uint16_t nbytes, const uint16_t onemark, const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace, const uint8_t tolerance=<a class="el" href="IRrecv_8h.html#a05025e8bd724ae2d0c7fea6e924ca84c">kUseDefTol</a>, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>, const bool MSBfirst=true, const bool expectlastspace=true)</td></tr>
+<tr class="memdesc:a97534938349b52b46395be1d3e2f59fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match &amp; decode the typical data section of an IR message. The bytes are stored at result_ptr. The first byte in the result equates to the first byte encountered, and so on.  <a href="classIRrecv.html#a97534938349b52b46395be1d3e2f59fa">More...</a><br /></td></tr>
+<tr class="separator:a97534938349b52b46395be1d3e2f59fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab783f52acc2ff4052313d6947563e4fd"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#ab783f52acc2ff4052313d6947563e4fd">matchGeneric</a> (volatile uint16_t *data_ptr, uint64_t *result_ptr, const uint16_t remaining, const uint16_t nbits, const uint16_t hdrmark, const uint32_t hdrspace, const uint16_t onemark, const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace, const uint16_t footermark, const uint32_t footerspace, const bool atleast=false, const uint8_t tolerance=<a class="el" href="IRrecv_8h.html#a05025e8bd724ae2d0c7fea6e924ca84c">kUseDefTol</a>, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>, const bool MSBfirst=true)</td></tr>
 <tr class="memdesc:ab783f52acc2ff4052313d6947563e4fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match &amp; decode a generic/typical &lt;= 64bit IR message. The data is stored at result_ptr.  <a href="classIRrecv.html#ab783f52acc2ff4052313d6947563e4fd">More...</a><br /></td></tr>
 <tr class="separator:ab783f52acc2ff4052313d6947563e4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -320,6 +320,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:ae4af614a45ea65cb3304ef5bd7965122"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#ae4af614a45ea65cb3304ef5bd7965122">decodeLasertag</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a3ea0e89a8b6a3ffa4a2d346abeed851e">kLasertagBits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:ae4af614a45ea65cb3304ef5bd7965122"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Lasertag message. Status: BETA / Appears to be working 90% of the time.  <a href="classIRrecv.html#ae4af614a45ea65cb3304ef5bd7965122">More...</a><br /></td></tr>
 <tr class="separator:ae4af614a45ea65cb3304ef5bd7965122"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adddf192765ba0d9c233833bdda9b266e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#adddf192765ba0d9c233833bdda9b266e">decodeMilestag2</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#ae29b9f5dd6db067c17917417a3524905">kMilesTag2ShotBits</a>, const bool strict=true)</td></tr>
+<tr class="memdesc:adddf192765ba0d9c233833bdda9b266e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied MilesTag2 message. Status: ALPHA / Probably works but needs testing with a real device.  <a href="classIRrecv.html#adddf192765ba0d9c233833bdda9b266e">More...</a><br /></td></tr>
+<tr class="separator:adddf192765ba0d9c233833bdda9b266e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf3d1c37038120a5c0996d92577ce74a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#acf3d1c37038120a5c0996d92577ce74a">decodeCarrierAC</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a668d9ac84f7dae61c35534b842d4956b">kCarrierAcBits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:acf3d1c37038120a5c0996d92577ce74a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Carrier HVAC message.  <a href="classIRrecv.html#acf3d1c37038120a5c0996d92577ce74a">More...</a><br /></td></tr>
 <tr class="separator:acf3d1c37038120a5c0996d92577ce74a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -430,6 +433,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:ac830ece2c2c200b8c13fcd66828e2846"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#ac830ece2c2c200b8c13fcd66828e2846">decodeElitescreens</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a102ebea398ea7b155e1e5212676af6dd">kEliteScreensBits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:ac830ece2c2c200b8c13fcd66828e2846"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Elite Screens message. Status: STABLE / Confirmed working.  <a href="classIRrecv.html#ac830ece2c2c200b8c13fcd66828e2846">More...</a><br /></td></tr>
 <tr class="separator:ac830ece2c2c200b8c13fcd66828e2846"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a823387b95b6adb676e976a8eeaf01a0b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a823387b95b6adb676e976a8eeaf01a0b">decodeEcoclim</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#accd38d1019bde991e9a887f853f295d0">kEcoclimBits</a>, const bool strict=true)</td></tr>
+<tr class="memdesc:a823387b95b6adb676e976a8eeaf01a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied EcoClim A/C message. Status: STABLE / Confirmed working on real remote.  <a href="classIRrecv.html#a823387b95b6adb676e976a8eeaf01a0b">More...</a><br /></td></tr>
+<tr class="separator:a823387b95b6adb676e976a8eeaf01a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -1089,7 +1095,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Aiwa RC T501 appears to be a 42 bit variant of the NEC1 protocol. However, we historically (original Arduino IRremote project) treats it as a 15 bit (data) protocol. So, we expect nbits to typically be 15, and we will remove the prefix and postfix from the raw data, and use that as the result. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.com/knowledge/ir/nec.php">http://www.sbprojects.com/knowledge/ir/nec.php</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.net/knowledge/ir/nec.php">http://www.sbprojects.net/knowledge/ir/nec.php</a> </dd>
 <dd>
 <a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1069">https://github.com/crankyoldgit/IRremoteESP8266/issues/1069</a> </dd></dl>
 
@@ -2253,6 +2259,66 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a823387b95b6adb676e976a8eeaf01a0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a823387b95b6adb676e976a8eeaf01a0b">&#9670;&nbsp;</a></span>decodeEcoclim()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::decodeEcoclim </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecode__results.html">decode_results</a> *&#160;</td>
+          <td class="paramname"><em>results</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>offset</em> = <code><a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#accd38d1019bde991e9a887f853f295d0">kEcoclimBits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>strict</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decode the supplied EcoClim A/C message. Status: STABLE / Confirmed working on real remote. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decode result. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
+
+</div>
+</div>
 <a id="ad3a7be8afc36451c8e28e27f3c3e9aaa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad3a7be8afc36451c8e28e27f3c3e9aaa">&#9670;&nbsp;</a></span>decodeElectraAC()</h2>
 
@@ -3189,7 +3255,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>JVC repeat codes don't have a header. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.com/knowledge/ir/jvc.php">http://www.sbprojects.com/knowledge/ir/jvc.php</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.net/knowledge/ir/jvc.php">http://www.sbprojects.net/knowledge/ir/jvc.php</a> </dd></dl>
 
 </div>
 </div>
@@ -3311,7 +3377,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This protocol is pretty much just raw Manchester encoding. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.com/knowledge/ir/rc5.php">http://www.sbprojects.com/knowledge/ir/rc5.php</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.net/knowledge/ir/rc5.php">http://www.sbprojects.net/knowledge/ir/rc5.php</a> </dd>
 <dd>
 <a href="https://en.wikipedia.org/wiki/RC-5">https://en.wikipedia.org/wiki/RC-5</a> </dd>
 <dd>
@@ -3744,6 +3810,67 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 <dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This protocol is basically a 48-bit version of the NEC protocol with alternate bytes inverted, thus only 24 bits of real data. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Can't be used beyond 32 bits. </dd></dl>
+
+</div>
+</div>
+<a id="adddf192765ba0d9c233833bdda9b266e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adddf192765ba0d9c233833bdda9b266e">&#9670;&nbsp;</a></span>decodeMilestag2()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::decodeMilestag2 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecode__results.html">decode_results</a> *&#160;</td>
+          <td class="paramname"><em>results</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>offset</em> = <code><a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#ae29b9f5dd6db067c17917417a3524905">kMilesTag2ShotBits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>strict</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decode the supplied MilesTag2 message. Status: ALPHA / Probably works but needs testing with a real device. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the result </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if it can decode it, false if it can't. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1360">https://github.com/crankyoldgit/IRremoteESP8266/issues/1360</a> </dd></dl>
 
 </div>
 </div>
@@ -4352,7 +4479,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>NEC protocol has three variants/forms. Normal: an 8 bit address &amp; an 8 bit command in 32 bit data form. i.e. address + inverted(address) + command + inverted(command) Extended: a 16 bit address &amp; an 8 bit command in 32 bit data form. i.e. address + command + inverted(command) Repeat: a 0-bit code. i.e. No data bits. Just the header + footer. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.com/knowledge/ir/nec.php">http://www.sbprojects.com/knowledge/ir/nec.php</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.sbprojects.net/knowledge/ir/nec.php">http://www.sbprojects.net/knowledge/ir/nec.php</a> </dd></dl>
 
 </div>
 </div>
@@ -6368,8 +6495,8 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 
 </div>
 </div>
-<a id="adc2c9bc4c4e5741cfac7468126bf8ca6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc2c9bc4c4e5741cfac7468126bf8ca6">&#9670;&nbsp;</a></span>matchBytes()</h2>
+<a id="a97534938349b52b46395be1d3e2f59fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97534938349b52b46395be1d3e2f59fa">&#9670;&nbsp;</a></span>matchBytes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6441,7 +6568,13 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>MSBfirst</em> = <code>true</code>&#160;</td>
+          <td class="paramname"><em>MSBfirst</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>expectlastspace</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -6470,6 +6603,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
     <tr><td class="paramdir">[in]</td><td class="paramname">tolerance</td><td>Percentage error margin to allow. (Default: kUseDefTol) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">excess</td><td>Nr. of uSeconds. (Def: kMarkExcess) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">MSBfirst</td><td>Bit order to save the data in. (Def: true) true is Most Significant Bit First Order, false is Least Significant First </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">expectlastspace</td><td>Do we expect a space at the end of the message? </td></tr>
   </table>
   </dd>
 </dl>
@@ -6477,8 +6611,8 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 
 </div>
 </div>
-<a id="a5361439cb69b1069553544e486502d2e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5361439cb69b1069553544e486502d2e">&#9670;&nbsp;</a></span>matchData()</h2>
+<a id="a1d8b50fcac074e71e9a92a62f62f0be7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d8b50fcac074e71e9a92a62f62f0be7">&#9670;&nbsp;</a></span>matchData()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6538,7 +6672,13 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>MSBfirst</em> = <code>true</code>&#160;</td>
+          <td class="paramname"><em>MSBfirst</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>expectlastspace</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -6565,6 +6705,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
     <tr><td class="paramdir">[in]</td><td class="paramname">tolerance</td><td>Percentage error margin to allow. (Default: kUseDefTol) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">excess</td><td>Nr. of uSeconds. (Def: kMarkExcess) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">MSBfirst</td><td>Bit order to save the data in. (Def: true) true is Most Significant Bit First Order, false is Least Significant First </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">expectlastspace</td><td>Do we expect a space at the end of the message? </td></tr>
   </table>
   </dd>
 </dl>
@@ -7639,6 +7780,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 <li>src/<a class="el" href="ir__Denon_8cpp.html">ir_Denon.cpp</a></li>
 <li>src/<a class="el" href="ir__Dish_8cpp.html">ir_Dish.cpp</a></li>
 <li>src/<a class="el" href="ir__Doshisha_8cpp.html">ir_Doshisha.cpp</a></li>
+<li>src/<a class="el" href="ir__EcoClim_8cpp.html">ir_EcoClim.cpp</a></li>
 <li>src/<a class="el" href="ir__Electra_8cpp.html">ir_Electra.cpp</a></li>
 <li>src/<a class="el" href="ir__EliteScreens_8cpp.html">ir_EliteScreens.cpp</a></li>
 <li>src/<a class="el" href="ir__Epson_8cpp.html">ir_Epson.cpp</a></li>
@@ -7658,6 +7800,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 <li>src/<a class="el" href="ir__Magiquest_8cpp.html">ir_Magiquest.cpp</a></li>
 <li>src/<a class="el" href="ir__Metz_8cpp.html">ir_Metz.cpp</a></li>
 <li>src/<a class="el" href="ir__Midea_8cpp.html">ir_Midea.cpp</a></li>
+<li>src/<a class="el" href="ir__MilesTag2_8cpp.html">ir_MilesTag2.cpp</a></li>
 <li>src/<a class="el" href="ir__Mirage_8cpp.html">ir_Mirage.cpp</a></li>
 <li>src/<a class="el" href="ir__Mitsubishi_8cpp.html">ir_Mitsubishi.cpp</a></li>
 <li>src/<a class="el" href="ir__MitsubishiHeavy_8cpp.html">ir_MitsubishiHeavy.cpp</a></li>

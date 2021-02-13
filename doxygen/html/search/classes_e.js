@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['voltasprotocol_3624',['VoltasProtocol',['../unionVoltasProtocol.html',1,'']]]
+  ['voltasprotocol_3642',['VoltasProtocol',['../unionVoltasProtocol.html',1,'']]]
 ];

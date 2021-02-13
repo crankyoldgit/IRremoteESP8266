@@ -4742,6 +4742,12 @@ Private Attributes</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">model</td><td>The A/C model if applicable. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">power</td><td>The power setting. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The operation mode setting. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Changing mode from "Off" to something else does NOT turn on a device. You need to use <code>power</code> for that. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">celsius</td><td>Temperature units. True is Celsius, False is Fahrenheit. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fan</td><td>The speed setting for the fan. </td></tr>
@@ -4803,6 +4809,7 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>Note</dt><dd>Changing mode from "Off" to something else does NOT turn on a device. You need to use <code>power</code> for that. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>True, if accepted/converted/attempted etc. False, if unsupported. </dd></dl>
 
 </div>
