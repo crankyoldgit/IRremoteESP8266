@@ -1,5 +1,6 @@
 // Copyright 2021 David Conran
 
+#include "ir_EcoClim.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -12,7 +13,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("ECOCLIM", typeToString(decode_type_t::ECOCLIM));
   ASSERT_EQ(decode_type_t::ECOCLIM, strToDecodeType("ECOCLIM"));
   ASSERT_FALSE(hasACState(decode_type_t::ECOCLIM));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::ECOCLIM));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::ECOCLIM));
   ASSERT_EQ(kEcoclimBits, IRsend::defaultBits(decode_type_t::ECOCLIM));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::ECOCLIM));
 }
@@ -174,9 +175,10 @@ TEST(TestDecodeEcoclim, RealExample) {
   EXPECT_EQ(kEcoclimBits, irsend.capture.bits);
   EXPECT_EQ(0x110673AEFFFF72, irsend.capture.value);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 0 (Auto), Temp: 11C, SensorTemp: 22C, Fan: 3 (Auto), "
+      "Clock: 15:42",
       IRAcUtils::resultAcToString(&irsend.capture));
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 
   irsend.reset();
   irsend.sendRaw(short_rawData, 97, 38000);
@@ -198,7 +200,62 @@ TEST(TestDecodeEcoclim, RealExample) {
   EXPECT_EQ(kEcoclimBits, irsend.capture.bits);
   EXPECT_EQ(0x15594507FFFF0A, irsend.capture.value);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 2 (Dry), Temp: 30C, SensorTemp: 26C, Fan: 0 (Low), "
+      "Clock: 21:27",
       IRAcUtils::resultAcToString(&irsend.capture));
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+TEST(TestIREcoclimAcClass, Power) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIREcoclimAcClass, SetAndGetTemp) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(kEcoclimTempMin);
+  EXPECT_EQ(kEcoclimTempMin, ac.getTemp());
+  ac.setTemp(kEcoclimTempMin - 1);
+  EXPECT_EQ(kEcoclimTempMin, ac.getTemp());
+  ac.setTemp(kEcoclimTempMax);
+  EXPECT_EQ(kEcoclimTempMax, ac.getTemp());
+  ac.setTemp(kEcoclimTempMax + 1);
+  EXPECT_EQ(kEcoclimTempMax, ac.getTemp());
+}
+
+TEST(TestIREcoclimAcClass, FanSpeed) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setFan(0);
+  EXPECT_EQ(kEcoclimFanMin, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kEcoclimFanAuto, ac.getFan());
+
+  ac.setFan(kEcoclimFanMax);
+  EXPECT_EQ(kEcoclimFanMax, ac.getFan());
+
+  ac.setFan(std::max(kEcoclimFanAuto, kEcoclimFanMax) + 1);
+  EXPECT_EQ(kEcoclimFanAuto, ac.getFan());
+
+  ac.setFan(kEcoclimFanMed);
+  EXPECT_EQ(kEcoclimFanMed, ac.getFan());
+
+  ac.setFan(kEcoclimFanMin);
+  EXPECT_EQ(kEcoclimFanMin, ac.getFan());
 }

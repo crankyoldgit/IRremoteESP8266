@@ -9,6 +9,7 @@
 #include "ir_Corona.h"
 #include "ir_Daikin.h"
 #include "ir_Delonghi.h"
+#include "ir_EcoClim.h"
 #include "ir_Electra.h"
 #include "ir_Fujitsu.h"
 #include "ir_Goodweather.h"
@@ -505,6 +506,30 @@ TEST(TestIRac, DelonghiAc) {
   ASSERT_EQ(decode_type_t::DELONGHI_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kDelonghiAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+TEST(TestIRac, Ecoclim) {
+  IREcoclimAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 1 (Cool), Temp: 26C, SensorTemp: 26C, "
+      "Fan: 2 (High), Clock: 12:34";
+
+  ac.begin();
+  irac.ecoclim(&ac,
+               true,                        // Power
+               stdAc::opmode_t::kCool,      // Mode
+               26,                          // Celsius
+               stdAc::fanspeed_t::kHigh,    // Fan speed
+               12 * 60 + 34);               // Clock
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(ECOCLIM, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kEcoclimBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.value);
+  ASSERT_EQ(expected, ac.toString());
 }
 
 TEST(TestIRac, Electra) {
