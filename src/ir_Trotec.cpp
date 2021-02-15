@@ -31,8 +31,6 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_TROTEC
 /// Send a Trotec message.
@@ -64,7 +62,7 @@ void IRsend::sendTrotec(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRTrotecESP::IRTrotecESP(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Set up hardware to be able to send a message.
 void IRTrotecESP::begin(void) { _irsend.begin(); }
@@ -96,78 +94,76 @@ bool IRTrotecESP::validChecksum(const uint8_t state[], const uint16_t length) {
 
 /// Calculate & set the checksum for the current internal state of the remote.
 void IRTrotecESP::checksum(void) {
-  remote_state[kTrotecStateLength - 1] = sumBytes(remote_state + 2,
-                                                  kTrotecStateLength - 3);
+  _.Sum = sumBytes(_.raw + 2, kTrotecStateLength - 3);
 }
 
 /// Reset the state of the remote to a known good state/sequence.
 void IRTrotecESP::stateReset(void) {
-  for (uint8_t i = 2; i < kTrotecStateLength; i++) remote_state[i] = 0x0;
+  for (uint8_t i = 2; i < kTrotecStateLength; i++) _.raw[i] = 0x0;
 
-  remote_state[0] = kTrotecIntro1;
-  remote_state[1] = kTrotecIntro2;
+  _.Intro1 = kTrotecIntro1;
+  _.Intro2 = kTrotecIntro2;
 
-  this->setPower(false);
-  this->setTemp(kTrotecDefTemp);
-  this->setSpeed(kTrotecFanMed);
-  this->setMode(kTrotecAuto);
+  _.Power = false;
+  setTemp(kTrotecDefTemp);
+  _.Fan = kTrotecFanMed;
+  _.Mode = kTrotecAuto;
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRTrotecESP::getRaw(void) {
-  this->checksum();
-  return remote_state;
+  checksum();
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] state A valid code for this protocol.
 void IRTrotecESP::setRaw(const uint8_t state[]) {
-  memcpy(remote_state, state, kTrotecStateLength);
+  memcpy(_.raw, state, kTrotecStateLength);
 }
 
 /// Set the requested power state of the A/C to on.
-void IRTrotecESP::on(void) { this->setPower(true); }
+void IRTrotecESP::on(void) { setPower(true); }
 
 /// Set the requested power state of the A/C to off.
-void IRTrotecESP::off(void) { this->setPower(false); }
+void IRTrotecESP::off(void) { setPower(false); }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRTrotecESP::setPower(const bool on) {
-  setBit(&remote_state[2], kTrotecPowerBitOffset, on);
+  _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRTrotecESP::getPower(void) {
-  return GETBIT8(remote_state[2], kTrotecPowerBitOffset);
+bool IRTrotecESP::getPower(void) const {
+  return _.Power;
 }
 
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting.
 void IRTrotecESP::setSpeed(const uint8_t fan) {
   uint8_t speed = std::min(fan, kTrotecFanHigh);
-  setBits(&remote_state[2], kTrotecFanOffset, kTrotecFanSize, speed);
+  _.Fan = speed;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed/mode.
-uint8_t IRTrotecESP::getSpeed(void) {
-  return GETBITS8(remote_state[2], kTrotecFanOffset, kTrotecFanSize);
+uint8_t IRTrotecESP::getSpeed(void) const {
+  return _.Fan;
 }
 
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired operating mode.
 void IRTrotecESP::setMode(const uint8_t mode) {
-  setBits(&remote_state[2], kTrotecModeOffset, kTrotecModeSize,
-          (mode > kTrotecFan) ? kTrotecAuto : mode);
+  _.Mode = (mode > kTrotecFan) ? kTrotecAuto : mode;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRTrotecESP::getMode(void) {
-  return GETBITS8(remote_state[2], kTrotecModeOffset, kTrotecModeSize);
+uint8_t IRTrotecESP::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the temperature.
@@ -175,39 +171,37 @@ uint8_t IRTrotecESP::getMode(void) {
 void IRTrotecESP::setTemp(const uint8_t celsius) {
   uint8_t temp = std::max(celsius, kTrotecMinTemp);
   temp = std::min(temp, kTrotecMaxTemp);
-  setBits(&remote_state[3], kTrotecTempOffset, kTrotecTempSize,
-          temp - kTrotecMinTemp);
+  _.Temp = temp - kTrotecMinTemp;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRTrotecESP::getTemp(void) {
-  return GETBITS8(remote_state[3], kTrotecTempOffset, kTrotecTempSize) +
-      kTrotecMinTemp;
+uint8_t IRTrotecESP::getTemp(void) const {
+  return _.Temp + kTrotecMinTemp;
 }
 
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRTrotecESP::setSleep(const bool on) {
-  setBit(&remote_state[3], kTrotecSleepBitOffset, on);
+  _.Sleep = on;
 }
 
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRTrotecESP::getSleep(void) {
-  return GETBIT8(remote_state[3], kTrotecSleepBitOffset);
+bool IRTrotecESP::getSleep(void) const {
+  return _.Sleep;
 }
 
 /// Set the timer time in nr. of Hours.
 /// @param[in] timer Nr. of Hours. Max is `kTrotecMaxTimer`
 void IRTrotecESP::setTimer(const uint8_t timer) {
-  setBit(&remote_state[5], kTrotecTimerBitOffset, timer);
-  remote_state[6] = (timer > kTrotecMaxTimer) ? kTrotecMaxTimer : timer;
+  _.Timer = timer;
+  _.Hours = (timer > kTrotecMaxTimer) ? kTrotecMaxTimer : timer;
 }
 
 /// Get the timer time in nr. of Hours.
 /// @return Nr. of Hours.
-uint8_t IRTrotecESP::getTimer(void) { return remote_state[6]; }
+uint8_t IRTrotecESP::getTimer(void) const { return _.Hours; }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
@@ -262,15 +256,15 @@ stdAc::fanspeed_t IRTrotecESP::toCommonFanSpeed(const uint8_t spd) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRTrotecESP::toCommon(void) {
+stdAc::state_t IRTrotecESP::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::TROTEC;
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getSpeed());
-  result.sleep = this->getSleep() ? 0 : -1;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.sleep = _.Sleep ? 0 : -1;
   // Not supported.
   result.model = -1;  // Not supported.
   result.swingv = stdAc::swingv_t::kOff;
@@ -288,16 +282,16 @@ stdAc::state_t IRTrotecESP::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRTrotecESP::toString(void) {
+String IRTrotecESP::toString(void) const {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kTrotecAuto, kTrotecCool, kTrotecAuto,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kTrotecAuto, kTrotecCool, kTrotecAuto,
                             kTrotecDry, kTrotecFan);
   result += addTempToString(getTemp());
-  result += addFanToString(getSpeed(), kTrotecFanHigh, kTrotecFanLow,
+  result += addFanToString(_.Fan, kTrotecFanHigh, kTrotecFanLow,
                            kTrotecFanHigh, kTrotecFanHigh, kTrotecFanMed);
-  result += addBoolToString(getSleep(), kSleepStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
   return result;
 }
 
