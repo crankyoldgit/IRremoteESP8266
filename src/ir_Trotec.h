@@ -22,41 +22,56 @@
 #include "IRsend_test.h"
 #endif
 
-// Constants
-// Byte 0
-const uint8_t kTrotecIntro1 = 0x12;
+/// Native representation of a Trotec A/C message.
+union TrotecProtocol{
+  uint8_t raw[kTrotecStateLength];  ///< Remote state in IR code form.
+  struct {
+    // Byte 0
+    uint8_t Intro1:8;  // fixed value
+    // Byte 1
+    uint8_t Intro2:8;  // fixed value
+    // Byte 2
+    uint8_t Mode  :2;
+    uint8_t       :1;
+    uint8_t Power :1;
+    uint8_t Fan   :2;
+    uint8_t       :2;
+    // Byte 3
+    uint8_t Temp  :4;
+    uint8_t       :3;
+    uint8_t Sleep :1;
+    // Byte 4
+    uint8_t       :8;
+    // Byte 5
+    uint8_t       :6;
+    uint8_t Timer :1;
+    uint8_t       :1;
+    // Byte 6
+    uint8_t Hours :8;
+    // Byte 7
+    uint8_t       :8;
+    // Byte 8
+    uint8_t Sum   :8;
+  };
+};
 
-// Byte 1
+// Constants
+const uint8_t kTrotecIntro1 = 0x12;
 const uint8_t kTrotecIntro2 = 0x34;
 
-// Byte 2
-const uint8_t kTrotecModeOffset = 0;
-const uint8_t kTrotecModeSize = 2;  // Nr. of bits
 const uint8_t kTrotecAuto = 0;
 const uint8_t kTrotecCool = 1;
 const uint8_t kTrotecDry = 2;
 const uint8_t kTrotecFan = 3;
 
-const uint8_t kTrotecPowerBitOffset = 3;
-
-const uint8_t kTrotecFanOffset = 4;
-const uint8_t kTrotecFanSize = 2;  // Nr. of bits
 const uint8_t kTrotecFanLow = 1;
 const uint8_t kTrotecFanMed = 2;
 const uint8_t kTrotecFanHigh = 3;
 
-// Byte 3
-const uint8_t kTrotecTempOffset = 0;
-const uint8_t kTrotecTempSize = 4;  // Nr. of bits
 const uint8_t kTrotecMinTemp = 18;
 const uint8_t kTrotecDefTemp = 25;
 const uint8_t kTrotecMaxTemp = 32;
-const uint8_t kTrotecSleepBitOffset = 7;
 
-// Byte 5
-const uint8_t kTrotecTimerBitOffset = 6;
-
-// Byte 6
 const uint8_t kTrotecMaxTimer = 23;
 
 // Legacy defines. (Deprecated)
@@ -91,33 +106,36 @@ class IRTrotecESP {
   void on(void);
   void off(void);
   void setPower(const bool state);
-  bool getPower(void);
+  bool getPower(void) const;
 
   void setTemp(const uint8_t celsius);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
 
   void setSpeed(const uint8_t fan);
-  uint8_t getSpeed(void);
+  uint8_t getSpeed(void) const;
 
-  uint8_t getMode(void);
+  void setFan(const uint8_t fan) { setSpeed(fan); }
+  uint8_t getFan(void) const { return getSpeed(); }
+
+  uint8_t getMode(void) const;
   void setMode(const uint8_t mode);
 
-  bool getSleep(void);
+  bool getSleep(void) const;
   void setSleep(const bool on);
 
-  uint8_t getTimer(void);
+  uint8_t getTimer(void) const;
   void setTimer(const uint8_t timer);
 
   uint8_t* getRaw(void);
   void setRaw(const uint8_t state[]);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kTrotecStateLength);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -127,7 +145,7 @@ class IRTrotecESP {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kTrotecStateLength];  ///< Remote state in IR code form.
+  TrotecProtocol _;
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kTrotecStateLength);
   void checksum(void);
