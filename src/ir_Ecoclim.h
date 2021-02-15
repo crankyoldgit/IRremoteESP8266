@@ -36,15 +36,17 @@ const uint8_t kEcoclimFanMin =  0b00;  ///< 0
 const uint8_t kEcoclimFanMed =  0b01;  ///< 1
 const uint8_t kEcoclimFanMax =  0b10;  ///< 2
 const uint8_t kEcoclimFanAuto = 0b11;  ///< 3
+// DIP settings
+const uint8_t kEcoclimDipMaster = 0b0000;
+const uint8_t kEcoclimDipSlave =  0b0111;
 // Temperature
 const uint8_t kEcoclimTempMin = 5;  // Celsius
 const uint8_t kEcoclimTempMax = kEcoclimTempMin + 31;  // Celsius
+// Timer
+const uint16_t kEcoclimTimerDisable = 0x1F * 60 + 7 * 10;  // 4774
 
-const uint8_t kEcoclimSensorTempMax = 30;  // Celsius
-const uint8_t kEcoclimSensorTempIgnoreCode = 0b11111;  // 0x1F / 31 (DEC)
-
-// Power: On, Mode: Auto, Temp: 11C, Sensor: 22C, Fan: Auto, Clock: 15:42
-const uint64_t kEcoclimDefaultState = 0x110673AEFFFF72;
+// Power: Off, Mode: Auto, Temp: 11C, Sensor: 22C, Fan: Auto, Clock: 00:00
+const uint64_t kEcoclimDefaultState = 0x11063000FFFF02;
 
 /// Native representation of a Ecoclim A/C message.
 union EcoclimProtocol {
@@ -53,7 +55,7 @@ union EcoclimProtocol {
     // Byte
     uint64_t            :3;  ///< Fixed 0b010
     uint64_t            :1;  ///< Unknown
-    uint64_t DipConfig  :4;
+    uint64_t DipConfig  :4;  ///< 0b0000 = Master, 0b0111 = Slave
     // Byte
     uint64_t OffMins    :3;  ///< Off Timer minutes (in tens of mins)
     uint64_t OffHours   :5;  ///< Off Timer nr of Hours
@@ -109,11 +111,21 @@ class IREcoclimAc {
   uint16_t getClock(void) const;
   uint64_t getRaw(void) const;
   void setRaw(const uint64_t new_code);
+  void setType(const uint8_t code);
+  uint8_t getType(void) const;
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void) const;
+  void setOnTimer(const uint16_t nr_of_mins);
+  uint16_t getOnTimer(void) const;
+  bool isOnTimerEnabled(void) const;
+  void disableOnTimer(void);
+  void setOffTimer(const uint16_t nr_of_mins);
+  uint16_t getOffTimer(void) const;
+  bool isOffTimerEnabled(void) const;
+  void disableOffTimer(void);
   String toString(void) const;
 #ifndef UNIT_TEST
 

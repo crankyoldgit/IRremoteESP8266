@@ -23,7 +23,7 @@
 #include "ir_Coolix.h"
 #include "ir_Corona.h"
 #include "ir_Daikin.h"
-#include "ir_EcoClim.h"
+#include "ir_Ecoclim.h"
 #include "ir_Electra.h"
 #include "ir_Fujitsu.h"
 #include "ir_Haier.h"

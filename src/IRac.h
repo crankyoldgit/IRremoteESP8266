@@ -16,7 +16,7 @@
 #include "ir_Daikin.h"
 #include "ir_Delonghi.h"
 #include "ir_Fujitsu.h"
-#include "ir_EcoClim.h"
+#include "ir_Ecoclim.h"
 #include "ir_Electra.h"
 #include "ir_Goodweather.h"
 #include "ir_Gree.h"

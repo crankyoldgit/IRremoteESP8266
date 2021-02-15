@@ -4,7 +4,7 @@
 /// @brief EcoClim A/C protocol.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1397
 
-#include "ir_EcoClim.h"
+#include "ir_Ecoclim.h"
 #include <algorithm>
 #include <cstring>
 #include "IRac.h"
@@ -128,9 +128,7 @@ IREcoclimAc::IREcoclimAc(const uint16_t pin, const bool inverted,
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the internal state to a fixed known good state.
-void IREcoclimAc::stateReset(void) {
-  setRaw(kEcoclimDefaultState);
-}
+void IREcoclimAc::stateReset(void) { _.raw = kEcoclimDefaultState; }
 
 /// Set up hardware to be able to send a message.
 void IREcoclimAc::begin(void) { _irsend.begin(); }
@@ -287,6 +285,77 @@ void IREcoclimAc::setClock(const uint16_t nr_of_mins) {
   _.Clock = std::min(nr_of_mins, (uint16_t)(24 * 60 - 1));
 }
 
+/// Get the Unit type/DIP switch settings of the remote.
+/// @return The binary representation of the 4 DIP switches on the remote.
+uint8_t IREcoclimAc::getType(void) const { return _.DipConfig; }
+
+/// Set the Unit type/DIP switch settings for the remote.
+/// @param[in] code The binary representation of the remote's 4 DIP switches.
+void IREcoclimAc::setType(const uint8_t code) {
+  switch (code) {
+    case kEcoclimDipMaster:
+    case kEcoclimDipSlave:
+      _.DipConfig = code;
+      break;
+    default:
+      setType(kEcoclimDipMaster);
+  }
+}
+
+/// Set & enable the On Timer for the A/C.
+/// @param[in] nr_of_mins The time, in minutes since midnight.
+void IREcoclimAc::setOnTimer(const uint16_t nr_of_mins) {
+  if (nr_of_mins < 24 * 60) {
+    _.OnHours = nr_of_mins / 60;
+    _.OnMins = (nr_of_mins % 60) / 10;  // Store it in tens of mins resolution.
+  }
+}
+
+/// Get the On Timer for the A/C.
+/// @return The On Time, in minutes since midnight.
+uint16_t IREcoclimAc::getOnTimer(void) const {
+  return _.OnHours * 60 + _.OnMins * 10;
+}
+
+/// Check if the On Timer is enabled.
+/// @return true, if the timer is enabled, otherwise false.
+bool IREcoclimAc::isOnTimerEnabled(void) const {
+  return (getOnTimer() != kEcoclimTimerDisable);
+}
+
+/// Disable & clear the On Timer.
+void IREcoclimAc::disableOnTimer(void) {
+  _.OnHours = 0x1F;
+  _.OnMins = 0x7;
+}
+
+/// Set & enable the Off Timer for the A/C.
+/// @param[in] nr_of_mins The time, in minutes since midnight.
+void IREcoclimAc::setOffTimer(const uint16_t nr_of_mins) {
+  if (nr_of_mins < 24 * 60) {
+    _.OffHours = nr_of_mins / 60;
+    _.OffMins = (nr_of_mins % 60) / 10;  // Store it in tens of mins resolution.
+  }
+}
+
+/// Get the Off Timer for the A/C.
+/// @return The Off Time, in minutes since midnight.
+uint16_t IREcoclimAc::getOffTimer(void) const {
+  return _.OffHours * 60 + _.OffMins * 10;
+}
+
+/// Check if the Off Timer is enabled.
+/// @return true, if the timer is enabled, otherwise false.
+bool IREcoclimAc::isOffTimerEnabled(void) const {
+  return (getOffTimer() != kEcoclimTimerDisable);
+}
+
+/// Disable & clear the Off Timer.
+void IREcoclimAc::disableOffTimer(void) {
+  _.OffHours = 0x1F;
+  _.OffMins = 0x7;
+}
+
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IREcoclimAc::toCommon(void) const {
@@ -317,7 +386,7 @@ stdAc::state_t IREcoclimAc::toCommon(void) const {
 /// @return A string containing the settings in human-readable form.
 String IREcoclimAc::toString(void) const {
   String result = "";
-  result.reserve(110);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(140);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, kEcoclimAuto, kEcoclimCool,
                             kEcoclimHeat, kEcoclimDry, kEcoclimFan);
@@ -332,5 +401,11 @@ String IREcoclimAc::toString(void) const {
                            kEcoclimFanMed,
                            kEcoclimFanMax);
   result += addLabeledString(minsToString(_.Clock), kClockStr);
+  result += addLabeledString(
+      isOnTimerEnabled() ? minsToString(getOnTimer()) : kOffStr, kOnTimerStr);
+  result += addLabeledString(
+      isOffTimerEnabled() ? minsToString(getOffTimer()) : kOffStr,
+      kOffTimerStr);
+  result += addIntToString(_.DipConfig, kTypeStr);
   return result;
 }

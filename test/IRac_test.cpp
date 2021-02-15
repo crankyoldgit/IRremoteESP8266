@@ -9,7 +9,7 @@
 #include "ir_Corona.h"
 #include "ir_Daikin.h"
 #include "ir_Delonghi.h"
-#include "ir_EcoClim.h"
+#include "ir_Ecoclim.h"
 #include "ir_Electra.h"
 #include "ir_Fujitsu.h"
 #include "ir_Goodweather.h"
@@ -513,8 +513,8 @@ TEST(TestIRac, Ecoclim) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Mode: 1 (Cool), Temp: 26C, SensorTemp: 26C, "
-      "Fan: 2 (High), Clock: 12:34";
+      "Power: On, Mode: 1 (Cool), Temp: 26C, SensorTemp: 26C, Fan: 2 (High), "
+      "Clock: 12:34, On Timer: Off, Off Timer: Off, Type: 0";
 
   ac.begin();
   irac.ecoclim(&ac,
@@ -528,8 +528,7 @@ TEST(TestIRac, Ecoclim) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(ECOCLIM, ac._irsend.capture.decode_type);
   ASSERT_EQ(kEcoclimBits, ac._irsend.capture.bits);
-  ac.setRaw(ac._irsend.capture.value);
-  ASSERT_EQ(expected, ac.toString());
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
 TEST(TestIRac, Electra) {
