@@ -57,10 +57,10 @@ union EcoclimProtocol {
     uint64_t            :1;  ///< Unknown
     uint64_t DipConfig  :4;  ///< 0b0000 = Master, 0b0111 = Slave
     // Byte
-    uint64_t OffMins    :3;  ///< Off Timer minutes (in tens of mins)
+    uint64_t OffTenMins :3;  ///< Off Timer minutes (in tens of mins)
     uint64_t OffHours   :5;  ///< Off Timer nr of Hours
     // Byte
-    uint64_t OnMins     :3;  ///< On Timer minutes (in tens of mins)
+    uint64_t OnTenMins  :3;  ///< On Timer minutes (in tens of mins)
     uint64_t OnHours    :5;  ///< On Timer nr of Hours
     // Byte+Byte
     uint64_t Clock      :11;

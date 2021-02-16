@@ -307,14 +307,14 @@ void IREcoclimAc::setType(const uint8_t code) {
 void IREcoclimAc::setOnTimer(const uint16_t nr_of_mins) {
   if (nr_of_mins < 24 * 60) {
     _.OnHours = nr_of_mins / 60;
-    _.OnMins = (nr_of_mins % 60) / 10;  // Store it in tens of mins resolution.
+    _.OnTenMins = (nr_of_mins % 60) / 10;  // Store in tens of mins resolution.
   }
 }
 
 /// Get the On Timer for the A/C.
 /// @return The On Time, in minutes since midnight.
 uint16_t IREcoclimAc::getOnTimer(void) const {
-  return _.OnHours * 60 + _.OnMins * 10;
+  return _.OnHours * 60 + _.OnTenMins * 10;
 }
 
 /// Check if the On Timer is enabled.
@@ -326,7 +326,7 @@ bool IREcoclimAc::isOnTimerEnabled(void) const {
 /// Disable & clear the On Timer.
 void IREcoclimAc::disableOnTimer(void) {
   _.OnHours = 0x1F;
-  _.OnMins = 0x7;
+  _.OnTenMins = 0x7;
 }
 
 /// Set & enable the Off Timer for the A/C.
@@ -334,14 +334,14 @@ void IREcoclimAc::disableOnTimer(void) {
 void IREcoclimAc::setOffTimer(const uint16_t nr_of_mins) {
   if (nr_of_mins < 24 * 60) {
     _.OffHours = nr_of_mins / 60;
-    _.OffMins = (nr_of_mins % 60) / 10;  // Store it in tens of mins resolution.
+    _.OffTenMins = (nr_of_mins % 60) / 10;  // Store in tens of mins resolution.
   }
 }
 
 /// Get the Off Timer for the A/C.
 /// @return The Off Time, in minutes since midnight.
 uint16_t IREcoclimAc::getOffTimer(void) const {
-  return _.OffHours * 60 + _.OffMins * 10;
+  return _.OffHours * 60 + _.OffTenMins * 10;
 }
 
 /// Check if the Off Timer is enabled.
@@ -353,7 +353,7 @@ bool IREcoclimAc::isOffTimerEnabled(void) const {
 /// Disable & clear the Off Timer.
 void IREcoclimAc::disableOffTimer(void) {
   _.OffHours = 0x1F;
-  _.OffMins = 0x7;
+  _.OffTenMins = 0x7;
 }
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
