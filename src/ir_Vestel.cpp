@@ -26,8 +26,6 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::minsToString;
-using irutils::setBit;
-using irutils::setBits;
 
 #if SEND_VESTEL_AC
 /// Send a Vestel message
@@ -53,14 +51,13 @@ void IRsend::sendVestelAc(const uint64_t data, const uint16_t nbits,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRVestelAc::IRVestelAc(const uint16_t pin, const bool inverted,
                        const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) { this->stateReset(); }
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the state of the remote to a known good state/sequence.
 /// @note Power On, Mode Auto, Fan Auto, Temp = 25C/77F
 void IRVestelAc::stateReset(void) {
-  remote_state = kVestelAcStateDefault;
-  remote_time_state = kVestelAcTimeStateDefault;
-  use_time_state = false;
+  _.cmdState = kVestelAcStateDefault;
+  _.timeState = kVestelAcTimeStateDefault;
 }
 
 /// Set up hardware to be able to send a message.
@@ -77,9 +74,9 @@ void IRVestelAc::send(const uint16_t repeat) {
 /// Get a copy of the internal state/code for this protocol.
 /// @return A code for this protocol based on the current internal state.
 uint64_t IRVestelAc::getRaw(void) {
-  this->checksum();
-  if (use_time_state) return remote_time_state;
-  return remote_state;
+  checksum();
+  if (!_.UseCmd) return _.timeState;
+  return _.cmdState;
 }
 
 /// Set the internal state from a valid code for this protocol.
@@ -88,20 +85,19 @@ void IRVestelAc::setRaw(const uint8_t* newState) {
   uint64_t upState = 0;
   for (int i = 0; i < 7; i++)
     upState |= static_cast<uint64_t>(newState[i]) << (i * 8);
-  this->setRaw(upState);
+  setRaw(upState);
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] newState A valid code for this protocol.
 void IRVestelAc::setRaw(const uint64_t newState) {
-  use_time_state = false;
-  remote_state = newState;
-  remote_time_state = newState;
-  if (this->isTimeCommand()) {
-    use_time_state = true;
-    remote_state = kVestelAcStateDefault;
+  _.cmdState = newState;
+  _.timeState = newState;
+  if (isTimeCommand()) {
+    _.cmdState = kVestelAcStateDefault;
+    _.UseCmd = false;
   } else {
-    remote_time_state = kVestelAcTimeStateDefault;
+    _.timeState = kVestelAcTimeStateDefault;
   }
 }
 
@@ -114,15 +110,14 @@ void IRVestelAc::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRVestelAc::setPower(const bool on) {
-  setBits(&remote_state, kVestelAcPowerOffset, kVestelAcPowerSize,
-          on ? 0b11 : 0b00);
-  use_time_state = false;
+  _.Power = (on ? 0b11 : 0b00);
+  _.UseCmd = true;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRVestelAc::getPower(void) {
-  return GETBITS64(remote_state, kVestelAcPowerOffset, kVestelAcPowerSize);
+bool IRVestelAc::getPower(void) const {
+  return _.Power;
 }
 
 /// Set the temperature.
@@ -130,16 +125,14 @@ bool IRVestelAc::getPower(void) {
 void IRVestelAc::setTemp(const uint8_t temp) {
   uint8_t new_temp = std::max(kVestelAcMinTempC, temp);
   new_temp = std::min(kVestelAcMaxTemp, new_temp);
-  setBits(&remote_state, kVestelAcTempOffset, kNibbleSize,
-          new_temp - kVestelAcMinTempH);
-  use_time_state = false;
+  _.Temp = new_temp - kVestelAcMinTempH;
+  _.UseCmd = true;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRVestelAc::getTemp(void) {
-  return GETBITS64(remote_state, kVestelAcTempOffset, kNibbleSize) +
-      kVestelAcMinTempH;
+uint8_t IRVestelAc::getTemp(void) const {
+  return _.Temp + kVestelAcMinTempH;
 }
 
 /// Set the speed of the fan.
@@ -152,24 +145,24 @@ void IRVestelAc::setFan(const uint8_t fan) {
     case kVestelAcFanAutoCool:
     case kVestelAcFanAutoHot:
     case kVestelAcFanAuto:
-      setBits(&remote_state, kVestelAcFanOffset, kVestelAcFanSize, fan);
+      _.Fan = fan;
       break;
     default:
-      setFan(kVestelAcFanAuto);
+      _.Fan = kVestelAcFanAuto;
   }
-  use_time_state = false;
+  _.UseCmd = true;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed/mode.
-uint8_t IRVestelAc::getFan(void) {
-  return GETBITS64(remote_state, kVestelAcFanOffset, kVestelAcFanSize);
+uint8_t IRVestelAc::getFan(void) const {
+  return _.Fan;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRVestelAc::getMode(void) {
-  return GETBITS64(remote_state, kVestelAcModeOffset, kModeBitsSize);
+uint8_t IRVestelAc::getMode(void) const {
+  return _.Mode;
 }
 
 /// Set the operating mode of the A/C.
@@ -182,20 +175,20 @@ void IRVestelAc::setMode(const uint8_t mode) {
     case kVestelAcHeat:
     case kVestelAcDry:
     case kVestelAcFan:
-      setBits(&remote_state, kVestelAcModeOffset, kModeBitsSize, mode);
+      _.Mode = mode;
       break;
     default:
-      setMode(kVestelAcAuto);
+      _.Mode = kVestelAcAuto;
   }
-  use_time_state = false;
+  _.UseCmd = true;
 }
 
 /// Set Auto mode/level of the A/C.
 /// @param[in] autoLevel The auto mode/level setting.
 void IRVestelAc::setAuto(const int8_t autoLevel) {
   if (autoLevel < -2 || autoLevel > 2) return;
-  setMode(kVestelAcAuto);
-  setFan((autoLevel < 0 ? kVestelAcFanAutoCool : kVestelAcFanAutoHot));
+  _.Mode = kVestelAcAuto;
+  _.Fan = (autoLevel < 0 ? kVestelAcFanAutoCool : kVestelAcFanAutoHot);
   if (autoLevel == 2)
     setTemp(30);
   else if (autoLevel == 1)
@@ -211,14 +204,14 @@ void IRVestelAc::setAuto(const int8_t autoLevel) {
 /// Set the timer to be active on the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRVestelAc::setTimerActive(const bool on) {
-  setBit(&remote_time_state, kVestelAcTimerFlagOffset, on);
-  use_time_state = true;
+  _.Timer = on;
+  _.UseCmd = false;
 }
 
 /// Get if the Timer is active on the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRVestelAc::isTimerActive(void) {
-  return GETBIT64(remote_time_state, kVestelAcTimerFlagOffset);
+bool IRVestelAc::isTimerActive(void) const {
+  return _.Timer;
 }
 
 /// Set Timer option of A/C.
@@ -227,166 +220,141 @@ bool IRVestelAc::isTimerActive(void) {
 ///   0 disables the timer.
 void IRVestelAc::setTimer(const uint16_t minutes) {
   // Clear both On & Off timers.
-  remote_time_state &= ~((uint64_t)0xFFFF << kVestelAcOffTimeOffset);
+  _.OnHours = 0;
+  _.OnTenMins = 0;
   // Set the "Off" time with the nr of minutes before we turn off.
-  remote_time_state |= (uint64_t)(((minutes / 60) << 3) + (minutes % 60) / 10)
-                       << kVestelAcOffTimeOffset;
+  _.OffHours = minutes / 60;
+  _.OffTenMins = (minutes % 60) / 10;
   setOffTimerActive(false);
   // Yes. On Timer instead of Off timer active.
   setOnTimerActive(minutes != 0);
   setTimerActive(minutes != 0);
-  use_time_state = true;
 }
 
 /// Get the Timer time of A/C.
 /// @return The number of minutes of time on the timer.
-uint16_t IRVestelAc::getTimer(void) { return getOffTimer(); }
+uint16_t IRVestelAc::getTimer(void) const { return getOffTimer(); }
 
 /// Set the A/C's internal clock.
 /// @param[in] minutes The time expressed in nr. of minutes past midnight.
 void IRVestelAc::setTime(const uint16_t minutes) {
-  setBits(&remote_time_state, kVestelAcHourOffset, kVestelAcHourSize,
-          minutes / 60);
-  setBits(&remote_time_state, kVestelAcMinuteOffset, kVestelAcMinuteSize,
-          minutes % 60);
-  use_time_state = true;
+  _.Hours = minutes / 60;
+  _.Minutes = minutes % 60;
+  _.UseCmd = false;
 }
 
 /// Get the A/C's internal clock's time.
 /// @return The time expressed in nr. of minutes past midnight.
-uint16_t IRVestelAc::getTime(void) {
-  return GETBITS64(remote_time_state, kVestelAcHourOffset, kVestelAcHourSize) *
-      60 + GETBITS64(remote_time_state, kVestelAcMinuteOffset,
-                     kVestelAcMinuteSize);
+uint16_t IRVestelAc::getTime(void) const {
+  return _.Hours * 60 + _.Minutes;
 }
 
 /// Set the On timer to be active on the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRVestelAc::setOnTimerActive(const bool on) {
-  setBit(&remote_time_state, kVestelAcOnTimerFlagOffset, on);
-  use_time_state = true;
+  _.OnTimer = on;
+  _.UseCmd = false;
 }
 
 /// Get if the On Timer is active on the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRVestelAc::isOnTimerActive(void) {
-  return GETBIT64(remote_time_state, kVestelAcOnTimerFlagOffset);
-}
-
-/// Set a given timer time at a given bit offset.
-/// @param[in] minutes Time in nr. of minutes.
-/// @param[in] offset Nr. of bits offset from the start of the state.
-void IRVestelAc::_setTimer(const uint16_t minutes, const uint8_t offset) {
-  setBits(&remote_time_state, offset, kVestelAcTimerSize,
-          ((minutes / 60) << 3) + (minutes % 60) / 10);
-  setTimerActive(false);
-  use_time_state = true;
-}
-
-/// Get the number of minutes a timer is set for.
-/// @param[in] offset Nr. of bits offset from the start of the state.
-/// @return The time expressed in nr. of minutes.
-uint16_t IRVestelAc::_getTimer(const uint8_t offset) {
-  return GETBITS64(remote_time_state, offset + kVestelAcTimerMinsSize,
-                   kVestelAcTimerHourSize) * 60 +  // Hrs
-      GETBITS64(remote_time_state, offset, kVestelAcTimerMinsSize) * 10;  // Min
+bool IRVestelAc::isOnTimerActive(void) const {
+  return _.OnTimer;
 }
 
 /// Set the On timer time on the A/C.
 /// @param[in] minutes Time in nr. of minutes.
 void IRVestelAc::setOnTimer(const uint16_t minutes) {
   setOnTimerActive(minutes);
-  _setTimer(minutes, kVestelAcOnTimeOffset);
+  _.OnHours = minutes / 60;
+  _.OnTenMins = (minutes % 60) / 10;
+  setTimerActive(false);
 }
 
 /// Get the A/C's On Timer time.
 /// @return The time expressed in nr. of minutes.
-uint16_t IRVestelAc::getOnTimer(void) {
-  return _getTimer(kVestelAcOnTimeOffset);
+uint16_t IRVestelAc::getOnTimer(void) const {
+  return _.OnHours * 60 + _.OnTenMins * 10;
 }
 
 /// Set the Off timer to be active on the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRVestelAc::setOffTimerActive(const bool on) {
-  setBit(&remote_time_state, kVestelAcOffTimerFlagOffset, on);
-  use_time_state = true;
+  _.OffTimer = on;
+  _.UseCmd = false;
 }
 
 /// Get if the Off Timer is active on the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRVestelAc::isOffTimerActive(void) {
-  return GETBIT64(remote_time_state, kVestelAcOffTimerFlagOffset);
+bool IRVestelAc::isOffTimerActive(void) const {
+  return _.OffTimer;
 }
 
 /// Set the Off timer time on the A/C.
 /// @param[in] minutes Time in nr. of minutes.
 void IRVestelAc::setOffTimer(const uint16_t minutes) {
   setOffTimerActive(minutes);
-  _setTimer(minutes, kVestelAcOffTimeOffset);
+  _.OffHours = minutes / 60;
+  _.OffTenMins = (minutes % 60) / 10;
+  setTimerActive(false);
 }
 
 /// Get the A/C's Off Timer time.
 /// @return The time expressed in nr. of minutes.
-uint16_t IRVestelAc::getOffTimer(void) {
-  return _getTimer(kVestelAcOffTimeOffset);
+uint16_t IRVestelAc::getOffTimer(void) const {
+  return _.OffHours * 60 + _.OffTenMins * 10;
 }
 
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRVestelAc::setSleep(const bool on) {
-  setBits(&remote_state, kVestelAcTurboSleepOffset, kNibbleSize,
-          on ? kVestelAcSleep : kVestelAcNormal);
-  use_time_state = false;
+  _.TurboSleep = (on ? kVestelAcSleep : kVestelAcNormal);
+  _.UseCmd = true;
 }
 
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRVestelAc::getSleep(void) {
-  return GETBITS64(remote_state, kVestelAcTurboSleepOffset, kNibbleSize) ==
-      kVestelAcSleep;
+bool IRVestelAc::getSleep(void) const {
+  return _.TurboSleep == kVestelAcSleep;
 }
 
 /// Set the Turbo setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRVestelAc::setTurbo(const bool on) {
-  setBits(&remote_state, kVestelAcTurboSleepOffset, kNibbleSize,
-          on ? kVestelAcTurbo : kVestelAcNormal);
-  use_time_state = false;
+  _.TurboSleep = (on ? kVestelAcTurbo : kVestelAcNormal);
+  _.UseCmd = true;
 }
 
 /// Get the Turbo setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRVestelAc::getTurbo(void) {
-  return GETBITS64(remote_state, kVestelAcTurboSleepOffset, kNibbleSize) ==
-      kVestelAcTurbo;
+bool IRVestelAc::getTurbo(void) const {
+  return _.TurboSleep == kVestelAcTurbo;
 }
 
 /// Set the Ion (Filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRVestelAc::setIon(const bool on) {
-  setBit(&remote_state, kVestelAcIonOffset, on);
-  use_time_state = false;
+  _.Ion = on;
+  _.UseCmd = true;
 }
 
 /// Get the Ion (Filter) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRVestelAc::getIon(void) {
-  return GETBIT64(remote_state, kVestelAcIonOffset);
+bool IRVestelAc::getIon(void) const {
+  return _.Ion;
 }
 
 /// Set the Swing Roaming setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRVestelAc::setSwing(const bool on) {
-  setBits(&remote_state, kVestelAcSwingOffset, kNibbleSize,
-          on ? kVestelAcSwing : 0xF);
-  use_time_state = false;
+  _.Swing = (on ? kVestelAcSwing : 0xF);
+  _.UseCmd = true;
 }
 
 /// Get the Swing Roaming setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRVestelAc::getSwing(void) {
-  return GETBITS64(remote_state, kVestelAcSwingOffset, kNibbleSize) ==
-      kVestelAcSwing;
+bool IRVestelAc::getSwing(void) const {
+  return _.Swing == kVestelAcSwing;
 }
 
 /// Calculate the checksum for a given state.
@@ -401,24 +369,22 @@ uint8_t IRVestelAc::calcChecksum(const uint64_t state) {
 /// @param[in] state The state to verify the checksum of.
 /// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRVestelAc::validChecksum(const uint64_t state) {
-  return GETBITS64(state, kVestelAcChecksumOffset, kVestelAcChecksumSize) ==
-      IRVestelAc::calcChecksum(state);
+  VestelProtocol vp;
+  vp.cmdState = state;
+  return vp.CmdSum == IRVestelAc::calcChecksum(state);
 }
 
 /// Calculate & set the checksum for the current internal state of the remote.
 void IRVestelAc::checksum(void) {
   // Stored the checksum value in the last byte.
-  setBits(&remote_state, kVestelAcChecksumOffset, kVestelAcChecksumSize,
-          this->calcChecksum(remote_state));
-  setBits(&remote_time_state, kVestelAcChecksumOffset, kVestelAcChecksumSize,
-          this->calcChecksum(remote_time_state));
+  _.CmdSum = calcChecksum(_.cmdState);
+  _.TimeSum = calcChecksum(_.timeState);
 }
 
 /// Is the current state a time command?
 /// @return true, if the state is a time message. Otherwise, false.
-bool IRVestelAc::isTimeCommand(void) {
-  return !GETBITS64(remote_state, kVestelAcPowerOffset, kNibbleSize) ||
-      use_time_state;
+bool IRVestelAc::isTimeCommand(void) const {
+  return !_.UseCmd;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -475,20 +441,20 @@ stdAc::fanspeed_t IRVestelAc::toCommonFanSpeed(const uint8_t spd) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRVestelAc::toCommon(void) {
+stdAc::state_t IRVestelAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::VESTEL_AC;
   result.model = -1;  // Not supported.
-  result.power = this->getPower();
-  result.mode = this->toCommonMode(this->getMode());
+  result.power = _.Power;
+  result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = this->getTemp();
-  result.fanspeed = this->toCommonFanSpeed(this->getFan());
-  result.swingv = this->getSwing() ? stdAc::swingv_t::kAuto :
-                                     stdAc::swingv_t::kOff;
-  result.turbo = this->getTurbo();
-  result.filter = this->getIon();
-  result.sleep = this->getSleep() ? 0 : -1;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = (getSwing() ? stdAc::swingv_t::kAuto
+                              : stdAc::swingv_t::kOff);
+  result.turbo = getTurbo();
+  result.filter = _.Ion;
+  result.sleep = (getSleep() ? 0 : -1);
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.light = false;
@@ -502,31 +468,30 @@ stdAc::state_t IRVestelAc::toCommon(void) {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRVestelAc::toString(void) {
+String IRVestelAc::toString(void) const {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  if (this->isTimeCommand()) {
+  if (isTimeCommand()) {
     result += addLabeledString(minsToString(getTime()), kClockStr, false);
     result += addLabeledString(
-        isTimerActive() ? minsToString(getTimer()) : kOffStr,
+        (_.Timer ? minsToString(getTimer()) : kOffStr),
         kTimerStr);
     result += addLabeledString(
-        (isOnTimerActive() && !isTimerActive()) ?
-          minsToString(this->getOnTimer()) : kOffStr,
+        (_.OnTimer && !_.Timer) ? minsToString(getOnTimer()) : kOffStr,
         kOnTimerStr);
     result += addLabeledString(
-        isOffTimerActive() ? minsToString(getOffTimer()) : kOffStr,
+        (_.OffTimer ? minsToString(getOffTimer()) : kOffStr),
         kOffTimerStr);
     return result;
   }
   // Not a time command, it's a normal command.
-  result += addBoolToString(getPower(), kPowerStr, false);
-  result += addModeToString(getMode(), kVestelAcAuto, kVestelAcCool,
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kVestelAcAuto, kVestelAcCool,
                             kVestelAcHeat, kVestelAcDry, kVestelAcFan);
   result += addTempToString(getTemp());
-  result += addIntToString(getFan(), kFanStr);
+  result += addIntToString(_.Fan, kFanStr);
   result += kSpaceLBraceStr;
-  switch (this->getFan()) {
+  switch (_.Fan) {
     case kVestelAcFanAuto:
       result += kAutoStr;
       break;
@@ -555,7 +520,7 @@ String IRVestelAc::toString(void) {
   result += ')';
   result += addBoolToString(getSleep(), kSleepStr);
   result += addBoolToString(getTurbo(), kTurboStr);
-  result += addBoolToString(getIon(), kIonStr);
+  result += addBoolToString(_.Ion, kIonStr);
   result += addBoolToString(getSwing(), kSwingStr);
   return result;
 }

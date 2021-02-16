@@ -22,35 +22,43 @@
 #include "IRsend_test.h"
 #endif
 
-
-// Structure of a Command message (56 bits)
-//   Signature: 12 bits. e.g. 0x201
-//   Checksum: 8 bits
-//   Swing: 4 bits. (auto 0xA, stop 0xF)
-//   turbo_sleep_normal: 4bits. (normal 0x1, sleep 0x3, turbo 0x7)
-//   Unused: 8 bits. (0x00)
-//   Temperature: 4 bits. (Celsius, but offset by -16 degrees. e.g. 0x0 = 16C)
-//   Fan Speed: 4 bits (auto 0x1, low 0x5, mid 0x9, high 0xB, 0xD auto hot,
-//                    0xC auto cool)
-//   Mode: 3 bits. (auto 0x0, cold 0x1, dry 0x2, fan 0x3, hot 0x4)
-//   unknown/unused: 6 bits.
-//   Ion flag: 1 bit.
-//   unknown/unused: 1 bit.
-//   Power/message type: 4 bits. (on 0xF, off 0xC, 0x0 == Timer mesage)
-//
-// Structure of a Time(r) message (56 bits)
-//   Signature: 12 bits. e.g. 0x201
-//   Checksum: 8 bits
-//   Off Minutes: 3 bits. (Stored in 10 min increments. eg. xx:20 is 0x2)
-//   Off Hours: 5 bits. (0x17 == 11PM / 23:00)
-//   On Minutes: 3 bits. (Stored in 10 min increments. eg. xx:20 is 0x2)
-//   On Hours: 5 bits. (0x9 == 9AM / 09:00)
-//   Clock Hours: 5 bits.
-//   On Timer flag: 1 bit.
-//   Off Timer flag: 1 bit.
-//   Timer mode flag: 1 bit. (Off after X many hours/mins, not at clock time.)
-//   Clock Minutes: 8 bits. (0-59)
-//   Power/message type: 4 bits. (0x0 == Timer mesage, else see Comman message)
+/// Native representation of a Vestel A/C message.
+union VestelProtocol{
+  struct {
+    uint64_t cmdState;
+    uint64_t timeState;
+  };
+  struct {
+    // Command
+    uint64_t Signature  :12;  // 0x201
+    uint64_t CmdSum     :8;
+    uint64_t Swing      :4;  // auto 0xA, stop 0xF
+    uint64_t TurboSleep :4;  // normal 0x1, sleep 0x3, turbo 0x7
+    uint64_t            :8;
+    uint64_t Temp       :4;
+    uint64_t Fan        :4;
+    uint64_t Mode       :3;
+    uint64_t            :3;
+    uint64_t Ion        :1;
+    uint64_t            :1;
+    uint64_t Power      :2;
+    uint64_t UseCmd     :1;
+    uint64_t            :0;
+    // Time
+    uint64_t            :12;
+    uint64_t TimeSum    :8;
+    uint64_t OffTenMins :3;
+    uint64_t OffHours   :5;
+    uint64_t OnTenMins  :3;
+    uint64_t OnHours    :5;
+    uint64_t Hours      :5;
+    uint64_t OnTimer    :1;
+    uint64_t OffTimer   :1;
+    uint64_t Timer      :1;
+    uint64_t Minutes    :8;
+    uint64_t            :0;
+  };
+};
 
 // Constants
 const uint16_t kVestelAcHdrMark = 3110;
@@ -83,30 +91,6 @@ const uint8_t kVestelAcTurbo = 7;
 const uint8_t kVestelAcIon = 4;
 const uint8_t kVestelAcSwing = 0xA;
 
-const uint8_t kVestelAcChecksumOffset = 12;
-const uint8_t kVestelAcChecksumSize = 8;  // Nr. of bits
-const uint8_t kVestelAcSwingOffset = 20;
-const uint8_t kVestelAcTurboSleepOffset = 24;
-const uint8_t kVestelAcTempOffset = 36;
-const uint8_t kVestelAcFanOffset = 40;
-const uint8_t kVestelAcFanSize = 4;  // Nr. of bits
-const uint8_t kVestelAcModeOffset = 44;
-const uint8_t kVestelAcIonOffset = 50;
-const uint8_t kVestelAcPowerOffset = 52;
-const uint8_t kVestelAcPowerSize = 2;  // Nr. of bits
-const uint8_t kVestelAcOffTimeOffset = 20;
-const uint8_t kVestelAcOnTimeOffset = 28;
-const uint8_t kVestelAcTimerHourSize = 5;  // Nr. of bits
-const uint8_t kVestelAcTimerMinsSize = 3;  // Nr. of bits
-const uint8_t kVestelAcTimerSize = kVestelAcTimerHourSize +
-    kVestelAcTimerMinsSize;  // Nr. of bits
-const uint8_t kVestelAcHourOffset = 36;  // 5 bits
-const uint8_t kVestelAcHourSize = 5;  // Nr. of bits
-const uint8_t kVestelAcOnTimerFlagOffset = kVestelAcHourOffset + 5;
-const uint8_t kVestelAcOffTimerFlagOffset = kVestelAcHourOffset + 6;
-const uint8_t kVestelAcTimerFlagOffset = kVestelAcHourOffset + 7;
-const uint8_t kVestelAcMinuteOffset = 44;
-const uint8_t kVestelAcMinuteSize = 8;  // Nr. of bits
 // Default states
 const uint64_t kVestelAcStateDefault = 0x0F00D9001FEF201ULL;
 const uint64_t kVestelAcTimeStateDefault = 0x201ULL;
@@ -130,48 +114,48 @@ class IRVestelAc {
   void on(void);
   void off(void);
   void setPower(const bool on);
-  bool getPower(void);
+  bool getPower(void) const;
   void setAuto(const int8_t autoLevel);
   void setTimer(const uint16_t minutes);
-  uint16_t getTimer(void);
+  uint16_t getTimer(void) const;
   void setTime(const uint16_t minutes);
-  uint16_t getTime(void);
+  uint16_t getTime(void) const;
   void setOnTimer(const uint16_t minutes);
-  uint16_t getOnTimer(void);
+  uint16_t getOnTimer(void) const;
   void setOffTimer(const uint16_t minutes);
-  uint16_t getOffTimer(void);
+  uint16_t getOffTimer(void) const;
   void setTemp(const uint8_t temp);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t fan);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   void setRaw(const uint8_t* newState);
   void setRaw(const uint64_t newState);
   uint64_t getRaw(void);
   static bool validChecksum(const uint64_t state);
   void setSwing(const bool on);
-  bool getSwing(void);
+  bool getSwing(void) const;
   void setSleep(const bool on);
-  bool getSleep(void);
+  bool getSleep(void) const;
   void setTurbo(const bool on);
-  bool getTurbo(void);
+  bool getTurbo(void) const;
   void setIon(const bool on);
-  bool getIon(void);
-  bool isTimeCommand(void);
-  bool isOnTimerActive(void);
+  bool getIon(void) const;
+  bool isTimeCommand(void) const;
+  bool isOnTimerActive(void) const;
   void setOnTimerActive(const bool on);
-  bool isOffTimerActive(void);
+  bool isOffTimerActive(void) const;
   void setOffTimerActive(const bool on);
-  bool isTimerActive(void);
+  bool isTimerActive(void) const;
   void setTimerActive(const bool on);
   static uint8_t calcChecksum(const uint64_t state);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -181,12 +165,8 @@ class IRVestelAc {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint64_t remote_state;  ///< The state of the IR remote in IR code form.
-  uint64_t remote_time_state;   ///< The time state of the remote in code form.
-  bool use_time_state;
+  VestelProtocol _;
   void checksum(void);
-  void _setTimer(const uint16_t minutes, const uint8_t offset);
-  uint16_t _getTimer(const uint8_t offset);
 };
 
 #endif  // IR_VESTEL_H_
