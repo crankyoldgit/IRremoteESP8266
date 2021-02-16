@@ -114,6 +114,7 @@ extern const char* kPreviousPowerStr;
 extern const char* kProtocolStr;
 extern const char* kPurifyStr;
 extern const char* kQuietStr;
+extern const char* kRecycleStr;
 extern const char* kRepeatStr;
 extern const char* kRightMaxStr;
 extern const char* kRightStr;

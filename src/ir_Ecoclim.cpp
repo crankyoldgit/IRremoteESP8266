@@ -388,8 +388,20 @@ String IREcoclimAc::toString(void) const {
   String result = "";
   result.reserve(140);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(_.Power, kPowerStr, false);
-  result += addModeToString(_.Mode, kEcoclimAuto, kEcoclimCool,
-                            kEcoclimHeat, kEcoclimDry, kEcoclimFan);
+  // Custom Mode output as this protocol has Recycle and Sleep as modes.
+  result += addIntToString(_.Mode, kModeStr);
+  result += kSpaceLBraceStr;
+  switch (_.Mode) {
+    case kEcoclimAuto:    result += kAutoStr; break;
+    case kEcoclimCool:    result += kCoolStr; break;
+    case kEcoclimHeat:    result += kHeatStr; break;
+    case kEcoclimDry:     result += kDryStr; break;
+    case kEcoclimFan:     result += kFanStr; break;
+    case kEcoclimRecycle: result += kRecycleStr; break;
+    case kEcoclimSleep:   result += kSleepStr; break;
+    default:              result += kUnknownStr;
+  }
+  result += ')';
   result += addTempToString(getTemp());
   result += kCommaSpaceStr;
   result += kSensorStr;

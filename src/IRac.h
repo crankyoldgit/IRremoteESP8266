@@ -211,7 +211,7 @@ void daikin216(IRDaikin216 *ac,
 void ecoclim(IREcoclimAc *ac,
              const bool on, const stdAc::opmode_t mode,
              const float degrees, const stdAc::fanspeed_t fan,
-             const int16_t clock = -1);
+             const int16_t sleep = -1, const int16_t clock = -1);
 #endif  // SEND_ECOCLIM
 #if SEND_ELECTRA_AC
 void electra(IRElectraAc *ac,

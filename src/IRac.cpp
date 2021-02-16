@@ -813,14 +813,20 @@ void IRac::delonghiac(IRDelonghiAc *ac,
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 /// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
 void IRac::ecoclim(IREcoclimAc *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
-                   const int16_t clock) {
+                   const int16_t sleep, const int16_t clock) {
   ac->begin();
   ac->setPower(on);
-  ac->setMode(ac->convertMode(mode));
+  uint8_t new_mode;
+  if (sleep >= 0)  // EcoClim has a descrete Sleep operation mode, not a setting
+    new_mode = kEcoclimSleep;  // Override the requested operating mode.
+  else
+    new_mode = ac->convertMode(mode);  // Not Sleep, so use the supplied mode.
+  ac->setMode(new_mode);
   ac->setTemp(degrees);
   ac->setSensorTemp(degrees);  //< Set to the desired temp until we cab disable.
   ac->setFan(ac->convertFan(fan));
