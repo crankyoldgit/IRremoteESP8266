@@ -996,6 +996,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     if (decodeEcoclim(results, offset, kEcoclimBits) ||
         decodeEcoclim(results, offset, kEcoclimShortBits)) return true;
 #endif  // DECODE_ECOCLIM
+#if DECODE_XMP
+    DPRINTLN("Attempting XMP decode");
+    if (decodeXmp(results, offset, kXmpBits)) return true;
+#endif  // DECODE_XMP
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
@@ -1134,6 +1138,26 @@ bool IRrecv::matchMark(uint32_t measured, uint32_t desired, uint8_t tolerance,
   return match(measured, desired + excess, tolerance);
 }
 
+/// Check if we match a mark signal(measured) with the desired within a
+/// range (in uSeconds) either side of the desired, after an expected is excess
+/// is added.
+/// @param[in] measured The recorded period of the signal pulse.
+/// @param[in] desired The expected period (in usecs) we are matching against.
+/// @param[in] range The range limit from desired to accept in uSeconds.
+/// @param[in] excess A non-scaling amount to reduce usecs by.
+/// @return A Boolean. true if it matches, false if it doesn't.
+bool IRrecv::matchMarkRange(const uint32_t measured, const uint32_t desired,
+                            const uint16_t range, const int16_t excess) {
+  DPRINT("Matching MARK ");
+  DPRINT(measured * kRawTick);
+  DPRINT(" vs ");
+  DPRINT(desired);
+  DPRINT(" + ");
+  DPRINT(excess);
+  DPRINT(". ");
+  return match(measured, desired + excess, 0, range);
+}
+
 /// Check if we match a space signal(measured) with the desired within
 ///  +/-tolerance percent, after an expected is excess is removed.
 /// @param[in] measured The recorded period of the signal pulse.
@@ -1151,6 +1175,26 @@ bool IRrecv::matchSpace(uint32_t measured, uint32_t desired, uint8_t tolerance,
   DPRINT(excess);
   DPRINT(". ");
   return match(measured, desired - excess, tolerance);
+}
+
+/// Check if we match a space signal(measured) with the desired within a
+/// range (in uSeconds) either side of the desired, after an expected is excess
+/// is removed.
+/// @param[in] measured The recorded period of the signal pulse.
+/// @param[in] desired The expected period (in usecs) we are matching against.
+/// @param[in] range The range limit from desired to accept in uSeconds.
+/// @param[in] excess A non-scaling amount to reduce usecs by.
+/// @return A Boolean. true if it matches, false if it doesn't.
+bool IRrecv::matchSpaceRange(const uint32_t measured, const uint32_t desired,
+                             const uint16_t range, const int16_t excess) {
+  DPRINT("Matching SPACE ");
+  DPRINT(measured * kRawTick);
+  DPRINT(" vs ");
+  DPRINT(desired);
+  DPRINT(" - ");
+  DPRINT(excess);
+  DPRINT(". ");
+  return match(measured, desired - excess, 0, range);
 }
 
 #if DECODE_HASH

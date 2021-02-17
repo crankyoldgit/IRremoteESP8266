@@ -698,6 +698,10 @@ class IRsend {
   void sendEcoclim(const uint64_t data, const uint16_t nbits = kEcoclimBits,
                    const uint16_t repeat = kNoRepeat);
 #endif  // SEND_ECOCLIM
+#if SEND_XMP
+  void sendXmp(const uint64_t data, const uint16_t nbits = kXmpBits,
+               const uint16_t repeat = kNoRepeat);
+#endif  // SEND_XMP
 
  protected:
 #ifdef UNIT_TEST

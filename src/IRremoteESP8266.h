@@ -733,6 +733,13 @@
 #define SEND_ECOCLIM        _IR_ENABLE_DEFAULT_
 #endif  // SEND_ECOCLIM
 
+#ifndef DECODE_XMP
+#define DECODE_XMP          _IR_ENABLE_DEFAULT_
+#endif  // DECODE_XMP
+#ifndef SEND_XMP
+#define SEND_XMP            _IR_ENABLE_DEFAULT_
+#endif  // SEND_XMP
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -883,8 +890,9 @@ enum decode_type_t {
   PANASONIC_AC32,
   MILESTAG2,
   ECOCLIM,
+  XMP,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = ECOCLIM,
+  kLastDecodeType = XMP,
 };
 
 // Message lengths & required repeat values
@@ -1108,6 +1116,7 @@ const uint16_t kWhirlpoolAcBits = kWhirlpoolAcStateLength * 8;
 const uint16_t kWhirlpoolAcDefaultRepeat = kNoRepeat;
 const uint16_t kWhynterBits = 32;
 const uint8_t  kVestelAcBits = 56;
+const uint16_t kXmpBits = 64;
 const uint16_t kZepealBits = 16;
 const uint16_t kZepealMinRepeat = 4;
 const uint16_t kVoltasBits = 80;
