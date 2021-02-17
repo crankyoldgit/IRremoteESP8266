@@ -1,5 +1,7 @@
 // Copyright 2021 David Conran
 
+#include "ir_Ecoclim.h"
+#include <algorithm>
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -12,7 +14,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("ECOCLIM", typeToString(decode_type_t::ECOCLIM));
   ASSERT_EQ(decode_type_t::ECOCLIM, strToDecodeType("ECOCLIM"));
   ASSERT_FALSE(hasACState(decode_type_t::ECOCLIM));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::ECOCLIM));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::ECOCLIM));
   ASSERT_EQ(kEcoclimBits, IRsend::defaultBits(decode_type_t::ECOCLIM));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::ECOCLIM));
 }
@@ -174,9 +176,10 @@ TEST(TestDecodeEcoclim, RealExample) {
   EXPECT_EQ(kEcoclimBits, irsend.capture.bits);
   EXPECT_EQ(0x110673AEFFFF72, irsend.capture.value);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 0 (Auto), Temp: 11C, SensorTemp: 22C, Fan: 3 (Auto), "
+      "Clock: 15:42, On Timer: Off, Off Timer: Off, Type: 7",
       IRAcUtils::resultAcToString(&irsend.capture));
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 
   irsend.reset();
   irsend.sendRaw(short_rawData, 97, 38000);
@@ -198,7 +201,158 @@ TEST(TestDecodeEcoclim, RealExample) {
   EXPECT_EQ(kEcoclimBits, irsend.capture.bits);
   EXPECT_EQ(0x15594507FFFF0A, irsend.capture.value);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 2 (Dry), Temp: 30C, SensorTemp: 26C, Fan: 0 (Low), "
+      "Clock: 21:27, On Timer: Off, Off Timer: Off, Type: 0",
       IRAcUtils::resultAcToString(&irsend.capture));
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+TEST(TestIREcoclimAcClass, Power) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIREcoclimAcClass, SetAndGetTemp) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  ac.setTemp(kEcoclimTempMin);
+  EXPECT_EQ(kEcoclimTempMin, ac.getTemp());
+  ac.setTemp(kEcoclimTempMin - 1);
+  EXPECT_EQ(kEcoclimTempMin, ac.getTemp());
+  ac.setTemp(kEcoclimTempMax);
+  EXPECT_EQ(kEcoclimTempMax, ac.getTemp());
+  ac.setTemp(kEcoclimTempMax + 1);
+  EXPECT_EQ(kEcoclimTempMax, ac.getTemp());
+}
+
+TEST(TestIREcoclimAcClass, SetAndGetSensorTemp) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.setSensorTemp(25);
+  EXPECT_EQ(25, ac.getSensorTemp());
+  ac.setSensorTemp(kEcoclimTempMin);
+  EXPECT_EQ(kEcoclimTempMin, ac.getSensorTemp());
+  ac.setSensorTemp(kEcoclimTempMin - 1);
+  EXPECT_EQ(kEcoclimTempMin, ac.getSensorTemp());
+  ac.setSensorTemp(kEcoclimTempMax);
+  EXPECT_EQ(kEcoclimTempMax, ac.getSensorTemp());
+  ac.setSensorTemp(kEcoclimTempMax + 1);
+  EXPECT_EQ(kEcoclimTempMax, ac.getSensorTemp());
+}
+
+TEST(TestIREcoclimAcClass, FanSpeed) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setFan(0);
+  EXPECT_EQ(kEcoclimFanMin, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kEcoclimFanAuto, ac.getFan());
+
+  ac.setFan(kEcoclimFanMax);
+  EXPECT_EQ(kEcoclimFanMax, ac.getFan());
+
+  ac.setFan(std::max(kEcoclimFanAuto, kEcoclimFanMax) + 1);
+  EXPECT_EQ(kEcoclimFanAuto, ac.getFan());
+
+  ac.setFan(kEcoclimFanMed);
+  EXPECT_EQ(kEcoclimFanMed, ac.getFan());
+
+  ac.setFan(kEcoclimFanMin);
+  EXPECT_EQ(kEcoclimFanMin, ac.getFan());
+}
+
+TEST(TestIREcoclimAcClass, OperatingMode) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kEcoclimCool);
+  EXPECT_EQ(kEcoclimCool, ac.getMode());
+  ac.setMode(kEcoclimFan);
+  EXPECT_EQ(kEcoclimFan, ac.getMode());
+  ac.setMode(kEcoclimDry);
+  EXPECT_EQ(kEcoclimDry, ac.getMode());
+  ac.setMode(kEcoclimHeat);
+  EXPECT_EQ(kEcoclimHeat, ac.getMode());
+  ac.setMode(255);
+  EXPECT_EQ(kEcoclimAuto, ac.getMode());
+}
+
+TEST(TestIREcoclimAcClass, Timers) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.begin();
+  ASSERT_FALSE(ac.isOnTimerEnabled());
+  EXPECT_EQ(kEcoclimTimerDisable, ac.getOnTimer());
+  ASSERT_FALSE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kEcoclimTimerDisable, ac.getOffTimer());
+
+  ac.setOnTimer(0);
+  EXPECT_TRUE(ac.isOnTimerEnabled());
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_FALSE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kEcoclimTimerDisable, ac.getOffTimer());
+
+  ac.disableOnTimer();
+  EXPECT_FALSE(ac.isOnTimerEnabled());
+  EXPECT_EQ(kEcoclimTimerDisable, ac.getOnTimer());
+
+  ac.setOnTimer(23 * 60 + 59);  // Max (23:59)
+  EXPECT_TRUE(ac.isOnTimerEnabled());
+  EXPECT_EQ(23 * 60 + 50, ac.getOnTimer());  // Rounded down to 10 min boundary.
+  EXPECT_FALSE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kEcoclimTimerDisable, ac.getOffTimer());
+
+  ac.setOffTimer(3 * 60);  // 3am
+  EXPECT_TRUE(ac.isOnTimerEnabled());
+  EXPECT_TRUE(ac.isOffTimerEnabled());
+  EXPECT_EQ(23 * 60 + 50, ac.getOnTimer());  // Rounded down to 10 min boundary.
+  EXPECT_EQ(3 * 60, ac.getOffTimer());
+
+  ac.disableOnTimer();
+  EXPECT_FALSE(ac.isOnTimerEnabled());
+  EXPECT_TRUE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kEcoclimTimerDisable, ac.getOnTimer());
+  EXPECT_EQ(3 * 60, ac.getOffTimer());
+
+  ac.disableOffTimer();
+  EXPECT_FALSE(ac.isOnTimerEnabled());
+  EXPECT_EQ(kEcoclimTimerDisable, ac.getOnTimer());
+  EXPECT_FALSE(ac.isOffTimerEnabled());
+  EXPECT_EQ(kEcoclimTimerDisable, ac.getOffTimer());
+}
+
+TEST(TestIREcoclimAcClass, HumanReadable) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.begin();
+  EXPECT_EQ(kEcoclimDefaultState, ac.getRaw());
+  EXPECT_EQ(
+      "Power: Off, Mode: 0 (Auto), Temp: 11C, SensorTemp: 22C, Fan: 3 (Auto), "
+      "Clock: 00:00, On Timer: Off, Off Timer: Off, Type: 0",
+      ac.toString());
+  ac.setPower(true);
+  ac.setMode(kEcoclimHeat);
+  ac.setTemp(25);
+  ac.setSensorTemp(19);
+  ac.setFan(kEcoclimFanMin);
+  ac.setClock(7 * 60 + 59);
+  ac.setOnTimer(8 * 60 + 0);
+  ac.setOffTimer(20 * 60 + 40);
+  ac.setType(kEcoclimDipSlave);
+  EXPECT_EQ(
+      "Power: On, Mode: 5 (Heat), Temp: 25C, SensorTemp: 19C, Fan: 0 (Low), "
+      "Clock: 07:59, On Timer: 08:00, Off Timer: 20:40, Type: 7",
+      ac.toString());
 }

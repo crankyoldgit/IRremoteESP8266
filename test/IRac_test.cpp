@@ -9,6 +9,7 @@
 #include "ir_Corona.h"
 #include "ir_Daikin.h"
 #include "ir_Delonghi.h"
+#include "ir_Ecoclim.h"
 #include "ir_Electra.h"
 #include "ir_Fujitsu.h"
 #include "ir_Goodweather.h"
@@ -505,6 +506,49 @@ TEST(TestIRac, DelonghiAc) {
   ASSERT_EQ(decode_type_t::DELONGHI_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kDelonghiAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+TEST(TestIRac, Ecoclim) {
+  IREcoclimAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 1 (Cool), Temp: 26C, SensorTemp: 26C, Fan: 2 (High), "
+      "Clock: 12:34, On Timer: Off, Off Timer: Off, Type: 0";
+
+  ac.begin();
+  irac.ecoclim(&ac,
+               true,                        // Power
+               stdAc::opmode_t::kCool,      // Mode
+               26,                          // Celsius
+               stdAc::fanspeed_t::kHigh,    // Fan speed
+               -1,                          // Sleep
+               12 * 60 + 34);               // Clock
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(ECOCLIM, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kEcoclimBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+
+  char expected_sleep[] =
+      "Power: On, Mode: 7 (Sleep), Temp: 21C, SensorTemp: 21C, Fan: 0 (Low), "
+      "Clock: 17:17, On Timer: Off, Off Timer: Off, Type: 0";
+
+  ac._irsend.reset();
+  irac.ecoclim(&ac,
+               true,                        // Power
+               stdAc::opmode_t::kCool,      // Mode
+               21,                          // Celsius
+               stdAc::fanspeed_t::kLow,     // Fan speed
+               8 * 60,                      // Sleep
+               17 * 60 + 17);               // Clock
+  ASSERT_EQ(expected_sleep, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(ECOCLIM, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kEcoclimBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected_sleep, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
 TEST(TestIRac, Electra) {
