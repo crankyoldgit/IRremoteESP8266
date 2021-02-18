@@ -39,7 +39,7 @@ using irutils::addModelToString;
 using irutils::addTempToString;
 using irutils::minsToString;
 
-#define GETTIME(x) _.x##Hours * 60 + _.x##Mins
+#define GETTIME(x) (_.x##Hours * 60 + _.x##Mins)
 #define SETTIME(x, n) do { \
   uint16_t mins = n;\
   _.x##Hours = (mins / 60) % 24;\
@@ -294,13 +294,13 @@ bool IRWhirlpoolAc::getSwing(void) const {
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRWhirlpoolAc::setLight(const bool on) {
   // Cleared when on.
-  _.NotLight = !on;
+  _.LightOff = !on;
 }
 
 /// Get the Light (Display/LED) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRWhirlpoolAc::getLight(void) const {
-  return !_.NotLight;
+  return !_.LightOff;
 }
 
 /// Set the clock time in nr. of minutes past midnight.
@@ -330,13 +330,13 @@ uint16_t IRWhirlpoolAc::getOffTimer(void) const {
 /// Is the Off timer enabled?
 /// @return true, the Timer is enabled. false, the Timer is disabled.
 bool IRWhirlpoolAc::isOffTimerEnabled(void) const {
-  return _.OffTimer;
+  return _.OffTimerEnabled;
 }
 
 /// Enable the Off Timer.
 /// @param[in] on true, the timer is enabled. false, the timer is disabled.
 void IRWhirlpoolAc::enableOffTimer(const bool on) {
-  _.OffTimer = on;
+  _.OffTimerEnabled = on;
   _.Cmd = kWhirlpoolAcCommandOffTimer;
 }
 
@@ -355,13 +355,13 @@ uint16_t IRWhirlpoolAc::getOnTimer(void) const {
 /// Is the On timer enabled?
 /// @return true, the Timer is enabled. false, the Timer is disabled.
 bool IRWhirlpoolAc::isOnTimerEnabled(void) const {
-  return _.OnTimer;
+  return _.OnTimerEnabled;
 }
 
 /// Enable the On Timer.
 /// @param[in] on true, the timer is enabled. false, the timer is disabled.
 void IRWhirlpoolAc::enableOnTimer(const bool on) {
-  _.OnTimer = on;
+  _.OnTimerEnabled = on;
   _.Cmd = kWhirlpoolAcCommandOnTimer;
 }
 
@@ -542,9 +542,9 @@ String IRWhirlpoolAc::toString(void) const {
   result += addBoolToString(getLight(), kLightStr);
   result += addLabeledString(minsToString(getClock()), kClockStr);
   result += addLabeledString(
-      _.OnTimer ? minsToString(getOnTimer()) : kOffStr, kOnTimerStr);
+      _.OnTimerEnabled ? minsToString(getOnTimer()) : kOffStr, kOnTimerStr);
   result += addLabeledString(
-      _.OffTimer ? minsToString(getOffTimer()) : kOffStr, kOffTimerStr);
+      _.OffTimerEnabled ? minsToString(getOffTimer()) : kOffStr, kOffTimerStr);
   result += addBoolToString(_.Sleep, kSleepStr);
   result += addBoolToString(getSuper(), kSuperStr);
   result += addIntToString(_.Cmd, kCommandStr);

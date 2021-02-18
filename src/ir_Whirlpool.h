@@ -57,21 +57,21 @@ union WhirlpoolProtocol{
     uint8_t Super2  :1;
     // Byte 6
     uint8_t ClockHours  :5;
-    uint8_t NotLight    :1;
+    uint8_t LightOff    :1;
     uint8_t             :2;
     // Byte 7
-    uint8_t ClockMins :6;
-    uint8_t           :1;
-    uint8_t OffTimer  :1;
+    uint8_t ClockMins       :6;
+    uint8_t                 :1;
+    uint8_t OffTimerEnabled :1;
     // Byte 8
     uint8_t OffHours  :5;
     uint8_t           :1;
     uint8_t Swing2    :1;
     uint8_t           :1;
     // Byte 9
-    uint8_t OffMins :6;
-    uint8_t         :1;
-    uint8_t OnTimer :1;
+    uint8_t OffMins         :6;
+    uint8_t                 :1;
+    uint8_t OnTimerEnabled  :1;
     // Byte 10
     uint8_t OnHours :5;
     uint8_t         :3;
