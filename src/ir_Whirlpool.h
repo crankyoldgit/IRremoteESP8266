@@ -32,6 +32,73 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Whirlpool A/C message.
+union WhirlpoolProtocol{
+  uint8_t raw[kWhirlpoolAcStateLength];  ///< The state in IR code form
+  struct {
+    // Byte 0~1
+    uint8_t pad0[2];
+    // Byte 2
+    uint8_t Fan     :2;
+    uint8_t Power   :1;
+    uint8_t Sleep   :1;
+    uint8_t         :3;
+    uint8_t Swing1  :1;
+    // Byte 3
+    uint8_t Mode  :3;
+    uint8_t       :1;
+    uint8_t Temp  :4;
+    // Byte 4
+    uint8_t       :8;
+    // Byte 5
+    uint8_t         :4;
+    uint8_t Super1  :1;
+    uint8_t         :2;
+    uint8_t Super2  :1;
+    // Byte 6
+    uint8_t ClockHours  :5;
+    uint8_t LightOff    :1;
+    uint8_t             :2;
+    // Byte 7
+    uint8_t ClockMins       :6;
+    uint8_t                 :1;
+    uint8_t OffTimerEnabled :1;
+    // Byte 8
+    uint8_t OffHours  :5;
+    uint8_t           :1;
+    uint8_t Swing2    :1;
+    uint8_t           :1;
+    // Byte 9
+    uint8_t OffMins         :6;
+    uint8_t                 :1;
+    uint8_t OnTimerEnabled  :1;
+    // Byte 10
+    uint8_t OnHours :5;
+    uint8_t         :3;
+    // Byte 11
+    uint8_t OnMins  :6;
+    uint8_t         :2;
+    // Byte 12
+    uint8_t       :8;
+    // Byte 13
+    uint8_t Sum1  :8;
+    // Byte 14
+    uint8_t       :8;
+    // Byte 15
+    uint8_t Cmd   :8;
+    // Byte 16~17
+    uint8_t pad1[2];
+    // Byte 18
+    uint8_t       :3;
+    uint8_t J191  :1;
+    uint8_t       :4;
+    // Byte 19
+    uint8_t       :8;
+    // Byte 20
+    uint8_t Sum2  :8;
+  };
+};
+
 // Constants
 const uint8_t kWhirlpoolAcChecksumByte1 = 13;
 const uint8_t kWhirlpoolAcChecksumByte2 = kWhirlpoolAcStateLength - 1;
@@ -40,37 +107,13 @@ const uint8_t kWhirlpoolAcAuto = 1;
 const uint8_t kWhirlpoolAcCool = 2;
 const uint8_t kWhirlpoolAcDry = 3;
 const uint8_t kWhirlpoolAcFan = 4;
-const uint8_t kWhirlpoolAcModeOffset = 0;
-const uint8_t kWhirlpoolAcModePos = 3;
-const uint8_t kWhirlpoolAcFanOffset = 0;  // Mask 0b00000011
-const uint8_t kWhirlpoolAcFanSize = 2;  // Nr. of bits
 const uint8_t kWhirlpoolAcFanAuto = 0;
 const uint8_t kWhirlpoolAcFanHigh = 1;
 const uint8_t kWhirlpoolAcFanMedium = 2;
 const uint8_t kWhirlpoolAcFanLow = 3;
-const uint8_t kWhirlpoolAcFanPos = 2;
 const uint8_t kWhirlpoolAcMinTemp = 18;     // 18C (DG11J1-3A), 16C (DG11J1-91)
 const uint8_t kWhirlpoolAcMaxTemp = 32;     // 32C (DG11J1-3A), 30C (DG11J1-91)
 const uint8_t kWhirlpoolAcAutoTemp = 23;    // 23C
-const uint8_t kWhirlpoolAcTempPos = 3;
-const uint8_t kWhirlpoolAcSwing1Offset = 7;
-const uint8_t kWhirlpoolAcSwing2Offset = 6;
-const uint8_t kWhirlpoolAcLightOffset = 5;
-const uint8_t kWhirlpoolAcPowerToggleOffset = 2;  // 0b00000100
-const uint8_t kWhirlpoolAcPowerTogglePos = 2;
-const uint8_t kWhirlpoolAcSleepOffset = 3;
-const uint8_t kWhirlpoolAcSleepPos = 2;
-const uint8_t kWhirlpoolAcSuperMask = 0b10010000;
-const uint8_t kWhirlpoolAcSuperPos = 5;
-const uint8_t kWhirlpoolAcHourOffset = 0;  // Mask 0b00011111
-const uint8_t kWhirlpoolAcHourSize = 5;  // Nr. of bits
-const uint8_t kWhirlpoolAcMinuteOffset = 0;  // Mask 0b00111111
-const uint8_t kWhirlpoolAcMinuteSize = 6;  // Nr. of bits
-const uint8_t kWhirlpoolAcTimerEnableOffset = 7;  // 0b10000000
-const uint8_t kWhirlpoolAcClockPos = 6;
-const uint8_t kWhirlpoolAcOffTimerPos = 8;
-const uint8_t kWhirlpoolAcOnTimerPos = 10;
-const uint8_t kWhirlpoolAcCommandPos = 15;
 const uint8_t kWhirlpoolAcCommandLight = 0x00;
 const uint8_t kWhirlpoolAcCommandPower = 0x01;
 const uint8_t kWhirlpoolAcCommandTemp = 0x02;
@@ -83,8 +126,6 @@ const uint8_t kWhirlpoolAcCommandIFeel = 0x0D;
 const uint8_t kWhirlpoolAcCommandFanSpeed = 0x11;
 const uint8_t kWhirlpoolAcCommand6thSense = 0x17;
 const uint8_t kWhirlpoolAcCommandOffTimer = 0x1D;
-const uint8_t kWhirlpoolAcAltTempOffset = 3;
-const uint8_t kWhirlpoolAcAltTempPos = 18;
 
 // Classes
 /// Class for handling detailed Whirlpool A/C messages.
@@ -104,34 +145,34 @@ class IRWhirlpoolAc {
 #endif  // SEND_WHIRLPOOL_AC
   void begin(void);
   void setPowerToggle(const bool on);
-  bool getPowerToggle(void);
+  bool getPowerToggle(void) const;
   void setSleep(const bool on);
-  bool getSleep(void);
+  bool getSleep(void) const;
   void setSuper(const bool on);
-  bool getSuper(void);
+  bool getSuper(void) const;
   void setTemp(const uint8_t temp);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFan(const uint8_t speed);
-  uint8_t getFan(void);
+  uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   void setSwing(const bool on);
-  bool getSwing(void);
+  bool getSwing(void) const;
   void setLight(const bool on);
-  bool getLight(void);
-  uint16_t getClock(void);
+  bool getLight(void) const;
+  uint16_t getClock(void) const;
   void setClock(const uint16_t minspastmidnight);
-  uint16_t getOnTimer(void);
+  uint16_t getOnTimer(void) const;
   void setOnTimer(const uint16_t minspastmidnight);
   void enableOnTimer(const bool on);
-  bool isOnTimerEnabled(void);
-  uint16_t getOffTimer(void);
+  bool isOnTimerEnabled(void) const;
+  uint16_t getOffTimer(void) const;
   void setOffTimer(const uint16_t minspastmidnight);
   void enableOffTimer(const bool on);
-  bool isOffTimerEnabled(void);
+  bool isOffTimerEnabled(void) const;
   void setCommand(const uint8_t code);
-  uint8_t getCommand(void);
-  whirlpool_ac_remote_model_t getModel(void);
+  uint8_t getCommand(void) const;
+  whirlpool_ac_remote_model_t getModel(void) const;
   void setModel(const whirlpool_ac_remote_model_t model);
   uint8_t* getRaw(const bool calcchecksum = true);
   void setRaw(const uint8_t new_code[],
@@ -142,8 +183,8 @@ class IRWhirlpoolAc {
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
-  String toString(void);
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -153,16 +194,12 @@ class IRWhirlpoolAc {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif  // UNIT_TEST
-  uint8_t remote_state[kWhirlpoolAcStateLength];  ///< The state in IR code form
+  WhirlpoolProtocol _;
   uint8_t _desiredtemp;  ///< The last user explicitly set temperature.
   void checksum(const uint16_t length = kWhirlpoolAcStateLength);
-  uint16_t getTime(const uint16_t pos);
-  void setTime(const uint16_t pos, const uint16_t minspastmidnight);
-  bool isTimerEnabled(const uint16_t pos);
-  void enableTimer(const uint16_t pos, const bool state);
   void _setTemp(const uint8_t temp, const bool remember = true);
   void _setMode(const uint8_t mode);
-  int8_t getTempOffset(void);
+  int8_t getTempOffset(void) const;
 };
 
 #endif  // IR_WHIRLPOOL_H_
