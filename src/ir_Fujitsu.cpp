@@ -196,6 +196,7 @@ void IRFujitsuAC::checkSum(void) {
       case fujitsu_ac_remote_model_t::ARRAH2E:
       case fujitsu_ac_remote_model_t::ARRY4:
         _.unknown = 1;
+        // FALL THRU
       default:
         checksum = sumBytes(_.longcode + _state_length_short,
                             _state_length - _state_length_short - 1);
@@ -803,6 +804,7 @@ String IRFujitsuAC::toString(void) {
   switch (model) {
     case fujitsu_ac_remote_model_t::ARREB1E:
       result += addBoolToString(getOutsideQuiet(), kOutsideQuietStr);
+      // FALL THRU
     // These models seem to have timer support.
     case fujitsu_ac_remote_model_t::ARRAH2E:
       switch (getTimerType()) {
