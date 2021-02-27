@@ -178,7 +178,10 @@ void IRFujitsuAC::checkSum(void) {
     _.OnTimerEnable = _.OnTimer > 0;
 
     switch (_model) {
-      case fujitsu_ac_remote_model_t::ARRY4:
+      // tell ARRAH2E & ARRY4 apart
+      case fujitsu_ac_remote_model_t::ARRAH2E:
+        _.Clean = 0;
+        _.Filter = 0;
         break;
       default:
         _.longcode[14] = 0;
