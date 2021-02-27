@@ -199,7 +199,7 @@ class IRFujitsuAC {
   void setFilter(const bool on);
   bool getFilter(void) const;
   void setOutsideQuiet(const bool on);
-  bool getOutsideQuiet(void);
+  bool getOutsideQuiet(void) const;
   uint8_t getTimerType(void) const;
   void setTimerType(const uint8_t timertype);
   uint16_t getOnTimer(void) const;
@@ -212,7 +212,7 @@ class IRFujitsuAC {
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(void) const;
-  String toString(void);
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:

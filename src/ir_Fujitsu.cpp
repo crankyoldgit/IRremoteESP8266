@@ -166,9 +166,20 @@ void IRFujitsuAC::checkSum(void) {
   if (longcodes) {
     // Nr. of bytes in the message after this byte.
     _.RestLength = _state_length - 7;
-
     _.longcode[7] = 0x30;
     _.Power = (_cmd == kFujitsuAcCmdTurnOn);
+
+    // These values depend on model
+    if (_model != fujitsu_ac_remote_model_t::ARREB1E) {
+      _.OutsideQuiet = 0;
+      if (_model != fujitsu_ac_remote_model_t::ARRAH2E) {
+        _.TimerType = kFujitsuAcStopTimers;
+      }
+    }
+    if (_model != fujitsu_ac_remote_model_t::ARRY4) {
+      _.Clean = 0;
+      _.Filter = 0;
+    }
     // Set the On/Off/Sleep timer Nr of mins.
     _.OffTimer = getOffSleepTimer();
     _.OnTimer = getOnTimer();
@@ -177,15 +188,6 @@ void IRFujitsuAC::checkSum(void) {
     // Enable bit for the On timer
     _.OnTimerEnable = _.OnTimer > 0;
 
-    switch (_model) {
-      // tell ARRAH2E & ARRY4 apart
-      case fujitsu_ac_remote_model_t::ARRAH2E:
-        _.Clean = 0;
-        _.Filter = 0;
-        break;
-      default:
-        _.longcode[14] = 0;
-    }
     uint8_t checksum = 0;
     uint8_t checksum_complement = 0;
     switch (_model) {
@@ -283,6 +285,8 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
   // either the raw Filter or Clean setting is on.
   if (_model == fujitsu_ac_remote_model_t::ARRAH2E && (_.Filter || _.Clean))
       setModel(fujitsu_ac_remote_model_t::ARRY4);
+  if (_state_length == kFujitsuAcStateLength && _.OutsideQuiet)
+      setModel(fujitsu_ac_remote_model_t::ARREB1E);
   switch (_.Cmd) {
     case kFujitsuAcCmdTurnOff:
     case kFujitsuAcCmdStepHoriz:
@@ -294,7 +298,6 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
       setCmd(_.Cmd);
       break;
   }
-  getOutsideQuiet();
 }
 
 /// Set the internal state from a valid code for this protocol.
@@ -407,12 +410,12 @@ void IRFujitsuAC::setOutsideQuiet(const bool on) {
 
 /// Get the Outside Quiet mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRFujitsuAC::getOutsideQuiet(void) {
-  if (_state_length == kFujitsuAcStateLength && _.OutsideQuiet) {
+bool IRFujitsuAC::getOutsideQuiet(void) const {
+  switch (_model) {
     // Only ARREB1E seems to have this mode.
-    setModel(fujitsu_ac_remote_model_t::ARREB1E);
+    case fujitsu_ac_remote_model_t::ARREB1E: return _.OutsideQuiet;
+    default: return false;
   }
-  return _.OutsideQuiet;
 }
 
 /// Set the temperature.
@@ -547,11 +550,9 @@ void IRFujitsuAC::setTimerType(const uint8_t timertype) {
 /// Get the On Timer setting of the A/C.
 /// @return nr of minutes left on the timer. 0 means disabled/not supported.
 uint16_t IRFujitsuAC::getOnTimer(void) const {
-  if (getTimerType() == kFujitsuAcOnTimer) {
+  if (getTimerType() == kFujitsuAcOnTimer)
     return _.OnTimer;
-  } else {
-    return 0;
-  }
+  return 0;
 }
 
 /// Set the On Timer setting of the A/C.
@@ -726,7 +727,7 @@ stdAc::state_t IRFujitsuAC::toCommon(void) const {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRFujitsuAC::toString(void) {
+String IRFujitsuAC::toString(void) const {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   fujitsu_ac_remote_model_t model = _model;
