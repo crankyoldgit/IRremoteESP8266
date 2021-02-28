@@ -16,6 +16,8 @@
 //   Brand: Toshiba,  Model: RAS 18SKP-ES
 //   Brand: Toshiba,  Model: WH-TA04NE
 //   Brand: Toshiba,  Model: WC-L03SE
+//   Brand: Toshiba,  Model: WH-UB03NJ remote
+//   Brand: Toshiba,  Model: RAS-2558V A/C
 //   Brand: Carrier,  Model: 42NQV060M2 / 38NYV060M2 A/C
 //   Brand: Carrier,  Model: 42NQV050M2 / 38NYV050M2 A/C
 //   Brand: Carrier,  Model: 42NQV035M2 / 38NYV035M2 A/C
