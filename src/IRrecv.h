@@ -141,9 +141,15 @@ class IRrecv {
   bool matchMark(const uint32_t measured, const uint32_t desired,
                  const uint8_t tolerance = kUseDefTol,
                  const int16_t excess = kMarkExcess);
+  bool matchMarkRange(const uint32_t measured, const uint32_t desired,
+                      const uint16_t range = 100,
+                      const int16_t excess = kMarkExcess);
   bool matchSpace(const uint32_t measured, const uint32_t desired,
                   const uint8_t tolerance = kUseDefTol,
                   const int16_t excess = kMarkExcess);
+  bool matchSpaceRange(const uint32_t measured, const uint32_t desired,
+                       const uint16_t range = 100,
+                       const int16_t excess = kMarkExcess);
 #ifndef UNIT_TEST
 
  private:
@@ -719,6 +725,10 @@ class IRrecv {
                      const uint16_t nbits = kEcoclimBits,
                      const bool strict = true);
 #endif  // DECODE_ECOCLIM
+#if DECODE_XMP
+  bool decodeXmp(decode_results *results, uint16_t offset = kStartOffset,
+                 const uint16_t nbits = kXmpBits, const bool strict = true);
+#endif  // DECODE_XMP
 };
 
 #endif  // IRRECV_H_
