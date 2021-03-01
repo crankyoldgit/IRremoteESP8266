@@ -1,4 +1,4 @@
-// Copyright 2017 David Conran
+// Copyright 2017-2021 David Conran
 
 /// @file
 /// @brief Support for Toshiba protocols.
@@ -27,7 +27,10 @@ const uint16_t kToshibaAcHdrSpace = 4300;
 const uint16_t kToshibaAcBitMark = 580;
 const uint16_t kToshibaAcOneSpace = 1600;
 const uint16_t kToshibaAcZeroSpace = 490;
-const uint16_t kToshibaAcMinGap = 7400;
+// Some models have a different inter-message gap.
+// See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1420
+const uint16_t kToshibaAcMinGap = 4600;    // WH-UB03NJ remote
+const uint16_t kToshibaAcUsualGap = 7400;  // Others
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -48,7 +51,7 @@ void IRsend::sendToshibaAC(const uint8_t data[], const uint16_t nbytes,
                            const uint16_t repeat) {
   sendGeneric(kToshibaAcHdrMark, kToshibaAcHdrSpace, kToshibaAcBitMark,
               kToshibaAcOneSpace, kToshibaAcBitMark, kToshibaAcZeroSpace,
-              kToshibaAcBitMark, kToshibaAcMinGap, data, nbytes, 38, true,
+              kToshibaAcBitMark, kToshibaAcUsualGap, data, nbytes, 38, true,
               repeat, 50);
 }
 #endif  // SEND_TOSHIBA_AC

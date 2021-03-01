@@ -550,7 +550,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
 }
 
 TEST(TestToshibaACClass, toCommon) {
-  IRToshibaAC ac(0);
+  IRToshibaAC ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kToshibaAcCool);
   ac.setTemp(20);
@@ -633,8 +633,8 @@ TEST(TestDecodeToshibaAC, RealLongExample) {
 
 /// Decode a synthetic long message.
 TEST(TestDecodeToshibaAC, SyntheticLongExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
 
   const uint8_t expectedState[kToshibaACStateLengthLong] = {
         0xF2, 0x0D, 0x04, 0xFB, 0x09, 0x50, 0x00, 0x00, 0x01, 0x58};
@@ -738,4 +738,58 @@ TEST(TestToshibaACClass, ConstructLongState) {
         0xF2, 0x0D, 0x04, 0xFB, 0x09, 0xC0, 0x62, 0x00, 0x03, 0xA8};
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kToshibaACBitsLong);
   EXPECT_EQ(kToshibaACStateLengthLong, ac.getStateLength());
+}
+
+// Decode a real WH-UB03NJ message.
+TEST(TestDecodeToshibaAC, RealExample_WHUB03NJ) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  irsend.reset();
+  // Data from:
+  //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1420#issue-817430242
+  const uint16_t rawData[295] = {4438, 4364, 558, 1604, 558, 1580, 580, 1604,
+      558, 1580, 582, 522, 556, 500, 580, 1582, 580, 500, 580, 498, 582, 498,
+      582, 498, 580, 500, 582, 1582, 580, 1582, 582, 500, 582, 1580, 582, 520,
+      558, 522, 558, 496, 582, 524, 560, 520, 556, 500, 582, 1604, 558, 1584,
+      580, 1582, 580, 1582, 582, 1580, 582, 1580, 582, 1580, 582, 1582, 580,
+      522, 556, 524, 556, 500, 580, 522, 560, 498, 582, 522, 558, 500, 554, 524,
+      582, 498, 580, 1582, 580, 500, 582, 496, 582, 1582, 582, 1604, 558, 524,
+      558, 522, 560, 498, 580, 500, 582, 498, 582, 522, 558, 498, 582, 520, 558,
+      500, 528, 1634, 580, 1584, 578, 1582, 582, 496, 584, 496, 582, 498, 582,
+      498, 582, 498, 582, 500, 582, 522, 558, 498, 584, 498, 582, 496, 582,
+      1580, 582, 1604, 558, 500, 582, 1580, 554, 1608, 580, 500, 580,
+      4630, 4416, 4316, 606, 1604, 558, 1580, 580, 1606, 556, 1604, 558, 500,
+      580, 498, 554, 1606, 582, 498, 582, 498, 584, 496, 584, 498, 582, 522,
+      558, 1586, 556, 1608, 580, 498, 584, 1580, 580, 500, 582, 498, 582, 500,
+      582, 498, 580, 498, 582, 522, 558, 1580, 554, 1610, 580, 1604, 532, 1606,
+      582, 1604, 558, 1604, 560, 1582, 580, 1582, 554, 548, 560, 498, 582, 500,
+      580, 500, 580, 500, 582, 520, 558, 500, 580, 524, 558, 498, 582, 1582,
+      582, 498, 580, 522, 532, 1608, 582, 1604, 558, 498, 582, 522, 556, 500,
+      580, 500, 582, 498, 582, 522, 560, 496, 582, 500, 582, 498, 582, 1604,
+      558, 1604, 558, 1604, 560, 496, 582, 522, 558, 500, 580, 500, 582, 500,
+      554, 524, 582, 500, 580, 500, 582, 498, 554, 524, 582, 1604, 558, 1582,
+      582, 496, 582, 1582, 580, 1604, 558, 500, 580};  // TOSHIBA_AC
+
+  const uint8_t expectedState[kToshibaACStateLength] = {
+      0xF2, 0x0D, 0x03, 0xFC, 0x01, 0x30, 0x07, 0x00, 0x36};
+  irsend.sendRaw(rawData, 295, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::TOSHIBA_AC, irsend.capture.decode_type);
+  EXPECT_EQ(kToshibaACBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Temp: 20C, Power: Off, Fan: 0 (Auto), Turbo: Off, Econo: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+}
+
+TEST(TestUtils, Housekeeping) {
+  ASSERT_EQ("TOSHIBA_AC", typeToString(decode_type_t::TOSHIBA_AC));
+  ASSERT_EQ(decode_type_t::TOSHIBA_AC, strToDecodeType("TOSHIBA_AC"));
+  ASSERT_TRUE(hasACState(decode_type_t::TOSHIBA_AC));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::TOSHIBA_AC));
+  ASSERT_EQ(kToshibaACBits, IRsend::defaultBits(decode_type_t::TOSHIBA_AC));
+  ASSERT_EQ(kSingleRepeat, IRsend::minRepeats(decode_type_t::TOSHIBA_AC));
 }
