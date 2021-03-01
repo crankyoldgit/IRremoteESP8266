@@ -146,7 +146,8 @@ class IRToshibaAC {
   bool getEcono(void) const;
   void setMode(const uint8_t mode);
   uint8_t getMode(const bool raw = false) const;
-  void setRaw(const uint8_t newState[]);
+  void setRaw(const uint8_t newState[],
+              const uint16_t length = kToshibaACStateLength);
   uint8_t* getRaw(void);
   static uint16_t getInternalStateLength(const uint8_t state[],
                                          const uint16_t size);

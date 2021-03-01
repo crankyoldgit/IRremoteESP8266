@@ -426,7 +426,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
-  ac.setRaw(irsend.capture.state);
+  ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_TRUE(ac.getPower());
   EXPECT_EQ(23, ac.getTemp());
   EXPECT_EQ(kToshibaAcFanAuto, ac.getFan());
@@ -465,7 +465,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
-  ac.setRaw(irsend.capture.state);
+  ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_TRUE(ac.getPower());
   EXPECT_EQ(17, ac.getTemp());
   EXPECT_EQ(3, ac.getFan());
@@ -504,7 +504,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
-  ac.setRaw(irsend.capture.state);
+  ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_TRUE(ac.getPower());
   EXPECT_EQ(24, ac.getTemp());
   EXPECT_EQ(kToshibaAcFanMax, ac.getFan());
@@ -543,7 +543,7 @@ TEST(TestDecodeToshibaAC, RealExamples) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(TOSHIBA_AC, irsend.capture.decode_type);
   ASSERT_EQ(kToshibaACBits, irsend.capture.bits);
-  ac.setRaw(irsend.capture.state);
+  ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
   EXPECT_FALSE(ac.getPower());
   EXPECT_EQ(22, ac.getTemp());
   EXPECT_EQ(4, ac.getFan());
@@ -822,7 +822,7 @@ TEST(TestToshibaACClass, SwingCodes) {
 
   const uint8_t swingToggleState[kToshibaACStateLengthShort] = {
         0xF2, 0x0D, 0x01, 0xFE, 0x21, 0x04, 0x25};
-  ac.setRaw(swingToggleState);
+  ac.setRaw(swingToggleState, kToshibaACStateLengthShort);
   EXPECT_EQ(kToshibaAcSwingToggle, ac.getSwing());
   EXPECT_EQ(
       "Temp: 17C, Swing(V): 4 (Toggle)",

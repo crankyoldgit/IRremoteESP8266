@@ -141,8 +141,9 @@ uint8_t* IRToshibaAC::getRaw(void) {
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] newState A valid code for this protocol.
-void IRToshibaAC::setRaw(const uint8_t newState[]) {
-  memcpy(_.raw, newState, kToshibaACStateLength);
+/// @param[in] length The length/size of the array.
+void IRToshibaAC::setRaw(const uint8_t newState[], const uint16_t length) {
+  memcpy(_.raw, newState, length);
   _prev_mode = getMode();
   _send_swing = true;
 }
