@@ -793,3 +793,38 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(kToshibaACBits, IRsend::defaultBits(decode_type_t::TOSHIBA_AC));
   ASSERT_EQ(kSingleRepeat, IRsend::minRepeats(decode_type_t::TOSHIBA_AC));
 }
+
+// For https://github.com/crankyoldgit/IRremoteESP8266/issues/1423
+TEST(TestToshibaACClass, SwingCodes) {
+  IRToshibaAC ac(kGpioUnused);
+  ac.setStateLength(kToshibaACStateLengthShort);
+  ac.setTemp(kToshibaAcMinTemp);
+  ac.setSwing(kToshibaAcSwingOn);
+
+  EXPECT_EQ(
+      "Temp: 17C, Swing(V): 1 (On)",
+      ac.toString());
+  EXPECT_EQ(kToshibaACStateLengthShort, ac.getStateLength());
+  const uint8_t swingOnState[kToshibaACStateLengthShort] = {
+        0xF2, 0x0D, 0x01, 0xFE, 0x21, 0x01, 0x20};
+  EXPECT_STATE_EQ(swingOnState, ac.getRaw(), kToshibaACBitsShort);
+  EXPECT_EQ(kToshibaACStateLengthShort, ac.getStateLength());
+
+  ac.setSwing(kToshibaAcSwingOff);
+  EXPECT_EQ(
+      "Temp: 17C, Swing(V): 2 (Off)",
+      ac.toString());
+  EXPECT_EQ(kToshibaACStateLengthShort, ac.getStateLength());
+  const uint8_t swingOffState[kToshibaACStateLengthShort] = {
+        0xF2, 0x0D, 0x01, 0xFE, 0x21, 0x02, 0x23};
+  EXPECT_STATE_EQ(swingOffState, ac.getRaw(), kToshibaACBitsShort);
+  EXPECT_EQ(kToshibaACStateLengthShort, ac.getStateLength());
+
+  const uint8_t swingToggleState[kToshibaACStateLengthShort] = {
+        0xF2, 0x0D, 0x01, 0xFE, 0x21, 0x04, 0x25};
+  ac.setRaw(swingToggleState);
+  EXPECT_EQ(kToshibaAcSwingToggle, ac.getSwing());
+  EXPECT_EQ(
+      "Temp: 17C, Swing(V): 4 (Toggle)",
+      ac.toString());
+}

@@ -252,6 +252,7 @@ void IRToshibaAC::setSwing(const uint8_t setting) {
     case kToshibaAcSwingStep:
     case kToshibaAcSwingOn:
     case kToshibaAcSwingOff:
+    case kToshibaAcSwingToggle:
       _send_swing = true;
       _swing_mode = setting;
       if (getStateLength() == kToshibaACStateLengthShort)
@@ -395,8 +396,17 @@ stdAc::fanspeed_t IRToshibaAC::toCommonFanSpeed(const uint8_t spd) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRToshibaAC::toCommon(void) const {
+stdAc::state_t IRToshibaAC::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
+  // Start with the previous state if given it.
+  if (prev != NULL) {
+    result = *prev;
+  } else {
+    // Set defaults for non-zero values that are not implicitly set for when
+    // there is no previous state.
+    // e.g. Any setting that toggles should probably go here.
+    result.swingv = stdAc::swingv_t::kOff;
+  }
   result.protocol = decode_type_t::TOSHIBA_AC;
   result.model = -1;  // Not supported.
   result.power = getPower();
@@ -404,8 +414,18 @@ stdAc::state_t IRToshibaAC::toCommon(void) const {
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
-  result.swingv = (getSwing() == kToshibaAcSwingOn) ? stdAc::swingv_t::kAuto
-                                                    : stdAc::swingv_t::kOff;
+  switch (getSwing()) {
+    case kToshibaAcSwingOn:
+      result.swingv = stdAc::swingv_t::kAuto;
+      break;
+    case kToshibaAcSwingToggle:
+      if (prev->swingv != stdAc::swingv_t::kOff)
+        result.swingv = stdAc::swingv_t::kOff;
+      else
+        result.swingv = stdAc::swingv_t::kAuto;
+      break;
+    default: result.swingv = stdAc::swingv_t::kOff;
+  }
   result.turbo = getTurbo();
   result.econo = getEcono();
   // Not supported.
@@ -431,10 +451,11 @@ String IRToshibaAC::toString(void) const {
       result += addIntToString(getSwing(true), kSwingVStr);
       result += kSpaceLBraceStr;
       switch (getSwing(true)) {
-        case kToshibaAcSwingOff: result += kOffStr; break;
-        case kToshibaAcSwingOn: result += kOnStr; break;
-        case kToshibaAcSwingStep: result += kStepStr; break;
-        default: result += kUnknownStr;
+        case kToshibaAcSwingOff:    result += kOffStr; break;
+        case kToshibaAcSwingOn:     result += kOnStr; break;
+        case kToshibaAcSwingStep:   result += kStepStr; break;
+        case kToshibaAcSwingToggle: result += kToggleStr; break;
+        default:                    result += kUnknownStr;
       }
       result += ')';
       break;
