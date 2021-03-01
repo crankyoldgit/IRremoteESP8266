@@ -409,11 +409,18 @@ stdAc::state_t IRToshibaAC::toCommon(const stdAc::state_t *prev) const {
   }
   result.protocol = decode_type_t::TOSHIBA_AC;
   result.model = -1;  // Not supported.
-  result.power = getPower();
-  result.mode = toCommonMode(getMode());
-  result.celsius = true;
-  result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
+  // Do we have enough current state info to override any previous state?
+  // i.e. Was the class just setRaw()'ed with a short "swing" message.
+  // This should enables us to also ignore the Swing msg's special 17C setting.
+  if (getStateLength() != kToshibaACStateLengthShort) {
+    result.power = getPower();
+    result.mode = toCommonMode(getMode());
+    result.celsius = true;
+    result.degrees = getTemp();
+    result.fanspeed = toCommonFanSpeed(getFan());
+    result.turbo = getTurbo();
+    result.econo = getEcono();
+  }
   switch (getSwing()) {
     case kToshibaAcSwingOn:
       result.swingv = stdAc::swingv_t::kAuto;
@@ -426,8 +433,6 @@ stdAc::state_t IRToshibaAC::toCommon(const stdAc::state_t *prev) const {
       break;
     default: result.swingv = stdAc::swingv_t::kOff;
   }
-  result.turbo = getTurbo();
-  result.econo = getEcono();
   // Not supported.
   result.light = false;
   result.filter = false;
