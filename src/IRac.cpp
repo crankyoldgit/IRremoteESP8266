@@ -3287,7 +3287,7 @@ namespace IRAcUtils {
 #if DECODE_TOSHIBA_AC
       case decode_type_t::TOSHIBA_AC: {
         IRToshibaAC ac(kGpioUnused);
-        ac.setRaw(result->state);
+        ac.setRaw(result->state, result->bits / 8);
         return ac.toString();
       }
 #endif  // DECODE_TOSHIBA_AC
@@ -3865,8 +3865,8 @@ namespace IRAcUtils {
 #if DECODE_TOSHIBA_AC
       case decode_type_t::TOSHIBA_AC: {
         IRToshibaAC ac(kGpioUnused);
-        ac.setRaw(decode->state);
-        *result = ac.toCommon();
+        ac.setRaw(decode->state, decode->bits / 8);
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_TOSHIBA_AC

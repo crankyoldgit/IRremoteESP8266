@@ -60,8 +60,8 @@ union ToshibaProtocol{
     uint8_t ShortMsg:1;
     uint8_t         :2;
     // Byte[5]
-    uint8_t Swing :2;
-    uint8_t       :2;
+    uint8_t Swing :3;
+    uint8_t       :1;
     uint8_t Temp  :4;
     // Byte[6]
     uint8_t Mode  :3;
@@ -83,9 +83,10 @@ const uint8_t kToshibaAcMinLength = 6;  ///< Min Nr. of bytes in a message.
 const uint16_t kToshibaAcInvertedLength = 4;  ///< Nr. of leading bytes in
                                               ///< inverted pairs.
 
-const uint8_t kToshibaAcSwingStep = 0;       ///<            0b00
-const uint8_t kToshibaAcSwingOn = 1;         ///<            0b01
-const uint8_t kToshibaAcSwingOff = 2;        ///<            0b10
+const uint8_t kToshibaAcSwingStep = 0;       ///<            0b000
+const uint8_t kToshibaAcSwingOn = 1;         ///<            0b001
+const uint8_t kToshibaAcSwingOff = 2;        ///<            0b010
+const uint8_t kToshibaAcSwingToggle = 4;     ///<            0b100
 
 const uint8_t kToshibaAcMinTemp = 17;  ///< 17C
 const uint8_t kToshibaAcMaxTemp = 30;  ///< 30C
@@ -145,7 +146,8 @@ class IRToshibaAC {
   bool getEcono(void) const;
   void setMode(const uint8_t mode);
   uint8_t getMode(const bool raw = false) const;
-  void setRaw(const uint8_t newState[]);
+  void setRaw(const uint8_t newState[],
+              const uint16_t length = kToshibaACStateLength);
   uint8_t* getRaw(void);
   static uint16_t getInternalStateLength(const uint8_t state[],
                                          const uint16_t size);
@@ -158,7 +160,7 @@ class IRToshibaAC {
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void) const;
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL) const;
   String toString(void) const;
 #ifndef UNIT_TEST
 

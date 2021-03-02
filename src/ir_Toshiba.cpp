@@ -141,8 +141,9 @@ uint8_t* IRToshibaAC::getRaw(void) {
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] newState A valid code for this protocol.
-void IRToshibaAC::setRaw(const uint8_t newState[]) {
-  memcpy(_.raw, newState, kToshibaACStateLength);
+/// @param[in] length The length/size of the array.
+void IRToshibaAC::setRaw(const uint8_t newState[], const uint16_t length) {
+  memcpy(_.raw, newState, length);
   _prev_mode = getMode();
   _send_swing = true;
 }
@@ -252,6 +253,7 @@ void IRToshibaAC::setSwing(const uint8_t setting) {
     case kToshibaAcSwingStep:
     case kToshibaAcSwingOn:
     case kToshibaAcSwingOff:
+    case kToshibaAcSwingToggle:
       _send_swing = true;
       _swing_mode = setting;
       if (getStateLength() == kToshibaACStateLengthShort)
@@ -395,19 +397,43 @@ stdAc::fanspeed_t IRToshibaAC::toCommonFanSpeed(const uint8_t spd) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRToshibaAC::toCommon(void) const {
+stdAc::state_t IRToshibaAC::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
+  // Start with the previous state if given it.
+  if (prev != NULL) {
+    result = *prev;
+  } else {
+    // Set defaults for non-zero values that are not implicitly set for when
+    // there is no previous state.
+    // e.g. Any setting that toggles should probably go here.
+    result.swingv = stdAc::swingv_t::kOff;
+  }
   result.protocol = decode_type_t::TOSHIBA_AC;
   result.model = -1;  // Not supported.
-  result.power = getPower();
-  result.mode = toCommonMode(getMode());
-  result.celsius = true;
-  result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
-  result.swingv = (getSwing() == kToshibaAcSwingOn) ? stdAc::swingv_t::kAuto
-                                                    : stdAc::swingv_t::kOff;
-  result.turbo = getTurbo();
-  result.econo = getEcono();
+  // Do we have enough current state info to override any previous state?
+  // i.e. Was the class just setRaw()'ed with a short "swing" message.
+  // This should enables us to also ignore the Swing msg's special 17C setting.
+  if (getStateLength() != kToshibaACStateLengthShort) {
+    result.power = getPower();
+    result.mode = toCommonMode(getMode());
+    result.celsius = true;
+    result.degrees = getTemp();
+    result.fanspeed = toCommonFanSpeed(getFan());
+    result.turbo = getTurbo();
+    result.econo = getEcono();
+  }
+  switch (getSwing()) {
+    case kToshibaAcSwingOn:
+      result.swingv = stdAc::swingv_t::kAuto;
+      break;
+    case kToshibaAcSwingToggle:
+      if (prev->swingv != stdAc::swingv_t::kOff)
+        result.swingv = stdAc::swingv_t::kOff;
+      else
+        result.swingv = stdAc::swingv_t::kAuto;
+      break;
+    default: result.swingv = stdAc::swingv_t::kOff;
+  }
   // Not supported.
   result.light = false;
   result.filter = false;
@@ -431,10 +457,11 @@ String IRToshibaAC::toString(void) const {
       result += addIntToString(getSwing(true), kSwingVStr);
       result += kSpaceLBraceStr;
       switch (getSwing(true)) {
-        case kToshibaAcSwingOff: result += kOffStr; break;
-        case kToshibaAcSwingOn: result += kOnStr; break;
-        case kToshibaAcSwingStep: result += kStepStr; break;
-        default: result += kUnknownStr;
+        case kToshibaAcSwingOff:    result += kOffStr; break;
+        case kToshibaAcSwingOn:     result += kOnStr; break;
+        case kToshibaAcSwingStep:   result += kStepStr; break;
+        case kToshibaAcSwingToggle: result += kToggleStr; break;
+        default:                    result += kUnknownStr;
       }
       result += ')';
       break;
