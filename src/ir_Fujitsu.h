@@ -1,5 +1,6 @@
 // Copyright 2017 Jonny Graham
 // Copyright 2018-2019 David Conran
+// Copyright 2021 siriuslzx
 
 /// @file
 /// @brief Support for Fujitsu A/C protocols.
@@ -46,6 +47,51 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Fujitsu A/C message.
+union FujitsuProtocol {
+  struct {
+    uint8_t longcode[kFujitsuAcStateLength];  ///< The state of the IR remote.
+    uint8_t shortcode[kFujitsuAcStateLengthShort];
+  };
+  struct {
+    // Byte 0~4
+    uint64_t      :40;
+    // Byte 5
+    uint64_t Cmd  :8;  // short codes:cmd; long codes:fixed value
+    // Byte 6
+    uint64_t RestLength :8;  // Nr. of bytes in the message after this byte.
+    // Byte 7
+    uint64_t        :8;
+    // Byte 8
+    uint64_t Power  :1;
+    uint64_t        :3;
+    uint64_t Temp   :4;
+    // Byte 9
+    uint64_t Mode       :3;
+    uint64_t Clean      :1;
+    uint64_t TimerType  :2;
+    uint64_t            :2;
+    // Byte 10
+    uint64_t Fan    :3;
+    uint64_t        :1;
+    uint64_t Swing  :2;
+    uint64_t        :2;
+    // Byte 11~13
+    uint64_t OffTimer       :11;  // Also is the sleep timer value
+    uint64_t OffTimerEnable :1;
+    uint64_t OnTimer        :11;
+    uint64_t OnTimerEnable  :1;
+    // Byte 14
+    uint64_t              :3;
+    uint64_t Filter       :1;
+    uint64_t              :1;
+    uint64_t unknown      :1;
+    uint64_t              :1;
+    uint64_t OutsideQuiet :1;
+    // Byte 15
+    uint64_t :0;
+  };
+};
 
 // Constants
 const uint8_t kFujitsuAcModeAuto = 0x00;
@@ -69,24 +115,15 @@ const uint8_t kFujitsuAcFanHigh = 0x01;
 const uint8_t kFujitsuAcFanMed = 0x02;
 const uint8_t kFujitsuAcFanLow = 0x03;
 const uint8_t kFujitsuAcFanQuiet = 0x04;
-const uint8_t kFujitsuAcFanSize = 3;  // Bits
 
 const uint8_t kFujitsuAcMinTemp = 16;  // 16C
 const uint8_t kFujitsuAcMaxTemp = 30;  // 30C
 
-const uint8_t kFujitsuAcSwingSize = 2;
 const uint8_t kFujitsuAcSwingOff = 0x00;
 const uint8_t kFujitsuAcSwingVert = 0x01;
 const uint8_t kFujitsuAcSwingHoriz = 0x02;
 const uint8_t kFujitsuAcSwingBoth = 0x03;
 
-const uint8_t kFujitsuAcOutsideQuietOffset = 7;
-const uint8_t kFujitsuAcCleanOffset = 3;
-const uint8_t kFujitsuAcFilterOffset = 3;
-
-const uint8_t kFujitsuAcTimerTypeByte = 9;
-const uint8_t kFujitsuAcTimerTypeOffset = 4;  ///< Mask: 0b00xx0000
-const uint8_t kFujitsuAcTimerTypeSize = 2;    ///< Mask: 0b00xx0000
 const uint8_t kFujitsuAcStopTimers =                       0b00;  // 0
 const uint8_t kFujitsuAcSleepTimer =                       0b01;  // 1
 const uint8_t kFujitsuAcOffTimer =                         0b10;  // 2
@@ -124,7 +161,7 @@ class IRFujitsuAC {
                        const bool inverted = false,
                        const bool use_modulation = true);
   void setModel(const fujitsu_ac_remote_model_t model);
-  fujitsu_ac_remote_model_t getModel(void);
+  fujitsu_ac_remote_model_t getModel(void) const;
   void stateReset(void);
 #if SEND_FUJITSU_AC
   void send(const uint16_t repeat = kFujitsuAcMinRepeat);
@@ -140,15 +177,15 @@ class IRFujitsuAC {
   void stepVert(void);
   void toggleSwingVert(const bool update = true);
   void setCmd(const uint8_t cmd);
-  uint8_t getCmd(const bool raw = false);
+  uint8_t getCmd(void) const;
   void setTemp(const uint8_t temp);
-  uint8_t getTemp(void);
+  uint8_t getTemp(void) const;
   void setFanSpeed(const uint8_t fan);
-  uint8_t getFanSpeed(void);
+  uint8_t getFanSpeed(void) const;
   void setMode(const uint8_t mode);
-  uint8_t getMode(void);
+  uint8_t getMode(void) const;
   void setSwing(const uint8_t mode);
-  uint8_t getSwing(const bool raw = false);
+  uint8_t getSwing(void) const;
   uint8_t* getRaw(void);
   bool setRaw(const uint8_t newState[], const uint16_t length);
   uint8_t getStateLength(void);
@@ -156,26 +193,26 @@ class IRFujitsuAC {
   void setPower(const bool on);
   void off(void);
   void on(void);
-  bool getPower(void);
+  bool getPower(void) const;
   void setClean(const bool on);
-  bool getClean(const bool raw = false);
+  bool getClean(void) const;
   void setFilter(const bool on);
-  bool getFilter(const bool raw = false);
+  bool getFilter(void) const;
   void setOutsideQuiet(const bool on);
-  bool getOutsideQuiet(const bool raw = false);
-  uint8_t getTimerType(const bool raw = false);
+  bool getOutsideQuiet(void) const;
+  uint8_t getTimerType(void) const;
   void setTimerType(const uint8_t timertype);
-  uint16_t getOnTimer(const bool raw = false);
+  uint16_t getOnTimer(void) const;
   void setOnTimer(const uint16_t nr_mins);
-  uint16_t getOffSleepTimer(const bool raw = false);
+  uint16_t getOffSleepTimer(void) const;
   void setOffTimer(const uint16_t nr_mins);
   void setSleepTimer(const uint16_t nr_mins);
-  uint8_t convertMode(const stdAc::opmode_t mode);
-  uint8_t convertFan(stdAc::fanspeed_t speed);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void);
-  String toString(void);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
@@ -185,22 +222,13 @@ class IRFujitsuAC {
   IRsendTest _irsend;  ///< Instance of the testing IR send class
   /// @endcond
 #endif
-  uint8_t remote_state[kFujitsuAcStateLength];  ///< The state of the IR remote.
-  uint8_t _temp;
-  uint8_t _fanSpeed;
-  uint8_t _mode;
-  uint8_t _swingMode;
+  FujitsuProtocol _;
   uint8_t _cmd;
   fujitsu_ac_remote_model_t _model;
   uint8_t _state_length;
   uint8_t _state_length_short;
-  bool _outsideQuiet;
-  bool _clean;
-  bool _filter;
-  uint16_t _ontimer;
-  uint16_t _offtimer;  // Also is the sleep timer value
-  uint8_t _timertype;
-  void buildState(void);
+  void checkSum(void);
+  bool updateUseLongOrShort(void);
   void buildFromState(const uint16_t length);
   void setOffSleepTimer(const uint16_t nr_mins);
 };
