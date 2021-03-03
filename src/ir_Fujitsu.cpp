@@ -162,8 +162,7 @@ bool IRFujitsuAC::updateUseLongOrShort(void) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRFujitsuAC::checkSum(void) {
-  bool longcodes = updateUseLongOrShort();
-  if (longcodes) {
+  if (updateUseLongOrShort()) {  // Is it a long code?
     // Nr. of bytes in the message after this byte.
     _.RestLength = _state_length - 7;
     _.longcode[7] = 0x30;
@@ -193,7 +192,7 @@ void IRFujitsuAC::checkSum(void) {
     switch (_model) {
       case fujitsu_ac_remote_model_t::ARDB1:
       case fujitsu_ac_remote_model_t::ARJW2:
-        _.Swing = 0;
+        _.Swing = kFujitsuAcSwingOff;
         checksum = sumBytes(_.longcode, _state_length - 1);
         checksum_complement = 0x9B;
         break;
@@ -229,11 +228,7 @@ void IRFujitsuAC::checkSum(void) {
 /// Get the length (size) of the state code for the current configuration.
 /// @return The length of the state array required for this config.
 uint8_t IRFujitsuAC::getStateLength(void) {
-  bool longcodes = updateUseLongOrShort();
-  if (longcodes)
-    return _state_length;
-  else
-    return _state_length_short;
+  return updateUseLongOrShort() ? _state_length : _state_length_short;
 }
 
 /// Get a PTR to the internal state/code for this protocol.
@@ -242,8 +237,7 @@ uint8_t* IRFujitsuAC::getRaw(void) {
   checkSum();
   if (_.Cmd == 0xFE || _.Cmd == 0xFC)
     return _.longcode;
-  else
-    return _.shortcode;
+  return _.shortcode;
 }
 
 /// Build the internal state/config from the current (raw) A/C message.
@@ -368,7 +362,7 @@ void IRFujitsuAC::setCmd(const uint8_t cmd) {
       switch (_model) {
         // Only these remotes have these commands.
         case ARREB1E:
-        _cmd = cmd;
+          _cmd = cmd;
         break;
       default:
         _cmd = kFujitsuAcCmdStayOn;
@@ -712,7 +706,7 @@ stdAc::state_t IRFujitsuAC::toCommon(void) const {
       result.swingh = stdAc::swingh_t::kOff;
   }
 
-  result.quiet = (_.Fan == kFujitsuAcFanQuiet);
+  result.quiet = _.Fan == kFujitsuAcFanQuiet;
   result.turbo = _cmd == kFujitsuAcCmdPowerful;
   result.econo = _cmd == kFujitsuAcCmdEcono;
   // Not supported.
