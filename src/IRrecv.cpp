@@ -360,6 +360,7 @@ void IRrecv::disableIRIn(void) {
 #endif  // ESP8266
 #if defined(ESP32)
   timerAlarmDisable(timer);
+  timerEnd(timer);
 #endif  // ESP32
   detachInterrupt(params.recvpin);
 #endif  // UNIT_TEST
