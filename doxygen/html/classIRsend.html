@@ -466,8 +466,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a1a506824c7668e58f35351ad400051b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Percentage.  <a href="classIRsend.html#a1a506824c7668e58f35351ad400051b1">More...</a><br /></td></tr>
 <tr class="separator:a1a506824c7668e58f35351ad400051b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63f0d3f7ed8433c7dd18114d50e5d076"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a63f0d3f7ed8433c7dd18114d50e5d076">sendEcoclim</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#accd38d1019bde991e9a887f853f295d0">kEcoclimBits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
-<tr class="memdesc:a63f0d3f7ed8433c7dd18114d50e5d076"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a EcoClim A/C formatted message. Status: Alpha / Completely untested.  <a href="classIRsend.html#a63f0d3f7ed8433c7dd18114d50e5d076">More...</a><br /></td></tr>
+<tr class="memdesc:a63f0d3f7ed8433c7dd18114d50e5d076"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a EcoClim A/C formatted message. Status: STABLE / Confirmed working on real device.  <a href="classIRsend.html#a63f0d3f7ed8433c7dd18114d50e5d076">More...</a><br /></td></tr>
 <tr class="separator:a63f0d3f7ed8433c7dd18114d50e5d076"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79e650dedb19f37601600c8cb16e4c8e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a79e650dedb19f37601600c8cb16e4c8e">sendXmp</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#adfcd08adae1243b1108353ef5cfe8776">kXmpBits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
+<tr class="memdesc:a79e650dedb19f37601600c8cb16e4c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a XMP packet. Status: Beta / Untested against a real device.  <a href="classIRsend.html#a79e650dedb19f37601600c8cb16e4c8e">More...</a><br /></td></tr>
+<tr class="separator:a79e650dedb19f37601600c8cb16e4c8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -2769,7 +2772,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Send a EcoClim A/C formatted message. Status: Alpha / Completely untested. </p>
+<p>Send a EcoClim A/C formatted message. Status: STABLE / Confirmed working on real device. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The message to be sent. </td></tr>
@@ -6718,6 +6721,50 @@ Use this method if you want to send the results of <code>decodePanasonic</code>.
 
 </div>
 </div>
+<a id="a79e650dedb19f37601600c8cb16e4c8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79e650dedb19f37601600c8cb16e4c8e">&#9670;&nbsp;</a></span>sendXmp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRsend::sendXmp </td>
+          <td>(</td>
+          <td class="paramtype">const uint64_t&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#adfcd08adae1243b1108353ef5cfe8776">kXmpBits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a XMP packet. Status: Beta / Untested against a real device. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of bits of message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>The number of times the command is to be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a9bcba8bbac41d679b5b930e67d3e1b7f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9bcba8bbac41d679b5b930e67d3e1b7f">&#9670;&nbsp;</a></span>sendZepeal()</h2>
 
@@ -7069,7 +7116,7 @@ For RC-6 (36-bits/Xbox-360), it is the 16th least significant bit. </dd></dl>
 <li>src/<a class="el" href="ir__Denon_8cpp.html">ir_Denon.cpp</a></li>
 <li>src/<a class="el" href="ir__Dish_8cpp.html">ir_Dish.cpp</a></li>
 <li>src/<a class="el" href="ir__Doshisha_8cpp.html">ir_Doshisha.cpp</a></li>
-<li>src/<a class="el" href="ir__EcoClim_8cpp.html">ir_EcoClim.cpp</a></li>
+<li>src/<a class="el" href="ir__Ecoclim_8cpp.html">ir_Ecoclim.cpp</a></li>
 <li>src/<a class="el" href="ir__Electra_8cpp.html">ir_Electra.cpp</a></li>
 <li>src/<a class="el" href="ir__EliteScreens_8cpp.html">ir_EliteScreens.cpp</a></li>
 <li>src/<a class="el" href="ir__Epson_8cpp.html">ir_Epson.cpp</a></li>
@@ -7120,14 +7167,15 @@ For RC-6 (36-bits/Xbox-360), it is the 16th least significant bit. </dd></dl>
 <li>src/<a class="el" href="ir__Voltas_8cpp.html">ir_Voltas.cpp</a></li>
 <li>src/<a class="el" href="ir__Whirlpool_8cpp.html">ir_Whirlpool.cpp</a></li>
 <li>src/<a class="el" href="ir__Whynter_8cpp.html">ir_Whynter.cpp</a></li>
+<li>src/<a class="el" href="ir__Xmp_8cpp.html">ir_Xmp.cpp</a></li>
 <li>src/<a class="el" href="ir__Zepeal_8cpp.html">ir_Zepeal.cpp</a></li>
 <li>src/<a class="el" href="IRsend_8cpp.html">IRsend.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <div class="ttc" id="aclassIRsend_html_a0b349351e2ba19f87e6b01cde7e67c49"><div class="ttname"><a href="classIRsend.html#a0b349351e2ba19f87e6b01cde7e67c49">IRsend::sendPronto</a></div><div class="ttdeci">void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat=kNoRepeat)</div><div class="ttdoc">Send a Pronto Code formatted message. Status: STABLE / Known working.</div><div class="ttdef"><b>Definition:</b> ir_Pronto.cpp:56</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a336bd721135fc8b869941cd3aa73646e"><div class="ttname"><a href="IRremoteESP8266_8h.html#a336bd721135fc8b869941cd3aa73646e">kVoltasStateLength</a></div><div class="ttdeci">const uint16_t kVoltasStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1114</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_ab18df94a82b365ff30caaabb05a9fcaf"><div class="ttname"><a href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a></div><div class="ttdeci">const uint16_t kCoronaAcStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:914</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a112408429fb4a5cca22a66a351453bad"><div class="ttname"><a href="IRremoteESP8266_8h.html#a112408429fb4a5cca22a66a351453bad">kSonyMinRepeat</a></div><div class="ttdeci">const uint16_t kSonyMinRepeat</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1086</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a336bd721135fc8b869941cd3aa73646e"><div class="ttname"><a href="IRremoteESP8266_8h.html#a336bd721135fc8b869941cd3aa73646e">kVoltasStateLength</a></div><div class="ttdeci">const uint16_t kVoltasStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1123</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_ab18df94a82b365ff30caaabb05a9fcaf"><div class="ttname"><a href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a></div><div class="ttdeci">const uint16_t kCoronaAcStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:922</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a112408429fb4a5cca22a66a351453bad"><div class="ttname"><a href="IRremoteESP8266_8h.html#a112408429fb4a5cca22a66a351453bad">kSonyMinRepeat</a></div><div class="ttdeci">const uint16_t kSonyMinRepeat</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1094</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
