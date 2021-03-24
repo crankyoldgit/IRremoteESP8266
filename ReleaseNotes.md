@@ -1,5 +1,21 @@
 # Release Notes
 
+## _v2.7.16 (20210324)_
+
+**[Features]**
+- ToshibaAC: Swing handling and `setRaw()` improvements. (#1423 #1424 #1425)
+- Support for XMP (Xfinity) protocol. (#1414 #1422)
+- ToshibaAC: Adjust inter-message gap timing to improve matching. (#1420 #1421)
+- Ecoclim: Add detailed A/C support (#1397 #1415)
+
+**[Misc]**
+- [ESP32] Fix `addApbChangeCallback(): duplicate func` kernel msgs (#1434 #1435)
+- refactor ir_Fujitsu (#1419)
+- refactor ir_Whirlpool (#1416)
+- refactor ir_Vestel (#1413)
+- refactor ir_Trotec (#1412)
+
+
 ## _v2.7.15 (20210213)_
 
 **[BREAKING CHANGES]**
