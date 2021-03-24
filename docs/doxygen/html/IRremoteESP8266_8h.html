@@ -209,7 +209,8 @@ Enumerations</h2></td></tr>
 <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada5ffb7486d99840e02f2688e3d6605a14">MILESTAG2</a>, 
 <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab7e60c2218bac76695bcff178366ec8d">ECOCLIM</a>, 
 <br />
-&#160;&#160;<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = ECOCLIM
+&#160;&#160;<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada009e712c328b21b54c2a099ec8520585">XMP</a>, 
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = XMP
 <br />
  }</td></tr>
 <tr class="memdesc:ad5b287a488a8c1b7b8661f029ab56fad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumerator for defining and numbering of supported IR protocol.  <a href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">More...</a><br /></td></tr>
@@ -649,6 +650,8 @@ Variables</h2></td></tr>
 <tr class="separator:a4553f6670e241a67104d45216a4ebd98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae31945a1ce90b2d4c33b5c91d980d3a7"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ae31945a1ce90b2d4c33b5c91d980d3a7">kVestelAcBits</a> = 56</td></tr>
 <tr class="separator:ae31945a1ce90b2d4c33b5c91d980d3a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfcd08adae1243b1108353ef5cfe8776"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#adfcd08adae1243b1108353ef5cfe8776">kXmpBits</a> = 64</td></tr>
+<tr class="separator:adfcd08adae1243b1108353ef5cfe8776"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af09c9402a1c4fa24f692994498641296"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#af09c9402a1c4fa24f692994498641296">kZepealBits</a> = 16</td></tr>
 <tr class="separator:af09c9402a1c4fa24f692994498641296"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb5c734e808d8f108f976f0556bf6e58"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#afb5c734e808d8f108f976f0556bf6e58">kZepealMinRepeat</a> = 4</td></tr>
@@ -795,6 +798,7 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada790ec65ea3e5d3ef9dc19614521c889e"></a>PANASONIC_AC32&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada5ffb7486d99840e02f2688e3d6605a14"></a>MILESTAG2&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadab7e60c2218bac76695bcff178366ec8d"></a>ECOCLIM&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada009e712c328b21b54c2a099ec8520585"></a>XMP&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59"></a>kLastDecodeType&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
@@ -3897,6 +3901,20 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="adfcd08adae1243b1108353ef5cfe8776"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfcd08adae1243b1108353ef5cfe8776">&#9670;&nbsp;</a></span>kXmpBits</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kXmpBits = 64</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="af09c9402a1c4fa24f692994498641296"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af09c9402a1c4fa24f692994498641296">&#9670;&nbsp;</a></span>kZepealBits</h2>
 
@@ -3926,8 +3944,8 @@ Variables</h2></td></tr>
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1071</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1070</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1079</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1078</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

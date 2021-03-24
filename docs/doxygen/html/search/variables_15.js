@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['wall_6993',['Wall',['../unionDaikin128Protocol.html#aed2c5bc365820f2c0a5f27dd68fa8a05',1,'Daikin128Protocol']]],
-  ['wand_5fid_6994',['wand_id',['../unionmagiquest.html#a1b159cd47635d548e1d4198cd6d41e93',1,'magiquest']]],
-  ['weeklytimer_6995',['WeeklyTimer',['../unionDaikinESPProtocol.html#a25e632da82856caebd233699fda8d796',1,'DaikinESPProtocol::WeeklyTimer()'],['../unionMitsubishi144Protocol.html#a313d3721705676e04d73aee8a29c4a37',1,'Mitsubishi144Protocol::WeeklyTimer()']]],
-  ['widevane_6996',['WideVane',['../unionMitsubishi144Protocol.html#ad0c48e95ca7e0658edf7c2ac2b541c3c',1,'Mitsubishi144Protocol']]],
-  ['wifi_6997',['Wifi',['../unionVoltasProtocol.html#aae1406825a156f159c5ad4b28d20364c',1,'VoltasProtocol::Wifi()'],['../unionGreeProtocol.html#a6cf8e0a6c54a5d2b6f14074c6f3dcc92',1,'GreeProtocol::WiFi()']]]
+  ['value_6989',['value',['../classdecode__results.html#a033502b7a6b4b0412e5a2062e33c5f47',1,'decode_results']]],
+  ['vane_6990',['Vane',['../unionMitsubishi144Protocol.html#af4cb685d4c5f87f6ff61d1305ccd6967',1,'Mitsubishi144Protocol']]],
+  ['vanebit_6991',['VaneBit',['../unionMitsubishi144Protocol.html#aaefd53cd1441b57b90dc3d21488bbdd3',1,'Mitsubishi144Protocol']]],
+  ['vent_6992',['Vent',['../unionAmcorProtocol.html#a289bcba64f01cd2c847845f41978d400',1,'AmcorProtocol']]],
+  ['ventswing_6993',['VentSwing',['../unionKelvinatorProtocol.html#af7cd4e8ebfaa36812d09105c54f868f2',1,'KelvinatorProtocol']]]
 ];

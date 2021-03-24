@@ -81,8 +81,9 @@ Collaboration diagram for IRVestelAc:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRVestelAc__coll__graph.png" border="0" usemap="#IRVestelAc_coll__map" alt="Collaboration graph"/></div>
 <map name="IRVestelAc_coll__map" id="IRVestelAc_coll__map">
-<area shape="rect" title="Class for handling detailed Vestel A/C messages." alt="" coords="5,95,96,121"/>
-<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="17,5,84,32"/>
+<area shape="rect" title="Class for handling detailed Vestel A/C messages." alt="" coords="51,95,141,121"/>
+<area shape="rect" href="classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
+<area shape="rect" href="unionVestelProtocol.html" title="Native representation of a Vestel A/C message." alt="" coords="96,5,211,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -112,54 +113,54 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a01e06ff3916d4a14f9ca49f22918a47b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a01e06ff3916d4a14f9ca49f22918a47b">setPower</a> (const bool <a class="el" href="classIRVestelAc.html#a4ed05fb5cbdfa5677ca238616bf03922">on</a>)</td></tr>
 <tr class="memdesc:a01e06ff3916d4a14f9ca49f22918a47b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRVestelAc.html#a01e06ff3916d4a14f9ca49f22918a47b">More...</a><br /></td></tr>
 <tr class="separator:a01e06ff3916d4a14f9ca49f22918a47b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d6cdc9ad13ebbf1e9a4a83f95244ced"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a1d6cdc9ad13ebbf1e9a4a83f95244ced">getPower</a> (void)</td></tr>
-<tr class="memdesc:a1d6cdc9ad13ebbf1e9a4a83f95244ced"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRVestelAc.html#a1d6cdc9ad13ebbf1e9a4a83f95244ced">More...</a><br /></td></tr>
-<tr class="separator:a1d6cdc9ad13ebbf1e9a4a83f95244ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88e2b24cc600488a6a27a1e616c80580"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a88e2b24cc600488a6a27a1e616c80580">getPower</a> (void) const</td></tr>
+<tr class="memdesc:a88e2b24cc600488a6a27a1e616c80580"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRVestelAc.html#a88e2b24cc600488a6a27a1e616c80580">More...</a><br /></td></tr>
+<tr class="separator:a88e2b24cc600488a6a27a1e616c80580"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2509eed2e0d7b23595bbe6dd7df17d74"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a2509eed2e0d7b23595bbe6dd7df17d74">setAuto</a> (const int8_t autoLevel)</td></tr>
 <tr class="memdesc:a2509eed2e0d7b23595bbe6dd7df17d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Auto mode/level of the A/C.  <a href="classIRVestelAc.html#a2509eed2e0d7b23595bbe6dd7df17d74">More...</a><br /></td></tr>
 <tr class="separator:a2509eed2e0d7b23595bbe6dd7df17d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c66e1ec13c827714eaa2233f50f072b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a7c66e1ec13c827714eaa2233f50f072b">setTimer</a> (const uint16_t minutes)</td></tr>
 <tr class="memdesc:a7c66e1ec13c827714eaa2233f50f072b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Timer option of A/C.  <a href="classIRVestelAc.html#a7c66e1ec13c827714eaa2233f50f072b">More...</a><br /></td></tr>
 <tr class="separator:a7c66e1ec13c827714eaa2233f50f072b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca4faedc9d82e357c8974fc6143b6e77"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#aca4faedc9d82e357c8974fc6143b6e77">getTimer</a> (void)</td></tr>
-<tr class="memdesc:aca4faedc9d82e357c8974fc6143b6e77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Timer time of A/C.  <a href="classIRVestelAc.html#aca4faedc9d82e357c8974fc6143b6e77">More...</a><br /></td></tr>
-<tr class="separator:aca4faedc9d82e357c8974fc6143b6e77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa445ac18ef2b872a10c6048b222e90c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#afa445ac18ef2b872a10c6048b222e90c">getTimer</a> (void) const</td></tr>
+<tr class="memdesc:afa445ac18ef2b872a10c6048b222e90c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Timer time of A/C.  <a href="classIRVestelAc.html#afa445ac18ef2b872a10c6048b222e90c">More...</a><br /></td></tr>
+<tr class="separator:afa445ac18ef2b872a10c6048b222e90c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc5dedf83855a8fea8b29494bfb07d64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#afc5dedf83855a8fea8b29494bfb07d64">setTime</a> (const uint16_t minutes)</td></tr>
 <tr class="memdesc:afc5dedf83855a8fea8b29494bfb07d64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the A/C's internal clock.  <a href="classIRVestelAc.html#afc5dedf83855a8fea8b29494bfb07d64">More...</a><br /></td></tr>
 <tr class="separator:afc5dedf83855a8fea8b29494bfb07d64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3542ec93c30ec3bc1bb4e242edcf1def"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a3542ec93c30ec3bc1bb4e242edcf1def">getTime</a> (void)</td></tr>
-<tr class="memdesc:a3542ec93c30ec3bc1bb4e242edcf1def"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the A/C's internal clock's time.  <a href="classIRVestelAc.html#a3542ec93c30ec3bc1bb4e242edcf1def">More...</a><br /></td></tr>
-<tr class="separator:a3542ec93c30ec3bc1bb4e242edcf1def"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7310f2d251aaba0467718fb8c8983f3d"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a7310f2d251aaba0467718fb8c8983f3d">getTime</a> (void) const</td></tr>
+<tr class="memdesc:a7310f2d251aaba0467718fb8c8983f3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the A/C's internal clock's time.  <a href="classIRVestelAc.html#a7310f2d251aaba0467718fb8c8983f3d">More...</a><br /></td></tr>
+<tr class="separator:a7310f2d251aaba0467718fb8c8983f3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af19bb7704326eb5688f2a2fa08e10ee2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#af19bb7704326eb5688f2a2fa08e10ee2">setOnTimer</a> (const uint16_t minutes)</td></tr>
 <tr class="memdesc:af19bb7704326eb5688f2a2fa08e10ee2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the On timer time on the A/C.  <a href="classIRVestelAc.html#af19bb7704326eb5688f2a2fa08e10ee2">More...</a><br /></td></tr>
 <tr class="separator:af19bb7704326eb5688f2a2fa08e10ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa39e3047ea694ada9cc7e992e7b03e32"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#aa39e3047ea694ada9cc7e992e7b03e32">getOnTimer</a> (void)</td></tr>
-<tr class="memdesc:aa39e3047ea694ada9cc7e992e7b03e32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the A/C's On Timer time.  <a href="classIRVestelAc.html#aa39e3047ea694ada9cc7e992e7b03e32">More...</a><br /></td></tr>
-<tr class="separator:aa39e3047ea694ada9cc7e992e7b03e32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b93b975802111973241d2c57d691bd0"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a3b93b975802111973241d2c57d691bd0">getOnTimer</a> (void) const</td></tr>
+<tr class="memdesc:a3b93b975802111973241d2c57d691bd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the A/C's On Timer time.  <a href="classIRVestelAc.html#a3b93b975802111973241d2c57d691bd0">More...</a><br /></td></tr>
+<tr class="separator:a3b93b975802111973241d2c57d691bd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc61cd785d2f668a86ecefb243d63549"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#acc61cd785d2f668a86ecefb243d63549">setOffTimer</a> (const uint16_t minutes)</td></tr>
 <tr class="memdesc:acc61cd785d2f668a86ecefb243d63549"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Off timer time on the A/C.  <a href="classIRVestelAc.html#acc61cd785d2f668a86ecefb243d63549">More...</a><br /></td></tr>
 <tr class="separator:acc61cd785d2f668a86ecefb243d63549"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a575ba7c6aee1d2377975ef0ef938775a"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a575ba7c6aee1d2377975ef0ef938775a">getOffTimer</a> (void)</td></tr>
-<tr class="memdesc:a575ba7c6aee1d2377975ef0ef938775a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the A/C's Off Timer time.  <a href="classIRVestelAc.html#a575ba7c6aee1d2377975ef0ef938775a">More...</a><br /></td></tr>
-<tr class="separator:a575ba7c6aee1d2377975ef0ef938775a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45c725deb349e357b8c52ab3dcf51bdb"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a45c725deb349e357b8c52ab3dcf51bdb">getOffTimer</a> (void) const</td></tr>
+<tr class="memdesc:a45c725deb349e357b8c52ab3dcf51bdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the A/C's Off Timer time.  <a href="classIRVestelAc.html#a45c725deb349e357b8c52ab3dcf51bdb">More...</a><br /></td></tr>
+<tr class="separator:a45c725deb349e357b8c52ab3dcf51bdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c4eddfba4edfa16e317e12677736756"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a8c4eddfba4edfa16e317e12677736756">setTemp</a> (const uint8_t temp)</td></tr>
 <tr class="memdesc:a8c4eddfba4edfa16e317e12677736756"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRVestelAc.html#a8c4eddfba4edfa16e317e12677736756">More...</a><br /></td></tr>
 <tr class="separator:a8c4eddfba4edfa16e317e12677736756"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a835ab977fa0dbf47776e5d618d59c819"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a835ab977fa0dbf47776e5d618d59c819">getTemp</a> (void)</td></tr>
-<tr class="memdesc:a835ab977fa0dbf47776e5d618d59c819"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRVestelAc.html#a835ab977fa0dbf47776e5d618d59c819">More...</a><br /></td></tr>
-<tr class="separator:a835ab977fa0dbf47776e5d618d59c819"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a822bb550803b7fbb1ae9f00c51279259"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a822bb550803b7fbb1ae9f00c51279259">getTemp</a> (void) const</td></tr>
+<tr class="memdesc:a822bb550803b7fbb1ae9f00c51279259"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRVestelAc.html#a822bb550803b7fbb1ae9f00c51279259">More...</a><br /></td></tr>
+<tr class="separator:a822bb550803b7fbb1ae9f00c51279259"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af53dfd0a0372c878b6ba2ca1cfc21ccd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#af53dfd0a0372c878b6ba2ca1cfc21ccd">setFan</a> (const uint8_t fan)</td></tr>
 <tr class="memdesc:af53dfd0a0372c878b6ba2ca1cfc21ccd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRVestelAc.html#af53dfd0a0372c878b6ba2ca1cfc21ccd">More...</a><br /></td></tr>
 <tr class="separator:af53dfd0a0372c878b6ba2ca1cfc21ccd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a492abc867ad5b766715eaa301c71f3c8"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a492abc867ad5b766715eaa301c71f3c8">getFan</a> (void)</td></tr>
-<tr class="memdesc:a492abc867ad5b766715eaa301c71f3c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRVestelAc.html#a492abc867ad5b766715eaa301c71f3c8">More...</a><br /></td></tr>
-<tr class="separator:a492abc867ad5b766715eaa301c71f3c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a510b05386df2578a3241929cffcfa13e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a510b05386df2578a3241929cffcfa13e">getFan</a> (void) const</td></tr>
+<tr class="memdesc:a510b05386df2578a3241929cffcfa13e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current fan speed setting.  <a href="classIRVestelAc.html#a510b05386df2578a3241929cffcfa13e">More...</a><br /></td></tr>
+<tr class="separator:a510b05386df2578a3241929cffcfa13e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a470e14ab5623386c0fa2b02fd15ea1d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a470e14ab5623386c0fa2b02fd15ea1d8">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a470e14ab5623386c0fa2b02fd15ea1d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRVestelAc.html#a470e14ab5623386c0fa2b02fd15ea1d8">More...</a><br /></td></tr>
 <tr class="separator:a470e14ab5623386c0fa2b02fd15ea1d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5b3d9f1420f4d1951ba148399ccbd41"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#ae5b3d9f1420f4d1951ba148399ccbd41">getMode</a> (void)</td></tr>
-<tr class="memdesc:ae5b3d9f1420f4d1951ba148399ccbd41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRVestelAc.html#ae5b3d9f1420f4d1951ba148399ccbd41">More...</a><br /></td></tr>
-<tr class="separator:ae5b3d9f1420f4d1951ba148399ccbd41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38e48fa0f7ddbc0b16983d84824a198b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a38e48fa0f7ddbc0b16983d84824a198b">getMode</a> (void) const</td></tr>
+<tr class="memdesc:a38e48fa0f7ddbc0b16983d84824a198b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRVestelAc.html#a38e48fa0f7ddbc0b16983d84824a198b">More...</a><br /></td></tr>
+<tr class="separator:a38e48fa0f7ddbc0b16983d84824a198b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a617bf1f4b5596d5ad005237e8445c12e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a617bf1f4b5596d5ad005237e8445c12e">setRaw</a> (const uint8_t *newState)</td></tr>
 <tr class="memdesc:a617bf1f4b5596d5ad005237e8445c12e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRVestelAc.html#a617bf1f4b5596d5ad005237e8445c12e">More...</a><br /></td></tr>
 <tr class="separator:a617bf1f4b5596d5ad005237e8445c12e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -172,54 +173,54 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6c98427df6e5e8081a6dcbfcd436ff0d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a6c98427df6e5e8081a6dcbfcd436ff0d">setSwing</a> (const bool <a class="el" href="classIRVestelAc.html#a4ed05fb5cbdfa5677ca238616bf03922">on</a>)</td></tr>
 <tr class="memdesc:a6c98427df6e5e8081a6dcbfcd436ff0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Swing Roaming setting of the A/C.  <a href="classIRVestelAc.html#a6c98427df6e5e8081a6dcbfcd436ff0d">More...</a><br /></td></tr>
 <tr class="separator:a6c98427df6e5e8081a6dcbfcd436ff0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a991f8ca21319cb39b6c4cd358de4dbf4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a991f8ca21319cb39b6c4cd358de4dbf4">getSwing</a> (void)</td></tr>
-<tr class="memdesc:a991f8ca21319cb39b6c4cd358de4dbf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Swing Roaming setting of the A/C.  <a href="classIRVestelAc.html#a991f8ca21319cb39b6c4cd358de4dbf4">More...</a><br /></td></tr>
-<tr class="separator:a991f8ca21319cb39b6c4cd358de4dbf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f1d1009cc3cd29123a0db815e437c3a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a5f1d1009cc3cd29123a0db815e437c3a">getSwing</a> (void) const</td></tr>
+<tr class="memdesc:a5f1d1009cc3cd29123a0db815e437c3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Swing Roaming setting of the A/C.  <a href="classIRVestelAc.html#a5f1d1009cc3cd29123a0db815e437c3a">More...</a><br /></td></tr>
+<tr class="separator:a5f1d1009cc3cd29123a0db815e437c3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b93d5585b7fb9d509e7fcf84e2b4abc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a4b93d5585b7fb9d509e7fcf84e2b4abc">setSleep</a> (const bool <a class="el" href="classIRVestelAc.html#a4ed05fb5cbdfa5677ca238616bf03922">on</a>)</td></tr>
 <tr class="memdesc:a4b93d5585b7fb9d509e7fcf84e2b4abc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Sleep setting of the A/C.  <a href="classIRVestelAc.html#a4b93d5585b7fb9d509e7fcf84e2b4abc">More...</a><br /></td></tr>
 <tr class="separator:a4b93d5585b7fb9d509e7fcf84e2b4abc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54f97dfe120c96b8c041550ed26d46f2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a54f97dfe120c96b8c041550ed26d46f2">getSleep</a> (void)</td></tr>
-<tr class="memdesc:a54f97dfe120c96b8c041550ed26d46f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep setting of the A/C.  <a href="classIRVestelAc.html#a54f97dfe120c96b8c041550ed26d46f2">More...</a><br /></td></tr>
-<tr class="separator:a54f97dfe120c96b8c041550ed26d46f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31143f56418da08af313eccf0fd46c40"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a31143f56418da08af313eccf0fd46c40">getSleep</a> (void) const</td></tr>
+<tr class="memdesc:a31143f56418da08af313eccf0fd46c40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Sleep setting of the A/C.  <a href="classIRVestelAc.html#a31143f56418da08af313eccf0fd46c40">More...</a><br /></td></tr>
+<tr class="separator:a31143f56418da08af313eccf0fd46c40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa762d0fa63ecc7444c1c107f8f07cdb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#afa762d0fa63ecc7444c1c107f8f07cdb">setTurbo</a> (const bool <a class="el" href="classIRVestelAc.html#a4ed05fb5cbdfa5677ca238616bf03922">on</a>)</td></tr>
 <tr class="memdesc:afa762d0fa63ecc7444c1c107f8f07cdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Turbo setting of the A/C.  <a href="classIRVestelAc.html#afa762d0fa63ecc7444c1c107f8f07cdb">More...</a><br /></td></tr>
 <tr class="separator:afa762d0fa63ecc7444c1c107f8f07cdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ce168cc9422e54d631aed571cfe66be"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a9ce168cc9422e54d631aed571cfe66be">getTurbo</a> (void)</td></tr>
-<tr class="memdesc:a9ce168cc9422e54d631aed571cfe66be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Turbo setting of the A/C.  <a href="classIRVestelAc.html#a9ce168cc9422e54d631aed571cfe66be">More...</a><br /></td></tr>
-<tr class="separator:a9ce168cc9422e54d631aed571cfe66be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa492c2fc2d3ff33cdcc53abe8ecd6ea5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#aa492c2fc2d3ff33cdcc53abe8ecd6ea5">getTurbo</a> (void) const</td></tr>
+<tr class="memdesc:aa492c2fc2d3ff33cdcc53abe8ecd6ea5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Turbo setting of the A/C.  <a href="classIRVestelAc.html#aa492c2fc2d3ff33cdcc53abe8ecd6ea5">More...</a><br /></td></tr>
+<tr class="separator:aa492c2fc2d3ff33cdcc53abe8ecd6ea5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf860da68a15d463dab437a808c9c8c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#acf860da68a15d463dab437a808c9c8c6">setIon</a> (const bool <a class="el" href="classIRVestelAc.html#a4ed05fb5cbdfa5677ca238616bf03922">on</a>)</td></tr>
 <tr class="memdesc:acf860da68a15d463dab437a808c9c8c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Ion (Filter) setting of the A/C.  <a href="classIRVestelAc.html#acf860da68a15d463dab437a808c9c8c6">More...</a><br /></td></tr>
 <tr class="separator:acf860da68a15d463dab437a808c9c8c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a835f194f14479c25a3d651f324e6436c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a835f194f14479c25a3d651f324e6436c">getIon</a> (void)</td></tr>
-<tr class="memdesc:a835f194f14479c25a3d651f324e6436c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Ion (Filter) setting of the A/C.  <a href="classIRVestelAc.html#a835f194f14479c25a3d651f324e6436c">More...</a><br /></td></tr>
-<tr class="separator:a835f194f14479c25a3d651f324e6436c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae811a07c1a8d82e7068c39b9ca73aaf1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#ae811a07c1a8d82e7068c39b9ca73aaf1">isTimeCommand</a> (void)</td></tr>
-<tr class="memdesc:ae811a07c1a8d82e7068c39b9ca73aaf1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the current state a time command?  <a href="classIRVestelAc.html#ae811a07c1a8d82e7068c39b9ca73aaf1">More...</a><br /></td></tr>
-<tr class="separator:ae811a07c1a8d82e7068c39b9ca73aaf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67f0e970af50fcf6e01e4cac85c5862a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a67f0e970af50fcf6e01e4cac85c5862a">isOnTimerActive</a> (void)</td></tr>
-<tr class="memdesc:a67f0e970af50fcf6e01e4cac85c5862a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get if the On Timer is active on the A/C.  <a href="classIRVestelAc.html#a67f0e970af50fcf6e01e4cac85c5862a">More...</a><br /></td></tr>
-<tr class="separator:a67f0e970af50fcf6e01e4cac85c5862a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b31dcca090f98b575a97fd6cb397eb3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a9b31dcca090f98b575a97fd6cb397eb3">getIon</a> (void) const</td></tr>
+<tr class="memdesc:a9b31dcca090f98b575a97fd6cb397eb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Ion (Filter) setting of the A/C.  <a href="classIRVestelAc.html#a9b31dcca090f98b575a97fd6cb397eb3">More...</a><br /></td></tr>
+<tr class="separator:a9b31dcca090f98b575a97fd6cb397eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dd52adaef191c8e735e2d13bc489a9f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a6dd52adaef191c8e735e2d13bc489a9f">isTimeCommand</a> (void) const</td></tr>
+<tr class="memdesc:a6dd52adaef191c8e735e2d13bc489a9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the current state a time command?  <a href="classIRVestelAc.html#a6dd52adaef191c8e735e2d13bc489a9f">More...</a><br /></td></tr>
+<tr class="separator:a6dd52adaef191c8e735e2d13bc489a9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9d0a8755026644b8198398278f2457b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#ad9d0a8755026644b8198398278f2457b">isOnTimerActive</a> (void) const</td></tr>
+<tr class="memdesc:ad9d0a8755026644b8198398278f2457b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get if the On Timer is active on the A/C.  <a href="classIRVestelAc.html#ad9d0a8755026644b8198398278f2457b">More...</a><br /></td></tr>
+<tr class="separator:ad9d0a8755026644b8198398278f2457b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16ef4ecb7c76bef89b6e0ca36746d606"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a16ef4ecb7c76bef89b6e0ca36746d606">setOnTimerActive</a> (const bool <a class="el" href="classIRVestelAc.html#a4ed05fb5cbdfa5677ca238616bf03922">on</a>)</td></tr>
 <tr class="memdesc:a16ef4ecb7c76bef89b6e0ca36746d606"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the On timer to be active on the A/C.  <a href="classIRVestelAc.html#a16ef4ecb7c76bef89b6e0ca36746d606">More...</a><br /></td></tr>
 <tr class="separator:a16ef4ecb7c76bef89b6e0ca36746d606"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa756171e82ed1b43593b81aa3a63b812"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#aa756171e82ed1b43593b81aa3a63b812">isOffTimerActive</a> (void)</td></tr>
-<tr class="memdesc:aa756171e82ed1b43593b81aa3a63b812"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get if the Off Timer is active on the A/C.  <a href="classIRVestelAc.html#aa756171e82ed1b43593b81aa3a63b812">More...</a><br /></td></tr>
-<tr class="separator:aa756171e82ed1b43593b81aa3a63b812"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae000ce54cedc707ba8e3dc025b506b54"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#ae000ce54cedc707ba8e3dc025b506b54">isOffTimerActive</a> (void) const</td></tr>
+<tr class="memdesc:ae000ce54cedc707ba8e3dc025b506b54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get if the Off Timer is active on the A/C.  <a href="classIRVestelAc.html#ae000ce54cedc707ba8e3dc025b506b54">More...</a><br /></td></tr>
+<tr class="separator:ae000ce54cedc707ba8e3dc025b506b54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a023f5594b446f0c20f66c4ee584d8e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a8a023f5594b446f0c20f66c4ee584d8e">setOffTimerActive</a> (const bool <a class="el" href="classIRVestelAc.html#a4ed05fb5cbdfa5677ca238616bf03922">on</a>)</td></tr>
 <tr class="memdesc:a8a023f5594b446f0c20f66c4ee584d8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Off timer to be active on the A/C.  <a href="classIRVestelAc.html#a8a023f5594b446f0c20f66c4ee584d8e">More...</a><br /></td></tr>
 <tr class="separator:a8a023f5594b446f0c20f66c4ee584d8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a160b73df8e1eda984f9bfbff3df7fa63"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a160b73df8e1eda984f9bfbff3df7fa63">isTimerActive</a> (void)</td></tr>
-<tr class="memdesc:a160b73df8e1eda984f9bfbff3df7fa63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get if the Timer is active on the A/C.  <a href="classIRVestelAc.html#a160b73df8e1eda984f9bfbff3df7fa63">More...</a><br /></td></tr>
-<tr class="separator:a160b73df8e1eda984f9bfbff3df7fa63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06a63f80a7cdadac86ffbd4f5795b14b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a06a63f80a7cdadac86ffbd4f5795b14b">isTimerActive</a> (void) const</td></tr>
+<tr class="memdesc:a06a63f80a7cdadac86ffbd4f5795b14b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get if the Timer is active on the A/C.  <a href="classIRVestelAc.html#a06a63f80a7cdadac86ffbd4f5795b14b">More...</a><br /></td></tr>
+<tr class="separator:a06a63f80a7cdadac86ffbd4f5795b14b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77f78e534b19a8dca776b17aa06739aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a77f78e534b19a8dca776b17aa06739aa">setTimerActive</a> (const bool <a class="el" href="classIRVestelAc.html#a4ed05fb5cbdfa5677ca238616bf03922">on</a>)</td></tr>
 <tr class="memdesc:a77f78e534b19a8dca776b17aa06739aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the timer to be active on the A/C.  <a href="classIRVestelAc.html#a77f78e534b19a8dca776b17aa06739aa">More...</a><br /></td></tr>
 <tr class="separator:a77f78e534b19a8dca776b17aa06739aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb7ab58e91f13b999b62559fc7add91a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#adb7ab58e91f13b999b62559fc7add91a">toCommon</a> (void)</td></tr>
-<tr class="memdesc:adb7ab58e91f13b999b62559fc7add91a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRVestelAc.html#adb7ab58e91f13b999b62559fc7add91a">More...</a><br /></td></tr>
-<tr class="separator:adb7ab58e91f13b999b62559fc7add91a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fd0630ad7c1d5da3b1bfc5aefc443ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a5fd0630ad7c1d5da3b1bfc5aefc443ec">toString</a> (void)</td></tr>
-<tr class="memdesc:a5fd0630ad7c1d5da3b1bfc5aefc443ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRVestelAc.html#a5fd0630ad7c1d5da3b1bfc5aefc443ec">More...</a><br /></td></tr>
-<tr class="separator:a5fd0630ad7c1d5da3b1bfc5aefc443ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad31b99f939667487b6f04acace6a29bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#ad31b99f939667487b6f04acace6a29bd">toCommon</a> (void) const</td></tr>
+<tr class="memdesc:ad31b99f939667487b6f04acace6a29bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRVestelAc.html#ad31b99f939667487b6f04acace6a29bd">More...</a><br /></td></tr>
+<tr class="separator:ad31b99f939667487b6f04acace6a29bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab13d9ddf1d487acb12a4d8e3cee72b1b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#ab13d9ddf1d487acb12a4d8e3cee72b1b">toString</a> (void) const</td></tr>
+<tr class="memdesc:ab13d9ddf1d487acb12a4d8e3cee72b1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRVestelAc.html#ab13d9ddf1d487acb12a4d8e3cee72b1b">More...</a><br /></td></tr>
+<tr class="separator:ab13d9ddf1d487acb12a4d8e3cee72b1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -247,26 +248,14 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a7a9046e7b5ff57864862bf5f7ad23c4d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a7a9046e7b5ff57864862bf5f7ad23c4d">checksum</a> (void)</td></tr>
 <tr class="memdesc:a7a9046e7b5ff57864862bf5f7ad23c4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate &amp; set the checksum for the current internal state of the remote.  <a href="classIRVestelAc.html#a7a9046e7b5ff57864862bf5f7ad23c4d">More...</a><br /></td></tr>
 <tr class="separator:a7a9046e7b5ff57864862bf5f7ad23c4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a726178a16458c84d031aec07355d0dd2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a726178a16458c84d031aec07355d0dd2">_setTimer</a> (const uint16_t minutes, const uint8_t offset)</td></tr>
-<tr class="memdesc:a726178a16458c84d031aec07355d0dd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a given timer time at a given bit offset.  <a href="classIRVestelAc.html#a726178a16458c84d031aec07355d0dd2">More...</a><br /></td></tr>
-<tr class="separator:a726178a16458c84d031aec07355d0dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3f095d248ad3c84a777ed9f2d3b001e"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#ad3f095d248ad3c84a777ed9f2d3b001e">_getTimer</a> (const uint8_t offset)</td></tr>
-<tr class="memdesc:ad3f095d248ad3c84a777ed9f2d3b001e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of minutes a timer is set for.  <a href="classIRVestelAc.html#ad3f095d248ad3c84a777ed9f2d3b001e">More...</a><br /></td></tr>
-<tr class="separator:ad3f095d248ad3c84a777ed9f2d3b001e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a56d35fc5d39c97b4c6f2decf176e2cae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIRsend.html">IRsend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a56d35fc5d39c97b4c6f2decf176e2cae">_irsend</a></td></tr>
 <tr class="memdesc:a56d35fc5d39c97b4c6f2decf176e2cae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance of the IR send class.  <a href="classIRVestelAc.html#a56d35fc5d39c97b4c6f2decf176e2cae">More...</a><br /></td></tr>
 <tr class="separator:a56d35fc5d39c97b4c6f2decf176e2cae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74d889a0db2fa63a2e38aaa15819568c"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a74d889a0db2fa63a2e38aaa15819568c">remote_state</a></td></tr>
-<tr class="memdesc:a74d889a0db2fa63a2e38aaa15819568c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state of the IR remote in IR code form.  <a href="classIRVestelAc.html#a74d889a0db2fa63a2e38aaa15819568c">More...</a><br /></td></tr>
-<tr class="separator:a74d889a0db2fa63a2e38aaa15819568c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b10e4a0c1f71aecbeb385666d1a53bd"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a9b10e4a0c1f71aecbeb385666d1a53bd">remote_time_state</a></td></tr>
-<tr class="memdesc:a9b10e4a0c1f71aecbeb385666d1a53bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time state of the remote in code form.  <a href="classIRVestelAc.html#a9b10e4a0c1f71aecbeb385666d1a53bd">More...</a><br /></td></tr>
-<tr class="separator:a9b10e4a0c1f71aecbeb385666d1a53bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1b622c50a4952fb3edaf483e1bf9328"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#af1b622c50a4952fb3edaf483e1bf9328">use_time_state</a></td></tr>
-<tr class="separator:af1b622c50a4952fb3edaf483e1bf9328"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1445480ae91942e752beb2facc9b151b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionVestelProtocol.html">VestelProtocol</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRVestelAc.html#a1445480ae91942e752beb2facc9b151b">_</a></td></tr>
+<tr class="separator:a1445480ae91942e752beb2facc9b151b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for handling detailed Vestel A/C messages. </p>
@@ -324,86 +313,6 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ad3f095d248ad3c84a777ed9f2d3b001e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3f095d248ad3c84a777ed9f2d3b001e">&#9670;&nbsp;</a></span>_getTimer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint16_t IRVestelAc::_getTimer </td>
-          <td>(</td>
-          <td class="paramtype">const uint8_t&#160;</td>
-          <td class="paramname"><em>offset</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get the number of minutes a timer is set for. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>Nr. of bits offset from the start of the state. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The time expressed in nr. of minutes. </dd></dl>
-
-</div>
-</div>
-<a id="a726178a16458c84d031aec07355d0dd2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a726178a16458c84d031aec07355d0dd2">&#9670;&nbsp;</a></span>_setTimer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void IRVestelAc::_setTimer </td>
-          <td>(</td>
-          <td class="paramtype">const uint16_t&#160;</td>
-          <td class="paramname"><em>minutes</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const uint8_t&#160;</td>
-          <td class="paramname"><em>offset</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set a given timer time at a given bit offset. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">minutes</td><td>Time in nr. of minutes. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>Nr. of bits offset from the start of the state. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a794808d49eb6ce1521ff800b2b15a580"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a794808d49eb6ce1521ff800b2b15a580">&#9670;&nbsp;</a></span>begin()</h2>
 
@@ -587,8 +496,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a492abc867ad5b766715eaa301c71f3c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a492abc867ad5b766715eaa301c71f3c8">&#9670;&nbsp;</a></span>getFan()</h2>
+<a id="a510b05386df2578a3241929cffcfa13e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a510b05386df2578a3241929cffcfa13e">&#9670;&nbsp;</a></span>getFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -598,7 +507,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -608,8 +517,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a835f194f14479c25a3d651f324e6436c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a835f194f14479c25a3d651f324e6436c">&#9670;&nbsp;</a></span>getIon()</h2>
+<a id="a9b31dcca090f98b575a97fd6cb397eb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b31dcca090f98b575a97fd6cb397eb3">&#9670;&nbsp;</a></span>getIon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -619,7 +528,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -629,8 +538,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ae5b3d9f1420f4d1951ba148399ccbd41"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae5b3d9f1420f4d1951ba148399ccbd41">&#9670;&nbsp;</a></span>getMode()</h2>
+<a id="a38e48fa0f7ddbc0b16983d84824a198b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38e48fa0f7ddbc0b16983d84824a198b">&#9670;&nbsp;</a></span>getMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -640,7 +549,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -650,8 +559,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a575ba7c6aee1d2377975ef0ef938775a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a575ba7c6aee1d2377975ef0ef938775a">&#9670;&nbsp;</a></span>getOffTimer()</h2>
+<a id="a45c725deb349e357b8c52ab3dcf51bdb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45c725deb349e357b8c52ab3dcf51bdb">&#9670;&nbsp;</a></span>getOffTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -661,7 +570,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -671,8 +580,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa39e3047ea694ada9cc7e992e7b03e32"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa39e3047ea694ada9cc7e992e7b03e32">&#9670;&nbsp;</a></span>getOnTimer()</h2>
+<a id="a3b93b975802111973241d2c57d691bd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b93b975802111973241d2c57d691bd0">&#9670;&nbsp;</a></span>getOnTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -682,7 +591,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -692,8 +601,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a1d6cdc9ad13ebbf1e9a4a83f95244ced"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d6cdc9ad13ebbf1e9a4a83f95244ced">&#9670;&nbsp;</a></span>getPower()</h2>
+<a id="a88e2b24cc600488a6a27a1e616c80580"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88e2b24cc600488a6a27a1e616c80580">&#9670;&nbsp;</a></span>getPower()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -703,7 +612,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -734,8 +643,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a54f97dfe120c96b8c041550ed26d46f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54f97dfe120c96b8c041550ed26d46f2">&#9670;&nbsp;</a></span>getSleep()</h2>
+<a id="a31143f56418da08af313eccf0fd46c40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31143f56418da08af313eccf0fd46c40">&#9670;&nbsp;</a></span>getSleep()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -745,7 +654,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -755,8 +664,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a991f8ca21319cb39b6c4cd358de4dbf4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a991f8ca21319cb39b6c4cd358de4dbf4">&#9670;&nbsp;</a></span>getSwing()</h2>
+<a id="a5f1d1009cc3cd29123a0db815e437c3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f1d1009cc3cd29123a0db815e437c3a">&#9670;&nbsp;</a></span>getSwing()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -766,7 +675,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -776,8 +685,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a835ab977fa0dbf47776e5d618d59c819"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a835ab977fa0dbf47776e5d618d59c819">&#9670;&nbsp;</a></span>getTemp()</h2>
+<a id="a822bb550803b7fbb1ae9f00c51279259"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a822bb550803b7fbb1ae9f00c51279259">&#9670;&nbsp;</a></span>getTemp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -787,7 +696,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -797,8 +706,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a3542ec93c30ec3bc1bb4e242edcf1def"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3542ec93c30ec3bc1bb4e242edcf1def">&#9670;&nbsp;</a></span>getTime()</h2>
+<a id="a7310f2d251aaba0467718fb8c8983f3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7310f2d251aaba0467718fb8c8983f3d">&#9670;&nbsp;</a></span>getTime()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -808,7 +717,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -818,8 +727,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aca4faedc9d82e357c8974fc6143b6e77"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca4faedc9d82e357c8974fc6143b6e77">&#9670;&nbsp;</a></span>getTimer()</h2>
+<a id="afa445ac18ef2b872a10c6048b222e90c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa445ac18ef2b872a10c6048b222e90c">&#9670;&nbsp;</a></span>getTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -829,7 +738,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -839,8 +748,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a9ce168cc9422e54d631aed571cfe66be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9ce168cc9422e54d631aed571cfe66be">&#9670;&nbsp;</a></span>getTurbo()</h2>
+<a id="aa492c2fc2d3ff33cdcc53abe8ecd6ea5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa492c2fc2d3ff33cdcc53abe8ecd6ea5">&#9670;&nbsp;</a></span>getTurbo()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -850,7 +759,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -860,8 +769,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa756171e82ed1b43593b81aa3a63b812"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa756171e82ed1b43593b81aa3a63b812">&#9670;&nbsp;</a></span>isOffTimerActive()</h2>
+<a id="ae000ce54cedc707ba8e3dc025b506b54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae000ce54cedc707ba8e3dc025b506b54">&#9670;&nbsp;</a></span>isOffTimerActive()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -871,7 +780,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -881,8 +790,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a67f0e970af50fcf6e01e4cac85c5862a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a67f0e970af50fcf6e01e4cac85c5862a">&#9670;&nbsp;</a></span>isOnTimerActive()</h2>
+<a id="ad9d0a8755026644b8198398278f2457b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9d0a8755026644b8198398278f2457b">&#9670;&nbsp;</a></span>isOnTimerActive()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -892,7 +801,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -902,8 +811,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ae811a07c1a8d82e7068c39b9ca73aaf1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae811a07c1a8d82e7068c39b9ca73aaf1">&#9670;&nbsp;</a></span>isTimeCommand()</h2>
+<a id="a6dd52adaef191c8e735e2d13bc489a9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dd52adaef191c8e735e2d13bc489a9f">&#9670;&nbsp;</a></span>isTimeCommand()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -913,7 +822,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -923,8 +832,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a160b73df8e1eda984f9bfbff3df7fa63"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a160b73df8e1eda984f9bfbff3df7fa63">&#9670;&nbsp;</a></span>isTimerActive()</h2>
+<a id="a06a63f80a7cdadac86ffbd4f5795b14b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06a63f80a7cdadac86ffbd4f5795b14b">&#9670;&nbsp;</a></span>isTimerActive()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -934,7 +843,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1501,8 +1410,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="adb7ab58e91f13b999b62559fc7add91a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb7ab58e91f13b999b62559fc7add91a">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="ad31b99f939667487b6f04acace6a29bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad31b99f939667487b6f04acace6a29bd">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1512,7 +1421,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1592,8 +1501,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5fd0630ad7c1d5da3b1bfc5aefc443ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fd0630ad7c1d5da3b1bfc5aefc443ec">&#9670;&nbsp;</a></span>toString()</h2>
+<a id="ab13d9ddf1d487acb12a4d8e3cee72b1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab13d9ddf1d487acb12a4d8e3cee72b1b">&#9670;&nbsp;</a></span>toString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1603,7 +1512,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1649,6 +1558,28 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a1445480ae91942e752beb2facc9b151b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1445480ae91942e752beb2facc9b151b">&#9670;&nbsp;</a></span>_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="unionVestelProtocol.html">VestelProtocol</a> IRVestelAc::_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a56d35fc5d39c97b4c6f2decf176e2cae"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a56d35fc5d39c97b4c6f2decf176e2cae">&#9670;&nbsp;</a></span>_irsend</h2>
 
@@ -1670,76 +1601,6 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Instance of the IR send class. </p>
-
-</div>
-</div>
-<a id="a74d889a0db2fa63a2e38aaa15819568c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74d889a0db2fa63a2e38aaa15819568c">&#9670;&nbsp;</a></span>remote_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint64_t IRVestelAc::remote_state</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The state of the IR remote in IR code form. </p>
-
-</div>
-</div>
-<a id="a9b10e4a0c1f71aecbeb385666d1a53bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b10e4a0c1f71aecbeb385666d1a53bd">&#9670;&nbsp;</a></span>remote_time_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint64_t IRVestelAc::remote_time_state</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The time state of the remote in code form. </p>
-
-</div>
-</div>
-<a id="af1b622c50a4952fb3edaf483e1bf9328"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af1b622c50a4952fb3edaf483e1bf9328">&#9670;&nbsp;</a></span>use_time_state</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool IRVestelAc::use_time_state</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
 
 </div>
 </div>

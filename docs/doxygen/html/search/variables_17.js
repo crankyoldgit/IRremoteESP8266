@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['zonefollow1_6999',['ZoneFollow1',['../unionCoolixProtocol.html#a5f19a21823bbdb6d5deceb03db0d3d5b',1,'CoolixProtocol']]],
-  ['zonefollow2_7000',['ZoneFollow2',['../unionCoolixProtocol.html#ade33ba99bcfcf9d7dac334e56e9bb167',1,'CoolixProtocol']]]
+  ['xfan_6999',['XFan',['../unionKelvinatorProtocol.html#a44a0ba82ee5dc39f64215d26edb9636c',1,'KelvinatorProtocol::XFan()'],['../unionGreeProtocol.html#a3fbf66dfc2043710c5e00f8230eddb48',1,'GreeProtocol::Xfan()']]]
 ];

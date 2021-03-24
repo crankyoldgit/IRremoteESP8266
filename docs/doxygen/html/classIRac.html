@@ -216,6 +216,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:af290b0b08cff5121bb88c62051ed1074"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#af290b0b08cff5121bb88c62051ed1074">delonghiac</a> (<a class="el" href="classIRDelonghiAc.html">IRDelonghiAc</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const bool celsius, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const bool turbo, const int16_t sleep=-1)</td></tr>
 <tr class="memdesc:af290b0b08cff5121bb88c62051ed1074"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Delonghi A/C message with the supplied settings.  <a href="classIRac.html#af290b0b08cff5121bb88c62051ed1074">More...</a><br /></td></tr>
 <tr class="separator:af290b0b08cff5121bb88c62051ed1074"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ef3fd7283a1578963ca314a6f1cbd71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#a3ef3fd7283a1578963ca314a6f1cbd71">ecoclim</a> (<a class="el" href="classIREcoclimAc.html">IREcoclimAc</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const int16_t sleep=-1, const int16_t clock=-1)</td></tr>
+<tr class="memdesc:a3ef3fd7283a1578963ca314a6f1cbd71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an EcoClim A/C message with the supplied settings.  <a href="classIRac.html#a3ef3fd7283a1578963ca314a6f1cbd71">More...</a><br /></td></tr>
+<tr class="separator:a3ef3fd7283a1578963ca314a6f1cbd71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb847bd5e09feb293432b8a8cf0dd9de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRac.html#abb847bd5e09feb293432b8a8cf0dd9de">electra</a> (<a class="el" href="classIRElectraAc.html">IRElectraAc</a> *ac, const bool on, const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode, const float degrees, const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> fan, const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv, const <a class="el" href="namespacestdAc.html#aae50ee315fa9c9ec1a4078da40d6b147">stdAc::swingh_t</a> swingh, const bool turbo, const bool lighttoggle, const bool clean)</td></tr>
 <tr class="memdesc:abb847bd5e09feb293432b8a8cf0dd9de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an Electra A/C message with the supplied settings.  <a href="classIRac.html#abb847bd5e09feb293432b8a8cf0dd9de">More...</a><br /></td></tr>
 <tr class="separator:abb847bd5e09feb293432b8a8cf0dd9de"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1888,6 +1891,86 @@ Private Attributes</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">fan</td><td>The speed setting for the fan. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">turbo</td><td>Run the device in turbo/powerful mode. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">sleep</td><td>Nr. of minutes for sleep mode. -1 is Off, &gt;= 0 is on. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3ef3fd7283a1578963ca314a6f1cbd71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ef3fd7283a1578963ca314a6f1cbd71">&#9670;&nbsp;</a></span>ecoclim()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRac::ecoclim </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classIREcoclimAc.html">IREcoclimAc</a> *&#160;</td>
+          <td class="paramname"><em>ac</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>on</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>degrees</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td>
+          <td class="paramname"><em>fan</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int16_t&#160;</td>
+          <td class="paramname"><em>sleep</em> = <code>-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int16_t&#160;</td>
+          <td class="paramname"><em>clock</em> = <code>-1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Send an EcoClim A/C message with the supplied settings. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ac</td><td>A Ptr to an <a class="el" href="classIREcoclimAc.html" title="Class for handling detailed EcoClim A/C 56 bit messages.">IREcoclimAc</a> object to use. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>The power setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The operation mode setting. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">degrees</td><td>The temperature setting in degrees. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fan</td><td>The speed setting for the fan. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sleep</td><td>Nr. of minutes for sleep mode. -1 is Off, &gt;= 0 is on. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">clock</td><td>The time in Nr. of mins since midnight. &lt; 0 is ignore. </td></tr>
   </table>
   </dd>
 </dl>

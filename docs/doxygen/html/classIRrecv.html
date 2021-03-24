@@ -125,9 +125,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae78ef12b8194db5d3cb5a2605d29830d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#ae78ef12b8194db5d3cb5a2605d29830d">matchMark</a> (const uint32_t measured, const uint32_t desired, const uint8_t tolerance=<a class="el" href="IRrecv_8h.html#a05025e8bd724ae2d0c7fea6e924ca84c">kUseDefTol</a>, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>)</td></tr>
 <tr class="memdesc:ae78ef12b8194db5d3cb5a2605d29830d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if we match a mark signal(measured) with the desired within +/-tolerance percent, after an expected is excess is added.  <a href="classIRrecv.html#ae78ef12b8194db5d3cb5a2605d29830d">More...</a><br /></td></tr>
 <tr class="separator:ae78ef12b8194db5d3cb5a2605d29830d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf11286f0ef5e8984396b5f6331db87e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#adf11286f0ef5e8984396b5f6331db87e">matchMarkRange</a> (const uint32_t measured, const uint32_t desired, const uint16_t range=100, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>)</td></tr>
+<tr class="memdesc:adf11286f0ef5e8984396b5f6331db87e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if we match a mark signal(measured) with the desired within a range (in uSeconds) either side of the desired, after an expected is excess is added.  <a href="classIRrecv.html#adf11286f0ef5e8984396b5f6331db87e">More...</a><br /></td></tr>
+<tr class="separator:adf11286f0ef5e8984396b5f6331db87e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9fd363e8b2edee2ed3c473349ecc58fc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a9fd363e8b2edee2ed3c473349ecc58fc">matchSpace</a> (const uint32_t measured, const uint32_t desired, const uint8_t tolerance=<a class="el" href="IRrecv_8h.html#a05025e8bd724ae2d0c7fea6e924ca84c">kUseDefTol</a>, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>)</td></tr>
 <tr class="memdesc:a9fd363e8b2edee2ed3c473349ecc58fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if we match a space signal(measured) with the desired within +/-tolerance percent, after an expected is excess is removed.  <a href="classIRrecv.html#a9fd363e8b2edee2ed3c473349ecc58fc">More...</a><br /></td></tr>
 <tr class="separator:a9fd363e8b2edee2ed3c473349ecc58fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2200a9c1064497838506eb278791bb03"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a2200a9c1064497838506eb278791bb03">matchSpaceRange</a> (const uint32_t measured, const uint32_t desired, const uint16_t range=100, const int16_t excess=<a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a>)</td></tr>
+<tr class="memdesc:a2200a9c1064497838506eb278791bb03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if we match a space signal(measured) with the desired within a range (in uSeconds) either side of the desired, after an expected is excess is removed.  <a href="classIRrecv.html#a2200a9c1064497838506eb278791bb03">More...</a><br /></td></tr>
+<tr class="separator:a2200a9c1064497838506eb278791bb03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -436,6 +442,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a823387b95b6adb676e976a8eeaf01a0b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a823387b95b6adb676e976a8eeaf01a0b">decodeEcoclim</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#accd38d1019bde991e9a887f853f295d0">kEcoclimBits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:a823387b95b6adb676e976a8eeaf01a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied EcoClim A/C message. Status: STABLE / Confirmed working on real remote.  <a href="classIRrecv.html#a823387b95b6adb676e976a8eeaf01a0b">More...</a><br /></td></tr>
 <tr class="separator:a823387b95b6adb676e976a8eeaf01a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c7c5cdee244070d5999232a1bcdae60"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a9c7c5cdee244070d5999232a1bcdae60">decodeXmp</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#adfcd08adae1243b1108353ef5cfe8776">kXmpBits</a>, const bool strict=true)</td></tr>
+<tr class="memdesc:a9c7c5cdee244070d5999232a1bcdae60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied XMP packet/message. Status: BETA / Probably works.  <a href="classIRrecv.html#a9c7c5cdee244070d5999232a1bcdae60">More...</a><br /></td></tr>
+<tr class="separator:a9c7c5cdee244070d5999232a1bcdae60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -6146,6 +6155,66 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 
 </div>
 </div>
+<a id="a9c7c5cdee244070d5999232a1bcdae60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c7c5cdee244070d5999232a1bcdae60">&#9670;&nbsp;</a></span>decodeXmp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::decodeXmp </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecode__results.html">decode_results</a> *&#160;</td>
+          <td class="paramname"><em>results</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>offset</em> = <code><a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#adfcd08adae1243b1108353ef5cfe8776">kXmpBits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>strict</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decode the supplied XMP packet/message. Status: BETA / Probably works. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the result </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if it can decode it, false if it can't. </dd></dl>
+
+</div>
+</div>
 <a id="a72afd857c8b2e0192021a40afc96c2d8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a72afd857c8b2e0192021a40afc96c2d8">&#9670;&nbsp;</a></span>decodeZepeal()</h2>
 
@@ -7445,6 +7514,58 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 
 </div>
 </div>
+<a id="adf11286f0ef5e8984396b5f6331db87e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf11286f0ef5e8984396b5f6331db87e">&#9670;&nbsp;</a></span>matchMarkRange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::matchMarkRange </td>
+          <td>(</td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>measured</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>desired</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>range</em> = <code>100</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int16_t&#160;</td>
+          <td class="paramname"><em>excess</em> = <code><a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if we match a mark signal(measured) with the desired within a range (in uSeconds) either side of the desired, after an expected is excess is added. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">measured</td><td>The recorded period of the signal pulse. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">desired</td><td>The expected period (in usecs) we are matching against. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>The range limit from desired to accept in uSeconds. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">excess</td><td>A non-scaling amount to reduce usecs by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Boolean. true if it matches, false if it doesn't. </dd></dl>
+
+</div>
+</div>
 <a id="a9fd363e8b2edee2ed3c473349ecc58fc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9fd363e8b2edee2ed3c473349ecc58fc">&#9670;&nbsp;</a></span>matchSpace()</h2>
 
@@ -7489,6 +7610,58 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
     <tr><td class="paramdir">[in]</td><td class="paramname">measured</td><td>The recorded period of the signal pulse. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">desired</td><td>The expected period (in usecs) we are matching against. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">tolerance</td><td>A percentage expressed as an integer. e.g. 10 is 10%. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">excess</td><td>A non-scaling amount to reduce usecs by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A Boolean. true if it matches, false if it doesn't. </dd></dl>
+
+</div>
+</div>
+<a id="a2200a9c1064497838506eb278791bb03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2200a9c1064497838506eb278791bb03">&#9670;&nbsp;</a></span>matchSpaceRange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::matchSpaceRange </td>
+          <td>(</td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>measured</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>desired</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>range</em> = <code>100</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int16_t&#160;</td>
+          <td class="paramname"><em>excess</em> = <code><a class="el" href="IRrecv_8h.html#a99bbffe986ad7ba86d2b11e75f4aa50e">kMarkExcess</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if we match a space signal(measured) with the desired within a range (in uSeconds) either side of the desired, after an expected is excess is removed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">measured</td><td>The recorded period of the signal pulse. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">desired</td><td>The expected period (in usecs) we are matching against. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>The range limit from desired to accept in uSeconds. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">excess</td><td>A non-scaling amount to reduce usecs by. </td></tr>
   </table>
   </dd>
@@ -7780,7 +7953,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 <li>src/<a class="el" href="ir__Denon_8cpp.html">ir_Denon.cpp</a></li>
 <li>src/<a class="el" href="ir__Dish_8cpp.html">ir_Dish.cpp</a></li>
 <li>src/<a class="el" href="ir__Doshisha_8cpp.html">ir_Doshisha.cpp</a></li>
-<li>src/<a class="el" href="ir__EcoClim_8cpp.html">ir_EcoClim.cpp</a></li>
+<li>src/<a class="el" href="ir__Ecoclim_8cpp.html">ir_Ecoclim.cpp</a></li>
 <li>src/<a class="el" href="ir__Electra_8cpp.html">ir_Electra.cpp</a></li>
 <li>src/<a class="el" href="ir__EliteScreens_8cpp.html">ir_EliteScreens.cpp</a></li>
 <li>src/<a class="el" href="ir__Epson_8cpp.html">ir_Epson.cpp</a></li>
@@ -7827,6 +8000,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 <li>src/<a class="el" href="ir__Voltas_8cpp.html">ir_Voltas.cpp</a></li>
 <li>src/<a class="el" href="ir__Whirlpool_8cpp.html">ir_Whirlpool.cpp</a></li>
 <li>src/<a class="el" href="ir__Whynter_8cpp.html">ir_Whynter.cpp</a></li>
+<li>src/<a class="el" href="ir__Xmp_8cpp.html">ir_Xmp.cpp</a></li>
 <li>src/<a class="el" href="ir__Zepeal_8cpp.html">ir_Zepeal.cpp</a></li>
 <li>src/<a class="el" href="IRrecv_8cpp.html">IRrecv.cpp</a></li>
 </ul>

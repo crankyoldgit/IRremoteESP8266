@@ -79,47 +79,47 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a8d696bb16d652ef6d582014049be2bbb"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionMideaProtocol.html#a8d696bb16d652ef6d582014049be2bbb">remote_state</a></td></tr>
 <tr class="memdesc:a8d696bb16d652ef6d582014049be2bbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state in native IR code form.  <a href="unionMideaProtocol.html#a8d696bb16d652ef6d582014049be2bbb">More...</a><br /></td></tr>
 <tr class="separator:a8d696bb16d652ef6d582014049be2bbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a761080de122aaf0a2e67f9ba58375a86"><td class="memItemLeft" >struct {</td></tr>
-<tr class="memitem:a206917e2839b38e4172091492cc84ed0"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a3d4afe5411a769c48e8bfaa3a9e8e84c">Sum</a></td></tr>
-<tr class="separator:a206917e2839b38e4172091492cc84ed0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa78caf474f4e06b6f4fdd8622dc6e73b"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a2ce21157e61749f4d1c3b14fd0b6cfe8">SensorTemp</a>:7</td></tr>
-<tr class="memdesc:aa78caf474f4e06b6f4fdd8622dc6e73b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Degrees or OnTimer.  <a href="structMideaProtocol_1_1_0d53.html#aa78caf474f4e06b6f4fdd8622dc6e73b">More...</a><br /></td></tr>
-<tr class="separator:aa78caf474f4e06b6f4fdd8622dc6e73b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec9dabc470909f3d1f1498d1af6f3321"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a20cc2079eae404c980cc75101b4a3116">disableSensor</a>:1</td></tr>
-<tr class="separator:aec9dabc470909f3d1f1498d1af6f3321"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a607d9d63bdabc500bb3b94920a3022e8"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#ab48c834ee5a37297d04e71e6e32468d2">__pad0__</a>:1</td></tr>
-<tr class="separator:a607d9d63bdabc500bb3b94920a3022e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b24ed24edfa13dfc9f2ea7134c6c7df"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#afd53c8223249e271fe48d03c67a74364">OffTimer</a>:6</td></tr>
-<tr class="memdesc:a2b24ed24edfa13dfc9f2ea7134c6c7df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nr of Half hours. Off is 0b111111.  <a href="structMideaProtocol_1_1_0d53.html#a2b24ed24edfa13dfc9f2ea7134c6c7df">More...</a><br /></td></tr>
-<tr class="separator:a2b24ed24edfa13dfc9f2ea7134c6c7df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa4a7f90500357e741dcc81c8a106b09"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a2a1d3b51765737427adb5dddcda84d60">BeepDisable</a>:1</td></tr>
-<tr class="memdesc:aaa4a7f90500357e741dcc81c8a106b09"><td class="mdescLeft">&#160;</td><td class="mdescRight">0 = no beep in follow me messages, 1 = beep.  <a href="structMideaProtocol_1_1_0d53.html#aaa4a7f90500357e741dcc81c8a106b09">More...</a><br /></td></tr>
-<tr class="separator:aaa4a7f90500357e741dcc81c8a106b09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa76d031ca3457329d1428b39bcdfed84"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a4206c02c5cafe996c05d92beb7a7e8d6">Temp</a>:5</td></tr>
-<tr class="separator:aa76d031ca3457329d1428b39bcdfed84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae36792c29bec24c485c5753021f34219"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a1b1258107620bb83fd6356815242e19b">useFahrenheit</a>:1</td></tr>
-<tr class="separator:ae36792c29bec24c485c5753021f34219"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8975aaf1d9f29d37ae31c7822e7ae1f"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a3351e3af6d3f214536e593c450fa0915">__pad1__</a>:0</td></tr>
-<tr class="separator:ad8975aaf1d9f29d37ae31c7822e7ae1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c89cd05abdf5d4f67dc3d67831b024c"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#aa0255e9e1351d594b2e2c8c6f9698e1a">Mode</a>:3</td></tr>
-<tr class="separator:a2c89cd05abdf5d4f67dc3d67831b024c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f869ee5de6aac4d1440b7cc55f4e1df"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a04b0f344ec9b7cf2bdbd2c530b409fcb">Fan</a>:2</td></tr>
-<tr class="separator:a0f869ee5de6aac4d1440b7cc55f4e1df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab812308f082a852fb070e19888fd58f3"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#ab638086cc0b8d25fba57278c7ba881cb">__pad2__</a>:1</td></tr>
-<tr class="memdesc:ab812308f082a852fb070e19888fd58f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unknown, but set on <em>some</em> Pioneer System A/Cs.  <a href="structMideaProtocol_1_1_0d53.html#ab812308f082a852fb070e19888fd58f3">More...</a><br /></td></tr>
-<tr class="separator:ab812308f082a852fb070e19888fd58f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a000277f983a5f47aef961cc377185160"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#aeea5e2520e4cd1773c1eddc8a84af2d3">Sleep</a>:1</td></tr>
-<tr class="separator:a000277f983a5f47aef961cc377185160"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a375eb4c3e5815c9f18e7ec52e5f05879"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a6b534bb5845c3c184ee43b87995cff32">Power</a>:1</td></tr>
-<tr class="separator:a375eb4c3e5815c9f18e7ec52e5f05879"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aacacab24ee7fcbbb5db634e4bc5e7759"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#ae6deb4675602e9d1be3f8a49c601cdce">Type</a>:3</td></tr>
-<tr class="memdesc:aacacab24ee7fcbbb5db634e4bc5e7759"><td class="mdescLeft">&#160;</td><td class="mdescRight">Normal, Special, or FollowMe message type.  <a href="structMideaProtocol_1_1_0d53.html#aacacab24ee7fcbbb5db634e4bc5e7759">More...</a><br /></td></tr>
-<tr class="separator:aacacab24ee7fcbbb5db634e4bc5e7759"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96dd9c59ace3130edb32ad8a56eccc83"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a892508b7b4cade91dd2e315b678f5f1b">Header</a>:5</td></tr>
-<tr class="memdesc:a96dd9c59ace3130edb32ad8a56eccc83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Typically 0b10100.  <a href="structMideaProtocol_1_1_0d53.html#a96dd9c59ace3130edb32ad8a56eccc83">More...</a><br /></td></tr>
-<tr class="separator:a96dd9c59ace3130edb32ad8a56eccc83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a761080de122aaf0a2e67f9ba58375a86"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:a761080de122aaf0a2e67f9ba58375a86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0247df137fd725922759edb1b115226c"><td class="memItemLeft" >struct {</td></tr>
+<tr class="memitem:a029709ad1da04606039ed86f8e15456e"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a3d4afe5411a769c48e8bfaa3a9e8e84c">Sum</a></td></tr>
+<tr class="separator:a029709ad1da04606039ed86f8e15456e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e42c964eae5794c0882f0d147488324"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a2ce21157e61749f4d1c3b14fd0b6cfe8">SensorTemp</a>:7</td></tr>
+<tr class="memdesc:a5e42c964eae5794c0882f0d147488324"><td class="mdescLeft">&#160;</td><td class="mdescRight">Degrees or OnTimer.  <a href="structMideaProtocol_1_1_0d59.html#a5e42c964eae5794c0882f0d147488324">More...</a><br /></td></tr>
+<tr class="separator:a5e42c964eae5794c0882f0d147488324"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59becedd3dda61b99a8ef6891fb53a73"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a20cc2079eae404c980cc75101b4a3116">disableSensor</a>:1</td></tr>
+<tr class="separator:a59becedd3dda61b99a8ef6891fb53a73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09a6335902d6a272d8802148558c716e"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#ab48c834ee5a37297d04e71e6e32468d2">__pad0__</a>:1</td></tr>
+<tr class="separator:a09a6335902d6a272d8802148558c716e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1319090c31734ea5199352f738cab5df"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#afd53c8223249e271fe48d03c67a74364">OffTimer</a>:6</td></tr>
+<tr class="memdesc:a1319090c31734ea5199352f738cab5df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nr of Half hours. Off is 0b111111.  <a href="structMideaProtocol_1_1_0d59.html#a1319090c31734ea5199352f738cab5df">More...</a><br /></td></tr>
+<tr class="separator:a1319090c31734ea5199352f738cab5df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2d4aff34681b15f1d1b81575cb67d6a"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a2a1d3b51765737427adb5dddcda84d60">BeepDisable</a>:1</td></tr>
+<tr class="memdesc:aa2d4aff34681b15f1d1b81575cb67d6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">0 = no beep in follow me messages, 1 = beep.  <a href="structMideaProtocol_1_1_0d59.html#aa2d4aff34681b15f1d1b81575cb67d6a">More...</a><br /></td></tr>
+<tr class="separator:aa2d4aff34681b15f1d1b81575cb67d6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7789a778b81420b9bd2cefadc43c6e79"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a4206c02c5cafe996c05d92beb7a7e8d6">Temp</a>:5</td></tr>
+<tr class="separator:a7789a778b81420b9bd2cefadc43c6e79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ee0f80d7c3953998b9e992df71a2160"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a1b1258107620bb83fd6356815242e19b">useFahrenheit</a>:1</td></tr>
+<tr class="separator:a4ee0f80d7c3953998b9e992df71a2160"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4eba9376fe265838d56f6752a68ee35c"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a3351e3af6d3f214536e593c450fa0915">__pad1__</a>:0</td></tr>
+<tr class="separator:a4eba9376fe265838d56f6752a68ee35c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fae344d63df391aaf0c933594dd39a4"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#aa0255e9e1351d594b2e2c8c6f9698e1a">Mode</a>:3</td></tr>
+<tr class="separator:a7fae344d63df391aaf0c933594dd39a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45055a62c5aba4440a3e16d1dfb93723"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a04b0f344ec9b7cf2bdbd2c530b409fcb">Fan</a>:2</td></tr>
+<tr class="separator:a45055a62c5aba4440a3e16d1dfb93723"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f13637d07dc9052875f4130bc2e79f1"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#ab638086cc0b8d25fba57278c7ba881cb">__pad2__</a>:1</td></tr>
+<tr class="memdesc:a9f13637d07dc9052875f4130bc2e79f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unknown, but set on <em>some</em> Pioneer System A/Cs.  <a href="structMideaProtocol_1_1_0d59.html#a9f13637d07dc9052875f4130bc2e79f1">More...</a><br /></td></tr>
+<tr class="separator:a9f13637d07dc9052875f4130bc2e79f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4473200c8548ce3e0781906ec272d8f3"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#aeea5e2520e4cd1773c1eddc8a84af2d3">Sleep</a>:1</td></tr>
+<tr class="separator:a4473200c8548ce3e0781906ec272d8f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76aad44beacb2e7cd1517369416b9d3f"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a6b534bb5845c3c184ee43b87995cff32">Power</a>:1</td></tr>
+<tr class="separator:a76aad44beacb2e7cd1517369416b9d3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae295f0c353943c6d710dc5dbad490574"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#ae6deb4675602e9d1be3f8a49c601cdce">Type</a>:3</td></tr>
+<tr class="memdesc:ae295f0c353943c6d710dc5dbad490574"><td class="mdescLeft">&#160;</td><td class="mdescRight">Normal, Special, or FollowMe message type.  <a href="structMideaProtocol_1_1_0d59.html#ae295f0c353943c6d710dc5dbad490574">More...</a><br /></td></tr>
+<tr class="separator:ae295f0c353943c6d710dc5dbad490574"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1352a35f3e670453ef250ab41fe5d5d"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionMideaProtocol.html#a892508b7b4cade91dd2e315b678f5f1b">Header</a>:5</td></tr>
+<tr class="memdesc:aa1352a35f3e670453ef250ab41fe5d5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Typically 0b10100.  <a href="structMideaProtocol_1_1_0d59.html#aa1352a35f3e670453ef250ab41fe5d5d">More...</a><br /></td></tr>
+<tr class="separator:aa1352a35f3e670453ef250ab41fe5d5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0247df137fd725922759edb1b115226c"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:a0247df137fd725922759edb1b115226c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Native representation of a Midea A/C message. </p>
@@ -128,8 +128,8 @@ Public Attributes</h2></td></tr>
 Some Pioneer Systems have required a special bit to be set in order for the A/C unit to accept the message. We don't currently understand what this bit does. See the link for details of how to set this if needed. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1342#issuecomment-733721085">https://github.com/crankyoldgit/IRremoteESP8266/issues/1342#issuecomment-733721085</a> </dd></dl>
 </div><h2 class="groupheader">Member Data Documentation</h2>
-<a id="a761080de122aaf0a2e67f9ba58375a86"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a761080de122aaf0a2e67f9ba58375a86">&#9670;&nbsp;</a></span>@54</h2>
+<a id="a0247df137fd725922759edb1b115226c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0247df137fd725922759edb1b115226c">&#9670;&nbsp;</a></span>@60</h2>
 
 <div class="memitem">
 <div class="memproto">
