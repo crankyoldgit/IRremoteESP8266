@@ -702,6 +702,10 @@ class IRsend {
   void sendXmp(const uint64_t data, const uint16_t nbits = kXmpBits,
                const uint16_t repeat = kNoRepeat);
 #endif  // SEND_XMP
+#if SEND_TRUMA
+  void sendTruma(const uint64_t data, const uint16_t nbits = kTrumaBits,
+                 const uint16_t repeat = kNoRepeat);
+#endif  // SEND_TRUMA
 
  protected:
 #ifdef UNIT_TEST
