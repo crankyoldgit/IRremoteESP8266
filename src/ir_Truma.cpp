@@ -7,7 +7,8 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1440
 
 // Supports:
-//   Brand: Truma,  Model: Caravan A/C
+//   Brand: Truma,  Model: Aventa A/C
+//   Brand: Truma,  Model: 40091-86700 remote
 
 #include "IRrecv.h"
 #include "IRsend.h"
