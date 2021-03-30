@@ -3817,7 +3817,7 @@ namespace IRAcUtils {
 #if DECODE_SAMSUNG_AC
       case decode_type_t::SAMSUNG_AC: {
         IRSamsungAc ac(kGpioUnused);
-        ac.setRaw(decode->state);
+        ac.setRaw(decode->state, decode->bits / 8);
         *result = ac.toCommon();
         break;
       }
