@@ -3,7 +3,6 @@
 /// @file
 /// @brief Support for Truma protocol.
 /// This protocol uses mark length bit encoding.
-/// @warning Binary data format not yet stablished. May be inverted or reversed.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1440
 
 // Supports:
@@ -28,10 +27,8 @@ const uint32_t kTrumaGap = kDefaultMessageGap;  // Just a guess.
 
 #if SEND_TRUMA
 /// Send a Truma formatted message.
-/// Status: ALPHA / Probably okay. Bit order etc not yet established.
+/// Status: BETA / Probably okay. Not yet tested on a real device.
 /// @param[in] data The message to be sent.
-/// @warning Bit format is not yet extablished. May be invert or order changed
-///   in the future.
 /// @param[in] nbits The bit size of the message being sent.
 /// @param[in] repeat The number of times the message is to be repeated.
 void IRsend::sendTruma(const uint64_t data, const uint16_t nbits,
@@ -51,11 +48,9 @@ void IRsend::sendTruma(const uint64_t data, const uint16_t nbits,
 
 #if DECODE_TRUMA
 /// Decode the supplied Truma message.
-/// Status: ALPHA / Probably okay. Bit order etc not yet established.
+/// Status: STABLE / Confirmed working with real device.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
-/// @warning Bit format is not yet extablished. May be invert or order changed
-///   in the future.
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect. Typically kTrumaBits.
