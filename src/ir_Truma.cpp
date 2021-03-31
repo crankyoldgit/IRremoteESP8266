@@ -4,6 +4,7 @@
 /// @brief Support for Truma protocol.
 /// This protocol uses mark length bit encoding.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1440
+/// @see https://docs.google.com/spreadsheets/d/1k-RHu0vSIB6IweiTZSa3Rxy3Z_qPUtqwcqot8uXVO6I/edit?usp=sharing
 
 
 #include "ir_Truma.h"
@@ -32,7 +33,7 @@ const uint32_t kTrumaGap = kDefaultMessageGap;  // Just a guess.
 
 #if SEND_TRUMA
 /// Send a Truma formatted message.
-/// Status: BETA / Probably okay. Not yet tested on a real device.
+/// Status: STABLE / Confirmed working.
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The bit size of the message being sent.
 /// @param[in] repeat The number of times the message is to be repeated.

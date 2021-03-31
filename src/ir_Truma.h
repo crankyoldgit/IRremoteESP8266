@@ -3,6 +3,7 @@
 /// @file
 /// @brief Support for Truma protocol.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1440
+/// @see https://docs.google.com/spreadsheets/d/1k-RHu0vSIB6IweiTZSa3Rxy3Z_qPUtqwcqot8uXVO6I/edit?usp=sharing
 
 // Supports:
 //   Brand: Truma,  Model: Aventa A/C
