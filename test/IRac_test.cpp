@@ -29,6 +29,7 @@
 #include "ir_Teco.h"
 #include "ir_Toshiba.h"
 #include "ir_Trotec.h"
+#include "ir_Truma.h"
 #include "ir_Vestel.h"
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
@@ -1598,6 +1599,35 @@ TEST(TestIRac, Trotec) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(TROTEC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kTrotecBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
+TEST(TestIRac, Truma) {
+  IRTrumaAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 2 (Cool), Temp: 22C, Fan: 3 (Quiet), Quiet: On";
+
+  ac.begin();
+  irac.truma(&ac,
+             true,                        // Power
+             stdAc::opmode_t::kCool,      // Mode
+             22,                          // Celsius
+             stdAc::fanspeed_t::kHigh,    // Fan speed
+             true);                       // Quiet (will override fan speed)
+  EXPECT_TRUE(ac.getPower());
+  EXPECT_EQ(kTrumaCool, ac.getMode());
+  EXPECT_EQ(22, ac.getTemp());
+  EXPECT_EQ(kTrumaFanQuiet, ac.getFan());
+  EXPECT_TRUE(ac.getQuiet());
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TRUMA, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTrumaBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
