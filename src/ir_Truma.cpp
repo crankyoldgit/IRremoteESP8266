@@ -85,8 +85,7 @@ bool IRrecv::decodeTruma(decode_results *results, uint16_t offset,
   if (!used) return false;
 
   // Compliance
-  if (strict)
-    if (!IRTrumaAc::validChecksum(data)) return false;  // Checksum failed.
+  if (strict && !IRTrumaAc::validChecksum(data)) return false;  // Checksum.
 
   // Success
   results->value = data;
