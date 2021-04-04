@@ -38,6 +38,7 @@
 #include "ir_Toshiba.h"
 #include "ir_Transcold.h"
 #include "ir_Trotec.h"
+#include "ir_Truma.h"
 #include "ir_Vestel.h"
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
@@ -420,6 +421,11 @@ void electra(IRElectraAc *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,
               const stdAc::fanspeed_t fan, const int16_t sleep = -1);
 #endif  // SEND_TROTEC
+#if SEND_TRUMA
+  void truma(IRTrumaAc *ac,
+              const bool on, const stdAc::opmode_t mode, const float degrees,
+              const stdAc::fanspeed_t fan, const bool quiet);
+#endif  // SEND_TRUMA
 #if SEND_VESTEL_AC
   void vestel(IRVestelAc *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,

@@ -766,6 +766,9 @@
 #ifndef D_STR_TROTEC
 #define D_STR_TROTEC "TROTEC"
 #endif  // D_STR_TROTEC
+#ifndef D_STR_TRUMA
+#define D_STR_TRUMA "TRUMA"
+#endif  // D_STR_TRUMA
 #ifndef D_STR_UNUSED
 #define D_STR_UNUSED "UNUSED"
 #endif  // D_STR_UNUSED
