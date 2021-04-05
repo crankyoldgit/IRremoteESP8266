@@ -167,7 +167,7 @@ TEST(TestIRFujitsuACClass, SetRaw) {
 
 TEST(TestSendFujitsuAC, GenerateMessage) {
   IRFujitsuAC ac(kGpioUnused);
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   ac.begin();
   irsend.begin();
 
@@ -210,7 +210,7 @@ TEST(TestSendFujitsuAC, GenerateMessage) {
 
 TEST(TestSendFujitsuAC, GenerateShortMessage) {
   IRFujitsuAC ac(kGpioUnused);
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   ac.begin();
   irsend.begin();
 
@@ -235,7 +235,7 @@ TEST(TestSendFujitsuAC, GenerateShortMessage) {
 // Issue #275
 TEST(TestSendFujitsuAC, Issue275) {
   IRFujitsuAC ac(kGpioUnused);
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   ac.begin();
   irsend.begin();
   irsend.reset();
@@ -301,9 +301,9 @@ TEST(TestSendFujitsuAC, Issue275) {
 }
 
 TEST(TestDecodeFujitsuAC, SyntheticShortMessages) {
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   IRFujitsuAC ac(kGpioUnused);
-  IRrecv irrecv(0);
+  IRrecv irrecv(kGpioUnused);
 
   irsend.begin();
   irsend.reset();
@@ -339,9 +339,9 @@ TEST(TestDecodeFujitsuAC, SyntheticShortMessages) {
 }
 
 TEST(TestDecodeFujitsuAC, SyntheticLongMessages) {
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   IRFujitsuAC ac(kGpioUnused);
-  IRrecv irrecv(0);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -389,8 +389,8 @@ TEST(TestDecodeFujitsuAC, SyntheticLongMessages) {
 }
 
 TEST(TestDecodeFujitsuAC, RealShortARDB1OffExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   IRFujitsuAC ac(kGpioUnused);
 
   irsend.begin();
@@ -421,8 +421,8 @@ TEST(TestDecodeFujitsuAC, RealShortARDB1OffExample) {
 }
 
 TEST(TestDecodeFujitsuAC, RealLongARDB1Example) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   IRFujitsuAC ac(kGpioUnused);
 
   irsend.begin();
@@ -502,8 +502,8 @@ TEST(TestDecodeFujitsuAC, RealLongARDB1Example) {
 }
 
 TEST(TestDecodeFujitsuAC, Issue414) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   IRFujitsuAC ac(kGpioUnused);
 
   // Capture as supplied by arpmota
@@ -609,7 +609,7 @@ TEST(TestIRFujitsuACClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().power);
   ac.send();
   ac.stateReset();
-  IRrecv irrecv(0);
+  IRrecv irrecv(kGpioUnused);
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
   ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
@@ -644,8 +644,8 @@ TEST(TestIRFujitsuACClass, toCommon) {
 }
 
 TEST(TestDecodeFujitsuAC, Issue716) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   IRFujitsuAC ac(kGpioUnused);
 
   // Powerful command from a raw data capture.
@@ -697,8 +697,8 @@ TEST(TestDecodeFujitsuAC, Issue716) {
 }
 
 TEST(TestIRFujitsuACClass, OutsideQuiet) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   IRFujitsuAC ac(kGpioUnused);
 
   ASSERT_NE(fujitsu_ac_remote_model_t::ARDB1,
@@ -753,8 +753,8 @@ TEST(TestIRFujitsuACClass, OutsideQuiet) {
 }
 
 TEST(TestIRFujitsuACClass, toggleSwing) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   IRFujitsuAC ac(kGpioUnused);
 
   ac.begin();
@@ -802,8 +802,8 @@ TEST(TestIRFujitsuACClass, toggleSwing) {
 }
 
 TEST(TestDecodeFujitsuAC, Issue726) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   IRFujitsuAC ac(kGpioUnused);
 
   // fan:auto mode:auto temp:24 power：on
@@ -1057,4 +1057,17 @@ TEST(TestIRFujitsuACClass, ARREW4E) {
   EXPECT_TRUE(ac.validChecksum(mode_C_power_on_18, kFujitsuAcStateLength));
   ac.setRaw(mode_C_power_on_18, kFujitsuAcStateLength);
   EXPECT_EQ(2, ac.getId());
+
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendFujitsuAC(mode_C_power_on_18, kFujitsuAcStateLength);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(FUJITSU_AC, irsend.capture.decode_type);
+  ASSERT_EQ(kFujitsuAcStateLength * 8, irsend.capture.bits);
+  EXPECT_STATE_EQ(mode_C_power_on_18, irsend.capture.state,
+                  irsend.capture.bits);
 }

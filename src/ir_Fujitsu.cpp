@@ -867,26 +867,22 @@ bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t offset,
     }
   }
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kFujitsuAcHdrMark)) return false;
-  if (!matchSpace(results->rawbuf[offset++], kFujitsuAcHdrSpace)) return false;
-
-  // Data (Fixed signature)
-  match_result_t data_result =
-      matchData(&(results->rawbuf[offset]), kFujitsuAcMinBits - 8,
-                kFujitsuAcBitMark, kFujitsuAcOneSpace, kFujitsuAcBitMark,
-                kFujitsuAcZeroSpace, _tolerance, kMarkExcess, false);
-  if (data_result.success == false) return false;      // Fail
-  if (data_result.data != 0x1010006314) return false;  // Signature failed.
+  // Header / Some of the Data
+  uint16_t used = matchGeneric(results->rawbuf + offset, results->state,
+                               results->rawlen - offset, kFujitsuAcMinBits - 8,
+                               kFujitsuAcHdrMark, kFujitsuAcHdrSpace,  // Header
+                               kFujitsuAcBitMark, kFujitsuAcOneSpace,  // Data
+                               kFujitsuAcBitMark, kFujitsuAcZeroSpace,
+                               0, 0,  // No Footer (yet)
+                               false, kUseDefTol, kMarkExcess, false);  // LSBF
+  if (!used) return false;
+  offset += used;
+  // Check we have the typical data header.
+  if (results->state[0] != 0x14 || results->state[1] != 0x63) return false;
   dataBitsSoFar += kFujitsuAcMinBits - 8;
-  offset += data_result.used;
-  results->state[0] = 0x14;
-  results->state[1] = 0x63;
-  results->state[2] = 0x00;
-  results->state[3] = 0x10;
-  results->state[4] = 0x10;
 
   // Keep reading bytes until we either run out of message or state to fill.
+  match_result_t data_result;
   for (uint16_t i = 5;
        offset <= results->rawlen - 16 && i < kFujitsuAcStateLength;
        i++, dataBitsSoFar += 8, offset += data_result.used) {
