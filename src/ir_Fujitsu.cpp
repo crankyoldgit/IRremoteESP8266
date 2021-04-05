@@ -623,6 +623,14 @@ bool IRFujitsuAC::validChecksum(uint8_t state[], const uint16_t length) {
   return checksum == (uint8_t)(sum_complement - sum);  // Does it match?
 }
 
+/// Set the device's remote ID number.
+/// @param[in] num The ID for the remote. Valid number range is 0 to 3.
+void IRFujitsuAC::setId(const uint8_t num) { _.Id = num; }
+
+/// Get the current device's remote ID number.
+/// @return The current device's remote ID number.
+uint8_t IRFujitsuAC::getId(void) const { return _.Id; }
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -726,6 +734,7 @@ String IRFujitsuAC::toString(void) const {
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
   fujitsu_ac_remote_model_t model = _model;
   result += addModelToString(decode_type_t::FUJITSU_AC, model, false);
+  result += addIntToString(_.Id, kIdStr);
   result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(_.Mode, kFujitsuAcModeAuto, kFujitsuAcModeCool,
                             kFujitsuAcModeHeat, kFujitsuAcModeDry,

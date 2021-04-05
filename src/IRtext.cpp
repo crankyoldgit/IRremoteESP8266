@@ -97,6 +97,7 @@ const PROGMEM char* kRoomStr = D_STR_ROOM;  ///< "Room"
 const PROGMEM char* k6thSenseStr = D_STR_6THSENSE;  ///< "6th Sense"
 const PROGMEM char* kTypeStr = D_STR_TYPE;  ///< "Type"
 const PROGMEM char* kSpecialStr = D_STR_SPECIAL;  ///< "Special"
+const PROGMEM char* kIdStr = D_STR_ID;  ///< "Id" / Device Identifier
 
 const PROGMEM char* kAutoStr = D_STR_AUTO;  ///< "Auto"
 const PROGMEM char* kAutomaticStr = D_STR_AUTOMATIC;  ///< "Automatic"

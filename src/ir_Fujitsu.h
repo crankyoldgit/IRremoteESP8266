@@ -54,8 +54,14 @@ union FujitsuProtocol {
     uint8_t shortcode[kFujitsuAcStateLengthShort];
   };
   struct {
-    // Byte 0~4
-    uint64_t      :40;
+    // Byte 0~1
+    uint64_t      :16;
+    // Byte 2
+    uint64_t      :2;
+    uint64_t Id   :2;   // Device Number/Identifier
+    uint64_t      :4;
+    // Byte 3-4
+    uint64_t      :16;
     // Byte 5
     uint64_t Cmd  :8;  // short codes:cmd; long codes:fixed value
     // Byte 6
@@ -207,6 +213,8 @@ class IRFujitsuAC {
   uint16_t getOffSleepTimer(void) const;
   void setOffTimer(const uint16_t nr_mins);
   void setSleepTimer(const uint16_t nr_mins);
+  void setId(const uint8_t num);
+  uint8_t getId(void) const;
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);

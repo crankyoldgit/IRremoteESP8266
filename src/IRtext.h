@@ -66,6 +66,7 @@ extern const char* kHoldStr;
 extern const char* kHoursStr;
 extern const char* kHourStr;
 extern const char* kHumidStr;
+extern const char* kIdStr;
 extern const char* kIFeelStr;
 extern const char* kInsideStr;
 extern const char* kIonStr;

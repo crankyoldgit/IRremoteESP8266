@@ -585,14 +585,14 @@ TEST(TestIRac, Fujitsu) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   std::string ardb1_expected =
-      "Model: 2 (ARDB1), Power: On, Mode: 1 (Cool), Temp: 19C, "
+      "Model: 2 (ARDB1), Id: 0, Power: On, Mode: 1 (Cool), Temp: 19C, "
       "Fan: 2 (Medium), Command: N/A";
   std::string arrah2e_expected =
-      "Model: 1 (ARRAH2E), Power: On, Mode: 1 (Cool), Temp: 19C, "
+      "Model: 1 (ARRAH2E), Id: 0, Power: On, Mode: 1 (Cool), Temp: 19C, "
       "Fan: 2 (Medium), Clean: Off, Filter: Off, Swing: 0 (Off), Command: N/A, "
       "Sleep Timer: 03:00";
   std::string arry4_expected =
-      "Model: 5 (ARRY4), Power: On, Mode: 1 (Cool), Temp: 19C, "
+      "Model: 5 (ARRY4), Id: 0, Power: On, Mode: 1 (Cool), Temp: 19C, "
       "Fan: 2 (Medium), Clean: On, Filter: On, Swing: 0 (Off), Command: N/A";
   ac.begin();
   irac.fujitsu(&ac,

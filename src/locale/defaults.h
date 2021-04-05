@@ -273,6 +273,9 @@
 #ifndef D_STR_RECYCLE
 #define D_STR_RECYCLE "Recycle"
 #endif  // D_STR_RECYCLE
+#ifndef D_STR_ID
+#define D_STR_ID "Id"
+#endif  // D_STR_ID
 
 #ifndef D_STR_AUTO
 #define D_STR_AUTO "Auto"
