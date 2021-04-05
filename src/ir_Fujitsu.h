@@ -57,9 +57,9 @@ union FujitsuProtocol {
     // Byte 0~1
     uint64_t      :16;
     // Byte 2
-    uint64_t      :2;
-    uint64_t Id   :2;   // Device Number/Identifier
     uint64_t      :4;
+    uint64_t Id   :2;   // Device Number/Identifier
+    uint64_t      :2;
     // Byte 3-4
     uint64_t      :16;
     // Byte 5

@@ -1050,4 +1050,11 @@ TEST(TestIRFujitsuACClass, ARREW4E) {
   EXPECT_TRUE(ac.validChecksum(on_18_cool_auto, kFujitsuAcStateLength));
   ac.setRaw(on_18_cool_auto, kFujitsuAcStateLength);
   EXPECT_EQ(0, ac.getId());
+
+  uint8_t mode_C_power_on_18[kFujitsuAcStateLength] = {
+      0x14, 0x63, 0x20, 0x10, 0x10, 0xFE, 0x09, 0x31,
+      0x51, 0x01, 0x00, 0x17, 0x07, 0x54, 0x20, 0xEB};
+  EXPECT_TRUE(ac.validChecksum(mode_C_power_on_18, kFujitsuAcStateLength));
+  ac.setRaw(mode_C_power_on_18, kFujitsuAcStateLength);
+  EXPECT_EQ(2, ac.getId());
 }
