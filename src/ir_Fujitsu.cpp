@@ -28,6 +28,7 @@ const uint16_t kFujitsuAcBitMark = 448;
 const uint16_t kFujitsuAcOneSpace = 1182;
 const uint16_t kFujitsuAcZeroSpace = 390;
 const uint16_t kFujitsuAcMinGap = 8100;
+const uint8_t  kFujitsuAcExtraTolerance = 5;  // Extra tolerance percentage.
 
 using irutils::addBoolToString;
 using irutils::addIntToString;
@@ -874,7 +875,8 @@ bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t offset,
                                kFujitsuAcBitMark, kFujitsuAcOneSpace,  // Data
                                kFujitsuAcBitMark, kFujitsuAcZeroSpace,
                                0, 0,  // No Footer (yet)
-                               false, kUseDefTol, kMarkExcess, false);  // LSBF
+                               false, _tolerance + kFujitsuAcExtraTolerance, 0,
+                               false);  // LSBF
   if (!used) return false;
   offset += used;
   // Check we have the typical data header.
@@ -888,7 +890,8 @@ bool IRrecv::decodeFujitsuAC(decode_results* results, uint16_t offset,
        i++, dataBitsSoFar += 8, offset += data_result.used) {
     data_result = matchData(
         &(results->rawbuf[offset]), 8, kFujitsuAcBitMark, kFujitsuAcOneSpace,
-        kFujitsuAcBitMark, kFujitsuAcZeroSpace, _tolerance, kMarkExcess, false);
+        kFujitsuAcBitMark, kFujitsuAcZeroSpace,
+        _tolerance + kFujitsuAcExtraTolerance, 0, false);
     if (data_result.success == false) break;  // Fail
     results->state[i] = data_result.data;
   }
