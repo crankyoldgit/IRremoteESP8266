@@ -893,6 +893,7 @@ void IRac::electra(IRElectraAc *ac,
 /// @param[in] model The A/C model to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
@@ -905,6 +906,7 @@ void IRac::electra(IRElectraAc *ac,
 /// @param[in] sleep Nr. of minutes for sleep mode. <= 0 is Off, > 0 is on.
 void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
                    const bool on, const stdAc::opmode_t mode,
+                   const bool celsius,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                    const bool quiet, const bool turbo, const bool econo,
@@ -933,7 +935,7 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
     }
     // Normal operation.
     ac->setMode(ac->convertMode(mode));
-    ac->setTemp(degrees);
+    ac->setTemp(degrees, celsius);
     ac->setFanSpeed(ac->convertFan(fan));
     uint8_t swing = kFujitsuAcSwingOff;
     if (swingv > stdAc::swingv_t::kOff) swing |= kFujitsuAcSwingVert;
@@ -2485,7 +2487,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRFujitsuAC ac(_pin, (fujitsu_ac_remote_model_t)send.model, _inverted,
                      _modulation);
       fujitsu(&ac, (fujitsu_ac_remote_model_t)send.model, send.power, send.mode,
-              degC, send.fanspeed, send.swingv, send.swingh, send.quiet,
+              send.celsius, send.degrees, send.fanspeed,
+              send.swingv, send.swingh, send.quiet,
               send.turbo, send.econo, send.filter, send.clean);
       break;
     }

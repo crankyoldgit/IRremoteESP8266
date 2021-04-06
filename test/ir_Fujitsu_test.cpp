@@ -1050,6 +1050,8 @@ TEST(TestIRFujitsuACClass, ARREW4E) {
   EXPECT_TRUE(ac.validChecksum(on_18_cool_auto, kFujitsuAcStateLength));
   ac.setRaw(on_18_cool_auto, kFujitsuAcStateLength);
   EXPECT_EQ(0, ac.getId());
+  EXPECT_EQ(fujitsu_ac_remote_model_t::ARREW4E, ac.getModel());
+  EXPECT_EQ(18, ac.getTemp());
 
   uint8_t mode_C_power_on_18[kFujitsuAcStateLength] = {
       0x14, 0x63, 0x20, 0x10, 0x10, 0xFE, 0x09, 0x31,
@@ -1057,6 +1059,8 @@ TEST(TestIRFujitsuACClass, ARREW4E) {
   EXPECT_TRUE(ac.validChecksum(mode_C_power_on_18, kFujitsuAcStateLength));
   ac.setRaw(mode_C_power_on_18, kFujitsuAcStateLength);
   EXPECT_EQ(2, ac.getId());
+  EXPECT_EQ(fujitsu_ac_remote_model_t::ARREW4E, ac.getModel());
+  EXPECT_EQ(18, ac.getTemp());
 
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
@@ -1102,4 +1106,78 @@ TEST(TestDecodeFujitsuAC, Issue1455) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(FUJITSU_AC, irsend.capture.decode_type);
   ASSERT_EQ(kFujitsuAcStateLength * 8, irsend.capture.bits);
+  EXPECT_EQ(
+      "Model: 6 (ARREW4E), Id: 0, Power: On, Mode: 4 (Heat), Temp: 19C, "
+      "Fan: 0 (Auto), Command: N/A, Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+TEST(TestUtils, Housekeeping) {
+  ASSERT_EQ("FUJITSU_AC", typeToString(decode_type_t::FUJITSU_AC));
+  ASSERT_EQ(decode_type_t::FUJITSU_AC, strToDecodeType("FUJITSU_AC"));
+  ASSERT_TRUE(hasACState(decode_type_t::FUJITSU_AC));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::FUJITSU_AC));
+  ASSERT_EQ(0, IRsend::defaultBits(decode_type_t::FUJITSU_AC));  // No default
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::FUJITSU_AC));
+}
+
+TEST(TestIRFujitsuACClass, Temperature) {
+  IRFujitsuAC ac(kGpioUnused);
+  // Most models
+  ac.setModel(fujitsu_ac_remote_model_t::ARRAH2E);
+  ac.setTemp(kFujitsuAcMinTemp);
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(kFujitsuAcMinTemp, ac.getTemp());
+  ac.setTemp(kFujitsuAcMaxTemp);
+  EXPECT_EQ(kFujitsuAcMaxTemp, ac.getTemp());
+  ac.setTemp(kFujitsuAcMinTemp - 1);
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(kFujitsuAcMinTemp, ac.getTemp());
+  ac.setTemp(kFujitsuAcMaxTemp + 1);
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(kFujitsuAcMaxTemp, ac.getTemp());
+
+  // ARREW4E is different.
+  ac.setModel(fujitsu_ac_remote_model_t::ARREW4E);
+  ac.setTemp(kFujitsuAcMinTemp);
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(kFujitsuAcMinTemp, ac.getTemp());
+  ac.setTemp(kFujitsuAcMaxTemp);
+  EXPECT_EQ(kFujitsuAcMaxTemp, ac.getTemp());
+  ac.setTemp(kFujitsuAcMinTemp - 1);
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(kFujitsuAcMinTemp, ac.getTemp());
+  ac.setTemp(kFujitsuAcMaxTemp + 1);
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(kFujitsuAcMaxTemp, ac.getTemp());
+  ac.setTemp(22.5);
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(22.5, ac.getTemp());
+  // Fahrenheit
+  ac.setTemp(77, false);
+  EXPECT_FALSE(ac.getCelsius());
+  EXPECT_EQ(77, ac.getTemp());
+
+  // Real example
+  const uint8_t arew4e_22c[16] = {
+      0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x31,
+      0x70, 0x01, 0x00, 0x20, 0x03, 0x58, 0x20, 0xC3};
+  ac.setRaw(arew4e_22c, 16);
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(22, ac.getTemp());
+  const uint8_t arew4e_25_5c[16] = {
+      0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x31,
+      0x8C, 0x01, 0x00, 0x21, 0x03, 0x12, 0x20, 0xEC};
+  ac.setRaw(arew4e_25_5c, 16);
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(25.5, ac.getTemp());
+  const uint8_t arew4e_69f[16] = {
+      0x14, 0x63, 0x20, 0x10, 0x10, 0xFE, 0x09, 0x31,
+      0x66, 0x04, 0x00, 0x16, 0x01, 0x32, 0x20, 0xFC};
+  ac.setRaw(arew4e_69f, 16);
+  EXPECT_EQ(fujitsu_ac_remote_model_t::ARREW4E, ac.getModel());
+  EXPECT_FALSE(ac.getCelsius());
+  EXPECT_EQ(69, ac.getTemp());
 }

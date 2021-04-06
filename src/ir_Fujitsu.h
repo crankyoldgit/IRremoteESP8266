@@ -55,23 +55,23 @@ union FujitsuProtocol {
   };
   struct {
     // Byte 0~1
-    uint64_t      :16;
+    uint64_t           :16;  // Fixed header
     // Byte 2
-    uint64_t      :4;
-    uint64_t Id   :2;   // Device Number/Identifier
-    uint64_t      :2;
+    uint64_t            :4;
+    uint64_t Id         :2;   // Device Number/Identifier
+    uint64_t            :2;
     // Byte 3-4
-    uint64_t      :16;
+    uint64_t            :16;
     // Byte 5
-    uint64_t Cmd  :8;  // short codes:cmd; long codes:fixed value
+    uint64_t Cmd        :8;  // short codes:cmd; long codes:fixed value
     // Byte 6
     uint64_t RestLength :8;  // Nr. of bytes in the message after this byte.
     // Byte 7
-    uint64_t        :8;
+    uint64_t Protocol   :8;  // Seems like a protocol version number. Not sure.
     // Byte 8
-    uint64_t Power  :1;
-    uint64_t        :3;
-    uint64_t Temp   :4;
+    uint64_t Power      :1;
+    uint64_t Fahrenheit :1;
+    uint64_t Temp       :6;  // Internal representation varies between models.
     // Byte 9
     uint64_t Mode       :3;
     uint64_t Clean      :1;
@@ -122,8 +122,12 @@ const uint8_t kFujitsuAcFanMed = 0x02;
 const uint8_t kFujitsuAcFanLow = 0x03;
 const uint8_t kFujitsuAcFanQuiet = 0x04;
 
-const uint8_t kFujitsuAcMinTemp = 16;  // 16C
-const uint8_t kFujitsuAcMaxTemp = 30;  // 30C
+const float   kFujitsuAcMinTemp =     16;  // 16C
+const float   kFujitsuAcMaxTemp =     30;  // 30C
+const uint8_t kFujitsuAcTempOffsetC = kFujitsuAcMinTemp;
+const float   kFujitsuAcMinTempF =    60;  // 60F
+const float   kFujitsuAcMaxTempF =    88;  // 88F
+const uint8_t kFujitsuAcTempOffsetF = 44;
 
 const uint8_t kFujitsuAcSwingOff = 0x00;
 const uint8_t kFujitsuAcSwingVert = 0x01;
@@ -152,8 +156,8 @@ const uint16_t kFujitsuAcTimerMax = 12 * 60;  ///< Minutes.
 #define FUJITSU_AC_FAN_MED kFujitsuAcFanMed
 #define FUJITSU_AC_FAN_LOW kFujitsuAcFanLow
 #define FUJITSU_AC_FAN_QUIET kFujitsuAcFanQuiet
-#define FUJITSU_AC_MIN_TEMP kFujitsuAcMinTemp
-#define FUJITSU_AC_MAX_TEMP kFujitsuAcMaxTemp
+#define FUJITSU_AC_MIN_TEMP kFujitsuAcMinTempC
+#define FUJITSU_AC_MAX_TEMP kFujitsuAcMaxTempC
 #define FUJITSU_AC_SWING_OFF kFujitsuAcSwingOff
 #define FUJITSU_AC_SWING_VERT kFujitsuAcSwingVert
 #define FUJITSU_AC_SWING_HORIZ kFujitsuAcSwingHoriz
@@ -184,8 +188,8 @@ class IRFujitsuAC {
   void toggleSwingVert(const bool update = true);
   void setCmd(const uint8_t cmd);
   uint8_t getCmd(void) const;
-  void setTemp(const uint8_t temp);
-  uint8_t getTemp(void) const;
+  void setTemp(const float temp, const bool useCelsius = true);
+  float getTemp(void) const;
   void setFanSpeed(const uint8_t fan);
   uint8_t getFanSpeed(void) const;
   void setMode(const uint8_t mode);
@@ -215,6 +219,8 @@ class IRFujitsuAC {
   void setSleepTimer(const uint16_t nr_mins);
   void setId(const uint8_t num);
   uint8_t getId(void) const;
+  void setCelsius(const bool on);
+  bool getCelsius(void) const;
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);

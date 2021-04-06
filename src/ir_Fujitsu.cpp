@@ -148,6 +148,7 @@ bool IRFujitsuAC::updateUseLongOrShort(void) {
         case fujitsu_ac_remote_model_t::ARRY4:
         case fujitsu_ac_remote_model_t::ARRAH2E:
         case fujitsu_ac_remote_model_t::ARREB1E:
+        case fujitsu_ac_remote_model_t::ARREW4E:
           _.Cmd = 0xFE;
           break;
         case fujitsu_ac_remote_model_t::ARDB1:
@@ -166,7 +167,7 @@ void IRFujitsuAC::checkSum(void) {
   if (updateUseLongOrShort()) {  // Is it a long code?
     // Nr. of bytes in the message after this byte.
     _.RestLength = _state_length - 7;
-    _.longcode[7] = 0x30;
+    _.Protocol = (_model == fujitsu_ac_remote_model_t::ARREW4E) ? 0x31 : 0x30;
     _.Power = (_cmd == kFujitsuAcCmdTurnOn);
 
     // These values depend on model
@@ -293,6 +294,8 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
       setCmd(_.Cmd);
       break;
   }
+  if (_model == fujitsu_ac_remote_model_t::ARRAH2E && _.Protocol == 0x31)
+    setModel(fujitsu_ac_remote_model_t::ARREW4E);
 }
 
 /// Set the internal state from a valid code for this protocol.
@@ -414,17 +417,45 @@ bool IRFujitsuAC::getOutsideQuiet(void) const {
 }
 
 /// Set the temperature.
-/// @param[in] temp The temperature in degrees celsius.
-void IRFujitsuAC::setTemp(const uint8_t temp) {
-  uint8_t t = std::max((uint8_t)kFujitsuAcMinTemp, temp);
-  t = std::min((uint8_t)kFujitsuAcMaxTemp, t);
-  _.Temp = t - kFujitsuAcMinTemp;
+/// @param[in] temp The temperature in degrees.
+/// @param[in] useCelsius Use Celsius or Fahrenheit?
+void IRFujitsuAC::setTemp(const float temp, const bool useCelsius) {
+  float mintemp;
+  float maxtemp;
+  uint8_t offset;
+  setCelsius(useCelsius);
+  if (useCelsius) {
+    mintemp = kFujitsuAcMinTemp;
+    maxtemp = kFujitsuAcMaxTemp;
+    offset = kFujitsuAcTempOffsetC;
+  } else {
+    mintemp = kFujitsuAcMinTempF;
+    maxtemp = kFujitsuAcMaxTempF;
+    offset = kFujitsuAcTempOffsetF;
+  }
+  float t = std::max(mintemp, temp);
+  t = std::min(maxtemp, t);
+  if (useCelsius) {
+    if (_model == fujitsu_ac_remote_model_t::ARREW4E)
+      _.Temp = (t - (offset / 2)) * 2;
+    else
+      _.Temp = (t - offset) * 4;
+  } else {
+    _.Temp = t - offset;
+  }
   setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
 
 /// Get the current temperature setting.
-/// @return The current setting for temp. in degrees celsius.
-uint8_t IRFujitsuAC::getTemp(void) const { return _.Temp + kFujitsuAcMinTemp; }
+/// @return The current setting for temp. in degrees of the currently set units.
+float IRFujitsuAC::getTemp(void) const {
+  if (_.Fahrenheit) return _.Temp + kFujitsuAcTempOffsetF;
+  // Celsius
+  if (_model == fujitsu_ac_remote_model_t::ARREW4E)
+    return (_.Temp / 2.0) + (kFujitsuAcMinTemp / 2);
+  else
+    return _.Temp / 4 + kFujitsuAcMinTemp;
+}
 
 /// Set the speed of the fan.
 /// @param[in] fanSpeed The desired setting.
@@ -632,6 +663,14 @@ void IRFujitsuAC::setId(const uint8_t num) { _.Id = num; }
 /// @return The current device's remote ID number.
 uint8_t IRFujitsuAC::getId(void) const { return _.Id; }
 
+/// Set the Temperature units for the A/C.
+/// @param[in] on true, use Celsius. false, use Fahrenheit.
+void IRFujitsuAC::setCelsius(const bool on) { _.Fahrenheit = !on; }
+
+/// Get the Clean mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRFujitsuAC::getCelsius(void) const { return !_.Fahrenheit; }
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -693,7 +732,7 @@ stdAc::state_t IRFujitsuAC::toCommon(void) const {
   result.model = _model;
   result.power = getPower();
   result.mode = toCommonMode(_.Mode);
-  result.celsius = true;
+  result.celsius = getCelsius();
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
   uint8_t swing = _.Swing;
@@ -740,7 +779,7 @@ String IRFujitsuAC::toString(void) const {
   result += addModeToString(_.Mode, kFujitsuAcModeAuto, kFujitsuAcModeCool,
                             kFujitsuAcModeHeat, kFujitsuAcModeDry,
                             kFujitsuAcModeFan);
-  result += addTempToString(getTemp());
+  result += addTempToString(getTemp(), getCelsius());
   result += addFanToString(_.Fan, kFujitsuAcFanHigh, kFujitsuAcFanLow,
                            kFujitsuAcFanAuto, kFujitsuAcFanQuiet,
                            kFujitsuAcFanMed);
@@ -748,6 +787,7 @@ String IRFujitsuAC::toString(void) const {
     // These models have no internal swing, clean. or filter state.
     case fujitsu_ac_remote_model_t::ARDB1:
     case fujitsu_ac_remote_model_t::ARJW2:
+    case fujitsu_ac_remote_model_t::ARREW4E:
       break;
     default:  // Assume everything else does.
       result += addBoolToString(getClean(), kCleanStr);
@@ -815,6 +855,7 @@ String IRFujitsuAC::toString(void) const {
       // FALL THRU
     // These models seem to have timer support.
     case fujitsu_ac_remote_model_t::ARRAH2E:
+    case fujitsu_ac_remote_model_t::ARREW4E:
       switch (getTimerType()) {
         case kFujitsuAcOnTimer:
           type_str = kOnTimerStr;

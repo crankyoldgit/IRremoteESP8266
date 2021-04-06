@@ -594,12 +594,16 @@ TEST(TestIRac, Fujitsu) {
   std::string arry4_expected =
       "Model: 5 (ARRY4), Id: 0, Power: On, Mode: 1 (Cool), Temp: 19C, "
       "Fan: 2 (Medium), Clean: On, Filter: On, Swing: 0 (Off), Command: N/A";
+  std::string arrew4e_expected =
+      "Model: 6 (ARREW4E), Id: 0, Power: On, Mode: 1 (Cool), Temp: 73F, "
+      "Fan: 1 (High), Command: N/A, Timer: Off";
   ac.begin();
   irac.fujitsu(&ac,
                ARDB1,                       // Model
                true,                        // Power
                stdAc::opmode_t::kCool,      // Mode
-               19,                          // Celsius
+               true,                        // Celsius
+               19,                          // Degrees
                stdAc::fanspeed_t::kMedium,  // Fan speed
                stdAc::swingv_t::kOff,       // Vertical swing
                stdAc::swingh_t::kOff,       // Horizontal swing
@@ -622,7 +626,8 @@ TEST(TestIRac, Fujitsu) {
                ARRAH2E,                     // Model
                true,                        // Power
                stdAc::opmode_t::kCool,      // Mode
-               19,                          // Celsius
+               true,                        // Celsius
+               19,                          // Degrees
                stdAc::fanspeed_t::kMedium,  // Fan speed
                stdAc::swingv_t::kOff,       // Vertical swing
                stdAc::swingh_t::kOff,       // Horizontal swing
@@ -644,7 +649,8 @@ TEST(TestIRac, Fujitsu) {
                fujitsu_ac_remote_model_t::ARRY4,  // Model
                true,                        // Power
                stdAc::opmode_t::kCool,      // Mode
-               19,                          // Celsius
+               true,                        // Celsius
+               19,                          // Degrees
                stdAc::fanspeed_t::kMedium,  // Fan speed
                stdAc::swingv_t::kOff,       // Vertical swing
                stdAc::swingh_t::kOff,       // Horizontal swing
@@ -660,6 +666,28 @@ TEST(TestIRac, Fujitsu) {
   ASSERT_EQ(kFujitsuAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(arry4_expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+
+  ac._irsend.reset();
+  irac.fujitsu(&ac,
+               ARREW4E,                     // Model
+               true,                        // Power
+               stdAc::opmode_t::kCool,      // Mode
+               false,                       // Fahrenheit
+               73,                          // Degrees
+               stdAc::fanspeed_t::kHigh,    // Fan speed
+               stdAc::swingv_t::kOff,       // Vertical swing
+               stdAc::swingh_t::kOff,       // Horizontal swing
+               false,                       // Quiet
+               false,                       // Turbo (Powerful)
+               false,                       // Econo
+               false,                        // Filter
+               false);                       // Clean
+  ASSERT_EQ(arrew4e_expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kFujitsuAcBits, ac._irsend.capture.bits);
+  ASSERT_EQ(arrew4e_expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
 TEST(TestIRac, Goodweather) {
