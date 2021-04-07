@@ -171,7 +171,8 @@ void IRFujitsuAC::checkSum(void) {
     _.Power = (_cmd == kFujitsuAcCmdTurnOn);
 
     // These values depend on model
-    if (_model != fujitsu_ac_remote_model_t::ARREB1E) {
+    if (_model != fujitsu_ac_remote_model_t::ARREB1E &&
+        _model != fujitsu_ac_remote_model_t::ARREW4E) {
       _.OutsideQuiet = 0;
       if (_model != fujitsu_ac_remote_model_t::ARRAH2E) {
         _.TimerType = kFujitsuAcStopTimers;
@@ -280,9 +281,9 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
   // Currently the only way we know how to tell ARRAH2E & ARRY4 apart is if
   // either the raw Filter or Clean setting is on.
   if (_model == fujitsu_ac_remote_model_t::ARRAH2E && (_.Filter || _.Clean))
-      setModel(fujitsu_ac_remote_model_t::ARRY4);
+    setModel(fujitsu_ac_remote_model_t::ARRY4);
   if (_state_length == kFujitsuAcStateLength && _.OutsideQuiet)
-      setModel(fujitsu_ac_remote_model_t::ARREB1E);
+    setModel(fujitsu_ac_remote_model_t::ARREB1E);
   switch (_.Cmd) {
     case kFujitsuAcCmdTurnOff:
     case kFujitsuAcCmdStepHoriz:
@@ -294,8 +295,7 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
       setCmd(_.Cmd);
       break;
   }
-  if (_model == fujitsu_ac_remote_model_t::ARRAH2E && _.Protocol == 0x31)
-    setModel(fujitsu_ac_remote_model_t::ARREW4E);
+  if (_.Protocol == 0x31) setModel(fujitsu_ac_remote_model_t::ARREW4E);
 }
 
 /// Set the internal state from a valid code for this protocol.
