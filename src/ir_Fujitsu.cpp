@@ -411,8 +411,10 @@ void IRFujitsuAC::setOutsideQuiet(const bool on) {
 /// @return true, the setting is on. false, the setting is off.
 bool IRFujitsuAC::getOutsideQuiet(void) const {
   switch (_model) {
-    // Only ARREB1E seems to have this mode.
-    case fujitsu_ac_remote_model_t::ARREB1E: return _.OutsideQuiet;
+    // Only ARREB1E & ARREW4E seems to have this mode.
+    case fujitsu_ac_remote_model_t::ARREB1E:
+    case fujitsu_ac_remote_model_t::ARREW4E:
+      return _.OutsideQuiet;
     default: return false;
   }
 }
@@ -856,11 +858,11 @@ String IRFujitsuAC::toString(void) const {
   String type_str = kTimerStr;
   switch (model) {
     case fujitsu_ac_remote_model_t::ARREB1E:
+    case fujitsu_ac_remote_model_t::ARREW4E:
       result += addBoolToString(getOutsideQuiet(), kOutsideQuietStr);
       // FALL THRU
     // These models seem to have timer support.
     case fujitsu_ac_remote_model_t::ARRAH2E:
-    case fujitsu_ac_remote_model_t::ARREW4E:
       switch (getTimerType()) {
         case kFujitsuAcOnTimer:
           type_str = kOnTimerStr;
