@@ -36,7 +36,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addFanToString;
-using irutils::addTempToString;
+using irutils::addTempFloatToString;
 using irutils::minsToString;
 
 #if SEND_FUJITSU_AC
@@ -779,7 +779,7 @@ String IRFujitsuAC::toString(void) const {
   result += addModeToString(_.Mode, kFujitsuAcModeAuto, kFujitsuAcModeCool,
                             kFujitsuAcModeHeat, kFujitsuAcModeDry,
                             kFujitsuAcModeFan);
-  result += addTempToString(getTemp(), getCelsius());
+  result += addTempFloatToString(getTemp(), getCelsius());
   result += addFanToString(_.Fan, kFujitsuAcFanHigh, kFujitsuAcFanLow,
                            kFujitsuAcFanAuto, kFujitsuAcFanQuiet,
                            kFujitsuAcFanMed);

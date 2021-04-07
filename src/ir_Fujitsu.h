@@ -95,7 +95,7 @@ union FujitsuProtocol {
     uint64_t              :1;
     uint64_t OutsideQuiet :1;
     // Byte 15
-    uint64_t :0;
+    uint64_t              :0;  // Checksum
   };
 };
 
