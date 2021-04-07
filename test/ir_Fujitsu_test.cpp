@@ -1108,7 +1108,7 @@ TEST(TestDecodeFujitsuAC, Issue1455) {
   ASSERT_EQ(kFujitsuAcStateLength * 8, irsend.capture.bits);
   EXPECT_EQ(
       "Model: 6 (ARREW4E), Id: 0, Power: On, Mode: 4 (Heat), Temp: 19C, "
-      "Fan: 0 (Auto), Command: N/A, Timer: Off",
+      "Fan: 0 (Auto), Swing: 0 (Off), Command: N/A, Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));

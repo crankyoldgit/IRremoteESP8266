@@ -366,6 +366,7 @@ void IRFujitsuAC::setCmd(const uint8_t cmd) {
       switch (_model) {
         // Only these remotes have these commands.
         case ARREB1E:
+        case ARREW4E:
           _cmd = cmd;
         break;
       default:
@@ -787,11 +788,15 @@ String IRFujitsuAC::toString(void) const {
     // These models have no internal swing, clean. or filter state.
     case fujitsu_ac_remote_model_t::ARDB1:
     case fujitsu_ac_remote_model_t::ARJW2:
-    case fujitsu_ac_remote_model_t::ARREW4E:
       break;
-    default:  // Assume everything else does.
+    // These models have Clean & Filter, plus Swing (via fall thru)
+    case fujitsu_ac_remote_model_t::ARRAH2E:
+    case fujitsu_ac_remote_model_t::ARREB1E:
+    case fujitsu_ac_remote_model_t::ARRY4:
       result += addBoolToString(getClean(), kCleanStr);
       result += addBoolToString(getFilter(), kFilterStr);
+      // FALL THRU
+    default:   // e.g. ARREW4E
       result += addIntToString(_.Swing, kSwingStr);
       result += kSpaceLBraceStr;
       switch (_.Swing) {

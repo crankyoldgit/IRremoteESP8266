@@ -596,7 +596,7 @@ TEST(TestIRac, Fujitsu) {
       "Fan: 2 (Medium), Clean: On, Filter: On, Swing: 0 (Off), Command: N/A";
   std::string arrew4e_expected =
       "Model: 6 (ARREW4E), Id: 0, Power: On, Mode: 1 (Cool), Temp: 73F, "
-      "Fan: 1 (High), Command: N/A, Timer: Off";
+      "Fan: 1 (High), Swing: 0 (Off), Command: N/A, Timer: Off";
   ac.begin();
   irac.fujitsu(&ac,
                ARDB1,                       // Model
