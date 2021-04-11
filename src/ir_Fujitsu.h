@@ -1,5 +1,5 @@
 // Copyright 2017 Jonny Graham
-// Copyright 2018-2019 David Conran
+// Copyright 2018-2021 David Conran
 // Copyright 2021 siriuslzx
 
 /// @file
@@ -31,6 +31,8 @@
 //   Brand: Fujitsu,  Model: ASU30C1 A/C (ARDB1)
 //   Brand: Fujitsu,  Model: AR-RAH1U remote (ARREB1E)
 //   Brand: Fujitsu,  Model: ASU12RLF A/C (ARREB1E)
+//   Brand: Fujitsu,  Model: AR-REW4E remote (ARREW4E)
+//   Brand: Fujitsu,  Model: ASYG09KETA-B A/C (ARREW4E)
 
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_

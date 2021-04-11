@@ -1,5 +1,5 @@
 // Copyright 2017 Jonny Graham
-// Copyright 2017-2019 David Conran
+// Copyright 2017-2021 David Conran
 // Copyright 2021 siriuslzx
 
 /// @file
