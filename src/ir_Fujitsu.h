@@ -74,7 +74,7 @@ union FujitsuProtocol {
     uint64_t Temp       :6;  // Internal representation varies between models.
     // Byte 9
     uint64_t Mode       :3;
-    uint64_t Clean      :1;
+    uint64_t Clean      :1;  // Also 10C Heat in ARREW4E.
     uint64_t TimerType  :2;
     uint64_t            :2;
     // Byte 10
@@ -100,11 +100,11 @@ union FujitsuProtocol {
 };
 
 // Constants
-const uint8_t kFujitsuAcModeAuto = 0x00;
-const uint8_t kFujitsuAcModeCool = 0x01;
-const uint8_t kFujitsuAcModeDry = 0x02;
-const uint8_t kFujitsuAcModeFan = 0x03;
-const uint8_t kFujitsuAcModeHeat = 0x04;
+const uint8_t kFujitsuAcModeAuto =  0x0;  // 0b000
+const uint8_t kFujitsuAcModeCool =  0x1;  // 0b001
+const uint8_t kFujitsuAcModeDry =   0x2;  // 0b010
+const uint8_t kFujitsuAcModeFan =   0x3;  // 0b011
+const uint8_t kFujitsuAcModeHeat =  0x4;  // 0b100
 
 const uint8_t kFujitsuAcCmdStayOn = 0x00;            // b00000000
 const uint8_t kFujitsuAcCmdTurnOn = 0x01;            // b00000001
@@ -208,6 +208,8 @@ class IRFujitsuAC {
   bool getClean(void) const;
   void setFilter(const bool on);
   bool getFilter(void) const;
+  void set10CHeat(const bool on);
+  bool get10CHeat(void) const;
   void setOutsideQuiet(const bool on);
   bool getOutsideQuiet(void) const;
   uint8_t getTimerType(void) const;

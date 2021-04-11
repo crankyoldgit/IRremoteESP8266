@@ -1108,11 +1108,49 @@ TEST(TestDecodeFujitsuAC, Issue1455) {
   ASSERT_EQ(kFujitsuAcStateLength * 8, irsend.capture.bits);
   EXPECT_EQ(
       "Model: 6 (ARREW4E), Id: 0, Power: On, Mode: 4 (Heat), Temp: 19C, "
-      "Fan: 0 (Auto), Swing: 0 (Off), Command: N/A, Outside Quiet: Off, "
-      "Timer: Off",
+      "Fan: 0 (Auto), 10C Heat: Off, Swing: 0 (Off), Command: N/A, "
+      "Outside Quiet: Off, Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+TEST(TestIRFujitsuACClass, Heat10Deg) {
+  IRFujitsuAC ac(kGpioUnused);
+  const uint8_t heat_on[kFujitsuAcStateLength] = {
+      0x14, 0x63, 0x10, 0x10, 0x10, 0xFE, 0x09, 0x31,
+      0x69, 0x0B, 0x00, 0x23, 0x06, 0x23, 0x20, 0xEF};
+  ac.setRaw(heat_on, kFujitsuAcStateLength);
+  EXPECT_EQ(
+      "Model: 6 (ARREW4E), Id: 1, Power: On, Mode: 3 (Fan), Temp: 21C, "
+      "Fan: 0 (Auto), 10C Heat: On, Swing: 0 (Off), Command: N/A, "
+      "Outside Quiet: Off, Timer: Off",
+      ac.toString());
+  ac.stateReset();
+  ac.setModel(fujitsu_ac_remote_model_t::ARREW4E);
+  ac.setId(1);
+  ac.setMode(kFujitsuAcModeFan);
+  ac.setTemp(21);
+  ac.setFanSpeed(kFujitsuAcFanAuto);
+  ac.setSwing(0);
+  ac.setOutsideQuiet(false);
+  ac.setPower(true);
+  ac.set10CHeat(true);
+  EXPECT_TRUE(ac.get10CHeat());
+  EXPECT_EQ(
+      "Model: 6 (ARREW4E), Id: 1, Power: On, Mode: 3 (Fan), Temp: 21C, "
+      "Fan: 0 (Auto), 10C Heat: On, Swing: 0 (Off), Command: N/A, "
+      "Outside Quiet: Off, Timer: Off",
+      ac.toString());
+  EXPECT_EQ(kFujitsuAcStateLength, ac.getStateLength());
+
+  ac.set10CHeat(false);
+  EXPECT_FALSE(ac.get10CHeat());
+  EXPECT_EQ(
+      "Model: 6 (ARREW4E), Id: 1, Power: On, Mode: 3 (Fan), Temp: 21C, "
+      "Fan: 0 (Auto), 10C Heat: Off, Swing: 0 (Off), Command: N/A, "
+      "Outside Quiet: Off, Timer: Off",
+      ac.toString());
 }
 
 TEST(TestUtils, Housekeeping) {
@@ -1127,6 +1165,7 @@ TEST(TestUtils, Housekeeping) {
 TEST(TestIRFujitsuACClass, Temperature) {
   IRFujitsuAC ac(kGpioUnused);
   // Most models
+  // Celsius
   ac.setModel(fujitsu_ac_remote_model_t::ARRAH2E);
   ac.setTemp(kFujitsuAcMinTemp);
   EXPECT_TRUE(ac.getCelsius());
@@ -1139,6 +1178,10 @@ TEST(TestIRFujitsuACClass, Temperature) {
   ac.setTemp(kFujitsuAcMaxTemp + 1);
   EXPECT_TRUE(ac.getCelsius());
   EXPECT_EQ(kFujitsuAcMaxTemp, ac.getTemp());
+  // Fahrenheit (can't be used by most model, check it converts correctly)
+  ac.setTemp(77, false);  // 77F is 25C
+  EXPECT_TRUE(ac.getCelsius());
+  EXPECT_EQ(25, ac.getTemp());
 
   // ARREW4E is different.
   ac.setModel(fujitsu_ac_remote_model_t::ARREW4E);

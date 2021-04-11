@@ -168,7 +168,7 @@ void IRFujitsuAC::checkSum(void) {
     // Nr. of bytes in the message after this byte.
     _.RestLength = _state_length - 7;
     _.Protocol = (_model == fujitsu_ac_remote_model_t::ARREW4E) ? 0x31 : 0x30;
-    _.Power = (_cmd == kFujitsuAcCmdTurnOn);
+    _.Power = (_cmd == kFujitsuAcCmdTurnOn) || get10CHeat();
 
     // These values depend on model
     if (_model != fujitsu_ac_remote_model_t::ARREB1E &&
@@ -179,8 +179,8 @@ void IRFujitsuAC::checkSum(void) {
       }
     }
     if (_model != fujitsu_ac_remote_model_t::ARRY4) {
-      _.Clean = 0;
-      _.Filter = 0;
+      if (_model != fujitsu_ac_remote_model_t::ARREW4E) _.Clean = false;
+      _.Filter = false;
     }
     // Set the On/Off/Sleep timer Nr of mins.
     _.OffTimer = getOffSleepTimer();
@@ -426,8 +426,22 @@ void IRFujitsuAC::setTemp(const float temp, const bool useCelsius) {
   float mintemp;
   float maxtemp;
   uint8_t offset;
-  setCelsius(useCelsius);
-  if (useCelsius) {
+  bool _useCelsius;
+  float _temp;
+
+  switch (_model) {
+    // These models have native Fahrenheit & Celsius upport.
+    case fujitsu_ac_remote_model_t::ARREW4E:
+      _useCelsius = useCelsius;
+      _temp = temp;
+      break;
+    // Make sure everything else uses Celsius.
+    default:
+      _useCelsius = true;
+      _temp = useCelsius ? temp : fahrenheitToCelsius(temp);
+  }
+  setCelsius(_useCelsius);
+  if (_useCelsius) {
     mintemp = kFujitsuAcMinTemp;
     maxtemp = kFujitsuAcMaxTemp;
     offset = kFujitsuAcTempOffsetC;
@@ -436,15 +450,15 @@ void IRFujitsuAC::setTemp(const float temp, const bool useCelsius) {
     maxtemp = kFujitsuAcMaxTempF;
     offset = kFujitsuAcTempOffsetF;
   }
-  float t = std::max(mintemp, temp);
-  t = std::min(maxtemp, t);
-  if (useCelsius) {
+  _temp = std::max(mintemp, _temp);
+  _temp = std::min(maxtemp, _temp);
+  if (_useCelsius) {
     if (_model == fujitsu_ac_remote_model_t::ARREW4E)
-      _.Temp = (t - (offset / 2)) * 2;
+      _.Temp = (_temp - (offset / 2)) * 2;
     else
-      _.Temp = (t - offset) * 4;
+      _.Temp = (_temp - offset) * 4;
   } else {
-    _.Temp = t - offset;
+    _.Temp = _temp - offset;
   }
   setCmd(kFujitsuAcCmdStayOn);  // No special command involved.
 }
@@ -452,12 +466,14 @@ void IRFujitsuAC::setTemp(const float temp, const bool useCelsius) {
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees of the currently set units.
 float IRFujitsuAC::getTemp(void) const {
-  if (_.Fahrenheit) return _.Temp + kFujitsuAcTempOffsetF;
-  // Celsius
-  if (_model == fujitsu_ac_remote_model_t::ARREW4E)
-    return (_.Temp / 2.0) + (kFujitsuAcMinTemp / 2);
-  else
+  if (_model == fujitsu_ac_remote_model_t::ARREW4E) {
+    if (_.Fahrenheit)  // Currently only ARREW4E supports native Fahrenheit.
+      return _.Temp + kFujitsuAcTempOffsetF;
+    else
+      return (_.Temp / 2.0) + (kFujitsuAcMinTemp / 2);
+  } else {
     return _.Temp / 4 + kFujitsuAcMinTemp;
+  }
 }
 
 /// Set the speed of the fan.
@@ -546,6 +562,32 @@ void IRFujitsuAC::setFilter(const bool on) {
 bool IRFujitsuAC::getFilter(void) const {
   switch (_model) {
     case fujitsu_ac_remote_model_t::ARRY4: return _.Filter;
+    default: return false;
+  }
+}
+
+/// Set the 10C heat status of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRFujitsuAC::set10CHeat(const bool on) {
+  switch (_model) {
+    // Only selected models support this.
+    case fujitsu_ac_remote_model_t::ARREW4E:
+      setClean(on);  // 10C Heat uses the same bit as Clean
+      if (on) {
+        _.Mode = kFujitsuAcModeFan;
+        _.Power = true;
+      }
+    default:
+      break;
+  }
+}
+
+/// Get the 10C heat status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRFujitsuAC::get10CHeat(void) const {
+  switch (_model) {
+    case fujitsu_ac_remote_model_t::ARREW4E:
+      return _.Clean && _.Power && (_.Mode == kFujitsuAcModeFan);
     default: return false;
   }
 }
@@ -799,6 +841,8 @@ String IRFujitsuAC::toString(void) const {
       result += addBoolToString(getFilter(), kFilterStr);
       // FALL THRU
     default:   // e.g. ARREW4E
+      if (model == fujitsu_ac_remote_model_t::ARREW4E)
+        result += addBoolToString(get10CHeat(), k10CHeatStr);
       result += addIntToString(_.Swing, kSwingStr);
       result += kSpaceLBraceStr;
       switch (_.Swing) {
