@@ -1151,6 +1151,21 @@ TEST(TestIRFujitsuACClass, Heat10Deg) {
       "Fan: 0 (Auto), 10C Heat: Off, Swing: 0 (Off), Command: N/A, "
       "Outside Quiet: Off, Timer: Off",
       ac.toString());
+
+  // For https://github.com/crankyoldgit/IRremoteESP8266/issues/1455#issuecomment-817339816
+  ac.set10CHeat(true);
+  EXPECT_TRUE(ac.get10CHeat());
+  ac.setFanSpeed(kFujitsuAcFanHigh);
+  ac.setSwing(kFujitsuAcSwingVert);
+  EXPECT_FALSE(ac.get10CHeat());
+  ac.set10CHeat(false);
+  EXPECT_EQ(kFujitsuAcFanHigh, ac.getFanSpeed());
+  EXPECT_EQ(kFujitsuAcSwingVert, ac.getSwing());
+  EXPECT_FALSE(ac.get10CHeat());
+  ac.set10CHeat(true);
+  EXPECT_TRUE(ac.get10CHeat());
+  EXPECT_EQ(kFujitsuAcFanAuto, ac.getFanSpeed());
+  EXPECT_EQ(kFujitsuAcSwingOff, ac.getSwing());
 }
 
 TEST(TestUtils, Housekeeping) {

@@ -577,6 +577,8 @@ void IRFujitsuAC::set10CHeat(const bool on) {
       if (on) {
         _.Mode = kFujitsuAcModeFan;
         _.Power = true;
+        _.Fan = kFujitsuAcFanAuto;
+        _.Swing = kFujitsuAcSwingOff;
       }
     default:
       break;
@@ -588,7 +590,8 @@ void IRFujitsuAC::set10CHeat(const bool on) {
 bool IRFujitsuAC::get10CHeat(void) const {
   switch (_model) {
     case fujitsu_ac_remote_model_t::ARREW4E:
-      return _.Clean && _.Power && (_.Mode == kFujitsuAcModeFan);
+      return (_.Clean && _.Power && _.Mode == kFujitsuAcModeFan &&
+              _.Fan == kFujitsuAcFanAuto && _.Swing == kFujitsuAcSwingOff);
     default: return false;
   }
 }
