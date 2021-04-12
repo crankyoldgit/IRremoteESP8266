@@ -1205,23 +1205,54 @@ TEST(TestIRFujitsuACClass, Temperature) {
   EXPECT_EQ(77, ac.getTemp());
 
   // Real example
-  const uint8_t arew4e_22c[16] = {
+  const uint8_t arrew4e_22c[16] = {
       0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x31,
       0x70, 0x01, 0x00, 0x20, 0x03, 0x58, 0x20, 0xC3};
-  ac.setRaw(arew4e_22c, 16);
+  ac.setRaw(arrew4e_22c, 16);
   EXPECT_TRUE(ac.getCelsius());
   EXPECT_EQ(22, ac.getTemp());
-  const uint8_t arew4e_25_5c[16] = {
+  const uint8_t arrew4e_25_5c[16] = {
       0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0x31,
       0x8C, 0x01, 0x00, 0x21, 0x03, 0x12, 0x20, 0xEC};
-  ac.setRaw(arew4e_25_5c, 16);
+  ac.setRaw(arrew4e_25_5c, 16);
   EXPECT_TRUE(ac.getCelsius());
   EXPECT_EQ(25.5, ac.getTemp());
-  const uint8_t arew4e_69f[16] = {
+  const uint8_t arrew4e_69f[16] = {
       0x14, 0x63, 0x20, 0x10, 0x10, 0xFE, 0x09, 0x31,
       0x66, 0x04, 0x00, 0x16, 0x01, 0x32, 0x20, 0xFC};
-  ac.setRaw(arew4e_69f, 16);
+  ac.setRaw(arrew4e_69f, 16);
   EXPECT_EQ(fujitsu_ac_remote_model_t::ARREW4E, ac.getModel());
   EXPECT_FALSE(ac.getCelsius());
   EXPECT_EQ(69, ac.getTemp());
+}
+
+TEST(TestIRFujitsuACClass, ARREW4EShortCodes) {
+  // ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1455#issuecomment-817339816
+  IRFujitsuAC ac(kGpioUnused);
+  ac.setId(3);
+  ac.setModel(fujitsu_ac_remote_model_t::ARREW4E);
+
+  const uint8_t off[kFujitsuAcStateLengthShort] = {
+      0x14, 0x63, 0x30, 0x10, 0x10, 0x02, 0xFD};
+  ac.off();
+  ASSERT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
+  EXPECT_STATE_EQ(off, ac.getRaw(), kFujitsuAcStateLengthShort * 8);
+
+  const uint8_t econo[kFujitsuAcStateLengthShort] = {
+      0x14, 0x63, 0x30, 0x10, 0x10, 0x09, 0xF6};
+  ac.setCmd(kFujitsuAcCmdEcono);
+  ASSERT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
+  EXPECT_STATE_EQ(econo, ac.getRaw(), kFujitsuAcStateLengthShort * 8);
+
+  const uint8_t powerful[kFujitsuAcStateLengthShort] = {
+      0x14, 0x63, 0x30, 0x10, 0x10, 0x39, 0xC6};
+  ac.setCmd(kFujitsuAcCmdPowerful);
+  ASSERT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
+  EXPECT_STATE_EQ(powerful, ac.getRaw(), kFujitsuAcStateLengthShort * 8);
+
+  const uint8_t stepvert[kFujitsuAcStateLengthShort] = {
+      0x14, 0x63, 0x30, 0x10, 0x10, 0x6C, 0x93};
+  ac.setCmd(kFujitsuAcCmdStepVert);
+  ASSERT_EQ(kFujitsuAcStateLengthShort, ac.getStateLength());
+  EXPECT_STATE_EQ(stepvert, ac.getRaw(), kFujitsuAcStateLengthShort * 8);
 }

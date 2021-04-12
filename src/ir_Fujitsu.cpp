@@ -218,6 +218,7 @@ void IRFujitsuAC::checkSum(void) {
       case fujitsu_ac_remote_model_t::ARRY4:
       case fujitsu_ac_remote_model_t::ARRAH2E:
       case fujitsu_ac_remote_model_t::ARREB1E:
+      case fujitsu_ac_remote_model_t::ARREW4E:
         // The last byte is the inverse of penultimate byte
         _.shortcode[_state_length_short - 1] =
             ~_.shortcode[_state_length_short - 2];
