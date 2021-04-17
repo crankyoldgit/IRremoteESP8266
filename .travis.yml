@@ -57,6 +57,8 @@ jobs:
       - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,src/locale,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
       - pylint3 -d F0001 {src,test,tools}/*.py
       - shopt -u nullglob
+      # Install the Google test suite.
+      - (cd test; make install-googletest)
       # Build and run the unit tests.
       - (cd test; make run)
       - (cd tools; make run_tests)
