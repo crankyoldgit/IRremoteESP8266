@@ -135,6 +135,9 @@
 #ifndef D_STR_8C_HEAT
 #define D_STR_8C_HEAT "8C " D_STR_HEAT  // Set `D_STR_HEAT` first!
 #endif  // D_STR_8C_HEAT
+#ifndef D_STR_10C_HEAT
+#define D_STR_10C_HEAT "10C " D_STR_HEAT  // Set `D_STR_HEAT` first!
+#endif  // D_STR_10C_HEAT
 #ifndef D_STR_BUTTON
 #define D_STR_BUTTON "Button"
 #endif  // D_STR_BUTTON
@@ -273,6 +276,9 @@
 #ifndef D_STR_RECYCLE
 #define D_STR_RECYCLE "Recycle"
 #endif  // D_STR_RECYCLE
+#ifndef D_STR_ID
+#define D_STR_ID "Id"
+#endif  // D_STR_ID
 
 #ifndef D_STR_AUTO
 #define D_STR_AUTO "Auto"
