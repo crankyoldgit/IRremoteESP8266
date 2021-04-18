@@ -1,5 +1,19 @@
 # Release Notes
 
+## _v2.7.17 (20210418)_
+**[News]**
+- The library now supports 100 IR protocols! \o/
+
+**[Bug Fixes]**
+- Fix `IRAcUtils::decodeToState()` for different length Samsung msgs (#1447 #1448)
+
+**[Features]**
+- Fujitsu: Add support for `ARREW4E` model. (#1455 #1456)
+- Experimental detailed support for Truma A/Cs. (#1440 #1449)
+
+**[Misc]**
+- Fix Arduino library linter issues. (#1451 #1452 #1453 #1460)
+
 ## _v2.7.16 (20210324)_
 
 **[Features]**
