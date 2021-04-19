@@ -1,0 +1,21 @@
+name: Unit tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  Unit_Tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install the Google test suite
+      run: (cd test; make install-googletest)
+    - name: Build and run the library unit tests.
+      run: (cd test; make run)
+    - name: Build and run the tools unit tests.
+      run: (cd tools; make run_tests)
