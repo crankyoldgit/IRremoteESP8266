@@ -1,12 +1,20 @@
 # Release Notes
 
-## _v2.7.17 (20210420)_
+## _v2.7.17.1 (20210420)_
+
+**[Misc]**
+- Fix issues with installing the library under the Arduino IDE on Win10 & OSX (#1451 #1464)
+- Reduce the library's github zip download size. (#1451 #1463)
+- An experiment in using Github Actions to do some of the CI work. (#1462)
+
+
+## _v2.7.17 (20210418)_
+
 **[News]**
 - The library now supports 100 IR protocols! \o/
 
 **[Bug Fixes]**
 - Fix `IRAcUtils::decodeToState()` for different length Samsung msgs (#1447 #1448)
-- Fix issues with installing the library under the Arduino IDE on Win10 & OSX (#1451 #1464)
 
 **[Features]**
 - Fujitsu: Add support for `ARREW4E` model. (#1455 #1456)
