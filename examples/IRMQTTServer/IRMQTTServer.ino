@@ -1000,7 +1000,8 @@ String htmlHeader(const String title, const String h1_text) {
   html += title;
   html += F("</title><meta http-equiv=\"Content-Type\" "
             "content=\"text/html;charset=utf-8\">"
-            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0\">"
+            "<meta name=\"viewport\" content=\"width=device-width,"
+            "initial-scale=1.0,minimum-scale=1.0,maximum-scale=5.0\">"
             "</head><body><center><h1>");
   if (h1_text.length())
     html += h1_text;
