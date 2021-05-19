@@ -747,6 +747,13 @@
 #define SEND_TRUMA          _IR_ENABLE_DEFAULT_
 #endif  // SEND_TRUMA
 
+#ifndef DECODE_HAIER_AC176
+#define DECODE_HAIER_AC176  _IR_ENABLE_DEFAULT_
+#endif  // DECODE_HAIER_AC176
+#ifndef SEND_HAIER_AC176
+#define SEND_HAIER_AC176    _IR_ENABLE_DEFAULT_
+#endif  // SEND_HAIER_AC176
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -759,7 +766,7 @@
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
      DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
      DECODE_HITACHI_AC344 || DECODE_CORONA_AC || DECODE_SANYO_AC || \
-     DECODE_VOLTAS || DECODE_MIRAGE)
+     DECODE_VOLTAS || DECODE_MIRAGE || DECODE_HAIER_AC176)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
@@ -899,8 +906,9 @@ enum decode_type_t {
   ECOCLIM,
   XMP,
   TRUMA,  // 100
+  HAIER_AC176,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = TRUMA,
+  kLastDecodeType = HAIER_AC176,
 };
 
 // Message lengths & required repeat values
@@ -992,6 +1000,9 @@ const uint16_t kHaierAcDefaultRepeat = kNoRepeat;
 const uint16_t kHaierACYRW02StateLength = 14;
 const uint16_t kHaierACYRW02Bits = kHaierACYRW02StateLength * 8;
 const uint16_t kHaierAcYrw02DefaultRepeat = kNoRepeat;
+const uint16_t kHaierAC176StateLength = 22;
+const uint16_t kHaierAC176Bits = kHaierAC176StateLength * 8;
+const uint16_t kHaierAc176DefaultRepeat = kNoRepeat;
 const uint16_t kHitachiAcStateLength = 28;
 const uint16_t kHitachiAcBits = kHitachiAcStateLength * 8;
 const uint16_t kHitachiAcDefaultRepeat = kNoRepeat;
