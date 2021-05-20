@@ -1066,11 +1066,11 @@ uint32_t IRrecv::ticksHigh(const uint32_t usecs, const uint8_t tolerance,
 bool IRrecv::match(uint32_t measured, uint32_t desired, uint8_t tolerance,
                    uint16_t delta) {
   measured *= kRawTick;  // Convert to uSecs.
-  DPRINT("Matching: ");
+  /*DPRINT("Matching: ");
   DPRINT(ticksLow(desired, tolerance, delta));
   DPRINT(" <= ");
   DPRINT(measured);
-  DPRINT(" <= ");
+  DPRINT(" <= ");*/
   DPRINTLN(ticksHigh(desired, tolerance, delta));
 #ifdef UNIT_TEST
   // Sanity checks that we don't have values that cause integer over/underflow.
@@ -1138,13 +1138,13 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
 /// @return A Boolean. true if it matches, false if it doesn't.
 bool IRrecv::matchMark(uint32_t measured, uint32_t desired, uint8_t tolerance,
                        int16_t excess) {
-  DPRINT("Matching MARK ");
+  /*DPRINT("Matching MARK ");
   DPRINT(measured * kRawTick);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" + ");
   DPRINT(excess);
-  DPRINT(". ");
+  DPRINT(". ");*/
   return match(measured, desired + excess, tolerance);
 }
 
@@ -1158,13 +1158,13 @@ bool IRrecv::matchMark(uint32_t measured, uint32_t desired, uint8_t tolerance,
 /// @return A Boolean. true if it matches, false if it doesn't.
 bool IRrecv::matchMarkRange(const uint32_t measured, const uint32_t desired,
                             const uint16_t range, const int16_t excess) {
-  DPRINT("Matching MARK ");
+  /*DPRINT("Matching MARK ");
   DPRINT(measured * kRawTick);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" + ");
   DPRINT(excess);
-  DPRINT(". ");
+  DPRINT(". ");*/
   return match(measured, desired + excess, 0, range);
 }
 
@@ -1177,13 +1177,13 @@ bool IRrecv::matchMarkRange(const uint32_t measured, const uint32_t desired,
 /// @return A Boolean. true if it matches, false if it doesn't.
 bool IRrecv::matchSpace(uint32_t measured, uint32_t desired, uint8_t tolerance,
                         int16_t excess) {
-  DPRINT("Matching SPACE ");
+  /*DPRINT("Matching SPACE ");
   DPRINT(measured * kRawTick);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" - ");
   DPRINT(excess);
-  DPRINT(". ");
+  DPRINT(". ");*/
   return match(measured, desired - excess, tolerance);
 }
 
@@ -1197,13 +1197,13 @@ bool IRrecv::matchSpace(uint32_t measured, uint32_t desired, uint8_t tolerance,
 /// @return A Boolean. true if it matches, false if it doesn't.
 bool IRrecv::matchSpaceRange(const uint32_t measured, const uint32_t desired,
                              const uint16_t range, const int16_t excess) {
-  DPRINT("Matching SPACE ");
+  /*DPRINT("Matching SPACE ");
   DPRINT(measured * kRawTick);
   DPRINT(" vs ");
   DPRINT(desired);
   DPRINT(" - ");
   DPRINT(excess);
-  DPRINT(". ");
+  DPRINT(". ");*/
   return match(measured, desired - excess, 0, range);
 }
 

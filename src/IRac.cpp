@@ -288,6 +288,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_WHIRLPOOL_AC
     case decode_type_t::WHIRLPOOL_AC:
 #endif
+#if SEND_HAIER_AC176
+    case decode_type_t::HAIER_AC176:
+#endif
 // Note: Compiler Warning is disabled because someone could disable all
 //       the protocols before this and it is then unreachable.
 //       "-Wswitch-unreachable" not used as it appears to be an unknown option.
@@ -3379,6 +3382,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_HAIER_AC
+#if DECODE_HAIER_AC176
+      case decode_type_t::HAIER_AC176: {
+        IRHaierACYRW02 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_HAIER_AC
 #if DECODE_HAIER_AC_YRW02
       case decode_type_t::HAIER_AC_YRW02: {
         IRHaierACYRW02 ac(kGpioUnused);
@@ -3730,6 +3740,14 @@ namespace IRAcUtils {
 #endif  // DECODE_HAIER_AC
 #if DECODE_HAIER_AC_YRW02
       case decode_type_t::HAIER_AC_YRW02: {
+        IRHaierACYRW02 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HAIER_AC_YRW02
+#if DECODE_HAIER_AC176
+      case decode_type_t::HAIER_AC176: {
         IRHaierACYRW02 ac(kGpioUnused);
         ac.setRaw(decode->state);
         *result = ac.toCommon();
