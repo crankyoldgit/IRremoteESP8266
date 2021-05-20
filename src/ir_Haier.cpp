@@ -68,7 +68,7 @@ void IRsend::sendHaierAC(const unsigned char data[], const uint16_t nbytes,
 
 #if SEND_HAIER_AC_YRW02
 /// Send a Haier YR-W02 remote A/C formatted message.
-/// Status: Alpha / Untested on a real device.
+/// Status: STABLE / Known to be working.
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
@@ -80,7 +80,7 @@ void IRsend::sendHaierACYRW02(const unsigned char data[], const uint16_t nbytes,
 
 #if SEND_HAIER_AC176
 /// Send a Haier 176 bit remote A/C formatted message.
-/// Status: Alpha / Untested on a real device.
+/// Status: STABLE / Known to be working.
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
@@ -1055,7 +1055,7 @@ bool IRrecv::decodeHaierACYRW02(decode_results* results, uint16_t offset,
 
 #if DECODE_HAIER_AC176
 /// Decode the supplied Haier 176 bit remote A/C message.
-/// Status: BETA / Appears to be working.
+/// Status: STABLE / Known to be working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
