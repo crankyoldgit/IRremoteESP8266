@@ -561,6 +561,12 @@ class IRrecv {
                           const uint16_t nbits = kHaierACYRW02Bits,
                           const bool strict = true);
 #endif
+#if DECODE_HAIER_AC176
+  bool decodeHaierAC176(decode_results *results,
+                        uint16_t offset = kStartOffset,
+                        const uint16_t nbits = kHaierAC176Bits,
+                        const bool strict = true);
+#endif  // DECODE_HAIER_AC176
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2 || DECODE_HITACHI_AC344)
   bool decodeHitachiAC(decode_results *results, uint16_t offset = kStartOffset,
                        const uint16_t nbits = kHitachiAcBits,

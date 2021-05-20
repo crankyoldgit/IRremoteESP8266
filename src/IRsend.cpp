@@ -700,6 +700,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kHaierACBits;
     case HAIER_AC_YRW02:
       return kHaierACYRW02Bits;
+    case HAIER_AC176:
+      return kHaierAC176Bits;
     case HITACHI_AC:
       return kHitachiAcBits;
     case HITACHI_AC1:
@@ -1143,6 +1145,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendHaierACYRW02(state, nbytes);
       break;
 #endif  // SEND_HAIER_AC_YRW02
+#if SEND_HAIER_AC176
+    case HAIER_AC176:
+      sendHaierAC176(state, nbytes);
+      break;
+#endif  // SEND_HAIER_AC176
 #if SEND_HITACHI_AC
     case HITACHI_AC:
       sendHitachiAC(state, nbytes);
