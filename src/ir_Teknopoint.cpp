@@ -5,6 +5,7 @@
 
 // Supports:
 //   Brand: Teknopoint,  Model: Allegro SSA-09H A/C
+//   Brand: Teknopoint,  Model: GZ-055B-E1 remote
 
 #include "IRrecv.h"
 #include "IRsend.h"
