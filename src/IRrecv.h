@@ -739,6 +739,11 @@ class IRrecv {
   bool decodeTruma(decode_results *results, uint16_t offset = kStartOffset,
                    const uint16_t nbits = kTrumaBits, const bool strict = true);
 #endif  // DECODE_TRUMA
+#if DECODE_TEKNOPOINT
+  bool decodeTeknopoint(decode_results *results, uint16_t offset = kStartOffset,
+                        const uint16_t nbits = kTeknopointBits,
+                        const bool strict = true);
+#endif  // DECODE_TEKNOPOINT
 };
 
 #endif  // IRRECV_H_

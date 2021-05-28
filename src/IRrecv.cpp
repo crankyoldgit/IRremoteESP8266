@@ -1014,6 +1014,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting XMP decode");
     if (decodeXmp(results, offset, kXmpBits)) return true;
 #endif  // DECODE_XMP
+#if DECODE_TEKNOPOINT
+    DPRINTLN("Attempting Teknopoint decode");
+    if (decodeTeknopoint(results, offset)) return true;
+#endif  // DECODE_TEKNOPOINT
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

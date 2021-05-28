@@ -754,6 +754,13 @@
 #define SEND_HAIER_AC176    _IR_ENABLE_DEFAULT_
 #endif  // SEND_HAIER_AC176
 
+#ifndef DECODE_TEKNOPOINT
+#define DECODE_TEKNOPOINT  _IR_ENABLE_DEFAULT_
+#endif  // DECODE_TEKNOPOINT
+#ifndef SEND_TEKNOPOINT
+#define SEND_TEKNOPOINT    _IR_ENABLE_DEFAULT_
+#endif  // SEND_TEKNOPOINT
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -766,7 +773,7 @@
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
      DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
      DECODE_HITACHI_AC344 || DECODE_CORONA_AC || DECODE_SANYO_AC || \
-     DECODE_VOLTAS || DECODE_MIRAGE || DECODE_HAIER_AC176)
+     DECODE_VOLTAS || DECODE_MIRAGE || DECODE_HAIER_AC176 || DECODE_TEKNOPOINT)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
@@ -907,8 +914,9 @@ enum decode_type_t {
   XMP,
   TRUMA,  // 100
   HAIER_AC176,
+  TEKNOPOINT,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = HAIER_AC176,
+  kLastDecodeType = TEKNOPOINT,
 };
 
 // Message lengths & required repeat values
@@ -1118,6 +1126,8 @@ const uint16_t kTcl112AcBits = kTcl112AcStateLength * 8;
 const uint16_t kTcl112AcDefaultRepeat = kNoRepeat;
 const uint16_t kTecoBits = 35;
 const uint16_t kTecoDefaultRepeat = kNoRepeat;
+const uint16_t kTeknopointStateLength = 14;
+const uint16_t kTeknopointBits = kTeknopointStateLength * 8;
 const uint16_t kToshibaACStateLength = 9;
 const uint16_t kToshibaACBits = kToshibaACStateLength * 8;
 const uint16_t kToshibaACMinRepeat = kSingleRepeat;
