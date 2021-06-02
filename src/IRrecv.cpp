@@ -32,7 +32,7 @@ extern "C" {
 #define USE_IRAM_ATTR IRAM_ATTR
 #else  // IRAM_ATTR
 #define USE_IRAM_ATTR ICACHE_RAM_ATTR
-#endif // IRAM_ATTR
+#endif  // IRAM_ATTR
 #endif  // ESP8266
 #if defined(ESP32)
 #define USE_IRAM_ATTR IRAM_ATTR
