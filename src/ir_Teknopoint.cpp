@@ -12,13 +12,13 @@
 #include "IRutils.h"
 
 // Protocol timings
-const uint16_t kTeknopointHdrMark = 3614;
-const uint16_t kTeknopointBitMark = 439;
-const uint16_t kTeknopointHdrSpace = 1610;
-const uint16_t kTeknopointOneSpace = 1238;
-const uint16_t kTeknopointZeroSpace = 567;
+const uint16_t kTeknopointHdrMark = 3600;
+const uint16_t kTeknopointBitMark = 477;
+const uint16_t kTeknopointHdrSpace = 1600;
+const uint16_t kTeknopointOneSpace = 1200;
+const uint16_t kTeknopointZeroSpace = 530;
 const uint16_t kTeknopointFreq = 38000;  // Hz. (Guess Only)
-const uint16_t kTeknopointOverhead = 3;
+const uint8_t  kTeknopointExtraTol = 10;  // Extra tolerance percentage.
 
 #if SEND_TEKNOPOINT
 /// Send a Teknopoint formatted message.
@@ -65,7 +65,8 @@ bool IRrecv::decodeTeknopoint(decode_results *results, uint16_t offset,
                     kTeknopointHdrMark, kTeknopointHdrSpace,
                     kTeknopointBitMark, kTeknopointOneSpace,
                     kTeknopointBitMark, kTeknopointZeroSpace,
-                    kTeknopointBitMark, kDefaultMessageGap, true)) return false;
+                    kTeknopointBitMark, kDefaultMessageGap,
+                    true, _tolerance + kTeknopointExtraTol)) return false;
   // Success
   results->decode_type = decode_type_t::TEKNOPOINT;
   results->bits = nbits;
