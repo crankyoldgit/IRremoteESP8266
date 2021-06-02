@@ -293,7 +293,6 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 //       "-Wswitch-unreachable" not used as it appears to be an unknown option.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
-#pragma GCC diagnostic warning "-Wswitch"
       return true;
 #pragma GCC diagnostic pop
     default:
