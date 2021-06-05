@@ -3334,7 +3334,7 @@ namespace IRAcUtils {
 #if DECODE_KELON
       case decode_type_t::KELON: {
         IRKelonAC ac(kGpioUnused);
-        ac.setRaw(result->state);
+        ac.setRaw(result->value);
         return ac.toString();
       }
 #endif  // DECODE_KELON
@@ -3826,7 +3826,7 @@ namespace IRAcUtils {
 #if DECODE_KELON
       case decode_type_t::KELON: {
         IRKelonAC ac(kGpioUnused);
-        ac.setRaw(decode->state);
+        ac.setRaw(decode->value);
         *result = ac.toCommon();
         break;
       }

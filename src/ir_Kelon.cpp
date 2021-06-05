@@ -40,16 +40,15 @@ const uint16_t kKelonFreq = 38000;
 
 /// Send a Kelon message.
 /// Status: Beta / Should be working.
-/// @param[in] data The message to be sent.
-/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] data The data to be transmitted.
+/// @param[in] nbits Nr. of bits of data to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
-void IRsend::sendKelon(const unsigned char data[], const uint16_t nbytes,
-                       const uint16_t repeat) {
+void IRsend::sendKelon(const uint64_t data, const uint16_t nbits, const uint16_t repeat) {
   sendGeneric(kKelonHdrMark, kKelonHdrSpace,
               kKelonBitMark, kKelonOneSpace,
               kKelonBitMark, kKelonZeroSpace,
               kKelonBitMark, kKelonGap,
-              data, nbytes, kKelonFreq, false,  // LSB First.
+              data, nbits, kKelonFreq, false,  // LSB First.
               repeat, 50);
 }
 
@@ -100,7 +99,7 @@ IRKelonAC::IRKelonAC(const uint16_t pin, const bool inverted, const bool use_mod
 
 /// Reset the internals of the object to a known good state.
 void IRKelonAC::stateReset() {
-  for (unsigned char &i : _.raw) i = 0x0;
+  _.raw = 0L;
   _.preamble[0] = 0b10000011;
   _.preamble[1] = 0b00000110;
 }
@@ -110,7 +109,7 @@ void IRKelonAC::stateReset() {
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRKelonAC::send(const uint16_t repeat) {
-  _irsend.sendKelon(getRaw(), kKelonStateLength, repeat);
+  _irsend.sendKelon(getRaw(), kKelonBits, repeat);
 
   // Reset toggle flags
   _.PowerToggle = false;
@@ -319,14 +318,14 @@ bool IRKelonAC::getTimerEnabled() const {
 /// Get the raw state of the object, suitable to be sent with the appropriate
 /// IRsend object method.
 /// @return A PTR to the internal state.
-uint8_t *IRKelonAC::getRaw() {
+uint64_t IRKelonAC::getRaw() const {
   return _.raw;
 }
 
 /// Set the raw state of the object.
 /// @param[in] new_code The raw state from the native IR message.
-void IRKelonAC::setRaw(const uint8_t *new_code) {
-  std::memcpy(_.raw, new_code, kKelonStateLength);
+void IRKelonAC::setRaw(const uint64_t new_code) {
+  _.raw = new_code;
 }
 
 /// Convert a standard A/C mode (stdAc::opmode_t) into it a native mode.

@@ -22,7 +22,7 @@
 #include "IRutils.h"
 
 union KelonProtocol {
-  uint8_t raw[kKelonStateLength];
+  uint64_t raw;
 
   struct {
     uint8_t preamble[2];
@@ -124,9 +124,9 @@ public:
 
   bool getTimerEnabled() const;
 
-  uint8_t *getRaw();
+  uint64_t getRaw() const;
 
-  void setRaw(const uint8_t new_code[]);
+  void setRaw(const uint64_t new_code);
 
   static uint8_t convertMode(stdAc::opmode_t mode);
 
