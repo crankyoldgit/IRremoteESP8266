@@ -67,6 +67,18 @@ String uint64ToString(uint64_t input, uint8_t base) {
   return result;
 }
 
+/// Convert a int64_t (signed long long) to a string.
+/// Arduino String/toInt/Serial.print() can't handle printing 64 bit values.
+/// @param[in] input The value to print
+/// @param[in] base The output base.
+/// @returns A String representation of the integer.
+String int64ToString(int64_t input, uint8_t base) {
+  if (input < 0) {
+    return "-" + uint64ToString(-input, base);
+  }
+  return uint64ToString(input, base);
+}
+
 #ifdef ARDUINO
 /// Print a uint64_t/unsigned long long to the Serial port
 /// Serial.print() can't handle printing long longs. (uint64_t)
@@ -495,6 +507,19 @@ namespace irutils {
                         const bool precomma) {
     return addLabeledString(uint64ToString(value), label, precomma);
   }
+
+  /// Create a String with a colon separated labeled Integer suitable for
+  /// Humans.
+  /// e.g. "Foo: 23"
+  /// @param[in] value The value to come after the label.
+  /// @param[in] label The label to precede the value.
+  /// @param[in] precomma Should the output string start with ", " or not?
+  /// @return The resulting String.
+  String addSignedIntToString(const int16_t value, const String label,
+                        const bool precomma) {
+    return addLabeledString(int64ToString(value), label, precomma);
+  }
+
 
   /// Generate the model string for a given Protocol/Model pair.
   /// @param[in] protocol The IR protocol.
