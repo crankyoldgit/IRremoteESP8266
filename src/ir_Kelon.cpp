@@ -22,7 +22,7 @@
 
 using irutils::addBoolToString;
 using irutils::addIntToString;
-using irutils::addLabeledString;
+using irutils::addSignedIntToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
@@ -438,7 +438,7 @@ String IRKelonAC::toString() const {
   result += addModeToString(_.Mode, kKelonModeSmart, kKelonModeCool, kKelonModeHeat, kKelonModeDry, kKelonModeFan);
   result += addFanToString(_.Fan, kKelonFanMax, kKelonFanMin, kKelonFanAuto, -1, kKelonFanMedium, kKelonFanMax);
   result += addBoolToString(_.SleepEnabled, kSleepStr);
-  result += addIntToString(getDryGrade(), kDryGradeStr);
+  result += addSignedIntToString(getDryGrade(), kDryGradeStr);
   result += addBoolToString(getTimerEnabled(), kTimerStr);
   result += addBoolToString(getSupercool(), kTurboStr);
   if (getTogglePower()) {
