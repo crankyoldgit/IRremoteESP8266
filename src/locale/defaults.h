@@ -616,6 +616,9 @@
 #ifndef D_STR_JVC
 #define D_STR_JVC "JVC"
 #endif  // D_STR_JVC
+#ifndef D_STR_KELON
+#define D_STR_KELON "KELON"
+#endif // D_STR_KELON
 #ifndef D_STR_KELVINATOR
 #define D_STR_KELVINATOR "KELVINATOR"
 #endif  // D_STR_KELVINATOR
@@ -805,9 +808,6 @@
 #ifndef D_STR_ZEPEAL
 #define D_STR_ZEPEAL "ZEPEAL"
 #endif  // D_STR_ZEPEAL
-#ifndef D_STR_KELON
-#define D_STR_KELON "KELON"
-#endif // D_STR_KELON
 
 // IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP
