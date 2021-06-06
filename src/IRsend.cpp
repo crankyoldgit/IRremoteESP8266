@@ -658,6 +658,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case SANYO_LC7461:
       return kSanyoLC7461Bits;  // 42
     case GOODWEATHER:
+    case KELON:
     case MIDEA:
     case PANASONIC:
       return 48;
