@@ -9,13 +9,15 @@
 ///    - Explicit on/off due to AC unit limitations
 ///    - Explicit swing position due to AC unit limitations
 ///    - Fahrenheit.
-
-
 // Supports:
-// - Brand: Kelon,  Model: ON/OFF 9000-12000
+//   Brand: Kelon,  Model: ON/OFF 9000-12000
 
 #ifndef IR_KELON_H_
 #define IR_KELON_H_
+
+#ifdef UNIT_TEST
+#include "IRsend_test.h"
+#endif
 
 #include "IRremoteESP8266.h"
 #include "IRsend.h"

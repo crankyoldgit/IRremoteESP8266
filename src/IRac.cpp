@@ -1276,6 +1276,7 @@ void IRac::kelon(IRKelonAC *ac,
   ac->setTemp(static_cast<uint8_t>(degrees));
   ac->setSleep(sleep);
   ac->setSupercool(superCool);
+  ac->setDryGrade(dryGrade);
 
   ac->setTogglePower(togglePower);
   ac->setToggleSwingVertical(toggleSwing);
