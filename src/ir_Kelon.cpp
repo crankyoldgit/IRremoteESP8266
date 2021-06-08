@@ -26,6 +26,8 @@ using irutils::addSignedIntToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::addLabeledString;
+using irutils::minsToString;
 
 // Constants
 const uint16_t kKelonHdrMark = 9000;
@@ -438,7 +440,9 @@ String IRKelonAC::toString() const {
   result += addFanToString(_.Fan, kKelonFanMax, kKelonFanMin, kKelonFanAuto, -1, kKelonFanMedium, kKelonFanMax);
   result += addBoolToString(_.SleepEnabled, kSleepStr);
   result += addSignedIntToString(getDryGrade(), kDryGradeStr);
-  result += addBoolToString(getTimerEnabled(), kTimerStr);
+  result += addLabeledString(getTimerEnabled()
+      ? (getTimer() > 0 ? minsToString(getTimer()) : kOnStr)
+      : kOffStr,kTimerStr);
   result += addBoolToString(getSupercool(), kTurboStr);
   if (getTogglePower()) {
     result += addBoolToString(true, kPowerToggleStr);
