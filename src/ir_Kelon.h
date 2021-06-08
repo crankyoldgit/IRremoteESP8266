@@ -118,9 +118,9 @@ public:
 
   bool getSupercool() const;
 
-  void setTimer(uint8_t mins);
+  void setTimer(uint16_t mins);
 
-  uint8_t getTimer() const;
+  uint16_t getTimer() const;
 
   void setTimerEnabled(bool on);
 

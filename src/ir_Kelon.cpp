@@ -277,8 +277,8 @@ bool IRKelonAC::getSupercool() const {
 
 /// Set the timer time and enable it. Timer is an off timer if the unit is on, it is an on timer if the unit is off.
 /// @param[in] mins Timer minutes (only multiples of 30m are supported for < 10h, then only multiples of 60m)
-void IRKelonAC::setTimer(uint8_t mins) {
-  const uint8_t minutes = std::min(static_cast<int>(mins), 24 * 60);
+void IRKelonAC::setTimer(uint16_t mins) {
+  const uint16_t minutes = std::min(static_cast<int>(mins), 24 * 60);
 
   if (minutes / 60 >= 10) {
     uint8_t hours = minutes / 60 + 10;
@@ -295,11 +295,11 @@ void IRKelonAC::setTimer(uint8_t mins) {
 /// Get the set timer. Timer set time is deleted once the command is sent, so calling this after send() will return 0.
 /// The AC unit will continue keeping track of the remaining time unless it is later disabled.
 /// @return The timer set minutes
-uint8_t IRKelonAC::getTimer() const {
+uint16_t IRKelonAC::getTimer() const {
   if (_.TimerHours >= 10) {
-    return (((_.TimerHours << 1) | _.TimerHalfHour) - 10) * 60;
+    return ((uint16_t) ((_.TimerHours << 1) | _.TimerHalfHour) - 10) * 60;
   }
-  return _.TimerHours * 60 + _.TimerHalfHour ? 30 : 0;
+  return (((uint16_t) _.TimerHours) * 60) + (_.TimerHalfHour ? 30 : 0);
 }
 
 /// Enable or disable the timer. Note that in order to enable the timer the minutes must be set with setTimer().
