@@ -161,6 +161,7 @@ uint8_t IRKelonAC::getTemp() const {
 void IRKelonAC::setFan(const uint8_t speed) {
   uint8_t fan = std::min(speed, kKelonFanMax);
 
+  _previousFan = _.Fan;
   // Note: Kelon fan speeds are backwards! This code maps the range 0,1:3 to 0,3:1 to save the API's user's sanity.
   _.Fan = ((static_cast<int16_t>(fan) - 4) * -1) % 4;
 }
@@ -200,11 +201,16 @@ int8_t IRKelonAC::getDryGrade() const {
 /// Set the desired operation mode.
 /// @param[in] mode The desired operation mode.
 void IRKelonAC::setMode(const uint8_t mode) {
-  if (_.Mode == kKelonModeSmart || _.Mode == kKelonModeFan || _.Mode == kKelonModeDry || _.SuperCoolEnabled1) {
+  if (_.Mode == kKelonModeSmart || _.Mode == kKelonModeFan || _.Mode == kKelonModeDry) {
     _.Temperature = _previousTemp;
   }
-  _.SuperCoolEnabled1 = false;
-  _.SuperCoolEnabled2 = false;
+  if (_.SuperCoolEnabled1) {
+    // Cancel supercool
+    _.SuperCoolEnabled1 = false;
+    _.SuperCoolEnabled2 = false;
+    _.Temperature = _previousTemp;
+    _.Fan = _previousFan;
+  }
   _previousMode = _.Mode;
 
   switch (mode) {
@@ -263,8 +269,9 @@ void IRKelonAC::setSupercool(const bool on) {
   if (on) {
     setTemp(kKelonMinTemp);
     setMode(kKelonModeCool);
+    setFan(kKelonFanMax);
   } else {
-    _.Temperature = _previousTemp;
+    // All reverts to previous are handled by setMode as needed
     setMode(_previousMode);
   }
   _.SuperCoolEnabled1 = on;

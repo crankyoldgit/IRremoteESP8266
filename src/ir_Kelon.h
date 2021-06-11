@@ -155,6 +155,7 @@ private:
   // Used when exiting supercool mode
   uint8_t _previousMode{0};
   uint8_t _previousTemp{kKelonMinTemp};
+  uint8_t _previousFan{kKelonFanAuto};
 };
 
 #endif // IR_KELON_H_
