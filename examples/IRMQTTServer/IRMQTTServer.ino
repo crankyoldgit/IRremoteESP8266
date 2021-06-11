@@ -2593,7 +2593,9 @@ void sendMQTTDiscovery(const char *topic) {
 #endif  // MQTT_ENABLE
 
 void loop(void) {
+#if MDNS_ENABLE
   mdns.update();
+#endif  // MDNS_ENABLE
   server.handleClient();  // Handle any web activity
 
 #if MQTT_ENABLE
