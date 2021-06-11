@@ -77,7 +77,7 @@ bool IRrecv::decodeKelon(decode_results *results, uint16_t offset,
                       kKelonHdrMark, kKelonHdrSpace,
                       kKelonBitMark, kKelonOneSpace,
                       kKelonBitMark, kKelonZeroSpace,
-                      kKelonBitMark, kKelonBitMark, false,
+                      kKelonBitMark, 0, false,
                       _tolerance, 0, false);
 
   // Data bits + 2 bits header + 1 bit footer = 99 bits
