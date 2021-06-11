@@ -122,6 +122,31 @@ void IRKelonAC::send(const uint16_t repeat) {
   _.TimerHalfHour = 0;
 }
 
+/// Ensures the AC is on or off by exploiting the fact that setting
+/// it to "smart" will always turn it on if it's off.
+/// This method will send 2 commands to the AC to do the trick
+/// @param[in] on Whether to ensure the AC is on or off
+void IRKelonAC::ensurePower(bool on) {
+  // Try to avoid turning on the compressor for this operation.
+  // "Dry grade", when in "smart" mode, acts as a temperature offset that
+  // the user can configure if they feel too cold or too hot. By setting it
+  // to +2 we're setting the temperature to ~28°C, which will effectively
+  // set the AC to fan mode.
+  int8_t previousDry = getDryGrade();
+  setDryGrade(2);
+  setMode(kKelonModeSmart);
+  send();
+
+  setDryGrade(previousDry);
+  setMode(_previousMode);
+
+  // Now we're sure it's on. Turn it back off.
+  if (!on) {
+    setTogglePower(true);
+  }
+  send();
+}
+
 #endif // SEND_KELON
 
 /// Set up hardware to be able to send a message.

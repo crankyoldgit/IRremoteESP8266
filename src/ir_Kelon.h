@@ -81,6 +81,12 @@ public:
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate() { return _irsend.calibrate(); }
 
+  /// Since the AC does not support actually setting the power state to a known
+  /// value, this utility allow ensuring the AC is on or off by exploiting
+  /// the fact that the AC, according to the user manual, will always turn on
+  /// when setting it to "smart" or "super" mode.
+  void ensurePower(bool on);
+
   #endif
 
 
