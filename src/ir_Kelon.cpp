@@ -417,12 +417,12 @@ stdAc::state_t IRKelonAC::toCommon() const {
   stdAc::state_t result{};
   result.protocol = decode_type_t::KELON;
   result.model = -1;  // Unused.
-  result.mode = toCommonMode(_.Mode);
+  result.mode = toCommonMode(getMode());
   result.celsius = true;
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.fanspeed = toCommonFanSpeed(getFan());
   result.turbo = getSupercool();
-  result.sleep = _.SleepEnabled ? 0 : -1;
+  result.sleep = getSleep() ? 0 : -1;
   // Not supported.
   result.power = true; // N/A, AC only supports toggling it
   result.swingv = stdAc::swingv_t::kAuto; // N/A, AC only supports toggling it
