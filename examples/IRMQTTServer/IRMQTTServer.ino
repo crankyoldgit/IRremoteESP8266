@@ -2143,6 +2143,8 @@ void setup(void) {
   if (mdns.begin(Hostname)) {
 #endif  // ESP8266
     debug("MDNS responder started");
+    // Announce esp tcp service on port 8080
+    mdns.addService("esp", "tcp", 8080);
   }
 #endif  // MDNS_ENABLE
 
@@ -2591,6 +2593,7 @@ void sendMQTTDiscovery(const char *topic) {
 #endif  // MQTT_ENABLE
 
 void loop(void) {
+  mdns.update();
   server.handleClient();  // Handle any web activity
 
 #if MQTT_ENABLE
