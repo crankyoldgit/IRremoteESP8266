@@ -200,7 +200,7 @@ int8_t IRKelonAC::getDryGrade() const {
 /// Set the desired operation mode.
 /// @param[in] mode The desired operation mode.
 void IRKelonAC::setMode(const uint8_t mode) {
-  if (_previousMode == kKelonModeSmart || _previousMode == kKelonModeFan || _.SuperCoolEnabled1) {
+  if (_.Mode == kKelonModeSmart || _.Mode == kKelonModeFan || _.Mode == kKelonModeDry || _.SuperCoolEnabled1) {
     _.Temperature = _previousTemp;
   }
   _.SuperCoolEnabled1 = false;
@@ -209,13 +209,13 @@ void IRKelonAC::setMode(const uint8_t mode) {
 
   switch (mode) {
     case kKelonModeSmart:
-      _.Temperature = 26 - kKelonMinTemp; // Do not save _previousTemp
+      setTemp(26);
       _.SmartModeEnabled = true;
       _.Mode = mode;
       break;
     case kKelonModeDry:
     case kKelonModeFan:
-      _.Temperature = 25 - kKelonMinTemp; // Do not save _previousTemp
+      setTemp(25);
       _.Mode = mode;
       //fallthrough
     case kKelonModeCool:
@@ -260,8 +260,6 @@ bool IRKelonAC::getSleep() const {
 /// Control the current super cool mode setting.
 /// @param[in] on The desired setting.
 void IRKelonAC::setSupercool(const bool on) {
-  _.SuperCoolEnabled1 = on;
-  _.SuperCoolEnabled2 = on;
   if (on) {
     setTemp(kKelonMinTemp);
     setMode(kKelonModeCool);
@@ -269,6 +267,8 @@ void IRKelonAC::setSupercool(const bool on) {
     _.Temperature = _previousTemp;
     setMode(_previousMode);
   }
+  _.SuperCoolEnabled1 = on;
+  _.SuperCoolEnabled2 = on;
 }
 
 /// Is the super cool mode setting on?
