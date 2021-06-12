@@ -460,7 +460,7 @@ void IRac::coolix(IRCoolixAC *ac,
     ac->setTurbo();
     ac->send();
   }
-  if (sleep > 0) {
+  if (sleep >= 0) {
     // Sleep has a special command that needs to be sent independently.
     ac->setSleep();
     ac->send();
