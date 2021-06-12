@@ -382,7 +382,7 @@ uint8_t IRKelonAC::convertMode(const stdAc::opmode_t mode) {
 }
 
 /// Convert a standard A/C fan speed (stdAc::fanspeed_t) into it a native speed.
-/// @param[in] mode A stdAc::fanspeed_t fan speed
+/// @param[in] fan A stdAc::fanspeed_t fan speed
 /// @return The native speed equivalent.
 uint8_t IRKelonAC::convertFan(stdAc::fanspeed_t fan) {
   switch (fan) {
