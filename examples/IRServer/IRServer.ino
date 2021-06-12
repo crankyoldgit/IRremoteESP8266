@@ -132,6 +132,8 @@ void setup(void) {
   if (mdns.begin(HOSTNAME)) {
 #endif  // ESP8266
     Serial.println("MDNS responder started");
+    // Announce http tcp service on port 80
+    mdns.addService("http", "tcp", 80);
   }
 
   server.on("/", handleRoot);
@@ -148,5 +150,8 @@ void setup(void) {
 }
 
 void loop(void) {
+#if defined(ESP8266)
+  mdns.update();
+#endif
   server.handleClient();
 }

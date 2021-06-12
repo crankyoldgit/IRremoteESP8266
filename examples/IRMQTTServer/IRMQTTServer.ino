@@ -2143,6 +2143,8 @@ void setup(void) {
   if (mdns.begin(Hostname)) {
 #endif  // ESP8266
     debug("MDNS responder started");
+    // Announce http tcp service on kHttpPort
+    mdns.addService("http", "tcp", kHttpPort);
   }
 #endif  // MDNS_ENABLE
 
@@ -2591,6 +2593,9 @@ void sendMQTTDiscovery(const char *topic) {
 #endif  // MQTT_ENABLE
 
 void loop(void) {
+#if MDNS_ENABLE && defined(ESP8266)
+  mdns.update();
+#endif  // MDNS_ENABLE and ESP8266
   server.handleClient();  // Handle any web activity
 
 #if MQTT_ENABLE
