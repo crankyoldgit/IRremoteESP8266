@@ -46,7 +46,6 @@ extern const char* kDayStr;
 extern const char* kDisplayTempStr;
 extern const char* kDownStr;
 extern const char* kDryStr;
-extern const char* kDryGradeStr;
 extern const char* kEconoStr;
 extern const char* kEconoToggleStr;
 extern const char* kEyeAutoStr;

@@ -457,7 +457,7 @@ String IRKelonAc::toString() const {
   result += addModeToString(_.Mode, kKelonModeSmart, kKelonModeCool, kKelonModeHeat, kKelonModeDry, kKelonModeFan);
   result += addFanToString(_.Fan, kKelonFanMax, kKelonFanMin, kKelonFanAuto, -1, kKelonFanMedium, kKelonFanMax);
   result += addBoolToString(_.SleepEnabled, kSleepStr);
-  result += addLabeledString(String(getDryGrade()), kDryGradeStr);
+  //result += addLabeledString(String(static_cast<int>(getDryGrade())), kDryStr);
   result += addLabeledString(getTimerEnabled()
       ? (getTimer() > 0 ? minsToString(getTimer()) : kOnStr)
       : kOffStr,kTimerStr);

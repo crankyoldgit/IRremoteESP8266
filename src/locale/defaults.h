@@ -279,9 +279,6 @@
 #ifndef D_STR_ID
 #define D_STR_ID "Id"
 #endif  // D_STR_ID
-#ifndef D_STR_DRY_GRADE
-#define D_STR_DRY_GRADE "Dry grade"
-#endif  // D_STR_DRY_GRADE
 
 #ifndef D_STR_AUTO
 #define D_STR_AUTO "Auto"
