@@ -1256,7 +1256,7 @@ void IRac::hitachi424(IRHitachiAc424 *ac,
 
 #if SEND_KELON
 /// Send a Kelon A/C message with the supplied settings.
-/// @param[in, out] ac A Ptr to an IRKelonAC object to use.
+/// @param[in, out] ac A Ptr to an IRKelonAc object to use.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
@@ -1265,14 +1265,14 @@ void IRac::hitachi424(IRHitachiAc424 *ac,
 /// @param[in] dryGrade The dehumidification intensity grade
 /// @param[in] togglePower Whether to toggle the unit's power
 /// @param[in] toggleSwing Whether to toggle the swing setting
-void IRac::kelon(IRKelonAC *ac,
+void IRac::kelon(IRKelonAc *ac,
                  const stdAc::opmode_t mode, const float degrees,
                  const stdAc::fanspeed_t fan, const bool sleep,
                  const bool superCool, const int8_t dryGrade,
                  const bool togglePower = false, const bool toggleSwing = false) {
   ac->begin();
-  ac->setMode(IRKelonAC::convertMode(mode));
-  ac->setFan(IRKelonAC::convertFan(fan));
+  ac->setMode(IRKelonAc::convertMode(mode));
+  ac->setFan(IRKelonAc::convertFan(fan));
   ac->setTemp(static_cast<uint8_t>(degrees));
   ac->setSleep(sleep);
   ac->setSupercool(superCool);
@@ -2617,7 +2617,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
 #endif  // SEND_HITACHI_AC424
 #if SEND_KELON
     case KELON: {
-      IRKelonAC ac(_pin, _inverted, _modulation);
+      IRKelonAc ac(_pin, _inverted, _modulation);
       kelon(&ac, send.mode, send.degrees, send.fanspeed, send.sleep,
             send.turbo, 0, send.power, send.swingv != stdAc::swingv_t::kOff);
       break;
@@ -3334,7 +3334,7 @@ namespace IRAcUtils {
 #endif  // DECODE_FUJITSU_AC
 #if DECODE_KELON
       case decode_type_t::KELON: {
-        IRKelonAC ac(kGpioUnused);
+        IRKelonAc ac(kGpioUnused);
         ac.setRaw(result->value);
         return ac.toString();
       }
@@ -3826,7 +3826,7 @@ namespace IRAcUtils {
 #endif  // DECODE_HITACHI_AC424
 #if DECODE_KELON
       case decode_type_t::KELON: {
-        IRKelonAC ac(kGpioUnused);
+        IRKelonAc ac(kGpioUnused);
         ac.setRaw(decode->value);
         *result = ac.toCommon();
         break;

@@ -11,7 +11,7 @@
 
 // Test sending typical data only.
 TEST(TestSendKelon, SendDataOnly) {
-  IRsendTest irsend(4);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   // Temp: 26C, Mode: 2 (Cool), Fan: 0 (Auto), Sleep: Off, Dry grade: 0, Timer: Off, Turbo: Off
@@ -95,8 +95,8 @@ TEST(TestSendKelon, SendDataOnly) {
 // Tests for decodeKelon().
 // Decode normal Kelon messages.
 TEST(TestDecodeKelon, Timer12HSmartMode) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -114,8 +114,8 @@ TEST(TestDecodeKelon, Timer12HSmartMode) {
 }
 
 TEST(TestDecodeKelon, Timer5_5hSuperCoolMode) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -133,8 +133,8 @@ TEST(TestDecodeKelon, Timer5_5hSuperCoolMode) {
 }
 
 TEST(TestDecodeKelon, ChangeSettingsWithTimerSetHeatMode) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -152,8 +152,8 @@ TEST(TestDecodeKelon, ChangeSettingsWithTimerSetHeatMode) {
 }
 
 TEST(TestDecodeKelon, TestPowerToggleDryMode) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -171,8 +171,8 @@ TEST(TestDecodeKelon, TestPowerToggleDryMode) {
 }
 
 TEST(TestDecodeKelon, TestSwingToggleDryMode) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -190,8 +190,8 @@ TEST(TestDecodeKelon, TestSwingToggleDryMode) {
 }
 
 TEST(TestDecodeKelon, TestDryGradeNegativeValue) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -210,15 +210,15 @@ TEST(TestDecodeKelon, TestDryGradeNegativeValue) {
 
 TEST(TestIRKelonClass, SetAndGetRaw) {
   uint64_t rawData = 0x100B0A010683;
-  IRKelonAC ac(kGpioUnused);
+  IRKelonAc ac(kGpioUnused);
   ac.setRaw(rawData);
   EXPECT_EQ(rawData, ac.getRaw());
 }
 
 TEST(TestIRKelonClass, SetAndGetTemp) {
-  IRKelonAC ac(kGpioUnused);
+  IRKelonAc ac(kGpioUnused);
 
-  for (uint8_t temp = 18; temp <= 32; temp++) {
+  for (uint8_t temp = kKelonMinTemp; temp <= kKelonMaxTemp; temp++) {
     ac.setTemp(temp);
     EXPECT_EQ(temp, ac.getTemp());
   }
@@ -231,7 +231,7 @@ TEST(TestIRKelonClass, SetAndGetTemp) {
 }
 
 TEST(TestIRKelonClass, SetAndGetTimer) {
-  IRKelonAC ac(kGpioUnused);
+  IRKelonAc ac(kGpioUnused);
 
   // 0.5h to 10h timers have a granularity of 30 minutes
   for (uint16_t minutes = 0; minutes <= 60 * 10; minutes += 30) {
@@ -251,7 +251,7 @@ TEST(TestIRKelonClass, SetAndGetTimer) {
 }
 
 TEST(TestIRKelonClass, CheckToggles) {
-  IRKelonAC ac(kGpioUnused);
+  IRKelonAc ac(kGpioUnused);
 
   ac.setTogglePower(true);
   EXPECT_TRUE(ac.getTogglePower());
@@ -273,7 +273,7 @@ TEST(TestIRKelonClass, CheckToggles) {
 }
 
 TEST(TestIRKelonClass, SetAndGetMode) {
-  IRKelonAC ac(kGpioUnused);
+  IRKelonAc ac(kGpioUnused);
 
   uint8_t initial_temp = 20;
   ac.setMode(kKelonModeHeat);
@@ -316,7 +316,7 @@ TEST(TestIRKelonClass, SetAndGetMode) {
 }
 
 TEST(TestIRKelonClass, CheckSuperCoolMode) {
-  IRKelonAC ac(kGpioUnused);
+  IRKelonAc ac(kGpioUnused);
 
   uint8_t initial_temp = 20;
   uint8_t initial_fan = kKelonFanMin;
@@ -350,7 +350,7 @@ TEST(TestIRKelonClass, CheckSuperCoolMode) {
 }
 
 TEST(TestIRKelonClass, SetAndGetDryGrade) {
-  IRKelonAC ac(kGpioUnused);
+  IRKelonAc ac(kGpioUnused);
 
   for (int i = -2; i <= 2; i++) {
     ac.setDryGrade(i);
@@ -364,7 +364,7 @@ TEST(TestIRKelonClass, SetAndGetDryGrade) {
 }
 
 TEST(TestIRKelonClass, toCommon) {
-  IRKelonAC ac(kGpioUnused);
+  IRKelonAc ac(kGpioUnused);
 
   ac.setSleep(false);
   ac.setTemp(23);

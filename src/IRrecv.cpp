@@ -1021,7 +1021,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
 #if DECODE_KELON
     DPRINTLN("Attempting Kelon decode");
     if (decodeKelon(results, offset, kKelonBits)) return true;
-#endif // DECODE_KELON
+#endif  // DECODE_KELON
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

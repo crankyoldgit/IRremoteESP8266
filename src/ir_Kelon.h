@@ -47,106 +47,106 @@ union KelonProtocol {
 };
 
 // Constants
-const uint8_t kKelonModeHeat{0};
-const uint8_t kKelonModeSmart{1};  // (temp = 26C, but not shown)
-const uint8_t kKelonModeCool{2};
-const uint8_t kKelonModeDry{3};    // (temp = 25C, but not shown)
-const uint8_t kKelonModeFan{4};    // (temp = 25C, but not shown)
-const uint8_t kKelonFanAuto{0};
+const uint8_t kKelonModeHeat = 0;
+const uint8_t kKelonModeSmart = 1;  // (temp = 26C, but not shown)
+const uint8_t kKelonModeCool = 2;
+const uint8_t kKelonModeDry = 3;    // (temp = 25C, but not shown)
+const uint8_t kKelonModeFan = 4;    // (temp = 25C, but not shown)
+const uint8_t kKelonFanAuto = 0;
 // Note! Kelon fan speeds are actually 0:AUTO, 1:MAX, 2:MED, 3:MIN
 // Since this is insane, I decided to invert them in the public API, they are converted back in setFan/getFan
-const uint8_t kKelonFanMin{1};
-const uint8_t kKelonFanMedium{2};
-const uint8_t kKelonFanMax{3};
+const uint8_t kKelonFanMin = 1;
+const uint8_t kKelonFanMedium = 2;
+const uint8_t kKelonFanMax = 3;
 
-const int8_t kKelonDryGradeMax{2};
-const int8_t kKelonDryGradeMin{-2};
-const uint8_t kKelonMinTemp{18};
-const uint8_t kKelonMaxTemp{32};
+const int8_t kKelonDryGradeMin = -2;
+const int8_t kKelonDryGradeMax = +2;
+const uint8_t kKelonMinTemp = 18;
+const uint8_t kKelonMaxTemp = 32;
 
 
-class IRKelonAC {
+class IRKelonAc {
 public:
-  explicit IRKelonAC(uint16_t pin, bool inverted = false, bool use_modulation = true);
+  explicit IRKelonAc(uint16_t pin, bool inverted = false, bool use_modulation = true);
 
-  void stateReset();
+  void stateReset(void);
 
   #if SEND_KELON
 
-  void send(uint16_t repeat = kNoRepeat);
+  void send(const uint16_t repeat = kNoRepeat);
 
   /// Run the calibration to calculate uSec timing offsets for this platform.
   /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
-  int8_t calibrate() { return _irsend.calibrate(); }
+  int8_t calibrate(void) { return _irsend.calibrate(); }
 
   /// Since the AC does not support actually setting the power state to a known
   /// value, this utility allow ensuring the AC is on or off by exploiting
   /// the fact that the AC, according to the user manual, will always turn on
   /// when setting it to "smart" or "super" mode.
-  void ensurePower(bool on);
+  void ensurePower(const bool on);
 
   #endif
 
 
-  void begin();
+  void begin(void);
 
-  void setTogglePower(bool toggle);
+  void setTogglePower(const bool toggle);
 
-  bool getTogglePower() const;
+  bool getTogglePower(void) const;
 
-  void setTemp(uint8_t degrees);
+  void setTemp(const uint8_t degrees);
 
-  uint8_t getTemp() const;
+  uint8_t getTemp(void) const;
 
-  void setFan(uint8_t speed);
+  void setFan(const uint8_t speed);
 
-  uint8_t getFan() const;
+  uint8_t getFan(void) const;
 
-  void setDryGrade(int8_t grade);
+  void setDryGrade(const int8_t grade);
 
-  int8_t getDryGrade() const;
+  int8_t getDryGrade(void) const;
 
-  void setMode(uint8_t mode);
+  void setMode(const uint8_t mode);
 
-  uint8_t getMode() const;
+  uint8_t getMode(void) const;
 
-  void setToggleSwingVertical(bool toggle);
+  void setToggleSwingVertical(const bool toggle);
 
-  bool getToggleSwingVertical() const;
+  bool getToggleSwingVertical(void) const;
 
-  void setSleep(bool on);
+  void setSleep(const bool on);
 
-  bool getSleep() const;
+  bool getSleep(void) const;
 
-  void setSupercool(bool on);
+  void setSupercool(const bool on);
 
-  bool getSupercool() const;
+  bool getSupercool(void) const;
 
-  void setTimer(uint16_t mins);
+  void setTimer(const uint16_t mins);
 
-  uint16_t getTimer() const;
+  uint16_t getTimer(void) const;
 
-  void setTimerEnabled(bool on);
+  void setTimerEnabled(const bool on);
 
-  bool getTimerEnabled() const;
+  bool getTimerEnabled(void) const;
 
-  uint64_t getRaw() const;
+  uint64_t getRaw(void) const;
 
   void setRaw(const uint64_t new_code);
 
-  static uint8_t convertMode(stdAc::opmode_t mode);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
 
-  static uint8_t convertFan(stdAc::fanspeed_t fan);
+  static uint8_t convertFan(const stdAc::fanspeed_t fan);
 
-  static stdAc::opmode_t toCommonMode(uint8_t mode);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
 
-  static stdAc::fanspeed_t toCommonFanSpeed(uint8_t speed);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
 
-  stdAc::state_t toCommon() const;
+  stdAc::state_t toCommon(void) const;
 
-  String toString() const;
+  String toString(void) const;
 
 private:
 #ifndef UNIT_TEST
@@ -159,9 +159,9 @@ private:
   KelonProtocol _;
 
   // Used when exiting supercool mode
-  uint8_t _previousMode{0};
-  uint8_t _previousTemp{kKelonMinTemp};
-  uint8_t _previousFan{kKelonFanAuto};
+  uint8_t _previousMode = 0;
+  uint8_t _previousTemp = kKelonMinTemp;
+  uint8_t _previousFan = kKelonFanAuto;
 };
 
 #endif // IR_KELON_H_

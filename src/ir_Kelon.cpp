@@ -22,7 +22,6 @@
 
 using irutils::addBoolToString;
 using irutils::addIntToString;
-using irutils::addSignedIntToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
@@ -71,17 +70,13 @@ bool IRrecv::decodeKelon(decode_results *results, uint16_t offset,
   if (strict && nbits != kKelonBits) {
     return false;
   }
-  uint16_t used;
-  used = matchGeneric(results->rawbuf + offset, results->state,
-                      results->rawlen - offset, nbits,
-                      kKelonHdrMark, kKelonHdrSpace,
-                      kKelonBitMark, kKelonOneSpace,
-                      kKelonBitMark, kKelonZeroSpace,
-                      kKelonBitMark, 0, false,
-                      _tolerance, 0, false);
-
-  // Data bits + 2 bits header + 1 bit footer = 99 bits
-  if (strict && used != nbits * 2 + 3) {
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kKelonHdrMark, kKelonHdrSpace,
+                    kKelonBitMark, kKelonOneSpace,
+                    kKelonBitMark, kKelonZeroSpace,
+                    kKelonBitMark, 0, false,
+                    _tolerance, 0, false)) {
     return false;
   }
 
@@ -90,17 +85,17 @@ bool IRrecv::decodeKelon(decode_results *results, uint16_t offset,
   return true;
 }
 
-#endif // DECODE_KELON
+#endif  // DECODE_KELON
 
 /// Class constructor
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-IRKelonAC::IRKelonAC(const uint16_t pin, const bool inverted, const bool use_modulation)
+IRKelonAc::IRKelonAc(const uint16_t pin, const bool inverted, const bool use_modulation)
     : _irsend{pin, inverted, use_modulation}, _{} { stateReset(); }
 
 /// Reset the internals of the object to a known good state.
-void IRKelonAC::stateReset() {
+void IRKelonAc::stateReset() {
   _.raw = 0L;
   _.preamble[0] = 0b10000011;
   _.preamble[1] = 0b00000110;
@@ -110,7 +105,7 @@ void IRKelonAC::stateReset() {
 
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
-void IRKelonAC::send(const uint16_t repeat) {
+void IRKelonAc::send(const uint16_t repeat) {
   _irsend.sendKelon(getRaw(), kKelonBits, repeat);
 
   // Reset toggle flags
@@ -126,7 +121,7 @@ void IRKelonAC::send(const uint16_t repeat) {
 /// it to "smart" will always turn it on if it's off.
 /// This method will send 2 commands to the AC to do the trick
 /// @param[in] on Whether to ensure the AC is on or off
-void IRKelonAC::ensurePower(bool on) {
+void IRKelonAc::ensurePower(bool on) {
   // Try to avoid turning on the compressor for this operation.
   // "Dry grade", when in "smart" mode, acts as a temperature offset that
   // the user can configure if they feel too cold or too hot. By setting it
@@ -150,25 +145,25 @@ void IRKelonAC::ensurePower(bool on) {
 #endif // SEND_KELON
 
 /// Set up hardware to be able to send a message.
-void IRKelonAC::begin() {
+void IRKelonAc::begin() {
   _irsend.begin();
 }
 
 /// Request toggling power - will be reset to false after sending
 /// @param[in] toggle Whether to toggle the power state
-void IRKelonAC::setTogglePower(const bool toggle) {
+void IRKelonAc::setTogglePower(const bool toggle) {
   _.PowerToggle = toggle;
 }
 
 /// Get whether toggling power will be requested
 /// @return The power toggle state
-bool IRKelonAC::getTogglePower() const {
+bool IRKelonAc::getTogglePower() const {
   return _.PowerToggle;
 }
 
 /// Set the temperature setting.
 /// @param[in] degrees The temperature in degrees celsius.
-void IRKelonAC::setTemp(const uint8_t degrees) {
+void IRKelonAc::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max(kKelonMinTemp, degrees);
   temp = std::min(kKelonMaxTemp, temp);
   _previousTemp = _.Temperature;
@@ -177,13 +172,13 @@ void IRKelonAC::setTemp(const uint8_t degrees) {
 
 /// Get the current temperature setting.
 /// @return Get current setting for temp. in degrees celsius.
-uint8_t IRKelonAC::getTemp() const {
+uint8_t IRKelonAc::getTemp() const {
   return _.Temperature + kKelonMinTemp;
 }
 
 /// Set the speed of the fan.
 /// @param[in] speed 0 is auto, 1-5 is the speed
-void IRKelonAC::setFan(const uint8_t speed) {
+void IRKelonAc::setFan(const uint8_t speed) {
   uint8_t fan = std::min(speed, kKelonFanMax);
 
   _previousFan = _.Fan;
@@ -193,13 +188,13 @@ void IRKelonAC::setFan(const uint8_t speed) {
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRKelonAC::getFan() const {
+uint8_t IRKelonAc::getFan() const {
   return ((static_cast<int16_t>(_.Fan) - 4) * -1) % 4;;
 }
 
 /// Set the dehumidification intensity.
 /// @param[in] grade has to be in the range [-2 : +2]
-void IRKelonAC::setDryGrade(const int8_t grade) {
+void IRKelonAc::setDryGrade(const int8_t grade) {
   int8_t drygrade = std::max(kKelonDryGradeMin, grade);
   drygrade = std::min(kKelonDryGradeMax, drygrade);
 
@@ -215,17 +210,13 @@ void IRKelonAC::setDryGrade(const int8_t grade) {
 
 /// Get the current dehumidification intensity setting. In smart mode, this controls the temperature adjustment.
 /// @return The current dehumidification intensity.
-int8_t IRKelonAC::getDryGrade() const {
-  auto outval = static_cast<int8_t>(_.DehumidifierGrade & 0b011);
-  if ((_.DehumidifierGrade & 0b100) == 0b100) {
-    outval *= -1;
-  }
-  return outval;
+int8_t IRKelonAc::getDryGrade() const {
+  return (_.DehumidifierGrade & 0b011) * (_.DehumidifierGrade & 0b100) ? -1 : 1;
 }
 
 /// Set the desired operation mode.
 /// @param[in] mode The desired operation mode.
-void IRKelonAC::setMode(const uint8_t mode) {
+void IRKelonAc::setMode(const uint8_t mode) {
   if (_.Mode == kKelonModeSmart || _.Mode == kKelonModeFan || _.Mode == kKelonModeDry) {
     _.Temperature = _previousTemp;
   }
@@ -247,7 +238,6 @@ void IRKelonAC::setMode(const uint8_t mode) {
     case kKelonModeDry:
     case kKelonModeFan:
       setTemp(25);
-      _.Mode = mode;
       //fallthrough
     case kKelonModeCool:
     case kKelonModeHeat:
@@ -260,37 +250,37 @@ void IRKelonAC::setMode(const uint8_t mode) {
 
 /// Get the current operation mode setting.
 /// @return The current operation mode.
-uint8_t IRKelonAC::getMode() const {
+uint8_t IRKelonAc::getMode() const {
   return _.Mode;
 }
 
 /// Request toggling the vertical swing - will be reset to false after sending
 /// @param[in] toggle If true, the swing mode will be toggled when sent.
-void IRKelonAC::setToggleSwingVertical(const bool toggle) {
+void IRKelonAc::setToggleSwingVertical(const bool toggle) {
   _.SwingVToggle = toggle;
 }
 
 /// Get whether the swing mode is set to be toggled
 /// @return Whether the toggle bit is set
-bool IRKelonAC::getToggleSwingVertical() const {
+bool IRKelonAc::getToggleSwingVertical() const {
   return _.SwingVToggle;
 }
 
 /// Control the current sleep (quiet) setting.
 /// @param[in] on The desired setting.
-void IRKelonAC::setSleep(const bool on) {
+void IRKelonAc::setSleep(const bool on) {
   _.SleepEnabled = on;
 }
 
 /// Is the sleep setting on?
 /// @return The current value.
-bool IRKelonAC::getSleep() const {
+bool IRKelonAc::getSleep() const {
   return _.SleepEnabled;
 }
 
 /// Control the current super cool mode setting.
 /// @param[in] on The desired setting.
-void IRKelonAC::setSupercool(const bool on) {
+void IRKelonAc::setSupercool(const bool on) {
   if (on) {
     setTemp(kKelonMinTemp);
     setMode(kKelonModeCool);
@@ -305,13 +295,13 @@ void IRKelonAC::setSupercool(const bool on) {
 
 /// Is the super cool mode setting on?
 /// @return The current value.
-bool IRKelonAC::getSupercool() const {
+bool IRKelonAc::getSupercool() const {
   return _.SuperCoolEnabled1;
 }
 
 /// Set the timer time and enable it. Timer is an off timer if the unit is on, it is an on timer if the unit is off.
-/// @param[in] mins Timer minutes (only multiples of 30m are supported for < 10h, then only multiples of 60m)
-void IRKelonAC::setTimer(uint16_t mins) {
+/// @param[in] mins Nr. of minutes (only multiples of 30m are supported for < 10h, then only multiples of 60m)
+void IRKelonAc::setTimer(uint16_t mins) {
   const uint16_t minutes = std::min(static_cast<int>(mins), 24 * 60);
 
   if (minutes / 60 >= 10) {
@@ -329,7 +319,7 @@ void IRKelonAC::setTimer(uint16_t mins) {
 /// Get the set timer. Timer set time is deleted once the command is sent, so calling this after send() will return 0.
 /// The AC unit will continue keeping track of the remaining time unless it is later disabled.
 /// @return The timer set minutes
-uint16_t IRKelonAC::getTimer() const {
+uint16_t IRKelonAc::getTimer() const {
   if (_.TimerHours >= 10) {
     return ((uint16_t) ((_.TimerHours << 1) | _.TimerHalfHour) - 10) * 60;
   }
@@ -338,13 +328,13 @@ uint16_t IRKelonAC::getTimer() const {
 
 /// Enable or disable the timer. Note that in order to enable the timer the minutes must be set with setTimer().
 /// @param[in] on Whether to enable or disable the timer
-void IRKelonAC::setTimerEnabled(bool on) {
+void IRKelonAc::setTimerEnabled(bool on) {
   _.TimerEnabled = on;
 }
 
 /// Get the current timer status
 /// @return Whether the timer is enabled.
-bool IRKelonAC::getTimerEnabled() const {
+bool IRKelonAc::getTimerEnabled() const {
   return _.TimerEnabled;
 }
 
@@ -352,20 +342,20 @@ bool IRKelonAC::getTimerEnabled() const {
 /// Get the raw state of the object, suitable to be sent with the appropriate
 /// IRsend object method.
 /// @return A PTR to the internal state.
-uint64_t IRKelonAC::getRaw() const {
+uint64_t IRKelonAc::getRaw() const {
   return _.raw;
 }
 
 /// Set the raw state of the object.
 /// @param[in] new_code The raw state from the native IR message.
-void IRKelonAC::setRaw(const uint64_t new_code) {
+void IRKelonAc::setRaw(const uint64_t new_code) {
   _.raw = new_code;
 }
 
 /// Convert a standard A/C mode (stdAc::opmode_t) into it a native mode.
 /// @param[in] mode A stdAc::opmode_t operation mode.
 /// @return The native mode equivalent.
-uint8_t IRKelonAC::convertMode(const stdAc::opmode_t mode) {
+uint8_t IRKelonAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool:
       return kKelonModeCool;
@@ -375,7 +365,6 @@ uint8_t IRKelonAC::convertMode(const stdAc::opmode_t mode) {
       return kKelonModeDry;
     case stdAc::opmode_t::kFan:
       return kKelonModeFan;
-    case stdAc::opmode_t::kAuto:
     default:
       return kKelonModeSmart;
   }
@@ -384,7 +373,7 @@ uint8_t IRKelonAC::convertMode(const stdAc::opmode_t mode) {
 /// Convert a standard A/C fan speed (stdAc::fanspeed_t) into it a native speed.
 /// @param[in] fan A stdAc::fanspeed_t fan speed
 /// @return The native speed equivalent.
-uint8_t IRKelonAC::convertFan(stdAc::fanspeed_t fan) {
+uint8_t IRKelonAc::convertFan(stdAc::fanspeed_t fan) {
   switch (fan) {
     case stdAc::fanspeed_t::kMin:
     case stdAc::fanspeed_t::kLow:
@@ -394,7 +383,6 @@ uint8_t IRKelonAC::convertFan(stdAc::fanspeed_t fan) {
     case stdAc::fanspeed_t::kHigh:
     case stdAc::fanspeed_t::kMax:
       return kKelonFanMax;
-    case stdAc::fanspeed_t::kAuto:
     default:
       return kKelonFanAuto;
   }
@@ -403,7 +391,7 @@ uint8_t IRKelonAC::convertFan(stdAc::fanspeed_t fan) {
 /// Convert a native mode to it's stdAc::opmode_t equivalent.
 /// @param[in] mode A native operating mode value.
 /// @return The stdAc::opmode_t equivalent.
-stdAc::opmode_t IRKelonAC::toCommonMode(const uint8_t mode) {
+stdAc::opmode_t IRKelonAc::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kKelonModeCool:
       return stdAc::opmode_t::kCool;
@@ -413,7 +401,6 @@ stdAc::opmode_t IRKelonAC::toCommonMode(const uint8_t mode) {
       return stdAc::opmode_t::kDry;
     case kKelonModeFan:
       return stdAc::opmode_t::kFan;
-    case kKelonModeSmart:
     default:
       return stdAc::opmode_t::kAuto;
   }
@@ -422,7 +409,7 @@ stdAc::opmode_t IRKelonAC::toCommonMode(const uint8_t mode) {
 /// Convert a native fan speed to it's stdAc::fanspeed_t equivalent.
 /// @param[in] speed A native fan speed value.
 /// @return The stdAc::fanspeed_t equivalent.
-stdAc::fanspeed_t IRKelonAC::toCommonFanSpeed(const uint8_t speed) {
+stdAc::fanspeed_t IRKelonAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kKelonFanMin:
       return stdAc::fanspeed_t::kLow;
@@ -430,7 +417,6 @@ stdAc::fanspeed_t IRKelonAC::toCommonFanSpeed(const uint8_t speed) {
       return stdAc::fanspeed_t::kMedium;
     case kKelonFanMax:
       return stdAc::fanspeed_t::kHigh;
-    case kKelonFanAuto:
     default:
       return stdAc::fanspeed_t::kAuto;
   }
@@ -438,7 +424,7 @@ stdAc::fanspeed_t IRKelonAC::toCommonFanSpeed(const uint8_t speed) {
 
 /// Convert the internal A/C object state to it's stdAc::state_t equivalent.
 /// @return A stdAc::state_t containing the current settings.
-stdAc::state_t IRKelonAC::toCommon() const {
+stdAc::state_t IRKelonAc::toCommon() const {
   stdAc::state_t result{};
   result.protocol = decode_type_t::KELON;
   result.model = -1;  // Unused.
@@ -464,14 +450,14 @@ stdAc::state_t IRKelonAC::toCommon() const {
 
 /// Convert the internal settings into a human readable string.
 /// @return A String.
-String IRKelonAC::toString() const {
+String IRKelonAc::toString() const {
   String result = "";
   result.reserve(160);  // Reserve some heap for the string to reduce fragging.
   result += addTempToString(getTemp(), true, false);
   result += addModeToString(_.Mode, kKelonModeSmart, kKelonModeCool, kKelonModeHeat, kKelonModeDry, kKelonModeFan);
   result += addFanToString(_.Fan, kKelonFanMax, kKelonFanMin, kKelonFanAuto, -1, kKelonFanMedium, kKelonFanMax);
   result += addBoolToString(_.SleepEnabled, kSleepStr);
-  result += addSignedIntToString(getDryGrade(), kDryGradeStr);
+  result += addLabeledString(String(getDryGrade()), kDryGradeStr);
   result += addLabeledString(getTimerEnabled()
       ? (getTimer() > 0 ? minsToString(getTimer()) : kOnStr)
       : kOffStr,kTimerStr);
