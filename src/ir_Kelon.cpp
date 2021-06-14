@@ -2,13 +2,16 @@
 
 /// @file
 /// @brief Support for Kelan AC protocol.
-/// Both sending and decoding should be functional for models of series KELON ON/OFF 9000-12000.
+/// Both sending and decoding should be functional for models of series
+/// KELON ON/OFF 9000-12000.
 /// All features of the standard remote are implemented.
 ///
 /// @note Unsupported:
 ///    - Explicit on/off due to AC unit limitations
 ///    - Explicit swing position due to AC unit limitations
 ///    - Fahrenheit.
+
+#include <algorithm>
 
 #include "ir_Kelon.h"
 
@@ -43,7 +46,8 @@ const uint16_t kKelonFreq = 38000;
 /// @param[in] data The data to be transmitted.
 /// @param[in] nbits Nr. of bits of data to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
-void IRsend::sendKelon(const uint64_t data, const uint16_t nbits, const uint16_t repeat) {
+void IRsend::sendKelon(const uint64_t data, const uint16_t nbits,
+                       const uint16_t repeat) {
   sendGeneric(kKelonHdrMark, kKelonHdrSpace,
               kKelonBitMark, kKelonOneSpace,
               kKelonBitMark, kKelonZeroSpace,
@@ -90,7 +94,8 @@ bool IRrecv::decodeKelon(decode_results *results, uint16_t offset,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-IRKelonAc::IRKelonAc(const uint16_t pin, const bool inverted, const bool use_modulation)
+IRKelonAc::IRKelonAc(const uint16_t pin, const bool inverted,
+                     const bool use_modulation)
     : _irsend{pin, inverted, use_modulation}, _{} { stateReset(); }
 
 /// Reset the internals of the object to a known good state.
@@ -181,7 +186,8 @@ void IRKelonAc::setFan(const uint8_t speed) {
   uint8_t fan = std::min(speed, kKelonFanMax);
 
   _previousFan = _.Fan;
-  // Note: Kelon fan speeds are backwards! This code maps the range 0,1:3 to 0,3:1 to save the API's user's sanity.
+  // Note: Kelon fan speeds are backwards! This code maps the range 0,1:3 to
+  // 0,3:1 to save the API's user's sanity.
   _.Fan = ((static_cast<int16_t>(fan) - 4) * -1) % 4;
 }
 
@@ -207,16 +213,19 @@ void IRKelonAc::setDryGrade(const int8_t grade) {
   _.DehumidifierGrade = outval;
 }
 
-/// Get the current dehumidification intensity setting. In smart mode, this controls the temperature adjustment.
+/// Get the current dehumidification intensity setting. In smart mode, this
+/// controls the temperature adjustment.
 /// @return The current dehumidification intensity.
 int8_t IRKelonAc::getDryGrade() const {
-  return (_.DehumidifierGrade & 0b011) * ((_.DehumidifierGrade & 0b100) ? -1 : 1); // NOLINT(cppcoreguidelines-narrowing-conversions)
+  return static_cast<int8_t>(_.DehumidifierGrade & 0b011) *
+         ((_.DehumidifierGrade & 0b100) ? -1 : 1);
 }
 
 /// Set the desired operation mode.
 /// @param[in] mode The desired operation mode.
 void IRKelonAc::setMode(const uint8_t mode) {
-  if (_.Mode == kKelonModeSmart || _.Mode == kKelonModeFan || _.Mode == kKelonModeDry) {
+  if (_.Mode == kKelonModeSmart || _.Mode == kKelonModeFan ||
+      _.Mode == kKelonModeDry) {
     _.Temperature = _previousTemp;
   }
   if (_.SuperCoolEnabled1) {
@@ -298,8 +307,10 @@ bool IRKelonAc::getSupercool() const {
   return _.SuperCoolEnabled1;
 }
 
-/// Set the timer time and enable it. Timer is an off timer if the unit is on, it is an on timer if the unit is off.
-/// @param[in] mins Nr. of minutes (only multiples of 30m are supported for < 10h, then only multiples of 60m)
+/// Set the timer time and enable it. Timer is an off timer if the unit is on,
+/// it is an on timer if the unit is off.
+/// Only multiples of 30m are supported for < 10h, then only multiples of 60m
+/// @param[in] mins Nr. of minutes
 void IRKelonAc::setTimer(uint16_t mins) {
   const uint16_t minutes = std::min(static_cast<int>(mins), 24 * 60);
 
@@ -315,8 +326,10 @@ void IRKelonAc::setTimer(uint16_t mins) {
   setTimerEnabled(true);
 }
 
-/// Get the set timer. Timer set time is deleted once the command is sent, so calling this after send() will return 0.
-/// The AC unit will continue keeping track of the remaining time unless it is later disabled.
+/// Get the set timer. Timer set time is deleted once the command is sent, so
+/// calling this after send() will return 0.
+/// The AC unit will continue keeping track of the remaining time unless it is
+/// later disabled.
 /// @return The timer set minutes
 uint16_t IRKelonAc::getTimer() const {
   if (_.TimerHours >= 10) {
@@ -325,7 +338,8 @@ uint16_t IRKelonAc::getTimer() const {
   return (((uint16_t) _.TimerHours) * 60) + (_.TimerHalfHour ? 30 : 0);
 }
 
-/// Enable or disable the timer. Note that in order to enable the timer the minutes must be set with setTimer().
+/// Enable or disable the timer. Note that in order to enable the timer the
+/// minutes must be set with setTimer().
 /// @param[in] on Whether to enable or disable the timer
 void IRKelonAc::setTimerEnabled(bool on) {
   _.TimerEnabled = on;
@@ -436,7 +450,8 @@ stdAc::state_t IRKelonAc::toCommon() const {
   // Not supported.
   result.power = true; // N/A, AC only supports toggling it
   result.swingv = stdAc::swingv_t::kAuto; // N/A, AC only supports toggling it
-  result.swingh = stdAc::swingh_t::kOff; // N/A, horizontal air direction can only be set by manually adjusting the flaps
+  // N/A, horizontal air direction can only be set by manually adjusting it
+  result.swingh = stdAc::swingh_t::kOff;
   result.light = true;
   result.beep = true;
   result.quiet = false;
@@ -451,15 +466,24 @@ stdAc::state_t IRKelonAc::toCommon() const {
 /// @return A String.
 String IRKelonAc::toString() const {
   String result = "";
-  result.reserve(160);  // Reserve some heap for the string to reduce fragging.
+  // Reserve some heap for the string to reduce fragging.
+  result.reserve(160);
   result += addTempToString(getTemp(), true, false);
-  result += addModeToString(_.Mode, kKelonModeSmart, kKelonModeCool, kKelonModeHeat, kKelonModeDry, kKelonModeFan);
-  result += addFanToString(_.Fan, kKelonFanMax, kKelonFanMin, kKelonFanAuto, -1, kKelonFanMedium, kKelonFanMax);
+  result += addModeToString(_.Mode, kKelonModeSmart, kKelonModeCool,
+                            kKelonModeHeat, kKelonModeDry, kKelonModeFan);
+  result += addFanToString(_.Fan, kKelonFanMax, kKelonFanMin, kKelonFanAuto,
+                           -1, kKelonFanMedium, kKelonFanMax);
   result += addBoolToString(_.SleepEnabled, kSleepStr);
   result += addSignedIntToString(getDryGrade(), kDryStr);
-  result += addLabeledString(getTimerEnabled()
-      ? (getTimer() > 0 ? minsToString(getTimer()) : kOnStr)
-      : kOffStr,kTimerStr);
+  result += addLabeledString(
+      getTimerEnabled()
+      ? (
+          getTimer() > 0
+          ? minsToString(getTimer())
+          : kOnStr
+      )
+      : kOffStr,
+      kTimerStr);
   result += addBoolToString(getSupercool(), kTurboStr);
   if (getTogglePower()) {
     result += addBoolToString(true, kPowerToggleStr);

@@ -516,7 +516,7 @@ namespace irutils {
   /// @param[in] precomma Should the output string start with ", " or not?
   /// @return The resulting String.
   String addSignedIntToString(const int16_t value, const String label,
-                        const bool precomma) {
+                              const bool precomma) {
     return addLabeledString(int64ToString(value), label, precomma);
   }
 

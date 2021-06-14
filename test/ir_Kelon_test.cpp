@@ -14,7 +14,8 @@ TEST(TestSendKelon, SendDataOnly) {
   IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
-  // Temp: 26C, Mode: 2 (Cool), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: Off, Turbo: Off
+  // Temp: 26C, Mode: 2 (Cool), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: Off,
+  // Turbo: Off
   irsend.reset();
   irsend.sendKelon(0x82000683);
   EXPECT_EQ(
@@ -26,10 +27,10 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s600m560s1680m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s600m560s100000",
-      irsend.outputStr()
-  );
+      irsend.outputStr());
 
-  // Temp: 18C, Mode: 2 (Cool), Fan: 1 (Low), Sleep: Off, Dry: 0, Timer: Off, Turbo: On
+  // Temp: 18C, Mode: 2 (Cool), Fan: 1 (Low), Sleep: Off, Dry: 0, Timer: Off,
+  // Turbo: On
   irsend.reset();
   irsend.sendKelon(0x900002010683);
   EXPECT_EQ(
@@ -41,10 +42,10 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s1680m560s600m560s600m560s1680m560s100000",
-      irsend.outputStr()
-  );
+      irsend.outputStr());
 
-  // Temp: 23C, Mode: 0 (Heat), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: Off, Turbo: Off, Power Toggle: On
+  // Temp: 23C, Mode: 0 (Heat), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: Off,
+  // Turbo: Off, Power Toggle: On
   irsend.reset();
   irsend.sendKelon(0x50040683);
   EXPECT_EQ(
@@ -56,10 +57,10 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s600m560s1680m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s100000",
-      irsend.outputStr()
-  );
+      irsend.outputStr());
 
-  // Temp: 26C, Mode: 2 (Cool), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: On (9.5h), Turbo:
+  // Temp: 26C, Mode: 2 (Cool), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer:
+  // On (9.5h), Turbo:
   irsend.reset();
   irsend.sendKelon(0x138A000683);
   EXPECT_EQ(
@@ -72,10 +73,10 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s1680m560s600m560s600m560s1680m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s100000",
-      irsend.outputStr()
-  );
+      irsend.outputStr());
 
-  // Temp: 26C, Mode: 2 (Cool), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: On (15h), Turbo: Off:
+  // Temp: 26C, Mode: 2 (Cool), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer:
+  // On (15h), Turbo: Off:
   irsend.reset();
   irsend.sendKelon(0x198A000683);
   EXPECT_EQ(
@@ -88,8 +89,7 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s1680m560s600m560s600m560s1680m560s1680m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s100000",
-      irsend.outputStr()
-  );
+      irsend.outputStr());
 }
 
 // Tests for decodeKelon().
@@ -106,9 +106,9 @@ TEST(TestDecodeKelon, Timer12HSmartMode) {
   EXPECT_EQ(KELON, irsend.capture.decode_type);
   EXPECT_EQ(kKelonBits, irsend.capture.bits);
   EXPECT_EQ(
-      "Temp: 25C, Mode: 1 (Auto), Fan: 3 (High), Sleep: Off, Dry: 0, Timer: 12:00, Turbo: Off",
-      IRAcUtils::resultAcToString(&irsend.capture)
-  );
+      "Temp: 25C, Mode: 1 (Auto), Fan: 3 (High), Sleep: Off, Dry: 0, "
+      "Timer: 12:00, Turbo: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
@@ -125,9 +125,9 @@ TEST(TestDecodeKelon, Timer5_5hSuperCoolMode) {
   EXPECT_EQ(KELON, irsend.capture.decode_type);
   EXPECT_EQ(kKelonBits, irsend.capture.bits);
   EXPECT_EQ(
-      "Temp: 18C, Mode: 2 (Cool), Fan: 1 (Low), Sleep: Off, Dry: 0, Timer: 05:30, Turbo: On",
-      IRAcUtils::resultAcToString(&irsend.capture)
-  );
+      "Temp: 18C, Mode: 2 (Cool), Fan: 1 (Low), Sleep: Off, Dry: 0, "
+      "Timer: 05:30, Turbo: On",
+      IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
@@ -144,9 +144,9 @@ TEST(TestDecodeKelon, ChangeSettingsWithTimerSetHeatMode) {
   EXPECT_EQ(KELON, irsend.capture.decode_type);
   EXPECT_EQ(kKelonBits, irsend.capture.bits);
   EXPECT_EQ(
-      "Temp: 23C, Mode: 0 (Heat), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: On, Turbo: Off",
-      IRAcUtils::resultAcToString(&irsend.capture)
-  );
+      "Temp: 23C, Mode: 0 (Heat), Fan: 0 (Auto), Sleep: Off, Dry: 0, "
+      "Timer: On, Turbo: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
@@ -163,9 +163,9 @@ TEST(TestDecodeKelon, TestPowerToggleDryMode) {
   EXPECT_EQ(KELON, irsend.capture.decode_type);
   EXPECT_EQ(kKelonBits, irsend.capture.bits);
   EXPECT_EQ(
-      "Temp: 26C, Mode: 3 (Dry), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: Off, Turbo: Off, Power Toggle: On",
-      IRAcUtils::resultAcToString(&irsend.capture)
-  );
+      "Temp: 26C, Mode: 3 (Dry), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer:"
+      " Off, Turbo: Off, Power Toggle: On",
+      IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
@@ -182,9 +182,9 @@ TEST(TestDecodeKelon, TestSwingToggleDryMode) {
   EXPECT_EQ(KELON, irsend.capture.decode_type);
   EXPECT_EQ(kKelonBits, irsend.capture.bits);
   EXPECT_EQ(
-      "Temp: 26C, Mode: 3 (Dry), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: Off, Turbo: Off, Swing(V) Toggle: On",
-      IRAcUtils::resultAcToString(&irsend.capture)
-  );
+      "Temp: 26C, Mode: 3 (Dry), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer:"
+      " Off, Turbo: Off, Swing(V) Toggle: On",
+      IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
@@ -201,9 +201,9 @@ TEST(TestDecodeKelon, TestDryGradeNegativeValue) {
   EXPECT_EQ(KELON, irsend.capture.decode_type);
   EXPECT_EQ(kKelonBits, irsend.capture.bits);
   EXPECT_EQ(
-      "Temp: 26C, Mode: 3 (Dry), Fan: 0 (Auto), Sleep: Off, Dry: -2, Timer: Off, Turbo: Off",
-      IRAcUtils::resultAcToString(&irsend.capture)
-  );
+      "Temp: 26C, Mode: 3 (Dry), Fan: 0 (Auto), Sleep: Off, Dry: -2,"
+      " Timer: Off, Turbo: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
