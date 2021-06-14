@@ -10,8 +10,6 @@
 ///    - Explicit swing position due to AC unit limitations
 ///    - Fahrenheit.
 
-#include <cstring>
-
 #include "ir_Kelon.h"
 
 #include "IRrecv.h"
@@ -22,6 +20,7 @@
 
 using irutils::addBoolToString;
 using irutils::addIntToString;
+using irutils::addSignedIntToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
@@ -211,7 +210,7 @@ void IRKelonAc::setDryGrade(const int8_t grade) {
 /// Get the current dehumidification intensity setting. In smart mode, this controls the temperature adjustment.
 /// @return The current dehumidification intensity.
 int8_t IRKelonAc::getDryGrade() const {
-  return (_.DehumidifierGrade & 0b011) * (_.DehumidifierGrade & 0b100) ? -1 : 1;
+  return (_.DehumidifierGrade & 0b011) * ((_.DehumidifierGrade & 0b100) ? -1 : 1); // NOLINT(cppcoreguidelines-narrowing-conversions)
 }
 
 /// Set the desired operation mode.
@@ -457,7 +456,7 @@ String IRKelonAc::toString() const {
   result += addModeToString(_.Mode, kKelonModeSmart, kKelonModeCool, kKelonModeHeat, kKelonModeDry, kKelonModeFan);
   result += addFanToString(_.Fan, kKelonFanMax, kKelonFanMin, kKelonFanAuto, -1, kKelonFanMedium, kKelonFanMax);
   result += addBoolToString(_.SleepEnabled, kSleepStr);
-  //result += addLabeledString(String(static_cast<int>(getDryGrade())), kDryStr);
+  result += addSignedIntToString(getDryGrade(), kDryStr);
   result += addLabeledString(getTimerEnabled()
       ? (getTimer() > 0 ? minsToString(getTimer()) : kOnStr)
       : kOffStr,kTimerStr);
