@@ -450,6 +450,13 @@ void IRac::coolix(IRCoolixAC *ac,
   // No Clock setting available.
   // No Econo setting available.
   // No Quiet setting available.
+  ac->send();  // Send the state, which will also power on the unit.
+  // The following are all options/settings that create their own special
+  // messages. Often they only make sense to be sent after the unit is turned
+  // on. For instance, assuming a person wants to have the a/c on and in turbo
+  // mode. If we send the turbo message, it is ignored if the unit is off.
+  // Hence we send the special mode/setting messages after a normal message
+  // which will turn on the device.
   if (swingv != stdAc::swingv_t::kOff || swingh != stdAc::swingh_t::kOff) {
     // Swing has a special command that needs to be sent independently.
     ac->setSwing();
@@ -475,7 +482,6 @@ void IRac::coolix(IRCoolixAC *ac,
     ac->setClean();
     ac->send();
   }
-  ac->send();
 }
 #endif  // SEND_COOLIX
 
