@@ -1,6 +1,6 @@
 ![IRremoteESP8266 Library](./assets/images/banner.svg)
 
-[![Build-Status](https://travis-ci.org/crankyoldgit/IRremoteESP8266.svg?branch=master)](https://travis-ci.org/crankyoldgit/IRremoteESP8266)
+[![Build-Status](https://travis-ci.com/crankyoldgit/IRremoteESP8266.svg?branch=master)](https://travis-ci.com/crankyoldgit/IRremoteESP8266)
 [![Arduino-Bibliothek-Abzeichen](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
 [![Durchschnittliche Zeit bis zur Problemlösung](http://isitmaintained.com/badge/resolution/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Resolution Time")
 [![Prozentsatz der offenen Probleme](http://isitmaintained.com/badge/open/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Open issues")
