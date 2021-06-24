@@ -22,15 +22,8 @@ const uint8_t  kTeknopointExtraTol = 10;  // Extra tolerance percentage.
 
 #if SEND_TEKNOPOINT
 /// Send a Teknopoint formatted message.
-/// Status: BETA / Probably works however the bit order is not yet determined.
+/// Status: BETA / Probably works.
 /// @param[in] data An array of bytes containing the IR command.
-///                 It is assumed to be in MSB order for this code.
-/// e.g.
-/// @code
-///   uint8_t data[kTeknopointStateLength] = {
-///       0xC4, 0xD3, 0x64, 0x80, 0x00, 0x24, 0xC0,
-///       0xF0, 0x10, 0x00, 0x00, 0x00, 0x00, 0xCA};
-/// @endcode
 /// @param[in] nbytes Nr. of bytes of data in the array.
 /// @param[in] repeat Nr. of times the message is to be repeated.
 void IRsend::sendTeknopoint(const uint8_t data[], const uint16_t nbytes,
@@ -40,13 +33,13 @@ void IRsend::sendTeknopoint(const uint8_t data[], const uint16_t nbytes,
               kTeknopointBitMark, kTeknopointZeroSpace,
               kTeknopointBitMark, kDefaultMessageGap,
               data, nbytes,  // Bytes
-              kTeknopointFreq, true, repeat, kDutyDefault);
+              kTeknopointFreq, false, repeat, kDutyDefault);
 }
 #endif  // SEND_TEKNOPOINT
 
 #if DECODE_TEKNOPOINT
 /// Decode the supplied Teknopoint message.
-/// Status: Alpha / Probably works however the bit order is not yet determined.
+/// Status: Alpha / Probably works.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
@@ -66,7 +59,14 @@ bool IRrecv::decodeTeknopoint(decode_results *results, uint16_t offset,
                     kTeknopointBitMark, kTeknopointOneSpace,
                     kTeknopointBitMark, kTeknopointZeroSpace,
                     kTeknopointBitMark, kDefaultMessageGap,
-                    true, _tolerance + kTeknopointExtraTol)) return false;
+                    true, _tolerance + kTeknopointExtraTol,
+                    kMarkExcess, false)) return false;
+  // Compliance
+  if (strict) {
+    // Is the checksum valid?
+    if (sumBytes(results->state, kTeknopointStateLength - 1) !=
+        results->state[kTeknopointStateLength - 1]) return false;
+  }
   // Success
   results->decode_type = decode_type_t::TEKNOPOINT;
   results->bits = nbits;
