@@ -766,6 +766,9 @@
 #ifndef D_STR_TECO
 #define D_STR_TECO "TECO"
 #endif  // D_STR_TECO
+#ifndef D_STR_TEKNOPOINT
+#define D_STR_TEKNOPOINT "TEKNOPOINT"
+#endif  // D_STR_TEKNOPOINT
 #ifndef D_STR_TOSHIBA_AC
 #define D_STR_TOSHIBA_AC "TOSHIBA_AC"
 #endif  // D_STR_TOSHIBA_AC

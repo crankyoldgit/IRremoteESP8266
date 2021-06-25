@@ -674,8 +674,8 @@ class IRsend {
 #endif  // SEND_ZEPEAL
 #if SEND_VOLTAS
   void sendVoltas(const unsigned char data[],
-                       const uint16_t nbytes = kVoltasStateLength,
-                       const uint16_t repeat = kNoRepeat);
+                  const uint16_t nbytes = kVoltasStateLength,
+                  const uint16_t repeat = kNoRepeat);
 #endif  // SEND_VOLTAS
 #if SEND_METZ
   void sendMetz(const uint64_t data,
@@ -712,6 +712,11 @@ class IRsend {
   void sendTruma(const uint64_t data, const uint16_t nbits = kTrumaBits,
                  const uint16_t repeat = kNoRepeat);
 #endif  // SEND_TRUMA
+#if SEND_TEKNOPOINT
+  void sendTeknopoint(const unsigned char data[],
+                      const uint16_t nbytes = kTeknopointStateLength,
+                      const uint16_t repeat = kNoRepeat);
+#endif  // SEND_TEKNOPOINT
 
  protected:
 #ifdef UNIT_TEST

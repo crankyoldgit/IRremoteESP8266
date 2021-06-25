@@ -166,6 +166,7 @@ bool hasACState(const decode_type_t protocol) {
     case SANYO_AC:
     case SHARP_AC:
     case TCL112AC:
+    case TEKNOPOINT:
     case TOSHIBA_AC:
     case TROTEC:
     case VOLTAS:
