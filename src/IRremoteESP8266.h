@@ -773,7 +773,9 @@
      DECODE_AMCOR || DECODE_DAIKIN152 || DECODE_MITSUBISHI136 || \
      DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
      DECODE_HITACHI_AC344 || DECODE_CORONA_AC || DECODE_SANYO_AC || \
-     DECODE_VOLTAS || DECODE_MIRAGE || DECODE_HAIER_AC176 || DECODE_TEKNOPOINT)
+     DECODE_VOLTAS || DECODE_MIRAGE || DECODE_HAIER_AC176 || \
+     DECODE_TEKNOPOINT || \
+     false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
 #define DECODE_AC true  // We need some common infrastructure for decoding A/Cs.
