@@ -580,6 +580,8 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
       return kDishMinRepeat;
     case EPSON:
       return kEpsonMinRepeat;
+    case SANYO_AC88:
+      return kSanyoAc88MinRepeat;
     case SONY:
       return kSonyMinRepeat;
     case SONY_38K:
@@ -739,6 +741,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kSamsungAcBits;
     case SANYO_AC:
       return kSanyoAcBits;
+    case SANYO_AC88:
+      return kSanyoAc88Bits;
     case SHARP_AC:
       return kSharpAcBits;
     case TCL112AC:
@@ -1247,6 +1251,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendSanyoAc(state, nbytes);
       break;
 #endif  // SEND_SANYO_AC
+#if SEND_SANYO_AC88
+    case SANYO_AC88:
+      sendSanyoAc88(state, nbytes);
+      break;
+#endif  // SEND_SANYO_AC88
 #if SEND_SHARP_AC
     case SHARP_AC:
       sendSharpAc(state, nbytes);

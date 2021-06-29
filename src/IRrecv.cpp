@@ -1028,6 +1028,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Kelon decode");
     if (decodeKelon(results, offset)) return true;
 #endif  // DECODE_KELON
+#if DECODE_SANYO_AC88
+    DPRINTLN("Attempting SanyoAc88 decode");
+    if (decodeSanyoAc88(results, offset)) return true;
+#endif  // DECODE_SANYO_AC88
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

@@ -1,4 +1,4 @@
-// Copyright 2020 David Conran
+// Copyright 2020-2021 David Conran
 
 /// @file
 /// @brief Support for Sanyo protocols.
@@ -11,6 +11,7 @@
 /// @see http://slydiman.narod.ru/scr/kb/sanyo.htm
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1211
 /// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?usp=sharing
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1503
 
 // Supports:
 //   Brand: Sanyo,  Model: SA 8650B - disabled

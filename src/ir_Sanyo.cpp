@@ -1,6 +1,6 @@
 // Copyright 2009 Ken Shirriff
 // Copyright 2016 marcosamarinho
-// Copyright 2017-2020 David Conran
+// Copyright 2017-2021 David Conran
 
 /// @file
 /// @brief Support for Sanyo protocols.
@@ -13,6 +13,7 @@
 /// @see http://slydiman.narod.ru/scr/kb/sanyo.htm
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1211
 /// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?usp=sharing
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1503
 
 #include "ir_Sanyo.h"
 #include <algorithm>
@@ -66,6 +67,15 @@ const uint16_t kSanyoAcOneSpace = 1600;  ///< uSeconds
 const uint16_t kSanyoAcZeroSpace = 550;  ///< uSeconds
 const uint32_t kSanyoAcGap = kDefaultMessageGap;  ///< uSeconds (Guess only)
 const uint16_t kSanyoAcFreq = 38000;  ///< Hz. (Guess only)
+
+const uint16_t kSanyoAc88HdrMark = 5400;   ///< uSeconds
+const uint16_t kSanyoAc88HdrSpace = 2000;  ///< uSeconds
+const uint16_t kSanyoAc88BitMark = 500;    ///< uSeconds
+const uint16_t kSanyoAc88OneSpace = 1500;  ///< uSeconds
+const uint16_t kSanyoAc88ZeroSpace = 750;  ///< uSeconds
+const uint32_t kSanyoAc88Gap = 3675;       ///< uSeconds
+const uint16_t kSanyoAc88Freq = 38000;     ///< Hz. (Guess only)
+const uint8_t  kSanyoAc88ExtraTolerance = 5;  /// (%) Extra tolerance to use.
 
 #if SEND_SANYO
 /// Construct a Sanyo LC7461 message.
@@ -656,3 +666,72 @@ String IRSanyoAc::toString(void) const {
                              kOffTimerStr);
   return result;
 }
+
+#if SEND_SANYO_AC88
+/// Send a SanyoAc88 formatted message.
+/// Status: ALPHA / Completely untested.
+/// @param[in] data An array of bytes containing the IR command.
+/// @warning data's bit order may change. It is not yet confirmed.
+/// @param[in] nbytes Nr. of bytes of data in the array.
+/// @param[in] repeat Nr. of times the message is to be repeated.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1503
+void IRsend::sendSanyoAc88(const uint8_t data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
+  // (Header + Data + Footer) per repeat
+  sendGeneric(kSanyoAc88HdrMark, kSanyoAc88HdrSpace,
+              kSanyoAc88BitMark, kSanyoAc88OneSpace,
+              kSanyoAc88BitMark, kSanyoAc88ZeroSpace,
+              kSanyoAc88BitMark, kSanyoAc88Gap,
+              data, nbytes, kSanyoAc88Freq, false, repeat, kDutyDefault);
+  space(kDefaultMessageGap);  // Make a guess at a post message gap.
+}
+#endif  // SEND_SANYO_AC88
+
+#if DECODE_SANYO_AC88
+/// Decode the supplied SanyoAc message.
+/// Status: ALPHA / Untested.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+/// @warning data's bit order may change. It is not yet confirmed.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1503
+bool IRrecv::decodeSanyoAc88(decode_results *results, uint16_t offset,
+                             const uint16_t nbits, const bool strict) {
+  if (strict && nbits != kSanyoAc88Bits)
+    return false;
+
+  uint16_t used = 0;
+  // Compliance
+  const uint16_t expected_repeats = strict ? kSanyoAc88MinRepeat : 0;
+
+  // Handle the expected nr of repeats.
+  for (uint16_t r = 0; r <= expected_repeats; r++) {
+    // Header + Data + Footer
+    used = matchGeneric(results->rawbuf + offset, results->state,
+                        results->rawlen - offset, nbits,
+                        kSanyoAc88HdrMark, kSanyoAc88HdrSpace,
+                        kSanyoAc88BitMark, kSanyoAc88OneSpace,
+                        kSanyoAc88BitMark, kSanyoAc88ZeroSpace,
+                        kSanyoAc88BitMark,
+                        // Expect an inter-message gap, or just the end of msg?
+                        (r < expected_repeats) ? kSanyoAc88Gap
+                                               : kDefaultMessageGap,
+                        r == expected_repeats,
+                        _tolerance + kSanyoAc88ExtraTolerance,
+                        kMarkExcess, false);
+    if (!used) return false;  // No match!
+    offset += used;
+  }
+
+  // Success
+  results->decode_type = decode_type_t::SANYO_AC88;
+  results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_SANYO_AC88
