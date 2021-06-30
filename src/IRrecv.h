@@ -744,6 +744,10 @@ class IRrecv {
                         const uint16_t nbits = kTeknopointBits,
                         const bool strict = true);
 #endif  // DECODE_TEKNOPOINT
+#if DECODE_KELON
+  bool decodeKelon(decode_results *results, uint16_t offset = kStartOffset,
+                   const uint16_t nbits = kKelonBits, const bool strict = true);
+#endif  // DECODE_KELON
 };
 
 #endif  // IRRECV_H_

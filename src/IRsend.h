@@ -717,6 +717,10 @@ class IRsend {
                       const uint16_t nbytes = kTeknopointStateLength,
                       const uint16_t repeat = kNoRepeat);
 #endif  // SEND_TEKNOPOINT
+#if SEND_KELON
+  void sendKelon(const unsigned char data[], const uint16_t nbytes = kKelonStateLength,
+                         const uint16_t repeat = kNoRepeat);
+#endif  // SEND_KELON
 
  protected:
 #ifdef UNIT_TEST

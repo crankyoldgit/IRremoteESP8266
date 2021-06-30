@@ -28,6 +28,7 @@
 #include "ir_Fujitsu.h"
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
+#include "ir_Kelon.h"
 #include "ir_Kelvinator.h"
 #include "ir_LG.h"
 #include "ir_Midea.h"
@@ -216,6 +217,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_HITACHI_AC424
     case decode_type_t::HITACHI_AC424:
+#endif
+#if SEND_KELON
+    case decode_type_t::KELON:
 #endif
 #if SEND_KELVINATOR
     case decode_type_t::KELVINATOR:
@@ -1250,6 +1254,36 @@ void IRac::hitachi424(IRHitachiAc424 *ac,
 }
 #endif  // SEND_HITACHI_AC424
 
+#if SEND_KELON
+/// Send a Kelon A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRKelonAC object to use.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] sleep Run the device in sleep/quiet mode.
+/// @param[in] superCool Run the device in Super cooling mode.
+/// @param[in] dryGrade The dehumidification intensity grade
+/// @param[in] togglePower Whether to toggle the unit's power
+/// @param[in] toggleSwing Whether to toggle the swing setting
+void IRac::kelon(IRKelonAC *ac,
+                 const stdAc::opmode_t mode, const float degrees,
+                 const stdAc::fanspeed_t fan, const bool sleep,
+                 const bool superCool, const int8_t dryGrade,
+                 const bool togglePower = false, const bool toggleSwing = false) {
+  ac->begin();
+  ac->setMode(IRKelonAC::convertMode(mode));
+  ac->setFan(IRKelonAC::convertFan(fan));
+  ac->setTemp(static_cast<uint8_t>(degrees));
+  ac->setSleep(sleep);
+  ac->setSupercool(superCool);
+
+  ac->setTogglePower(togglePower);
+  ac->setToggleSwingVertical(toggleSwing);
+
+  ac->send();
+}
+#endif  // SEND_KELON
+
 #if SEND_KELVINATOR
 /// Send a Kelvinator A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRKelvinatorAC object to use.
@@ -2262,6 +2296,14 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         if (desired.model == panasonic_ac_remote_model_t::kPanasonicCkp)
           result.power = desired.power ^ prev->power;
         break;
+      case decode_type_t::KELON:
+        result.power = desired.power ^ prev->power;
+        if ((desired.swingv == stdAc::swingv_t::kOff) ^
+            (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
+          result.swingv = stdAc::swingv_t::kAuto;
+        else
+          result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
+        break;
       default:
         {};
     }
@@ -2572,6 +2614,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_HITACHI_AC424
+#if SEND_KELON
+    case KELON: {
+      IRKelonAC ac(_pin, _inverted, _modulation);
+      kelon(&ac, send.mode, send.degrees, send.fanspeed, send.sleep,
+            send.turbo, 0, send.power, send.swingv != stdAc::swingv_t::kOff);
+      break;
+    }
+#endif
 #if SEND_KELVINATOR
     case KELVINATOR:
     {
@@ -3281,6 +3331,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_FUJITSU_AC
+#if DECODE_KELON
+      case decode_type_t::KELON: {
+        IRKelonAC ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_KELON
 #if DECODE_KELVINATOR
       case decode_type_t::KELVINATOR: {
         IRKelvinatorAC ac(kGpioUnused);
@@ -3766,6 +3823,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_HITACHI_AC424
+#if DECODE_KELON
+      case decode_type_t::KELON: {
+        IRKelonAC ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif
 #if DECODE_KELVINATOR
       case decode_type_t::KELVINATOR: {
         IRKelvinatorAC ac(kGpioUnused);

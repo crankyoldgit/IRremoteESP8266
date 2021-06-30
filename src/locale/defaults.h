@@ -279,6 +279,9 @@
 #ifndef D_STR_ID
 #define D_STR_ID "Id"
 #endif  // D_STR_ID
+#ifndef D_STR_DRY_GRADE
+#define D_STR_DRY_GRADE "Dry grade"
+#endif  // D_STR_DRY_GRADE
 
 #ifndef D_STR_AUTO
 #define D_STR_AUTO "Auto"
@@ -802,6 +805,9 @@
 #ifndef D_STR_ZEPEAL
 #define D_STR_ZEPEAL "ZEPEAL"
 #endif  // D_STR_ZEPEAL
+#ifndef D_STR_KELON
+#define D_STR_KELON "KELON"
+#endif // D_STR_KELON
 
 // IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP

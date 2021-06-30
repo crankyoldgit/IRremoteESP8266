@@ -1182,6 +1182,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendHitachiAc424(state, nbytes);
       break;
 #endif  // SEND_HITACHI_AC424
+#if SEND_KELON
+    case KELON:
+      sendKelon(state, nbytes);
+      break;
+#endif  // SEND_KELON
 #if SEND_KELVINATOR
     case KELVINATOR:
       sendKelvinator(state, nbytes);

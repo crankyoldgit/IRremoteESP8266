@@ -99,6 +99,7 @@ const PROGMEM char* k6thSenseStr = D_STR_6THSENSE;  ///< "6th Sense"
 const PROGMEM char* kTypeStr = D_STR_TYPE;  ///< "Type"
 const PROGMEM char* kSpecialStr = D_STR_SPECIAL;  ///< "Special"
 const PROGMEM char* kIdStr = D_STR_ID;  ///< "Id" / Device Identifier
+const PROGMEM char* kDryGradeStr = D_STR_DRY_GRADE; ///< "Dry grade"
 
 const PROGMEM char* kAutoStr = D_STR_AUTO;  ///< "Auto"
 const PROGMEM char* kAutomaticStr = D_STR_AUTOMATIC;  ///< "Automatic"
@@ -287,5 +288,6 @@ const PROGMEM char *kAllProtocolNamesStr =
     D_STR_TRUMA "\x0"
     D_STR_HAIER_AC176 "\x0"
     D_STR_TEKNOPOINT "\x0"
+    D_STR_KELON "\x0"
     ///< New protocol strings should be added just above this line.
     "\x0";  ///< This string requires double null termination.
