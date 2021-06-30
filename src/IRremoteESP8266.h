@@ -924,10 +924,10 @@ enum decode_type_t {
   XMP,
   TRUMA,  // 100
   HAIER_AC176,
-  KELON,
   TEKNOPOINT,
+  KELON,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = TEKNOPOINT,
+  kLastDecodeType = KELON,
 };
 
 // Message lengths & required repeat values
