@@ -140,12 +140,15 @@ void IRKelonAc::ensurePower(bool on) {
 
   setDryGrade(previousDry);
   setMode(_previousMode);
-
-  // Now we're sure it's on. Turn it back off.
-  if (!on) {
-    setTogglePower(true);
-  }
   send();
+
+  // Now we're sure it's on. Turn it back off. The AC seems to turn back on if
+  // we don't send this separately
+  if (!on) {
+    _irsend.space(kKelonGap);
+    setTogglePower(true);
+    send();
+  }
 }
 
 #endif // SEND_KELON
