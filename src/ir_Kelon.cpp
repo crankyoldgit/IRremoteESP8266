@@ -42,7 +42,7 @@ const uint16_t kKelonFreq = 38000;
 #if SEND_KELON
 
 /// Send a Kelon message.
-/// Status: Beta / Should be working.
+/// Status: STABLE / Working.
 /// @param[in] data The data to be transmitted.
 /// @param[in] nbits Nr. of bits of data to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
@@ -60,7 +60,7 @@ void IRsend::sendKelon(const uint64_t data, const uint16_t nbits,
 
 #if DECODE_KELON
 /// Decode the supplied Kelon message.
-/// Status: Beta / Should be working.
+/// Status: STABLE / Working.
 /// @param[in,out] results Ptr to the data to decode & where to store the result
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
