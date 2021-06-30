@@ -136,6 +136,8 @@ void IRKelonAc::ensurePower(bool on) {
   setMode(kKelonModeSmart);
   send();
 
+  _irsend.space(kKelonGap);
+
   setDryGrade(previousDry);
   setMode(_previousMode);
 
