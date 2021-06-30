@@ -56,7 +56,7 @@ void IRsend::sendKelon(const uint64_t data, const uint16_t nbits,
               repeat, 50);
 }
 
-#endif // SEND_KELON
+#endif  // SEND_KELON
 
 #if DECODE_KELON
 /// Decode the supplied Kelon message.
@@ -151,7 +151,7 @@ void IRKelonAc::ensurePower(bool on) {
   }
 }
 
-#endif // SEND_KELON
+#endif  // SEND_KELON
 
 /// Set up hardware to be able to send a message.
 void IRKelonAc::begin() {
@@ -251,7 +251,7 @@ void IRKelonAc::setMode(const uint8_t mode) {
     case kKelonModeDry:
     case kKelonModeFan:
       setTemp(25);
-      //fallthrough
+      // fallthrough
     case kKelonModeCool:
     case kKelonModeHeat:
       _.Mode = mode;
@@ -453,8 +453,8 @@ stdAc::state_t IRKelonAc::toCommon() const {
   result.turbo = getSupercool();
   result.sleep = getSleep() ? 0 : -1;
   // Not supported.
-  result.power = true; // N/A, AC only supports toggling it
-  result.swingv = stdAc::swingv_t::kAuto; // N/A, AC only supports toggling it
+  result.power = true;  // N/A, AC only supports toggling it
+  result.swingv = stdAc::swingv_t::kAuto;  // N/A, AC only supports toggling it
   // N/A, horizontal air direction can only be set by manually adjusting it
   result.swingh = stdAc::swingh_t::kOff;
   result.light = true;

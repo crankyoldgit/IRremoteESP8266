@@ -2619,7 +2619,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case KELON: {
       IRKelonAc ac(_pin, _inverted, _modulation);
       kelon(&ac, send.mode, send.degrees, send.fanspeed, send.sleep,
-            send.turbo, 0, send.power, send.swingv != stdAc::swingv_t::kOff);
+            send.turbo, 0, send.power,
+            send.swingv != stdAc::swingv_t::kOff);
       break;
     }
 #endif

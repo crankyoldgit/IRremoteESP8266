@@ -293,8 +293,9 @@ void electra(IRElectraAc *ac,
 #if SEND_KELON
   void kelon(IRKelonAc *ac,
              const stdAc::opmode_t mode, const float degrees,
-             const stdAc::fanspeed_t fan, const bool sleep, const bool superCool,
-             const int8_t dryGrade, const bool togglePower, const bool toggleSwing);
+             const stdAc::fanspeed_t fan, const bool sleep,
+             const bool superCool, const int8_t dryGrade,
+             const bool togglePower, const bool toggleSwing);
 #endif  // SEND_KELON
 #if SEND_KELVINATOR
   void kelvinator(IRKelvinatorAC *ac,

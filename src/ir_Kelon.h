@@ -2,7 +2,8 @@
 
 /// @file
 /// @brief Support for Kelan AC protocol.
-/// Both sending and decoding should be functional for models of series KELON ON/OFF 9000-12000.
+/// Both sending and decoding should be functional for models of series KELON
+/// ON/OFF 9000-12000.
 /// All features of the standard remote are implemented.
 ///
 /// @note Unsupported:
@@ -54,7 +55,8 @@ const uint8_t kKelonModeDry = 3;    // (temp = 25C, but not shown)
 const uint8_t kKelonModeFan = 4;    // (temp = 25C, but not shown)
 const uint8_t kKelonFanAuto = 0;
 // Note! Kelon fan speeds are actually 0:AUTO, 1:MAX, 2:MED, 3:MIN
-// Since this is insane, I decided to invert them in the public API, they are converted back in setFan/getFan
+// Since this is insane, I decided to invert them in the public API, they are
+// converted back in setFan/getFan
 const uint8_t kKelonFanMin = 1;
 const uint8_t kKelonFanMedium = 2;
 const uint8_t kKelonFanMax = 3;
@@ -66,8 +68,9 @@ const uint8_t kKelonMaxTemp = 32;
 
 
 class IRKelonAc {
-public:
-  explicit IRKelonAc(uint16_t pin, bool inverted = false, bool use_modulation = true);
+ public:
+  explicit IRKelonAc(uint16_t pin, bool inverted = false,
+                     bool use_modulation = true);
 
   void stateReset(void);
 
@@ -148,7 +151,7 @@ public:
 
   String toString(void) const;
 
-private:
+ private:
 #ifndef UNIT_TEST
   IRsend _irsend;  ///< Instance of the IR send class
 #else  // UNIT_TEST
@@ -164,4 +167,4 @@ private:
   uint8_t _previousFan = kKelonFanAuto;
 };
 
-#endif // IR_KELON_H_
+#endif  // IR_KELON_H_
