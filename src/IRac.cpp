@@ -2286,6 +2286,13 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         else
           result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
         break;
+      case decode_type_t::KELON:
+        if ((desired.swingv == stdAc::swingv_t::kOff) ^
+            (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
+          result.swingv = stdAc::swingv_t::kAuto;
+        else
+          result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
+        // FALL-THRU
       case decode_type_t::AIRWELL:
       case decode_type_t::DAIKIN64:
       case decode_type_t::PANASONIC_AC32:
@@ -2296,14 +2303,6 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         // CKP models use a power mode toggle.
         if (desired.model == panasonic_ac_remote_model_t::kPanasonicCkp)
           result.power = desired.power ^ prev->power;
-        break;
-      case decode_type_t::KELON:
-        result.power = desired.power ^ prev->power;
-        if ((desired.swingv == stdAc::swingv_t::kOff) ^
-            (prev->swingv == stdAc::swingv_t::kOff))  // It changed, so toggle.
-          result.swingv = stdAc::swingv_t::kAuto;
-        else
-          result.swingv = stdAc::swingv_t::kOff;  // No change, so no toggle.
         break;
       default:
         {};
