@@ -1257,24 +1257,24 @@ void IRac::hitachi424(IRHitachiAc424 *ac,
 #if SEND_KELON
 /// Send a Kelon A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRKelonAc object to use.
+/// @param[in] togglePower Whether to toggle the unit's power
 /// @param[in] mode The operation mode setting.
+/// @param[in] dryGrade The dehumidification intensity grade
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
-/// @param[in] sleep Run the device in sleep/quiet mode.
 /// @param[in] superCool Run the device in Super cooling mode.
-/// @param[in] dryGrade The dehumidification intensity grade
-/// @param[in] togglePower Whether to toggle the unit's power
 /// @param[in] toggleSwing Whether to toggle the swing setting
-void IRac::kelon(IRKelonAc *ac,
-                 const stdAc::opmode_t mode, const float degrees,
-                 const stdAc::fanspeed_t fan, const bool sleep,
-                 const bool superCool, const int8_t dryGrade,
-                 const bool togglePower = false, const bool toggleSwing = false) {
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on
+void IRac::kelon(IRKelonAc *ac, const bool togglePower,
+                 const stdAc::opmode_t mode, const int8_t dryGrade,
+                 const float degrees, const stdAc::fanspeed_t fan,
+                 const bool toggleSwing, const bool superCool,
+                 const int16_t sleep) {
   ac->begin();
   ac->setMode(IRKelonAc::convertMode(mode));
   ac->setFan(IRKelonAc::convertFan(fan));
   ac->setTemp(static_cast<uint8_t>(degrees));
-  ac->setSleep(sleep);
+  ac->setSleep(sleep >= 0);
   ac->setSupercool(superCool);
   ac->setDryGrade(dryGrade);
 
@@ -2618,9 +2618,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
 #if SEND_KELON
     case KELON: {
       IRKelonAc ac(_pin, _inverted, _modulation);
-      kelon(&ac, send.mode, send.degrees, send.fanspeed, send.sleep,
-            send.turbo, 0, send.power,
-            send.swingv != stdAc::swingv_t::kOff);
+      kelon(&ac, send.power,;
       break;
     }
 #endif
@@ -3832,7 +3830,7 @@ namespace IRAcUtils {
         *result = ac.toCommon();
         break;
       }
-#endif
+#endif  // DECODE_KELON
 #if DECODE_KELVINATOR
       case decode_type_t::KELVINATOR: {
         IRKelvinatorAC ac(kGpioUnused);

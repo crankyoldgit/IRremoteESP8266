@@ -36,7 +36,7 @@ const uint16_t kKelonHdrSpace = 4600;
 const uint16_t kKelonBitMark = 560;
 const uint16_t kKelonOneSpace = 1680;
 const uint16_t kKelonZeroSpace = 600;
-const uint32_t kKelonGap = kDefaultMessageGap;
+const uint32_t kKelonGap = 2 * kDefaultMessageGap;
 const uint16_t kKelonFreq = 38000;
 
 #if SEND_KELON
@@ -136,8 +136,6 @@ void IRKelonAc::ensurePower(bool on) {
   setMode(kKelonModeSmart);
   send();
 
-  _irsend.space(kKelonGap);
-
   setDryGrade(previousDry);
   setMode(_previousMode);
   send();
@@ -145,7 +143,6 @@ void IRKelonAc::ensurePower(bool on) {
   // Now we're sure it's on. Turn it back off. The AC seems to turn back on if
   // we don't send this separately
   if (!on) {
-    _irsend.space(kKelonGap);
     setTogglePower(true);
     send();
   }

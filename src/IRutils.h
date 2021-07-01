@@ -51,7 +51,7 @@ namespace irutils {
   String addIntToString(const uint16_t value, const String label,
                         const bool precomma = true);
   String addSignedIntToString(const int16_t value, const String label,
-                        const bool precomma = true);
+                              const bool precomma = true);
   String modelToStr(const decode_type_t protocol, const int16_t model);
   String addModelToString(const decode_type_t protocol, const int16_t model,
                           const bool precomma = true);

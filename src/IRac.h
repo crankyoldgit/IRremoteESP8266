@@ -291,11 +291,10 @@ void electra(IRElectraAc *ac,
                   const stdAc::swingv_t swingv);
 #endif  // SEND_HITACHI_AC424
 #if SEND_KELON
-  void kelon(IRKelonAc *ac,
-             const stdAc::opmode_t mode, const float degrees,
-             const stdAc::fanspeed_t fan, const bool sleep,
-             const bool superCool, const int8_t dryGrade,
-             const bool togglePower, const bool toggleSwing);
+  void kelon(IRKelonAc *ac, const bool togglePower, const stdAc::opmode_t mode,
+             const int8_t dryGrade, const float degrees,
+             const stdAc::fanspeed_t fan, const bool toggleSwing,
+             const bool superCool, const int16_t sleep);
 #endif  // SEND_KELON
 #if SEND_KELVINATOR
   void kelvinator(IRKelvinatorAC *ac,
