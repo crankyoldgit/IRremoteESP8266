@@ -1262,8 +1262,8 @@ void IRac::hitachi424(IRHitachiAc424 *ac,
 /// @param[in] dryGrade The dehumidification intensity grade
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
-/// @param[in] superCool Run the device in Super cooling mode.
 /// @param[in] toggleSwing Whether to toggle the swing setting
+/// @param[in] superCool Run the device in Super cooling mode.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on
 void IRac::kelon(IRKelonAc *ac, const bool togglePower,
                  const stdAc::opmode_t mode, const int8_t dryGrade,
@@ -2617,7 +2617,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
 #if SEND_KELON
     case KELON: {
       IRKelonAc ac(_pin, _inverted, _modulation);
-      kelon(&ac, send.power,;
+      kelon(&ac, send.power, send.mode, 0, send.degrees, send.fanspeed,
+            send.swingv != stdAc::swingv_t::kOff, send.turbo, send.sleep);
       break;
     }
 #endif
