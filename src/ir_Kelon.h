@@ -147,7 +147,7 @@ class IRKelonAc {
 
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
 
-  stdAc::state_t toCommon(const stdAc::state_t *prev) const;
+  stdAc::state_t toCommon(const stdAc::state_t *prev = nullptr) const;
 
   String toString(void) const;
 
