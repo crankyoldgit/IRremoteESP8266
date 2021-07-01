@@ -26,7 +26,7 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s600m560s600m560s600m560s1680m560s600m560s600m560s600m560s600"
       "m560s600m560s1680m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
-      "m560s600m560s600m560s100000",
+      "m560s600m560s600m560s200000",
       irsend.outputStr());
 
   // Temp: 18C, Mode: 2 (Cool), Fan: 1 (Low), Sleep: Off, Dry: 0, Timer: Off,
@@ -41,7 +41,7 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s600m560s600m560s600m560s600m560s1680m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
-      "m560s600m560s1680m560s600m560s600m560s1680m560s100000",
+      "m560s600m560s1680m560s600m560s600m560s1680m560s200000",
       irsend.outputStr());
 
   // Temp: 23C, Mode: 0 (Heat), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer: Off,
@@ -56,7 +56,7 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600m560s1680"
       "m560s600m560s1680m560s600m560s600m560s600m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
-      "m560s600m560s600m560s600m560s100000",
+      "m560s600m560s600m560s600m560s200000",
       irsend.outputStr());
 
   // Temp: 26C, Mode: 2 (Cool), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer:
@@ -72,7 +72,7 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s600m560s1680m560s600m560s600m560s600m560s1680m560s1680"
       "m560s1680m560s600m560s600m560s1680m560s600m560s600m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
-      "m560s600m560s100000",
+      "m560s600m560s200000",
       irsend.outputStr());
 
   // Temp: 26C, Mode: 2 (Cool), Fan: 0 (Auto), Sleep: Off, Dry: 0, Timer:
@@ -88,7 +88,7 @@ TEST(TestSendKelon, SendDataOnly) {
       "m560s1680m560s600m560s1680m560s600m560s600m560s600m560s1680"
       "m560s1680m560s600m560s600m560s1680m560s1680m560s600"
       "m560s600m560s600m560s600m560s600m560s600m560s600m560s600"
-      "m560s600m560s600m560s600m560s100000",
+      "m560s600m560s600m560s600m560s200000",
       irsend.outputStr());
 }
 
