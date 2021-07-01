@@ -439,7 +439,7 @@ stdAc::fanspeed_t IRKelonAc::toCommonFanSpeed(const uint8_t speed) {
 
 /// Convert the internal A/C object state to it's stdAc::state_t equivalent.
 /// @return A stdAc::state_t containing the current settings.
-stdAc::state_t IRKelonAc::toCommon() const {
+stdAc::state_t IRKelonAc::toCommon(const stdAc::state_t *prev = nullptr) const {
   stdAc::state_t result{};
   result.protocol = decode_type_t::KELON;
   result.model = -1;  // Unused.
@@ -450,8 +450,10 @@ stdAc::state_t IRKelonAc::toCommon() const {
   result.turbo = getSupercool();
   result.sleep = getSleep() ? 0 : -1;
   // Not supported.
-  result.power = true;  // N/A, AC only supports toggling it
-  result.swingv = stdAc::swingv_t::kAuto;  // N/A, AC only supports toggling it
+  // N/A, AC only supports toggling it
+  result.power = prev == nullptr || prev->power;
+  // N/A, AC only supports toggling it
+  result.swingv = prev != nullptr ? prev->swingv : stdAc::swingv_t::kAuto;
   // N/A, horizontal air direction can only be set by manually adjusting it
   result.swingh = stdAc::swingh_t::kOff;
   result.light = true;
