@@ -391,6 +391,33 @@ TEST(TestIRKelonClass, toCommon) {
   EXPECT_EQ(0, common.sleep);
 }
 
+TEST(TestIRKelonClass, toCommonToggles) {
+  IRKelonAc ac(kGpioUnused);
+
+  stdAc::state_t common = ac.toCommon();
+  stdAc::state_t prev = common;
+
+  EXPECT_TRUE(common.power);
+  EXPECT_EQ(stdAc::swingv_t::kAuto, common.swingv);
+
+  ac.setTogglePower(true);
+  ac.setToggleSwingVertical(true);
+
+  common = ac.toCommon(&prev);
+  prev = common;
+
+  EXPECT_FALSE(common.power);
+  EXPECT_EQ(stdAc::swingv_t::kOff, common.swingv);
+
+  ac.setTogglePower(true);
+  ac.setToggleSwingVertical(true);
+
+  common = ac.toCommon(&prev);
+
+  EXPECT_TRUE(common.power);
+  EXPECT_EQ(stdAc::swingv_t::kAuto, common.swingv);
+}
+
 TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("KELON", typeToString(decode_type_t::KELON));
   ASSERT_EQ(decode_type_t::KELON, strToDecodeType("KELON"));
