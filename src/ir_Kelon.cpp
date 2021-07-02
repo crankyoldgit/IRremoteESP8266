@@ -451,10 +451,13 @@ stdAc::state_t IRKelonAc::toCommon(const stdAc::state_t *prev) const {
   result.sleep = getSleep() ? 0 : -1;
   // Not supported.
   // N/A, AC only supports toggling it
-  result.power = prev == nullptr || prev->power;
+  result.power = (prev == nullptr || prev->power) ^ _.PowerToggle;
   // N/A, AC only supports toggling it
-  result.swingv = prev != nullptr ? prev->swingv : stdAc::swingv_t::kAuto;
-  // N/A, horizontal air direction can only be set by manually adjusting it
+  result.swingv = stdAc::swingv_t::kAuto;
+  if (prev != nullptr &&
+      (prev->swingv != stdAc::swingv_t::kAuto) ^ _.SwingVToggle) {
+    result.swingv = stdAc::swingv_t::kOff;
+  }
   result.swingh = stdAc::swingh_t::kOff;
   result.light = true;
   result.beep = true;
