@@ -1018,6 +1018,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Teknopoint decode");
     if (decodeTeknopoint(results, offset)) return true;
 #endif  // DECODE_TEKNOPOINT
+#if DECODE_KELON
+    DPRINTLN("Attempting Kelon decode");
+    if (decodeKelon(results, offset)) return true;
+#endif  // DECODE_KELON
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

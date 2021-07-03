@@ -658,6 +658,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case SANYO_LC7461:
       return kSanyoLC7461Bits;  // 42
     case GOODWEATHER:
+    case KELON:
     case MIDEA:
     case PANASONIC:
       return 48;
@@ -869,6 +870,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendJVC(data, nbits, min_repeat);
       break;
 #endif
+#if SEND_KELON
+    case KELON:
+      sendKelon(data, nbits, min_repeat);
+      break;
+#endif  // SEND_KELON
 #if SEND_LASERTAG
     case LASERTAG:
       sendLasertag(data, nbits, min_repeat);
