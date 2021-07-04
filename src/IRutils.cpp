@@ -559,6 +559,7 @@ namespace irutils {
         switch (model) {
           case lg_ac_remote_model_t::GE6711AR2853M: return F("GE6711AR2853M");
           case lg_ac_remote_model_t::AKB75215403: return F("AKB75215403");
+          case lg_ac_remote_model_t::AKB74955603: return F("AKB74955603");
           default: return kUnknownStr;
         }
         break;

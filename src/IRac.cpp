@@ -3056,6 +3056,8 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return lg_ac_remote_model_t::GE6711AR2853M;
   } else if (!strcasecmp(str, "AKB75215403")) {
     return lg_ac_remote_model_t::AKB75215403;
+  } else if (!strcasecmp(str, "AKB74955603")) {
+    return lg_ac_remote_model_t::AKB74955603;
   // Panasonic A/C families
   } else if (!strcasecmp(str, "LKE") || !strcasecmp(str, "PANASONICLKE")) {
     return panasonic_ac_remote_model_t::kPanasonicLke;

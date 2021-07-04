@@ -43,6 +43,8 @@ const uint16_t kLg2HdrMark = 3200;            ///< uSeconds.
 const uint16_t kLg2HdrSpace = 9900;           ///< uSeconds.
 const uint16_t kLg2BitMark = 480;             ///< uSeconds.
 
+const uint32_t kLgAcAKB74955603DetectionMask = 0x0000080;
+
 #if SEND_LG
 /// Send an LG formatted message. (LG)
 /// Status: Beta / Should be working.
@@ -242,26 +244,28 @@ void IRLgAc::send(const uint16_t repeat) {
 void IRLgAc::setModel(const lg_ac_remote_model_t model) {
   switch (model) {
     case lg_ac_remote_model_t::AKB75215403:
+    case lg_ac_remote_model_t::AKB74955603:
       _protocol = decode_type_t::LG2;
       break;
     case lg_ac_remote_model_t::GE6711AR2853M:
-      // FALL THRU
-    default:
       _protocol = decode_type_t::LG;
+      break;
+    default:
+      return;
   }
+  _model = model;
 }
 
 /// Get the model of the A/C.
 /// @return The enum of the compatible model.
 lg_ac_remote_model_t IRLgAc::getModel(void) const {
-  switch (_protocol) {
-    case LG2:
-      return lg_ac_remote_model_t::AKB75215403;
-    case LG:
-      // FALL THRU
-    default:
-      return lg_ac_remote_model_t::GE6711AR2853M;
-  }
+  return _model;
+}
+
+/// Check if the stored code must belong to a AKB74955603 model.
+/// @return true, if it is AKB74955603 message. Otherwise, false.
+bool IRLgAc::_isAKB74955603(void) const {
+  return _.raw & kLgAcAKB74955603DetectionMask;
 }
 
 /// Get a copy of the internal state/code for this protocol.
@@ -275,6 +279,7 @@ uint32_t IRLgAc::getRaw(void) {
 /// @param[in] new_code A valid code for this protocol.
 void IRLgAc::setRaw(const uint32_t new_code) {
   _.raw = new_code;
+  if (_isAKB74955603()) setModel(lg_ac_remote_model_t::AKB74955603);
   _temp = 15;  // Ensure there is a "sane" previous temp.
   _temp = getTemp();
 }
@@ -350,17 +355,38 @@ uint8_t IRLgAc::getTemp(void) const {
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
 void IRLgAc::setFan(const uint8_t speed) {
+  uint8_t _speed = speed;
+  // Only model AKB74955603 has these speeds, so convert if we have to.
+  if (getModel() != lg_ac_remote_model_t::AKB74955603) {
+    switch (speed) {
+      case kLgAcFanLowAlt:
+        _.Fan = kLgAcFanLow;
+        return;
+      case kLgAcFanHigh:
+        _.Fan = kLgAcFanMax;
+        return;
+    }
+  }
   switch (speed) {
+    case kLgAcFanLow:
+    case kLgAcFanLowAlt:
+      _speed = (getModel() != lg_ac_remote_model_t::AKB74955603)
+          ? kLgAcFanLow : kLgAcFanLowAlt;
+      break;
+    case kLgAcFanHigh:
+      _speed = (getModel() != lg_ac_remote_model_t::AKB74955603)
+          ? kLgAcFanMax : speed;
+      break;
     case kLgAcFanAuto:
     case kLgAcFanLowest:
-    case kLgAcFanLow:
     case kLgAcFanMedium:
-    case kLgAcFanHigh:
-      _.Fan = speed;
+    case kLgAcFanMax:
+      _speed = speed;
       break;
     default:
-      _.Fan = kLgAcFanAuto;
+      _speed = kLgAcFanAuto;
   }
+  _.Fan = _speed;
 }
 
 /// Get the current fan speed setting.
@@ -425,8 +451,8 @@ uint8_t IRLgAc::convertFan(const stdAc::fanspeed_t speed) {
     case stdAc::fanspeed_t::kMin:    return kLgAcFanLowest;
     case stdAc::fanspeed_t::kLow:    return kLgAcFanLow;
     case stdAc::fanspeed_t::kMedium: return kLgAcFanMedium;
-    case stdAc::fanspeed_t::kHigh:
-    case stdAc::fanspeed_t::kMax:    return kLgAcFanHigh;
+    case stdAc::fanspeed_t::kHigh:   return kLgAcFanHigh;
+    case stdAc::fanspeed_t::kMax:    return kLgAcFanMax;
     default:                         return kLgAcFanAuto;
   }
 }
@@ -436,9 +462,11 @@ uint8_t IRLgAc::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRLgAc::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kLgAcFanHigh:    return stdAc::fanspeed_t::kMax;
+    case kLgAcFanMax:     return stdAc::fanspeed_t::kMax;
+    case kLgAcFanHigh:    return stdAc::fanspeed_t::kHigh;
     case kLgAcFanMedium:  return stdAc::fanspeed_t::kMedium;
-    case kLgAcFanLow:     return stdAc::fanspeed_t::kLow;
+    case kLgAcFanLow:
+    case kLgAcFanLowAlt:  return stdAc::fanspeed_t::kLow;
     case kLgAcFanLowest:  return stdAc::fanspeed_t::kMin;
     default:              return stdAc::fanspeed_t::kAuto;
   }
@@ -482,7 +510,8 @@ String IRLgAc::toString(void) const {
                               kLgAcHeat, kLgAcDry, kLgAcFan);
     result += addTempToString(getTemp());
     result += addFanToString(_.Fan, kLgAcFanHigh, kLgAcFanLow,
-                             kLgAcFanAuto, kLgAcFanLowest, kLgAcFanMedium);
+                             kLgAcFanAuto, kLgAcFanLowest, kLgAcFanMedium,
+                             kLgAcFanMax);
   }
   return result;
 }

@@ -176,6 +176,7 @@ enum whirlpool_ac_remote_model_t {
 enum lg_ac_remote_model_t {
   GE6711AR2853M = 1,  // (1) LG 28-bit Protocol (default)
   AKB75215403,        // (2) LG2 28-bit Protocol
+  AKB74955603,        // (3) LG2 28-bit Protocol variant
 };
 
 

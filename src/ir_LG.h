@@ -10,8 +10,11 @@
 //   Brand: LG,  Model: AKB74395308 remote (LG2)
 //   Brand: LG,  Model: S4-W12JA3AA A/C (LG2)
 //   Brand: LG,  Model: AKB75215403 remote (LG2)
-//   Brand: General Electric,  Model: AG1BH09AW101 Split A/C
-//   Brand: General Electric,  Model: 6711AR2853M A/C Remote
+//   Brand: LG,  Model: AKB74955603 remote (LG2 - AKB74955603)
+//   Brand: LG,  Model: A4UW30GFA2 A/C (LG2 - AKB74955603)
+//   Brand: LG,  Model: AMNW09GSJA0 A/C (LG2 - AKB74955603)
+//   Brand: General Electric,  Model: AG1BH09AW101 Split A/C (LG)
+//   Brand: General Electric,  Model: 6711AR2853M A/C Remote (LG)
 
 #ifndef IR_LG_H_
 #define IR_LG_H_
@@ -33,8 +36,7 @@ union LGProtocol{
   uint32_t raw;  ///< The state of the IR remote in IR code form.
   struct {
     uint32_t Sum  :4;
-    uint32_t Fan  :3;
-    uint32_t      :1;
+    uint32_t Fan  :4;
     uint32_t Temp :4;
     uint32_t Mode :3;
     uint32_t      :3;
@@ -43,11 +45,15 @@ union LGProtocol{
   };
 };
 
-const uint8_t kLgAcFanLowest = 0;  // 0b000
-const uint8_t kLgAcFanLow = 1;     // 0b001
-const uint8_t kLgAcFanMedium = 2;  // 0b010
-const uint8_t kLgAcFanHigh = 4;    // 0b100
-const uint8_t kLgAcFanAuto = 5;    // 0b101
+const uint8_t kLgAcFanLowest = 0;  // 0b0000
+const uint8_t kLgAcFanLow = 1;     // 0b0001
+const uint8_t kLgAcFanMedium = 2;  // 0b0010
+const uint8_t kLgAcFanMax = 4;     // 0b0100
+const uint8_t kLgAcFanAuto = 5;    // 0b0101
+const uint8_t kLgAcFanLowAlt = 9;  // 0b1001
+const uint8_t kLgAcFanHigh = 10;   // 0b1010
+// Nr. of slots in the look-up table
+const uint8_t kLgAcFanEntries = kLgAcFanHigh + 1;
 const uint8_t kLgAcTempAdjust = 15;
 const uint8_t kLgAcMinTemp = 16;  // Celsius
 const uint8_t kLgAcMaxTemp = 30;  // Celsius
@@ -112,9 +118,11 @@ class IRLgAc {
 #endif  // UNIT_TEST
   LGProtocol _;
   uint8_t _temp;
-  decode_type_t _protocol;  ///< model
+  decode_type_t _protocol;  ///< Protocol version
+  lg_ac_remote_model_t _model;  ///< Model type
   void checksum(void);
   void _setTemp(const uint8_t value);
+  bool _isAKB74955603(void) const;
 };
 
 #endif  // IR_LG_H_
