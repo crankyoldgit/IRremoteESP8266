@@ -670,9 +670,9 @@ uint8_t IRPanasonicAc::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRPanasonicAc::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kPanasonicAcFanMin;
-    case stdAc::fanspeed_t::kLow:    return kPanasonicAcFanMin + 1;
-    case stdAc::fanspeed_t::kMedium: return kPanasonicAcFanMin + 2;
-    case stdAc::fanspeed_t::kHigh:   return kPanasonicAcFanMin + 3;
+    case stdAc::fanspeed_t::kLow:    return kPanasonicAcFanLow;
+    case stdAc::fanspeed_t::kMedium: return kPanasonicAcFanMed;
+    case stdAc::fanspeed_t::kHigh:   return kPanasonicAcFanHigh;
     case stdAc::fanspeed_t::kMax:    return kPanasonicAcFanMax;
     default:                         return kPanasonicAcFanAuto;
   }
@@ -725,9 +725,9 @@ stdAc::opmode_t IRPanasonicAc::toCommonMode(const uint8_t mode) {
 stdAc::fanspeed_t IRPanasonicAc::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kPanasonicAcFanMax:     return stdAc::fanspeed_t::kMax;
-    case kPanasonicAcFanMin + 3: return stdAc::fanspeed_t::kHigh;
-    case kPanasonicAcFanMin + 2: return stdAc::fanspeed_t::kMedium;
-    case kPanasonicAcFanMin + 1: return stdAc::fanspeed_t::kLow;
+    case kPanasonicAcFanHigh:    return stdAc::fanspeed_t::kHigh;
+    case kPanasonicAcFanMed:     return stdAc::fanspeed_t::kMedium;
+    case kPanasonicAcFanLow:     return stdAc::fanspeed_t::kLow;
     case kPanasonicAcFanMin:     return stdAc::fanspeed_t::kMin;
     default:                     return stdAc::fanspeed_t::kAuto;
   }
@@ -793,9 +793,9 @@ String IRPanasonicAc::toString(void) {
   result += addModeToString(getMode(), kPanasonicAcAuto, kPanasonicAcCool,
                             kPanasonicAcHeat, kPanasonicAcDry, kPanasonicAcFan);
   result += addTempToString(getTemp());
-  result += addFanToString(getFan(), kPanasonicAcFanMax, kPanasonicAcFanMin,
+  result += addFanToString(getFan(), kPanasonicAcFanHigh, kPanasonicAcFanLow,
                            kPanasonicAcFanAuto, kPanasonicAcFanAuto,
-                           kPanasonicAcFanMed);
+                           kPanasonicAcFanMed, kPanasonicAcFanMax);
   result += addSwingVToString(getSwingVertical(), kPanasonicAcSwingVAuto,
                               kPanasonicAcSwingVHighest,
                               kPanasonicAcSwingVHigh,
