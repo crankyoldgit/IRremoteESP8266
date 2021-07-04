@@ -455,7 +455,9 @@ void IRPanasonicAc::setSwingHorizontal(const uint8_t desired_direction) {
 void IRPanasonicAc::setFan(const uint8_t speed) {
   switch (speed) {
     case kPanasonicAcFanMin:
+    case kPanasonicAcFanLow:
     case kPanasonicAcFanMed:
+    case kPanasonicAcFanHigh:
     case kPanasonicAcFanMax:
     case kPanasonicAcFanAuto:
       setBits(&remote_state[16], kHighNibble, kNibbleSize,
