@@ -665,15 +665,15 @@ TEST(TestIRPanasonicAcClass, SetAndGetFan) {
   EXPECT_EQ(kPanasonicAcFanMin, ac.getFan());
   ac.setFan(kPanasonicAcFanMin - 1);
   EXPECT_EQ(kPanasonicAcFanAuto, ac.getFan());
+  ac.setFan(kPanasonicAcFanLow);
+  EXPECT_EQ(kPanasonicAcFanLow, ac.getFan());
   ac.setFan(kPanasonicAcFanMed);
   EXPECT_EQ(kPanasonicAcFanMed, ac.getFan());
-  ac.setFan(kPanasonicAcFanMin + 1);
-  EXPECT_EQ(kPanasonicAcFanAuto, ac.getFan());
+  ac.setFan(kPanasonicAcFanHigh);
+  EXPECT_EQ(kPanasonicAcFanHigh, ac.getFan());
   ac.setFan(kPanasonicAcFanMax);
   EXPECT_EQ(kPanasonicAcFanMax, ac.getFan());
   ac.setFan(kPanasonicAcFanMax + 1);
-  EXPECT_EQ(kPanasonicAcFanAuto, ac.getFan());
-  ac.setFan(kPanasonicAcFanMax - 1);
   EXPECT_EQ(kPanasonicAcFanAuto, ac.getFan());
 }
 
