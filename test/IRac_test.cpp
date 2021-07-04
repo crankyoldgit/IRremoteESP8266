@@ -1243,7 +1243,7 @@ TEST(TestIRac, Panasonic) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 
   char expected_dke[] =
-      "Model: 3 (DKE), Power: On, Mode: 3 (Cool), Temp: 18C, Fan: 4 (High), "
+      "Model: 3 (DKE), Power: On, Mode: 3 (Cool), Temp: 18C, Fan: 4 (Maximum), "
       "Swing(V): 2 (High), Swing(H): 6 (Middle), "
       "Quiet: Off, Powerful: On, Ion: On, "
       "Clock: 19:17, On Timer: Off, Off Timer: Off";
