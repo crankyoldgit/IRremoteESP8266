@@ -794,7 +794,7 @@ String IRPanasonicAc::toString(void) {
                             kPanasonicAcHeat, kPanasonicAcDry, kPanasonicAcFan);
   result += addTempToString(getTemp());
   result += addFanToString(getFan(), kPanasonicAcFanHigh, kPanasonicAcFanLow,
-                           kPanasonicAcFanAuto, kPanasonicAcFanAuto,
+                           kPanasonicAcFanAuto, kPanasonicAcFanMin,
                            kPanasonicAcFanMed, kPanasonicAcFanMax);
   result += addSwingVToString(getSwingVertical(), kPanasonicAcSwingVAuto,
                               kPanasonicAcSwingVHighest,
