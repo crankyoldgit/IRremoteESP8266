@@ -1884,4 +1884,11 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
   *result_ptr = GETBITS64(data, 0, nbits);
   return offset;
 }
+
+#if UNIT_TEST
+/// Unit test helper to get access to the params structure.
+volatile irparams_t *IRrecv::_getParamsPtr(void) {
+  return &params;
+}
+#endif  // UNIT_TEST
 // End of IRrecv class -------------------
