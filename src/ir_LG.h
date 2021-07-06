@@ -98,7 +98,8 @@ class IRLgAc {
   void setMode(const uint8_t mode);
   uint8_t getMode(void) const;
   uint32_t getRaw(void);
-  void setRaw(const uint32_t new_code);
+  void setRaw(const uint32_t new_code,
+              const decode_type_t protocol = decode_type_t::UNKNOWN);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);

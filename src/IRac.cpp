@@ -3573,14 +3573,7 @@ namespace IRAcUtils {
       case decode_type_t::LG:
       case decode_type_t::LG2: {
         IRLgAc ac(kGpioUnused);
-        ac.setRaw(result->value);  // Like Coolix, use value instead of state.
-        switch (result->decode_type) {
-          case decode_type_t::LG2:
-            ac.setModel(lg_ac_remote_model_t::AKB75215403);
-            break;
-          default:
-            ac.setModel(lg_ac_remote_model_t::GE6711AR2853M);
-        }
+        ac.setRaw(result->value, result->decode_type);  // Use value, not state.
         return ac.isValidLgAc() ? ac.toString() : "";
       }
 #endif  // DECODE_LG
@@ -3845,15 +3838,8 @@ namespace IRAcUtils {
       case decode_type_t::LG:
       case decode_type_t::LG2: {
         IRLgAc ac(kGpioUnused);
-        ac.setRaw(decode->value);  // Uses value instead of state.
+        ac.setRaw(decode->value, decode->decode_type);  // Use value, not state.
         if (!ac.isValidLgAc()) return false;
-        switch (decode->decode_type) {
-          case decode_type_t::LG2:
-            ac.setModel(lg_ac_remote_model_t::AKB75215403);
-            break;
-          default:
-            ac.setModel(lg_ac_remote_model_t::GE6711AR2853M);
-        }
         *result = ac.toCommon();
         break;
       }

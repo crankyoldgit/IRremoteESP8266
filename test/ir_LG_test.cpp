@@ -676,6 +676,19 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::LG2));
   ASSERT_EQ(kLgBits, IRsendTest::defaultBits(decode_type_t::LG2));
   ASSERT_EQ(kLgDefaultRepeat, IRsendTest::minRepeats(decode_type_t::LG2));
+
+  ASSERT_EQ(lg_ac_remote_model_t::GE6711AR2853M,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::LG,
+                lg_ac_remote_model_t::GE6711AR2853M).c_str()));
+  ASSERT_EQ(lg_ac_remote_model_t::AKB75215403,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::LG2,
+                lg_ac_remote_model_t::AKB75215403).c_str()));
+  ASSERT_EQ(lg_ac_remote_model_t::AKB74955603,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::LG2,
+                lg_ac_remote_model_t::AKB74955603).c_str()));
 }
 
 TEST(TestIRLgAcClass, KnownExamples) {
@@ -912,12 +925,29 @@ TEST(TestIRLgAcClass, FanSpeedIssue1513) {
 
 TEST(TestIRLgAcClass, DetectAKB74955603) {
   IRLgAc ac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+
   ac.stateReset();
   ASSERT_NE(lg_ac_remote_model_t::AKB74955603, ac.getModel());
   ac.setRaw(0x880A3A7);
   EXPECT_EQ(lg_ac_remote_model_t::AKB74955603, ac.getModel());
 
   ac.stateReset();
+  // https://docs.google.com/spreadsheets/d/1zF0FI2ENvbLdk4zaWBY9ZYVM3MB_4oxro9wCM7ETX4Y/edit#gid=1319765817&range=A2:C2
   ac.setRaw(0x880A396);
   EXPECT_EQ(lg_ac_remote_model_t::AKB74955603, ac.getModel());
+  char expected[] =
+      "Model: 3 (AKB74955603), Power: On, Mode: 2 (Fan), Temp: 18C, "
+      "Fan: 9 (Low)";
+  ASSERT_EQ(expected, ac.toString());
+
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }

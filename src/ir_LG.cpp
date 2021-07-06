@@ -277,8 +277,22 @@ uint32_t IRLgAc::getRaw(void) {
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
-void IRLgAc::setRaw(const uint32_t new_code) {
+/// @param[in] protocol A valid decode protocol type to use.
+void IRLgAc::setRaw(const uint32_t new_code, const decode_type_t protocol) {
   _.raw = new_code;
+  // Set the default model for this protocol, if the protocol is supplied.
+  switch (protocol) {
+    case decode_type_t::LG:
+      setModel(lg_ac_remote_model_t::GE6711AR2853M);
+      break;
+    case decode_type_t::LG2:
+      setModel(lg_ac_remote_model_t::AKB75215403);
+      break;
+    default:
+      // Don't change anything if it isn't an expected protocol.
+      break;
+  }
+  // Look for model specific settings/features to improve model detection.
   if (_isAKB74955603()) setModel(lg_ac_remote_model_t::AKB74955603);
   _temp = 15;  // Ensure there is a "sane" previous temp.
   _temp = getTemp();
@@ -509,7 +523,8 @@ String IRLgAc::toString(void) const {
     result += addModeToString(_.Mode, kLgAcAuto, kLgAcCool,
                               kLgAcHeat, kLgAcDry, kLgAcFan);
     result += addTempToString(getTemp());
-    result += addFanToString(_.Fan, kLgAcFanHigh, kLgAcFanLow,
+    result += addFanToString(_.Fan, kLgAcFanHigh,
+                             _isAKB74955603() ? kLgAcFanLowAlt : kLgAcFanLow,
                              kLgAcFanAuto, kLgAcFanLowest, kLgAcFanMedium,
                              kLgAcFanMax);
   }
