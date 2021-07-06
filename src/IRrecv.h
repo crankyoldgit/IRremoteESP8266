@@ -162,6 +162,9 @@ class IRrecv {
 #if DECODE_HASH
   uint16_t _unknown_threshold;
 #endif
+#ifdef UNIT_TEST
+  volatile irparams_t *_getParamsPtr(void);
+#endif  // UNIT_TEST
   // These are called by decode
   uint8_t _validTolerance(const uint8_t percentage);
   void copyIrParams(volatile irparams_t *src, irparams_t *dst);

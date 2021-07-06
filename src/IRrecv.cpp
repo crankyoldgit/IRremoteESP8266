@@ -518,7 +518,9 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   // interrupt. decode() is not stored in ICACHE_RAM.
   // Another better option would be to zero the entire irparams.rawbuf[] on
   // resume() but that is a much more expensive operation compare to this.
-  params.rawbuf[params.rawlen] = 0;
+  // However, don't do this if rawbuf is already full as we stomp over the heap.
+  // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1516
+  if (!params.overflow) params.rawbuf[params.rawlen] = 0;
 
   bool resumed = false;  // Flag indicating if we have resumed.
 
@@ -1882,4 +1884,11 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
   *result_ptr = GETBITS64(data, 0, nbits);
   return offset;
 }
+
+#if UNIT_TEST
+/// Unit test helper to get access to the params structure.
+volatile irparams_t *IRrecv::_getParamsPtr(void) {
+  return &params;
+}
+#endif  // UNIT_TEST
 // End of IRrecv class -------------------
