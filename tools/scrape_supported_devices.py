@@ -93,7 +93,7 @@ def getallacs():
     match = IRSEND_FN_RE.match(path.name)
     if match:
       rawmodels = getenums(path)
-      for acprotocol in rawmodels:
+      for acprotocol in rawmodels.keys():
         models = set()
         for model in rawmodels[acprotocol]:
           model = model.upper()

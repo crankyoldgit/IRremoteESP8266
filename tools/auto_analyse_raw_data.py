@@ -303,9 +303,10 @@ def convert_rawdata(data_str):
   for timing in [x.strip() for x in data_str.split(',')]:
     try:
       results.append(int(timing))
-    except ValueError:
+    except ValueError as non_numeric:
       raise ValueError(
-          "Raw Data contains a non-numeric value of '%s'." % timing)
+          "Raw Data contains a non-numeric value of '%s'." %
+          timing) from non_numeric
   return results
 
 
