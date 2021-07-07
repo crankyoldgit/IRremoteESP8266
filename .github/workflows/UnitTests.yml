@@ -18,4 +18,4 @@ jobs:
     - name: Build and run the library unit tests.
       run: (cd test; make run)
     - name: Build and run the tools unit tests.
-      run: (cd tools; make run_tests)
+      run: (cd tools; make all; make run_tests)

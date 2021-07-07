@@ -41,7 +41,7 @@ jobs:
       # Check that IRrecvDumpV2+ compiles.
       # i.e. We are splitting the work load in to parallel tasks.
       - find . -regextype egrep -name platformio.ini -type f -regex "${IRRECVDUMP_RE}" | sed 's,/platformio.ini$,,' | xargs --verbose -n 1 pio run  --jobs 2 --project-dir
-    - name: "Unit tests, Linter, Doc checks, & Compile IRMQTTServer"
+    - name: "Linter, Doc checks, & Compile IRMQTTServer"
       script:
       # Run all the Tests & check the code linters have no issues, and that
       # IRMQTTServer compiles.
@@ -50,18 +50,11 @@ jobs:
       - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
       - test ${LIB_VERSION} == "$(jq -r .version library.json)"
       - grep -q "^version=${LIB_VERSION}$" library.properties
-      # Check the tools programs compile.
-      - (cd tools; make all)
       # Check for lint issues.
       - shopt -s nullglob
       - python cpplint.py --extensions=c,cc,cpp,ino --headers=h,hpp {src,src/locale,test,tools}/*.{h,c,cc,cpp,hpp,ino} examples/*/*.{h,c,cc,cpp,hpp,ino}
       - pylint3 -d F0001 {src,test,tools}/*.py
       - shopt -u nullglob
-      # Install the Google test suite.
-      - (cd test; make install-googletest)
-      # Build and run the unit tests.
-      - (cd test; make run)
-      - (cd tools; make run_tests)
       # Check that every example directory has a platformio.ini file.
       - (status=0; for dir in examples/*; do if [[ ! -f "${dir}/platformio.ini" ]]; then echo "${dir} has no 'platform.ini' file!"; status=1; fi; done; exit ${status})
       # Check that doxygen completes without errors or warnings.
