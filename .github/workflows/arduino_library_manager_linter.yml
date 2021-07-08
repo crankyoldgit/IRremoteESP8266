@@ -15,7 +15,6 @@ jobs:
   arduino-library-manager-lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Arduino Library Manager Linter.
       - uses: actions/checkout@v2
       - uses: arduino/arduino-lint-action@v1
         with:
