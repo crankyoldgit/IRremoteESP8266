@@ -516,6 +516,7 @@ void IRMitsubishiAC::setMode(const uint8_t mode) {
     case kMitsubishiAcCool: _.raw[8] = 0b00110110; break;
     case kMitsubishiAcDry:  _.raw[8] = 0b00110010; break;
     case kMitsubishiAcHeat: _.raw[8] = 0b00110000; break;
+    case kMitsubishiAcFan:  _.raw[8] = 0b00110111; break;
     default:
       _.raw[8] = 0b00110000;
       _.Mode = kMitsubishiAcAuto;
