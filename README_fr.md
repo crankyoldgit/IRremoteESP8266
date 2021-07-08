@@ -1,9 +1,9 @@
 ![IRremoteESP8266 Library](./assets/images/banner.svg)
 
-[![Construire](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/PlatformIO.yml/badge.svg)](actions/workflows/PlatformIO.yml)
-[![Charbon de code](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Lint.yml/badge.svg)](actions/workflows/Lint.yml)
-[![Essais](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/UnitTests.yml/badge.svg)](actions/workflows/UnitTests.yml)
-[![Documentation](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Documentation.yml/badge.svg)](actions/workflows/Documentation.yml)
+[![Construire](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/PlatformIO.yml/badge.svg)](../../actions/workflows/PlatformIO.yml)
+[![Charbon de code](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Lint.yml/badge.svg)](../../actions/workflows/Lint.yml)
+[![Essais](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/UnitTests.yml/badge.svg)](../../actions/workflows/UnitTests.yml)
+[![Documentation](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Documentation.yml/badge.svg)](../../actions/workflows/Documentation.yml)
 [![arduino-library-badge](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
 [![LicenseGit](https://gitlicense.com/badge/crankyoldgit/IRremoteESP8266)](https://gitlicense.com/license/crankyoldgit/IRremoteESP8266)
 
