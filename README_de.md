@@ -1,9 +1,9 @@
 ![IRremoteESP8266 Library](./assets/images/banner.svg)
 
-![Build-Status](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/PlatformIO.yml/badge.svg)
-![Code-Lint](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Lint.yml/badge.svg)
-![Tests](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/UnitTests.yml/badge.svg)
-![Dokumentation](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Documentation.yml/badge.svg)
+[![Build-Status](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/PlatformIO.yml/badge.svg)](actions/workflows/PlatformIO.yml/badge.svg)
+[![Code-Lint](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Lint.yml/badge.svg)](actions/workflows/Lint.yml)
+[![Tests](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/UnitTests.yml/badge.svg)](actions/workflows/UnitTests.yml)
+[![Dokumentation](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Documentation.yml/badge.svg)](actions/workflows/Documentation.yml)
 [![arduino-library-badge](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
 [![Arduino-Bibliothek-Abzeichen](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
 [![Git-Lizenz](https://gitlicense.com/badge/crankyoldgit/IRremoteESP8266)](https://gitlicense.com/license/crankyoldgit/IRremoteESP8266)
