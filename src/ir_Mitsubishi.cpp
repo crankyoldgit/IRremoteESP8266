@@ -613,6 +613,7 @@ uint8_t IRMitsubishiAC::convertMode(const stdAc::opmode_t mode) {
     case stdAc::opmode_t::kCool: return kMitsubishiAcCool;
     case stdAc::opmode_t::kHeat: return kMitsubishiAcHeat;
     case stdAc::opmode_t::kDry:  return kMitsubishiAcDry;
+    case stdAc::opmode_t::kFan:  return kMitsubishiAcFan;
     default:                     return kMitsubishiAcAuto;
   }
 }
@@ -680,6 +681,7 @@ stdAc::opmode_t IRMitsubishiAC::toCommonMode(const uint8_t mode) {
     case kMitsubishiAcCool: return stdAc::opmode_t::kCool;
     case kMitsubishiAcHeat: return stdAc::opmode_t::kHeat;
     case kMitsubishiAcDry:  return stdAc::opmode_t::kDry;
+    case kMitsubishiAcFan:  return stdAc::opmode_t::kFan;
     default:                return stdAc::opmode_t::kAuto;
   }
 }
@@ -781,7 +783,7 @@ String IRMitsubishiAC::toString(void) const {
   result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, kMitsubishiAcAuto, kMitsubishiAcCool,
                             kMitsubishiAcHeat, kMitsubishiAcDry,
-                            kMitsubishiAcAuto);
+                            kMitsubishiAcFan);
   result += addTempFloatToString(getTemp());
   result += addFanToString(getFan(), kMitsubishiAcFanRealMax,
                            kMitsubishiAcFanRealMax - 3,
