@@ -31,7 +31,8 @@
 //   Brand: Mitsubishi Electric,  Model: SG153/M21EDF426 remote (MITSUBISHI_AC)
 //   Brand: Mitsubishi Electric,  Model: MSZ-GV2519 A/C (MITSUBISHI_AC)
 //   Brand: Mitsubishi Electric,  Model: RH151/M21ED6426 remote (MITSUBISHI_AC)
-//   Brand: Mitsubishi Electric,  Model: MSZ-SF25VE3/SG15D remote (MITSUBISHI_AC)
+//   Brand: Mitsubishi Electric,  Model: MSZ-SF25VE3 A/C (MITSUBISHI_AC)
+//   Brand: Mitsubishi Electric,  Model: SG15D remote (MITSUBISHI_AC)
 
 #ifndef IR_MITSUBISHI_H_
 #define IR_MITSUBISHI_H_
