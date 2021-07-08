@@ -31,6 +31,8 @@
 //   Brand: Mitsubishi Electric,  Model: SG153/M21EDF426 remote (MITSUBISHI_AC)
 //   Brand: Mitsubishi Electric,  Model: MSZ-GV2519 A/C (MITSUBISHI_AC)
 //   Brand: Mitsubishi Electric,  Model: RH151/M21ED6426 remote (MITSUBISHI_AC)
+//   Brand: Mitsubishi Electric,  Model: MSZ-SF25VE3 A/C (MITSUBISHI_AC)
+//   Brand: Mitsubishi Electric,  Model: SG15D remote (MITSUBISHI_AC)
 
 #ifndef IR_MITSUBISHI_H_
 #define IR_MITSUBISHI_H_
@@ -94,6 +96,7 @@ const uint8_t kMitsubishiAcAuto = 0b100;
 const uint8_t kMitsubishiAcCool = 0b011;
 const uint8_t kMitsubishiAcDry =  0b010;
 const uint8_t kMitsubishiAcHeat = 0b001;
+const uint8_t kMitsubishiAcFan  = 0b111;
 const uint8_t kMitsubishiAcFanAuto = 0;
 const uint8_t kMitsubishiAcFanMax = 5;
 const uint8_t kMitsubishiAcFanRealMax = 4;
