@@ -1,6 +1,6 @@
 ![IRremoteESP8266 Library](./assets/images/banner.svg)
 
-[![Construire](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/PlatformIO.yml/badge.svg)](../../actions/workflows/PlatformIO.yml)
+[![Construire](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Build.yml/badge.svg)](../../actions/workflows/Build.yml)
 [![Charbon de code](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Lint.yml/badge.svg)](../../actions/workflows/Lint.yml)
 [![Essais](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/UnitTests.yml/badge.svg)](../../actions/workflows/UnitTests.yml)
 [![Documentation](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Documentation.yml/badge.svg)](../../actions/workflows/Documentation.yml)
