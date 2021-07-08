@@ -15,8 +15,6 @@ cache:
 before_install:
   - python --version && pip --version
   - python3 --version && pip3 --version
-  - sudo pip3 install -U platformio
-  - pio update
 script: echo Running checks
 notifications:
   email:
@@ -24,18 +22,6 @@ notifications:
     on_failure: change
 jobs:
   include:
-    - name: "Misc & Doc checks"
+    - name: "Doc checks"
       script:
-      # Run all the Tests & check the code linters have no issues, and that
-      # IRMQTTServer compiles.
-      # i.e. We are splitting the work load in to parallel tasks.
-      # Check the version numbers match.
-      - LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
-      - test ${LIB_VERSION} == "$(jq -r .version library.json)"
-      - grep -q "^version=${LIB_VERSION}$" library.properties
-      # Check that every example directory has a platformio.ini file.
-      - (status=0; for dir in examples/*; do if [[ ! -f "${dir}/platformio.ini" ]]; then echo "${dir} has no 'platform.ini' file!"; status=1; fi; done; exit ${status})
-      # Check that doxygen completes without errors or warnings.
       - (DOXYGEN_OUTPUT=$(doxygen 2>&1); if [[ $? -ne 0 || -n "${DOXYGEN_OUTPUT}" ]]; then echo "${DOXYGEN_OUTPUT}"; exit 1; fi)
-      # Check that all files has supported sections.
-      - (SUPPORTED_OUTPUT=$(python3 tools/scrape_supported_devices.py --noout --alert 2>&1); if [[ $? -ne 0 || -n "${SUPPORTED_OUTPUT}" ]]; then echo "${SUPPORTED_OUTPUT}"; exit 1; fi)
