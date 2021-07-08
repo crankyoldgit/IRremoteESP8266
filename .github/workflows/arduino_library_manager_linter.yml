@@ -12,7 +12,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  arduino-lint:
+  arduino-library-manager-lint:
     runs-on: ubuntu-latest
     steps:
       - name: Arduino Library Manager Linter.
@@ -21,14 +21,13 @@ jobs:
         with:
           library-manager: update
           compliance: strict
-  detect-duplicate-files:
   # Detect case-insensitive file duplication in the same directory.
   # This can cause a problem for the Arduino IDE on Windows & Macs.
   # See:
   # - https://github.com/arduino/Arduino/issues/11441
   # - https://github.com/crankyoldgit/IRremoteESP8266/issues/1451
+  detect-duplicate-files:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Look for case-insensitive filename collisions.
@@ -42,9 +41,6 @@ jobs:
         LIB_VERSION=$(egrep "^#define\s+_IRREMOTEESP8266_VERSION_\s+" src/IRremoteESP8266.h  | cut -d\" -f2)
         test ${LIB_VERSION} == "$(jq -r .version library.json)"
         grep -q "^version=${LIB_VERSION}$" library.properties
-      # Check that every example directory has a platformio.ini file.
-      - (status=0; for dir in examples/*; do if [[ ! -f "${dir}/platformio.ini" ]]; then echo "${dir} has no 'platform.ini' file!"; status=1; fi; done; exit ${status})
-      # Check that doxygen completes without errors or warnings.
   examples-have-platformio.ini:
     runs-on: ubuntu-latest
     steps:
