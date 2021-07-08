@@ -1,9 +1,10 @@
 ![IRremoteESP8266 Library](./assets/images/banner.svg)
 
-[![Build Status](https://travis-ci.com/crankyoldgit/IRremoteESP8266.svg?branch=master)](https://travis-ci.com/crankyoldgit/IRremoteESP8266)
+![Build Status](https://github.com/github/docs/actions/workflows/PlatformIO.yml/badge.svg)
+![Code Lint](https://github.com/github/docs/actions/workflows/Lint.yml/badge.svg)
+![Tests](https://github.com/github/docs/actions/workflows/UnitTests.yml/badge.svg)
+![Documentation](https://github.com/github/docs/actions/workflows/Documentation.yml/badge.svg)
 [![arduino-library-badge](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Percentage of issues still open")
 [![GitLicense](https://gitlicense.com/badge/crankyoldgit/IRremoteESP8266)](https://gitlicense.com/license/crankyoldgit/IRremoteESP8266)
 
 This library enables you to **send _and_ receive** infra-red signals on an [ESP8266](https://github.com/esp8266/Arduino) or an
