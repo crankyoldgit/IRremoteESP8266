@@ -1,9 +1,11 @@
 ![IRremoteESP8266 Library](./assets/images/banner.svg)
 
-[![Build-Status](https://travis-ci.com/crankyoldgit/IRremoteESP8266.svg?branch=master)](https://travis-ci.com/crankyoldgit/IRremoteESP8266)
+![Build-Status](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/PlatformIO.yml/badge.svg)
+![Code-Lint](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Lint.yml/badge.svg)
+![Tests](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/UnitTests.yml/badge.svg)
+![Dokumentation](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Documentation.yml/badge.svg)
+[![arduino-library-badge](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
 [![Arduino-Bibliothek-Abzeichen](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
-[![Durchschnittliche Zeit bis zur Problemlösung](http://isitmaintained.com/badge/resolution/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Resolution Time")
-[![Prozentsatz der offenen Probleme](http://isitmaintained.com/badge/open/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Open issues")
 [![Git-Lizenz](https://gitlicense.com/badge/crankyoldgit/IRremoteESP8266)](https://gitlicense.com/license/crankyoldgit/IRremoteESP8266)
 
 Diese Programmbibliothek ermöglicht das **Senden _und_ Empfangen** von Infrarotsignalen mit [ESP8266](https://github.com/esp8266/Arduino)- und

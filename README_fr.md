@@ -1,10 +1,11 @@
 ![IRremoteESP8266 Library](./assets/images/banner.svg)
 
-[![Build Status](https://travis-ci.com/crankyoldgit/IRremoteESP8266.svg?branch=master)](https://travis-ci.com/crankyoldgit/IRremoteESP8266)
+![Construire](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/PlatformIO.yml/badge.svg)
+![Charbon de code](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Lint.yml/badge.svg)
+![Essais](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/UnitTests.yml/badge.svg)
+![Documentation](https://github.com/crankyoldgit/IRremoteESP8266/actions/workflows/Documentation.yml/badge.svg)
 [![arduino-library-badge](https://www.ardu-badge.com/badge/IRremoteESP8266.svg?)](https://www.ardu-badge.com/IRremoteESP8266)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/crankyoldgit/IRremoteESP8266.svg)](http://isitmaintained.com/project/crankyoldgit/IRremoteESP8266 "Percentage of issues still open")
-[![GitLicense](https://gitlicense.com/badge/crankyoldgit/IRremoteESP8266)](https://gitlicense.com/license/crankyoldgit/IRremoteESP8266)
+[![LicenseGit](https://gitlicense.com/badge/crankyoldgit/IRremoteESP8266)](https://gitlicense.com/license/crankyoldgit/IRremoteESP8266)
 
 Cette librairie vous permetra de **recevoir et d'envoyer des signaux** infrarouge sur le protocole [ESP8266](https://github.com/esp8266/Arduino) ou sur le protocole
 [ESP32](https://github.com/espressif/arduino-esp32) en utilisant le [Arduino framework](https://www.arduino.cc/) qui utilise la norme 940nm IR LEDs et le module basique de reception d'onde IR. Exemple : TSOP{17,22,24,36,38,44,48}* modules etc.
