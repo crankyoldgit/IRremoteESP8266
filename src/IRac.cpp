@@ -1854,6 +1854,7 @@ void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] swingh The horizontal swing setting.
+/// @param[in] quiet Run the device in quiet/silent mode.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] econo Run the device in economical mode.
@@ -1862,8 +1863,8 @@ void IRac::tcl112(IRTcl112Ac *ac,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                  const bool turbo, const bool light, const bool econo,
-                  const bool filter) {
+                  const bool quiet, const bool turbo, const bool light,
+                  const bool econo, const bool filter) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -1871,7 +1872,7 @@ void IRac::tcl112(IRTcl112Ac *ac,
   ac->setFan(ac->convertFan(fan));
   ac->setSwingVertical(swingv != stdAc::swingv_t::kOff);
   ac->setSwingHorizontal(swingh != stdAc::swingh_t::kOff);
-  // No Quiet setting available.
+  ac->setQuiet(quiet);
   ac->setTurbo(turbo);
   ac->setLight(light);
   ac->setEcono(econo);
@@ -2760,7 +2761,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRTcl112Ac ac(_pin, _inverted, _modulation);
       tcl112(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-             send.swingh, send.turbo, send.light, send.econo, send.filter);
+             send.swingh, send.quiet, send.turbo, send.light, send.econo,
+             send.filter);
       break;
     }
 #endif  // SEND_TCL112AC
@@ -3958,7 +3960,7 @@ namespace IRAcUtils {
       case decode_type_t::TCL112AC: {
         IRTcl112Ac ac(kGpioUnused);
         ac.setRaw(decode->state);
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_TCL112AC
