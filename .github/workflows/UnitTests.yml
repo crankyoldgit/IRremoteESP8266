@@ -14,6 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install the Google test suite
+      env:
+        MAKEFLAGS: "-j 2"
       run: (cd test; make install-googletest)
     - name: Build and run the library unit tests.
       env:
