@@ -527,6 +527,6 @@ TEST(TestDecodeTcl112Ac, Issue1528) {
   EXPECT_EQ(kTcl112AcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Type: 2, Quiet: On, Light: Off",
+      "Type: 2, Quiet: On",
       IRAcUtils::resultAcToString(&irsend.capture));
 }

@@ -1466,7 +1466,7 @@ TEST(TestIRac, Tcl112) {
   ASSERT_EQ(TCL112AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
   ASSERT_EQ(
-      "Type: 2, Quiet: On, Light: On",
+      "Type: 2, Quiet: On",
       IRAcUtils::resultAcToString(&ac._irsend.capture));
   // TCL112 uses the Mitsubishi112 decoder.
   // Skip first message.

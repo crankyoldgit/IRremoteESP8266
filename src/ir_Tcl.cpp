@@ -58,15 +58,12 @@ void IRTcl112Ac::send(const uint16_t repeat) {
   if (_quiet != _quiet_prev) {
     // Backup the current state.
     std::memcpy(save, _.raw, kTcl112AcStateLength);
-    bool light_save = getLight();
     const uint8_t quiet_off[kTcl112AcStateLength] = {
         0x23, 0xCB, 0x26, 0x02, 0x00, 0x40, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x65};
     // Use a known good quiet/mute off/type 2 state for the time being.
     // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1528#issuecomment-876989044
     setRaw(quiet_off);
-    // Copy in the light and quiet states.
-    setLight(light_save);
     setQuiet(_quiet);
     // Send it.
     _irsend.sendTcl112Ac(getRaw(), kTcl112AcStateLength, repeat);
@@ -355,7 +352,6 @@ stdAc::state_t IRTcl112Ac::toCommon(const stdAc::state_t *prev) const {
   if (prev != NULL) result = *prev;
   result.protocol = decode_type_t::TCL112AC;
   result.model = -1;  // Not supported.
-  result.light = getLight();
   result.quiet = getQuiet(result.quiet);
   // The rest only get updated if it is a "normal" message.
   if (_.MsgType == kTcl112AcNormal) {
@@ -369,6 +365,7 @@ stdAc::state_t IRTcl112Ac::toCommon(const stdAc::state_t *prev) const {
     result.turbo = _.Turbo;
     result.filter = _.Health;
     result.econo = _.Econo;
+    result.light = getLight();
   }
   // Not supported.
   result.clean = false;
@@ -398,12 +395,12 @@ String IRTcl112Ac::toString(void) const {
       result += addBoolToString(_.Turbo, kTurboStr);
       result += addBoolToString(_.SwingH, kSwingHStr);
       result += addBoolToString(_.SwingV, kSwingVStr);
+      result += addBoolToString(getLight(), kLightStr);
       break;
     case kTcl112AcSpecial:
       result += addBoolToString(_.Quiet, kQuietStr);
       break;
   }
-  result += addBoolToString(getLight(), kLightStr);
   return result;
 }
 
