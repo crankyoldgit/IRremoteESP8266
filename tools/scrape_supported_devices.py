@@ -93,9 +93,9 @@ def getallacs():
     match = IRSEND_FN_RE.match(path.name)
     if match:
       rawmodels = getenums(path)
-      for acprotocol in rawmodels:
+      for acprotocol, acmodels in rawmodels.items():
         models = set()
-        for model in rawmodels[acprotocol]:
+        for model in acmodels:
           model = model.upper()
           model = model.replace("K{}".format(acprotocol.upper()), "")
           if model and model not in EXCLUDED_PROTOCOLS:
