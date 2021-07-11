@@ -3843,7 +3843,7 @@ namespace IRAcUtils {
         IRLgAc ac(kGpioUnused);
         ac.setRaw(decode->value, decode->decode_type);  // Use value, not state.
         if (!ac.isValidLgAc()) return false;
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_LG
