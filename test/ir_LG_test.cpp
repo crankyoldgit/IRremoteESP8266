@@ -550,12 +550,12 @@ TEST(TestIRLgAcClass, toCommon) {
   ASSERT_EQ(20, ac.toCommon().degrees);
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_TRUE(ac.toCommon().light);
   // Unsupported.
   ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
   ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
   ASSERT_FALSE(ac.toCommon().turbo);
   ASSERT_FALSE(ac.toCommon().clean);
-  ASSERT_FALSE(ac.toCommon().light);
   ASSERT_FALSE(ac.toCommon().quiet);
   ASSERT_FALSE(ac.toCommon().econo);
   ASSERT_FALSE(ac.toCommon().filter);
@@ -950,4 +950,37 @@ TEST(TestIRLgAcClass, DetectAKB74955603) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
+TEST(TestIRLgAcClass, Light) {
+  IRLgAc ac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  ac.begin();
+
+  ASSERT_FALSE(ac.isLightToggle());
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_FALSE(ac.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+
+  ac.setRaw(0x880A396);  // A known state.
+  const char expected[] =
+      "Model: 3 (AKB74955603), Power: On, Mode: 2 (Fan), Temp: 18C, "
+      "Fan: 9 (Low)";
+  ac.setLight(false);
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  // First message should be normal.
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // The next should be a light toggle.
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 61));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ("Model: 3 (AKB74955603), Light Toggle: On",
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
 }

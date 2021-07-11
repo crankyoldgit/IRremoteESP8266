@@ -221,6 +221,7 @@ IRLgAc::IRLgAc(const uint16_t pin, const bool inverted,
 void IRLgAc::stateReset(void) {
   setRaw(kLgAcOffCommand);
   setModel(lg_ac_remote_model_t::GE6711AR2853M);
+  _light = true;
 }
 
 /// Set up hardware to be able to send a message.
@@ -230,14 +231,31 @@ void IRLgAc::begin(void) { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRLgAc::send(const uint16_t repeat) {
-  if (getPower())
+  if (getPower()) {
     _irsend.send(_protocol, getRaw(), kLgBits, repeat);
-  else
+    // Any "normal" command sent will always turn the light on, thus we only
+    // send it when we want it off. Light control only available on some models.
+    // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1513#issuecomment-877283080
+    if (!_light && getModel() == lg_ac_remote_model_t::AKB74955603)
+      _irsend.send(_protocol, kLgAcLightToggle, kLgBits, repeat);
+  } else {
     // Always send the special Off command if the power is set to off.
     // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1008#issuecomment-570763580
     _irsend.send(_protocol, kLgAcOffCommand, kLgBits, repeat);
+  }
 }
 #endif  // SEND_LG
+
+/// Is the current message a normal (non-special) message?
+/// @return True, if it is a normal message, False, if it is special.
+bool IRLgAc::_isNormal(void) const {
+  switch (_.raw) {
+    case kLgAcOffCommand:
+    case kLgAcLightToggle:
+      return false;
+  }
+  return true;
+}
 
 /// Set the model of the A/C to emulate.
 /// @param[in] model The enum of the appropriate model.
@@ -265,7 +283,7 @@ lg_ac_remote_model_t IRLgAc::getModel(void) const {
 /// Check if the stored code must belong to a AKB74955603 model.
 /// @return true, if it is AKB74955603 message. Otherwise, false.
 bool IRLgAc::_isAKB74955603(void) const {
-  return _.raw & kLgAcAKB74955603DetectionMask;
+  return ((_.raw & kLgAcAKB74955603DetectionMask) || _.raw == kLgAcLightToggle);
 }
 
 /// Get a copy of the internal state/code for this protocol.
@@ -341,6 +359,22 @@ bool IRLgAc::getPower(void) const {
   return _.Power == kLgAcPowerOn;
 }
 
+/// Is the message a Power Off message?
+/// @return true, if it is. false, if not.
+bool IRLgAc::isOffCommand(void) const { return _.raw == kLgAcOffCommand; }
+
+/// Change the light/led/display setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRLgAc::setLight(const bool on) { _light = on; }
+
+/// Get the value of the current light setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRLgAc::getLight(void) const { return _light; }
+
+/// Is the message a Light Toggle message?
+/// @return true, if it is. false, if not.
+bool IRLgAc::isLightToggle(void) const { return _.raw == kLgAcLightToggle; }
+
 /// Set the temperature.
 /// @param[in] value The native temperature.
 /// @note Internal use only.
@@ -360,10 +394,7 @@ void IRLgAc::setTemp(const uint8_t degrees) {
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
 uint8_t IRLgAc::getTemp(void) const {
-  if (getPower())
-    return _.Temp + kLgAcTempAdjust;
-  else
-    return _temp;
+  return _isNormal() ? _.Temp + kLgAcTempAdjust : _temp;
 }
 
 /// Set the speed of the fan.
@@ -405,15 +436,11 @@ void IRLgAc::setFan(const uint8_t speed) {
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRLgAc::getFan(void) const {
-  return _.Fan;
-}
+uint8_t IRLgAc::getFan(void) const { return _.Fan; }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRLgAc::getMode(void) const {
-  return _.Mode;
-}
+uint8_t IRLgAc::getMode(void) const { return _.Mode; }
 
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired operating mode.
@@ -487,22 +514,32 @@ stdAc::fanspeed_t IRLgAc::toCommonFanSpeed(const uint8_t speed) {
 }
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
+/// @param[in] prev Ptr to the previous state if required.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRLgAc::toCommon(void) const {
+stdAc::state_t IRLgAc::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
-  result.protocol = decode_type_t::LG;
+  // Start with the previous state if given it.
+  if (prev != NULL) {
+    result = *prev;
+  } else {
+    // Set defaults for non-zero values that are not implicitly set for when
+    // there is no previous state.
+    // e.g. Any setting that toggles should probably go here.
+    result.light = true;
+  }
+  result.protocol = _protocol;
   result.model = getModel();
   result.power = getPower();
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.light = isLightToggle() ? !result.light : _light;
   // Not supported.
   result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.turbo = false;
-  result.light = false;
   result.filter = false;
   result.clean = false;
   result.econo = false;
@@ -518,15 +555,20 @@ String IRLgAc::toString(void) const {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(_protocol, getModel(), false);
-  result += addBoolToString(getPower(), kPowerStr);
-  if (getPower()) {  // Only display the rest if is in power on state.
-    result += addModeToString(_.Mode, kLgAcAuto, kLgAcCool,
-                              kLgAcHeat, kLgAcDry, kLgAcFan);
-    result += addTempToString(getTemp());
-    result += addFanToString(_.Fan, kLgAcFanHigh,
-                             _isAKB74955603() ? kLgAcFanLowAlt : kLgAcFanLow,
-                             kLgAcFanAuto, kLgAcFanLowest, kLgAcFanMedium,
-                             kLgAcFanMax);
+  if (_isNormal()) {
+    result += addBoolToString(getPower(), kPowerStr);
+    if (getPower()) {  // Only display the rest if is in power on state.
+      result += addModeToString(_.Mode, kLgAcAuto, kLgAcCool,
+                                kLgAcHeat, kLgAcDry, kLgAcFan);
+      result += addTempToString(getTemp());
+      result += addFanToString(_.Fan, kLgAcFanHigh,
+                               _isAKB74955603() ? kLgAcFanLowAlt : kLgAcFanLow,
+                               kLgAcFanAuto, kLgAcFanLowest, kLgAcFanMedium,
+                               kLgAcFanMax);
+    }
+  } else {
+    if (isOffCommand()) result += addBoolToString(false, kPowerStr);
+    if (isLightToggle()) result += addBoolToString(true, kLightToggleStr);
   }
   return result;
 }

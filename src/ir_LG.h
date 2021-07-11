@@ -66,7 +66,8 @@ const uint8_t kLgAcPowerOff = 3;  // 0b11
 const uint8_t kLgAcPowerOn = 0;   // 0b00
 const uint8_t kLgAcSignature = 0x88;
 
-const uint32_t kLgAcOffCommand = 0x88C0051;
+const uint32_t kLgAcOffCommand =  0x88C0051;
+const uint32_t kLgAcLightToggle = 0x88C00A6;
 
 // Classes
 /// Class for handling detailed LG A/C messages.
@@ -91,12 +92,16 @@ class IRLgAc {
   void off(void);
   void setPower(const bool on);
   bool getPower(void) const;
+  bool isOffCommand(void) const;
   void setTemp(const uint8_t degrees);
   uint8_t getTemp(void) const;
   void setFan(const uint8_t speed);
   uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
   uint8_t getMode(void) const;
+  void setLight(const bool on);
+  bool getLight(void) const;
+  bool isLightToggle(void) const;
   uint32_t getRaw(void);
   void setRaw(const uint32_t new_code,
               const decode_type_t protocol = decode_type_t::UNKNOWN);
@@ -104,7 +109,7 @@ class IRLgAc {
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
-  stdAc::state_t toCommon(void) const;
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL) const;
   String toString(void) const;
   void setModel(const lg_ac_remote_model_t model);
   lg_ac_remote_model_t getModel(void) const;
@@ -119,11 +124,13 @@ class IRLgAc {
 #endif  // UNIT_TEST
   LGProtocol _;
   uint8_t _temp;
+  bool _light;
   decode_type_t _protocol;  ///< Protocol version
   lg_ac_remote_model_t _model;  ///< Model type
   void checksum(void);
   void _setTemp(const uint8_t value);
   bool _isAKB74955603(void) const;
+  bool _isNormal(void) const;
 };
 
 #endif  // IR_LG_H_
