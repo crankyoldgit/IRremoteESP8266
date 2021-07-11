@@ -21,6 +21,7 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::addSwingVToString;
 
 
 // Constants
@@ -222,6 +223,8 @@ void IRLgAc::stateReset(void) {
   setRaw(kLgAcOffCommand);
   setModel(lg_ac_remote_model_t::GE6711AR2853M);
   _light = true;
+  _swingv = kLgAcSwingVOff;
+  _swingv_prev = _swingv;
 }
 
 /// Set up hardware to be able to send a message.
@@ -233,11 +236,22 @@ void IRLgAc::begin(void) { _irsend.begin(); }
 void IRLgAc::send(const uint16_t repeat) {
   if (getPower()) {
     _irsend.send(_protocol, getRaw(), kLgBits, repeat);
-    // Any "normal" command sent will always turn the light on, thus we only
-    // send it when we want it off. Light control only available on some models.
-    // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1513#issuecomment-877283080
-    if (!_light && getModel() == lg_ac_remote_model_t::AKB74955603)
-      _irsend.send(_protocol, kLgAcLightToggle, kLgBits, repeat);
+    // Some models have extra/special settings & controls
+    switch (getModel()) {
+      case lg_ac_remote_model_t::AKB74955603:
+        // Only send the swing setting if we need to.
+        if (_swingv != _swingv_prev) {
+          _irsend.send(_protocol, _swingv, kLgBits, repeat);
+          _swingv_prev = _swingv;
+        }
+        // Any "normal" command sent will always turn the light on, thus we only
+        // send it when we want it off. Must be sent last!
+        // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1513#issuecomment-877283080
+        if (!_light) _irsend.send(_protocol, kLgAcLightToggle, kLgBits, repeat);
+        break;
+      default:
+        break;
+    }
   } else {
     // Always send the special Off command if the power is set to off.
     // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1008#issuecomment-570763580
@@ -254,6 +268,7 @@ bool IRLgAc::_isNormal(void) const {
     case kLgAcLightToggle:
       return false;
   }
+  if (isSwingV()) return false;
   return true;
 }
 
@@ -282,8 +297,10 @@ lg_ac_remote_model_t IRLgAc::getModel(void) const {
 
 /// Check if the stored code must belong to a AKB74955603 model.
 /// @return true, if it is AKB74955603 message. Otherwise, false.
+/// @note Internal use only.
 bool IRLgAc::_isAKB74955603(void) const {
-  return ((_.raw & kLgAcAKB74955603DetectionMask) || _.raw == kLgAcLightToggle);
+  return ((_.raw & kLgAcAKB74955603DetectionMask) || isSwingV() ||
+          isLightToggle());
 }
 
 /// Get a copy of the internal state/code for this protocol.
@@ -314,6 +331,7 @@ void IRLgAc::setRaw(const uint32_t new_code, const decode_type_t protocol) {
   if (_isAKB74955603()) setModel(lg_ac_remote_model_t::AKB74955603);
   _temp = 15;  // Ensure there is a "sane" previous temp.
   _temp = getTemp();
+  if (isSwingV()) _swingv = new_code;
 }
 
 /// Calculate the checksum for a given state.
@@ -378,9 +396,7 @@ bool IRLgAc::isLightToggle(void) const { return _.raw == kLgAcLightToggle; }
 /// Set the temperature.
 /// @param[in] value The native temperature.
 /// @note Internal use only.
-inline void IRLgAc::_setTemp(const uint8_t value) {
-  _.Temp = value;
-}
+inline void IRLgAc::_setTemp(const uint8_t value) { _.Temp = value; }
 
 /// Set the temperature.
 /// @param[in] degrees The temperature in degrees celsius.
@@ -458,6 +474,31 @@ void IRLgAc::setMode(const uint8_t mode) {
   }
 }
 
+/// Check if the stored code is a Swing message.
+/// @return true, if it is. Otherwise, false.
+bool IRLgAc::isSwingV(void) const {
+  return (_.raw >> 12) == kLgAcSwingSignature;
+}
+
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] position The position/mode to set the vanes to.
+void IRLgAc::setSwingV(const uint32_t position) {
+  // Is it a valid position code?
+  if (position == kLgAcSwingVOff ||
+      toCommonSwingV(position) != stdAc::swingv_t::kOff) {
+    if (position <= 0xFF) {  // It's a short code, convert it.
+      _swingv = (kLgAcSwingSignature << 8 | position) << 4;
+      _swingv |= calcChecksum(_swingv);
+    } else {
+      _swingv = position;
+    }
+  }
+}
+
+/// Get the Vertical Swing position setting of the A/C.
+/// @return The native position/mode.
+uint32_t IRLgAc::getSwingV(void) const { return _swingv; }
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -513,6 +554,44 @@ stdAc::fanspeed_t IRLgAc::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] swingv The enum to be converted.
+/// @return The native equivalent of the enum.
+uint32_t IRLgAc::convertSwingV(const stdAc::swingv_t swingv) {
+  switch (swingv) {
+    case stdAc::swingv_t::kHighest: return kLgAcSwingVHighest;
+    case stdAc::swingv_t::kHigh:    return kLgAcSwingVHigh;
+    case stdAc::swingv_t::kMiddle:  return kLgAcSwingVMiddle;
+    case stdAc::swingv_t::kLow:     return kLgAcSwingVLow;
+    case stdAc::swingv_t::kLowest:  return kLgAcSwingVLowest;
+    case stdAc::swingv_t::kAuto:    return kLgAcSwingVSwing;
+    default:                        return kLgAcSwingVOff;
+  }
+}
+
+/// Convert a native Vertical Swing into its stdAc equivalent.
+/// @param[in] code The native code to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::swingv_t IRLgAc::toCommonSwingV(const uint32_t code) {
+  switch (code) {
+    case kLgAcSwingVHighest_Short:
+    case kLgAcSwingVHighest: return stdAc::swingv_t::kHighest;
+    case kLgAcSwingVHigh_Short:
+    case kLgAcSwingVHigh:    return stdAc::swingv_t::kHigh;
+    case kLgAcSwingVUpperMiddle_Short:
+    case kLgAcSwingVUpperMiddle:
+    case kLgAcSwingVMiddle_Short:
+    case kLgAcSwingVMiddle:  return stdAc::swingv_t::kMiddle;
+    case kLgAcSwingVLow_Short:
+    case kLgAcSwingVLow:     return stdAc::swingv_t::kLow;
+    case kLgAcSwingVLowest_Short:
+    case kLgAcSwingVLowest:  return stdAc::swingv_t::kLowest;
+    case kLgAcSwingVSwing_Short:
+    case kLgAcSwingVSwing:   return stdAc::swingv_t::kAuto;
+    default:                 return stdAc::swingv_t::kOff;
+  }
+}
+
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @param[in] prev Ptr to the previous state if required.
 /// @return The stdAc equivalent of the native settings.
@@ -526,6 +605,7 @@ stdAc::state_t IRLgAc::toCommon(const stdAc::state_t *prev) const {
     // there is no previous state.
     // e.g. Any setting that toggles should probably go here.
     result.light = true;
+    result.swingv = toCommonSwingV(getSwingV());
   }
   result.protocol = _protocol;
   result.model = getModel();
@@ -535,8 +615,8 @@ stdAc::state_t IRLgAc::toCommon(const stdAc::state_t *prev) const {
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
   result.light = isLightToggle() ? !result.light : _light;
+  if (isSwingV()) result.swingv = toCommonSwingV(getSwingV());
   // Not supported.
-  result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.turbo = false;
@@ -569,6 +649,19 @@ String IRLgAc::toString(void) const {
   } else {
     if (isOffCommand()) result += addBoolToString(false, kPowerStr);
     if (isLightToggle()) result += addBoolToString(true, kLightToggleStr);
+    if (isSwingV())
+      result += addSwingVToString((uint8_t)(_swingv >> 4),
+                                  0,  // No Auto, See "swing". Unused
+                                  kLgAcSwingVHighest_Short,
+                                  kLgAcSwingVHigh_Short,
+                                  kLgAcSwingVUpperMiddle_Short,
+                                  kLgAcSwingVMiddle_Short,
+                                  0,  // Unused
+                                  kLgAcSwingVLow_Short,
+                                  kLgAcSwingVLowest_Short,
+                                  kLgAcSwingVOff_Short,
+                                  kLgAcSwingVSwing_Short,
+                                  0, 0);
   }
   return result;
 }

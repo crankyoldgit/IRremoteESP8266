@@ -66,8 +66,28 @@ const uint8_t kLgAcPowerOff = 3;  // 0b11
 const uint8_t kLgAcPowerOn = 0;   // 0b00
 const uint8_t kLgAcSignature = 0x88;
 
-const uint32_t kLgAcOffCommand =  0x88C0051;
-const uint32_t kLgAcLightToggle = 0x88C00A6;
+const uint32_t kLgAcOffCommand          = 0x88C0051;
+const uint32_t kLgAcLightToggle         = 0x88C00A6;
+
+const uint32_t kLgAcSwingSignature      = 0x8813;
+const uint32_t kLgAcSwingVLowest        = 0x8813048;
+const uint32_t kLgAcSwingVLow           = 0x8813059;
+const uint32_t kLgAcSwingVMiddle        = 0x881306A;
+const uint32_t kLgAcSwingVUpperMiddle   = 0x881307B;
+const uint32_t kLgAcSwingVHigh          = 0x881308C;
+const uint32_t kLgAcSwingVHighest       = 0x881309D;
+const uint32_t kLgAcSwingVSwing         = 0x8813149;
+const uint32_t kLgAcSwingVAuto          = kLgAcSwingVSwing;
+const uint32_t kLgAcSwingVOff           = 0x881315A;
+const uint8_t  kLgAcSwingVLowest_Short      = 0x04;
+const uint8_t  kLgAcSwingVLow_Short         = 0x05;
+const uint8_t  kLgAcSwingVMiddle_Short      = 0x06;
+const uint8_t  kLgAcSwingVUpperMiddle_Short = 0x07;
+const uint8_t  kLgAcSwingVHigh_Short        = 0x08;
+const uint8_t  kLgAcSwingVHighest_Short     = 0x09;
+const uint8_t  kLgAcSwingVSwing_Short       = 0x14;
+const uint8_t  kLgAcSwingVAuto_Short        = kLgAcSwingVSwing_Short;
+const uint8_t  kLgAcSwingVOff_Short         = 0x15;
 
 // Classes
 /// Class for handling detailed LG A/C messages.
@@ -102,13 +122,18 @@ class IRLgAc {
   void setLight(const bool on);
   bool getLight(void) const;
   bool isLightToggle(void) const;
+  bool isSwingV(void) const;
+  void setSwingV(const uint32_t position);
+  uint32_t getSwingV(void) const;
   uint32_t getRaw(void);
   void setRaw(const uint32_t new_code,
               const decode_type_t protocol = decode_type_t::UNKNOWN);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint32_t code);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint32_t convertSwingV(const stdAc::swingv_t swingv);
   stdAc::state_t toCommon(const stdAc::state_t *prev = NULL) const;
   String toString(void) const;
   void setModel(const lg_ac_remote_model_t model);
@@ -125,6 +150,8 @@ class IRLgAc {
   LGProtocol _;
   uint8_t _temp;
   bool _light;
+  uint32_t _swingv;
+  uint32_t _swingv_prev;
   decode_type_t _protocol;  ///< Protocol version
   lg_ac_remote_model_t _model;  ///< Model type
   void checksum(void);

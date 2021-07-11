@@ -950,6 +950,10 @@ TEST(TestIRLgAcClass, DetectAKB74955603) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+
+  ac.stateReset();
+  ac.setRaw(0x881306A);
+  EXPECT_EQ(lg_ac_remote_model_t::AKB74955603, ac.getModel());
 }
 
 TEST(TestIRLgAcClass, Light) {
@@ -982,5 +986,49 @@ TEST(TestIRLgAcClass, Light) {
   ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
   ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
   ASSERT_EQ("Model: 3 (AKB74955603), Light Toggle: On",
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+TEST(TestIRLgAcClass, SwingV) {
+  IRLgAc ac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  ac.begin();
+
+  EXPECT_EQ(kLgAcSwingVOff, ac.getSwingV());
+
+  // Ref: https://docs.google.com/spreadsheets/d/1zF0FI2ENvbLdk4zaWBY9ZYVM3MB_4oxro9wCM7ETX4Y/edit#gid=1912869597&range=D2:E9
+  ac.setRaw(0x881306A);
+  EXPECT_TRUE(ac.isSwingV());
+  const char expected_middle[] =
+      "Model: 3 (AKB74955603), Swing(V): 6 (Middle)";
+  EXPECT_EQ(expected_middle, ac.toString());
+  ac.setSwingV(kLgAcSwingVHigh);
+  EXPECT_EQ(kLgAcSwingVHigh, ac.getSwingV());
+  ac.setSwingV(0x880A396);  // Non SwingV code.
+  EXPECT_EQ(kLgAcSwingVHigh, ac.getSwingV());  // Last setting.
+
+  // Test sending via the class method.
+  ac.stateReset();
+  ac.setRaw(0x880A396);  // A known normal state.
+  const char expected[] =
+      "Model: 3 (AKB74955603), Power: On, Mode: 2 (Fan), Temp: 18C, "
+      "Fan: 9 (Low)";
+  ac.setSwingV(kLgAcSwingVMiddle_Short);
+  EXPECT_EQ(kLgAcSwingVMiddle, ac.getSwingV());
+
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  // First message should be normal.
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // The next should be a middle swing.
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 61));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  EXPECT_EQ(kLgAcSwingVMiddle, ac._irsend.capture.value);
+  ASSERT_EQ(expected_middle,
             IRAcUtils::resultAcToString(&ac._irsend.capture));
 }

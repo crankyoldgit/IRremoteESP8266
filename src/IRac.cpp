@@ -1333,20 +1333,23 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] light Turn on the LED/Display mode.
 void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
               const bool on, const stdAc::opmode_t mode,
-              const float degrees, const stdAc::fanspeed_t fan) {
+              const float degrees, const stdAc::fanspeed_t fan,
+              const stdAc::swingv_t swingv, const bool light) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  // No Vertical swing setting available.
+  ac->setSwingV(ac->convertSwingV(swingv));
   // No Horizontal swing setting available.
   // No Quiet setting available.
   // No Turbo setting available.
-  // No Light setting available.
+  ac->setLight(light);
   // No Filter setting available.
   // No Clean setting available.
   // No Beep setting available.
@@ -2638,7 +2641,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRLgAc ac(_pin, _inverted, _modulation);
       lg(&ac, (lg_ac_remote_model_t)send.model, send.power, send.mode,
-         send.degrees, send.fanspeed);
+         send.degrees, send.fanspeed, send.swingv, send.light);
       break;
     }
 #endif  // SEND_LG

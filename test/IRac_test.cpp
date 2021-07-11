@@ -1013,7 +1013,9 @@ TEST(TestIRac, LG) {
           true,                                 // Power
           stdAc::opmode_t::kDry,                // Mode
           27,                                   // Degrees C
-          stdAc::fanspeed_t::kMedium);          // Fan speed
+          stdAc::fanspeed_t::kMedium,           // Fan speed
+          stdAc::swingv_t::kLow,                // Vertical swing
+          true);                                // Light
 
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
@@ -1021,8 +1023,50 @@ TEST(TestIRac, LG) {
   ASSERT_EQ(LG, ac._irsend.capture.decode_type);
   ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // There should only be a single message.
+  ASSERT_EQ(61, ac._irsend.capture.rawlen);
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
+TEST(TestIRac, LG2) {
+  IRLgAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Model: 3 (AKB74955603), "
+      "Power: On, Mode: 1 (Dry), Temp: 27C, Fan: 9 (Low)";
+
+  ac.begin();
+  irac.lg(&ac,
+          lg_ac_remote_model_t::AKB74955603,    // Model
+          true,                                 // Power
+          stdAc::opmode_t::kDry,                // Mode
+          27,                                   // Degrees C
+          stdAc::fanspeed_t::kLow,              // Fan speed
+          stdAc::swingv_t::kLow,                // Vertical swing
+          false);                               // Light
+
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  ASSERT_EQ(181, ac._irsend.capture.rawlen);  // We expect three messages.
+  // Message #1
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  // Message #2 - SwingV Low
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 61));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(kLgAcSwingVLow, ac._irsend.capture.value);
+  // Message #3 - Light Toggle
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 121));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(kLgAcLightToggle, ac._irsend.capture.value);
 }
 
 TEST(TestIRac, Midea) {
