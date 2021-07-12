@@ -3,6 +3,7 @@
 /// @file
 /// @brief Support for LG protocols.
 /// @see https://github.com/arendst/Tasmota/blob/54c2eb283a02e4287640a4595e506bc6eadbd7f2/sonoff/xdrv_05_irremote.ino#L327-438
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1513
 
 // Supports:
 //   Brand: LG,  Model: 6711A20083V remote (LG)
