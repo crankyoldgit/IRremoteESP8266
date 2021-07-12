@@ -1,9 +1,8 @@
-// Copyright 2017, 2019 David Conran
+// Copyright 2017-2021 David Conran
 
 /// @file
 /// @brief Support for LG protocols.
 /// @see https://github.com/arendst/Tasmota/blob/54c2eb283a02e4287640a4595e506bc6eadbd7f2/sonoff/xdrv_05_irremote.ino#L327-438
-
 
 // Supports:
 //   Brand: LG,  Model: 6711A20083V remote (LG)
@@ -125,6 +124,7 @@ class IRLgAc {
   bool isSwingV(void) const;
   void setSwingV(const uint32_t position);
   uint32_t getSwingV(void) const;
+  void updateSwingVPrev(void);
   uint32_t getRaw(void);
   void setRaw(const uint32_t new_code,
               const decode_type_t protocol = decode_type_t::UNKNOWN);

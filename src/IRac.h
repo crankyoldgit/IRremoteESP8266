@@ -308,7 +308,8 @@ void electra(IRElectraAc *ac,
   void lg(IRLgAc *ac, const lg_ac_remote_model_t model,
           const bool on, const stdAc::opmode_t mode,
           const float degrees, const stdAc::fanspeed_t fan,
-          const stdAc::swingv_t swingv, const bool light);
+          const stdAc::swingv_t swingv, const stdAc::swingv_t swingv_prev,
+          const bool light);
 #endif  // SEND_LG
 #if SEND_MIDEA
   void midea(IRMideaAC *ac,

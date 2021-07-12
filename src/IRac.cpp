@@ -1334,17 +1334,21 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] swingv_prev The previous vertical swing setting.
 /// @param[in] light Turn on the LED/Display mode.
 void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
               const bool on, const stdAc::opmode_t mode,
               const float degrees, const stdAc::fanspeed_t fan,
-              const stdAc::swingv_t swingv, const bool light) {
+              const stdAc::swingv_t swingv, const stdAc::swingv_t swingv_prev,
+              const bool light) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(ac->convertSwingV(swingv_prev));
+  ac->updateSwingVPrev();
   ac->setSwingV(ac->convertSwingV(swingv));
   // No Horizontal swing setting available.
   // No Quiet setting available.
@@ -2371,7 +2375,11 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   // Construct a pointer-safe previous power state incase prev is NULL/NULLPTR.
 #if (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
   const bool prev_power = (prev != NULL) ? prev->power : !send.power;
-#endif
+#endif  // (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
+#if SEND_LG
+  const stdAc::swingv_t prev_swingv = (prev != NULL) ? prev->swingv
+                                                     : stdAc::swingv_t::kOff;
+#endif  // SEND_LG
   // Per vendor settings & setup.
   switch (send.protocol) {
 #if SEND_AIRWELL
@@ -2641,7 +2649,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRLgAc ac(_pin, _inverted, _modulation);
       lg(&ac, (lg_ac_remote_model_t)send.model, send.power, send.mode,
-         send.degrees, send.fanspeed, send.swingv, send.light);
+         send.degrees, send.fanspeed, send.swingv, prev_swingv, send.light);
       break;
     }
 #endif  // SEND_LG

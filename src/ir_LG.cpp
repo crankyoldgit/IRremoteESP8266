@@ -1,6 +1,6 @@
 // Copyright 2015 Darryl Smith
 // Copyright 2015 cheaplin
-// Copyright 2017, 2018 David Conran
+// Copyright 2017-2021 David Conran
 
 /// @file
 /// @brief Support for LG protocols.
@@ -224,7 +224,7 @@ void IRLgAc::stateReset(void) {
   setModel(lg_ac_remote_model_t::GE6711AR2853M);
   _light = true;
   _swingv = kLgAcSwingVOff;
-  _swingv_prev = _swingv;
+  updateSwingVPrev();
 }
 
 /// Set up hardware to be able to send a message.
@@ -242,7 +242,7 @@ void IRLgAc::send(const uint16_t repeat) {
         // Only send the swing setting if we need to.
         if (_swingv != _swingv_prev) {
           _irsend.send(_protocol, _swingv, kLgBits, repeat);
-          _swingv_prev = _swingv;
+          updateSwingVPrev();
         }
         // Any "normal" command sent will always turn the light on, thus we only
         // send it when we want it off. Must be sent last!
@@ -494,6 +494,9 @@ void IRLgAc::setSwingV(const uint32_t position) {
     }
   }
 }
+
+// Copy the previous swingv setting the current one.
+void IRLgAc::updateSwingVPrev(void) { _swingv_prev = _swingv; }
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.

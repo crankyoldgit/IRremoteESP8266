@@ -1032,3 +1032,48 @@ TEST(TestIRLgAcClass, SwingV) {
   ASSERT_EQ(expected_middle,
             IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
+
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1513#issuecomment-877960010
+//   https://docs.google.com/spreadsheets/d/1zF0FI2ENvbLdk4zaWBY9ZYVM3MB_4oxro9wCM7ETX4Y/edit#gid=348220307&range=A49:C49
+TEST(TestIRLgAcClass, SwingVOffAfterAuto) {
+  // Simulate sending a state with a SwingV auto, then followed by a SwingV Off.
+  IRLgAc ac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  ac.begin();
+  // IRhvac {"Vendor":"LG2", "Model": 3, "Power": "On", "Mode": "Heat",
+  //         "Temp": 26, "FanSpeed": "min", "SwingV": "Auto", "Light": "On"}
+  ac.setModel(lg_ac_remote_model_t::AKB74955603);
+  ac.setPower(true);
+  ac.setMode(kLgAcHeat);
+  ac.setTemp(26);
+  ac.setFan(kLgAcFanLowest);
+  ac.setSwingV(ac.convertSwingV(stdAc::swingv_t::kAuto));
+  ac.setLight(true);
+  ac._irsend.reset();
+  ac.send();
+  // All sent, we assume the above  works. Just need to switch to swing off now.
+  ac._irsend.reset();
+  // IRhvac {"Vendor":"LG2", "Model": 3, "Power": "On", "Mode": "Heat",
+  //         "Temp": 26, "FanSpeed": "min", "SwingV": "Off", "Light": "On"}
+  ac.setSwingV(ac.convertSwingV(stdAc::swingv_t::kOff));
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  // There should only be two messages.
+  EXPECT_EQ(121, ac._irsend.capture.rawlen);
+  // First message should be normal.
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(
+      "Model: 2 (AKB75215403), Power: On, Mode: 4 (Heat), Temp: 26C,"
+      " Fan: 0 (Quiet)",
+      IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // The next should be a SwingV Off.
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 61));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  EXPECT_EQ(kLgAcSwingVOff, ac._irsend.capture.value);
+  ASSERT_EQ("Model: 3 (AKB74955603), Swing(V): 21 (Off)",
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
+}

@@ -1015,6 +1015,7 @@ TEST(TestIRac, LG) {
           27,                                   // Degrees C
           stdAc::fanspeed_t::kMedium,           // Fan speed
           stdAc::swingv_t::kLow,                // Vertical swing
+          stdAc::swingv_t::kOff,                // Vertical swing (previous)
           true);                                // Light
 
   ASSERT_EQ(expected, ac.toString());
@@ -1045,6 +1046,7 @@ TEST(TestIRac, LG2) {
           27,                                   // Degrees C
           stdAc::fanspeed_t::kLow,              // Fan speed
           stdAc::swingv_t::kLow,                // Vertical swing
+          stdAc::swingv_t::kOff,                // Vertical swing (previous)
           false);                               // Light
 
   ASSERT_EQ(expected, ac.toString());
@@ -1067,6 +1069,65 @@ TEST(TestIRac, LG2) {
   ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
   ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
   ASSERT_EQ(kLgAcLightToggle, ac._irsend.capture.value);
+}
+
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1513#issuecomment-877960010
+//   https://docs.google.com/spreadsheets/d/1zF0FI2ENvbLdk4zaWBY9ZYVM3MB_4oxro9wCM7ETX4Y/edit#gid=348220307&range=A49:C49
+TEST(TestIRac, Issue1513) {
+  // Simulate sending a state with a SwingV auto, then followed by a SwingV Off.
+  IRLgAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  ac.begin();
+  // IRhvac {"Vendor":"LG2", "Model": 3, "Power": "On", "Mode": "Heat",
+  //         "Temp": 26, "FanSpeed": "min", "SwingV": "Auto", "Light": "On"}
+  ac._irsend.reset();
+  irac.lg(&ac,
+          lg_ac_remote_model_t::AKB74955603,    // Model
+          true,                                 // Power
+          stdAc::opmode_t::kHeat,               // Mode
+          26,                                   // Degrees C
+          stdAc::fanspeed_t::kMin,              // Fan speed
+          stdAc::swingv_t::kAuto,               // Vertical swing
+          stdAc::swingv_t::kHighest,            // Vertical swing (previous)
+          true);                                // Light
+  ac._irsend.makeDecodeResult();
+  // All sent, we assume the above  works. Just need to switch to swing off now.
+  ac._irsend.reset();
+  ac.stateReset();
+  ac.send();
+  // IRhvac {"Vendor":"LG2", "Model": 3, "Power": "On", "Mode": "Heat",
+  //         "Temp": 26, "FanSpeed": "min", "SwingV": "Off", "Light": "On"}
+  ac._irsend.makeDecodeResult();
+  ac._irsend.reset();
+  irac.lg(&ac,
+          lg_ac_remote_model_t::AKB74955603,    // Model
+          true,                                 // Power
+          stdAc::opmode_t::kHeat,               // Mode
+          26,                                   // Degrees C
+          stdAc::fanspeed_t::kMin,              // Fan speed
+          stdAc::swingv_t::kOff,                // Vertical swing
+          stdAc::swingv_t::kAuto,               // Vertical swing (previous)
+          true);                                // Light
+  ac._irsend.makeDecodeResult();
+  // There should only be two messages.
+  EXPECT_EQ(121, ac._irsend.capture.rawlen);
+  // First message should be normal.
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(
+      "Model: 2 (AKB75215403), Power: On, Mode: 4 (Heat), Temp: 26C,"
+      " Fan: 0 (Quiet)",
+      IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // The next should be a SwingV Off.
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 61));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  EXPECT_EQ(kLgAcSwingVOff, ac._irsend.capture.value);
+  ASSERT_EQ("Model: 3 (AKB74955603), Swing(V): 21 (Off)",
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
 TEST(TestIRac, Midea) {
