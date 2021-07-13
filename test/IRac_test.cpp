@@ -1527,8 +1527,9 @@ TEST(TestIRac, Tcl112) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Mode: 3 (Cool), Temp: 20C, Fan: 3 (Medium), Econo: On, "
-      "Health: On, Light: On, Turbo: Off, Swing(H): On, Swing(V): Off";
+      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 20C, Fan: 3 (Medium), "
+      "Econo: On, Health: On, Turbo: Off, Swing(H): On, Swing(V): Off, "
+      "Light: On";
 
   ac.begin();
   irac.tcl112(&ac,
@@ -1538,6 +1539,7 @@ TEST(TestIRac, Tcl112) {
               stdAc::fanspeed_t::kMedium,  // Fan speed
               stdAc::swingv_t::kOff,       // Vertical swing
               stdAc::swingh_t::kAuto,      // Horizontal swing
+              false,                       // Quiet (aka. Mute)
               false,                       // Turbo
               true,                        // Light
               true,                        // Econo
@@ -1550,6 +1552,33 @@ TEST(TestIRac, Tcl112) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  // Test the quiet mode, which should generate two messages.
+  ac._irsend.reset();
+  irac.tcl112(&ac,
+              true,                        // Power
+              stdAc::opmode_t::kCool,      // Mode
+              20,                          // Celsius
+              stdAc::fanspeed_t::kMedium,  // Fan speed
+              stdAc::swingv_t::kOff,       // Vertical swing
+              stdAc::swingh_t::kAuto,      // Horizontal swing
+              true,                        // Quiet (aka. Mute)
+              false,                       // Turbo
+              true,                        // Light
+              true,                        // Econo
+              true);                       // Filter (aka. Health)
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TCL112AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
+  ASSERT_EQ(
+      "Type: 2, Quiet: On",
+      IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // TCL112 uses the Mitsubishi112 decoder.
+  // Skip first message.
+  EXPECT_TRUE(capture.decodeMitsubishi112(&ac._irsend.capture, 229));
+  ASSERT_EQ(TCL112AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
 TEST(TestIRac, Technibel) {

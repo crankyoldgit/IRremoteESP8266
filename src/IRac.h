@@ -405,8 +405,8 @@ void electra(IRElectraAc *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,
               const stdAc::fanspeed_t fan,
               const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-              const bool turbo, const bool light, const bool econo,
-              const bool filter);
+              const bool quiet, const bool turbo, const bool light,
+              const bool econo, const bool filter);
 #endif  // SEND_TCL112AC
 #if SEND_TECHNIBEL_AC
   void technibel(IRTechnibelAc *ac,
