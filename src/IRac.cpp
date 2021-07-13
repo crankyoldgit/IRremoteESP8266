@@ -1333,20 +1333,27 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingv_prev The previous vertical swing setting.
+/// @param[in] light Turn on the LED/Display mode.
 void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
               const bool on, const stdAc::opmode_t mode,
-              const float degrees, const stdAc::fanspeed_t fan) {
+              const float degrees, const stdAc::fanspeed_t fan,
+              const stdAc::swingv_t swingv, const stdAc::swingv_t swingv_prev,
+              const bool light) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  // No Vertical swing setting available.
+  ac->setSwingV(ac->convertSwingV(swingv_prev));
+  ac->updateSwingVPrev();
+  ac->setSwingV(ac->convertSwingV(swingv));
   // No Horizontal swing setting available.
   // No Quiet setting available.
   // No Turbo setting available.
-  // No Light setting available.
+  ac->setLight(light);
   // No Filter setting available.
   // No Clean setting available.
   // No Beep setting available.
@@ -2368,7 +2375,11 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   // Construct a pointer-safe previous power state incase prev is NULL/NULLPTR.
 #if (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
   const bool prev_power = (prev != NULL) ? prev->power : !send.power;
-#endif
+#endif  // (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
+#if SEND_LG
+  const stdAc::swingv_t prev_swingv = (prev != NULL) ? prev->swingv
+                                                     : stdAc::swingv_t::kOff;
+#endif  // SEND_LG
   // Per vendor settings & setup.
   switch (send.protocol) {
 #if SEND_AIRWELL
@@ -2638,7 +2649,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRLgAc ac(_pin, _inverted, _modulation);
       lg(&ac, (lg_ac_remote_model_t)send.model, send.power, send.mode,
-         send.degrees, send.fanspeed);
+         send.degrees, send.fanspeed, send.swingv, prev_swingv, send.light);
       break;
     }
 #endif  // SEND_LG
@@ -3056,6 +3067,8 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return lg_ac_remote_model_t::GE6711AR2853M;
   } else if (!strcasecmp(str, "AKB75215403")) {
     return lg_ac_remote_model_t::AKB75215403;
+  } else if (!strcasecmp(str, "AKB74955603")) {
+    return lg_ac_remote_model_t::AKB74955603;
   // Panasonic A/C families
   } else if (!strcasecmp(str, "LKE") || !strcasecmp(str, "PANASONICLKE")) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
@@ -3571,14 +3584,7 @@ namespace IRAcUtils {
       case decode_type_t::LG:
       case decode_type_t::LG2: {
         IRLgAc ac(kGpioUnused);
-        ac.setRaw(result->value);  // Like Coolix, use value instead of state.
-        switch (result->decode_type) {
-          case decode_type_t::LG2:
-            ac.setModel(lg_ac_remote_model_t::AKB75215403);
-            break;
-          default:
-            ac.setModel(lg_ac_remote_model_t::GE6711AR2853M);
-        }
+        ac.setRaw(result->value, result->decode_type);  // Use value, not state.
         return ac.isValidLgAc() ? ac.toString() : "";
       }
 #endif  // DECODE_LG
@@ -3843,16 +3849,9 @@ namespace IRAcUtils {
       case decode_type_t::LG:
       case decode_type_t::LG2: {
         IRLgAc ac(kGpioUnused);
-        ac.setRaw(decode->value);  // Uses value instead of state.
+        ac.setRaw(decode->value, decode->decode_type);  // Use value, not state.
         if (!ac.isValidLgAc()) return false;
-        switch (decode->decode_type) {
-          case decode_type_t::LG2:
-            ac.setModel(lg_ac_remote_model_t::AKB75215403);
-            break;
-          default:
-            ac.setModel(lg_ac_remote_model_t::GE6711AR2853M);
-        }
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_LG
