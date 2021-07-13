@@ -530,3 +530,45 @@ TEST(TestDecodeTcl112Ac, Issue1528) {
       "Type: 2, Quiet: On",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
+
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1528#issuecomment-877640837
+TEST(TestTcl112AcClass, SendingQuiet) {
+  IRTcl112Ac ac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+
+
+  ac.begin();
+  ac.on();
+  ac.setTemp(24);
+  ac.setLight(false);
+  ac.setSwingHorizontal(true);
+  ac.send();
+  ac.setSwingHorizontal(false);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.send();
+  ac._irsend.reset();
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  ac.send();
+  EXPECT_TRUE(ac.getQuiet());
+  ac._irsend.makeDecodeResult();
+  // We are expecting two messages, confirm we got at least that much data.
+  EXPECT_EQ(1 + 228 + 228, ac._irsend.capture.rawlen);
+  // First message.
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TCL112AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
+  ASSERT_EQ(
+      "Type: 2, Quiet: On",
+      IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // Second message.
+  // TCL112 uses the Mitsubishi112 decoder.
+  // Skip first message.
+  EXPECT_TRUE(capture.decodeMitsubishi112(&ac._irsend.capture, 229));
+  ASSERT_EQ(TCL112AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
+  ASSERT_EQ(
+      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 24C, Fan: 0 (Auto), "
+      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
+      "Light: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
