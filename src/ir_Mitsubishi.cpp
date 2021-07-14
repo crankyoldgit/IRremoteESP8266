@@ -264,6 +264,7 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t offset,
   // Enough data?
   if (results->rawlen <= (nbits * 2 + kHeader + kFooter) *
                          (expected_repeats + 1) + offset - 1) return false;
+  uint16_t save[kStateSizeMax];
   // Handle repeats if we need too.
   for (uint16_t r = 0; r <= expected_repeats; r++) {
     // Header + Data + Footer
@@ -278,18 +279,24 @@ bool IRrecv::decodeMitsubishiAC(decode_results *results, uint16_t offset,
                                  0, false);
     if (!used) return false;  // No match.
     offset += used;
+    if (r) {  // Is this a repeat?
+      // Repeats are expected to be exactly the same.
+      if (std::memcmp(save, results->state, nbits / 8) != 0) return false;
+    } else {  // It is the first message.
+      // Compliance
+      if (strict) {
+        // Data signature check.
+        static const uint8_t signature[5] = {0x23, 0xCB, 0x26, 0x01, 0x00};
+        if (std::memcmp(results->state, signature, 5) != 0) return false;
+        // Checksum verification.
+        if (!IRMitsubishiAC::validChecksum(results->state)) return false;
+      }
+      // Save a copy of the state to compare with.
+      std::memcpy(save, results->state, nbits / 8);
+    }
   }
 
-  // Compliance
-  if (strict) {
-    // Data signature check.
-    if (results->state[0] != 0x23 || results->state[1] != 0xCB ||
-        results->state[2] != 0x26 || results->state[3] != 0x01 ||
-        results->state[4] != 0x00) return false;
-    // Checksum
-    if (!IRMitsubishiAC::validChecksum(results->state)) return false;
-  }
-
+  // Success.
   results->decode_type = MITSUBISHI_AC;
   results->bits = nbits;
   return true;
