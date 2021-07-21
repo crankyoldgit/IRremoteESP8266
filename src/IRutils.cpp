@@ -116,6 +116,7 @@ decode_type_t strToDecodeType(const char * const str) {
 /// @return A String containing the protocol name. kUnknownStr if no match.
 String typeToString(const decode_type_t protocol, const bool isRepeat) {
   String result = "";
+  result.reserve(30);  // Size of longest protocol name + " (Repeat)"
   const char *ptr = kAllProtocolNamesStr;
   if (protocol > kLastDecodeType || protocol == decode_type_t::UNKNOWN) {
     result = kUnknownStr;
@@ -209,12 +210,25 @@ uint16_t getCorrectedRawLength(const decode_results * const results) {
 /// @return A String containing the code-ified result.
 String resultToSourceCode(const decode_results * const results) {
   String output = "";
+  const uint16_t length = getCorrectedRawLength(results);
+  const bool hasState = hasACState(results->decode_type);
   // Reserve some space for the string to reduce heap fragmentation.
-  output.reserve(1536);  // 1.5KB should cover most cases.
+  // "uint16_t rawData[9999] = {};  // LONGEST_PROTOCOL\n" = ~55 chars.
+  // "NNNN,  " = ~7 chars on average per raw entry
+  // Protocols with a `state`:
+  //   "uint8_t state[NN] = {};\n" = ~25 chars
+  //   "0xNN, " = 6 chars per byte.
+  // Protocols without a `state`:
+  //   " DEADBEEFDEADBEEF\n"
+  //   "uint32_t address = 0xDEADBEEF;\n"
+  //   "uint32_t command = 0xDEADBEEF;\n"
+  //   "uint64_t data = 0xDEADBEEFDEADBEEF;" = ~116 chars max.
+  output.reserve(55 + (length * 7) + hasState ? 25 + (results->bits / 8) * 6
+                                              : 116);
   // Start declaration
   output += F("uint16_t ");  // variable type
   output += F("rawData[");   // array name
-  output += uint64ToString(getCorrectedRawLength(results), 10);
+  output += uint64ToString(length, 10);
   // array size
   output += F("] = {");  // Start declaration
 
@@ -242,13 +256,13 @@ String resultToSourceCode(const decode_results * const results) {
   output += F("  // ");
   output += typeToString(results->decode_type, results->repeat);
   // Only display the value if the decode type doesn't have an A/C state.
-  if (!hasACState(results->decode_type))
+  if (!hasState)
     output += ' ' + uint64ToString(results->value, 16);
   output += F("\n");
 
   // Now dump "known" codes
   if (results->decode_type != UNKNOWN) {
-    if (hasACState(results->decode_type)) {
+    if (hasState) {
 #if DECODE_AC
       uint16_t nbytes = results->bits / 8;
       output += F("uint8_t state[");
@@ -292,7 +306,9 @@ String resultToTimingInfo(const decode_results * const results) {
   String output = "";
   String value = "";
   // Reserve some space for the string to reduce heap fragmentation.
-  output.reserve(2048);  // 2KB should cover most cases.
+  // "Raw Timing[NNNN]:\n\n" = 19 chars
+  // "   +123456, " / "-123456, " = ~12 chars on avg per raw entry.
+  output.reserve(19 + 12 * results->rawlen);  // Should be less than this.
   value.reserve(6);  // Max value should be 2^17 = 131072
   output += F("Raw Timing[");
   output += uint64ToString(results->rawlen - 1, 10);
@@ -341,7 +357,9 @@ String resultToHexidecimal(const decode_results * const result) {
 String resultToHumanReadableBasic(const decode_results * const results) {
   String output = "";
   // Reserve some space for the string to reduce heap fragmentation.
-  output.reserve(2 * kStateSizeMax + 50);  // Should cover most cases.
+  // "Protocol  : LONGEST_PROTOCOL_NAME (Repeat)\n"
+  // "Code      : 0x (NNNN Bits)\n" = 70 chars
+  output.reserve(2 * kStateSizeMax + 70);  // Should cover most cases.
   // Show Encoding standard
   output += kProtocolStr;
   output += F("  : ");
@@ -479,6 +497,8 @@ namespace irutils {
   String addLabeledString(const String value, const String label,
                           const bool precomma) {
     String result = "";
+    // ", " + ": " = 4 chars
+    result.reserve(4 + value.length() + label.length());
     if (precomma) result += kCommaSpaceStr;
     result += label;
     result += kColonSpaceStr;
@@ -607,7 +627,10 @@ namespace irutils {
   /// @return The resulting String.
   String addModelToString(const decode_type_t protocol, const int16_t model,
                           const bool precomma) {
-    String result = addIntToString(model, kModelStr, precomma);
+    String result = "";
+    // ", Model: NNN (BlahBlahEtc)" = ~40 chars for longest model name.
+    result.reserve(40);
+    result += addIntToString(model, kModelStr, precomma);
     result += kSpaceLBraceStr;
     result += modelToStr(protocol, model);
     return result + ')';
@@ -636,7 +659,9 @@ namespace irutils {
   /// @return The resulting String.
   String addTempFloatToString(const float degrees, const bool celsius,
                               const bool precomma) {
-    String result = addIntToString(degrees, kTempStr, precomma);
+    String result = "";
+    result.reserve(14);  // Assuming ", Temp: XXX.5F" is the largest.
+    result += addIntToString(degrees, kTempStr, precomma);
     // Is it a half degree?
     if (((uint16_t)(2 * degrees)) & 1) result += F(".5");
     result += celsius ? 'C' : 'F';
@@ -655,7 +680,9 @@ namespace irutils {
   String addModeToString(const uint8_t mode, const uint8_t automatic,
                          const uint8_t cool, const uint8_t heat,
                          const uint8_t dry, const uint8_t fan) {
-    String result = addIntToString(mode, kModeStr);
+    String result = "";
+    result.reserve(22);  // ", Mode: NNN (UNKNOWN)"
+    result += addIntToString(mode, kModeStr);
     result += kSpaceLBraceStr;
     if (mode == automatic) result += kAutoStr;
     else if (mode == cool) result += kCoolStr;
@@ -677,7 +704,9 @@ namespace irutils {
   /// @return The resulting String.
   String addDayToString(const uint8_t day_of_week, const int8_t offset,
                         const bool precomma) {
-    String result = addIntToString(day_of_week, kDayStr, precomma);
+    String result = "";
+    result.reserve(19);  // ", Day: N (UNKNOWN)"
+    result += addIntToString(day_of_week, kDayStr, precomma);
     result += kSpaceLBraceStr;
     if ((uint8_t)(day_of_week + offset) < 7)
 #if UNIT_TEST
@@ -706,7 +735,9 @@ namespace irutils {
                         const uint8_t low, const uint8_t automatic,
                         const uint8_t quiet, const uint8_t medium,
                         const uint8_t maximum) {
-    String result = addIntToString(speed, kFanStr);
+    String result = "";
+    result.reserve(21);  // ", Fan: NNN (UNKNOWN)"
+    result += addIntToString(speed, kFanStr);
     result += kSpaceLBraceStr;
     if (speed == high)           result += kHighStr;
     else if (speed == low)       result += kLowStr;
@@ -741,7 +772,9 @@ namespace irutils {
                            const uint8_t off,
                            const uint8_t leftright, const uint8_t rightleft,
                            const uint8_t threed, const uint8_t wide) {
-    String result = addIntToString(position, kSwingHStr);
+    String result = "";
+    result.reserve(30);  // ", Swing(H): NNN (Left Right)"
+    result += addIntToString(position, kSwingHStr);
     result += kSpaceLBraceStr;
     if (position == automatic) {
       result += kAutoStr;
@@ -799,7 +832,9 @@ namespace irutils {
                            const uint8_t low, const uint8_t lowest,
                            const uint8_t off, const uint8_t swing,
                            const uint8_t breeze, const uint8_t circulate) {
-    String result = addIntToString(position, kSwingVStr);
+    String result = "";
+    result.reserve(31);  // ", Swing(V): NNN (Upper Middle)"
+    result += addIntToString(position, kSwingVStr);
     result += kSpaceLBraceStr;
     if (position == automatic) {
       result += kAutoStr;
@@ -881,6 +916,7 @@ namespace irutils {
     uint8_t seconds = totalseconds % 60;
 
     String result = "";
+    result.reserve(42);  // "99 Days, 23 Hours, 59 Minutes, 59 Seconds"
     if (days)
       result += uint64ToString(days) + ' ' + String((days > 1) ? kDaysStr
                                                                : kDayStr);
