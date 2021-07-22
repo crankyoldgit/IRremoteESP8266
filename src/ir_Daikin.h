@@ -16,6 +16,7 @@
 /// @see Daikin160 https://github.com/crankyoldgit/IRremoteESP8266/issues/731
 /// @see Daikin2 https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=B25:D32
 /// @see Daikin2 https://github.com/crankyoldgit/IRremoteESP8266/issues/582
+/// @see Daikin2 https://github.com/crankyoldgit/IRremoteESP8266/issues/1535
 /// @see Daikin2 https://www.daikin.co.nz/sites/default/files/daikin-split-system-US7-FTXZ25-50NV1B.pdf
 /// @see Daikin216 https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 /// @see Daikin216 https://github.com/danny-source/Arduino_DY_IRDaikin
@@ -27,6 +28,7 @@
 //   Brand: Daikin,  Model: FTXZ25NV1B A/C (DAIKIN2)
 //   Brand: Daikin,  Model: FTXZ35NV1B A/C (DAIKIN2)
 //   Brand: Daikin,  Model: FTXZ50NV1B A/C (DAIKIN2)
+//   Brand: Daikin,  Model: FTXZ25NV1B A/C (DAIKIN2)
 //   Brand: Daikin,  Model: ARC433B69 remote (DAIKIN216)
 //   Brand: Daikin,  Model: ARC423A5 remote (DAIKIN160)
 //   Brand: Daikin,  Model: FTE12HV2S A/C
@@ -227,9 +229,10 @@ union Daikin2Protocol{
     uint64_t          :1;
     // Byte 26
     uint64_t          :1;
-    uint64_t Temp     :7;
+    uint64_t Temp     :6;
+    uint64_t HumidOn  :1;
     // Byte 27
-    uint64_t          :8;
+    uint64_t Humidity :8;
     // Byte 28
     uint64_t          :4;
     uint64_t Fan      :4;
@@ -298,6 +301,19 @@ const uint8_t kDaikin2SwingHRightMax = 0xAC;
 const uint8_t kDaikin2SwingHAuto =     0xBE;  // A.k.a "Swing"
 const uint8_t kDaikin2SwingHOff =      0xBF;
 const uint8_t kDaikin2SwingHSwing =  kDaikin2SwingHAuto;
+
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1535#issuecomment-882092486
+//   https://docs.google.com/spreadsheets/d/1kxHgFqiUB9ETXYEkszAIN5gE-t2ykvnPCnOV-sPUE0A/edit?usp=sharing
+const uint8_t kDaikin2HumidityOff        = 0x00;
+const uint8_t kDaikin2HumidityHeatLow    = 0x28;  // Humidify (Heat) only (40%?)
+const uint8_t kDaikin2HumidityHeatMedium = 0x2D;  // Humidify (Heat) only (45%?)
+const uint8_t kDaikin2HumidityHeatHigh   = 0x32;  // Humidify (Heat) only (50%?)
+const uint8_t kDaikin2HumidityDryLow     = 0x32;  // Dry only (50%?)
+const uint8_t kDaikin2HumidityDryMedium  = 0x37;  // Dry only (55%?)
+const uint8_t kDaikin2HumidityDryHigh    = 0x3C;  // Dry only (60%?)
+const uint8_t kDaikin2HumidityAuto       = 0xFF;
+
 
 const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
@@ -805,6 +821,8 @@ class IRDaikin2 {
   bool getFreshAir(void) const;
   void setFreshAirHigh(const bool on);
   bool getFreshAirHigh(void) const;
+  uint8_t getHumidity(void) const;
+  void setHumidity(const uint8_t percent);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[]);
   static bool validChecksum(uint8_t state[],

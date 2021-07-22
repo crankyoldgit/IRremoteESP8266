@@ -1037,7 +1037,7 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
       "Clock: 14:50, On Timer: Off, Off Timer: Off, Sleep Timer: Off, "
       "Beep: 1 (Quiet), Light: 3 (Off), Mould: On, Clean: On, Fresh: Off, "
       "Eye: Off, Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: Off, "
-      "Econo: Off",
+      "Econo: Off, Humid: 0 (Off)",
       ac.toString());
 }
 
@@ -1448,7 +1448,8 @@ TEST(TestDaikin2Class, HumanReadable) {
       "Swing(V): 15 (Auto), Swing(H): 190 (Auto), Clock: 12:34, "
       "On Timer: Off, Off Timer: 20:00, Sleep Timer: 04:00, Beep: 2 (Loud), "
       "Light: 2 (Low), Mould: On, Clean: Off, Fresh: On, Eye: On, "
-      "Eye Auto: On, Quiet: Off, Powerful: On, Purify: On, Econo: Off",
+      "Eye Auto: On, Quiet: Off, Powerful: On, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
   ac.setQuiet(true);
   ac.setMode(kDaikinHeat);
@@ -1463,7 +1464,8 @@ TEST(TestDaikin2Class, HumanReadable) {
       "Swing(V): 15 (Auto), Swing(H): 190 (Auto), Clock: 23:45, "
       "On Timer: 09:11, Off Timer: 20:00, Sleep Timer: Off, Beep: 1 (Quiet), "
       "Light: 1 (High), Mould: On, Clean: Off, Fresh: On, Eye: On, "
-      "Eye Auto: On, Quiet: On, Powerful: Off, Purify: On, Econo: Off",
+      "Eye Auto: On, Quiet: On, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
 }
 
@@ -1505,7 +1507,7 @@ TEST(TestDaikin2Class, KnownConstruction) {
       "Clock: 14:50, On Timer: Off, Off Timer: Off, Sleep Timer: Off, "
       "Beep: 1 (Quiet), Light: 3 (Off), Mould: On, Clean: On, Fresh: Off, "
       "Eye: Off, Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: Off, "
-      "Econo: Off",
+      "Econo: Off, Humid: 0 (Off)",
       ac.toString());
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kDaikin2Bits);
 }
@@ -1571,7 +1573,8 @@ TEST(TestDecodeDaikin2, Issue582DeepDecodeExample) {
       "Swing(V): 14 (Off), Swing(H): 190 (Auto), Clock: 09:20, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
       "Light: 3 (Off), Mould: On, Clean: On, Fresh: Off, Eye: On, "
-      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
 }
 
@@ -1596,7 +1599,8 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
       "Swing(V): 14 (Off), Swing(H): 190 (Auto), Clock: 13:46, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
       "Light: 3 (Off), Mould: On, Clean: On, Fresh: Off, Eye: Off, "
-      "Eye Auto: Off, Quiet: Off, Powerful: On, Purify: On, Econo: Off",
+      "Eye Auto: Off, Quiet: Off, Powerful: On, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
   ac.setRaw(PowerfulOff);
   ASSERT_FALSE(ac.getPowerful());
@@ -1605,7 +1609,8 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
       "Swing(V): 14 (Off), Swing(H): 190 (Auto), Clock: 13:46, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
       "Light: 3 (Off), Mould: On, Clean: On, Fresh: Off, Eye: Off, "
-      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
 
   const uint8_t EconoOn[39] = {
@@ -1625,7 +1630,8 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
       "Swing(V): 14 (Off), Swing(H): 190 (Auto), Clock: 13:47, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
       "Light: 3 (Off), Mould: On, Clean: On, Fresh: Off, Eye: Off, "
-      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: On",
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: On, "
+      "Humid: 0 (Off)",
       ac.toString());
   ac.setRaw(EconoOff);
   ASSERT_FALSE(ac.getEcono());
@@ -1634,7 +1640,8 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
       "Swing(V): 14 (Off), Swing(H): 190 (Auto), Clock: 13:47, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 3 (Off), "
       "Light: 3 (Off), Mould: On, Clean: On, Fresh: Off, Eye: Off, "
-      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
 }
 
@@ -3033,7 +3040,8 @@ TEST(TestDaikin2ClassNew, Issue908) {
       "Swing(V): 3 (Upper Middle), Swing(H): 170 (Middle), Clock: 09:46, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
       "Light: 3 (Off), Mould: On, Clean: On, Fresh: Off, Eye: Off, "
-      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
   ASSERT_EQ(kDaikinFanMed, ac.getFan());
   ASSERT_EQ(stdAc::fanspeed_t::kMedium, ac.toCommon().fanspeed);
@@ -3051,7 +3059,8 @@ TEST(TestDaikin2ClassNew, Issue908) {
       "Swing(V): 3 (Upper Middle), Swing(H): 170 (Middle), Clock: 09:57, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
       "Light: 3 (Off), Mould: On, Clean: On, Fresh: Off, Eye: Off, "
-      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
   ASSERT_EQ(3, ac.getSwingVertical());
   ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
@@ -3396,7 +3405,8 @@ TEST(TestDaikin2Class, Issue1035) {
       "Swing(V): 1 (Highest), Swing(H): 190 (Auto), Clock: 13:09, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
       "Light: 1 (High), Mould: On, Clean: On, Fresh: On, Eye: Off, "
-      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
   ASSERT_TRUE(ac.toCommon().power);
   ASSERT_NE(ac.toCommon().mode, stdAc::opmode_t::kOff);
@@ -3407,7 +3417,8 @@ TEST(TestDaikin2Class, Issue1035) {
       "Swing(V): 1 (Highest), Swing(H): 190 (Auto), Clock: 13:09, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
       "Light: 1 (High), Mould: On, Clean: On, Fresh: On, Eye: Off, "
-      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off",
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)",
       ac.toString());
   ASSERT_FALSE(ac.toCommon().power);
 }
@@ -3726,4 +3737,108 @@ TEST(TestDecodeDaikin64, Issue1092) {
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+}
+
+// Test the humidity modes & settings.
+TEST(TestDaikin2Class, Humidity) {
+  IRDaikin2 ac(kGpioUnused);
+
+  EXPECT_FALSE(ac._.HumidOn);
+  EXPECT_EQ(kDaikin2HumidityOff, ac.getHumidity());
+  EXPECT_NE(kDaikinMaxTemp, ac.getTemp());
+
+  // Test it can't be changed when NOT in Heat or Dry mode.
+  EXPECT_NE(kDaikinHeat, ac.getMode());
+  EXPECT_NE(kDaikinDry, ac.getMode());
+  ac.setHumidity(kDaikin2HumidityAuto);
+  EXPECT_FALSE(ac._.HumidOn);
+  EXPECT_EQ(kDaikin2HumidityOff, ac.getHumidity());
+
+  // Turn on the setting.
+  ac.setMode(kDaikinHeat);
+  ac.setHumidity(kDaikin2HumidityAuto);
+  EXPECT_EQ(kDaikinHeat, ac.getMode());
+  EXPECT_TRUE(ac._.HumidOn);
+  EXPECT_EQ(kDaikin2HumidityAuto, ac._.Humidity);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  // Check it doesn't allow Dry only percentages.
+  ac.setHumidity(kDaikin2HumidityDryMedium);  // Invalid
+  EXPECT_EQ(kDaikinHeat, ac.getMode());
+  EXPECT_FALSE(ac._.HumidOn);
+  EXPECT_EQ(kDaikin2HumidityOff, ac.getHumidity());
+
+  // Now Dry modes/settings.
+  ac.setMode(kDaikinDry);
+  ac.setHumidity(kDaikin2HumidityAuto);
+  EXPECT_EQ(kDaikinDry, ac.getMode());
+  EXPECT_TRUE(ac._.HumidOn);
+  EXPECT_EQ(kDaikin2HumidityAuto, ac.getHumidity());
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setHumidity(kDaikin2HumidityDryMedium);  // Valid
+  EXPECT_EQ(kDaikinDry, ac.getMode());
+  EXPECT_TRUE(ac._.HumidOn);
+  EXPECT_EQ(kDaikin2HumidityDryMedium, ac.getHumidity());
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  // Confirm we can't change the temp while in Humidity mode etc.
+  ac.setTemp(kDaikinMaxTemp - 1);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+  EXPECT_TRUE(ac._.HumidOn);
+
+  // Confirm we can if it's off.
+  ac.setHumidity(kDaikin2HumidityOff);
+  ac.setTemp(kDaikinMaxTemp - 1);
+  EXPECT_EQ(kDaikinMaxTemp -1 , ac.getTemp());
+  EXPECT_FALSE(ac._.HumidOn);
+  EXPECT_EQ(kDaikin2HumidityOff, ac.getHumidity());
+
+  // Change to a mode that's incompatible
+  ac.setHumidity(kDaikin2HumidityAuto);
+  ac.setMode(kDaikinCool);
+  EXPECT_FALSE(ac._.HumidOn);
+  EXPECT_EQ(kDaikin2HumidityOff, ac.getHumidity());
+
+  // Test some real codes.
+
+  // Ref: https://docs.google.com/spreadsheets/d/1kxHgFqiUB9ETXYEkszAIN5gE-t2ykvnPCnOV-sPUE0A/edit#gid=1167536015&range=B7:AN7
+  const uint8_t stateHumidAuto[kDaikin2StateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x00, 0x40, 0x50, 0x60, 0x0C, 0x80, 0x04,
+      0xB0, 0x16, 0x24, 0x00, 0x00, 0x8B, 0xCE, 0xD6, 0x11, 0xDA, 0x27, 0x00,
+      0x00, 0x49, 0xC0, 0xFF, 0xA0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC1,
+      0x90, 0x60, 0xD1};
+  ac.stateReset();
+  ac.setRaw(stateHumidAuto);
+  EXPECT_TRUE(ac._.HumidOn);
+  EXPECT_EQ(kDaikinHeat, ac.getMode());
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+  EXPECT_EQ(kDaikin2HumidityAuto, ac.getHumidity());
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (Heat), Temp: 32C, Fan: 10 (Auto), "
+      "Swing(V): 14 (Off), Swing(H): 139 (UNKNOWN), Clock: 00:00, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 1 (Quiet), "
+      "Light: 1 (High), Mould: Off, Clean: On, Fresh: Off, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 255 (Auto)", ac.toString());
+
+  // Ref: https://docs.google.com/spreadsheets/d/1kxHgFqiUB9ETXYEkszAIN5gE-t2ykvnPCnOV-sPUE0A/edit#gid=1966092848&range=B6:AN6
+  const uint8_t stateDryStd[kDaikin2StateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0x01, 0x00, 0x40, 0x50, 0x60, 0x0C, 0x80, 0x04,
+      0xB0, 0x16, 0x24, 0x00, 0x00, 0x8B, 0xCE, 0xD6, 0x11, 0xDA, 0x27, 0x00,
+      0x00, 0x29, 0xC0, 0x37, 0xA0, 0x00, 0x00, 0x06, 0x60, 0x00, 0x00, 0xC1,
+      0x90, 0x60, 0xE9};
+  ac.stateReset();
+  ac.setRaw(stateDryStd);
+  EXPECT_TRUE(ac._.HumidOn);
+  EXPECT_EQ(kDaikinDry, ac.getMode());
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+  EXPECT_EQ(kDaikin2HumidityDryMedium, ac.getHumidity());
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Dry), Temp: 32C, Fan: 10 (Auto), "
+      "Swing(V): 14 (Off), Swing(H): 139 (UNKNOWN), Clock: 00:00, "
+      "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 1 (Quiet), "
+      "Light: 1 (High), Mould: Off, Clean: On, Fresh: Off, Eye: Off, "
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 55%", ac.toString());
 }
