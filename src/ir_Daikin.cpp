@@ -1115,11 +1115,11 @@ void IRDaikin2::setPurify(const bool on) { _.Purify = on; }
 /// @return true, the setting is on. false, the setting is off.
 bool IRDaikin2::getPurify(void) const { return _.Purify; }
 
-/// Get the Humidty percentage setting of the A/C.
+/// Get the Humidity percentage setting of the A/C.
 /// @return The setting percentage. 255 is Automatic. 0 is Off.
 uint8_t IRDaikin2::getHumidity(void) const { return _.Humidity; }
 
-/// Set the Humidty percentage setting of the A/C.
+/// Set the Humidity percentage setting of the A/C.
 /// @param[in] percent Percentage humidty. 255 is Auto. 0 is Off.
 /// @note Only available in Dry & Heat modes, otherwise it is Off.
 void IRDaikin2::setHumidity(const uint8_t percent) {
