@@ -399,7 +399,8 @@ TEST(TestIRac, Daikin2) {
       "Swing(V): 14 (Off), Swing(H): 170 (Middle), Clock: 00:00, "
       "On Timer: Off, Off Timer: Off, Sleep Timer: Off, Beep: 2 (Loud), "
       "Light: 1 (High), Mould: On, Clean: On, Fresh: Off, Eye: Off, "
-      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off";
+      "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
+      "Humid: 0 (Off)";
 
   ac.begin();
   irac.daikin2(&ac,
