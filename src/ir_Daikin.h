@@ -28,7 +28,6 @@
 //   Brand: Daikin,  Model: FTXZ25NV1B A/C (DAIKIN2)
 //   Brand: Daikin,  Model: FTXZ35NV1B A/C (DAIKIN2)
 //   Brand: Daikin,  Model: FTXZ50NV1B A/C (DAIKIN2)
-//   Brand: Daikin,  Model: FTXZ25NV1B A/C (DAIKIN2)
 //   Brand: Daikin,  Model: ARC433B69 remote (DAIKIN216)
 //   Brand: Daikin,  Model: ARC423A5 remote (DAIKIN160)
 //   Brand: Daikin,  Model: FTE12HV2S A/C
