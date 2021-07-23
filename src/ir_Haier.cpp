@@ -537,63 +537,74 @@ String IRHaierAC::toString(void) const {
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-IRHaierACYRW02::IRHaierACYRW02(const uint16_t pin, const bool inverted,
-                               const bool use_modulation)
+IRHaierAC176::IRHaierAC176(const uint16_t pin, const bool inverted,
+                           const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Set up hardware to be able to send a message.
-void IRHaierACYRW02::begin(void) { _irsend.begin(); }
+void IRHaierAC176::begin(void) { _irsend.begin(); }
 
-#if SEND_HAIER_AC_YRW02
+#if SEND_HAIER_AC176
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
-void IRHaierACYRW02::send(const uint16_t repeat) {
-  _irsend.sendHaierACYRW02(getRaw(), kHaierACYRW02StateLength, repeat);
+void IRHaierAC176::send(const uint16_t repeat) {
+  _irsend.sendHaierAC176(getRaw(), kHaierAC176StateLength, repeat);
 }
-#endif  // SEND_HAIER_AC_YRW02
+#endif  // SEND_HAIER_AC176
 
 /// Calculate and set the checksum values for the internal state.
-void IRHaierACYRW02::checksum(void) {
+void IRHaierAC176::checksum(void) {
   _.Sum = sumBytes(_.raw, kHaierACYRW02StateLength - 1);
+  _.Sum2 = sumBytes(_.raw + kHaierACYRW02StateLength,
+                    kHaierAC176StateLength - kHaierACYRW02StateLength - 1);
 }
 
 /// Verify the checksum is valid for a given state.
 /// @param[in] state The array to verify the checksum of.
 /// @param[in] length The length of the state array.
 /// @return true, if the state has a valid checksum. Otherwise, false.
-bool IRHaierACYRW02::validChecksum(uint8_t state[], const uint16_t length) {
+bool IRHaierAC176::validChecksum(const uint8_t state[], const uint16_t length) {
   if (length < 2) return false;  // 1 byte of data can't have a checksum.
-  return (state[length - 1] == sumBytes(state, length - 1));
+  if (length < kHaierAC176StateLength) {  // Is it too short?
+    // Then it is just a checksum of the whole thing.
+    return (state[length - 1] == sumBytes(state, length - 1));
+  } else {  // It is long enough for two checksums.
+    return (state[kHaierACYRW02StateLength - 1] ==
+            sumBytes(state, kHaierACYRW02StateLength - 1)) &&
+           (state[length - 1] ==
+            sumBytes(state + kHaierACYRW02StateLength,
+                     length - kHaierACYRW02StateLength - 1));
+  }
 }
 
 /// Reset the internal state to a fixed known good state.
-void IRHaierACYRW02::stateReset(void) {
+void IRHaierAC176::stateReset(void) {
   std::memset(_.raw, 0, sizeof _.raw);
-
   _.Prefix = kHaierAcYrw02Prefix;
+  _.Prefix2 = kHaierAc176Prefix;
   _.Temp = kHaierAcDefTemp - kHaierAcMinTemp;
   _.Health = true;
-  _.Fan = kHaierAcYrw02FanAuto;
+  setFan(kHaierAcYrw02FanAuto);
   _.Power = true;
   _.Button = kHaierAcYrw02ButtonPower;
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t* IRHaierACYRW02::getRaw(void) {
+uint8_t* IRHaierAC176::getRaw(void) {
   checksum();
   return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
-void IRHaierACYRW02::setRaw(const uint8_t new_code[]) {
-  memcpy(_.raw, new_code, kHaierACYRW02StateLength);
+void IRHaierAC176::setRaw(const uint8_t new_code[]) {
+  memcpy(_.raw, new_code, kHaierAC176StateLength);
 }
 
 /// Set the Button/Command setting of the A/C.
 /// @param[in] button The value of the button/command that was pressed.
-void IRHaierACYRW02::setButton(uint8_t button) {
+void IRHaierAC176::setButton(uint8_t button) {
   switch (button) {
     case kHaierAcYrw02ButtonTempUp:
     case kHaierAcYrw02ButtonTempDown:
@@ -610,13 +621,13 @@ void IRHaierACYRW02::setButton(uint8_t button) {
 
 /// Get the Button/Command setting of the A/C.
 /// @return The value of the button/command that was pressed.
-uint8_t IRHaierACYRW02::getButton(void) const {
+uint8_t IRHaierAC176::getButton(void) const {
   return _.Button;
 }
 
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired operating mode.
-void IRHaierACYRW02::setMode(uint8_t mode) {
+void IRHaierAC176::setMode(uint8_t mode) {
   uint8_t new_mode = mode;
   _.Button = kHaierAcYrw02ButtonMode;
   switch (mode) {
@@ -632,13 +643,13 @@ void IRHaierACYRW02::setMode(uint8_t mode) {
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRHaierACYRW02::getMode(void) const {
+uint8_t IRHaierAC176::getMode(void) const {
   return _.Mode;
 }
 
 /// Set the temperature.
 /// @param[in] celsius The temperature in degrees celsius.
-void IRHaierACYRW02::setTemp(const uint8_t celsius) {
+void IRHaierAC176::setTemp(const uint8_t celsius) {
   uint8_t temp = celsius;
   if (temp < kHaierAcMinTemp)
     temp = kHaierAcMinTemp;
@@ -656,58 +667,58 @@ void IRHaierACYRW02::setTemp(const uint8_t celsius) {
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRHaierACYRW02::getTemp(void) const {
+uint8_t IRHaierAC176::getTemp(void) const {
   return _.Temp + kHaierAcMinTemp;
 }
 
 /// Set the Health (filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRHaierACYRW02::setHealth(const bool on) {
+void IRHaierAC176::setHealth(const bool on) {
   _.Button = kHaierAcYrw02ButtonHealth;
   _.Health = on;
 }
 
 /// Get the Health (filter) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHaierACYRW02::getHealth(void) const {
+bool IRHaierAC176::getHealth(void) const {
   return _.Health;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHaierACYRW02::getPower(void) const {
+bool IRHaierAC176::getPower(void) const {
   return _.Power;
 }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRHaierACYRW02::setPower(const bool on) {
+void IRHaierAC176::setPower(const bool on) {
   _.Button = kHaierAcYrw02ButtonPower;
   _.Power = on;
 }
 
 /// Change the power setting to On.
-void IRHaierACYRW02::on(void) { setPower(true); }
+void IRHaierAC176::on(void) { setPower(true); }
 
 /// Change the power setting to Off.
-void IRHaierACYRW02::off(void) { setPower(false); }
+void IRHaierAC176::off(void) { setPower(false); }
 
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHaierACYRW02::getSleep(void) const {
+bool IRHaierAC176::getSleep(void) const {
   return _.Sleep;
 }
 
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRHaierACYRW02::setSleep(const bool on) {
+void IRHaierAC176::setSleep(const bool on) {
   _.Button = kHaierAcYrw02ButtonSleep;
   _.Sleep = on;
 }
 
 /// Get the Turbo setting of the A/C.
 /// @return The current turbo speed setting.
-uint8_t IRHaierACYRW02::getTurbo(void) const {
+uint8_t IRHaierAC176::getTurbo(void) const {
   return _.Turbo;
 }
 
@@ -715,7 +726,7 @@ uint8_t IRHaierACYRW02::getTurbo(void) const {
 /// @param[in] speed The desired turbo speed setting.
 /// @note Valid speeds are kHaierAcYrw02TurboOff, kHaierAcYrw02TurboLow, &
 ///   kHaierAcYrw02TurboHigh.
-void IRHaierACYRW02::setTurbo(uint8_t speed) {
+void IRHaierAC176::setTurbo(uint8_t speed) {
   switch (speed) {
     case kHaierAcYrw02TurboOff:
     case kHaierAcYrw02TurboLow:
@@ -727,32 +738,33 @@ void IRHaierACYRW02::setTurbo(uint8_t speed) {
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRHaierACYRW02::getFan(void) const {
+uint8_t IRHaierAC176::getFan(void) const {
   return _.Fan;
 }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
-void IRHaierACYRW02::setFan(uint8_t speed) {
+void IRHaierAC176::setFan(uint8_t speed) {
   switch (speed) {
     case kHaierAcYrw02FanLow:
     case kHaierAcYrw02FanMed:
     case kHaierAcYrw02FanHigh:
     case kHaierAcYrw02FanAuto:
       _.Fan = speed;
+      _.Fan2 = (speed == kHaierAcYrw02FanAuto) ? 0 : speed;
       _.Button = kHaierAcYrw02ButtonFan;
   }
 }
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
-uint8_t IRHaierACYRW02::getSwing(void) const {
+uint8_t IRHaierAC176::getSwing(void) const {
   return _.Swing;
 }
 
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] pos The position/mode to set the vanes to.
-void IRHaierACYRW02::setSwing(uint8_t pos) {
+void IRHaierAC176::setSwing(uint8_t pos) {
   uint8_t newpos = pos;
   switch (pos) {
     case kHaierAcYrw02SwingOff:
@@ -775,7 +787,7 @@ void IRHaierACYRW02::setSwing(uint8_t pos) {
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
-uint8_t IRHaierACYRW02::convertMode(const stdAc::opmode_t mode) {
+uint8_t IRHaierAC176::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
     case stdAc::opmode_t::kCool: return kHaierAcYrw02Cool;
     case stdAc::opmode_t::kHeat: return kHaierAcYrw02Heat;
@@ -788,7 +800,7 @@ uint8_t IRHaierACYRW02::convertMode(const stdAc::opmode_t mode) {
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
 /// @return The native equivalent of the enum.
-uint8_t IRHaierACYRW02::convertFan(const stdAc::fanspeed_t speed) {
+uint8_t IRHaierAC176::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
     case stdAc::fanspeed_t::kLow:    return kHaierAcYrw02FanLow;
@@ -802,7 +814,7 @@ uint8_t IRHaierACYRW02::convertFan(const stdAc::fanspeed_t speed) {
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] position The enum to be converted.
 /// @return The native equivalent of the enum.
-uint8_t IRHaierACYRW02::convertSwingV(const stdAc::swingv_t position) {
+uint8_t IRHaierAC176::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
     case stdAc::swingv_t::kHighest:
     case stdAc::swingv_t::kHigh:   return kHaierAcYrw02SwingTop;
@@ -817,7 +829,7 @@ uint8_t IRHaierACYRW02::convertSwingV(const stdAc::swingv_t position) {
 /// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
-stdAc::opmode_t IRHaierACYRW02::toCommonMode(const uint8_t mode) {
+stdAc::opmode_t IRHaierAC176::toCommonMode(const uint8_t mode) {
   switch (mode) {
     case kHaierAcYrw02Cool: return stdAc::opmode_t::kCool;
     case kHaierAcYrw02Heat: return stdAc::opmode_t::kHeat;
@@ -830,7 +842,7 @@ stdAc::opmode_t IRHaierACYRW02::toCommonMode(const uint8_t mode) {
 /// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
-stdAc::fanspeed_t IRHaierACYRW02::toCommonFanSpeed(const uint8_t speed) {
+stdAc::fanspeed_t IRHaierAC176::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
     case kHaierAcYrw02FanHigh: return stdAc::fanspeed_t::kMax;
     case kHaierAcYrw02FanMed:  return stdAc::fanspeed_t::kMedium;
@@ -842,7 +854,7 @@ stdAc::fanspeed_t IRHaierACYRW02::toCommonFanSpeed(const uint8_t speed) {
 /// Convert a stdAc::swingv_t enum into it's native setting.
 /// @param[in] pos The enum to be converted.
 /// @return The native equivalent of the enum.
-stdAc::swingv_t IRHaierACYRW02::toCommonSwingV(const uint8_t pos) {
+stdAc::swingv_t IRHaierAC176::toCommonSwingV(const uint8_t pos) {
   switch (pos) {
     case kHaierAcYrw02SwingTop:    return stdAc::swingv_t::kHighest;
     case kHaierAcYrw02SwingMiddle: return stdAc::swingv_t::kMiddle;
@@ -855,7 +867,7 @@ stdAc::swingv_t IRHaierACYRW02::toCommonSwingV(const uint8_t pos) {
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRHaierACYRW02::toCommon(void) const {
+stdAc::state_t IRHaierAC176::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::HAIER_AC_YRW02;
   result.model = -1;  // No models used.
@@ -881,7 +893,7 @@ stdAc::state_t IRHaierACYRW02::toCommon(void) const {
 
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
-String IRHaierACYRW02::toString(void) const {
+String IRHaierAC176::toString(void) const {
   String result = "";
   result.reserve(130);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(_.Power, kPowerStr, false);
@@ -972,7 +984,41 @@ String IRHaierACYRW02::toString(void) const {
   result += addBoolToString(_.Health, kHealthStr);
   return result;
 }
+// End of IRHaierAC176 class.
+
+
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+IRHaierACYRW02::IRHaierACYRW02(const uint16_t pin, const bool inverted,
+                               const bool use_modulation)
+    : IRHaierAC176(pin, inverted, use_modulation) { stateReset(); }
+
+#if SEND_HAIER_AC_YRW02
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
+void IRHaierACYRW02::send(const uint16_t repeat) {
+  _irsend.sendHaierACYRW02(getRaw(), kHaierACYRW02StateLength, repeat);
+}
+#endif  // SEND_HAIER_AC_YRW02
+
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
+void IRHaierACYRW02::setRaw(const uint8_t new_code[]) {
+  memcpy(_.raw, new_code, kHaierACYRW02StateLength);
+}
+
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
+bool IRHaierACYRW02::validChecksum(const uint8_t state[],
+                                   const uint16_t length) {
+  return IRHaierAC176::validChecksum(state, length);
+}
 // End of IRHaierACYRW02 class.
+
 
 #if (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
 /// Decode the supplied Haier HSU07-HEA03 remote message.
@@ -1076,6 +1122,7 @@ bool IRrecv::decodeHaierAC176(decode_results* results, uint16_t offset,
   // Compliance
   if (strict) {
     if (results->state[0] != kHaierAcYrw02Prefix) return false;
+    if (!IRHaierAC176::validChecksum(results->state, nbits / 8)) return false;
   }
 
   // Success

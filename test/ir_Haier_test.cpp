@@ -988,7 +988,7 @@ TEST(TestDecodeHaierAC_YRW02, RealExample) {
 // Default state of the remote needed to include hidden data.
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/668
 TEST(TestHaierAcIssues, Issue668) {
-  IRHaierAC ac(0);
+  IRHaierAC ac(kGpioUnused);
   IRHaierAC acText(1);
   IRrecv irrecv(kGpioUnused);
   ac.begin();
@@ -1075,7 +1075,7 @@ TEST(TestHaierAcIssues, Issue668) {
 }
 
 TEST(TestHaierACClass, toCommon) {
-  IRHaierAC ac(0);
+  IRHaierAC ac(kGpioUnused);
   ac.setCommand(kHaierAcCmdOn);
   ac.setMode(kHaierAcCool);
   ac.setTemp(20);
@@ -1106,7 +1106,7 @@ TEST(TestHaierACClass, toCommon) {
 }
 
 TEST(TestHaierACYRW02Class, toCommon) {
-  IRHaierACYRW02 ac(0);
+  IRHaierACYRW02 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kHaierAcYrw02Cool);
   ac.setTemp(20);
@@ -1202,6 +1202,12 @@ TEST(TestDecodeHaierAC176, SyntheticDecode) {
   EXPECT_EQ(kHaierAC176Bits, irsend.capture.bits);
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 24C, Fan: 5 (Auto), "
+      "Turbo: 0 (Off), Swing: 6 (UNKNOWN), Sleep: Off, Health: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
 TEST(TestUtils, Housekeeping) {
@@ -1223,7 +1229,29 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("HAIER_AC176", typeToString(decode_type_t::HAIER_AC176));
   ASSERT_EQ(decode_type_t::HAIER_AC176, strToDecodeType("HAIER_AC176"));
   ASSERT_TRUE(hasACState(decode_type_t::HAIER_AC176));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HAIER_AC176));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HAIER_AC176));
   ASSERT_EQ(kHaierAC176Bits, IRsend::defaultBits(decode_type_t::HAIER_AC176));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::HAIER_AC176));
+}
+
+TEST(TestHaierAC176Class, BuildKnownState) {
+  IRHaierAC176 ac(kGpioUnused);
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1480#issuecomment-884920033
+  // heat, 24 C, fan max
+  ac.setTemp(24);
+  ac.setMode(kHaierAcYrw02Heat);
+  ac.setFan(kHaierAcYrw02FanHigh);
+  EXPECT_TRUE(ac.validChecksum(ac.getRaw()));
+  EXPECT_EQ(
+      "Power: On, Button: 4 (Fan), Mode: 4 (Heat), Temp: 24C, Fan: 1 (High), "
+      "Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off, Health: On",
+      ac.toString());
+  /* Disabled pending:
+     https://github.com/crankyoldgit/IRremoteESP8266/issues/1480#issuecomment-885636790
+  const uint8_t expectedState[kHaierAC176StateLength] = {
+      0xA6, 0x0A, 0x00, 0x00, 0x40, 0x20, 0x00,
+      0x80, 0x00, 0x00, 0x00, 0x00, 0x04, 0x94,
+      0xB7, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0xF7};
+  EXPECT_STATE_EQ(expectedState, ac.getRaw(), kHaierAC176StateLength);
+  */
 }

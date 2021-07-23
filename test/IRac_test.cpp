@@ -783,6 +783,33 @@ TEST(TestIRac, Haier) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
+TEST(TestIRac, Haier176) {
+  IRHaierAC176 ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  const char expected[] =
+      "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
+      "Fan: 2 (Medium), Turbo: 1 (High), Swing: 1 (Highest), Sleep: On, "
+      "Health: On";
+  ac.begin();
+  irac.haier176(&ac,
+             true,                        // Power
+             stdAc::opmode_t::kCool,      // Mode
+             23,                          // Celsius
+             stdAc::fanspeed_t::kMedium,  // Fan speed
+             stdAc::swingv_t::kHigh,      // Vertical swing
+             true,                        // Turbo
+             true,                        // Filter
+             8 * 60 + 0);                 // Sleep time
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC176, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHaierAC176Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
 
 TEST(TestIRac, HaierYrwo2) {
   IRHaierACYRW02 ac(kGpioUnused);
