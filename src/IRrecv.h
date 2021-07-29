@@ -58,10 +58,10 @@ const uint8_t kDefaultESP32Timer = 3;
 #if DECODE_AC
 // Hitachi AC is the current largest state size.
 const uint16_t kStateSizeMax = kHitachiAc2StateLength;
-#else
-// Just define something
-const uint16_t kStateSizeMax = 0;
-#endif
+#else  // DECODE_AC
+// Just define something (a uint64_t)
+const uint16_t kStateSizeMax = sizeof(uint64_t);
+#endif  // DECODE_AC
 
 // Types
 
