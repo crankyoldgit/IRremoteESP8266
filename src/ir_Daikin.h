@@ -1,6 +1,6 @@
 // Copyright 2016 sillyfrog
 // Copyright 2017 sillyfrog, crankyoldgit
-// Copyright 2018-2020 crankyoldgit
+// Copyright 2018-2021 crankyoldgit
 // Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 
 /// @file
@@ -426,12 +426,28 @@ const uint8_t kDaikin160SwingVAuto =    0xF;
 union Daikin176Protocol{
   uint8_t raw[kDaikin176StateLength];  ///< The state of the IR remote.
   struct {
-    // Byte 0~5
-    uint8_t pad0[6];
+    // Byte 0~2
+    uint8_t      :8;
+    uint8_t      :8;
+    uint8_t      :8;
+    // Byte 3
+    uint8_t Id1  :1;
+    uint8_t      :7;
+    // Byte 4
+    uint8_t      :8;
+    // Byte 5
+    uint8_t      :8;
     // Byte 6
     uint8_t Sum1 :8;
-    // Byte 7~11
-    uint8_t pad1[5];
+    // Byte 7-9
+    uint8_t      :8;
+    uint8_t      :8;
+    uint8_t      :8;
+    // Byte 10
+    uint8_t Id2  :1;
+    uint8_t      :7;
+    // Byte 11
+    uint8_t      :8;
     // Byte 12
     uint8_t         :4;
     uint8_t AltMode :3;
@@ -992,6 +1008,8 @@ class IRDaikin176 {
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   void setSwingHorizontal(const uint8_t position);
   uint8_t getSwingHorizontal(void) const;
+  uint8_t getId(void) const;
+  void setId(const uint8_t num);
   static uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);

@@ -11,7 +11,7 @@
 
 // Test sending typical data only.
 TEST(TestSendDaikin, SendDataOnly) {
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   uint8_t daikin_code[kDaikinStateLength] = {
@@ -72,7 +72,7 @@ TEST(TestSendDaikin, SendDataOnly) {
 
 // Test sending with repeats.
 TEST(TestSendDaikin, SendWithRepeats) {
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   irsend.reset();
@@ -237,7 +237,7 @@ TEST(TestSendDaikin, SendUnexpectedSizes) {
 // Tests for IRDaikinESP class.
 
 TEST(TestDaikinClass, Power) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.on();
@@ -254,7 +254,7 @@ TEST(TestDaikinClass, Power) {
 }
 
 TEST(TestDaikinClass, Temperature) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setTemp(0);
@@ -289,7 +289,7 @@ TEST(TestDaikinClass, Temperature) {
 }
 
 TEST(TestDaikinClass, OperatingMode) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kDaikinAuto);
@@ -318,7 +318,7 @@ TEST(TestDaikinClass, OperatingMode) {
 }
 
 TEST(TestDaikinClass, VaneSwing) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setSwingHorizontal(true);
@@ -342,7 +342,7 @@ TEST(TestDaikinClass, VaneSwing) {
 }
 
 TEST(TestDaikinClass, QuietMode) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setQuiet(true);
@@ -366,7 +366,7 @@ TEST(TestDaikinClass, QuietMode) {
 }
 
 TEST(TestDaikinClass, PowerfulMode) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setPowerful(true);
@@ -387,7 +387,7 @@ TEST(TestDaikinClass, PowerfulMode) {
 }
 
 TEST(TestDaikinClass, EconoMode) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setEcono(true);
@@ -411,7 +411,7 @@ TEST(TestDaikinClass, EconoMode) {
 }
 
 TEST(TestDaikinClass, FanSpeed) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   // Unexpected value should default to Auto.
@@ -453,7 +453,7 @@ TEST(TestDaikinClass, FanSpeed) {
 }
 
 TEST(TestDaikinClass, CurrentTime) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setCurrentTime(0);  // 00:00
@@ -467,7 +467,7 @@ TEST(TestDaikinClass, CurrentTime) {
 }
 
 TEST(TestDaikinClass, OnOffTimers) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   // Both timers turned off.
@@ -542,7 +542,7 @@ TEST(TestDaikinClass, OnOffTimers) {
 }
 
 TEST(TestDaikinClass, WeeklyTimerEnable) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   // The Weekly Timer Enabled flag is stored in the same byte as Econo mode.
@@ -586,7 +586,7 @@ TEST(TestDaikinClass, WeeklyTimerEnable) {
 
 // Test Mold mode.
 TEST(TestDaikinClass, MoldSetting) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setMold(false);
@@ -601,7 +601,7 @@ TEST(TestDaikinClass, MoldSetting) {
 
 // Test Comfort mode.
 TEST(TestDaikinClass, ComfortSetting) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setComfort(false);
@@ -616,7 +616,7 @@ TEST(TestDaikinClass, ComfortSetting) {
 
 // Test Sensor mode.
 TEST(TestDaikinClass, SensorSetting) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.begin();
 
   ac.setSensor(false);
@@ -630,7 +630,7 @@ TEST(TestDaikinClass, SensorSetting) {
 }
 
 TEST(TestDaikinClass, SetAndGetRaw) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   uint8_t shortState[kDaikinStateLengthShort] = {
       0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54, 0x11,
       0xDA, 0x27, 0x00, 0x00, 0x49, 0x1E, 0x00, 0xB0, 0x00,
@@ -688,7 +688,7 @@ TEST(TestDaikinClass, ChecksumValidation) {
 
 // Test human readable output.
 TEST(TestDaikinClass, HumanReadable) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
 
   EXPECT_EQ(
       "Power: On, Mode: 4 (Heat), Temp: 15C, Fan: 11 (Quiet), "
@@ -723,7 +723,7 @@ TEST(TestDaikinClass, HumanReadable) {
 
 // Test general message construction after tweaking some settings.
 TEST(TestDaikinClass, MessageConstuction) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   IRsendTest irsend(4);
   ac.begin();
   irsend.begin();
@@ -796,9 +796,9 @@ TEST(TestDaikinClass, MessageConstuction) {
 
 // Test decoding a message captured from a real IR remote.
 TEST(TestDecodeDaikin, RealExample) {
-  IRDaikinESP ac(0);
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRDaikinESP ac(kGpioUnused);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   uint8_t expectedState[kDaikinStateLength] = {
@@ -875,9 +875,9 @@ TEST(TestDecodeDaikin, RealExample) {
 
 // Decoding a message we entirely constructed based solely on a given state.
 TEST(TestDecodeDaikin, ShortSyntheticExample) {
-  IRDaikinESP ac(0);
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRDaikinESP ac(kGpioUnused);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   uint8_t shortState[kDaikinStateLengthShort] = {
@@ -908,9 +908,9 @@ TEST(TestDecodeDaikin, ShortSyntheticExample) {
 
 // Decoding a message we entirely constructed based solely on a given state.
 TEST(TestDecodeDaikin, LongSyntheticExample) {
-  IRDaikinESP ac(0);
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRDaikinESP ac(kGpioUnused);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   uint8_t expectedState[kDaikinStateLength] = {
@@ -937,8 +937,8 @@ TEST(TestDecodeDaikin, LongSyntheticExample) {
 
 // Test decoding a message captured from a real IR remote.
 TEST(TestDecodeDaikin2, RealExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   uint8_t expectedState[kDaikin2StateLength] = {
@@ -1012,9 +1012,9 @@ TEST(TestDecodeDaikin2, RealExample) {
 
 // Decoding a message we entirely constructed based solely on a given state.
 TEST(TestDecodeDaikin2, SyntheticExample) {
-  IRDaikin2 ac(0);
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRDaikin2 ac(kGpioUnused);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   uint8_t expectedState[kDaikin2StateLength] = {
@@ -1042,7 +1042,7 @@ TEST(TestDecodeDaikin2, SyntheticExample) {
 }
 
 TEST(TestDaikin2Class, CurrentTime) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setCurrentTime(0);  // 00:00
@@ -1056,7 +1056,7 @@ TEST(TestDaikin2Class, CurrentTime) {
 }
 
 TEST(TestDaikin2Class, OnOffTimers) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   // Both timers turned off.
@@ -1097,7 +1097,7 @@ TEST(TestDaikin2Class, OnOffTimers) {
 }
 
 TEST(TestDaikin2Class, LightAndBeep) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setLight(kDaikinLightOff);
@@ -1113,7 +1113,7 @@ TEST(TestDaikin2Class, LightAndBeep) {
 }
 
 TEST(TestDaikin2Class, FanSpeed) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   // Unexpected value should default to Auto.
@@ -1156,7 +1156,7 @@ TEST(TestDaikin2Class, FanSpeed) {
 
 // Test Mold mode.
 TEST(TestDaikin2Class, MoldSetting) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setMold(false);
@@ -1171,7 +1171,7 @@ TEST(TestDaikin2Class, MoldSetting) {
 
 // Test Auto Clean setting.
 TEST(TestDaikin2Class, CleanSetting) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setClean(false);
@@ -1186,7 +1186,7 @@ TEST(TestDaikin2Class, CleanSetting) {
 
 
 TEST(TestDaikin2Class, Temperature) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kDaikinAuto);
@@ -1236,7 +1236,7 @@ TEST(TestDaikin2Class, Temperature) {
 
 // Test Fresh Air settings.
 TEST(TestDaikin2Class, FreshAirSettings) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setFreshAir(false);
@@ -1263,7 +1263,7 @@ TEST(TestDaikin2Class, FreshAirSettings) {
 
 // Test Eye mode.
 TEST(TestDaikin2Class, EyeSetting) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setEye(false);
@@ -1276,7 +1276,7 @@ TEST(TestDaikin2Class, EyeSetting) {
 
 // Test Econo setting.
 TEST(TestDaikin2Class, EconoSetting) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setEcono(false);
@@ -1288,7 +1288,7 @@ TEST(TestDaikin2Class, EconoSetting) {
 }
 
 TEST(TestDaikin2Class, SleepTimer) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   // NOTE: On & Sleep timer share the same time location.
@@ -1334,7 +1334,7 @@ TEST(TestDaikin2Class, SleepTimer) {
 
 // Test Vertical Swing.
 TEST(TestDaikin2Class, Swing) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   // Vertical
@@ -1372,7 +1372,7 @@ TEST(TestDaikin2Class, Swing) {
 }
 
 TEST(TestDaikin2Class, QuietMode) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setQuiet(true);
@@ -1390,7 +1390,7 @@ TEST(TestDaikin2Class, QuietMode) {
 }
 
 TEST(TestDaikin2Class, PowerfulMode) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setPowerful(true);
@@ -1408,7 +1408,7 @@ TEST(TestDaikin2Class, PowerfulMode) {
 
 // Test Purify mode.
 TEST(TestDaikin2Class, PurifySetting) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
 
   ac.setPurify(false);
@@ -1420,7 +1420,7 @@ TEST(TestDaikin2Class, PurifySetting) {
 }
 
 TEST(TestDaikin2Class, HumanReadable) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.begin();
   ac.setPower(true);
   ac.setMode(kDaikinCool);
@@ -1471,7 +1471,7 @@ TEST(TestDaikin2Class, HumanReadable) {
 
 // See if we can construct a known state.
 TEST(TestDaikin2Class, KnownConstruction) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
 
   uint8_t expectedState[kDaikin2StateLength] = {
       0x11, 0xDA, 0x27, 0x00, 0x01, 0x7A, 0xC3, 0x70, 0x28, 0x0C,
@@ -1556,7 +1556,7 @@ TEST(TestUtils, Housekeeping) {
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/582#issuecomment-453863879
 TEST(TestDecodeDaikin2, Issue582DeepDecodeExample) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
 
   const uint8_t state[kDaikin2StateLength] = {
       0x11, 0xDA, 0x27, 0x00, 0x01, 0x30, 0x42, 0xF0, 0x28, 0x0C,
@@ -1580,7 +1580,7 @@ TEST(TestDecodeDaikin2, Issue582DeepDecodeExample) {
 
 // https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit?ts=5c317775#gid=1023395743
 TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
 
   const uint8_t PowerfulOn[39] = {
       0x11, 0xDA, 0x27, 0x00, 0x01, 0x3A, 0x43, 0xF0, 0x28, 0x0C,
@@ -1648,7 +1648,7 @@ TEST(TestDecodeDaikin2, Issue582PowerfulEconoFix) {
 // Tests for IRDaikin216 class.
 
 TEST(TestDaikin216Class, Power) {
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.begin();
 
   ac.on();
@@ -1665,7 +1665,7 @@ TEST(TestDaikin216Class, Power) {
 }
 
 TEST(TestDaikin216Class, Temperature) {
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.begin();
 
   ac.setTemp(0);
@@ -1700,7 +1700,7 @@ TEST(TestDaikin216Class, Temperature) {
 }
 
 TEST(TestDaikin216Class, OperatingMode) {
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kDaikinAuto);
@@ -1729,7 +1729,7 @@ TEST(TestDaikin216Class, OperatingMode) {
 }
 
 TEST(TestDaikin216Class, VaneSwing) {
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.begin();
 
   ac.setSwingHorizontal(true);
@@ -1753,7 +1753,7 @@ TEST(TestDaikin216Class, VaneSwing) {
 }
 
 TEST(TestDaikin216Class, FanSpeed) {
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.begin();
 
   // Unexpected value should default to Auto.
@@ -1795,7 +1795,7 @@ TEST(TestDaikin216Class, FanSpeed) {
 }
 
 TEST(TestDaikin216Class, QuietAndPowerful) {
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.begin();
 
   ac.setQuiet(false);
@@ -1828,7 +1828,7 @@ TEST(TestDaikin216Class, QuietAndPowerful) {
 }
 
 TEST(TestDaikin216Class, ExampleStates) {
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.begin();
   // https://github.com/crankyoldgit/IRremoteESP8266/pull/690#issuecomment-487770194
   uint8_t state[kDaikin216StateLength] = {
@@ -1844,7 +1844,7 @@ TEST(TestDaikin216Class, ExampleStates) {
 }
 
 TEST(TestDaikin216Class, ReconstructKnownState) {
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.begin();
   // https://github.com/crankyoldgit/IRremoteESP8266/issues/689#issue-438086949
   uint8_t expectedState[kDaikin216StateLength] = {
@@ -1869,8 +1869,8 @@ TEST(TestDaikin216Class, ReconstructKnownState) {
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 TEST(TestDecodeDaikin216, RealExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   // https://github.com/crankyoldgit/IRremoteESP8266/issues/689#issue-438086949
   uint16_t rawData[439] = {
       3402, 1770, 382, 1340, 382, 480, 382, 478, 382, 480, 380, 1342, 382, 478,
@@ -1920,7 +1920,7 @@ TEST(TestDecodeDaikin216, RealExample) {
   ASSERT_EQ(kDaikin216Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
 
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
       "Power: Off, Mode: 0 (Auto), Temp: 19C, Fan: 10 (Auto), "
@@ -1931,8 +1931,8 @@ TEST(TestDecodeDaikin216, RealExample) {
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 TEST(TestDecodeDaikin216, SyntheticExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   // https://github.com/crankyoldgit/IRremoteESP8266/issues/689#issue-438086949
   uint8_t expectedState[kDaikin216StateLength] = {
       // 8 bytes
@@ -1952,7 +1952,7 @@ TEST(TestDecodeDaikin216, SyntheticExample) {
 }
 
 TEST(TestDaikinClass, toCommon) {
-  IRDaikinESP ac(0);
+  IRDaikinESP ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kDaikinCool);
   ac.setTemp(20);
@@ -1986,7 +1986,7 @@ TEST(TestDaikinClass, toCommon) {
 }
 
 TEST(TestDaikin2Class, toCommon) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kDaikinCool);
   ac.setTemp(20);
@@ -2024,7 +2024,7 @@ TEST(TestDaikin2Class, toCommon) {
 }
 
 TEST(TestDaikin216Class, toCommon) {
-  IRDaikin216 ac(0);
+  IRDaikin216 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kDaikinCool);
   ac.setTemp(20);
@@ -2057,8 +2057,8 @@ TEST(TestDaikin216Class, toCommon) {
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/731
 TEST(TestDecodeDaikin160, RealExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   uint16_t rawData[327] = {
       5024, 2144, 342, 1786, 344, 706, 342, 706, 344, 706, 342, 1786, 342, 706,
       342, 708, 342, 708, 342, 708, 342, 1786, 342, 708, 342, 1786, 342, 1788,
@@ -2100,15 +2100,15 @@ TEST(TestDecodeDaikin160, RealExample) {
   ASSERT_EQ(DAIKIN160, irsend.capture.decode_type);
   ASSERT_EQ(kDaikin160Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
-  IRDaikin160 ac(0);
+  IRDaikin160 ac(kGpioUnused);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ("Power: Off, Mode: 3 (Cool), Temp: 25C, Fan: 10 (Auto), "
             "Swing(V): 1 (Lowest)", ac.toString());
 }
 
 TEST(TestDecodeDaikin160, SyntheticExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
 
   uint8_t expectedState[kDaikin160StateLength] = {
       // 7 bytes
@@ -2128,7 +2128,7 @@ TEST(TestDecodeDaikin160, SyntheticExample) {
 }
 
 TEST(TestDaikin160Class, toCommon) {
-  IRDaikin160 ac(0);
+  IRDaikin160 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kDaikinCool);
   ac.setTemp(20);
@@ -2157,7 +2157,7 @@ TEST(TestDaikin160Class, toCommon) {
 }
 
 TEST(TestDaikin160Class, FanSpeed) {
-  IRDaikin160 ac(0);
+  IRDaikin160 ac(kGpioUnused);
   ac.begin();
 
   // Unexpected value should default to Auto.
@@ -2199,7 +2199,7 @@ TEST(TestDaikin160Class, FanSpeed) {
 }
 
 TEST(TestDaikin160Class, VaneSwing) {
-  IRDaikin160 ac(0);
+  IRDaikin160 ac(kGpioUnused);
   ac.begin();
 
   ac.setSwingVertical(kDaikin160SwingVAuto);
@@ -2220,7 +2220,7 @@ TEST(TestDaikin160Class, VaneSwing) {
 }
 
 TEST(TestDaikin160Class, Power) {
-  IRDaikin160 ac(0);
+  IRDaikin160 ac(kGpioUnused);
   ac.begin();
 
   ac.on();
@@ -2237,7 +2237,7 @@ TEST(TestDaikin160Class, Power) {
 }
 
 TEST(TestDaikin160Class, Temperature) {
-  IRDaikin160 ac(0);
+  IRDaikin160 ac(kGpioUnused);
   ac.begin();
 
   ac.setTemp(0);
@@ -2272,7 +2272,7 @@ TEST(TestDaikin160Class, Temperature) {
 }
 
 TEST(TestDaikin160Class, OperatingMode) {
-  IRDaikin160 ac(0);
+  IRDaikin160 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kDaikinAuto);
@@ -2301,7 +2301,7 @@ TEST(TestDaikin160Class, OperatingMode) {
 }
 
 TEST(TestDaikin160Class, HumanReadable) {
-  IRDaikin160 ac(0);
+  IRDaikin160 ac(kGpioUnused);
 
   EXPECT_EQ(
       "Power: Off, Mode: 3 (Cool), Temp: 25C, Fan: 10 (Auto), "
@@ -2319,23 +2319,27 @@ TEST(TestDaikin160Class, HumanReadable) {
 }
 
 TEST(TestDaikin176Class, FanControl) {
-  IRDaikin176 ac(0);
+  IRDaikin176 ac(kGpioUnused);
 
   EXPECT_EQ(
-      "Power: Off, Mode: 2 (Cool), Temp: 9C, Fan: 1 (Low), Swing(H): 6 (Off)",
+      "Power: Off, Mode: 2 (Cool), Temp: 9C, Fan: 1 (Low), Swing(H): 6 (Off), "
+      "Id: 0",
       ac.toString());
   ac.setFan(kDaikinFanMin);
   ac.setPower(true);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 9C, Fan: 1 (Low), Swing(H): 6 (Off)",
+      "Power: On, Mode: 2 (Cool), Temp: 9C, Fan: 1 (Low), Swing(H): 6 (Off), "
+      "Id: 0",
       ac.toString());
   ac.setFan(kDaikinFanMin + 1);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 9C, Fan: 3 (High), Swing(H): 6 (Off)",
+      "Power: On, Mode: 2 (Cool), Temp: 9C, Fan: 3 (High), Swing(H): 6 (Off), "
+      "Id: 0",
       ac.toString());
   ac.setFan(kDaikin176FanMax);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 9C, Fan: 3 (High), Swing(H): 6 (Off)",
+      "Power: On, Mode: 2 (Cool), Temp: 9C, Fan: 3 (High), Swing(H): 6 (Off), "
+      "Id: 0",
       ac.toString());
 
   // Real state from remote
@@ -2347,7 +2351,7 @@ TEST(TestDaikin176Class, FanControl) {
   ac.setRaw(state);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 26C, Fan: 3 (High), "
-      "Swing(H): 5 (Auto)",
+      "Swing(H): 5 (Auto), Id: 0",
       ac.toString());
 }
 
@@ -2364,25 +2368,28 @@ TEST(TestDaikin176Class, convertFan) {
 }
 
 TEST(TestDaikin176Class, SimulateIRacDaikin176) {
-  IRDaikin176 ac(0);
+  IRDaikin176 ac(kGpioUnused);
 
   ac.setPower(true);
   ac.setMode(ac.convertMode(stdAc::opmode_t::kCool));
   ac.setTemp(26);
   ac.setFan(ac.convertFan(stdAc::fanspeed_t::kMax));
   ac.setSwingHorizontal(kDaikin176SwingHOff);
+  ac.setId(0);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 26C, Fan: 3 (High), Swing(H): 6 (Off)",
+      "Power: On, Mode: 2 (Cool), Temp: 26C, Fan: 3 (High), Swing(H): 6 (Off), "
+      "Id: 0",
       ac.toString());
   ac.setSwingHorizontal(ac.convertSwingH(stdAc::swingh_t::kAuto));
+  ac.setId(1);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 26C, Fan: 3 (High), "
-      "Swing(H): 5 (Auto)",
+      "Swing(H): 5 (Auto), Id: 1",
       ac.toString());
 }
 
 TEST(TestDaikin176Class, OperatingMode) {
-  IRDaikin176 ac(0);
+  IRDaikin176 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kDaikin176Auto);
@@ -2411,7 +2418,7 @@ TEST(TestDaikin176Class, OperatingMode) {
 }
 
 TEST(TestDaikin176Class, Temperature) {
-  IRDaikin176 ac(0);
+  IRDaikin176 ac(kGpioUnused);
   ac.begin();
   ac.setMode(kDaikin176Auto);
   ac.setTemp(0);
@@ -2462,7 +2469,7 @@ TEST(TestDaikin176Class, Temperature) {
 }
 
 TEST(TestDaikin176Class, Power) {
-  IRDaikin176 ac(0);
+  IRDaikin176 ac(kGpioUnused);
   ac.begin();
 
   ac.on();
@@ -2479,7 +2486,7 @@ TEST(TestDaikin176Class, Power) {
 }
 
 TEST(TestDaikin176Class, VaneSwing) {
-  IRDaikin176 ac(0);
+  IRDaikin176 ac(kGpioUnused);
   ac.begin();
 
   ac.setSwingHorizontal(kDaikin176SwingHAuto);
@@ -2503,7 +2510,7 @@ TEST(TestDaikin176Class, VaneSwing) {
 }
 
 TEST(TestDaikin176Class, ReconstructKnownStates) {
-  IRDaikin176 ac(0);
+  IRDaikin176 ac(kGpioUnused);
   ac.begin();
   // Data from:
   //   https://github.com/crankyoldgit/IRremoteESP8266/pull/826#issuecomment-513531138
@@ -2550,8 +2557,8 @@ TEST(TestDaikin176Class, ReconstructKnownStates) {
 // Data from:
 //   https://docs.google.com/spreadsheets/d/1-YJnHyzy6bId5QmjTEZuw8_wSufESoIl-L_VEF-o8lM/edit?usp=sharing
 TEST(TestDecodeDaikin128, RealExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   uint16_t rawData[265] = {
       9846, 9794, 9848, 9796, 4638, 2512, 348, 382, 352, 954, 352, 956, 352,
       382, 352, 956, 352, 384, 352, 382, 352, 386, 352, 382, 352, 954, 352, 384,
@@ -2601,8 +2608,8 @@ TEST(TestDecodeDaikin128, RealExample) {
 // Data from:
 //   https://docs.google.com/spreadsheets/d/1-YJnHyzy6bId5QmjTEZuw8_wSufESoIl-L_VEF-o8lM/edit?usp=sharing
 TEST(TestDecodeDaikin128, SyntheticSelfDecode) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   uint8_t expectedState[kDaikin128StateLength] = {
       // 8 bytes
       0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0xAD,
@@ -2620,7 +2627,7 @@ TEST(TestDecodeDaikin128, SyntheticSelfDecode) {
 }
 
 TEST(TestDaikin128Class, Checksums) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
 
   uint8_t knownGood[kDaikin128StateLength] = {
       0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0xAD,
@@ -2636,7 +2643,7 @@ TEST(TestDaikin128Class, Checksums) {
 }
 
 TEST(TestDaikin128Class, PowerToggle) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   ac.setPowerToggle(true);
@@ -2648,7 +2655,7 @@ TEST(TestDaikin128Class, PowerToggle) {
 }
 
 TEST(TestDaikin128Class, SwingVertical) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   ac.setSwingVertical(true);
@@ -2660,7 +2667,7 @@ TEST(TestDaikin128Class, SwingVertical) {
 }
 
 TEST(TestDaikin128Class, Sleep) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   ac.setSleep(true);
@@ -2672,7 +2679,7 @@ TEST(TestDaikin128Class, Sleep) {
 }
 
 TEST(TestDaikin128Class, Econo) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   // Econo works in some modes
@@ -2691,7 +2698,7 @@ TEST(TestDaikin128Class, Econo) {
 }
 
 TEST(TestDaikin128Class, FanSpeed) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kDaikin128Cool);
@@ -2727,7 +2734,7 @@ TEST(TestDaikin128Class, FanSpeed) {
 }
 
 TEST(TestDaikin128Class, OperatingMode) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(0);
@@ -2751,7 +2758,7 @@ TEST(TestDaikin128Class, OperatingMode) {
 }
 
 TEST(TestDaikin128Class, Quiet) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   // Quiet works in some modes
@@ -2770,7 +2777,7 @@ TEST(TestDaikin128Class, Quiet) {
 }
 
 TEST(TestDaikin128Class, Powerful) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   // Powerful works in some modes
@@ -2789,7 +2796,7 @@ TEST(TestDaikin128Class, Powerful) {
 }
 
 TEST(TestDaikin128Class, Temperature) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   ac.setTemp(0);
@@ -2825,7 +2832,7 @@ TEST(TestDaikin128Class, Temperature) {
 
 // Test human readable output.
 TEST(TestDaikin128Class, HumanReadable) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
 
   ac.setPowerToggle(false);
   ac.setMode(kDaikin128Auto);
@@ -2866,7 +2873,7 @@ TEST(TestDaikin128Class, HumanReadable) {
 }
 
 TEST(TestDaikin128Class, Clock) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   ac.setClock(0);
@@ -2880,7 +2887,7 @@ TEST(TestDaikin128Class, Clock) {
 }
 
 TEST(TestDaikin128Class, Timers) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
   ac.begin();
 
   ac.setOnTimerEnabled(false);
@@ -2913,7 +2920,7 @@ TEST(TestDaikin128Class, Timers) {
 }
 
 TEST(TestDaikin128Class, ReconstructKnownState) {
-  IRDaikin128 ac(0);
+  IRDaikin128 ac(kGpioUnused);
 
   uint8_t expectedState[kDaikin128StateLength] = {
       0x16, 0x12, 0x20, 0x19, 0x47, 0x22, 0x26, 0xAD,
@@ -2943,8 +2950,8 @@ TEST(TestDaikin128Class, ReconstructKnownState) {
 // Data from:
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/873#issue-485088080
 TEST(TestDecodeDaikin152, RealExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   uint16_t rawData[319] = {
       450, 420, 448, 446, 422, 444, 422, 446, 422, 446, 422, 25182, 3492, 1718,
       450, 1288, 448, 422, 446, 448, 420, 446, 422, 1290, 448, 422, 446, 446,
@@ -2991,8 +2998,8 @@ TEST(TestDecodeDaikin152, RealExample) {
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/873
 TEST(TestDecodeDaikin152, SyntheticExample) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   uint8_t expectedState[kDaikin152StateLength] = {
       0x11, 0xDA, 0x27, 0x00, 0x00, 0x00, 0x34, 0x00, 0x40, 0x00,
       0x00, 0x00, 0x00, 0x20, 0x00, 0xC5, 0x40, 0x00, 0xAB};
@@ -3027,7 +3034,7 @@ TEST(TestDecodeDaikin152, SyntheticExample) {
 }
 
 TEST(TestDaikin2ClassNew, Issue908) {
-  IRDaikin2 ac(0);
+  IRDaikin2 ac(kGpioUnused);
   // https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=I8
   uint8_t fanMedium[kDaikin2StateLength] = {
       0x11, 0xDA, 0x27, 0x00, 0x01, 0x4A, 0x42, 0xB0, 0x28, 0x0C, 0x80, 0x04,
@@ -3084,7 +3091,7 @@ TEST(TestDaikin2ClassNew, Issue908) {
 // Tests for IRDaikin152 class.
 
 TEST(TestDaikin152Class, Power) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.begin();
 
   ac.on();
@@ -3101,7 +3108,7 @@ TEST(TestDaikin152Class, Power) {
 }
 
 TEST(TestDaikin152Class, Temperature) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.begin();
   ac.setMode(kDaikinHeat);  // Heat has the widest temp range.
   ac.setTemp(0);
@@ -3140,7 +3147,7 @@ TEST(TestDaikin152Class, Temperature) {
 }
 
 TEST(TestDaikin152Class, OperatingMode) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kDaikinAuto);
@@ -3173,7 +3180,7 @@ TEST(TestDaikin152Class, OperatingMode) {
 }
 
 TEST(TestDaikin152Class, Swing) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.begin();
 
   ac.setSwingV(false);
@@ -3187,7 +3194,7 @@ TEST(TestDaikin152Class, Swing) {
 }
 
 TEST(TestDaikin152Class, QuietMode) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.begin();
 
   ac.setQuiet(true);
@@ -3211,7 +3218,7 @@ TEST(TestDaikin152Class, QuietMode) {
 }
 
 TEST(TestDaikin152Class, PowerfulMode) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.begin();
 
   ac.setPowerful(true);
@@ -3232,7 +3239,7 @@ TEST(TestDaikin152Class, PowerfulMode) {
 }
 
 TEST(TestDaikin152Class, EconoMode) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.begin();
 
   ac.setEcono(true);
@@ -3256,7 +3263,7 @@ TEST(TestDaikin152Class, EconoMode) {
 }
 
 TEST(TestDaikin152Class, FanSpeed) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.begin();
 
   // Unexpected value should default to Auto.
@@ -3298,7 +3305,7 @@ TEST(TestDaikin152Class, FanSpeed) {
 }
 
 TEST(TestDaikin152Class, Comfort) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.begin();
 
   // Comfort mode should change these settings.
@@ -3320,7 +3327,7 @@ TEST(TestDaikin152Class, Comfort) {
 }
 
 TEST(TestDaikin152Class, toCommon) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kDaikinCool);
   ac.setTemp(20);
@@ -3364,7 +3371,7 @@ TEST(TestDaikin152Class, convertFan) {
 }
 
 TEST(TestDaikin152Class, BuildKnownState) {
-  IRDaikin152 ac(0);
+  IRDaikin152 ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kDaikinCool);
   ac.setTemp(20);
@@ -3488,7 +3495,7 @@ TEST(TestDaikin64Class, ChecksumAndSetGetRaw) {
 }
 
 TEST(TestDaikin64Class, Temperature) {
-  IRDaikin64 ac(0);
+  IRDaikin64 ac(kGpioUnused);
   ac.begin();
   ac.setTemp(0);
   EXPECT_EQ(kDaikin64MinTemp, ac.getTemp());
@@ -3527,7 +3534,7 @@ TEST(TestDaikin64Class, Temperature) {
 }
 
 TEST(TestDaikin64Class, OperatingMode) {
-  IRDaikin64 ac(0);
+  IRDaikin64 ac(kGpioUnused);
   ac.begin();
 
   ac.setMode(kDaikin64Cool);
@@ -3556,7 +3563,7 @@ TEST(TestDaikin64Class, OperatingMode) {
 }
 
 TEST(TestDaikin64Class, PowerToggle) {
-  IRDaikin64 ac(0);
+  IRDaikin64 ac(kGpioUnused);
   ac.begin();
 
   ac.setPowerToggle(true);
@@ -3841,4 +3848,34 @@ TEST(TestDaikin2Class, Humidity) {
       "Light: 1 (High), Mould: Off, Clean: On, Fresh: Off, Eye: Off, "
       "Eye Auto: Off, Quiet: Off, Powerful: Off, Purify: On, Econo: Off, "
       "Humid: 55%", ac.toString());
+}
+
+TEST(TestDaikin176Class, UnitId) {
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1543
+  IRDaikin176 ac(kGpioUnused);
+  EXPECT_EQ(0, ac.getId());
+  ac.setId(1);
+  EXPECT_EQ(1, ac.getId());
+  ac.setId(0);
+  EXPECT_EQ(0, ac.getId());
+
+  // Real example(s)
+  const uint8_t unita[22] = {
+      0x11, 0xDA, 0x17, 0x18, 0x04, 0x00, 0x1E,
+      0x11, 0xDA, 0x17, 0x18, 0x00, 0x73, 0x00,
+      0x21, 0x00, 0x00, 0x1E, 0x36, 0x00, 0x20, 0x22};
+  const uint8_t unitb[22] = {
+      0x11, 0xDA, 0x17, 0x19, 0x04, 0x00, 0x1F,
+      0x11, 0xDA, 0x17, 0x19, 0x00, 0x73, 0x00,
+      0x21, 0x00, 0x00, 0x1E, 0x36, 0x00, 0x20, 0x23};
+  ac.setRaw(unitb);
+  ASSERT_EQ(1, ac.getId());
+  EXPECT_STATE_EQ(unitb, ac.getRaw(), kDaikin176Bits);
+  EXPECT_EQ(
+      "Power: On, Mode: 2 (Cool), Temp: 24C, Fan: 3 (High), Swing(H): 6 (Off), "
+      "Id: 1", ac.toString());
+  // Check if we can successfully convert to a known-good Unit A message.
+  ac.setId(0);
+  ASSERT_EQ(0, ac.getId());
+  EXPECT_STATE_EQ(unita, ac.getRaw(), kDaikin176Bits);
 }
