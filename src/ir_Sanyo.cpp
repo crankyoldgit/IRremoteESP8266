@@ -735,3 +735,229 @@ bool IRrecv::decodeSanyoAc88(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_SANYO_AC88
+
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+IRSanyoAc88::IRSanyoAc88(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+/// Reset the state of the remote to a known good state/sequence.
+/// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?ts=5f0190a5#gid=1050142776&range=A2:B2
+void IRSanyoAc88::stateReset(void) {
+  static const uint8_t kReset[kSanyoAc88StateLength] = {
+    0xAA, 0x55, 0xA0, 0x16, 0x0F, 0x21, 0x01, 0x01, 0x00, 0x00, 0x10};
+  std::memcpy(_.raw, kReset, kSanyoAc88StateLength);
+}
+
+/// Set up hardware to be able to send a message.
+void IRSanyoAc88::begin(void) { _irsend.begin(); }
+
+#if SEND_SANYO_AC
+/// Send the current internal state as IR messages.
+/// @param[in] repeat Nr. of times the message will be repeated.
+void IRSanyoAc88::send(const uint16_t repeat) {
+  _irsend.sendSanyoAc88(getRaw(), kSanyoAc88StateLength, repeat);
+}
+#endif  // SEND_SANYO_AC
+
+/// Get a PTR to the internal state/code for this protocol with all integrity
+///   checks passing.
+/// @return PTR to a code for this protocol based on the current internal state.
+uint8_t* IRSanyoAc88::getRaw(void) {
+  return _.raw;
+}
+
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] newState A valid code for this protocol.
+void IRSanyoAc88::setRaw(const uint8_t newState[]) {
+  std::memcpy(_.raw, newState, kSanyoAc88StateLength);
+}
+
+/// Set the requested power state of the A/C to on.
+void IRSanyoAc88::on(void) { setPower(true); }
+
+/// Set the requested power state of the A/C to off.
+void IRSanyoAc88::off(void) { setPower(false); }
+
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSanyoAc88::setPower(const bool on) {   _.Power = on; }
+
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSanyoAc88::getPower(void) const { return _.Power; }
+
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
+uint8_t IRSanyoAc88::getMode(void) const { return _.Mode; }
+
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
+/// @note If we get an unexpected mode, default to AUTO.
+void IRSanyoAc88::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kSanyoAc88Auto:
+    case kSanyoAc88FeelCool:
+    case kSanyoAc88Cool:
+    case kSanyoAc88FeelHeat:
+    case kSanyoAc88Heat:
+    case kSanyoAc88Fan:
+      _.Mode = mode;
+      break;
+    default: _.Mode = kSanyoAc88Auto;
+  }
+}
+
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRSanyoAc88::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool: return kSanyoAc88Cool;
+    case stdAc::opmode_t::kHeat: return kSanyoAc88Heat;
+    case stdAc::opmode_t::kFan:  return kSanyoAc88Fan;
+    default:                     return kSanyoAc88Auto;
+  }
+}
+
+/// Convert a native mode into its stdAc equivalent.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::opmode_t IRSanyoAc88::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kSanyoAc88FeelCool:
+    case kSanyoAc88Cool:
+      return stdAc::opmode_t::kCool;
+    case kSanyoAc88FeelHeat:
+    case kSanyoAc88Heat:
+      return stdAc::opmode_t::kHeat;
+    case kSanyoAc88Fan:
+      return stdAc::opmode_t::kFan;
+    default:
+      return stdAc::opmode_t::kAuto;
+  }
+}
+
+/// Set the desired temperature.
+/// @param[in] degrees The temperature in degrees celsius.
+void IRSanyoAc88::setTemp(const uint8_t degrees) {
+  uint8_t temp = std::max((uint8_t)kSanyoAc88TempMin, degrees);
+  _.Temp = std::min((uint8_t)kSanyoAc88TempMax, temp);
+}
+
+/// Get the current desired temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRSanyoAc88::getTemp(void) const { return _.Temp; }
+
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
+void IRSanyoAc88::setFan(const uint8_t speed) { _.Fan = speed; }
+
+/// Get the current fan speed setting.
+/// @return The current fan speed/mode.
+uint8_t IRSanyoAc88::getFan(void) const { return _.Fan; }
+
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRSanyoAc88::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:    return kSanyoAc88FanLow;
+    case stdAc::fanspeed_t::kMedium: return kSanyoAc88FanMedium;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:    return kSanyoAc88FanHigh;
+    default:                         return kSanyoAc88FanAuto;
+  }
+}
+
+/// Convert a native fan speed into its stdAc equivalent.
+/// @param[in] spd The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::fanspeed_t IRSanyoAc88::toCommonFanSpeed(const uint8_t spd) {
+  switch (spd) {
+    case kSanyoAc88FanHigh:   return stdAc::fanspeed_t::kHigh;
+    case kSanyoAc88FanMedium: return stdAc::fanspeed_t::kMedium;
+    case kSanyoAc88FanLow:    return stdAc::fanspeed_t::kLow;
+    default:                  return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+/// Change the SwingV setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSanyoAc88::setSwingV(const bool on) { _.SwingV = on; }
+
+/// Get the value of the current SwingV setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSanyoAc88::getSwingV(void) const { return _.SwingV; }
+
+/// Change the Turbo setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSanyoAc88::setTurbo(const bool on) { _.Turbo = on; }
+
+/// Get the value of the current Turbo setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSanyoAc88::getTurbo(void) const { return _.Turbo; }
+
+/// Change the Filter setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSanyoAc88::setFilter(const bool on) { _.Filter = on; }
+
+/// Get the value of the current Filter setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSanyoAc88::getFilter(void) const { return _.Filter; }
+
+/// Change the Sleep setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSanyoAc88::setSleep(const bool on) { _.Sleep = on; }
+
+/// Get the value of the current Sleep setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSanyoAc88::getSleep(void) const { return _.Sleep; }
+
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
+stdAc::state_t IRSanyoAc88::toCommon(void) const {
+  stdAc::state_t result;
+  result.protocol = decode_type_t::SANYO_AC88;
+  result.model = -1;  // Not supported.
+  result.power = getPower();
+  result.mode = toCommonMode(_.Mode);
+  result.celsius = true;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.filter = _.Filter;
+  result.turbo = _.Turbo;
+  result.sleep = _.Sleep ? 0 : -1;
+  // Not supported.
+  result.swingh = stdAc::swingh_t::kOff;
+  result.econo = false;
+  result.light = false;
+  result.quiet = false;
+  result.beep = false;
+  result.clean = false;
+  result.clock = -1;
+  return result;
+}
+
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
+String IRSanyoAc88::toString(void) const {
+  String result = "";
+  result.reserve(100);
+  result += addBoolToString(getPower(), kPowerStr, false);
+  result += addModeToString(_.Mode, kSanyoAc88Auto, kSanyoAc88Cool,
+                            kSanyoAc88Heat, kSanyoAc88Auto, kSanyoAc88Fan);
+  result += addTempToString(getTemp());
+  result += addFanToString(_.Fan, kSanyoAc88FanHigh, kSanyoAc88FanLow,
+                           kSanyoAc88FanAuto, kSanyoAc88FanAuto,
+                           kSanyoAc88FanMedium);
+  result += addBoolToString(_.SwingV, kSwingVStr);
+  result += addBoolToString(_.Turbo, kTurboStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
+  return result;
+}
