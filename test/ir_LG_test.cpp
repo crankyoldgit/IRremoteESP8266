@@ -816,6 +816,13 @@ TEST(TestIRLgAcClass, KnownExamples) {
       "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 15C, Fan: 5 (Auto)",
       ac.toString());
+
+  // https://docs.google.com/spreadsheets/d/17C_Ay7OjsYNSAxxj8uXbh0Vi2jrqyrncwzIyUOGSuNo/edit#gid=0&range=A56:E56
+  ac.setRaw(0x881334B);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 4 (AKB73757604), Vane: 2, Swing(V): 4 (Middle)",
+      ac.toString());
 }
 
 // Verify decoding of LG2 message.
