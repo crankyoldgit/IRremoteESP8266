@@ -91,11 +91,11 @@ const uint8_t  kLgAcSwingVSwing_Short       = 0x14;
 const uint8_t  kLgAcSwingVAuto_Short        = kLgAcSwingVSwing_Short;
 const uint8_t  kLgAcSwingVOff_Short         = 0x15;
 
-// AKB73757604
+// AKB73757604 Constants
+// SwingH
 const uint32_t kLgAcSwingHAuto            = 0x881316B;
 const uint32_t kLgAcSwingHOff             = 0x881317C;
-const uint32_t kLgAcSwingHSignature       = kLgAcSwingHOff >> 5;
-const uint32_t kLgAcVaneSwingVBase        = 0x8813200;
+// SwingV
 const uint8_t  kLgAcVaneSwingVHighest     = 1;  ///< 0b001
 const uint8_t  kLgAcVaneSwingVHigh        = 2;  ///< 0b010
 const uint8_t  kLgAcVaneSwingVUpperMiddle = 3;  ///< 0b011
