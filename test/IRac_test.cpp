@@ -1018,6 +1018,7 @@ TEST(TestIRac, LG) {
           stdAc::fanspeed_t::kMedium,           // Fan speed
           stdAc::swingv_t::kLow,                // Vertical swing
           stdAc::swingv_t::kOff,                // Vertical swing (previous)
+          stdAc::swingh_t::kOff,                // Horizontal swing
           true);                                // Light
 
   ASSERT_EQ(expected, ac.toString());
@@ -1049,6 +1050,7 @@ TEST(TestIRac, LG2) {
           stdAc::fanspeed_t::kLow,              // Fan speed
           stdAc::swingv_t::kLow,                // Vertical swing
           stdAc::swingv_t::kOff,                // Vertical swing (previous)
+          stdAc::swingh_t::kOff,                // Horizontal swing
           false);                               // Light
 
   ASSERT_EQ(expected, ac.toString());
@@ -1093,6 +1095,7 @@ TEST(TestIRac, Issue1513) {
           stdAc::fanspeed_t::kMin,              // Fan speed
           stdAc::swingv_t::kAuto,               // Vertical swing
           stdAc::swingv_t::kHighest,            // Vertical swing (previous)
+          stdAc::swingh_t::kOff,                // Horizontal swing
           true);                                // Light
   ac._irsend.makeDecodeResult();
   // All sent, we assume the above  works. Just need to switch to swing off now.
@@ -1111,6 +1114,7 @@ TEST(TestIRac, Issue1513) {
           stdAc::fanspeed_t::kMin,              // Fan speed
           stdAc::swingv_t::kOff,                // Vertical swing
           stdAc::swingv_t::kAuto,               // Vertical swing (previous)
+          stdAc::swingh_t::kOff,                // Horizontal swing
           true);                                // Light
   ac._irsend.makeDecodeResult();
   // There should only be two messages.
@@ -1130,6 +1134,62 @@ TEST(TestIRac, Issue1513) {
   EXPECT_EQ(kLgAcSwingVOff, ac._irsend.capture.value);
   ASSERT_EQ("Model: 3 (AKB74955603), Swing(V): 21 (Off)",
             IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+TEST(TestIRac, LG2_AKB73757604) {
+  IRLgAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Model: 2 (AKB75215403), "
+      "Power: On, Mode: 1 (Dry), Temp: 27C, Fan: 1 (Low)";
+
+  ac.begin();
+  irac.lg(&ac,
+          lg_ac_remote_model_t::AKB73757604,    // Model
+          true,                                 // Power
+          stdAc::opmode_t::kDry,                // Mode
+          27,                                   // Degrees C
+          stdAc::fanspeed_t::kLow,              // Fan speed
+          stdAc::swingv_t::kLow,                // Vertical swing
+          stdAc::swingv_t::kOff,                // Vertical swing (previous)
+          stdAc::swingh_t::kAuto,               // Horizontal swing
+          true);                                // Light
+
+  ac._irsend.makeDecodeResult();
+  ASSERT_EQ(361, ac._irsend.capture.rawlen);  // We expect six messages.
+  // Message #1
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  // Message #2 - Vane 0 SwingV Low
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 61));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(0x881325B, ac._irsend.capture.value);
+  // Message #3 - Vane 1 SwingV Low
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 121));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(0x88132D3, ac._irsend.capture.value);
+  // Message #4 - Vane 2 SwingV Low
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 181));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(0x881335C, ac._irsend.capture.value);
+  // Message #5 - Vane 3 SwingV Low
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 241));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(0x88133D4, ac._irsend.capture.value);
+  // Message #6 - Horizontal swing
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 301));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(kLgAcSwingHAuto, ac._irsend.capture.value);
 }
 
 TEST(TestIRac, Midea) {

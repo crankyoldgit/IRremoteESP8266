@@ -689,6 +689,10 @@ TEST(TestUtils, Housekeeping) {
             IRac::strToModel(irutils::modelToStr(
                 decode_type_t::LG2,
                 lg_ac_remote_model_t::AKB74955603).c_str()));
+  ASSERT_EQ(lg_ac_remote_model_t::AKB73757604,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::LG2,
+                lg_ac_remote_model_t::AKB73757604).c_str()));
 }
 
 TEST(TestIRLgAcClass, KnownExamples) {
@@ -954,6 +958,37 @@ TEST(TestIRLgAcClass, DetectAKB74955603) {
   ac.stateReset();
   ac.setRaw(0x881306A);
   EXPECT_EQ(lg_ac_remote_model_t::AKB74955603, ac.getModel());
+
+  ac.stateReset();
+  ac.setRaw(kLgAcSwingHOff);
+  EXPECT_NE(lg_ac_remote_model_t::AKB74955603, ac.getModel());
+
+  ac.stateReset();
+  ac.setRaw(0x8813228);
+  EXPECT_NE(lg_ac_remote_model_t::AKB74955603, ac.getModel());
+}
+
+TEST(TestIRLgAcClass, DetectAKB73757604) {
+  IRLgAc ac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+
+  ac.stateReset();
+  ASSERT_NE(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+  ac.setRaw(0x880A3A7);
+  EXPECT_NE(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+
+  // https://docs.google.com/spreadsheets/d/17C_Ay7OjsYNSAxxj8uXbh0Vi2jrqyrncwzIyUOGSuNo/edit?usp=sharing
+  ac.stateReset();
+  ac.setRaw(kLgAcSwingHOff);
+  EXPECT_EQ(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+
+  ac.setRaw(0x8813228);
+  EXPECT_EQ(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+
+  ac.setRaw(0x881333A);
+  EXPECT_EQ(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+  ASSERT_EQ("Model: 4 (AKB73757604), Vane: 2, Swing(V): 3 (Upper Middle)",
+            ac.toString());
 }
 
 TEST(TestIRLgAcClass, Light) {

@@ -156,6 +156,7 @@ extern const char* kTypeStr;
 extern const char* kUnknownStr;
 extern const char* kUpperStr;
 extern const char* kUpStr;
+extern const char* kVaneStr;
 extern const char* kWallStr;
 extern const char* kWeeklyTimerStr;
 extern const char* kWideStr;

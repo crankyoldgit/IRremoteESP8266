@@ -1340,7 +1340,7 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
               const bool on, const stdAc::opmode_t mode,
               const float degrees, const stdAc::fanspeed_t fan,
               const stdAc::swingv_t swingv, const stdAc::swingv_t swingv_prev,
-              const bool light) {
+              const stdAc::swingh_t swingh, const bool light) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
@@ -1348,9 +1348,12 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(ac->convertSwingV(swingv_prev));
-  ac->updateSwingVPrev();
+  ac->updateSwingPrev();
   ac->setSwingV(ac->convertSwingV(swingv));
-  // No Horizontal swing setting available.
+  const uint8_t pos = ac->convertVaneSwingV(swingv);
+  for (uint8_t vane = 0; vane < kLgAcSwingVMaxVanes; vane++)
+    ac->setVaneSwingV(vane, pos);
+  ac->setSwingH(swingh != stdAc::swingh_t::kOff);
   // No Quiet setting available.
   // No Turbo setting available.
   ac->setLight(light);
@@ -2650,7 +2653,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRLgAc ac(_pin, _inverted, _modulation);
       lg(&ac, (lg_ac_remote_model_t)send.model, send.power, send.mode,
-         send.degrees, send.fanspeed, send.swingv, prev_swingv, send.light);
+         send.degrees, send.fanspeed, send.swingv, prev_swingv, send.swingh,
+         send.light);
       break;
     }
 #endif  // SEND_LG
@@ -3071,6 +3075,8 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return lg_ac_remote_model_t::AKB75215403;
   } else if (!strcasecmp(str, "AKB74955603")) {
     return lg_ac_remote_model_t::AKB74955603;
+  } else if (!strcasecmp(str, "AKB73757604")) {
+    return lg_ac_remote_model_t::AKB73757604;
   // Panasonic A/C families
   } else if (!strcasecmp(str, "LKE") || !strcasecmp(str, "PANASONICLKE")) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
