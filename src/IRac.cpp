@@ -1335,6 +1335,7 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] swingv_prev The previous vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
 /// @param[in] light Turn on the LED/Display mode.
 void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
               const bool on, const stdAc::opmode_t mode,

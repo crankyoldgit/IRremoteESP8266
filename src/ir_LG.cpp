@@ -697,7 +697,7 @@ stdAc::swingv_t IRLgAc::toCommonSwingV(const uint32_t code) {
 }
 
 /// Convert a native Vane specific Vertical Swing into its stdAc equivalent.
-/// @param[in] code The native code to be converted.
+/// @param[in] pos The native position to be converted.
 /// @return The stdAc equivalent of the native setting.
 stdAc::swingv_t IRLgAc::toCommonVaneSwingV(const uint8_t pos) {
   switch (pos) {
