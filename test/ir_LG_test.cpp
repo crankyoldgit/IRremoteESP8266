@@ -689,6 +689,10 @@ TEST(TestUtils, Housekeeping) {
             IRac::strToModel(irutils::modelToStr(
                 decode_type_t::LG2,
                 lg_ac_remote_model_t::AKB74955603).c_str()));
+  ASSERT_EQ(lg_ac_remote_model_t::AKB73757604,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::LG2,
+                lg_ac_remote_model_t::AKB73757604).c_str()));
 }
 
 TEST(TestIRLgAcClass, KnownExamples) {
@@ -811,6 +815,20 @@ TEST(TestIRLgAcClass, KnownExamples) {
   EXPECT_EQ(
       "Model: 1 (GE6711AR2853M), "
       "Power: On, Mode: 0 (Cool), Temp: 15C, Fan: 5 (Auto)",
+      ac.toString());
+
+  // https://docs.google.com/spreadsheets/d/17C_Ay7OjsYNSAxxj8uXbh0Vi2jrqyrncwzIyUOGSuNo/edit#gid=0&range=A56:E56
+  ac.setRaw(0x881334B);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 4 (AKB73757604), Vane: 2, Swing(V): 4 (Middle)",
+      ac.toString());
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1531#issuecomment-892070033
+  ac.setRaw(0x88133B2);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 4 (AKB73757604), Vane: 3, Swing(V): 3 (Upper Middle)",
       ac.toString());
 }
 
@@ -954,6 +972,37 @@ TEST(TestIRLgAcClass, DetectAKB74955603) {
   ac.stateReset();
   ac.setRaw(0x881306A);
   EXPECT_EQ(lg_ac_remote_model_t::AKB74955603, ac.getModel());
+
+  ac.stateReset();
+  ac.setRaw(kLgAcSwingHOff);
+  EXPECT_NE(lg_ac_remote_model_t::AKB74955603, ac.getModel());
+
+  ac.stateReset();
+  ac.setRaw(0x8813228);
+  EXPECT_NE(lg_ac_remote_model_t::AKB74955603, ac.getModel());
+}
+
+TEST(TestIRLgAcClass, DetectAKB73757604) {
+  IRLgAc ac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+
+  ac.stateReset();
+  ASSERT_NE(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+  ac.setRaw(0x880A3A7);
+  EXPECT_NE(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+
+  // https://docs.google.com/spreadsheets/d/17C_Ay7OjsYNSAxxj8uXbh0Vi2jrqyrncwzIyUOGSuNo/edit?usp=sharing
+  ac.stateReset();
+  ac.setRaw(kLgAcSwingHOff);
+  EXPECT_EQ(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+
+  ac.setRaw(0x8813228);
+  EXPECT_EQ(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+
+  ac.setRaw(0x881333A);
+  EXPECT_EQ(lg_ac_remote_model_t::AKB73757604, ac.getModel());
+  ASSERT_EQ("Model: 4 (AKB73757604), Vane: 2, Swing(V): 3 (Upper Middle)",
+            ac.toString());
 }
 
 TEST(TestIRLgAcClass, Light) {

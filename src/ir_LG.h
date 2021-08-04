@@ -11,8 +11,10 @@
 //   Brand: LG,  Model: S4-W12JA3AA A/C (LG2)
 //   Brand: LG,  Model: AKB75215403 remote (LG2)
 //   Brand: LG,  Model: AKB74955603 remote (LG2 - AKB74955603)
-//   Brand: LG,  Model: A4UW30GFA2 A/C (LG2 - AKB74955603)
+//   Brand: LG,  Model: A4UW30GFA2 A/C (LG2 - AKB74955603 & AKB73757604)
 //   Brand: LG,  Model: AMNW09GSJA0 A/C (LG2 - AKB74955603)
+//   Brand: LG,  Model: AMNW24GTPA1 A/C (LG2 - AKB73757604)
+//   Brand: LG,  Model: AKB73757604 remote (LG2 - AKB73757604)
 //   Brand: General Electric,  Model: AG1BH09AW101 Split A/C (LG)
 //   Brand: General Electric,  Model: 6711AR2853M A/C Remote (LG)
 
@@ -89,6 +91,20 @@ const uint8_t  kLgAcSwingVSwing_Short       = 0x14;
 const uint8_t  kLgAcSwingVAuto_Short        = kLgAcSwingVSwing_Short;
 const uint8_t  kLgAcSwingVOff_Short         = 0x15;
 
+// AKB73757604 Constants
+// SwingH
+const uint32_t kLgAcSwingHAuto            = 0x881316B;
+const uint32_t kLgAcSwingHOff             = 0x881317C;
+// SwingV
+const uint8_t  kLgAcVaneSwingVHighest     = 1;  ///< 0b001
+const uint8_t  kLgAcVaneSwingVHigh        = 2;  ///< 0b010
+const uint8_t  kLgAcVaneSwingVUpperMiddle = 3;  ///< 0b011
+const uint8_t  kLgAcVaneSwingVMiddle      = 4;  ///< 0b100
+const uint8_t  kLgAcVaneSwingVLow         = 5;  ///< 0b101
+const uint8_t  kLgAcVaneSwingVLowest      = 6;  ///< 0b110
+const uint8_t  kLgAcVaneSwingVSize        = 8;
+const uint8_t  kLgAcSwingVMaxVanes = 4;  ///< Max Nr. of Vanes
+
 // Classes
 /// Class for handling detailed LG A/C messages.
 class IRLgAc {
@@ -122,10 +138,19 @@ class IRLgAc {
   void setLight(const bool on);
   bool getLight(void) const;
   bool isLightToggle(void) const;
+  bool isSwing(void) const;
+  void setSwingH(const bool on);
+  bool getSwingH(void) const;
   bool isSwingV(void) const;
+  bool isVaneSwingV(void) const;
   void setSwingV(const uint32_t position);
   uint32_t getSwingV(void) const;
-  void updateSwingVPrev(void);
+  void setVaneSwingV(const uint8_t vane, const uint8_t position);
+  uint8_t getVaneSwingV(const uint8_t vane) const;
+  static uint32_t calcVaneSwingV(const uint8_t vane, const uint8_t position);
+  static uint8_t getVaneCode(const uint32_t raw);
+  bool isSwingH(void) const;
+  void updateSwingPrev(void);
   uint32_t getRaw(void);
   void setRaw(const uint32_t new_code,
               const decode_type_t protocol = decode_type_t::UNKNOWN);
@@ -133,8 +158,10 @@ class IRLgAc {
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint32_t code);
+  static stdAc::swingv_t toCommonVaneSwingV(const uint8_t pos);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static uint32_t convertSwingV(const stdAc::swingv_t swingv);
+  static uint8_t convertVaneSwingV(const stdAc::swingv_t swingv);
   stdAc::state_t toCommon(const stdAc::state_t *prev = NULL) const;
   String toString(void) const;
   void setModel(const lg_ac_remote_model_t model);
@@ -153,11 +180,16 @@ class IRLgAc {
   bool _light;
   uint32_t _swingv;
   uint32_t _swingv_prev;
+  uint8_t _vaneswingv[kLgAcSwingVMaxVanes];
+  uint8_t _vaneswingv_prev[kLgAcSwingVMaxVanes];
+  bool _swingh;
+  bool _swingh_prev;
   decode_type_t _protocol;  ///< Protocol version
   lg_ac_remote_model_t _model;  ///< Model type
   void checksum(void);
   void _setTemp(const uint8_t value);
   bool _isAKB74955603(void) const;
+  bool _isAKB73757604(void) const;
   bool _isNormal(void) const;
 };
 

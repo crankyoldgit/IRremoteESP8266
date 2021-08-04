@@ -279,6 +279,9 @@
 #ifndef D_STR_ID
 #define D_STR_ID "Id"
 #endif  // D_STR_ID
+#ifndef D_STR_VANE
+#define D_STR_VANE "Vane"
+#endif  // D_STR_VANE
 
 #ifndef D_STR_AUTO
 #define D_STR_AUTO "Auto"

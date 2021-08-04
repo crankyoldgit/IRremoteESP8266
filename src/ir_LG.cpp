@@ -23,6 +23,7 @@ using irutils::addModelToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::addSwingVToString;
+using irutils::addIntToString;
 
 
 // Constants
@@ -46,6 +47,16 @@ const uint16_t kLg2HdrSpace = 9900;           ///< uSeconds.
 const uint16_t kLg2BitMark = 480;             ///< uSeconds.
 
 const uint32_t kLgAcAKB74955603DetectionMask = 0x0000080;
+const uint8_t  kLgAcChecksumSize = 4;  ///< Size in bits.
+// Signature has the checksum removed, and another bit to match both Auto & Off.
+const uint8_t  kLgAcSwingHOffsetSize = kLgAcChecksumSize + 1;
+const uint32_t kLgAcSwingHSignature  = kLgAcSwingHOff >> kLgAcSwingHOffsetSize;
+const uint32_t kLgAcVaneSwingVBase = 0x8813200;
+
+#ifdef VANESWINGVPOS
+#undef VANESWINGVPOS
+#endif
+#define VANESWINGVPOS(code) (code % kLgAcVaneSwingVSize)
 
 #if SEND_LG
 /// Send an LG formatted message. (LG)
@@ -118,7 +129,8 @@ void IRsend::sendLG2(uint64_t data, uint16_t nbits, uint16_t repeat) {
 /// @return A raw 28-bit LG message code suitable for sendLG() etc.
 /// @note Sequence of bits = address + command + checksum.
 uint32_t IRsend::encodeLG(uint16_t address, uint16_t command) {
-  return ((address << 20) | (command << 4) | irutils::sumNibbles(command, 4));
+  return ((address << 20) | (command << kLgAcChecksumSize) |
+          irutils::sumNibbles(command, 4));
 }
 #endif  // SEND_LG
 
@@ -191,9 +203,10 @@ bool IRrecv::decodeLG(decode_results *results, uint16_t offset,
                       kBitmark, kLgMinGap, true, kUseDefTol)) return false;
   }
 
-  // Compliance
-  uint16_t command = (data >> 4);  // The 16 bits before the checksum.
+  // The 16 bits before the checksum.
+  uint16_t command = (data >> kLgAcChecksumSize);
 
+  // Compliance
   if (strict && (data & 0xF) != irutils::sumNibbles(command, 4))
     return false;  // The last 4 bits sent are the expected checksum.
   // Success
@@ -225,7 +238,10 @@ void IRLgAc::stateReset(void) {
   setModel(lg_ac_remote_model_t::GE6711AR2853M);
   _light = true;
   _swingv = kLgAcSwingVOff;
-  updateSwingVPrev();
+  _swingh = false;
+  for (uint8_t i = 0; i < kLgAcSwingVMaxVanes; i++)
+    _vaneswingv[i] = 0;  // Reset to an unused value.
+  updateSwingPrev();
 }
 
 /// Set up hardware to be able to send a message.
@@ -241,18 +257,28 @@ void IRLgAc::send(const uint16_t repeat) {
     switch (getModel()) {
       case lg_ac_remote_model_t::AKB74955603:
         // Only send the swing setting if we need to.
-        if (_swingv != _swingv_prev) {
+        if (_swingv != _swingv_prev)
           _irsend.send(_protocol, _swingv, kLgBits, repeat);
-          updateSwingVPrev();
-        }
         // Any "normal" command sent will always turn the light on, thus we only
         // send it when we want it off. Must be sent last!
         // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1513#issuecomment-877283080
         if (!_light) _irsend.send(_protocol, kLgAcLightToggle, kLgBits, repeat);
         break;
+      case lg_ac_remote_model_t::AKB73757604:
+        // Check if we need to send any vane specific swingv's.
+        for (uint8_t i = 0; i < kLgAcSwingVMaxVanes; i++)  // For all vanes
+          if (_vaneswingv[i] != _vaneswingv_prev[i])  // Only send if we must.
+            _irsend.send(_protocol, calcVaneSwingV(i, _vaneswingv[i]), kLgBits,
+                         repeat);
+        // and if we need to send a swingh message.
+        if (_swingh != _swingh_prev)
+          _irsend.send(_protocol, _swingh ? kLgAcSwingHAuto : kLgAcSwingHOff,
+                       kLgBits, repeat);
+        break;
       default:
         break;
     }
+    updateSwingPrev();  // Swing changes will have been sent, so make them prev.
   } else {
     // Always send the special Off command if the power is set to off.
     // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1008#issuecomment-570763580
@@ -269,7 +295,7 @@ bool IRLgAc::_isNormal(void) const {
     case kLgAcLightToggle:
       return false;
   }
-  if (isSwingV()) return false;
+  if (isSwing()) return false;
   return true;
 }
 
@@ -279,6 +305,7 @@ void IRLgAc::setModel(const lg_ac_remote_model_t model) {
   switch (model) {
     case lg_ac_remote_model_t::AKB75215403:
     case lg_ac_remote_model_t::AKB74955603:
+    case lg_ac_remote_model_t::AKB73757604:
       _protocol = decode_type_t::LG2;
       break;
     case lg_ac_remote_model_t::GE6711AR2853M:
@@ -300,8 +327,15 @@ lg_ac_remote_model_t IRLgAc::getModel(void) const {
 /// @return true, if it is AKB74955603 message. Otherwise, false.
 /// @note Internal use only.
 bool IRLgAc::_isAKB74955603(void) const {
-  return ((_.raw & kLgAcAKB74955603DetectionMask) || isSwingV() ||
-          isLightToggle());
+  return ((_.raw & kLgAcAKB74955603DetectionMask) && _isNormal()) ||
+      isSwingV() || isLightToggle();
+}
+
+/// Check if the stored code must belong to a AKB73757604 model.
+/// @return true, if it is AKB73757604 message. Otherwise, false.
+/// @note Internal use only.
+bool IRLgAc::_isAKB73757604(void) const {
+  return isSwingH() || isVaneSwingV();
 }
 
 /// Get a copy of the internal state/code for this protocol.
@@ -329,17 +363,29 @@ void IRLgAc::setRaw(const uint32_t new_code, const decode_type_t protocol) {
       break;
   }
   // Look for model specific settings/features to improve model detection.
-  if (_isAKB74955603()) setModel(lg_ac_remote_model_t::AKB74955603);
+  if (_isAKB74955603()) {
+    setModel(lg_ac_remote_model_t::AKB74955603);
+    if (isSwingV()) _swingv = new_code;
+  }
+  if (_isAKB73757604()) {
+    setModel(lg_ac_remote_model_t::AKB73757604);
+    if (isVaneSwingV()) {
+      // Extract just the vane nr and position part of the message.
+      const uint32_t vanecode = getVaneCode(_.raw);
+      _vaneswingv[vanecode / kLgAcVaneSwingVSize] = VANESWINGVPOS(vanecode);
+    } else if (isSwingH()) {
+      _swingh = (_.raw == kLgAcSwingHAuto);
+    }
+  }
   _temp = 15;  // Ensure there is a "sane" previous temp.
   _temp = getTemp();
-  if (isSwingV()) _swingv = new_code;
 }
 
 /// Calculate the checksum for a given state.
 /// @param[in] state The value to calc the checksum of.
 /// @return The calculated checksum value.
 uint8_t IRLgAc::calcChecksum(const uint32_t state) {
-  return irutils::sumNibbles(state >> 4, 4);
+  return irutils::sumNibbles(state >> kLgAcChecksumSize, 4);
 }
 
 /// Verify the checksum is valid for a given state.
@@ -477,8 +523,39 @@ void IRLgAc::setMode(const uint8_t mode) {
 
 /// Check if the stored code is a Swing message.
 /// @return true, if it is. Otherwise, false.
-bool IRLgAc::isSwingV(void) const {
+bool IRLgAc::isSwing(void) const {
   return (_.raw >> 12) == kLgAcSwingSignature;
+}
+
+/// Check if the stored code is a non-vane SwingV message.
+/// @return true, if it is. Otherwise, false.
+bool IRLgAc::isSwingV(void) const {
+  const uint32_t code = _.raw >> kLgAcChecksumSize;
+  return code >= (kLgAcSwingVLowest >> kLgAcChecksumSize) &&
+      code < (kLgAcSwingHAuto >> kLgAcChecksumSize);
+}
+
+/// Check if the stored code is a SwingH message.
+/// @return true, if it is. Otherwise, false.
+bool IRLgAc::isSwingH(void) const {
+  return (_.raw >> kLgAcSwingHOffsetSize) == kLgAcSwingHSignature;
+}
+
+/// Get the Horizontal Swing position setting of the A/C.
+/// @return true, if it is. Otherwise, false.
+bool IRLgAc::getSwingH(void) const { return _swingh; }
+
+/// Set the Horizontal Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRLgAc::setSwingH(const bool on) { _swingh = on; }
+
+/// Check if the stored code is a vane specific SwingV message.
+/// @return true, if it is. Otherwise, false.
+bool IRLgAc::isVaneSwingV(void) const {
+  return _.raw > kLgAcVaneSwingVBase &&
+      _.raw < (kLgAcVaneSwingVBase +
+               ((kLgAcSwingVMaxVanes *
+                 kLgAcVaneSwingVSize) << kLgAcChecksumSize));
 }
 
 /// Set the Vertical Swing mode of the A/C.
@@ -488,7 +565,7 @@ void IRLgAc::setSwingV(const uint32_t position) {
   if (position == kLgAcSwingVOff ||
       toCommonSwingV(position) != stdAc::swingv_t::kOff) {
     if (position <= 0xFF) {  // It's a short code, convert it.
-      _swingv = (kLgAcSwingSignature << 8 | position) << 4;
+      _swingv = (kLgAcSwingSignature << 8 | position) << kLgAcChecksumSize;
       _swingv |= calcChecksum(_swingv);
     } else {
       _swingv = position;
@@ -496,12 +573,48 @@ void IRLgAc::setSwingV(const uint32_t position) {
   }
 }
 
-// Copy the previous swingv setting the current one.
-void IRLgAc::updateSwingVPrev(void) { _swingv_prev = _swingv; }
+// Copy the previous swing settings from the current ones.
+void IRLgAc::updateSwingPrev(void) {
+  _swingv_prev = _swingv;
+  for (uint8_t i = 0; i < kLgAcSwingVMaxVanes; i++)
+    _vaneswingv_prev[i] = _vaneswingv[i];
+}
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
 uint32_t IRLgAc::getSwingV(void) const { return _swingv; }
+
+/// Set the per Vane Vertical Swing mode of the A/C.
+/// @param[in] vane The nr. of the vane to control.
+/// @param[in] position The position/mode to set the vanes to.
+void IRLgAc::setVaneSwingV(const uint8_t vane, const uint8_t position) {
+  if (vane < kLgAcSwingVMaxVanes)  // It's a valid vane nr.
+    if (position && position <= kLgAcVaneSwingVLowest)  // Valid position
+      _vaneswingv[vane] = position;
+}
+
+/// Get the Vertical Swing position for the given vane of the A/C.
+/// @return The native position/mode.
+uint8_t IRLgAc::getVaneSwingV(const uint8_t vane) const {
+  return (vane < kLgAcSwingVMaxVanes) ? _vaneswingv[vane] : 0;
+}
+
+/// Get the vane code of a Vane Vertical Swing message.
+/// @param[in] raw A raw number representing a native LG message.
+/// @return A number containing just the vane nr, and the position.
+uint8_t IRLgAc::getVaneCode(const uint32_t raw) {
+  return (raw - kLgAcVaneSwingVBase) >> kLgAcChecksumSize;
+}
+
+/// Calculate the Vane specific Vertical Swing code for the A/C.
+/// @return The native raw code.
+uint32_t IRLgAc::calcVaneSwingV(const uint8_t vane, const uint8_t position) {
+  uint32_t result = kLgAcVaneSwingVBase;
+  if (vane < kLgAcSwingVMaxVanes)  // It's a valid vane nr.
+    if (position && position <= kLgAcVaneSwingVLowest)  // Valid position
+      result += ((vane * kLgAcVaneSwingVSize + position) << kLgAcChecksumSize);
+  return result | calcChecksum(result);
+}
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
@@ -596,6 +709,33 @@ stdAc::swingv_t IRLgAc::toCommonSwingV(const uint32_t code) {
   }
 }
 
+/// Convert a native Vane specific Vertical Swing into its stdAc equivalent.
+/// @param[in] pos The native position to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::swingv_t IRLgAc::toCommonVaneSwingV(const uint8_t pos) {
+  switch (pos) {
+    case kLgAcVaneSwingVHigh:    return stdAc::swingv_t::kHigh;
+    case kLgAcVaneSwingVUpperMiddle:
+    case kLgAcVaneSwingVMiddle:  return stdAc::swingv_t::kMiddle;
+    case kLgAcVaneSwingVLow:     return stdAc::swingv_t::kLow;
+    case kLgAcVaneSwingVLowest:  return stdAc::swingv_t::kLowest;
+    default:                     return stdAc::swingv_t::kHighest;
+  }
+}
+
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] swingv The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRLgAc::convertVaneSwingV(const stdAc::swingv_t swingv) {
+  switch (swingv) {
+    case stdAc::swingv_t::kHigh:    return kLgAcVaneSwingVHigh;
+    case stdAc::swingv_t::kMiddle:  return kLgAcVaneSwingVMiddle;
+    case stdAc::swingv_t::kLow:     return kLgAcVaneSwingVLow;
+    case stdAc::swingv_t::kLowest:  return kLgAcVaneSwingVLowest;
+    default:                        return kLgAcVaneSwingVHighest;
+  }
+}
+
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @param[in] prev Ptr to the previous state if required.
 /// @return The stdAc equivalent of the native settings.
@@ -620,8 +760,10 @@ stdAc::state_t IRLgAc::toCommon(const stdAc::state_t *prev) const {
   result.fanspeed = toCommonFanSpeed(_.Fan);
   result.light = isLightToggle() ? !result.light : _light;
   if (isSwingV()) result.swingv = toCommonSwingV(getSwingV());
+  if (isVaneSwingV())
+    result.swingv = toCommonVaneSwingV(VANESWINGVPOS(getVaneCode(_.raw)));
+  result.swingh = isSwingH() ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   // Not supported.
-  result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.turbo = false;
   result.filter = false;
@@ -639,7 +781,7 @@ String IRLgAc::toString(void) const {
   String result = "";
   result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(_protocol, getModel(), false);
-  if (_isNormal()) {
+  if (_isNormal()) {  // A "Normal" generic settings message.
     result += addBoolToString(getPower(), kPowerStr);
     if (getPower()) {  // Only display the rest if is in power on state.
       result += addModeToString(_.Mode, kLgAcAuto, kLgAcCool,
@@ -650,11 +792,15 @@ String IRLgAc::toString(void) const {
                                kLgAcFanAuto, kLgAcFanLowest, kLgAcFanMedium,
                                kLgAcFanMax);
     }
-  } else {
-    if (isOffCommand()) result += addBoolToString(false, kPowerStr);
-    if (isLightToggle()) result += addBoolToString(true, kLightToggleStr);
-    if (isSwingV())
-      result += addSwingVToString((uint8_t)(_swingv >> 4),
+  } else {  // It must be a special single purpose code.
+    if (isOffCommand()) {
+      result += addBoolToString(false, kPowerStr);
+    } else if (isLightToggle()) {
+      result += addBoolToString(true, kLightToggleStr);
+    } else if (isSwingH()) {
+      result += addBoolToString(_swingh, kSwingHStr);
+    } else if (isSwingV()) {
+      result += addSwingVToString((uint8_t)(_swingv >> kLgAcChecksumSize),
                                   0,  // No Auto, See "swing". Unused
                                   kLgAcSwingVHighest_Short,
                                   kLgAcSwingVHigh_Short,
@@ -666,6 +812,21 @@ String IRLgAc::toString(void) const {
                                   kLgAcSwingVOff_Short,
                                   kLgAcSwingVSwing_Short,
                                   0, 0);
+    } else if (isVaneSwingV()) {
+      const uint8_t vane = getVaneCode(_.raw) / kLgAcVaneSwingVSize;
+      result += addIntToString(vane, kVaneStr);
+      result += addSwingVToString(_vaneswingv[vane],
+                                  0,  // No Auto, See "swing". Unused
+                                  kLgAcVaneSwingVHighest,
+                                  kLgAcVaneSwingVHigh,
+                                  kLgAcVaneSwingVUpperMiddle,
+                                  kLgAcVaneSwingVMiddle,
+                                  0,  // Unused
+                                  kLgAcVaneSwingVLow,
+                                  kLgAcVaneSwingVLowest,
+                                  // Rest unused
+                                  0, 0, 0, 0);
+    }
   }
   return result;
 }
