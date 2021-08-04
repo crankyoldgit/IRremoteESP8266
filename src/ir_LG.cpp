@@ -56,7 +56,7 @@ const uint32_t kLgAcVaneSwingVBase = 0x8813200;
 #ifdef VANESWINGVPOS
 #undef VANESWINGVPOS
 #endif
-#define VANESWINGVPOS(code) (code & 0xF)
+#define VANESWINGVPOS(code) (code % kLgAcVaneSwingVSize)
 
 #if SEND_LG
 /// Send an LG formatted message. (LG)

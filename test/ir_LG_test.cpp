@@ -823,6 +823,13 @@ TEST(TestIRLgAcClass, KnownExamples) {
   EXPECT_EQ(
       "Model: 4 (AKB73757604), Vane: 2, Swing(V): 4 (Middle)",
       ac.toString());
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1531#issuecomment-892070033
+  ac.setRaw(0x88133B2);
+  ASSERT_TRUE(ac.isValidLgAc());
+  EXPECT_EQ(
+      "Model: 4 (AKB73757604), Vane: 3, Swing(V): 3 (Upper Middle)",
+      ac.toString());
 }
 
 // Verify decoding of LG2 message.
