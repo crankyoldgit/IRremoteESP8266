@@ -3016,10 +3016,10 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
   else if (!strcasecmp(str, kOffStr) ||
            !strcasecmp(str, kStopStr))
     return stdAc::swingh_t::kOff;
-  else if (!strcasecmp(str, kLeftMaxStr) ||
-           !strcasecmp(str, D_STR_LEFT " " D_STR_MAX) ||
-           !strcasecmp(str, D_STR_MAX D_STR_LEFT) ||
-           !strcasecmp(str, kMaxLeftStr))
+  else if (!strcasecmp(str, kLeftMaxStr) ||                // "LeftMax"
+           !strcasecmp(str, D_STR_LEFT " " D_STR_MAX) ||   // "Left Max"
+           !strcasecmp(str, D_STR_MAX D_STR_LEFT) ||       // "MaxLeft"
+           !strcasecmp(str, kMaxLeftStr))                  // "Max Left"
     return stdAc::swingh_t::kLeftMax;
   else if (!strcasecmp(str, kLeftStr))
     return stdAc::swingh_t::kLeft;
@@ -3031,10 +3031,10 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
     return stdAc::swingh_t::kMiddle;
   else if (!strcasecmp(str, kRightStr))
     return stdAc::swingh_t::kRight;
-  else if (!strcasecmp(str, kRightMaxStr) ||
-           !strcasecmp(str, D_STR_MAX " " D_STR_RIGHT) ||
-           !strcasecmp(str, D_STR_MAX D_STR_RIGHT) ||
-           !strcasecmp(str, kMaxRightStr))
+  else if (!strcasecmp(str, kRightMaxStr) ||               // "RightMax"
+           !strcasecmp(str, D_STR_RIGHT " " D_STR_MAX) ||  // "Right Max"
+           !strcasecmp(str, D_STR_MAX D_STR_RIGHT) ||      // "MaxRight"
+           !strcasecmp(str, kMaxRightStr))                 // "Max Right"
     return stdAc::swingh_t::kRightMax;
   else if (!strcasecmp(str, kWideStr))
     return stdAc::swingh_t::kWide;
