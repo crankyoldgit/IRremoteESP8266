@@ -252,7 +252,8 @@ TEST(TestIRac, Daikin) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Mode: 3 (Cool), Temp: 19C, Fan: 5 (High), Powerful: Off, "
+      "Model: 2 (ARC484A4), Power: On, Mode: 3 (Cool), Temp: 19C, "
+      "Fan: 5 (High), Powerful: Off, "
       "Quiet: Off, Sensor: Off, Mould: On, Comfort: Off, "
       "Swing(H): Off, Swing(V): Off, "
       "Clock: 00:00, Day: 0 (UNKNOWN), On Timer: Off, "
@@ -260,16 +261,17 @@ TEST(TestIRac, Daikin) {
 
   ac.begin();
   irac.daikin(&ac,
-              true,                        // Power
-              stdAc::opmode_t::kCool,      // Mode
-              19,                          // Celsius
-              stdAc::fanspeed_t::kMax,     // Fan speed
-              stdAc::swingv_t::kOff,       // Vertical swing
-              stdAc::swingh_t::kOff,       // Horizontal swing
-              false,                       // Quiet
-              false,                       // Turbo
-              true,                        // Filter
-              true);                       // Clean
+              daikin_ac_remote_model_t::ARC484A4,  // Model
+              true,                                // Power
+              stdAc::opmode_t::kCool,              // Mode
+              19,                                  // Celsius
+              stdAc::fanspeed_t::kMax,             // Fan speed
+              stdAc::swingv_t::kOff,               // Vertical swing
+              stdAc::swingh_t::kOff,               // Horizontal swing
+              false,                               // Quiet
+              false,                               // Turbo
+              true,                                // Filter
+              true);                               // Clean
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));

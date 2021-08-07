@@ -524,6 +524,7 @@ void IRac::corona(IRCoronaAc *ac,
 #if SEND_DAIKIN
 /// Send a Daikin A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRDaikinESP object to use.
+/// @param[in] model The A/C model to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
@@ -534,13 +535,14 @@ void IRac::corona(IRCoronaAc *ac,
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] econo Run the device in economical mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
-void IRac::daikin(IRDaikinESP *ac,
+void IRac::daikin(IRDaikinESP *ac, const daikin_ac_remote_model_t model,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                   const bool quiet, const bool turbo, const bool econo,
                   const bool clean) {
   ac->begin();
+  ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -2443,8 +2445,10 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case DAIKIN:
     {
       IRDaikinESP ac(_pin, _inverted, _modulation);
-      daikin(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-             send.swingh, send.quiet, send.turbo, send.econo, send.clean);
+      daikin(&ac, (daikin_ac_remote_model_t)send.model,
+             send.power, send.mode, degC, send.fanspeed,
+             send.swingv, send.swingh, send.quiet, send.turbo, send.econo,
+             send.clean);
       break;
     }
 #endif  // SEND_DAIKIN
@@ -3101,6 +3105,11 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return whirlpool_ac_remote_model_t::DG11J13A;
   } else if (!strcasecmp(str, "DG11J191")) {
     return whirlpool_ac_remote_model_t::DG11J191;
+  // Daikin models
+  } else if (!strcasecmp(str, "ARC433XX")) {
+    return daikin_ac_remote_model_t::ARC433XX;
+  } else if (!strcasecmp(str, "ARC484A4")) {
+    return daikin_ac_remote_model_t::ARC484A4;
   } else {
     int16_t number = atoi(str);
     if (number > 0)

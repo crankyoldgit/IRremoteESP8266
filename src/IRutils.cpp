@@ -547,6 +547,13 @@ namespace irutils {
   /// @return The resulting String.
   String modelToStr(const decode_type_t protocol, const int16_t model) {
     switch (protocol) {
+      case decode_type_t::DAIKIN:
+        switch (model) {
+          case daikin_ac_remote_model_t::ARC433XX: return F("ARC433XX");
+          case daikin_ac_remote_model_t::ARC484A4: return F("ARC484A4");
+          default: return kUnknownStr;
+        }
+        break;
       case decode_type_t::FUJITSU_AC:
         switch (model) {
           case fujitsu_ac_remote_model_t::ARRAH2E: return F("ARRAH2E");

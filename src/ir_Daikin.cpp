@@ -42,6 +42,7 @@ using irutils::addDayToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addModelToString;
 using irutils::addSwingHToString;
 using irutils::addSwingVToString;
 using irutils::addTempToString;
@@ -208,14 +209,29 @@ void IRDaikinESP::off(void) { setPower(false); }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRDaikinESP::setPower(const bool on) {
-  _.Power = on;
-}
+void IRDaikinESP::setPower(const bool on) { _.Power = on; }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRDaikinESP::getPower(void) const {
-  return _.Power;
+bool IRDaikinESP::getPower(void) const { return _.Power; }
+
+/// Set the currently emulated model of the A/C.
+/// @param[in] model An enum representing the model to support/emulate.
+void IRDaikinESP::setModel(const daikin_ac_remote_model_t model) {
+  switch (model) {
+    case daikin_ac_remote_model_t::ARC484A4:
+      _.Arc484a4 = true;
+      break;
+    default:
+      _.Arc484a4 = false;
+  }
+}
+
+/// Get the currently emulated/detected model of the A/C.
+/// @return The enum representing the model of A/C.
+daikin_ac_remote_model_t IRDaikinESP::getModel(void) const {
+  return _.Arc484a4 ? daikin_ac_remote_model_t::ARC484A4
+                    : daikin_ac_remote_model_t::ARC433XX;
 }
 
 /// Set the temperature.
@@ -531,7 +547,7 @@ stdAc::fanspeed_t IRDaikinESP::toCommonFanSpeed(const uint8_t speed) {
 stdAc::state_t IRDaikinESP::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::DAIKIN;
-  result.model = -1;  // No models used.
+  result.model = getModel();
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
@@ -558,8 +574,9 @@ stdAc::state_t IRDaikinESP::toCommon(void) const {
 /// @return A human readable string.
 String IRDaikinESP::toString(void) const {
   String result = "";
-  result.reserve(230);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(_.Power, kPowerStr, false);
+  result.reserve(255);  // Reserve some heap for the string to reduce fragging.
+  result += addModelToString(decode_type_t::DAIKIN, getModel(), false);
+  result += addBoolToString(_.Power, kPowerStr);
   result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
   result += addTempToString(_.Temp);

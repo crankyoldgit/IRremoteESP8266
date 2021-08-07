@@ -180,6 +180,13 @@ enum lg_ac_remote_model_t {
   AKB73757604,        // (4) LG2 Variant of AKB74955603
 };
 
+///< Daikin A/C model numbers
+/// @note Only used by DAIKIN protocol currently. i.e. IRDaikinESP.
+enum daikin_ac_remote_model_t {
+  ARC433XX = 1,  // (1) ARC433**, ARC466A33 (default)
+  ARC484A4,      // (2) ARC484A4 (minor variant of ARC433XX)
+};
+
 
 // Classes
 

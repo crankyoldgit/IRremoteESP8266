@@ -143,7 +143,7 @@ void carrier64(IRCarrierAc64 *ac,
               const stdAc::swingv_t swingv, const bool econo);
 #endif  // SEND_CORONA_AC
 #if SEND_DAIKIN
-  void daikin(IRDaikinESP *ac,
+  void daikin(IRDaikinESP *ac, const daikin_ac_remote_model_t model,
               const bool on, const stdAc::opmode_t mode, const float degrees,
               const stdAc::fanspeed_t fan,
               const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,

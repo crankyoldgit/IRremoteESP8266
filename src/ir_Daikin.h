@@ -23,7 +23,7 @@
 /// @see Daikin64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
 
 // Supports:
-//   Brand: Daikin,  Model: ARC433** remote (DAIKIN)
+//   Brand: Daikin,  Model: ARC433** remote (DAIKIN, ARC433XX (1))
 //   Brand: Daikin,  Model: ARC477A1 remote (DAIKIN2)
 //   Brand: Daikin,  Model: FTXZ25NV1B A/C (DAIKIN2)
 //   Brand: Daikin,  Model: FTXZ35NV1B A/C (DAIKIN2)
@@ -41,10 +41,12 @@
 //   Brand: Daikin,  Model: ARC480A5 remote (DAIKIN152)
 //   Brand: Daikin,  Model: FFN-C/FCN-F Series A/C (DAIKIN64)
 //   Brand: Daikin,  Model: DGS01 remote (DAIKIN64)
-//   Brand: Daikin,  Model: M Series A/C (DAIKIN)
-//   Brand: Daikin,  Model: FTXM-M A/C (DAIKIN)
-//   Brand: Daikin,  Model: ARC466A33 remote (DAIKIN)
+//   Brand: Daikin,  Model: M Series A/C (DAIKIN, ARC433XX (1))
+//   Brand: Daikin,  Model: FTXM-M A/C (DAIKIN, ARC433XX (1))
+//   Brand: Daikin,  Model: ARC466A33 remote (DAIKIN, ARC433XX (1))
 //   Brand: Daikin,  Model: FTWX35AXV1 A/C (DAIKIN64)
+//   Brand: Daikin,  Model: FTQ60TV16US A/C (DAIKIN, ARC484A4 (2))
+//   Brand: Daikin,  Model: ARC466A33 remote (DAIKIN, ARC484A4 (2))
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
@@ -110,9 +112,11 @@ union DaikinESPProtocol{
     uint64_t          :4;
     uint64_t Quiet    :1;
     uint64_t          :2;
-    // Byte 30~31
-    uint64_t          :0;
-
+    // Byte 30
+    uint64_t          :8;
+    // Byte 31
+    uint64_t Arc484a4 :1;  // Always `1` for ARC484A4 models. Ref: Issue#1552
+    uint64_t          :7;
     // Byte 32
     uint8_t             :1;
     uint8_t Sensor      :1;
@@ -706,6 +710,8 @@ class IRDaikinESP {
   void off(void);
   void setPower(const bool on);
   bool getPower(void) const;
+  void setModel(const daikin_ac_remote_model_t model);
+  daikin_ac_remote_model_t getModel(void) const;
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void) const;
   void setFan(const uint8_t fan);

@@ -691,7 +691,8 @@ TEST(TestDaikinClass, HumanReadable) {
   IRDaikinESP ac(kGpioUnused);
 
   EXPECT_EQ(
-      "Power: On, Mode: 4 (Heat), Temp: 15C, Fan: 11 (Quiet), "
+      "Model: 1 (ARC433XX), Power: On, Mode: 4 (Heat), "
+      "Temp: 15C, Fan: 11 (Quiet), "
       "Powerful: Off, Quiet: Off, Sensor: Off, Mould: Off, "
       "Comfort: Off, Swing(H): Off, Swing(V): Off, "
       "Clock: 00:00, Day: 0 (UNKNOWN), On Timer: Off, "
@@ -711,9 +712,11 @@ TEST(TestDaikinClass, HumanReadable) {
   ac.enableOffTimer(17 * 60 + 30);
   ac.setComfort(true);
   ac.setWeeklyTimerEnable(false);
+  ac.setModel(daikin_ac_remote_model_t::ARC484A4);
   ac.off();
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (Auto), Temp: 25C, Fan: 10 (Auto), "
+      "Model: 2 (ARC484A4), Power: Off, Mode: 0 (Auto), "
+      "Temp: 25C, Fan: 10 (Auto), "
       "Powerful: Off, Quiet: On, Sensor: On, Mould: On, Comfort: On, "
       "Swing(H): On, Swing(V): On, "
       "Clock: 09:15, Day: 4 (Wed), On Timer: 08:00, Off Timer: 17:30, "
@@ -866,7 +869,8 @@ TEST(TestDecodeDaikin, RealExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Cool), Temp: 29C, Fan: 10 (Auto), Powerful: On, "
+      "Model: 1 (ARC433XX), Power: On, Mode: 3 (Cool), Temp: 29C, "
+      "Fan: 10 (Auto), Powerful: On, "
       "Quiet: Off, Sensor: Off, Mould: Off, Comfort: Off, "
       "Swing(H): Off, Swing(V): Off, "
       "Clock: 22:18, Day: 0 (UNKNOWN), "
@@ -899,7 +903,8 @@ TEST(TestDecodeDaikin, ShortSyntheticExample) {
   EXPECT_STATE_EQ(longState, irsend.capture.state, irsend.capture.bits);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Cool), Temp: 29C, Fan: 10 (Auto), Powerful: On, "
+      "Model: 1 (ARC433XX), Power: On, Mode: 3 (Cool), Temp: 29C, "
+      "Fan: 10 (Auto), Powerful: On, "
       "Quiet: Off, Sensor: Off, Mould: Off, Comfort: Off, "
       "Swing(H): Off, Swing(V): Off, "
       "Clock: 22:18, Day: 0 (UNKNOWN), "
@@ -928,7 +933,8 @@ TEST(TestDecodeDaikin, LongSyntheticExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Mode: 3 (Cool), Temp: 29C, Fan: 10 (Auto), Powerful: On, "
+      "Model: 1 (ARC433XX), Power: On, Mode: 3 (Cool), Temp: 29C, "
+      "Fan: 10 (Auto), Powerful: On, "
       "Quiet: Off, Sensor: Off, Mould: Off, Comfort: Off, "
       "Swing(H): Off, Swing(V): Off, "
       "Clock: 22:18, Day: 0 (UNKNOWN), "
@@ -1517,6 +1523,14 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(decode_type_t::DAIKIN, strToDecodeType("DAIKIN"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN));
+  ASSERT_EQ(daikin_ac_remote_model_t::ARC433XX,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::DAIKIN,
+                daikin_ac_remote_model_t::ARC433XX).c_str()));
+  ASSERT_EQ(daikin_ac_remote_model_t::ARC484A4,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::DAIKIN,
+                daikin_ac_remote_model_t::ARC484A4).c_str()));
 
   ASSERT_EQ("DAIKIN128", typeToString(decode_type_t::DAIKIN128));
   ASSERT_EQ(decode_type_t::DAIKIN128, strToDecodeType("DAIKIN128"));
@@ -1965,7 +1979,7 @@ TEST(TestDaikinClass, toCommon) {
   ac.setMold(true);
   // Now test it.
   ASSERT_EQ(decode_type_t::DAIKIN, ac.toCommon().protocol);
-  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_EQ(1, ac.toCommon().model);
   ASSERT_TRUE(ac.toCommon().power);
   ASSERT_TRUE(ac.toCommon().celsius);
   ASSERT_EQ(20, ac.toCommon().degrees);
@@ -1983,6 +1997,9 @@ TEST(TestDaikinClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+  // Different Model
+  ac.setModel(daikin_ac_remote_model_t::ARC484A4);
+  ASSERT_EQ(2, ac.toCommon().model);
 }
 
 TEST(TestDaikin2Class, toCommon) {
@@ -3878,4 +3895,57 @@ TEST(TestDaikin176Class, UnitId) {
   ac.setId(0);
   ASSERT_EQ(0, ac.getId());
   EXPECT_STATE_EQ(unita, ac.getRaw(), kDaikin176Bits);
+}
+
+TEST(TestDaikinClass, Models) {
+  IRDaikinESP ac(kGpioUnused);
+  ac.begin();
+  EXPECT_EQ(daikin_ac_remote_model_t::ARC433XX, ac.getModel());
+  ac.setModel(daikin_ac_remote_model_t::ARC484A4);
+  EXPECT_EQ(daikin_ac_remote_model_t::ARC484A4, ac.getModel());
+  ac.setModel(daikin_ac_remote_model_t::ARC433XX);
+  EXPECT_EQ(daikin_ac_remote_model_t::ARC433XX, ac.getModel());
+
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1552#issue-963181670
+  const uint8_t ARC484A4_remote_off[kDaikinStateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0xC5, 0x00, 0x10, 0xE7,
+      0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x38, 0x28, 0x00, 0xA0, 0x00, 0x00, 0x06,
+      0x60, 0x00, 0x00, 0xC1, 0x80, 0x00, 0xB9};
+  ac.setRaw(ARC484A4_remote_off);
+  EXPECT_EQ(daikin_ac_remote_model_t::ARC484A4, ac.getModel());
+  const char expected[] =
+      "Model: 2 (ARC484A4), Power: Off, Mode: 3 (Cool), Temp: 20C, "
+      "Fan: 10 (Auto), Powerful: Off, Quiet: Off, Sensor: Off, Mould: Off, "
+      "Comfort: On, Swing(H): Off, Swing(V): Off, Clock: 00:00, "
+      "Day: 0 (UNKNOWN), On Timer: Off, Off Timer: Off, Weekly Timer: Off";
+  EXPECT_EQ(expected, ac.toString());
+}
+
+TEST(TestDaikinClass, ConstructARC484A4Message) {
+  IRDaikinESP ac(kGpioUnused);
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1552#issue-963181670
+  const uint8_t ARC484A4_remote_off[kDaikinStateLength] = {
+      0x11, 0xDA, 0x27, 0x00, 0xC5, 0x00, 0x10, 0xE7,
+      0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54,
+      0x11, 0xDA, 0x27, 0x00, 0x00, 0x38, 0x28, 0x00, 0xA0, 0x00, 0x00, 0x06,
+      0x60, 0x00, 0x00, 0xC1, 0x80, 0x00, 0xB9};
+  ac.begin();
+  ac.setModel(daikin_ac_remote_model_t::ARC484A4);
+  ac.setPower(false);
+  ac.setMode(3);
+  ac.setFan(10);
+  ac.setTemp(20);
+  ac.setPowerful(false);
+  ac.setMold(false);
+  ac.setComfort(true);
+  ac.setWeeklyTimerEnable(false);
+  const char expected[] =
+      "Model: 2 (ARC484A4), Power: Off, Mode: 3 (Cool), Temp: 20C, "
+      "Fan: 10 (Auto), Powerful: Off, Quiet: Off, Sensor: Off, Mould: Off, "
+      "Comfort: On, Swing(H): Off, Swing(V): Off, Clock: 00:00, "
+      "Day: 0 (UNKNOWN), On Timer: Off, Off Timer: Off, Weekly Timer: Off";
+  EXPECT_EQ(expected, ac.toString());
+  ASSERT_EQ(kDaikinStateLength * 8, kDaikinBits);
+  EXPECT_STATE_EQ(ARC484A4_remote_off, ac.getRaw(), kDaikinBits);
 }
