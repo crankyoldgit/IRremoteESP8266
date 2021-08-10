@@ -201,10 +201,13 @@ union SanyoAc88Protocol{
     uint8_t Filter           :1;
     uint8_t SwingV           :1;
     uint8_t                  :1;
-    // Byte 4-9  (Timer times?)
-    uint8_t                  :8;
-    uint8_t                  :8;
-    uint8_t                  :8;
+    // Byte 4
+    uint8_t ClockSecs        :8;  // Nr. of Seconds
+    // Byte 5
+    uint8_t ClockMins        :8;  // Nr. of Minutes
+    // Byte 6
+    uint8_t ClockHrs         :8;  // Nr. of Hours
+    // Byte 7-9  (Timer times?)
     uint8_t                  :8;
     uint8_t                  :8;
     uint8_t                  :8;
@@ -252,6 +255,8 @@ class IRSanyoAc88 {
   bool getFilter(void) const;
   void setSwingV(const bool on);
   bool getSwingV(void) const;
+  uint16_t getClock(void) const;
+  void setClock(const uint16_t mins_since_midnight);
   void setRaw(const uint8_t newState[]);
   uint8_t* getRaw(void);
   static uint8_t convertMode(const stdAc::opmode_t mode);

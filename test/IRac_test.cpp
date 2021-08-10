@@ -1554,7 +1554,7 @@ TEST(TestIRac, Sanyo88) {
   IRrecv capture(kGpioUnused);
   const char expected[] =
       "Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 2 (Medium), Swing(V): On, "
-      "Turbo: On, Sleep: On";
+      "Turbo: On, Sleep: On, Clock: 11:40";
 
   ac.begin();
   irac.sanyo88(&ac,
@@ -1565,7 +1565,8 @@ TEST(TestIRac, Sanyo88) {
                stdAc::swingv_t::kAuto,       // Vertical Swing
                true,                         // Turbo
                true,                         // Filter
-               17);                          // Sleep
+               17,                           // Sleep
+               11 * 60 + 40);                // Clock
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));

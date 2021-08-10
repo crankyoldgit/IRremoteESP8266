@@ -596,7 +596,7 @@ TEST(TestDecodeSanyoAc88, DecodeRealExamples) {
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 24C, Fan: 0 (Auto), Swing(V): Off, "
-      "Turbo: Off, Sleep: Off",
+      "Turbo: Off, Sleep: Off, Clock: 18:42",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -617,7 +617,7 @@ TEST(TestDecodeSanyoAc88, SyntheticSelfDecode) {
   EXPECT_FALSE(irsend.capture.repeat);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 24C, Fan: 0 (Auto), Swing(V): Off, "
-      "Turbo: Off, Sleep: Off",
+      "Turbo: Off, Sleep: Off, Clock: 18:42",
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
       "f38000d50"
@@ -803,4 +803,20 @@ TEST(TestSanyoAc88Class, OperatingMode) {
 
   ac.setMode(255);
   EXPECT_EQ(kSanyoAc88Auto, ac.getMode());
+}
+
+TEST(TestSanyoAc88Class, Clock) {
+  IRSanyoAc88 ac(kGpioUnused);
+  ac.begin();
+
+  EXPECT_EQ(0, ac.getClock());
+
+  ac.setClock(21 * 60 + 19);
+  EXPECT_EQ(21 * 60 + 19, ac.getClock());
+
+  ac.setClock(0);
+  EXPECT_EQ(0, ac.getClock());
+
+  ac.setClock(25 * 60 + 61);
+  EXPECT_EQ(23 * 60 + 59, ac.getClock());
 }

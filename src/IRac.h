@@ -398,7 +398,8 @@ void electra(IRElectraAc *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv, const bool turbo,
-                   const bool filter, const int16_t sleep = -1);
+                   const bool filter,
+                   const int16_t sleep = -1, const int16_t clock = -1);
 #endif  // SEND_SANYO_AC88
 #if SEND_SHARP_AC
   void sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,

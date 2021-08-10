@@ -1818,11 +1818,13 @@ void IRac::sanyo(IRSanyoAc *ac,
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
+/// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
 void IRac::sanyo88(IRSanyoAc88 *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv, const bool turbo,
-                   const bool filter, const int16_t sleep) {
+                   const bool filter, const int16_t sleep,
+                   const int16_t clock) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -1838,7 +1840,7 @@ void IRac::sanyo88(IRSanyoAc88 *ac,
   // No Clean setting available.
   // No Beep setting available.
   ac->setSleep(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
-  // No Clock setting available.
+  if (clock >= 0) ac->setClock(clock);
   ac->send();
 }
 #endif  // SEND_SANYO_AC88
@@ -2842,7 +2844,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRSanyoAc88 ac(_pin, _inverted, _modulation);
       sanyo88(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-              send.turbo, send.filter, send.sleep);
+              send.turbo, send.filter, send.sleep, send.clock);
       break;
     }
 #endif  // SEND_SANYO_AC88

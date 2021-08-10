@@ -315,8 +315,7 @@ IRSanyoAc::IRSanyoAc(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
-/// Reset the state of the remote to a known good state/sequence.
-/// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?ts=5f0190a5#gid=1050142776&range=A2:B2
+/// Reset the state of the remote to a known  state/sequence.
 void IRSanyoAc::stateReset(void) {
   static const uint8_t kReset[kSanyoAcStateLength] = {
     0x6A, 0x6D, 0x51, 0x00, 0x10, 0x45, 0x00, 0x00, 0x33};
@@ -748,7 +747,7 @@ IRSanyoAc88::IRSanyoAc88(const uint16_t pin, const bool inverted,
 /// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?ts=5f0190a5#gid=1050142776&range=A2:B2
 void IRSanyoAc88::stateReset(void) {
   static const uint8_t kReset[kSanyoAc88StateLength] = {
-    0xAA, 0x55, 0xA0, 0x16, 0x0F, 0x21, 0x01, 0x01, 0x00, 0x00, 0x10};
+    0xAA, 0x55, 0xA0, 0x16, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x10};
   std::memcpy(_.raw, kReset, kSanyoAc88StateLength);
 }
 
@@ -874,6 +873,21 @@ uint8_t IRSanyoAc88::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
+/// Get the current clock time.
+/// @return The time as the nr. of minutes past midnight.
+uint16_t IRSanyoAc88::getClock(void) const {
+  return _.ClockHrs * 60 + _.ClockMins;
+}
+
+/// Set the current clock time.
+/// @param[in] mins_since_midnight The time as nr. of minutes past midnight.
+void IRSanyoAc88::setClock(const uint16_t mins_since_midnight) {
+  uint16_t mins = std::min(mins_since_midnight, (uint16_t)(23 * 60 + 59));
+  _.ClockMins = mins % 60;
+  _.ClockHrs = mins / 60;
+  _.ClockSecs = 0;
+}
+
 /// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] spd The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
@@ -933,6 +947,7 @@ stdAc::state_t IRSanyoAc88::toCommon(void) const {
   result.filter = _.Filter;
   result.turbo = _.Turbo;
   result.sleep = _.Sleep ? 0 : -1;
+  result.clock = getClock();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.econo = false;
@@ -940,7 +955,6 @@ stdAc::state_t IRSanyoAc88::toCommon(void) const {
   result.quiet = false;
   result.beep = false;
   result.clean = false;
-  result.clock = -1;
   return result;
 }
 
@@ -948,7 +962,7 @@ stdAc::state_t IRSanyoAc88::toCommon(void) const {
 /// @return A human readable string.
 String IRSanyoAc88::toString(void) const {
   String result = "";
-  result.reserve(100);
+  result.reserve(115);
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(_.Mode, kSanyoAc88Auto, kSanyoAc88Cool,
                             kSanyoAc88Heat, kSanyoAc88Auto, kSanyoAc88Fan);
@@ -959,5 +973,6 @@ String IRSanyoAc88::toString(void) const {
   result += addBoolToString(_.SwingV, kSwingVStr);
   result += addBoolToString(_.Turbo, kTurboStr);
   result += addBoolToString(_.Sleep, kSleepStr);
+  result += addLabeledString(minsToString(getClock()), kClockStr);
   return result;
 }
