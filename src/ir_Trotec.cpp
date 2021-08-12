@@ -25,6 +25,12 @@ const uint16_t kTrotecZeroSpace = 592;
 const uint16_t kTrotecGap = 6184;
 const uint16_t kTrotecGapEnd = 1500;  // made up value
 
+const uint16_t kTrotec3550HdrMark = 12000;
+const uint16_t kTrotec3550HdrSpace = 5130;
+const uint16_t kTrotec3550BitMark = 550;
+const uint16_t kTrotec3550OneSpace = 1950;
+const uint16_t kTrotec3550ZeroSpace = 500;
+
 using irutils::addBoolToString;
 using irutils::addFanToString;
 using irutils::addIntToString;
@@ -338,3 +344,50 @@ bool IRrecv::decodeTrotec(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_TROTEC
+
+#if SEND_TROTEC_3550
+/// Send a Trotec 3550 message.
+/// Status: Alpha / Untested.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+void IRsend::sendTrotec3550(const unsigned char data[], const uint16_t nbytes,
+                            const uint16_t repeat) {
+  sendGeneric(kTrotec3550HdrMark, kTrotec3550HdrSpace,
+              kTrotec3550BitMark, kTrotec3550OneSpace,
+              kTrotec3550BitMark, kTrotec3550ZeroSpace,
+              kTrotec3550BitMark, kDefaultMessageGap,
+              data, nbytes, 38, true, repeat, kDutyDefault);
+}
+#endif  // SEND_TROTEC_3550
+
+#if DECODE_TROTEC_3550
+/// Decode the supplied Trotec 3550 message.
+/// Status: ALPHA / Untested.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+bool IRrecv::decodeTrotec3550(decode_results *results, uint16_t offset,
+                              const uint16_t nbits, const bool strict) {
+  if (strict && nbits != kTrotecBits) return false;
+
+  // Header + Data + Footer
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kTrotec3550HdrMark, kTrotec3550HdrSpace,
+                    kTrotec3550BitMark, kTrotec3550OneSpace,
+                    kTrotec3550BitMark, kTrotec3550ZeroSpace,
+                    kTrotec3550BitMark, kDefaultMessageGap)) return false;
+
+  // Success
+  results->decode_type = TROTEC_3550;
+  results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_TROTEC_3550

@@ -7,8 +7,9 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1176
 
 // Supports:
-//   Brand: Trotec,  Model: PAC 3200 A/C
-//   Brand: Duux,  Model: Blizzard Smart 10K / DXMA04 A/C
+//   Brand: Trotec,  Model: PAC 3200 A/C (TROTEC)
+//   Brand: Trotec,  Model: PAC 3550 Pro A/C (TROTEC_3550)
+//   Brand: Duux,  Model: Blizzard Smart 10K / DXMA04 A/C (TROTEC)
 
 #ifndef IR_TROTEC_H_
 #define IR_TROTEC_H_
@@ -73,6 +74,41 @@ const uint8_t kTrotecDefTemp = 25;
 const uint8_t kTrotecMaxTemp = 32;
 
 const uint8_t kTrotecMaxTimer = 23;
+
+/// Native representation of a Trotec 3550 A/C message.
+union Trotec3550Protocol{
+  uint8_t raw[kTrotecStateLength];  ///< Remote state in IR code form.
+  struct {
+    // Byte 0
+    uint8_t Intro:    8;  // fixed value (0x55)
+    // Byte 1
+    uint8_t SwingV   :1;
+    uint8_t Power    :1;
+    uint8_t          :1;  // Unknown
+    uint8_t TimerSet :1;
+    uint8_t Temp     :4;  // Temp +16 for degC)
+    // Byte 2
+    uint8_t          :8;  // Unknown
+    // Byte 3
+    uint8_t          :1;  // Unknown
+    uint8_t Temp2    :4;  // Temp +16 for degC)
+    uint8_t          :3;  // Unknown
+    // Byte 4
+    uint8_t          :8;  // Unknown
+    // Byte 5
+    uint8_t          :8;  // Unknown
+    // Byte 6
+    uint8_t Mode     :2;
+    uint8_t          :2;  // Unknown
+    uint8_t Fan      :2;
+    uint8_t          :2;  // Unknown
+    // Byte 7
+    uint8_t          :7;  // Unknown
+    uint8_t Celsius  :1;  // DegC or DegF
+    // Byte 8
+    uint8_t Sum      :8;
+  };
+};
 
 // Legacy defines. (Deprecated)
 #define TROTEC_AUTO kTrotecAuto

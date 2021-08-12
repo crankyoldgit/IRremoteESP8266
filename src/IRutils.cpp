@@ -182,6 +182,7 @@ bool hasACState(const decode_type_t protocol) {
     case TEKNOPOINT:
     case TOSHIBA_AC:
     case TROTEC:
+    case TROTEC_3550:
     case VOLTAS:
     case WHIRLPOOL_AC:
       return true;

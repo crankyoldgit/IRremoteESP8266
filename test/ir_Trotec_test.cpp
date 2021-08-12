@@ -178,4 +178,68 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(decode_type_t::TROTEC, strToDecodeType("TROTEC"));
   ASSERT_TRUE(hasACState(decode_type_t::TROTEC));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::TROTEC));
+
+  ASSERT_EQ("TROTEC_3550", typeToString(decode_type_t::TROTEC_3550));
+  ASSERT_EQ(decode_type_t::TROTEC_3550, strToDecodeType("TROTEC_3550"));
+  ASSERT_TRUE(hasACState(decode_type_t::TROTEC_3550));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::TROTEC_3550));
+}
+
+
+TEST(TestDecodeTrotec3550, RealDecode) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  // Data from:
+  // https://docs.google.com/spreadsheets/d/1j4H1TDJ2QRFLPnls_sxkTZ3c9922TWxqIxwyGWwBIn0/edit#gid=2015400244&range=F8:EV8
+  const uint16_t rawData[147] = {
+      12005, 5130,
+      545, 500, 600, 1950, 540, 500, 595, 1950, 545, 500, 595, 1950, 545, 500,
+      595, 1950, 550, 495, 545, 495, 595, 1950, 545, 500, 545, 500, 540, 500,
+      600, 1950, 590, 1950, 545, 500, 540, 500, 545, 500, 545, 495, 545, 500,
+      545, 500, 545, 500, 540, 500, 545, 495, 545, 500, 545, 500, 545, 500,
+      540, 500, 595, 1950, 520, 520, 595, 1950, 545, 500, 540, 500, 545, 525,
+      515, 500, 545, 520, 520, 525, 520, 500, 540, 525, 520, 500, 540, 500,
+      545, 500, 540, 500, 545, 520, 525, 495, 520, 520, 545, 500, 570, 475,
+      540, 505, 590, 1950, 595, 1950, 545, 500, 540, 500, 570, 470, 595, 1950,
+      570, 1975, 545, 500, 545, 500, 545, 520, 570, 1950, 550, 495, 545, 500,
+      545, 495, 570, 470, 550, 495, 595, 1950, 570, 1975, 545, 525, 570, 1950,
+      595, 1950, 565, 475, 545};
+  const uint8_t expectedState[kTrotecStateLength] = {
+      0x55, 0x23, 0x00, 0x05, 0x00, 0x00, 0x31, 0x88, 0x36};
+  irsend.reset();
+  irsend.sendRaw(rawData, 147, 38000);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::TROTEC_3550, irsend.capture.decode_type);
+  EXPECT_EQ(kTrotecBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+TEST(TestDecodeTrotec3550, SyntheticDecode) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  // Synthesised Normal Trotec message.
+  irsend.reset();
+  const uint8_t expectedState[kTrotecStateLength] = {
+      0x55, 0x23, 0x00, 0x05, 0x00, 0x00, 0x31, 0x88, 0x36};
+  irsend.sendTrotec3550(expectedState);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::TROTEC_3550, irsend.capture.decode_type);
+  EXPECT_EQ(kTrotecBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }

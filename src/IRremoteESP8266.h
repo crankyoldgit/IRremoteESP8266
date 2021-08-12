@@ -349,6 +349,13 @@
 #define SEND_TROTEC            _IR_ENABLE_DEFAULT_
 #endif  // SEND_TROTEC
 
+#ifndef DECODE_TROTEC_3550
+#define DECODE_TROTEC_3550     _IR_ENABLE_DEFAULT_
+#endif  // DECODE_TROTEC_3550
+#ifndef SEND_TROTEC_3550
+#define SEND_TROTEC_3550       _IR_ENABLE_DEFAULT_
+#endif  // SEND_TROTEC_3550
+
 #ifndef DECODE_NIKAI
 #define DECODE_NIKAI           _IR_ENABLE_DEFAULT_
 #endif  // DECODE_NIKAI
@@ -782,7 +789,7 @@
      DECODE_MITSUBISHI112 || DECODE_HITACHI_AC424 || DECODE_HITACHI_AC3 || \
      DECODE_HITACHI_AC344 || DECODE_CORONA_AC || DECODE_SANYO_AC || \
      DECODE_VOLTAS || DECODE_MIRAGE || DECODE_HAIER_AC176 || \
-     DECODE_TEKNOPOINT || DECODE_KELON || \
+     DECODE_TEKNOPOINT || DECODE_KELON || DECODE_TROTEC_3550 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -926,8 +933,9 @@ enum decode_type_t {
   HAIER_AC176,
   TEKNOPOINT,
   KELON,
+  TROTEC_3550,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = KELON,
+  kLastDecodeType = TROTEC_3550,
 };
 
 // Message lengths & required repeat values

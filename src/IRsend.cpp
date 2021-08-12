@@ -748,6 +748,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case TOSHIBA_AC:
       return kToshibaACBits;
     case TROTEC:
+    case TROTEC_3550:
       return kTrotecBits;
     case VOLTAS:
       return kVoltasBits;
@@ -1271,6 +1272,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendTrotec(state, nbytes);
       break;
 #endif  // SEND_TROTEC
+#if SEND_TROTEC_3550
+    case TROTEC_3550:
+      sendTrotec3550(state, nbytes);
+      break;
+#endif  // SEND_TROTEC_3550
 #if SEND_WHIRLPOOL_AC
     case WHIRLPOOL_AC:
       sendWhirlpoolAC(state, nbytes);

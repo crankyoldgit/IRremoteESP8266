@@ -500,6 +500,11 @@ class IRrecv {
                     const uint16_t nbits = kTrotecBits,
                     const bool strict = true);
 #endif  // DECODE_TROTEC
+#if DECODE_TROTEC_3550
+  bool decodeTrotec3550(decode_results *results, uint16_t offset = kStartOffset,
+                        const uint16_t nbits = kTrotecBits,
+                        const bool strict = true);
+#endif  // DECODE_TROTEC_3550
 #if DECODE_MIDEA
   bool decodeMidea(decode_results *results, uint16_t offset = kStartOffset,
                    const uint16_t nbits = kMideaBits,
