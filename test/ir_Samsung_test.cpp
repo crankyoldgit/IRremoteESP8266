@@ -1270,6 +1270,8 @@ TEST(TestDecodeSamsung36, SyntheticExample) {
 }
 
 // https://github.com/crankyoldgit/IRremoteESP8266/issues/604
+// This has been superceeded in a way by the ability to calculate extended msg
+// checksums correctly. See #1484, #1538, & #1554
 TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
   IRSamsungAc ac(0);
   ac.begin();
@@ -1277,7 +1279,7 @@ TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
 
   std::string freqduty = "f38000d50";
 
-  std::string poweron =
+  std::string settings_section1 =
       "m690s17844"
       "m3086s8864"
       "m586s436m586s1432m586s436m586s436m586s436m586s436m586s436m586s436"
@@ -1287,36 +1289,8 @@ TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
       "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
       "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
       "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
-      "m586s2886"
-      "m3086s8864"
-      "m586s1432m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s436m586s1432m586s436m586s436m586s1432m586s436m586s1432m586s1432"
-      "m586s1432m586s1432m586s1432m586s1432m586s436m586s436m586s436m586s436"
-      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s2886"
-      "m3086s8864"
-      "m586s1432m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s436m586s1432m586s436m586s436m586s436m586s1432m586s1432m586s1432"
-      "m586s436m586s1432m586s1432m586s1432m586s1432m586s1432m586s1432m586s1432"
-      "m586s1432m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s436"
-      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s1432"
-      "m586s1432m586s436m586s436m586s436m586s1432m586s436m586s436m586s436"
-      "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
-      "m586s100000";
-  std::string settings =
-      "m690s17844"
-      "m3086s8864"
-      "m586s436m586s1432m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s436m586s1432m586s436m586s436m586s1432m586s436m586s436m586s1432"
-      "m586s1432m586s1432m586s1432m586s1432m586s436m586s436m586s436m586s436"
-      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
-      "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
-      "m586s2886"
+      "m586s2886";
+  std::string settings_section2 =
       "m3086s8864"
       "m586s1432m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
       "m586s436m586s1432m586s436m586s436m586s1432m586s436m586s1432m586s1432"
@@ -1326,6 +1300,16 @@ TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
       "m586s1432m586s436m586s436m586s1432m586s1432m586s436m586s436m586s436"
       "m586s436m586s436m586s436m586s436m586s1432m586s1432m586s1432m586s1432"
       "m586s100000";
+  std::string extended_section =
+      "m3086s8864"
+      "m586s1432m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s1432m586s436m586s436m586s1432m586s436m586s1432m586s1432"
+      "m586s1432m586s1432m586s1432m586s1432m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s436m586s436m586s436m586s436m586s436m586s436m586s436m586s436"
+      "m586s2886";
   std::string text = "Power: On, Mode: 1 (Cool), Temp: 23C, Fan: 4 (Med), "
                      "Swing: On, Beep: Off, Clean: Off, Quiet: Off, "
                      "Powerful: Off, Breeze: Off, Light: On, Ion: Off";
@@ -1336,33 +1320,38 @@ TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
   ac.setFan(kSamsungAcFanMed);
   ac.send();
   EXPECT_EQ(text, ac.toString());
-  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
+  EXPECT_EQ(freqduty + settings_section1 + settings_section2,
+            ac._irsend.outputStr());
   // Ensure the power state is changed by changing it and sending it.
   ac.off();
   ac.send();
   ac._irsend.reset();  // Clear the capture buffer.
   // Now trigger a special power message by using a power method.
   ac.on();
-  ac.send();  // This should result in two messages. 1 x extended + 1 x normal.
+  ac.send();  // This should result in an extended message.
   EXPECT_EQ(text, ac.toString());
-  EXPECT_EQ(freqduty + poweron + settings, ac._irsend.outputStr());
+  EXPECT_EQ(freqduty + settings_section1 + extended_section + settings_section2,
+            ac._irsend.outputStr());
   ac._irsend.reset();  // Clear the capture buffer.
   // Subsequent sending should be just the "settings" message.
   ac.send();
   EXPECT_EQ(text, ac.toString());
-  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
+  EXPECT_EQ(freqduty + settings_section1 + settings_section2,
+            ac._irsend.outputStr());
   ac._irsend.reset();  // Clear the capture buffer.
   ac.setPower(true);  // Note: The power state hasn't changed from previous.
   ac.send();  // This should result in a normal setting message.
   EXPECT_EQ(text, ac.toString());
-  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
+  EXPECT_EQ(freqduty + settings_section1 + settings_section2,
+            ac._irsend.outputStr());
 
   ac._irsend.reset();  // Clear the capture buffer.
   ac.setPower(false);
   ac.setPower(true);  // Note: The power state hasn't changed from the last sent
   ac.send();  // This should result in a normal setting message.
   EXPECT_EQ(text, ac.toString());
-  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
+  EXPECT_EQ(freqduty + settings_section1 + settings_section2,
+            ac._irsend.outputStr());
 
   ac.stateReset();  // Normal `stateReset` defaults to send the power message
                     // on first send.
@@ -1372,11 +1361,13 @@ TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
   ac.setFan(kSamsungAcFanMed);
   ac.send();
   EXPECT_EQ(text, ac.toString());
-  EXPECT_EQ(freqduty + poweron + settings, ac._irsend.outputStr());
+  EXPECT_EQ(freqduty + settings_section1 + extended_section + settings_section2,
+            ac._irsend.outputStr());
   ac._irsend.reset();  // Clear the capture buffer.
   ac.send();  // Subsequent send() should just be a settings message.
   EXPECT_EQ(text, ac.toString());
-  EXPECT_EQ(freqduty + settings, ac._irsend.outputStr());
+  EXPECT_EQ(freqduty + settings_section1 + settings_section2,
+            ac._irsend.outputStr());
 }
 
 TEST(TestIRSamsungAcClass, toCommon) {
