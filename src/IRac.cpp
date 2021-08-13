@@ -280,6 +280,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_TROTEC
     case decode_type_t::TROTEC:
 #endif
+#if SEND_TROTEC_3550
+    case decode_type_t::TROTEC_3550:
+#endif  // SEND_TROTEC_3550
 #if SEND_TRUMA
     case decode_type_t::TRUMA:
 #endif  // SEND_TRUMA
@@ -2031,6 +2034,39 @@ void IRac::trotec(IRTrotecESP *ac,
 }
 #endif  // SEND_TROTEC
 
+#if SEND_TROTEC_3550
+/// Send a Trotec 3550 A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRTrotecESP object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+void IRac::trotec3550(IRTrotec3550 *ac,
+                      const bool on, const stdAc::opmode_t mode,
+                      const bool celsius, const float degrees,
+                      const stdAc::fanspeed_t fan,
+                      const stdAc::swingv_t swingv) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees, celsius);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(swingv != stdAc::swingv_t::kOff);
+  // No Horizontal swing setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_TROTEC_3550
+
 #if SEND_TRUMA
 /// Send a Truma A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRTrumaAc object to use.
@@ -2817,6 +2853,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_TROTEC
+#if SEND_TROTEC_3550
+    case TROTEC_3550:
+    {
+      IRTrotec3550 ac(_pin, _inverted, _modulation);
+      trotec3550(&ac, send.power, send.mode, send.celsius, send.degrees,
+                 send.fanspeed, send.swingv);
+      break;
+    }
+#endif  // SEND_TROTEC_3550
 #if SEND_TRUMA
     case TRUMA:
     {
@@ -3421,6 +3466,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_TROTEC
+#if DECODE_TROTEC_3550
+      case decode_type_t::TROTEC_3550: {
+        IRTrotec3550 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_TROTEC_3550
 #if DECODE_TRUMA
       case decode_type_t::TRUMA: {
         IRTrumaAc ac(kGpioUnused);
@@ -4002,6 +4054,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_TROTEC
+#if DECODE_TROTEC_3550
+      case decode_type_t::TROTEC_3550: {
+        IRTrotec3550 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_TROTEC_3550
 #if DECODE_TRUMA
       case decode_type_t::TRUMA: {
         IRTrumaAc ac(kGpioUnused);

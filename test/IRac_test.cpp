@@ -1829,6 +1829,36 @@ TEST(TestIRac, Trotec) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
+TEST(TestIRac, Trotec3550) {
+  IRTrotec3550 ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On";
+
+  ac.begin();
+  irac.trotec3550(&ac,
+                  true,                        // Power
+                  stdAc::opmode_t::kCool,      // Mode
+                  true,                        // Celsius
+                  18,                          // Degrees
+                  stdAc::fanspeed_t::kHigh,    // Fan speed
+                  stdAc::swingv_t::kAuto);     // Vertical Swing
+  EXPECT_TRUE(ac.getPower());
+  EXPECT_EQ(kTrotecCool, ac.getMode());
+  EXPECT_EQ(18, ac.getTemp());
+  EXPECT_EQ(kTrotecFanHigh, ac.getFan());
+  EXPECT_TRUE(ac.getSwingV());
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(TROTEC_3550, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kTrotecBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
 TEST(TestIRac, Truma) {
   IRTrumaAc ac(kGpioUnused);
   IRac irac(kGpioUnused);

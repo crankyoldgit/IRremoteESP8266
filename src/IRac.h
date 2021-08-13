@@ -431,6 +431,12 @@ void electra(IRElectraAc *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,
               const stdAc::fanspeed_t fan, const int16_t sleep = -1);
 #endif  // SEND_TROTEC
+#if SEND_TROTEC_3550
+  void trotec3550(IRTrotec3550 *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const bool celsius, const float degrees,
+                  const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv);
+#endif  // SEND_TROTEC_3550
 #if SEND_TRUMA
   void truma(IRTrumaAc *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,
