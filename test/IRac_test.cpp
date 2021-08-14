@@ -1514,14 +1514,9 @@ TEST(TestIRac, Samsung) {
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+  // We expect an extended state because of `dopower`.
   ASSERT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
-  // However, we expect a plain "on" state as it should be sent before the
-  // desired state.
-  char expected_on[] =
-      "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 0 (Auto), Swing: Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off";
-  ASSERT_EQ(expected_on, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 

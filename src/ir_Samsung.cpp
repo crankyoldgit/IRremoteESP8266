@@ -280,8 +280,8 @@ IRSamsungAc::IRSamsungAc(const uint16_t pin, const bool inverted,
 /// @param[in] initialPower Set the initial power state. True, on. False, off.
 void IRSamsungAc::stateReset(const bool forcepower, const bool initialPower) {
   static const uint8_t kReset[kSamsungAcExtendedStateLength] = {
-      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0, 0x01, 0x02, 0xAE, 0x71, 0x00,
-      0x15, 0xF0};
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0x02, 0xAE, 0x71, 0x00, 0x15, 0xF0};
   std::memcpy(_.raw, kReset, kSamsungAcExtendedStateLength);
   _forcepower = forcepower;
   _lastsentpowerstate = initialPower;
@@ -355,18 +355,14 @@ void IRSamsungAc::checksum(void) {
 /// @note Use for most function/mode/settings changes to the unit.
 ///   i.e. When the device is already running.
 void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
-  if (calcchecksum) checksum();
-  // Do we need to send a the special power on/off message?
-  if (getPower() != _lastsentpowerstate || _forcepower) {
-    _forcepower = false;  // It will now been sent, so clear the flag if set.
-    if (getPower()) {
-      sendOn(repeat);
-    } else {
-      sendOff(repeat);
-      return;  // No point sending anything else if we are turning the unit off.
-    }
+  // Do we need to send a the special power on/off message? i.e. An Extended Msg
+  if (getPower() != _lastsentpowerstate || _forcepower) {  // We do.
+    sendExtended(repeat, calcchecksum);
+    _forcepower = false;  // It has now been sent, so clear the flag if set.
+  } else {  // No, it's just a normal message.
+    if (calcchecksum) checksum();
+    _irsend.sendSamsungAC(_.raw, kSamsungAcStateLength, repeat);
   }
-  _irsend.sendSamsungAC(_.raw, kSamsungAcStateLength, repeat);
 }
 
 /// Send the extended current internal state as an IR message.
@@ -376,20 +372,24 @@ void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
 /// Samsung A/C requires an extended length message when you want to
 /// change the power operating mode of the A/C unit.
 void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
+  static const uint8_t extended_middle_section[kSamsungAcSectionLength] = {
+      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00};
   if (calcchecksum) checksum();
-  uint8_t extended_state[kSamsungAcExtendedStateLength] = {
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-  // Copy/convert the internal state to an extended state.
-  for (uint16_t i = 0; i < kSamsungAcSectionLength; i++)
-    extended_state[i] = _.raw[i];
-  for (uint16_t i = kSamsungAcSectionLength; i < kSamsungAcStateLength; i++)
-    extended_state[i + kSamsungAcSectionLength] = _.raw[i];
-  // extended_state[8] seems special. This is a guess on how to calculate it.
-  extended_state[8] = (extended_state[1] & 0x9F) | 0x40;
+  // Copy/convert the internal state to an extended state by
+  // copying the second section to the third section, and inserting the extended
+  // middle (second) section.
+  std::memcpy(_.raw + 2 * kSamsungAcSectionLength,
+              _.raw + kSamsungAcSectionLength,
+              kSamsungAcSectionLength);
+  std::memcpy(_.raw + kSamsungAcSectionLength, extended_middle_section,
+              kSamsungAcSectionLength);
   // Send it.
-  _irsend.sendSamsungAC(extended_state, kSamsungAcExtendedStateLength, repeat);
+  _irsend.sendSamsungAC(_.raw, kSamsungAcExtendedStateLength, repeat);
+  // Now revert it by copying the third section over the second section.
+  std::memcpy(_.raw + kSamsungAcSectionLength,
+              _.raw + 2* kSamsungAcSectionLength,
+              kSamsungAcSectionLength);
+  _lastsentpowerstate = getPower();  // Remember the last power state sent.
 }
 
 /// Send the special extended "On" message as the library can't seem to
@@ -397,7 +397,7 @@ void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
 /// @param[in] repeat Nr. of times the message will be repeated.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/604#issuecomment-475020036
 void IRSamsungAc::sendOn(const uint16_t repeat) {
-  const uint8_t extended_state[21] = {
+  const uint8_t extended_state[kSamsungAcExtendedStateLength] = {
       0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
       0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
       0x01, 0xE2, 0xFE, 0x71, 0x80, 0x11, 0xF0};
@@ -410,7 +410,7 @@ void IRSamsungAc::sendOn(const uint16_t repeat) {
 /// @param[in] repeat Nr. of times the message will be repeated.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/604#issuecomment-475020036
 void IRSamsungAc::sendOff(const uint16_t repeat) {
-  const uint8_t extended_state[21] = {
+  const uint8_t extended_state[kSamsungAcExtendedStateLength] = {
       0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
       0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
       0x01, 0x02, 0xFF, 0x71, 0x80, 0x11, 0xC0};
