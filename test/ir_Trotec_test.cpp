@@ -280,8 +280,10 @@ TEST(TestTrotec3550Class, SetAndGetFan) {
 TEST(TestTrotec3550Class, SetAndGetTemp) {
   IRTrotec3550 ac(kGpioUnused);
 
+  // Celsius
   ac.setTemp(25);
   EXPECT_EQ(25, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
   ac.setTemp(kTrotec3550MinTempC);
   EXPECT_EQ(kTrotec3550MinTempC, ac.getTemp());
   ac.setTemp(kTrotec3550MaxTempC);
@@ -290,6 +292,26 @@ TEST(TestTrotec3550Class, SetAndGetTemp) {
   EXPECT_EQ(kTrotec3550MinTempC, ac.getTemp());
   ac.setTemp(kTrotec3550MaxTempC + 1);
   EXPECT_EQ(kTrotec3550MaxTempC, ac.getTemp());
+  // Fahrenheit
+  ac.setTemp(72, false);
+  EXPECT_EQ(72, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+  ac.setTemp(kTrotec3550MinTempF, false);
+  EXPECT_EQ(kTrotec3550MinTempF, ac.getTemp());
+  ac.setTemp(kTrotec3550MaxTempF, false);
+  EXPECT_EQ(kTrotec3550MaxTempF, ac.getTemp());
+  ac.setTemp(kTrotec3550MinTempF - 1, false);
+  EXPECT_EQ(kTrotec3550MinTempF, ac.getTemp());
+  ac.setTemp(kTrotec3550MaxTempF + 1, false);
+  EXPECT_EQ(kTrotec3550MaxTempF, ac.getTemp());
+  // Celsius
+  ac.setTemp(25, true);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+  uint8_t deg79F[9] = {0x55, 0xA3, 0x00, 0x14, 0x00, 0x00, 0x31, 0x40, 0x7D};
+  ac.setRaw(deg79F);
+  EXPECT_FALSE(ac.getTempUnit());  // Fahrenheit
+  EXPECT_EQ(79, ac.getTemp());
 }
 
 TEST(TestTrotec3550Class, SwingV) {

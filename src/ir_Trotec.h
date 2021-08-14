@@ -86,12 +86,11 @@ union Trotec3550Protocol{
     uint8_t Power    :1;
     uint8_t          :1;  // Unknown
     uint8_t TimerSet :1;
-    uint8_t Temp     :4;  // Temp +16 for degC)
+    uint8_t TempC    :4;  // Temp + kTrotec3550MinTempC for degC)
     // Byte 2
     uint8_t          :8;  // Unknown
     // Byte 3
-    uint8_t          :1;  // Unknown
-    uint8_t Temp2    :4;  // Temp +16 for degC)
+    uint8_t TempF    :5;  // Temp + kTrotec3550MinTempF for degF)
     uint8_t          :3;  // Unknown
     // Byte 4
     uint8_t          :8;  // Unknown
@@ -111,8 +110,9 @@ union Trotec3550Protocol{
 };
 
 const uint8_t kTrotec3550MinTempC = 16;
-const uint8_t kTrotec3550DefTempC = 25;
 const uint8_t kTrotec3550MaxTempC = 30;
+const uint8_t kTrotec3550MinTempF = 59;
+const uint8_t kTrotec3550MaxTempF = 86;
 
 // Legacy defines. (Deprecated)
 #define TROTEC_AUTO kTrotecAuto

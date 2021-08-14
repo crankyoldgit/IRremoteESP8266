@@ -347,7 +347,7 @@ bool IRrecv::decodeTrotec(decode_results *results, uint16_t offset,
 
 #if SEND_TROTEC_3550
 /// Send a Trotec 3550 message.
-/// Status: BETA / Probably works. Untested on real device.
+/// Status: STABLE / Known to be working.
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
@@ -491,21 +491,32 @@ uint8_t IRTrotec3550::getMode(void) const { return _.Mode; }
 /// Set the temperature.
 /// @param[in] degrees The temperature in degrees.
 /// @param[in] celsius Use celsius units. True, Celsius; False Fahrenheit.
-/// @note Fahrenheit is not yet supported. Waiting on data analysis.
 void IRTrotec3550::setTemp(const uint8_t degrees, const bool celsius) {
   setTempUnit(celsius);
   uint8_t minTemp = kTrotec3550MinTempC;
   uint8_t maxTemp = kTrotec3550MaxTempC;
+  if (!celsius) {  // Fahrenheit?
+    minTemp = kTrotec3550MinTempF;
+    maxTemp = kTrotec3550MaxTempF;
+  }
   uint8_t temp = std::max(degrees, minTemp);
   temp = std::min(temp, maxTemp);
-  _.Temp = _.Temp2 = temp - minTemp;
+  if (celsius) {
+    _.TempC = temp - minTemp;
+    _.TempF = celsiusToFahrenheit(temp) - kTrotec3550MinTempF;
+  } else {
+    _.TempF = temp - minTemp;
+    _.TempC = fahrenheitToCelsius(temp) - kTrotec3550MinTempC;
+  }
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees.
-/// @note Fahrenheit is not yet supported. Waiting on data analysis.
 uint8_t IRTrotec3550::getTemp(void) const {
-  return _.Temp + kTrotec3550MinTempC;
+  if (getTempUnit())  // Is Celsius?
+    return _.TempC + kTrotec3550MinTempC;
+  else
+    return _.TempF + kTrotec3550MinTempF;
 }
 
 /// Set the temperature unit that the A/C will use..
@@ -582,7 +593,7 @@ stdAc::state_t IRTrotec3550::toCommon(void) const {
   result.protocol = decode_type_t::TROTEC_3550;
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
-  result.celsius = _.Celsius;
+  result.celsius = getTempUnit();
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
   result.swingv = _.SwingV ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
