@@ -543,7 +543,7 @@ bool IRTrotec3550::getSwingV(void) const { return _.SwingV; }
 uint16_t IRTrotec3550::getTimer(void) const { return _.TimerHrs * 60; }
 
 /// Set the number of minutes of the Timer setting.
-/// @param[in] Nr. of Minutes for the Timer. `0` means disable the timer.
+/// @param[in] mins Nr. of Minutes for the Timer. `0` means disable the timer.
 void IRTrotec3550::setTimer(const uint16_t mins) {
   _.TimerSet = mins > 0;
   _.TimerHrs = (std::min(mins, kTrotec3550TimerMax) / 60);
