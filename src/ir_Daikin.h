@@ -45,6 +45,8 @@
 //   Brand: Daikin,  Model: FTXM-M A/C (DAIKIN)
 //   Brand: Daikin,  Model: ARC466A33 remote (DAIKIN)
 //   Brand: Daikin,  Model: FTWX35AXV1 A/C (DAIKIN64)
+//   Brand: Daikin,  Model: ARC484A4 remote (DAIKIN216)
+//   Brand: Daikin,  Model: FTQ60TV16U2 A/C (DAIKIN216)
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
