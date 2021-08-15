@@ -214,7 +214,8 @@ TEST(TestDecodeTrotec3550, RealDecode) {
   EXPECT_EQ(kTrotecBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On",
+      "Power: On, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On, "
+      "Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -236,7 +237,8 @@ TEST(TestDecodeTrotec3550, SyntheticDecode) {
   EXPECT_EQ(kTrotecBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On",
+      "Power: On, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On, "
+      "Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -334,29 +336,80 @@ TEST(TestTrotec3550Class, Power) {
   ASSERT_FALSE(ac.getPower());
 }
 
+TEST(TestTrotec3550Class, Timer) {
+  IRTrotec3550 ac(kGpioUnused);
+  EXPECT_FALSE(ac._.TimerSet);
+  EXPECT_EQ(0, ac.getTimer());
+
+  ac.setTimer(1);
+  EXPECT_TRUE(ac._.TimerSet);
+  EXPECT_EQ(0, ac.getTimer());
+
+  ac.setTimer(0);
+  EXPECT_FALSE(ac._.TimerSet);
+  EXPECT_EQ(0, ac.getTimer());
+
+  ac.setTimer(1 * 60);
+  EXPECT_TRUE(ac._.TimerSet);
+  EXPECT_EQ(1 * 60, ac.getTimer());
+
+  ac.setTimer(2 * 60 + 37);
+  EXPECT_TRUE(ac._.TimerSet);
+  EXPECT_EQ(2 * 60, ac.getTimer());
+
+  ac.setTimer(7 * 60 + 59);
+  EXPECT_TRUE(ac._.TimerSet);
+  EXPECT_EQ(7 * 60, ac.getTimer());
+
+  ac.setTimer(8 * 60);  // Max
+  EXPECT_TRUE(ac._.TimerSet);
+  EXPECT_EQ(8 * 60, ac.getTimer());  // Max
+
+  ac.setTimer(9 * 60);  // Beyond max
+  EXPECT_TRUE(ac._.TimerSet);
+  EXPECT_EQ(8 * 60, ac.getTimer());  // Max
+
+  ac.setTimer(0);
+  EXPECT_FALSE(ac._.TimerSet);
+  EXPECT_EQ(0, ac.getTimer());
+
+  // Real data.
+  uint8_t onehour[9] = {0x55, 0xBB, 0x01, 0x15, 0x00, 0x00, 0x31, 0x02, 0x59};
+  ac.setRaw(onehour);
+  EXPECT_TRUE(ac._.TimerSet);
+  EXPECT_EQ(1 * 60, ac.getTimer());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 80F, Fan: 3 (High), Swing(V): On, "
+      "Timer: 01:00", ac.toString());
+}
+
 TEST(TestTrotec3550Class, HumanReadable) {
   IRTrotec3550 ac(kGpioUnused);
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (Auto), Temp: 22C, Fan: 1 (Low), Swing(V): Off",
+      "Power: Off, Mode: 0 (Auto), Temp: 22C, Fan: 1 (Low), Swing(V): Off, "
+      "Timer: Off",
       ac.toString());
   // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1563#issuecomment-898318429
   const uint8_t oncool18f3swing[9] = {
       0x55, 0x23, 0x00, 0x05, 0x00, 0x00, 0x31, 0x88, 0x36};
   ac.setRaw(oncool18f3swing);
   EXPECT_EQ(
-      "Power: On, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On",
+      "Power: On, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On, "
+      "Timer: Off",
       ac.toString());
   const uint8_t offcool18f3swing[9] = {
       0x55, 0x21, 0x00, 0x05, 0x00, 0x00, 0x31, 0x88, 0x34};
   ac.setRaw(offcool18f3swing);
   EXPECT_EQ(
-      "Power: Off, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On",
+      "Power: Off, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On, "
+      "Timer: Off",
       ac.toString());
   const uint8_t modeauto[9] = {
       0x55, 0x60, 0x00, 0x0D, 0x00, 0x00, 0x10, 0x88, 0x5A};
   ac.setRaw(modeauto);
   EXPECT_EQ(
-      "Power: Off, Mode: 0 (Auto), Temp: 22C, Fan: 1 (Low), Swing(V): Off",
+      "Power: Off, Mode: 0 (Auto), Temp: 22C, Fan: 1 (Low), Swing(V): Off, "
+      "Timer: Off",
       ac.toString());
 }
 

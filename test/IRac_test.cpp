@@ -1834,8 +1834,8 @@ TEST(TestIRac, Trotec3550) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On";
-
+      "Power: On, Mode: 1 (Cool), Temp: 18C, Fan: 3 (High), Swing(V): On, "
+      "Timer: Off";
   ac.begin();
   irac.trotec3550(&ac,
                   true,                        // Power

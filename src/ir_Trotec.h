@@ -88,7 +88,8 @@ union Trotec3550Protocol{
     uint8_t TimerSet :1;
     uint8_t TempC    :4;  // Temp + kTrotec3550MinTempC for degC)
     // Byte 2
-    uint8_t          :8;  // Unknown
+    uint8_t TimerHrs :4;
+    uint8_t          :4;  // Unknown
     // Byte 3
     uint8_t TempF    :5;  // Temp + kTrotec3550MinTempF for degF)
     uint8_t          :3;  // Unknown
@@ -221,6 +222,8 @@ class IRTrotec3550 {
   void setMode(const uint8_t mode);
   bool getSwingV(void) const;
   void setSwingV(const bool on);
+  uint16_t getTimer(void) const;
+  void setTimer(const uint16_t mins);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t state[]);
   static bool validChecksum(const uint8_t state[],

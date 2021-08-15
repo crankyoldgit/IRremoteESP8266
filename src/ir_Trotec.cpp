@@ -31,12 +31,15 @@ const uint16_t kTrotec3550BitMark = 550;
 const uint16_t kTrotec3550OneSpace = 1950;
 const uint16_t kTrotec3550ZeroSpace = 500;
 
+const uint16_t kTrotec3550TimerMax = 8 * 60;  ///< 8 hours in Minutes.
+
 using irutils::addBoolToString;
 using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::minsToString;
 
 #if SEND_TROTEC
 /// Send a Trotec message.
@@ -535,6 +538,17 @@ void IRTrotec3550::setSwingV(const bool on) { _.SwingV = on; }
 /// @return true, the setting is on. false, the setting is off.
 bool IRTrotec3550::getSwingV(void) const { return _.SwingV; }
 
+/// Get the number of minutes of the Timer setting.
+/// @return Nr of minutes.
+uint16_t IRTrotec3550::getTimer(void) const { return _.TimerHrs * 60; }
+
+/// Set the number of minutes of the Timer setting.
+/// @param[in] Nr. of Minutes for the Timer. `0` means disable the timer.
+void IRTrotec3550::setTimer(const uint16_t mins) {
+  _.TimerSet = mins > 0;
+  _.TimerHrs = (std::min(mins, kTrotec3550TimerMax) / 60);
+}
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -616,7 +630,7 @@ stdAc::state_t IRTrotec3550::toCommon(void) const {
 /// @return A human readable string.
 String IRTrotec3550::toString(void) const {
   String result = "";
-  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, kTrotecAuto, kTrotecCool, kTrotecAuto,
                             kTrotecDry, kTrotecFan);
@@ -624,5 +638,7 @@ String IRTrotec3550::toString(void) const {
   result += addFanToString(_.Fan, kTrotecFanHigh, kTrotecFanLow,
                            kTrotecFanHigh, kTrotecFanHigh, kTrotecFanMed);
   result += addBoolToString(_.SwingV, kSwingVStr);
+  result += addLabeledString(_.TimerSet ? minsToString(getTimer()) : kOffStr,
+                             kTimerStr);
   return result;
 }
