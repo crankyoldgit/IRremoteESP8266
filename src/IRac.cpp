@@ -2463,7 +2463,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
                                                      : stdAc::swingv_t::kOff;
 #endif  // SEND_LG
   // Per vendor settings & setup.
-  switch (send.protocol) {
+  switch (send.protocol) {  // NOLINT(readability/fn_size)
 #if SEND_AIRWELL
     case AIRWELL:
     {
