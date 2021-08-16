@@ -2463,7 +2463,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
                                                      : stdAc::swingv_t::kOff;
 #endif  // SEND_LG
   // Per vendor settings & setup.
-  switch (send.protocol) {  // NOLINT(readability/fn_size)
+  switch (send.protocol) {
 #if SEND_AIRWELL
     case AIRWELL:
     {
@@ -2962,7 +2962,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       return false;  // Fail, didn't match anything.
   }
   return true;  // Success.
-}
+}  // NOLINT(readability/fn_size)
 
 /// Update the previous state to the current one.
 void IRac::markAsSent(void) {
