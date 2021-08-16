@@ -259,6 +259,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_SANYO_AC
     case decode_type_t::SANYO_AC:
 #endif
+#if SEND_SANYO_AC88
+    case decode_type_t::SANYO_AC88:
+#endif
 #if SEND_SHARP_AC
     case decode_type_t::SHARP_AC:
 #endif
@@ -1766,7 +1769,7 @@ void IRac::samsung(IRSamsungAc *ac,
 #endif  // SEND_SAMSUNG_AC
 
 #if SEND_SANYO_AC
-/// Send a Toshiba A/C message with the supplied settings.
+/// Send a Sanyo A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRSanyoAc object to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
@@ -1803,6 +1806,44 @@ void IRac::sanyo(IRSanyoAc *ac,
   ac->send();
 }
 #endif  // SEND_SANYO_AC
+
+#if SEND_SANYO_AC88
+/// Send a Sanyo 88-bit A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRSanyoAc88 object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
+/// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
+void IRac::sanyo88(IRSanyoAc88 *ac,
+                   const bool on, const stdAc::opmode_t mode,
+                   const float degrees, const stdAc::fanspeed_t fan,
+                   const stdAc::swingv_t swingv, const bool turbo,
+                   const bool filter, const int16_t sleep,
+                   const int16_t clock) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(swingv != stdAc::swingv_t::kOff);
+  // No Horizontal swing setting available.
+  // No Quiet setting available.
+  ac->setTurbo(turbo);
+  // No Econo setting available.
+  // No Light setting available.
+  ac->setFilter(filter);
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
+  if (clock >= 0) ac->setClock(clock);
+  ac->send();
+}
+#endif  // SEND_SANYO_AC88
 
 #if SEND_SHARP_AC
 /// Send a Sharp A/C message with the supplied settings.
@@ -2798,6 +2839,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_SANYO_AC
+#if SEND_SANYO_AC88
+    case SANYO_AC88:
+    {
+      IRSanyoAc88 ac(_pin, _inverted, _modulation);
+      sanyo88(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+              send.turbo, send.filter, send.sleep, send.clock);
+      break;
+    }
+#endif  // SEND_SANYO_AC88
 #if SEND_SHARP_AC
     case SHARP_AC:
     {
@@ -2912,7 +2962,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       return false;  // Fail, didn't match anything.
   }
   return true;  // Success.
-}
+}  // NOLINT(readability/fn_size)
 
 /// Update the previous state to the current one.
 void IRac::markAsSent(void) {
@@ -3529,6 +3579,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_SANYO_AC
+#if DECODE_SANYO_AC88
+      case decode_type_t::SANYO_AC88: {
+        IRSanyoAc88 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_SANYO_AC88
 #if DECODE_SHARP_AC
       case decode_type_t::SHARP_AC: {
         IRSharpAc ac(kGpioUnused);
@@ -4006,6 +4063,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_SANYO_AC
+#if DECODE_SANYO_AC88
+      case decode_type_t::SANYO_AC88: {
+        IRSanyoAc88 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_SANYO_AC88
 #if DECODE_SHARP_AC
       case decode_type_t::SHARP_AC: {
         IRSharpAc ac(kGpioUnused);

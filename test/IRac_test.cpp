@@ -1548,6 +1548,35 @@ TEST(TestIRac, Sanyo) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
+TEST(TestIRac, Sanyo88) {
+  IRSanyoAc88 ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  const char expected[] =
+      "Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 2 (Medium), Swing(V): On, "
+      "Turbo: On, Sleep: On, Clock: 11:40";
+
+  ac.begin();
+  irac.sanyo88(&ac,
+               true,                         // Power
+               stdAc::opmode_t::kCool,       // Mode
+               28,                           // Celsius
+               stdAc::fanspeed_t::kMedium,   // Fan speed
+               stdAc::swingv_t::kAuto,       // Vertical Swing
+               true,                         // Turbo
+               true,                         // Filter
+               17,                           // Sleep
+               11 * 60 + 40);                // Clock
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(SANYO_AC88, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kSanyoAc88Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
 TEST(TestIRac, Sharp) {
   IRSharpAc ac(kGpioUnused);
   IRac irac(kGpioUnused);

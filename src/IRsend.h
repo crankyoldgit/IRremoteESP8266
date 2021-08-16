@@ -319,6 +319,11 @@ class IRsend {
                    const uint16_t nbytes = kSanyoAcStateLength,
                    const uint16_t repeat = kNoRepeat);
 #endif  // SEND_SANYO_AC
+#if SEND_SANYO_AC88
+  void sendSanyoAc88(const uint8_t *data,
+                     const uint16_t nbytes = kSanyoAc88StateLength,
+                     const uint16_t repeat = kSanyoAc88MinRepeat);
+#endif  // SEND_SANYO_AC88
 #if SEND_DISH
   // sendDISH() should typically be called with repeat=3 as DISH devices
   // expect the code to be sent at least 4 times. (code + 3 repeats = 4 codes)
