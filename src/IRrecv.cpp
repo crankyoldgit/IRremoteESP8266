@@ -899,6 +899,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Trotec decode");
     if (decodeTrotec(results, offset)) return true;
 #endif  // DECODE_TROTEC
+#if DECODE_TROTEC_3550
+    DPRINTLN("Attempting Trotec 3550 decode");
+    if (decodeTrotec3550(results, offset)) return true;
+#endif  // DECODE_TROTEC_3550
 #if DECODE_DAIKIN160
     DPRINTLN("Attempting Daikin160 decode");
     if (decodeDaikin160(results, offset)) return true;
