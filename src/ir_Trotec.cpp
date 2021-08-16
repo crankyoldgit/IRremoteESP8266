@@ -516,10 +516,8 @@ void IRTrotec3550::setTemp(const uint8_t degrees, const bool celsius) {
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees.
 uint8_t IRTrotec3550::getTemp(void) const {
-  if (getTempUnit())  // Is Celsius?
-    return _.TempC + kTrotec3550MinTempC;
-  else
-    return _.TempF + kTrotec3550MinTempF;
+  return getTempUnit() ? _.TempC + kTrotec3550MinTempC
+                       : _.TempF + kTrotec3550MinTempF;
 }
 
 /// Set the temperature unit that the A/C will use..
