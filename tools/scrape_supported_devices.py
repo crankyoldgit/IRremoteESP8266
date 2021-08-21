@@ -173,7 +173,7 @@ def getalldevices():
     protocol = match.group(1)
     for brand, model in supports:
       protocolbrand = (protocol, brand)
-      pbset = sets.allcodes.get(protocolbrand, list())
+      pbset = sets.allcodes.get(protocolbrand, [])
       if model in pbset:
         print("Model %s is duplicated for %s, %s" % (model, protocol, brand))
       sets.allcodes[protocolbrand] = pbset + [model]
