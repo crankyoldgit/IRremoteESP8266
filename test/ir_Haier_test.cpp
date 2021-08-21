@@ -675,7 +675,7 @@ TEST(TestHaierACYRW02Class, MessageConstuction) {
   EXPECT_EQ(
       "Power: On, Button: 5 (Power), Mode: 0 (Auto), Temp: 25C,"
       " Fan: 5 (Auto), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
-      " Health: On",
+      " Health: On, On Timer: Off, Off Timer: Off",
       haier.toString());
   haier.setMode(kHaierAcYrw02Cool);
   haier.setTemp(21);
@@ -683,7 +683,7 @@ TEST(TestHaierACYRW02Class, MessageConstuction) {
   EXPECT_EQ(
       "Power: On, Button: 4 (Fan), Mode: 1 (Cool), Temp: 21C,"
       " Fan: 1 (High), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
-      " Health: On",
+      " Health: On, On Timer: Off, Off Timer: Off",
       haier.toString());
 
   haier.setSwing(kHaierAcYrw02SwingMiddle);
@@ -693,7 +693,7 @@ TEST(TestHaierACYRW02Class, MessageConstuction) {
   EXPECT_EQ(
       "Power: On, Button: 8 (Turbo), Mode: 1 (Cool), Temp: 21C,"
       " Fan: 1 (High), Turbo: 1 (High), Swing: 2 (Middle),"
-      " Sleep: On, Health: Off",
+      " Sleep: On, Health: Off, On Timer: Off, Off Timer: Off",
       haier.toString());
 }
 
@@ -706,9 +706,9 @@ TEST(TestHaierACYRW02Class, RealStates) {
   IRHaierACYRW02 haier(kGpioUnused);
   haier.setRaw(expectedState1);
   EXPECT_EQ(
-      "Power: On, Button: 7 (Health), Mode: 4 (Heat), Temp: 30C,"
-      " Fan: 1 (High), Turbo: 0 (Off), Swing: 1 (Highest), Sleep: Off,"
-      " Health: Off",
+      "Power: On, Button: 7 (Health), Mode: 4 (Heat), Temp: 30C, "
+      "Fan: 1 (High), Turbo: 0 (Off), Swing: 1 (Highest), Sleep: Off, "
+      "Health: Off, On Timer: Off, Off Timer: Off",
       haier.toString());
 
   uint8_t expectedState2[kHaierACYRW02StateLength] = {
@@ -716,9 +716,9 @@ TEST(TestHaierACYRW02Class, RealStates) {
       0x80, 0x00, 0x00, 0x00, 0x00, 0x05, 0x75};
   haier.setRaw(expectedState2);
   EXPECT_EQ(
-      "Power: Off, Button: 5 (Power), Mode: 4 (Heat), Temp: 30C,"
-      " Fan: 1 (High), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off,"
-      " Health: Off",
+      "Power: Off, Button: 5 (Power), Mode: 4 (Heat), Temp: 30C, "
+      "Fan: 1 (High), Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off, "
+      "Health: Off, On Timer: Off, Off Timer: Off",
       haier.toString());
 
   uint8_t expectedState3[kHaierACYRW02StateLength] = {
@@ -726,9 +726,9 @@ TEST(TestHaierACYRW02Class, RealStates) {
       0x20, 0x00, 0x00, 0x00, 0x00, 0x01, 0x2B};
   haier.setRaw(expectedState3);
   EXPECT_EQ(
-      "Power: On, Button: 1 (Temp Down), Mode: 1 (Cool), Temp: 16C,"
-      " Fan: 1 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off,"
-      " Health: On",
+      "Power: On, Button: 1 (Temp Down), Mode: 1 (Cool), Temp: 16C, "
+      "Fan: 1 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off, "
+      "Health: On, On Timer: Off, Off Timer: Off",
       haier.toString());
 
   // cool 25, health, fan auto, swing auto,  sleep on
@@ -737,9 +737,9 @@ TEST(TestHaierACYRW02Class, RealStates) {
       0x20, 0x80, 0x00, 0x00, 0x00, 0x0B, 0xD7};
   haier.setRaw(expectedState4);
   EXPECT_EQ(
-      "Power: On, Button: 11 (Sleep), Mode: 1 (Cool), Temp: 25C,"
-      " Fan: 5 (Auto), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On,"
-      " Health: On",
+      "Power: On, Button: 11 (Sleep), Mode: 1 (Cool), Temp: 25C, "
+      "Fan: 5 (Auto), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On, "
+      "Health: On, On Timer: Off, Off Timer: Off",
       haier.toString());
 
   // cool 25, health, fan 3, swing auto,  sleep on
@@ -748,9 +748,9 @@ TEST(TestHaierACYRW02Class, RealStates) {
       0x20, 0x80, 0x00, 0x00, 0x00, 0x04, 0x85};
   haier.setRaw(expectedState5);
   EXPECT_EQ(
-      "Power: On, Button: 4 (Fan), Mode: 1 (Cool), Temp: 25C,"
-      " Fan: 1 (High), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On,"
-      " Health: On",
+      "Power: On, Button: 4 (Fan), Mode: 1 (Cool), Temp: 25C, "
+      "Fan: 1 (High), Turbo: 0 (Off), Swing: 12 (Auto), Sleep: On, "
+      "Health: On, On Timer: Off, Off Timer: Off",
       haier.toString());
 }
 
@@ -979,9 +979,9 @@ TEST(TestDecodeHaierAC_YRW02, RealExample) {
   IRHaierACYRW02 haier(kGpioUnused);
   haier.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 17C,"
-      " Fan: 1 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off,"
-      " Health: On",
+      "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 17C, "
+      "Fan: 1 (High), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off, "
+      "Health: On, On Timer: Off, Off Timer: Off",
       haier.toString());
 }
 
@@ -1204,7 +1204,8 @@ TEST(TestDecodeHaierAC176, SyntheticDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 24C, Fan: 5 (Auto), "
-      "Turbo: 0 (Off), Swing: 6 (UNKNOWN), Sleep: Off, Health: Off",
+      "Turbo: 0 (Off), Swing: 6 (UNKNOWN), Sleep: Off, Health: Off, "
+      "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
@@ -1244,7 +1245,8 @@ TEST(TestHaierAC176Class, BuildKnownState) {
   EXPECT_TRUE(ac.validChecksum(ac.getRaw()));
   EXPECT_EQ(
       "Power: On, Button: 4 (Fan), Mode: 4 (Heat), Temp: 24C, Fan: 1 (High), "
-      "Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off, Health: On",
+      "Turbo: 0 (Off), Swing: 0 (Off), Sleep: Off, Health: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
   /* Disabled pending:
      https://github.com/crankyoldgit/IRremoteESP8266/issues/1480#issuecomment-885636790
@@ -1254,4 +1256,91 @@ TEST(TestHaierAC176Class, BuildKnownState) {
       0xB7, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0xF7};
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kHaierAC176StateLength);
   */
+}
+
+TEST(TestHaierAC176Class, Timers) {
+  IRHaierAC176 ac(kGpioUnused);
+  EXPECT_FALSE(ac._.OnTimerSet);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_FALSE(ac._.OffTimerSet);
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  // On Timer
+  ac.setOnTimer(1);
+  EXPECT_TRUE(ac._.OnTimerSet);
+  EXPECT_EQ(1, ac.getOnTimer());
+
+  ac.setOnTimer(0);
+  EXPECT_FALSE(ac._.OnTimerSet);
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setOnTimer(1 * 60);
+  EXPECT_TRUE(ac._.OnTimerSet);
+  EXPECT_EQ(1 * 60, ac.getOnTimer());
+
+  ac.setOnTimer(2 * 60 + 37);
+  EXPECT_TRUE(ac._.OnTimerSet);
+  EXPECT_EQ(2 * 60 + 37, ac.getOnTimer());
+
+  ac.setOnTimer(23 * 60 + 59);  // Max
+  EXPECT_TRUE(ac._.OnTimerSet);
+  EXPECT_EQ(23 * 60 + 59, ac.getOnTimer());
+
+  ac.setOnTimer(24 * 60);  // Beyond max
+  EXPECT_TRUE(ac._.OnTimerSet);
+  EXPECT_EQ(23 * 60 + 59, ac.getOnTimer());  // Max
+
+  ac.setOnTimer(0);
+  EXPECT_FALSE(ac._.OnTimerSet);
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  // Off Timer
+  ac.setOffTimer(1);
+  EXPECT_TRUE(ac._.OffTimerSet);
+  EXPECT_EQ(1, ac.getOffTimer());
+
+  ac.setOffTimer(0);
+  EXPECT_FALSE(ac._.OffTimerSet);
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOffTimer(1 * 60);
+  EXPECT_TRUE(ac._.OffTimerSet);
+  EXPECT_EQ(1 * 60, ac.getOffTimer());
+
+  ac.setOffTimer(2 * 60 + 37);
+  EXPECT_TRUE(ac._.OffTimerSet);
+  EXPECT_EQ(2 * 60 + 37, ac.getOffTimer());
+
+  ac.setOffTimer(23 * 60 + 59);  // Max
+  EXPECT_TRUE(ac._.OffTimerSet);
+  EXPECT_EQ(23 * 60 + 59, ac.getOffTimer());
+
+  ac.setOffTimer(24 * 60);  // Beyond max
+  EXPECT_TRUE(ac._.OffTimerSet);
+  EXPECT_EQ(23 * 60 + 59, ac.getOffTimer());  // Max
+
+  ac.setOffTimer(0);
+  EXPECT_FALSE(ac._.OffTimerSet);
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  // Real data.
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1480#issuecomment-894804106
+  const uint8_t timer30m[22] = {
+      0xA6, 0x82, 0x00, 0x40, 0x00, 0xA0, 0x00, 0x00, 0x1E, 0x00, 0x00,
+      0x00, 0x10, 0x36, 0xB7, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB7};
+  const uint8_t timeroff[22] = {
+      0xA6, 0x82, 0x00, 0x00, 0x40, 0xA0, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x10, 0x18, 0xB7, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB7};
+  ac.setRaw(timer30m);
+  EXPECT_EQ(
+      "Power: Off, Button: 0 (Temp Up), Mode: 0 (Auto), Temp: 24C, "
+      "Fan: 5 (Auto), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off, "
+      "Health: Off, On Timer: 00:30, Off Timer: Off",
+      ac.toString());
+  ac.setRaw(timeroff);
+  EXPECT_EQ(
+      "Power: On, Button: 0 (Temp Up), Mode: 0 (Auto), Temp: 24C, "
+      "Fan: 5 (Auto), Turbo: 0 (Off), Swing: 2 (Middle), Sleep: Off, "
+      "Health: Off, On Timer: Off, Off Timer: Off",
+      ac.toString());
 }

@@ -225,25 +225,29 @@ union HaierAc176Protocol{
     // Byte 2
     uint8_t :8;
     // Byte 3
-    uint8_t       :1;
-    uint8_t Health:1;
-    uint8_t       :6;
+    uint8_t                :1;
+    uint8_t Health         :1;
+    uint8_t                :3;
+    uint8_t OffTimerSet    :1;
+    uint8_t OnTimerSet     :1;
+    uint8_t                :1;
     // Byte 4
     uint8_t      :6;
     uint8_t Power:1;
     uint8_t      :1;
     // Byte 5
-    uint8_t    :5;
-    uint8_t Fan:3;
+    uint8_t OffTimerHrs :5;
+    uint8_t Fan         :3;
     // Byte 6
-    uint8_t      :6;
+    uint8_t OffTimerMins:6;
     uint8_t Turbo:2;
     // Byte 7
-    uint8_t     :5;
-    uint8_t Mode:3;
+    uint8_t OnTimerHrs  :5;
+    uint8_t Mode        :3;
     // Byte 8
-    uint8_t      :7;
-    uint8_t Sleep:1;
+    uint8_t OnTimerMins :6;
+    uint8_t             :1;
+    uint8_t Sleep       :1;
     // Byte 9
     uint8_t :8;
     // Byte 10
@@ -419,6 +423,11 @@ class IRHaierAC176 {
 
   uint8_t getSwing(void) const;
   void setSwing(const uint8_t pos);
+
+  void setOnTimer(const uint16_t mins);
+  uint16_t getOnTimer(void) const;
+  void setOffTimer(const uint16_t mins);
+  uint16_t getOffTimer(void) const;
 
   uint8_t* getRaw(void);
   virtual void setRaw(const uint8_t new_code[]);

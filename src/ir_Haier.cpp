@@ -11,6 +11,7 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1480
 
 #include "ir_Haier.h"
+#include <algorithm>
 #include <cstring>
 #ifndef UNIT_TEST
 #include <Arduino.h>
@@ -758,9 +759,7 @@ void IRHaierAC176::setFan(uint8_t speed) {
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
-uint8_t IRHaierAC176::getSwing(void) const {
-  return _.Swing;
-}
+uint8_t IRHaierAC176::getSwing(void) const { return _.Swing; }
 
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] pos The position/mode to set the vanes to.
@@ -782,6 +781,36 @@ void IRHaierAC176::setSwing(uint8_t pos) {
   if (pos == kHaierAcYrw02SwingBottom && _.Mode != kHaierAcYrw02Heat)
     newpos = kHaierAcYrw02SwingMiddle;
   _.Swing = newpos;
+}
+
+/// Set the number of minutes of the On Timer setting.
+/// @param[in] mins Nr. of Minutes for the Timer. `0` means disable the timer.
+void IRHaierAC176::setOnTimer(const uint16_t mins) {
+  const uint16_t nr_mins = std::min((uint16_t)(23 * 60 + 59), mins);
+  _.OnTimerSet = nr_mins > 0;
+  _.OnTimerHrs = nr_mins / 60;
+  _.OnTimerMins = nr_mins % 60;
+}
+
+/// Get the number of minutes of the On Timer setting.
+/// @return Nr of minutes.
+uint16_t IRHaierAC176::getOnTimer(void) const {
+  return _.OnTimerHrs * 60 + _.OnTimerMins;
+}
+
+/// Set the number of minutes of the Off Timer setting.
+/// @param[in] mins Nr. of Minutes for the Timer. `0` means disable the timer.
+void IRHaierAC176::setOffTimer(const uint16_t mins) {
+  const uint16_t nr_mins = std::min((uint16_t)(23 * 60 + 59), mins);
+  _.OffTimerSet = nr_mins > 0;
+  _.OffTimerHrs = nr_mins / 60;
+  _.OffTimerMins = nr_mins % 60;
+}
+
+/// Get the number of minutes of the Off Timer setting.
+/// @return Nr of minutes.
+uint16_t IRHaierAC176::getOffTimer(void) const {
+  return _.OffTimerHrs * 60 + _.OffTimerMins;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -982,6 +1011,12 @@ String IRHaierAC176::toString(void) const {
   result += ')';
   result += addBoolToString(_.Sleep, kSleepStr);
   result += addBoolToString(_.Health, kHealthStr);
+  result += addLabeledString(_.OnTimerSet ? minsToString(getOnTimer())
+                                          : kOffStr,
+                             kOnTimerStr);
+  result += addLabeledString(_.OffTimerSet ? minsToString(getOffTimer())
+                                           : kOffStr,
+                             kOffTimerStr);
   return result;
 }
 // End of IRHaierAC176 class.

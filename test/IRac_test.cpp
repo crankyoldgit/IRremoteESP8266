@@ -790,7 +790,7 @@ TEST(TestIRac, Haier176) {
   const char expected[] =
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
       "Fan: 2 (Medium), Turbo: 1 (High), Swing: 1 (Highest), Sleep: On, "
-      "Health: On";
+      "Health: On, On Timer: Off, Off Timer: Off";
   ac.begin();
   irac.haier176(&ac,
              true,                        // Power
@@ -818,7 +818,7 @@ TEST(TestIRac, HaierYrwo2) {
   char expected[] =
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
       "Fan: 2 (Medium), Turbo: 1 (High), Swing: 1 (Highest), Sleep: On, "
-      "Health: On";
+      "Health: On, On Timer: Off, Off Timer: Off";
 
   ac.begin();
   irac.haierYrwo2(&ac,
