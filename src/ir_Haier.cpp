@@ -1135,7 +1135,6 @@ bool IRHaierACYRW02::validChecksum(const uint8_t state[],
 }
 // End of IRHaierACYRW02 class.
 
-
 #if (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
 /// Decode the supplied Haier HSU07-HEA03 remote message.
 /// Status: STABLE / Known to be working.
