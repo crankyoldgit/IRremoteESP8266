@@ -84,8 +84,16 @@ union Mitsubishi144Protocol{
     uint8_t Timer       :3;
     uint8_t WeeklyTimer :1;
     uint8_t             :4;
-    // Byte 14~16
-    uint8_t pad1[3];
+    // Byte 14
+    uint8_t          :4;
+    uint8_t          :4;
+    // Byte 15
+    uint8_t          :4;
+    uint8_t          :4;
+    // Byte 16
+    uint8_t          :3;
+    uint8_t VaneLeft :3; // SwingH(Left)
+    uint8_t          :2;
     // Byte 17
     uint8_t Sum   :8;
   };
@@ -271,6 +279,8 @@ class IRMitsubishiAC {
   void setWideVane(const uint8_t position);
   uint8_t getVane(void) const;
   uint8_t getWideVane(void) const;
+  void setVaneLeft(const uint8_t position);
+  uint8_t getVaneLeft(void) const
   uint8_t* getRaw(void);
   void setRaw(const uint8_t* data);
   uint8_t getClock(void) const;

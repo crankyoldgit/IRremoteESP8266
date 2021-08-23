@@ -652,6 +652,26 @@ TEST(TestMitsubishiACClass, VaneMode) {
   EXPECT_EQ(kMitsubishiAcVaneAutoMove - 1, ac.getVane());
 }
 
+TEST(TestMitsubishiACClass, VaneMode) {
+  IRMitsubishiAC ac(kGpioUnused);
+  ac.begin();
+
+  ac.setVaneLeft(kMitsubishiAcVaneAuto);
+  EXPECT_EQ(kMitsubishiAcVaneAuto, ac.getVaneLeft());
+
+  ac.setVaneLeft(kMitsubishiAcVaneAuto + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAuto + 1, ac.getVaneLeft());
+
+  ac.setVaneLeft(kMitsubishiAcVaneAutoMove);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, ac.getVaneLeft());
+
+  ac.setVaneLeft(kMitsubishiAcVaneAutoMove + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, ac.getVaneLeft());
+
+  ac.setVaneLeft(kMitsubishiAcVaneAutoMove - 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove - 1, ac.getVaneLeft());
+}
+
 TEST(TestMitsubishiACClass, FanSpeed) {
   IRMitsubishiAC ac(kGpioUnused);
   ac.begin();
@@ -697,6 +717,7 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
   ac.setMode(kMitsubishiAcCool);
   ac.setTemp(27);
   ac.setVane(3);
+  ac.setVaneLeft(2);
   ac.on();
 
   // Check everything for kicks.
@@ -704,6 +725,7 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
   EXPECT_EQ(kMitsubishiAcCool, ac.getMode());
   EXPECT_EQ(27, ac.getTemp());
   EXPECT_EQ(3, ac.getVane());
+  EXPECT_EQ(2, ac.getVaneLeft());
   EXPECT_TRUE(ac.getPower());
 
   irsend.reset();
