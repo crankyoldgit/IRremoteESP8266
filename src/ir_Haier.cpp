@@ -783,13 +783,52 @@ void IRHaierAC176::setSwing(uint8_t pos) {
   _.Swing = newpos;
 }
 
+
+/// Set the Timer operating mode.
+/// @param[in] mode The timer mode to use.
+void IRHaierAC176::setTimerMode(const uint8_t mode) {
+  _.TimerMode = (mode > kHaierAcYrw02OffThenOnTimer) ? kHaierAcYrw02NoTimers
+                                                     : mode;
+  switch (_.TimerMode) {
+    case kHaierAcYrw02NoTimers:
+      setOnTimer(0);  // Disable the On timer.
+      setOffTimer(0);  // Disable the Off timer.
+      break;
+    case kHaierAcYrw02OffTimer:
+      setOnTimer(0);  // Disable the On timer.
+      break;
+    case kHaierAcYrw02OnTimer:
+      setOffTimer(0);  // Disable the Off timer.
+      break;
+  }
+}
+
+/// Get the Timer operating mode.
+/// @return The mode of the timer is currently configured to.
+uint8_t IRHaierAC176::getTimerMode(void) const { return _.TimerMode; }
+
 /// Set the number of minutes of the On Timer setting.
 /// @param[in] mins Nr. of Minutes for the Timer. `0` means disable the timer.
 void IRHaierAC176::setOnTimer(const uint16_t mins) {
   const uint16_t nr_mins = std::min((uint16_t)(23 * 60 + 59), mins);
-  _.OnTimerSet = nr_mins > 0;
   _.OnTimerHrs = nr_mins / 60;
   _.OnTimerMins = nr_mins % 60;
+
+  const bool enabled = (nr_mins > 0);
+  uint8_t mode = getTimerMode();
+  switch (mode) {
+    case kHaierAcYrw02OffTimer:
+      mode = enabled ? kHaierAcYrw02OffThenOnTimer : mode;
+      break;
+    case kHaierAcYrw02OnThenOffTimer:
+    case kHaierAcYrw02OffThenOnTimer:
+      mode = enabled ? kHaierAcYrw02OffThenOnTimer : kHaierAcYrw02OffTimer;
+      break;
+    default:
+      // Enable/Disable the On timer for the simple case.
+      mode = enabled << 1;
+  }
+  _.TimerMode = mode;
 }
 
 /// Get the number of minutes of the On Timer setting.
@@ -802,9 +841,24 @@ uint16_t IRHaierAC176::getOnTimer(void) const {
 /// @param[in] mins Nr. of Minutes for the Timer. `0` means disable the timer.
 void IRHaierAC176::setOffTimer(const uint16_t mins) {
   const uint16_t nr_mins = std::min((uint16_t)(23 * 60 + 59), mins);
-  _.OffTimerSet = nr_mins > 0;
   _.OffTimerHrs = nr_mins / 60;
   _.OffTimerMins = nr_mins % 60;
+
+  const bool enabled = (nr_mins > 0);
+  uint8_t mode = getTimerMode();
+  switch (mode) {
+    case kHaierAcYrw02OnTimer:
+      mode = enabled ? kHaierAcYrw02OnThenOffTimer : mode;
+      break;
+    case kHaierAcYrw02OnThenOffTimer:
+    case kHaierAcYrw02OffThenOnTimer:
+      mode = enabled ? kHaierAcYrw02OnThenOffTimer : kHaierAcYrw02OnTimer;
+      break;
+    default:
+      // Enable/Disable the Off timer for the simple case.
+      mode = enabled;
+  }
+  _.TimerMode = mode;
 }
 
 /// Get the number of minutes of the Off Timer setting.
@@ -1011,12 +1065,39 @@ String IRHaierAC176::toString(void) const {
   result += ')';
   result += addBoolToString(_.Sleep, kSleepStr);
   result += addBoolToString(_.Health, kHealthStr);
-  result += addLabeledString(_.OnTimerSet ? minsToString(getOnTimer())
-                                          : kOffStr,
-                             kOnTimerStr);
-  result += addLabeledString(_.OffTimerSet ? minsToString(getOffTimer())
-                                           : kOffStr,
-                             kOffTimerStr);
+  const uint8_t tmode = getTimerMode();
+  result += addIntToString(tmode, kTimerModeStr);
+  result += kSpaceLBraceStr;
+  switch (tmode) {
+    case kHaierAcYrw02NoTimers:
+      result += kNAStr;
+      break;
+    case kHaierAcYrw02OnTimer:
+      result += kOnStr;
+      break;
+    case kHaierAcYrw02OffTimer:
+      result += kOffStr;
+      break;
+    case kHaierAcYrw02OnThenOffTimer:
+      result += kOnStr;
+      result += '-';
+      result += kOffStr;
+      break;
+    case kHaierAcYrw02OffThenOnTimer:
+      result += kOffStr;
+      result += '-';
+      result += kOnStr;
+      break;
+    default:
+      result += kUnknownStr;
+  }
+  result += ')';
+  result += addLabeledString((tmode != kHaierAcYrw02NoTimers &&
+                              tmode != kHaierAcYrw02OffTimer) ?
+      minsToString(getOnTimer()) : kOffStr, kOnTimerStr);
+  result += addLabeledString((tmode != kHaierAcYrw02NoTimers &&
+                              tmode != kHaierAcYrw02OnTimer) ?
+      minsToString(getOffTimer()) : kOffStr, kOffTimerStr);
   return result;
 }
 // End of IRHaierAC176 class.

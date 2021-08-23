@@ -90,6 +90,9 @@
 #ifndef D_STR_OFFTIMER
 #define D_STR_OFFTIMER D_STR_OFF " " D_STR_TIMER  // Set `D_STR_OFF` first!
 #endif  // D_STR_OFFTIMER
+#ifndef D_STR_TIMERMODE
+#define D_STR_TIMERMODE D_STR_TIMER " " D_STR_MODE  // Set `D_STR_MODE` first!
+#endif  // D_STR_TIMERMODE
 #ifndef D_STR_CLOCK
 #define D_STR_CLOCK "Clock"
 #endif  // D_STR_CLOCK

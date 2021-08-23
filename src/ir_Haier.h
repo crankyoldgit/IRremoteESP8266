@@ -213,28 +213,32 @@ const uint8_t kHaierAcYrw02ButtonHealth = 0x7;
 const uint8_t kHaierAcYrw02ButtonTurbo = 0x8;
 const uint8_t kHaierAcYrw02ButtonSleep = 0xB;
 
+const uint8_t kHaierAcYrw02NoTimers       = 0b000;
+const uint8_t kHaierAcYrw02OffTimer       = 0b001;
+const uint8_t kHaierAcYrw02OnTimer        = 0b010;
+const uint8_t kHaierAcYrw02OnThenOffTimer = 0b100;
+const uint8_t kHaierAcYrw02OffThenOnTimer = 0b101;
+
 /// Native representation of a Haier 176 bit A/C message.
 union HaierAc176Protocol{
   uint8_t raw[kHaierAC176StateLength];  ///< The state in native form
   struct {
     // Byte 0
-    uint8_t Prefix;
+    uint8_t Prefix      :8;
     // Byte 1
-    uint8_t Swing:4;
-    uint8_t Temp :4;  // 16C~30C
+    uint8_t Swing       :4;
+    uint8_t Temp        :4;  // 16C~30C
     // Byte 2
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 3
-    uint8_t                :1;
-    uint8_t Health         :1;
-    uint8_t                :3;
-    uint8_t OffTimerSet    :1;
-    uint8_t OnTimerSet     :1;
-    uint8_t                :1;
+    uint8_t             :1;
+    uint8_t Health      :1;
+    uint8_t             :3;
+    uint8_t TimerMode   :3;
     // Byte 4
-    uint8_t      :6;
-    uint8_t Power:1;
-    uint8_t      :1;
+    uint8_t             :6;
+    uint8_t Power       :1;
+    uint8_t             :1;
     // Byte 5
     uint8_t OffTimerHrs :5;
     uint8_t Fan         :3;
@@ -249,33 +253,33 @@ union HaierAc176Protocol{
     uint8_t             :1;
     uint8_t Sleep       :1;
     // Byte 9
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 10
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 11
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 12
-    uint8_t Button:4;
-    uint8_t       :4;
+    uint8_t Button      :4;
+    uint8_t             :4;
     // Byte 13
-    uint8_t Sum;
+    uint8_t Sum         :8;
     // Byte 14
-    uint8_t Prefix2;
+    uint8_t Prefix2     :8;
     // Byte 15
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 16
-    uint8_t     :6;
-    uint8_t Fan2:2;
+    uint8_t             :6;
+    uint8_t Fan2        :2;
     // Byte 17
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 18
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 19
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 20
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 21
-    uint8_t Sum2:8;
+    uint8_t Sum2        :8;
   };
 };
 
@@ -424,6 +428,8 @@ class IRHaierAC176 {
   uint8_t getSwing(void) const;
   void setSwing(const uint8_t pos);
 
+  void setTimerMode(const uint8_t setting);
+  uint8_t getTimerMode(void) const;
   void setOnTimer(const uint16_t mins);
   uint16_t getOnTimer(void) const;
   void setOffTimer(const uint16_t mins);
