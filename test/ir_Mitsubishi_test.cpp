@@ -652,7 +652,7 @@ TEST(TestMitsubishiACClass, VaneMode) {
   EXPECT_EQ(kMitsubishiAcVaneAutoMove - 1, ac.getVane());
 }
 
-TEST(TestMitsubishiACClass, VaneMode) {
+TEST(TestMitsubishiACClass, VaneLeft) {
   IRMitsubishiAC ac(kGpioUnused);
   ac.begin();
 
