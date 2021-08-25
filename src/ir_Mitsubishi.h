@@ -91,7 +91,7 @@ union Mitsubishi144Protocol{
     uint8_t          :8;
     // Byte 16
     uint8_t          :3;
-    uint8_t VaneLeft :3; // SwingH(Left)
+    uint8_t VaneLeft :3; // SwingV(Left)
     uint8_t          :2;
     // Byte 17
     uint8_t Sum   :8;
