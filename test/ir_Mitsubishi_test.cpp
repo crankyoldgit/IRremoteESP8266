@@ -725,7 +725,6 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
   EXPECT_EQ(kMitsubishiAcCool, ac.getMode());
   EXPECT_EQ(27, ac.getTemp());
   EXPECT_EQ(3, ac.getVane());
-  EXPECT_EQ(2, ac.getVaneLeft());
   EXPECT_TRUE(ac.getPower());
 
   irsend.reset();
