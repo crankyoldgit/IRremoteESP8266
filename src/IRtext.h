@@ -146,6 +146,7 @@ extern const char* kTempDownStr;
 extern const char* kTempStr;
 extern const char* kTempUpStr;
 extern const char* kThreeLetterDayOfWeekStr;
+extern const char* kTimerModeStr;
 extern const char* kTimerStr;
 extern const char* kToggleStr;
 extern const char* kTopStr;
