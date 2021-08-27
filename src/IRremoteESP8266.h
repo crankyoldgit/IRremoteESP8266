@@ -784,10 +784,10 @@
 #endif  // SEND_KELON
 
 #ifndef DECODE_BOSE
-#define DECODE_BOSE        _IR_ENABLE_DEFAULT_
+#define DECODE_BOSE         _IR_ENABLE_DEFAULT_
 #endif  // DECODE_BOSE
 #ifndef SEND_BOSE
-#define SEND_BOSE          _IR_ENABLE_DEFAULT_
+#define SEND_BOSE           _IR_ENABLE_DEFAULT_
 #endif  // SEND_BOSE
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
