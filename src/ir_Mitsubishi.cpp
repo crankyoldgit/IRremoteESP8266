@@ -455,6 +455,7 @@ void IRMitsubishiAC::setMode(const uint8_t mode) {
 }
 
 /// Set the requested vane (Vertical Swing) operation mode of the a/c unit.
+/// @note On some models, this represents the Right vertical vane.
 /// @param[in] position The position/mode to set the vane to.
 void IRMitsubishiAC::setVane(const uint8_t position) {
   uint8_t pos = std::min(position, kMitsubishiAcVaneAutoMove);  // bounds check
@@ -469,6 +470,7 @@ void IRMitsubishiAC::setWideVane(const uint8_t position) {
 }
 
 /// Get the Vane (Vertical Swing) mode of the A/C.
+/// @note On some models, this represents the Right vertical vane.
 /// @return The native position/mode setting.
 uint8_t IRMitsubishiAC::getVane(void) const {
   return _.Vane;
