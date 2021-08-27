@@ -783,6 +783,13 @@
 #define SEND_KELON          _IR_ENABLE_DEFAULT_
 #endif  // SEND_KELON
 
+#ifndef DECODE_BOSE
+#define DECODE_BOSE        _IR_ENABLE_DEFAULT_
+#endif  // DECODE_BOSE
+#ifndef SEND_BOSE
+#define SEND_BOSE          _IR_ENABLE_DEFAULT_
+#endif  // SEND_BOSE
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -943,8 +950,9 @@ enum decode_type_t {
   KELON,
   TROTEC_3550,
   SANYO_AC88,  // 105
+  BOSE,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = SANYO_AC88,
+  kLastDecodeType = BOSE,
 };
 
 // Message lengths & required repeat values
@@ -1186,6 +1194,7 @@ const uint16_t kVoltasStateLength = 10;
 const uint16_t kMilesTag2ShotBits = 14;
 const uint16_t kMilesTag2MsgBits = 24;
 const uint16_t kMilesMinRepeat = 0;
+const uint16_t kBoseBits = 16;
 
 
 // Legacy defines. (Deprecated)
