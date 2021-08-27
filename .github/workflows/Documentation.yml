@@ -4,11 +4,7 @@ name: Documentation
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
