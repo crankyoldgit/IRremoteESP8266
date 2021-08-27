@@ -4,11 +4,7 @@ name: Documentation
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -16,6 +12,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: SteffenSeckler/doxygen-action@v2.2.0beta4
-        with:
-            fail-on-warnings: true
+      - uses: mattnotmitt/doxygen-action@v1
