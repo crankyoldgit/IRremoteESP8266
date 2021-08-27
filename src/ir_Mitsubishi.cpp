@@ -480,6 +480,16 @@ uint8_t IRMitsubishiAC::getWideVane(void) const {
   return _.WideVane;
 }
 
+/// Set the requested Left Vane (Vertical Swing) operation mode of the a/c unit.
+/// @param[in] position The position/mode to set the vane to.
+void IRMitsubishiAC::setVaneLeft(const uint8_t position) {
+  _.VaneLeft = std::min(position, kMitsubishiAcVaneAutoMove);  // bounds check
+}
+
+/// Get the Left Vane (Vertical Swing) mode of the A/C.
+/// @return The native position/mode setting.
+uint8_t IRMitsubishiAC::getVaneLeft(void) const { return _.VaneLeft; }
+
 /// Get the clock time of the A/C unit.
 /// @return Nr. of 10 minute increments past midnight.
 /// @note 1 = 1/6 hour (10 minutes). e.g. 4pm = 48.

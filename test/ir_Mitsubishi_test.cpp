@@ -652,6 +652,26 @@ TEST(TestMitsubishiACClass, VaneMode) {
   EXPECT_EQ(kMitsubishiAcVaneAutoMove - 1, ac.getVane());
 }
 
+TEST(TestMitsubishiACClass, VaneLeft) {
+  IRMitsubishiAC ac(kGpioUnused);
+  ac.begin();
+
+  ac.setVaneLeft(kMitsubishiAcVaneAuto);
+  EXPECT_EQ(kMitsubishiAcVaneAuto, ac.getVaneLeft());
+
+  ac.setVaneLeft(kMitsubishiAcVaneAuto + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAuto + 1, ac.getVaneLeft());
+
+  ac.setVaneLeft(kMitsubishiAcVaneAutoMove);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, ac.getVaneLeft());
+
+  ac.setVaneLeft(kMitsubishiAcVaneAutoMove + 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove, ac.getVaneLeft());
+
+  ac.setVaneLeft(kMitsubishiAcVaneAutoMove - 1);
+  EXPECT_EQ(kMitsubishiAcVaneAutoMove - 1, ac.getVaneLeft());
+}
+
 TEST(TestMitsubishiACClass, FanSpeed) {
   IRMitsubishiAC ac(kGpioUnused);
   ac.begin();
@@ -697,6 +717,7 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
   ac.setMode(kMitsubishiAcCool);
   ac.setTemp(27);
   ac.setVane(3);
+  ac.setVaneLeft(2);
   ac.on();
 
   // Check everything for kicks.
@@ -727,8 +748,8 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
       "m450s420m450s420m450s420m450s420m450s420m450s420m450s420m450s420"
       "m450s420m450s420m450s420m450s420m450s420m450s420m450s420m450s420"
       "m450s420m450s420m450s420m450s420m450s420m450s420m450s420m450s420"
-      "m450s420m450s420m450s420m450s420m450s420m450s420m450s420m450s420"
-      "m450s420m450s1300m450s1300m450s1300m450s420m450s420m450s1300m450s420"
+      "m450s420m450s420m450s420m450s420m450s1300m450s420m450s420m450s420"
+      "m450s420m450s1300m450s1300m450s1300m450s1300m450s420m450s1300m450s420"
       "m440s17100"
       "m3400s1750"
       "m450s1300m450s1300m450s420m450s420m450s420m450s1300m450s420m450s420"
@@ -747,8 +768,8 @@ TEST(TestMitsubishiACClass, MessageConstuction) {
       "m450s420m450s420m450s420m450s420m450s420m450s420m450s420m450s420"
       "m450s420m450s420m450s420m450s420m450s420m450s420m450s420m450s420"
       "m450s420m450s420m450s420m450s420m450s420m450s420m450s420m450s420"
-      "m450s420m450s420m450s420m450s420m450s420m450s420m450s420m450s420"
-      "m450s420m450s1300m450s1300m450s1300m450s420m450s420m450s1300m450s420"
+      "m450s420m450s420m450s420m450s420m450s1300m450s420m450s420m450s420"
+      "m450s420m450s1300m450s1300m450s1300m450s1300m450s420m450s1300m450s420"
       "m440s17100",
       irsend.outputStr());
 }
