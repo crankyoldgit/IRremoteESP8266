@@ -10,7 +10,7 @@
 //   Brand: Trotec,  Model: PAC 3200 A/C (TROTEC)
 //   Brand: Trotec,  Model: PAC 3550 Pro A/C (TROTEC_3550)
 //   Brand: Duux,  Model: Blizzard Smart 10K / DXMA04 A/C (TROTEC)
-/// @note For Trotec Model PAC 3900 X, use the Midea protocol instead.
+// For Trotec Model PAC 3900 X, use the Midea protocol instead.
 
 #ifndef IR_TROTEC_H_
 #define IR_TROTEC_H_
