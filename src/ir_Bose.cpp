@@ -7,7 +7,7 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/1579
 
 // Supports:
-//   Brand: Bose,  Model: Insert_TV_Speaker_Model_Here
+//   Brand: Bose,  Model: Bose TV Speaker
 
 #include "IRrecv.h"
 #include "IRsend.h"
