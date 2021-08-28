@@ -1,11 +1,16 @@
 var searchData=
 [
-  ['tcl112ac_7389',['TCL112AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadac4a6ebe702365620ed65ac6f484afda6',1,'IRremoteESP8266.h']]],
-  ['technibel_5fac_7390',['TECHNIBEL_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada11b133c97acd985c6eed8815ae0baf21',1,'IRremoteESP8266.h']]],
-  ['teco_7391',['TECO',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada3a15ee4466478d484508acc3d4d7a050',1,'IRremoteESP8266.h']]],
-  ['teknopoint_7392',['TEKNOPOINT',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada41578cc8c062749d2805da53694dbc55',1,'IRremoteESP8266.h']]],
-  ['toshiba_5fac_7393',['TOSHIBA_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada66de3fced9e8f97d1919bcf4d5726f3e',1,'IRremoteESP8266.h']]],
-  ['transcold_7394',['TRANSCOLD',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada67cbbd63e69dfc1ff147fc2a070222ef',1,'IRremoteESP8266.h']]],
-  ['trotec_7395',['TROTEC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada7d0f8056d221b37f68f80bace2b794b9',1,'IRremoteESP8266.h']]],
-  ['truma_7396',['TRUMA',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada89f82e81dfba292febe62858976e9e91',1,'IRremoteESP8266.h']]]
+  ['samsung_7722',['SAMSUNG',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada2b451b6e7bebbf070d0913ec77d5d438',1,'IRremoteESP8266.h']]],
+  ['samsung36_7723',['SAMSUNG36',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadaa0d1be0c368e3594bc546c241d031fd4',1,'IRremoteESP8266.h']]],
+  ['samsung_5fac_7724',['SAMSUNG_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada39f991023009d760432489e7ad7ad4df',1,'IRremoteESP8266.h']]],
+  ['sanyo_7725',['SANYO',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadac1cf5078ebfd7ff83c70e8ec8522b288',1,'IRremoteESP8266.h']]],
+  ['sanyo_5fac_7726',['SANYO_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadaf85e76d33b94649a2ecc957acd214209',1,'IRremoteESP8266.h']]],
+  ['sanyo_5fac88_7727',['SANYO_AC88',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadafc1c7b1b9a94ca7011443c61494b4d52',1,'IRremoteESP8266.h']]],
+  ['sanyo_5flc7461_7728',['SANYO_LC7461',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada558721044a11b1d4b491343f02267e1d',1,'IRremoteESP8266.h']]],
+  ['sharp_7729',['SHARP',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadaad63db67a2284cd7e3ffe382b6d6ea82',1,'IRremoteESP8266.h']]],
+  ['sharp_5fac_7730',['SHARP_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada353a9d71906702ae10aa4f803a04ca68',1,'IRremoteESP8266.h']]],
+  ['sherwood_7731',['SHERWOOD',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada1412522651b0c8f1a35e1db3807466bb',1,'IRremoteESP8266.h']]],
+  ['sony_7732',['SONY',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada72d58193d4d25517202d22b7e57a65c3',1,'IRremoteESP8266.h']]],
+  ['sony_5f38k_7733',['SONY_38K',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada0027bcfbb78c0c2b951dfff1102a027b',1,'IRremoteESP8266.h']]],
+  ['symphony_7734',['SYMPHONY',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada44c4a84d776e02328ef3b169e743e5ec',1,'IRremoteESP8266.h']]]
 ];

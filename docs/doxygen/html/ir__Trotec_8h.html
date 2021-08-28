@@ -83,8 +83,14 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionTrotecProtocol.html">TrotecProtocol</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Trotec A/C message.  <a href="unionTrotecProtocol.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionTrotec3550Protocol.html">Trotec3550Protocol</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Trotec 3550 A/C message.  <a href="unionTrotec3550Protocol.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTrotecESP.html">IRTrotecESP</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Trotec A/C messages.  <a href="classIRTrotecESP.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTrotec3550.html">IRTrotec3550</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Trotec 3550 A/C messages.  <a href="classIRTrotec3550.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
@@ -115,6 +121,14 @@ Variables</h2></td></tr>
 <tr class="separator:abfe4004dcac892f575ec1efb09567595"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8467d1b9983d5750a61817cacb148efd"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Trotec_8h.html#a8467d1b9983d5750a61817cacb148efd">kTrotecMaxTimer</a> = 23</td></tr>
 <tr class="separator:a8467d1b9983d5750a61817cacb148efd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac464016da9550e438966d563d111ff94"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Trotec_8h.html#ac464016da9550e438966d563d111ff94">kTrotec3550MinTempC</a> = 16</td></tr>
+<tr class="separator:ac464016da9550e438966d563d111ff94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2b93a212482e86918a4ca2a47712da2"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Trotec_8h.html#ac2b93a212482e86918a4ca2a47712da2">kTrotec3550MaxTempC</a> = 30</td></tr>
+<tr class="separator:ac2b93a212482e86918a4ca2a47712da2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0ee010efb5dc36ea74b6942c30969f0"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Trotec_8h.html#ab0ee010efb5dc36ea74b6942c30969f0">kTrotec3550MinTempF</a> = 59</td></tr>
+<tr class="separator:ab0ee010efb5dc36ea74b6942c30969f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3aff13ef394771f4e2f772074848f40"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Trotec_8h.html#ac3aff13ef394771f4e2f772074848f40">kTrotec3550MaxTempF</a> = 86</td></tr>
+<tr class="separator:ac3aff13ef394771f4e2f772074848f40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support for Trotec protocols. </p>
@@ -122,6 +136,62 @@ Variables</h2></td></tr>
 <dd>
 <a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1176">https://github.com/crankyoldgit/IRremoteESP8266/issues/1176</a> </dd></dl>
 </div><h2 class="groupheader">Variable Documentation</h2>
+<a id="ac2b93a212482e86918a4ca2a47712da2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2b93a212482e86918a4ca2a47712da2">&#9670;&nbsp;</a></span>kTrotec3550MaxTempC</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kTrotec3550MaxTempC = 30</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac3aff13ef394771f4e2f772074848f40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3aff13ef394771f4e2f772074848f40">&#9670;&nbsp;</a></span>kTrotec3550MaxTempF</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kTrotec3550MaxTempF = 86</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac464016da9550e438966d563d111ff94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac464016da9550e438966d563d111ff94">&#9670;&nbsp;</a></span>kTrotec3550MinTempC</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kTrotec3550MinTempC = 16</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab0ee010efb5dc36ea74b6942c30969f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0ee010efb5dc36ea74b6942c30969f0">&#9670;&nbsp;</a></span>kTrotec3550MinTempF</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kTrotec3550MinTempF = 59</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a53b2687b96f8e69ec6f57dd2ac7a6dfa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a53b2687b96f8e69ec6f57dd2ac7a6dfa">&#9670;&nbsp;</a></span>kTrotecAuto</h2>
 

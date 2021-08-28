@@ -190,7 +190,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a2618e000bf91cf1585329308a078653a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Denon formatted message. Status: STABLE / Should be working.  <a href="classIRsend.html#a2618e000bf91cf1585329308a078653a">More...</a><br /></td></tr>
 <tr class="separator:a2618e000bf91cf1585329308a078653a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a864bef0dc48f6af4b59057362906cf5d"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a864bef0dc48f6af4b59057362906cf5d">encodeSanyoLC7461</a> (uint16_t address, uint8_t command)</td></tr>
-<tr class="memdesc:a864bef0dc48f6af4b59057362906cf5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a Sanyo LC7461 message.  <a href="classIRsend.html#a864bef0dc48f6af4b59057362906cf5d">More...</a><br /></td></tr>
+<tr class="memdesc:a864bef0dc48f6af4b59057362906cf5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">(%) Extra tolerance to use.  <a href="classIRsend.html#a864bef0dc48f6af4b59057362906cf5d">More...</a><br /></td></tr>
 <tr class="separator:a864bef0dc48f6af4b59057362906cf5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa23e51a97a0ec1907d22623fed6dd223"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#aa23e51a97a0ec1907d22623fed6dd223">sendSanyoLC7461</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#ad067db05b273337e0df38d529094c9e8">kSanyoLC7461Bits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
 <tr class="memdesc:aa23e51a97a0ec1907d22623fed6dd223"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Sanyo LC7461 message. Status: BETA / Probably works.  <a href="classIRsend.html#aa23e51a97a0ec1907d22623fed6dd223">More...</a><br /></td></tr>
@@ -198,6 +198,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab606c11f7bdc726289ba4dadf8bd9da6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#ab606c11f7bdc726289ba4dadf8bd9da6">sendSanyoAc</a> (const uint8_t *data, const uint16_t nbytes=<a class="el" href="IRremoteESP8266_8h.html#ae3128c987a1571fb6b021ffe30079663">kSanyoAcStateLength</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
 <tr class="memdesc:ab606c11f7bdc726289ba4dadf8bd9da6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a SanyoAc formatted message. Status: STABLE / Reported as working.  <a href="classIRsend.html#ab606c11f7bdc726289ba4dadf8bd9da6">More...</a><br /></td></tr>
 <tr class="separator:ab606c11f7bdc726289ba4dadf8bd9da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a713fdba5dbdf6769c4be9f6368036104"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a713fdba5dbdf6769c4be9f6368036104">sendSanyoAc88</a> (const uint8_t *data, const uint16_t nbytes=<a class="el" href="IRremoteESP8266_8h.html#a4051f17043dd78b991c31b092f733c45">kSanyoAc88StateLength</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#afe969a8c9e2b5ca42c88a47b241a23e3">kSanyoAc88MinRepeat</a>)</td></tr>
+<tr class="memdesc:a713fdba5dbdf6769c4be9f6368036104"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a SanyoAc88 formatted message. Status: ALPHA / Completely untested.  <a href="classIRsend.html#a713fdba5dbdf6769c4be9f6368036104">More...</a><br /></td></tr>
+<tr class="separator:a713fdba5dbdf6769c4be9f6368036104"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7a72d61af219d983409911bdc1769b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#ac7a72d61af219d983409911bdc1769b8">sendDISH</a> (uint64_t data, uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#aea0cc15e1c7a6edcd6b60d9ac62d4831">kDishBits</a>, uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a5c2263819b032e3af4d416ab41126bd8">kDishMinRepeat</a>)</td></tr>
 <tr class="memdesc:ac7a72d61af219d983409911bdc1769b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a DISH NETWORK formatted message. Status: STABLE / Working.  <a href="classIRsend.html#ac7a72d61af219d983409911bdc1769b8">More...</a><br /></td></tr>
 <tr class="separator:ac7a72d61af219d983409911bdc1769b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -321,6 +324,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a135796327b5db127473f4d198e663c00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a135796327b5db127473f4d198e663c00">sendTrotec</a> (const unsigned char data[], const uint16_t nbytes=<a class="el" href="IRremoteESP8266_8h.html#ae1d2aa52fef81f03b92c35f4970728d2">kTrotecStateLength</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a4c0411462f2854a8606deca09ed15df5">kTrotecDefaultRepeat</a>)</td></tr>
 <tr class="memdesc:a135796327b5db127473f4d198e663c00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Trotec message. Status: Beta / Probably Working.  <a href="classIRsend.html#a135796327b5db127473f4d198e663c00">More...</a><br /></td></tr>
 <tr class="separator:a135796327b5db127473f4d198e663c00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62e87eb1b347df733e33d012e512bca9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a62e87eb1b347df733e33d012e512bca9">sendTrotec3550</a> (const unsigned char data[], const uint16_t nbytes=<a class="el" href="IRremoteESP8266_8h.html#ae1d2aa52fef81f03b92c35f4970728d2">kTrotecStateLength</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a4c0411462f2854a8606deca09ed15df5">kTrotecDefaultRepeat</a>)</td></tr>
+<tr class="memdesc:a62e87eb1b347df733e33d012e512bca9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Trotec 3550 message. Status: STABLE / Known to be working.  <a href="classIRsend.html#a62e87eb1b347df733e33d012e512bca9">More...</a><br /></td></tr>
+<tr class="separator:a62e87eb1b347df733e33d012e512bca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a693e6616b81509cf27d1345c140acc96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a693e6616b81509cf27d1345c140acc96">sendNikai</a> (uint64_t data, uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a9fce002592f9e2488b1b717d0b1a6a40">kNikaiBits</a>, uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
 <tr class="memdesc:a693e6616b81509cf27d1345c140acc96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Nikai formatted message. Status: STABLE / Working.  <a href="classIRsend.html#a693e6616b81509cf27d1345c140acc96">More...</a><br /></td></tr>
 <tr class="separator:a693e6616b81509cf27d1345c140acc96"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -483,6 +489,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab0b4816ad227a541d27042d76c451b73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#ab0b4816ad227a541d27042d76c451b73">sendKelon</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a98d17d9115af9c6edff1198b14c46838">kKelonBits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
 <tr class="memdesc:ab0b4816ad227a541d27042d76c451b73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Kelon message. Status: STABLE / Working.  <a href="classIRsend.html#ab0b4816ad227a541d27042d76c451b73">More...</a><br /></td></tr>
 <tr class="separator:ab0b4816ad227a541d27042d76c451b73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5051a6d33741d8b2b2ddd5c48903f96c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a5051a6d33741d8b2b2ddd5c48903f96c">sendBose</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#ae5680dcf6d8674e21b3864b8ba2f9718">kBoseBits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
+<tr class="memdesc:a5051a6d33741d8b2b2ddd5c48903f96c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Bose formatted message. Status: STABLE / Known working.  <a href="classIRsend.html#a5051a6d33741d8b2b2ddd5c48903f96c">More...</a><br /></td></tr>
+<tr class="separator:a5051a6d33741d8b2b2ddd5c48903f96c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -1393,8 +1402,8 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Construct a Sanyo LC7461 message. </p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>(%) Extra tolerance to use. </p>
+<p>Construct a Sanyo LC7461 message. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>The 13 bit value of the address(Custom) portion of the protocol. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">command</td><td>The 8 bit value of the command(Key) portion of the protocol. </td></tr>
@@ -1903,6 +1912,50 @@ Private Attributes</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The message to be sent. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">nbytes</td><td>The number of bytes of message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>The number of times the command is to be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a5051a6d33741d8b2b2ddd5c48903f96c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5051a6d33741d8b2b2ddd5c48903f96c">&#9670;&nbsp;</a></span>sendBose()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRsend::sendBose </td>
+          <td>(</td>
+          <td class="paramtype">const uint64_t&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#ae5680dcf6d8674e21b3864b8ba2f9718">kBoseBits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a Bose formatted message. Status: STABLE / Known working. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of bits of message to be sent. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>The number of times the command is to be repeated. </td></tr>
   </table>
   </dd>
@@ -6003,6 +6056,57 @@ Use this method if you want to send the results of <code>decodePanasonic</code>.
 
 </div>
 </div>
+<a id="a713fdba5dbdf6769c4be9f6368036104"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a713fdba5dbdf6769c4be9f6368036104">&#9670;&nbsp;</a></span>sendSanyoAc88()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRsend::sendSanyoAc88 </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbytes</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a4051f17043dd78b991c31b092f733c45">kSanyoAc88StateLength</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#afe969a8c9e2b5ca42c88a47b241a23e3">kSanyoAc88MinRepeat</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a SanyoAc88 formatted message. Status: ALPHA / Completely untested. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>An array of bytes containing the IR command. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>data's bit order may change. It is not yet confirmed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbytes</td><td>Nr. of bytes of data in the array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>Nr. of times the message is to be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1503">https://github.com/crankyoldgit/IRremoteESP8266/issues/1503</a> </dd></dl>
+
+</div>
+</div>
 <a id="aa23e51a97a0ec1907d22623fed6dd223"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa23e51a97a0ec1907d22623fed6dd223">&#9670;&nbsp;</a></span>sendSanyoLC7461()</h2>
 
@@ -6686,6 +6790,50 @@ Use this method if you want to send the results of <code>decodePanasonic</code>.
 
 </div>
 </div>
+<a id="a62e87eb1b347df733e33d012e512bca9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62e87eb1b347df733e33d012e512bca9">&#9670;&nbsp;</a></span>sendTrotec3550()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRsend::sendTrotec3550 </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned char&#160;</td>
+          <td class="paramname"><em>data</em>[], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbytes</em> = <code><a class="el" href="IRremoteESP8266_8h.html#ae1d2aa52fef81f03b92c35f4970728d2">kTrotecStateLength</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a4c0411462f2854a8606deca09ed15df5">kTrotecDefaultRepeat</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a Trotec 3550 message. Status: STABLE / Known to be working. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbytes</td><td>The number of bytes of message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>The number of times the command is to be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="addb8dc185e7d96d3186dad362a6e1445"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#addb8dc185e7d96d3186dad362a6e1445">&#9670;&nbsp;</a></span>sendTruma()</h2>
 
@@ -7296,6 +7444,7 @@ For RC-6 (36-bits/Xbox-360), it is the 16th least significant bit. </dd></dl>
 <li>src/<a class="el" href="ir__Aiwa_8cpp.html">ir_Aiwa.cpp</a></li>
 <li>src/<a class="el" href="ir__Amcor_8cpp.html">ir_Amcor.cpp</a></li>
 <li>src/<a class="el" href="ir__Argo_8cpp.html">ir_Argo.cpp</a></li>
+<li>src/<a class="el" href="ir__Bose_8cpp.html">ir_Bose.cpp</a></li>
 <li>src/<a class="el" href="ir__Carrier_8cpp.html">ir_Carrier.cpp</a></li>
 <li>src/<a class="el" href="ir__Coolix_8cpp.html">ir_Coolix.cpp</a></li>
 <li>src/<a class="el" href="ir__Corona_8cpp.html">ir_Corona.cpp</a></li>
@@ -7364,9 +7513,9 @@ For RC-6 (36-bits/Xbox-360), it is the 16th least significant bit. </dd></dl>
 </ul>
 </div><!-- contents -->
 <div class="ttc" id="aclassIRsend_html_a0b349351e2ba19f87e6b01cde7e67c49"><div class="ttname"><a href="classIRsend.html#a0b349351e2ba19f87e6b01cde7e67c49">IRsend::sendPronto</a></div><div class="ttdeci">void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat=kNoRepeat)</div><div class="ttdoc">Send a Pronto Code formatted message. Status: STABLE / Known working.</div><div class="ttdef"><b>Definition:</b> ir_Pronto.cpp:56</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a336bd721135fc8b869941cd3aa73646e"><div class="ttname"><a href="IRremoteESP8266_8h.html#a336bd721135fc8b869941cd3aa73646e">kVoltasStateLength</a></div><div class="ttdeci">const uint16_t kVoltasStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1165</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_ab18df94a82b365ff30caaabb05a9fcaf"><div class="ttname"><a href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a></div><div class="ttdeci">const uint16_t kCoronaAcStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:957</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a112408429fb4a5cca22a66a351453bad"><div class="ttname"><a href="IRremoteESP8266_8h.html#a112408429fb4a5cca22a66a351453bad">kSonyMinRepeat</a></div><div class="ttdeci">const uint16_t kSonyMinRepeat</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1133</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a336bd721135fc8b869941cd3aa73646e"><div class="ttname"><a href="IRremoteESP8266_8h.html#a336bd721135fc8b869941cd3aa73646e">kVoltasStateLength</a></div><div class="ttdeci">const uint16_t kVoltasStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1193</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_ab18df94a82b365ff30caaabb05a9fcaf"><div class="ttname"><a href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a></div><div class="ttdeci">const uint16_t kCoronaAcStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:982</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a112408429fb4a5cca22a66a351453bad"><div class="ttname"><a href="IRremoteESP8266_8h.html#a112408429fb4a5cca22a66a351453bad">kSonyMinRepeat</a></div><div class="ttdeci">const uint16_t kSonyMinRepeat</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1161</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

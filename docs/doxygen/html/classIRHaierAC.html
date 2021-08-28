@@ -101,6 +101,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab92fd48ccb5707cb6d14e9d46ce42e17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#ab92fd48ccb5707cb6d14e9d46ce42e17">begin</a> (void)</td></tr>
 <tr class="memdesc:ab92fd48ccb5707cb6d14e9d46ce42e17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up hardware to be able to send a message.  <a href="classIRHaierAC.html#ab92fd48ccb5707cb6d14e9d46ce42e17">More...</a><br /></td></tr>
 <tr class="separator:ab92fd48ccb5707cb6d14e9d46ce42e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62fbae1d2bac01ac3a2194274aa839d9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a62fbae1d2bac01ac3a2194274aa839d9">stateReset</a> (void)</td></tr>
+<tr class="memdesc:a62fbae1d2bac01ac3a2194274aa839d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state to a fixed known good state.  <a href="classIRHaierAC.html#a62fbae1d2bac01ac3a2194274aa839d9">More...</a><br /></td></tr>
+<tr class="separator:a62fbae1d2bac01ac3a2194274aa839d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade34c951e72a794c2ff7fa0d1595d68f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#ade34c951e72a794c2ff7fa0d1595d68f">setCommand</a> (const uint8_t command)</td></tr>
 <tr class="memdesc:ade34c951e72a794c2ff7fa0d1595d68f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Command/Button setting of the A/C.  <a href="classIRHaierAC.html#ade34c951e72a794c2ff7fa0d1595d68f">More...</a><br /></td></tr>
 <tr class="separator:ade34c951e72a794c2ff7fa0d1595d68f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -203,9 +206,6 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:a62fbae1d2bac01ac3a2194274aa839d9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#a62fbae1d2bac01ac3a2194274aa839d9">stateReset</a> (void)</td></tr>
-<tr class="memdesc:a62fbae1d2bac01ac3a2194274aa839d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state to a fixed known good state.  <a href="classIRHaierAC.html#a62fbae1d2bac01ac3a2194274aa839d9">More...</a><br /></td></tr>
-<tr class="separator:a62fbae1d2bac01ac3a2194274aa839d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7faae274ff7f30bf7df3c58d6e7e210"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html#ab7faae274ff7f30bf7df3c58d6e7e210">checksum</a> (void)</td></tr>
 <tr class="memdesc:ab7faae274ff7f30bf7df3c58d6e7e210"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate and set the checksum values for the internal state.  <a href="classIRHaierAC.html#ab7faae274ff7f30bf7df3c58d6e7e210">More...</a><br /></td></tr>
 <tr class="separator:ab7faae274ff7f30bf7df3c58d6e7e210"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1025,9 +1025,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void IRHaierAC::stateReset </td>
@@ -1037,11 +1034,6 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Reset the internal state to a fixed known good state. </p>
