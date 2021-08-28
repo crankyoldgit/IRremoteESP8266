@@ -1,6 +1,8 @@
 /// @file
 /// @brief Support for Bose protocols.
-/// Currently only tested against Bose TV Speaker.
+
+// Supports:
+//   Brand: Bose,  Model: Bose TV Speaker
 
 #include "IRrecv.h"
 #include "IRsend.h"
