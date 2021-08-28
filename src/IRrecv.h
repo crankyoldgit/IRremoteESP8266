@@ -762,6 +762,10 @@ class IRrecv {
   bool decodeKelon(decode_results *results, uint16_t offset = kStartOffset,
                    const uint16_t nbits = kKelonBits, const bool strict = true);
 #endif  // DECODE_KELON
+#if DECODE_BOSE
+  bool decodeBose(decode_results *results, uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kBoseBits, const bool strict = true);
+#endif  // DECODE_BOSE
 };
 
 #endif  // IRRECV_H_

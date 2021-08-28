@@ -612,6 +612,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case DENON:
     case SHARP:
       return 15;
+    case BOSE:
     case DISH:
     case GICABLE:
     case JVC:
@@ -790,6 +791,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendAiwaRCT501(data, nbits, min_repeat);
       break;
 #endif
+#if SEND_BOSE
+    case BOSE:
+      sendBose(data, nbits, min_repeat);
+      break;
+#endif  // SEND_BOSE
 #if SEND_CARRIER_AC
     case CARRIER_AC:
       sendCarrierAC(data, nbits, min_repeat);

@@ -1032,6 +1032,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting SanyoAc88 decode");
     if (decodeSanyoAc88(results, offset)) return true;
 #endif  // DECODE_SANYO_AC88
+#if DECODE_BOSE
+    DPRINTLN("Attempting Bose decode");
+    if (decodeBose(results, offset)) return true;
+#endif  // DECODE_BOSE
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
