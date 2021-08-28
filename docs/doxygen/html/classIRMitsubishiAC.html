@@ -147,6 +147,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6d6008f7d374113cc6b5c3a4f298a287"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMitsubishiAC.html#a6d6008f7d374113cc6b5c3a4f298a287">getWideVane</a> (void) const</td></tr>
 <tr class="memdesc:a6d6008f7d374113cc6b5c3a4f298a287"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Wide Vane (Horizontal Swing) mode of the A/C.  <a href="classIRMitsubishiAC.html#a6d6008f7d374113cc6b5c3a4f298a287">More...</a><br /></td></tr>
 <tr class="separator:a6d6008f7d374113cc6b5c3a4f298a287"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a994411e8c49341752d0f7f51106759"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMitsubishiAC.html#a5a994411e8c49341752d0f7f51106759">setVaneLeft</a> (const uint8_t position)</td></tr>
+<tr class="memdesc:a5a994411e8c49341752d0f7f51106759"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the requested Left Vane (Vertical Swing) operation mode of the a/c unit.  <a href="classIRMitsubishiAC.html#a5a994411e8c49341752d0f7f51106759">More...</a><br /></td></tr>
+<tr class="separator:a5a994411e8c49341752d0f7f51106759"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42f5a1ed5e9a651dfd0b231d8cd86f3c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMitsubishiAC.html#a42f5a1ed5e9a651dfd0b231d8cd86f3c">getVaneLeft</a> (void) const</td></tr>
+<tr class="memdesc:a42f5a1ed5e9a651dfd0b231d8cd86f3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Left Vane (Vertical Swing) mode of the A/C.  <a href="classIRMitsubishiAC.html#a42f5a1ed5e9a651dfd0b231d8cd86f3c">More...</a><br /></td></tr>
+<tr class="separator:a42f5a1ed5e9a651dfd0b231d8cd86f3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f2d0ea70bdeb71efab4c20ccd876aa9"><td class="memItemLeft" align="right" valign="top">uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRMitsubishiAC.html#a1f2d0ea70bdeb71efab4c20ccd876aa9">getRaw</a> (void)</td></tr>
 <tr class="memdesc:a1f2d0ea70bdeb71efab4c20ccd876aa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a PTR to the internal state/code for this protocol.  <a href="classIRMitsubishiAC.html#a1f2d0ea70bdeb71efab4c20ccd876aa9">More...</a><br /></td></tr>
 <tr class="separator:a1f2d0ea70bdeb71efab4c20ccd876aa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -766,6 +772,28 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the Vane (Vertical Swing) mode of the A/C. </p>
+<dl class="section note"><dt>Note</dt><dd>On some models, this represents the Right vertical vane. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The native position/mode setting. </dd></dl>
+
+</div>
+</div>
+<a id="a42f5a1ed5e9a651dfd0b231d8cd86f3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42f5a1ed5e9a651dfd0b231d8cd86f3c">&#9670;&nbsp;</a></span>getVaneLeft()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRMitsubishiAC::getVaneLeft </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the Left Vane (Vertical Swing) mode of the A/C. </p>
 <dl class="section return"><dt>Returns</dt><dd>The native position/mode setting. </dd></dl>
 
 </div>
@@ -1134,6 +1162,33 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Set the requested vane (Vertical Swing) operation mode of the a/c unit. </p>
+<dl class="section note"><dt>Note</dt><dd>On some models, this represents the Right vertical vane. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">position</td><td>The position/mode to set the vane to. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a5a994411e8c49341752d0f7f51106759"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a994411e8c49341752d0f7f51106759">&#9670;&nbsp;</a></span>setVaneLeft()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRMitsubishiAC::setVaneLeft </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>position</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the requested Left Vane (Vertical Swing) operation mode of the a/c unit. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">position</td><td>The position/mode to set the vane to. </td></tr>

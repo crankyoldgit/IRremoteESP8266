@@ -143,6 +143,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4cf043df8f6f2e5a3554208dff0d963d"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin176.html#a4cf043df8f6f2e5a3554208dff0d963d">getSwingHorizontal</a> (void) const</td></tr>
 <tr class="memdesc:a4cf043df8f6f2e5a3554208dff0d963d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Horizontal Swing mode of the A/C.  <a href="classIRDaikin176.html#a4cf043df8f6f2e5a3554208dff0d963d">More...</a><br /></td></tr>
 <tr class="separator:a4cf043df8f6f2e5a3554208dff0d963d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad07f9a0dceb879dc15269fcc82bc8c92"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin176.html#ad07f9a0dceb879dc15269fcc82bc8c92">getId</a> (void) const</td></tr>
+<tr class="memdesc:ad07f9a0dceb879dc15269fcc82bc8c92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Unit Id of the A/C.  <a href="classIRDaikin176.html#ad07f9a0dceb879dc15269fcc82bc8c92">More...</a><br /></td></tr>
+<tr class="separator:ad07f9a0dceb879dc15269fcc82bc8c92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a693a060503cfa574638363ad5b702450"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin176.html#a693a060503cfa574638363ad5b702450">setId</a> (const uint8_t num)</td></tr>
+<tr class="memdesc:a693a060503cfa574638363ad5b702450"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Unit Id of the A/C.  <a href="classIRDaikin176.html#a693a060503cfa574638363ad5b702450">More...</a><br /></td></tr>
+<tr class="separator:a693a060503cfa574638363ad5b702450"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee7d30b9935881513afafa5291dd8c0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin176.html#aee7d30b9935881513afafa5291dd8c0c">toCommon</a> (void) const</td></tr>
 <tr class="memdesc:aee7d30b9935881513afafa5291dd8c0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRDaikin176.html#aee7d30b9935881513afafa5291dd8c0c">More...</a><br /></td></tr>
 <tr class="separator:aee7d30b9935881513afafa5291dd8c0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -454,6 +460,27 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ad07f9a0dceb879dc15269fcc82bc8c92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad07f9a0dceb879dc15269fcc82bc8c92">&#9670;&nbsp;</a></span>getId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRDaikin176::getId </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the Unit Id of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>The Unit Id the A/C is to use. </dd></dl>
+
+</div>
+</div>
 <a id="a06d4d50b48a3d10c882342c582d46402"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a06d4d50b48a3d10c882342c582d46402">&#9670;&nbsp;</a></span>getMode()</h2>
 
@@ -649,6 +676,33 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>1 for Min or 3 for Max </dd></dl>
+
+</div>
+</div>
+<a id="a693a060503cfa574638363ad5b702450"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a693a060503cfa574638363ad5b702450">&#9670;&nbsp;</a></span>setId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRDaikin176::setId </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>num</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the Unit Id of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">num</td><td>The Unit Id the A/C is to use. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>0 for Unit A; 1 for Unit B </dd></dl>
 
 </div>
 </div>

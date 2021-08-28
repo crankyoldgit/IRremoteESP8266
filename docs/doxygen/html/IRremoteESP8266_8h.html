@@ -215,7 +215,11 @@ Enumerations</h2></td></tr>
 <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada41578cc8c062749d2805da53694dbc55">TEKNOPOINT</a>, 
 <br />
 &#160;&#160;<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada1da4bf20d5f517e00e57b593b9878c7d">KELON</a>, 
-<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = KELON
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada8b72d2c82b5affa909d2ef3b4406682d">TROTEC_3550</a>, 
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadafc1c7b1b9a94ca7011443c61494b4d52">SANYO_AC88</a>, 
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadafa87658e57567fc9c8af942d0e5c217b">BOSE</a>, 
+<br />
+&#160;&#160;<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = BOSE
 <br />
  }</td></tr>
 <tr class="memdesc:ad5b287a488a8c1b7b8661f029ab56fad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumerator for defining and numbering of supported IR protocol.  <a href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">More...</a><br /></td></tr>
@@ -581,6 +585,12 @@ Variables</h2></td></tr>
 <tr class="separator:ae3128c987a1571fb6b021ffe30079663"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3931645167deda3fd0ec72ba33a4034"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ad3931645167deda3fd0ec72ba33a4034">kSanyoAcBits</a> = <a class="el" href="IRremoteESP8266_8h.html#ae3128c987a1571fb6b021ffe30079663">kSanyoAcStateLength</a> * 8</td></tr>
 <tr class="separator:ad3931645167deda3fd0ec72ba33a4034"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4051f17043dd78b991c31b092f733c45"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a4051f17043dd78b991c31b092f733c45">kSanyoAc88StateLength</a> = 11</td></tr>
+<tr class="separator:a4051f17043dd78b991c31b092f733c45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cedcbcd35a177f26354e2451c66947e"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a9cedcbcd35a177f26354e2451c66947e">kSanyoAc88Bits</a> = <a class="el" href="IRremoteESP8266_8h.html#a4051f17043dd78b991c31b092f733c45">kSanyoAc88StateLength</a> * 8</td></tr>
+<tr class="separator:a9cedcbcd35a177f26354e2451c66947e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe969a8c9e2b5ca42c88a47b241a23e3"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#afe969a8c9e2b5ca42c88a47b241a23e3">kSanyoAc88MinRepeat</a> = 2</td></tr>
+<tr class="separator:afe969a8c9e2b5ca42c88a47b241a23e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c572c8bfa811b7dc3a8a537cc642b85"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a2c572c8bfa811b7dc3a8a537cc642b85">kSanyoSA8650BBits</a> = 12</td></tr>
 <tr class="separator:a2c572c8bfa811b7dc3a8a537cc642b85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e15e988acbea0fb4dfaee6f5bfa12d0"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a> = 13</td></tr>
@@ -685,6 +695,8 @@ Variables</h2></td></tr>
 <tr class="separator:a09f5246478103197630f269ccb3b8c40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa92b00aa3423473fc42766d369ff99ad"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#aa92b00aa3423473fc42766d369ff99ad">kMilesMinRepeat</a> = 0</td></tr>
 <tr class="separator:aa92b00aa3423473fc42766d369ff99ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5680dcf6d8674e21b3864b8ba2f9718"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ae5680dcf6d8674e21b3864b8ba2f9718">kBoseBits</a> = 16</td></tr>
+<tr class="separator:ae5680dcf6d8674e21b3864b8ba2f9718"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="afbeda3fd1bdc8c37d01bdf9f5c8274ff"></a>
@@ -822,6 +834,9 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada5840c3d0e9c83ef706b600ba78854209"></a>HAIER_AC176&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada41578cc8c062749d2805da53694dbc55"></a>TEKNOPOINT&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada1da4bf20d5f517e00e57b593b9878c7d"></a>KELON&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada8b72d2c82b5affa909d2ef3b4406682d"></a>TROTEC_3550&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadafc1c7b1b9a94ca7011443c61494b4d52"></a>SANYO_AC88&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadafa87658e57567fc9c8af942d0e5c217b"></a>BOSE&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59"></a>kLastDecodeType&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
@@ -976,6 +991,20 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint16_t kArgoStateLength = 12</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae5680dcf6d8674e21b3864b8ba2f9718"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5680dcf6d8674e21b3864b8ba2f9718">&#9670;&nbsp;</a></span>kBoseBits</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kBoseBits = 16</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -3306,6 +3335,48 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a9cedcbcd35a177f26354e2451c66947e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9cedcbcd35a177f26354e2451c66947e">&#9670;&nbsp;</a></span>kSanyoAc88Bits</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kSanyoAc88Bits = <a class="el" href="IRremoteESP8266_8h.html#a4051f17043dd78b991c31b092f733c45">kSanyoAc88StateLength</a> * 8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afe969a8c9e2b5ca42c88a47b241a23e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe969a8c9e2b5ca42c88a47b241a23e3">&#9670;&nbsp;</a></span>kSanyoAc88MinRepeat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kSanyoAc88MinRepeat = 2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4051f17043dd78b991c31b092f733c45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4051f17043dd78b991c31b092f733c45">&#9670;&nbsp;</a></span>kSanyoAc88StateLength</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kSanyoAc88StateLength = 11</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ad3931645167deda3fd0ec72ba33a4034"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad3931645167deda3fd0ec72ba33a4034">&#9670;&nbsp;</a></span>kSanyoAcBits</h2>
 
@@ -4065,8 +4136,8 @@ Variables</h2></td></tr>
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1118</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1117</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1146</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1145</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

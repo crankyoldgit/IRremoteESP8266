@@ -257,6 +257,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0e1d1a46a38c722943bc212cdc09ab97"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a0e1d1a46a38c722943bc212cdc09ab97">getFreshAirHigh</a> (void) const</td></tr>
 <tr class="memdesc:a0e1d1a46a38c722943bc212cdc09ab97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the (High) Fresh Air mode status of the A/C.  <a href="classIRDaikin2.html#a0e1d1a46a38c722943bc212cdc09ab97">More...</a><br /></td></tr>
 <tr class="separator:a0e1d1a46a38c722943bc212cdc09ab97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae029e36571a1166c49bcb027383aa75e"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#ae029e36571a1166c49bcb027383aa75e">getHumidity</a> (void) const</td></tr>
+<tr class="memdesc:ae029e36571a1166c49bcb027383aa75e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Humidity percentage setting of the A/C.  <a href="classIRDaikin2.html#ae029e36571a1166c49bcb027383aa75e">More...</a><br /></td></tr>
+<tr class="separator:ae029e36571a1166c49bcb027383aa75e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20ec978d4396476bb76da4a27367c731"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#a20ec978d4396476bb76da4a27367c731">setHumidity</a> (const uint8_t percent)</td></tr>
+<tr class="memdesc:a20ec978d4396476bb76da4a27367c731"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Humidity percentage setting of the A/C.  <a href="classIRDaikin2.html#a20ec978d4396476bb76da4a27367c731">More...</a><br /></td></tr>
+<tr class="separator:a20ec978d4396476bb76da4a27367c731"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4bcf5f856169761c9b0f1fb6607af21"><td class="memItemLeft" align="right" valign="top">uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRDaikin2.html#af4bcf5f856169761c9b0f1fb6607af21">getRaw</a> (void)</td></tr>
 <tr class="memdesc:af4bcf5f856169761c9b0f1fb6607af21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a PTR to the internal state/code for this protocol.  <a href="classIRDaikin2.html#af4bcf5f856169761c9b0f1fb6607af21">More...</a><br /></td></tr>
 <tr class="separator:af4bcf5f856169761c9b0f1fb6607af21"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -977,6 +983,27 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ae029e36571a1166c49bcb027383aa75e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae029e36571a1166c49bcb027383aa75e">&#9670;&nbsp;</a></span>getHumidity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRDaikin2::getHumidity </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the Humidity percentage setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>The setting percentage. 255 is Automatic. 0 is Off. </dd></dl>
+
+</div>
+</div>
 <a id="a100812aedfaa32830dfb59c7857b4af5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a100812aedfaa32830dfb59c7857b4af5">&#9670;&nbsp;</a></span>getLight()</h2>
 
@@ -1632,6 +1659,33 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a20ec978d4396476bb76da4a27367c731"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20ec978d4396476bb76da4a27367c731">&#9670;&nbsp;</a></span>setHumidity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRDaikin2::setHumidity </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>percent</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the Humidity percentage setting of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">percent</td><td>Percentage humidty. 255 is Auto. 0 is Off. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Only available in Dry &amp; Heat modes, otherwise it is Off. </dd></dl>
 
 </div>
 </div>

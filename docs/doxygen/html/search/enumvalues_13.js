@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['whirlpool_5fac_7401',['WHIRLPOOL_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada9faf927323d110269541b356f079b85a',1,'IRremoteESP8266.h']]],
-  ['whynter_7402',['WHYNTER',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada458cdd7fa2b29dc8617c694696580c0c',1,'IRremoteESP8266.h']]]
+  ['vestel_5fac_7746',['VESTEL_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada165413c6395bde985757b5b446f76569',1,'IRremoteESP8266.h']]],
+  ['voltas_7747',['VOLTAS',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada507821565df57e34d8806d2613b1533c',1,'IRremoteESP8266.h']]]
 ];
