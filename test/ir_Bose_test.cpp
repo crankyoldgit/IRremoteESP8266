@@ -1,9 +1,22 @@
+// Copyright 2021 parsnip42
+// Copyright 2021 David Conran
+
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
 #include "gtest/gtest.h"
+
+
+TEST(TestUtils, Housekeeping) {
+  ASSERT_EQ("BOSE", typeToString(decode_type_t::BOSE));
+  ASSERT_EQ(decode_type_t::BOSE, strToDecodeType("BOSE"));
+  ASSERT_FALSE(hasACState(decode_type_t::BOSE));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::BOSE));
+  ASSERT_EQ(kBoseBits, IRsend::defaultBits(decode_type_t::BOSE));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::BOSE));
+}
 
 // Tests for sendBose().
 
@@ -29,7 +42,7 @@ TEST(TestDecodeBose, SyntheticSelfDecode) {
   irsend.reset();
   irsend.sendBose(0xCD32);
   irsend.makeDecodeResult();
-  
+
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(BOSE, irsend.capture.decode_type);
   EXPECT_EQ(kBoseBits, irsend.capture.bits);
@@ -80,7 +93,7 @@ TEST(TestDecodeBose, RealMessageDecode2) {
       1024, 1504,
       496, 528, 472, 480, 520, 502, 496, 506, 494, 502, 496, 502, 498,
       502, 498, 1500, 498, 1502, 496, 1504, 496, 1502, 496, 1504, 494,
-      1472, 524, 1504, 468, 1556, 442, 532, 468, 
+      1472, 524, 1504, 468, 1556, 442, 532, 468,
   };
 
   irsend.sendRaw(rawData_0, 35, 38000);

@@ -612,6 +612,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case DENON:
     case SHARP:
       return 15;
+    case BOSE:
     case DISH:
     case GICABLE:
     case JVC:
@@ -677,8 +678,6 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return 64;
     case ARGO:
       return kArgoBits;
-    case BOSE:
-      return kBoseBits;
     case CORONA_AC:
       return kCoronaAcBits;
     case DAIKIN:
