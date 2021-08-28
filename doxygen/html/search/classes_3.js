@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['ecoclimprotocol_3676',['EcoclimProtocol',['../unionEcoclimProtocol.html',1,'']]],
-  ['electraprotocol_3677',['ElectraProtocol',['../unionElectraProtocol.html',1,'']]]
+  ['ecoclimprotocol_3848',['EcoclimProtocol',['../unionEcoclimProtocol.html',1,'']]],
+  ['electraprotocol_3849',['ElectraProtocol',['../unionElectraProtocol.html',1,'']]]
 ];

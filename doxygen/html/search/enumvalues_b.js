@@ -1,18 +1,8 @@
 var searchData=
 [
-  ['magiquest_7346',['MAGIQUEST',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada3be750ce1687bc1a92fee05b0c511100',1,'IRremoteESP8266.h']]],
-  ['metz_7347',['METZ',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadaa77ca3ee98846eee35bd2995bf2ae25b',1,'IRremoteESP8266.h']]],
-  ['midea_7348',['MIDEA',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada1571f3cf72caf1cf23481802b450382a',1,'IRremoteESP8266.h']]],
-  ['midea24_7349',['MIDEA24',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada59b5ac5c1d354e50932dc0208d9b0b43',1,'IRremoteESP8266.h']]],
-  ['milestag2_7350',['MILESTAG2',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada5ffb7486d99840e02f2688e3d6605a14',1,'IRremoteESP8266.h']]],
-  ['mirage_7351',['MIRAGE',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada9ab6dd14fa5c7d0d32c60d414c7df36a',1,'IRremoteESP8266.h']]],
-  ['mitsubishi_7352',['MITSUBISHI',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab98915357fe1cb91de0536136be20d07',1,'IRremoteESP8266.h']]],
-  ['mitsubishi112_7353',['MITSUBISHI112',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab8e5875a5959b72ca7ff17bccff97c4d',1,'IRremoteESP8266.h']]],
-  ['mitsubishi136_7354',['MITSUBISHI136',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada3c73724a654627a04cc96e280b9630fe',1,'IRremoteESP8266.h']]],
-  ['mitsubishi2_7355',['MITSUBISHI2',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada66368850d567cbeb3b2c2233cae34cd0',1,'IRremoteESP8266.h']]],
-  ['mitsubishi_5fac_7356',['MITSUBISHI_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada45198cb83bbf76b320eaa91d09c44b38',1,'IRremoteESP8266.h']]],
-  ['mitsubishi_5fheavy_5f152_7357',['MITSUBISHI_HEAVY_152',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada15c8d1d51d5f9e42fd03638cbdfb7cbf',1,'IRremoteESP8266.h']]],
-  ['mitsubishi_5fheavy_5f88_7358',['MITSUBISHI_HEAVY_88',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadad303f6c0494d33354cb7c11af258f663',1,'IRremoteESP8266.h']]],
-  ['multibrackets_7359',['MULTIBRACKETS',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadaaebb72f3ad9ff2a706d8041763de6e49',1,'IRremoteESP8266.h']]],
-  ['mwm_7360',['MWM',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada8a6938c955212e1fb81fb511437cbe56',1,'IRremoteESP8266.h']]]
+  ['lasertag_7686',['LASERTAG',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada92eadf4fa6dd16da5b79a2fcbf729894',1,'IRremoteESP8266.h']]],
+  ['legopf_7687',['LEGOPF',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada9a31bf5555b17ea7b115a5c2550fc1de',1,'IRremoteESP8266.h']]],
+  ['lg_7688',['LG',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadadf6c249ac7d923229f9e623eff9a61f4',1,'IRremoteESP8266.h']]],
+  ['lg2_7689',['LG2',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada8402547ec0b99b9b0efe97dec65badf9',1,'IRremoteESP8266.h']]],
+  ['lutron_7690',['LUTRON',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada76cc459b9e26d82ed82cf120272fd8cb',1,'IRremoteESP8266.h']]]
 ];

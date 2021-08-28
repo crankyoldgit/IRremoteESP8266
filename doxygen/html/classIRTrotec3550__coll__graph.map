@@ -1,0 +1,5 @@
+<map id="IRTrotec3550" name="IRTrotec3550">
+<area shape="rect" id="node1" title="Class for handling detailed Trotec 3550 A/C messages." alt="" coords="51,95,157,121"/>
+<area shape="rect" id="node2" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
+<area shape="rect" id="node3" href="$unionTrotec3550Protocol.html" title="Native representation of a Trotec 3550 A/C message." alt="" coords="96,5,243,32"/>
+</map>

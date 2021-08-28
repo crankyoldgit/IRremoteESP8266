@@ -119,6 +119,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a592403e1602a3b92f75d0e07756cc86e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a592403e1602a3b92f75d0e07756cc86e">getPower</a> (void) const</td></tr>
 <tr class="memdesc:a592403e1602a3b92f75d0e07756cc86e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current power setting.  <a href="classIRLgAc.html#a592403e1602a3b92f75d0e07756cc86e">More...</a><br /></td></tr>
 <tr class="separator:a592403e1602a3b92f75d0e07756cc86e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d96e712bafb539f24e238b99fd3219b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a0d96e712bafb539f24e238b99fd3219b">isOffCommand</a> (void) const</td></tr>
+<tr class="memdesc:a0d96e712bafb539f24e238b99fd3219b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the message a Power Off message?  <a href="classIRLgAc.html#a0d96e712bafb539f24e238b99fd3219b">More...</a><br /></td></tr>
+<tr class="separator:a0d96e712bafb539f24e238b99fd3219b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9924a8bc9737ec6007d76ec47b34142"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ad9924a8bc9737ec6007d76ec47b34142">setTemp</a> (const uint8_t degrees)</td></tr>
 <tr class="memdesc:ad9924a8bc9737ec6007d76ec47b34142"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRLgAc.html#ad9924a8bc9737ec6007d76ec47b34142">More...</a><br /></td></tr>
 <tr class="separator:ad9924a8bc9737ec6007d76ec47b34142"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,15 +140,56 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a684e35c0c7f4dafbaf6d53230e7ee643"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a684e35c0c7f4dafbaf6d53230e7ee643">getMode</a> (void) const</td></tr>
 <tr class="memdesc:a684e35c0c7f4dafbaf6d53230e7ee643"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the operating mode setting of the A/C.  <a href="classIRLgAc.html#a684e35c0c7f4dafbaf6d53230e7ee643">More...</a><br /></td></tr>
 <tr class="separator:a684e35c0c7f4dafbaf6d53230e7ee643"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a884ab1012dde89fad207e59243c39374"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a884ab1012dde89fad207e59243c39374">setLight</a> (const bool <a class="el" href="classIRLgAc.html#a171358340c1ba8f90fef0c5454f2aa41">on</a>)</td></tr>
+<tr class="memdesc:a884ab1012dde89fad207e59243c39374"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the light/led/display setting.  <a href="classIRLgAc.html#a884ab1012dde89fad207e59243c39374">More...</a><br /></td></tr>
+<tr class="separator:a884ab1012dde89fad207e59243c39374"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2a1fd4e4969da07d5664f20aa1cb513"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ae2a1fd4e4969da07d5664f20aa1cb513">getLight</a> (void) const</td></tr>
+<tr class="memdesc:ae2a1fd4e4969da07d5664f20aa1cb513"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of the current light setting.  <a href="classIRLgAc.html#ae2a1fd4e4969da07d5664f20aa1cb513">More...</a><br /></td></tr>
+<tr class="separator:ae2a1fd4e4969da07d5664f20aa1cb513"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7396ace3a9e106b9c3f58469b96904b4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a7396ace3a9e106b9c3f58469b96904b4">isLightToggle</a> (void) const</td></tr>
+<tr class="memdesc:a7396ace3a9e106b9c3f58469b96904b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the message a Light Toggle message?  <a href="classIRLgAc.html#a7396ace3a9e106b9c3f58469b96904b4">More...</a><br /></td></tr>
+<tr class="separator:a7396ace3a9e106b9c3f58469b96904b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf374890a9c7f052238531b3d9e91bc9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#acf374890a9c7f052238531b3d9e91bc9">isSwing</a> (void) const</td></tr>
+<tr class="memdesc:acf374890a9c7f052238531b3d9e91bc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the stored code is a Swing message.  <a href="classIRLgAc.html#acf374890a9c7f052238531b3d9e91bc9">More...</a><br /></td></tr>
+<tr class="separator:acf374890a9c7f052238531b3d9e91bc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab48421ad9422b936e472fe7edbe11cef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ab48421ad9422b936e472fe7edbe11cef">setSwingH</a> (const bool <a class="el" href="classIRLgAc.html#a171358340c1ba8f90fef0c5454f2aa41">on</a>)</td></tr>
+<tr class="memdesc:ab48421ad9422b936e472fe7edbe11cef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Horizontal Swing mode of the A/C.  <a href="classIRLgAc.html#ab48421ad9422b936e472fe7edbe11cef">More...</a><br /></td></tr>
+<tr class="separator:ab48421ad9422b936e472fe7edbe11cef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a990c182b057506ff9f0c1ff5427aed5c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a990c182b057506ff9f0c1ff5427aed5c">getSwingH</a> (void) const</td></tr>
+<tr class="memdesc:a990c182b057506ff9f0c1ff5427aed5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Horizontal Swing position setting of the A/C.  <a href="classIRLgAc.html#a990c182b057506ff9f0c1ff5427aed5c">More...</a><br /></td></tr>
+<tr class="separator:a990c182b057506ff9f0c1ff5427aed5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acac87b04f6a6c72f90d10f7f83b4fc42"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#acac87b04f6a6c72f90d10f7f83b4fc42">isSwingV</a> (void) const</td></tr>
+<tr class="memdesc:acac87b04f6a6c72f90d10f7f83b4fc42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the stored code is a non-vane SwingV message.  <a href="classIRLgAc.html#acac87b04f6a6c72f90d10f7f83b4fc42">More...</a><br /></td></tr>
+<tr class="separator:acac87b04f6a6c72f90d10f7f83b4fc42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97fd28df16001c4a29b894bbff13c8a4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a97fd28df16001c4a29b894bbff13c8a4">isVaneSwingV</a> (void) const</td></tr>
+<tr class="memdesc:a97fd28df16001c4a29b894bbff13c8a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the stored code is a vane specific SwingV message.  <a href="classIRLgAc.html#a97fd28df16001c4a29b894bbff13c8a4">More...</a><br /></td></tr>
+<tr class="separator:a97fd28df16001c4a29b894bbff13c8a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bd571d69084b209a444d1fdac1364b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a6bd571d69084b209a444d1fdac1364b6">setSwingV</a> (const uint32_t position)</td></tr>
+<tr class="memdesc:a6bd571d69084b209a444d1fdac1364b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Vertical Swing mode of the A/C.  <a href="classIRLgAc.html#a6bd571d69084b209a444d1fdac1364b6">More...</a><br /></td></tr>
+<tr class="separator:a6bd571d69084b209a444d1fdac1364b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a260d67d39cfa4d4978e205b8a2202c8c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a260d67d39cfa4d4978e205b8a2202c8c">getSwingV</a> (void) const</td></tr>
+<tr class="memdesc:a260d67d39cfa4d4978e205b8a2202c8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Vertical Swing position setting of the A/C.  <a href="classIRLgAc.html#a260d67d39cfa4d4978e205b8a2202c8c">More...</a><br /></td></tr>
+<tr class="separator:a260d67d39cfa4d4978e205b8a2202c8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af52a008ae58dd7269bbd24e78613d80f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#af52a008ae58dd7269bbd24e78613d80f">setVaneSwingV</a> (const uint8_t vane, const uint8_t position)</td></tr>
+<tr class="memdesc:af52a008ae58dd7269bbd24e78613d80f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the per Vane Vertical Swing mode of the A/C.  <a href="classIRLgAc.html#af52a008ae58dd7269bbd24e78613d80f">More...</a><br /></td></tr>
+<tr class="separator:af52a008ae58dd7269bbd24e78613d80f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a704467e2e36b9e502e48ff443ecc48ae"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a704467e2e36b9e502e48ff443ecc48ae">getVaneSwingV</a> (const uint8_t vane) const</td></tr>
+<tr class="memdesc:a704467e2e36b9e502e48ff443ecc48ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Vertical Swing position for the given vane of the A/C.  <a href="classIRLgAc.html#a704467e2e36b9e502e48ff443ecc48ae">More...</a><br /></td></tr>
+<tr class="separator:a704467e2e36b9e502e48ff443ecc48ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a023cb27e7e3d83a6a8c66f04669f3851"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a023cb27e7e3d83a6a8c66f04669f3851">isSwingH</a> (void) const</td></tr>
+<tr class="memdesc:a023cb27e7e3d83a6a8c66f04669f3851"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the stored code is a SwingH message.  <a href="classIRLgAc.html#a023cb27e7e3d83a6a8c66f04669f3851">More...</a><br /></td></tr>
+<tr class="separator:a023cb27e7e3d83a6a8c66f04669f3851"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c9a9f78144444ef5aec1f05acdc39b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a1c9a9f78144444ef5aec1f05acdc39b6">updateSwingPrev</a> (void)</td></tr>
+<tr class="separator:a1c9a9f78144444ef5aec1f05acdc39b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcb529d2f2c9016388264b80e6a99351"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#afcb529d2f2c9016388264b80e6a99351">getRaw</a> (void)</td></tr>
 <tr class="memdesc:afcb529d2f2c9016388264b80e6a99351"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a copy of the internal state/code for this protocol.  <a href="classIRLgAc.html#afcb529d2f2c9016388264b80e6a99351">More...</a><br /></td></tr>
 <tr class="separator:afcb529d2f2c9016388264b80e6a99351"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0da8ea4946826736f526386dc4d115cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a0da8ea4946826736f526386dc4d115cc">setRaw</a> (const uint32_t new_code)</td></tr>
-<tr class="memdesc:a0da8ea4946826736f526386dc4d115cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRLgAc.html#a0da8ea4946826736f526386dc4d115cc">More...</a><br /></td></tr>
-<tr class="separator:a0da8ea4946826736f526386dc4d115cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7c25ce38605a54204f761f8aa7f24e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ab7c25ce38605a54204f761f8aa7f24e1">toCommon</a> (void) const</td></tr>
-<tr class="memdesc:ab7c25ce38605a54204f761f8aa7f24e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRLgAc.html#ab7c25ce38605a54204f761f8aa7f24e1">More...</a><br /></td></tr>
-<tr class="separator:ab7c25ce38605a54204f761f8aa7f24e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1faf5f8fbb011589c36b984a0e1fb3c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ad1faf5f8fbb011589c36b984a0e1fb3c">setRaw</a> (const uint32_t new_code, const <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">decode_type_t</a> protocol=<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada6ce26a62afab55d7606ad4e92428b30c">decode_type_t::UNKNOWN</a>)</td></tr>
+<tr class="memdesc:ad1faf5f8fbb011589c36b984a0e1fb3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRLgAc.html#ad1faf5f8fbb011589c36b984a0e1fb3c">More...</a><br /></td></tr>
+<tr class="separator:ad1faf5f8fbb011589c36b984a0e1fb3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73fa4a00a54169befd00f039c095f6fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a73fa4a00a54169befd00f039c095f6fb">toCommon</a> (const <a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> *prev=NULL) const</td></tr>
+<tr class="memdesc:a73fa4a00a54169befd00f039c095f6fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRLgAc.html#a73fa4a00a54169befd00f039c095f6fb">More...</a><br /></td></tr>
+<tr class="separator:a73fa4a00a54169befd00f039c095f6fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a8711f21c894afd2653835be5bcdd9f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a4a8711f21c894afd2653835be5bcdd9f">toString</a> (void) const</td></tr>
 <tr class="memdesc:a4a8711f21c894afd2653835be5bcdd9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRLgAc.html#a4a8711f21c894afd2653835be5bcdd9f">More...</a><br /></td></tr>
 <tr class="separator:a4a8711f21c894afd2653835be5bcdd9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -164,6 +208,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a51748fa24de24049a2fafb4590e84176"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a51748fa24de24049a2fafb4590e84176">validChecksum</a> (const uint32_t state)</td></tr>
 <tr class="memdesc:a51748fa24de24049a2fafb4590e84176"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the checksum is valid for a given state.  <a href="classIRLgAc.html#a51748fa24de24049a2fafb4590e84176">More...</a><br /></td></tr>
 <tr class="separator:a51748fa24de24049a2fafb4590e84176"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0500b7baf4e1c50abc70c9ed7dbfa66"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#aa0500b7baf4e1c50abc70c9ed7dbfa66">calcVaneSwingV</a> (const uint8_t vane, const uint8_t position)</td></tr>
+<tr class="memdesc:aa0500b7baf4e1c50abc70c9ed7dbfa66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the Vane specific Vertical Swing code for the A/C.  <a href="classIRLgAc.html#aa0500b7baf4e1c50abc70c9ed7dbfa66">More...</a><br /></td></tr>
+<tr class="separator:aa0500b7baf4e1c50abc70c9ed7dbfa66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bfb3e3b68b26a4f552fed5040d01c72"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a6bfb3e3b68b26a4f552fed5040d01c72">getVaneCode</a> (const uint32_t raw)</td></tr>
+<tr class="memdesc:a6bfb3e3b68b26a4f552fed5040d01c72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vane code of a Vane Vertical Swing message.  <a href="classIRLgAc.html#a6bfb3e3b68b26a4f552fed5040d01c72">More...</a><br /></td></tr>
+<tr class="separator:a6bfb3e3b68b26a4f552fed5040d01c72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a114eca216b7c9c7be33d4527f848311e"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a114eca216b7c9c7be33d4527f848311e">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
 <tr class="memdesc:a114eca216b7c9c7be33d4527f848311e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRLgAc.html#a114eca216b7c9c7be33d4527f848311e">More...</a><br /></td></tr>
 <tr class="separator:a114eca216b7c9c7be33d4527f848311e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -173,9 +223,21 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:af47317ba139a4b1e5961b9a45db974df"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#af47317ba139a4b1e5961b9a45db974df">toCommonFanSpeed</a> (const uint8_t speed)</td></tr>
 <tr class="memdesc:af47317ba139a4b1e5961b9a45db974df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRLgAc.html#af47317ba139a4b1e5961b9a45db974df">More...</a><br /></td></tr>
 <tr class="separator:af47317ba139a4b1e5961b9a45db974df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25354c0ec72a3847941e0fec527c1c76"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a25354c0ec72a3847941e0fec527c1c76">toCommonSwingV</a> (const uint32_t code)</td></tr>
+<tr class="memdesc:a25354c0ec72a3847941e0fec527c1c76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native Vertical Swing into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRLgAc.html#a25354c0ec72a3847941e0fec527c1c76">More...</a><br /></td></tr>
+<tr class="separator:a25354c0ec72a3847941e0fec527c1c76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1df1726d8805481971b72305d0903b9d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a1df1726d8805481971b72305d0903b9d">toCommonVaneSwingV</a> (const uint8_t pos)</td></tr>
+<tr class="memdesc:a1df1726d8805481971b72305d0903b9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native Vane specific Vertical Swing into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRLgAc.html#a1df1726d8805481971b72305d0903b9d">More...</a><br /></td></tr>
+<tr class="separator:a1df1726d8805481971b72305d0903b9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71ce8d1be4222ecae26fcea3b71a1ba6"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a71ce8d1be4222ecae26fcea3b71a1ba6">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
 <tr class="memdesc:a71ce8d1be4222ecae26fcea3b71a1ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRLgAc.html#a71ce8d1be4222ecae26fcea3b71a1ba6">More...</a><br /></td></tr>
 <tr class="separator:a71ce8d1be4222ecae26fcea3b71a1ba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00443bd863bbf4ce0505482847a4746f"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a00443bd863bbf4ce0505482847a4746f">convertSwingV</a> (const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv)</td></tr>
+<tr class="memdesc:a00443bd863bbf4ce0505482847a4746f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43" title="Common A/C settings for Vertical Swing.">stdAc::swingv_t</a> enum into it's native setting.  <a href="classIRLgAc.html#a00443bd863bbf4ce0505482847a4746f">More...</a><br /></td></tr>
+<tr class="separator:a00443bd863bbf4ce0505482847a4746f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af478d89d3109f189fc2f07e41b22bfc2"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#af478d89d3109f189fc2f07e41b22bfc2">convertVaneSwingV</a> (const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> swingv)</td></tr>
+<tr class="memdesc:af478d89d3109f189fc2f07e41b22bfc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43" title="Common A/C settings for Vertical Swing.">stdAc::swingv_t</a> enum into it's native setting.  <a href="classIRLgAc.html#af478d89d3109f189fc2f07e41b22bfc2">More...</a><br /></td></tr>
+<tr class="separator:af478d89d3109f189fc2f07e41b22bfc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -185,6 +247,15 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a39aca9861608211c8e74c89a7ccc97cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a39aca9861608211c8e74c89a7ccc97cd">_setTemp</a> (const uint8_t value)</td></tr>
 <tr class="memdesc:a39aca9861608211c8e74c89a7ccc97cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the temperature.  <a href="classIRLgAc.html#a39aca9861608211c8e74c89a7ccc97cd">More...</a><br /></td></tr>
 <tr class="separator:a39aca9861608211c8e74c89a7ccc97cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f0b73bc626053c0e636a2c871831569"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a7f0b73bc626053c0e636a2c871831569">_isAKB74955603</a> (void) const</td></tr>
+<tr class="memdesc:a7f0b73bc626053c0e636a2c871831569"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the stored code must belong to a AKB74955603 model.  <a href="classIRLgAc.html#a7f0b73bc626053c0e636a2c871831569">More...</a><br /></td></tr>
+<tr class="separator:a7f0b73bc626053c0e636a2c871831569"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e84bb906414ebfab862a61a6e1a5ed6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a1e84bb906414ebfab862a61a6e1a5ed6">_isAKB73757604</a> (void) const</td></tr>
+<tr class="memdesc:a1e84bb906414ebfab862a61a6e1a5ed6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the stored code must belong to a AKB73757604 model.  <a href="classIRLgAc.html#a1e84bb906414ebfab862a61a6e1a5ed6">More...</a><br /></td></tr>
+<tr class="separator:a1e84bb906414ebfab862a61a6e1a5ed6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a442d768448bb220a401204b5b34d4a33"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a442d768448bb220a401204b5b34d4a33">_isNormal</a> (void) const</td></tr>
+<tr class="memdesc:a442d768448bb220a401204b5b34d4a33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the current message a normal (non-special) message?  <a href="classIRLgAc.html#a442d768448bb220a401204b5b34d4a33">More...</a><br /></td></tr>
+<tr class="separator:a442d768448bb220a401204b5b34d4a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -195,9 +266,26 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a2d337e8d615c8e526d5620206f7b45cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1eeb727ee96c26b784a607aabd4577c9"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a1eeb727ee96c26b784a607aabd4577c9">_temp</a></td></tr>
 <tr class="separator:a1eeb727ee96c26b784a607aabd4577c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c28369f65d40272ee5978346ef96f52"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a6c28369f65d40272ee5978346ef96f52">_light</a></td></tr>
+<tr class="separator:a6c28369f65d40272ee5978346ef96f52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5045df37932b80b1bd2a1a2fbd52a22"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#aa5045df37932b80b1bd2a1a2fbd52a22">_swingv</a></td></tr>
+<tr class="separator:aa5045df37932b80b1bd2a1a2fbd52a22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab760f8eb027f1136d58f5d82d45dbf21"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#ab760f8eb027f1136d58f5d82d45dbf21">_swingv_prev</a></td></tr>
+<tr class="separator:ab760f8eb027f1136d58f5d82d45dbf21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a317a4a854e0055b65ed8675fb8098ede"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a317a4a854e0055b65ed8675fb8098ede">_vaneswingv</a> [<a class="el" href="ir__LG_8h.html#abc9a6c2cf10175f1195762d356e9f11d">kLgAcSwingVMaxVanes</a>]</td></tr>
+<tr class="separator:a317a4a854e0055b65ed8675fb8098ede"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb040df01764ef02209cda31a4a075e8"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#afb040df01764ef02209cda31a4a075e8">_vaneswingv_prev</a> [<a class="el" href="ir__LG_8h.html#abc9a6c2cf10175f1195762d356e9f11d">kLgAcSwingVMaxVanes</a>]</td></tr>
+<tr class="separator:afb040df01764ef02209cda31a4a075e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a821d9592e0942dd2bda23d8b1eafdce0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a821d9592e0942dd2bda23d8b1eafdce0">_swingh</a></td></tr>
+<tr class="separator:a821d9592e0942dd2bda23d8b1eafdce0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74002a8353e6534eed11f80076c960f6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a74002a8353e6534eed11f80076c960f6">_swingh_prev</a></td></tr>
+<tr class="separator:a74002a8353e6534eed11f80076c960f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bd32e865a7358bbf32830d888e2786a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">decode_type_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a9bd32e865a7358bbf32830d888e2786a">_protocol</a></td></tr>
-<tr class="memdesc:a9bd32e865a7358bbf32830d888e2786a"><td class="mdescLeft">&#160;</td><td class="mdescRight">model  <a href="classIRLgAc.html#a9bd32e865a7358bbf32830d888e2786a">More...</a><br /></td></tr>
+<tr class="memdesc:a9bd32e865a7358bbf32830d888e2786a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Protocol version.  <a href="classIRLgAc.html#a9bd32e865a7358bbf32830d888e2786a">More...</a><br /></td></tr>
 <tr class="separator:a9bd32e865a7358bbf32830d888e2786a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8aaa178ff79b4fe5d0ede41e4a52e0b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRsend_8h.html#a50c54713e16502d280723334879dc83b">lg_ac_remote_model_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRLgAc.html#a8aaa178ff79b4fe5d0ede41e4a52e0b2">_model</a></td></tr>
+<tr class="memdesc:a8aaa178ff79b4fe5d0ede41e4a52e0b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Model type.  <a href="classIRLgAc.html#a8aaa178ff79b4fe5d0ede41e4a52e0b2">More...</a><br /></td></tr>
+<tr class="separator:a8aaa178ff79b4fe5d0ede41e4a52e0b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for handling detailed LG A/C messages. </p>
@@ -255,6 +343,95 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a1e84bb906414ebfab862a61a6e1a5ed6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e84bb906414ebfab862a61a6e1a5ed6">&#9670;&nbsp;</a></span>_isAKB73757604()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::_isAKB73757604 </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if the stored code must belong to a AKB73757604 model. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is AKB73757604 message. Otherwise, false. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Internal use only. </dd></dl>
+
+</div>
+</div>
+<a id="a7f0b73bc626053c0e636a2c871831569"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f0b73bc626053c0e636a2c871831569">&#9670;&nbsp;</a></span>_isAKB74955603()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::_isAKB74955603 </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if the stored code must belong to a AKB74955603 model. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is AKB74955603 message. Otherwise, false. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Internal use only. </dd></dl>
+
+</div>
+</div>
+<a id="a442d768448bb220a401204b5b34d4a33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a442d768448bb220a401204b5b34d4a33">&#9670;&nbsp;</a></span>_isNormal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::_isNormal </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Is the current message a normal (non-special) message? </p>
+<dl class="section return"><dt>Returns</dt><dd>True, if it is a normal message, False, if it is special. </dd></dl>
+
+</div>
+</div>
 <a id="a39aca9861608211c8e74c89a7ccc97cd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a39aca9861608211c8e74c89a7ccc97cd">&#9670;&nbsp;</a></span>_setTemp()</h2>
 
@@ -342,6 +519,45 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The calculated checksum value. </dd></dl>
+
+</div>
+</div>
+<a id="aa0500b7baf4e1c50abc70c9ed7dbfa66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0500b7baf4e1c50abc70c9ed7dbfa66">&#9670;&nbsp;</a></span>calcVaneSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t IRLgAc::calcVaneSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>vane</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>position</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculate the Vane specific Vertical Swing code for the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>The native raw code. </dd></dl>
 
 </div>
 </div>
@@ -473,6 +689,76 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a00443bd863bbf4ce0505482847a4746f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00443bd863bbf4ce0505482847a4746f">&#9670;&nbsp;</a></span>convertSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t IRLgAc::convertSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a>&#160;</td>
+          <td class="paramname"><em>swingv</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert a <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43" title="Common A/C settings for Vertical Swing.">stdAc::swingv_t</a> enum into it's native setting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">swingv</td><td>The enum to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
+
+</div>
+</div>
+<a id="af478d89d3109f189fc2f07e41b22bfc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af478d89d3109f189fc2f07e41b22bfc2">&#9670;&nbsp;</a></span>convertVaneSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRLgAc::convertVaneSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a>&#160;</td>
+          <td class="paramname"><em>swingv</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert a <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43" title="Common A/C settings for Vertical Swing.">stdAc::swingv_t</a> enum into it's native setting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">swingv</td><td>The enum to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
+
+</div>
+</div>
 <a id="a38a3fed9066641cd80208d330c92ef9b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a38a3fed9066641cd80208d330c92ef9b">&#9670;&nbsp;</a></span>getFan()</h2>
 
@@ -491,6 +777,27 @@ Private Attributes</h2></td></tr>
 
 <p>Get the current fan speed setting. </p>
 <dl class="section return"><dt>Returns</dt><dd>The current fan speed. </dd></dl>
+
+</div>
+</div>
+<a id="ae2a1fd4e4969da07d5664f20aa1cb513"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2a1fd4e4969da07d5664f20aa1cb513">&#9670;&nbsp;</a></span>getLight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::getLight </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the value of the current light setting. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
 
 </div>
 </div>
@@ -578,6 +885,48 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a990c182b057506ff9f0c1ff5427aed5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a990c182b057506ff9f0c1ff5427aed5c">&#9670;&nbsp;</a></span>getSwingH()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::getSwingH </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the Horizontal Swing position setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is. Otherwise, false. </dd></dl>
+
+</div>
+</div>
+<a id="a260d67d39cfa4d4978e205b8a2202c8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a260d67d39cfa4d4978e205b8a2202c8c">&#9670;&nbsp;</a></span>getSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t IRLgAc::getSwingV </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the Vertical Swing position setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>The native position/mode. </dd></dl>
+
+</div>
+</div>
 <a id="ab31fa58db72e02efe836e398d8c4ac85"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab31fa58db72e02efe836e398d8c4ac85">&#9670;&nbsp;</a></span>getTemp()</h2>
 
@@ -599,6 +948,167 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a6bfb3e3b68b26a4f552fed5040d01c72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6bfb3e3b68b26a4f552fed5040d01c72">&#9670;&nbsp;</a></span>getVaneCode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRLgAc::getVaneCode </td>
+          <td>(</td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>raw</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the vane code of a Vane Vertical Swing message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">raw</td><td>A raw number representing a native LG message. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A number containing just the vane nr, and the position. </dd></dl>
+
+</div>
+</div>
+<a id="a704467e2e36b9e502e48ff443ecc48ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a704467e2e36b9e502e48ff443ecc48ae">&#9670;&nbsp;</a></span>getVaneSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRLgAc::getVaneSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>vane</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the Vertical Swing position for the given vane of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>The native position/mode. </dd></dl>
+
+</div>
+</div>
+<a id="a7396ace3a9e106b9c3f58469b96904b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7396ace3a9e106b9c3f58469b96904b4">&#9670;&nbsp;</a></span>isLightToggle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::isLightToggle </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Is the message a Light Toggle message? </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is. false, if not. </dd></dl>
+
+</div>
+</div>
+<a id="a0d96e712bafb539f24e238b99fd3219b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d96e712bafb539f24e238b99fd3219b">&#9670;&nbsp;</a></span>isOffCommand()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::isOffCommand </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Is the message a Power Off message? </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is. false, if not. </dd></dl>
+
+</div>
+</div>
+<a id="acf374890a9c7f052238531b3d9e91bc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf374890a9c7f052238531b3d9e91bc9">&#9670;&nbsp;</a></span>isSwing()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::isSwing </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if the stored code is a Swing message. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is. Otherwise, false. </dd></dl>
+
+</div>
+</div>
+<a id="a023cb27e7e3d83a6a8c66f04669f3851"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a023cb27e7e3d83a6a8c66f04669f3851">&#9670;&nbsp;</a></span>isSwingH()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::isSwingH </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if the stored code is a SwingH message. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is. Otherwise, false. </dd></dl>
+
+</div>
+</div>
+<a id="acac87b04f6a6c72f90d10f7f83b4fc42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acac87b04f6a6c72f90d10f7f83b4fc42">&#9670;&nbsp;</a></span>isSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::isSwingV </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if the stored code is a non-vane SwingV message. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is. Otherwise, false. </dd></dl>
+
+</div>
+</div>
 <a id="ad35d47f590ee4bd51bfdf9d911bce242"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad35d47f590ee4bd51bfdf9d911bce242">&#9670;&nbsp;</a></span>isValidLgAc()</h2>
 
@@ -617,6 +1127,27 @@ Private Attributes</h2></td></tr>
 
 <p>Check if the internal state looks like a valid LG A/C message. </p>
 <dl class="section return"><dt>Returns</dt><dd>true, the internal state is a valid LG A/C mesg. Otherwise, false. </dd></dl>
+
+</div>
+</div>
+<a id="a97fd28df16001c4a29b894bbff13c8a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97fd28df16001c4a29b894bbff13c8a4">&#9670;&nbsp;</a></span>isVaneSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::isVaneSwingV </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if the stored code is a vane specific SwingV message. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if it is. Otherwise, false. </dd></dl>
 
 </div>
 </div>
@@ -712,6 +1243,32 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a884ab1012dde89fad207e59243c39374"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a884ab1012dde89fad207e59243c39374">&#9670;&nbsp;</a></span>setLight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRLgAc::setLight </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>on</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Change the light/led/display setting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a5e1b21d9121c6bf6507f615f470b5890"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5e1b21d9121c6bf6507f615f470b5890">&#9670;&nbsp;</a></span>setMode()</h2>
 
@@ -790,8 +1347,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a0da8ea4946826736f526386dc4d115cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0da8ea4946826736f526386dc4d115cc">&#9670;&nbsp;</a></span>setRaw()</h2>
+<a id="ad1faf5f8fbb011589c36b984a0e1fb3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1faf5f8fbb011589c36b984a0e1fb3c">&#9670;&nbsp;</a></span>setRaw()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -800,8 +1357,18 @@ Private Attributes</h2></td></tr>
           <td class="memname">void IRLgAc::setRaw </td>
           <td>(</td>
           <td class="paramtype">const uint32_t&#160;</td>
-          <td class="paramname"><em>new_code</em></td><td>)</td>
+          <td class="paramname"><em>new_code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">decode_type_t</a>&#160;</td>
+          <td class="paramname"><em>protocol</em> = <code><a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada6ce26a62afab55d7606ad4e92428b30c">decode_type_t::UNKNOWN</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -810,6 +1377,59 @@ Private Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">new_code</td><td>A valid code for this protocol. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">protocol</td><td>A valid decode protocol type to use. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab48421ad9422b936e472fe7edbe11cef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab48421ad9422b936e472fe7edbe11cef">&#9670;&nbsp;</a></span>setSwingH()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRLgAc::setSwingH </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>on</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the Horizontal Swing mode of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6bd571d69084b209a444d1fdac1364b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6bd571d69084b209a444d1fdac1364b6">&#9670;&nbsp;</a></span>setSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRLgAc::setSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>position</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the Vertical Swing mode of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">position</td><td>The position/mode to set the vanes to. </td></tr>
   </table>
   </dd>
 </dl>
@@ -842,6 +1462,43 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="af52a008ae58dd7269bbd24e78613d80f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af52a008ae58dd7269bbd24e78613d80f">&#9670;&nbsp;</a></span>setVaneSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRLgAc::setVaneSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>vane</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>position</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the per Vane Vertical Swing mode of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">vane</td><td>The nr. of the vane to control. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">position</td><td>The position/mode to set the vanes to. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a5959000c9f0b2cf64742d6a2f1c4c9b9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5959000c9f0b2cf64742d6a2f1c4c9b9">&#9670;&nbsp;</a></span>stateReset()</h2>
 
@@ -862,8 +1519,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab7c25ce38605a54204f761f8aa7f24e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab7c25ce38605a54204f761f8aa7f24e1">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="a73fa4a00a54169befd00f039c095f6fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73fa4a00a54169befd00f039c095f6fb">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -871,14 +1528,20 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> IRLgAc::toCommon </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> *&#160;</td>
+          <td class="paramname"><em>prev</em> = <code>NULL</code></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">prev</td><td>Ptr to the previous state if required. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native settings. </dd></dl>
 
 </div>
@@ -953,6 +1616,76 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a25354c0ec72a3847941e0fec527c1c76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25354c0ec72a3847941e0fec527c1c76">&#9670;&nbsp;</a></span>toCommonSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> IRLgAc::toCommonSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>code</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert a native Vertical Swing into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">code</td><td>The native code to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native setting. </dd></dl>
+
+</div>
+</div>
+<a id="a1df1726d8805481971b72305d0903b9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1df1726d8805481971b72305d0903b9d">&#9670;&nbsp;</a></span>toCommonVaneSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> IRLgAc::toCommonVaneSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert a native Vane specific Vertical Swing into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pos</td><td>The native position to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native setting. </dd></dl>
+
+</div>
+</div>
 <a id="a4a8711f21c894afd2653835be5bcdd9f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4a8711f21c894afd2653835be5bcdd9f">&#9670;&nbsp;</a></span>toString()</h2>
 
@@ -971,6 +1704,24 @@ Private Attributes</h2></td></tr>
 
 <p>Convert the current internal state into a human readable string. </p>
 <dl class="section return"><dt>Returns</dt><dd>A human readable string. </dd></dl>
+
+</div>
+</div>
+<a id="a1c9a9f78144444ef5aec1f05acdc39b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c9a9f78144444ef5aec1f05acdc39b6">&#9670;&nbsp;</a></span>updateSwingPrev()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRLgAc::updateSwingPrev </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -1056,6 +1807,52 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a6c28369f65d40272ee5978346ef96f52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c28369f65d40272ee5978346ef96f52">&#9670;&nbsp;</a></span>_light</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::_light</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8aaa178ff79b4fe5d0ede41e4a52e0b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8aaa178ff79b4fe5d0ede41e4a52e0b2">&#9670;&nbsp;</a></span>_model</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="IRsend_8h.html#a50c54713e16502d280723334879dc83b">lg_ac_remote_model_t</a> IRLgAc::_model</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Model type. </p>
+
+</div>
+</div>
 <a id="a9bd32e865a7358bbf32830d888e2786a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9bd32e865a7358bbf32830d888e2786a">&#9670;&nbsp;</a></span>_protocol</h2>
 
@@ -1076,7 +1873,95 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>model </p>
+<p>Protocol version. </p>
+
+</div>
+</div>
+<a id="a821d9592e0942dd2bda23d8b1eafdce0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a821d9592e0942dd2bda23d8b1eafdce0">&#9670;&nbsp;</a></span>_swingh</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::_swingh</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a74002a8353e6534eed11f80076c960f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74002a8353e6534eed11f80076c960f6">&#9670;&nbsp;</a></span>_swingh_prev</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRLgAc::_swingh_prev</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa5045df37932b80b1bd2a1a2fbd52a22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5045df37932b80b1bd2a1a2fbd52a22">&#9670;&nbsp;</a></span>_swingv</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t IRLgAc::_swingv</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab760f8eb027f1136d58f5d82d45dbf21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab760f8eb027f1136d58f5d82d45dbf21">&#9670;&nbsp;</a></span>_swingv_prev</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t IRLgAc::_swingv_prev</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -1091,6 +1976,50 @@ Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">uint8_t IRLgAc::_temp</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a317a4a854e0055b65ed8675fb8098ede"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a317a4a854e0055b65ed8675fb8098ede">&#9670;&nbsp;</a></span>_vaneswingv</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRLgAc::_vaneswingv[<a class="el" href="ir__LG_8h.html#abc9a6c2cf10175f1195762d356e9f11d">kLgAcSwingVMaxVanes</a>]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afb040df01764ef02209cda31a4a075e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb040df01764ef02209cda31a4a075e8">&#9670;&nbsp;</a></span>_vaneswingv_prev</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRLgAc::_vaneswingv_prev[<a class="el" href="ir__LG_8h.html#abc9a6c2cf10175f1195762d356e9f11d">kLgAcSwingVMaxVanes</a>]</td>
         </tr>
       </table>
   </td>

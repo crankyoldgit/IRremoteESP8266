@@ -86,8 +86,14 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionHaierYRW02Protocol.html">HaierYRW02Protocol</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Haier YRW02 A/C message.  <a href="unionHaierYRW02Protocol.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionHaierAc176Protocol.html">HaierAc176Protocol</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Haier 176 bit A/C message.  <a href="unionHaierAc176Protocol.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html">IRHaierAC</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Haier A/C messages.  <a href="classIRHaierAC.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC176.html">IRHaierAC176</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Haier 176 bit A/C messages.  <a href="classIRHaierAC176.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierACYRW02.html">IRHaierACYRW02</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Haier ACYRW02 A/C messages.  <a href="classIRHaierACYRW02.html#details">More...</a><br /></td></tr>
@@ -157,6 +163,8 @@ Variables</h2></td></tr>
 <tr class="separator:ac63b91acdffa55d440b08aee05bda5dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac62d0f7ca94e064712f8a7a80da2f11e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#ac62d0f7ca94e064712f8a7a80da2f11e">kHaierAcYrw02Prefix</a> = 0xA6</td></tr>
 <tr class="separator:ac62d0f7ca94e064712f8a7a80da2f11e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12cae5decc9032d65bca18d84d817fc2"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a12cae5decc9032d65bca18d84d817fc2">kHaierAc176Prefix</a> = 0xB7</td></tr>
+<tr class="separator:a12cae5decc9032d65bca18d84d817fc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62570c15418cf24a94c92b162967f892"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a62570c15418cf24a94c92b162967f892">kHaierAcYrw02SwingOff</a> = 0x0</td></tr>
 <tr class="separator:a62570c15418cf24a94c92b162967f892"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf10f1bc1b293c684232cb6398631f70"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#adf10f1bc1b293c684232cb6398631f70">kHaierAcYrw02SwingTop</a> = 0x1</td></tr>
@@ -211,6 +219,16 @@ Variables</h2></td></tr>
 <tr class="separator:ad80547c526b2eba142297715c0a0636d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c7b8ff351e3d0167ec2c897c4820c40"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a5c7b8ff351e3d0167ec2c897c4820c40">kHaierAcYrw02ButtonSleep</a> = 0xB</td></tr>
 <tr class="separator:a5c7b8ff351e3d0167ec2c897c4820c40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38f92622851e2dd5cb33e65b4ffc6fc3"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a38f92622851e2dd5cb33e65b4ffc6fc3">kHaierAcYrw02NoTimers</a> = 0b000</td></tr>
+<tr class="separator:a38f92622851e2dd5cb33e65b4ffc6fc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7e1429d1574f88e03589005ae221c15"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#ae7e1429d1574f88e03589005ae221c15">kHaierAcYrw02OffTimer</a> = 0b001</td></tr>
+<tr class="separator:ae7e1429d1574f88e03589005ae221c15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9df47b9b9d72c6f30fc9f4aa96610dd0"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a9df47b9b9d72c6f30fc9f4aa96610dd0">kHaierAcYrw02OnTimer</a> = 0b010</td></tr>
+<tr class="separator:a9df47b9b9d72c6f30fc9f4aa96610dd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa46862918e790c35a0a0f162145ab179"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#aa46862918e790c35a0a0f162145ab179">kHaierAcYrw02OnThenOffTimer</a> = 0b100</td></tr>
+<tr class="separator:aa46862918e790c35a0a0f162145ab179"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31247c83284fb820749b230c1fe493db"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a31247c83284fb820749b230c1fe493db">kHaierAcYrw02OffThenOnTimer</a> = 0b101</td></tr>
+<tr class="separator:a31247c83284fb820749b230c1fe493db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support for Haier A/C protocols. The specifics of reverse engineering the protocols details: </p>
@@ -226,6 +244,20 @@ Variables</h2></td></tr>
 </li>
 </ul>
 </div><h2 class="groupheader">Variable Documentation</h2>
+<a id="a12cae5decc9032d65bca18d84d817fc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12cae5decc9032d65bca18d84d817fc2">&#9670;&nbsp;</a></span>kHaierAc176Prefix</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc176Prefix = 0xB7</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ac33a02f63ee77e0d3050598511730865"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac33a02f63ee77e0d3050598511730865">&#9670;&nbsp;</a></span>kHaierAcAuto</h2>
 
@@ -892,6 +924,76 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint8_t kHaierAcYrw02Heat = 0b100</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a38f92622851e2dd5cb33e65b4ffc6fc3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38f92622851e2dd5cb33e65b4ffc6fc3">&#9670;&nbsp;</a></span>kHaierAcYrw02NoTimers</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAcYrw02NoTimers = 0b000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a31247c83284fb820749b230c1fe493db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31247c83284fb820749b230c1fe493db">&#9670;&nbsp;</a></span>kHaierAcYrw02OffThenOnTimer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAcYrw02OffThenOnTimer = 0b101</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae7e1429d1574f88e03589005ae221c15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7e1429d1574f88e03589005ae221c15">&#9670;&nbsp;</a></span>kHaierAcYrw02OffTimer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAcYrw02OffTimer = 0b001</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa46862918e790c35a0a0f162145ab179"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa46862918e790c35a0a0f162145ab179">&#9670;&nbsp;</a></span>kHaierAcYrw02OnThenOffTimer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAcYrw02OnThenOffTimer = 0b100</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9df47b9b9d72c6f30fc9f4aa96610dd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9df47b9b9d72c6f30fc9f4aa96610dd0">&#9670;&nbsp;</a></span>kHaierAcYrw02OnTimer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAcYrw02OnTimer = 0b010</td>
         </tr>
       </table>
 </div><div class="memdoc">

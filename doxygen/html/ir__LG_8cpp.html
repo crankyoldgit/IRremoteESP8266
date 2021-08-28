@@ -119,10 +119,23 @@ Variables</h2></td></tr>
 <tr class="memitem:abf4db4647161db6fb2548b5200c41843"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__LG_8cpp.html#abf4db4647161db6fb2548b5200c41843">kLg2BitMark</a> = 480</td></tr>
 <tr class="memdesc:abf4db4647161db6fb2548b5200c41843"><td class="mdescLeft">&#160;</td><td class="mdescRight">uSeconds.  <a href="ir__LG_8cpp.html#abf4db4647161db6fb2548b5200c41843">More...</a><br /></td></tr>
 <tr class="separator:abf4db4647161db6fb2548b5200c41843"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d8eee7c72d53d776f01e86326efd5a8"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__LG_8cpp.html#a8d8eee7c72d53d776f01e86326efd5a8">kLgAcAKB74955603DetectionMask</a> = 0x0000080</td></tr>
+<tr class="separator:a8d8eee7c72d53d776f01e86326efd5a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a177d205346380d47ae47b52079e5ffaf"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__LG_8cpp.html#a177d205346380d47ae47b52079e5ffaf">kLgAcChecksumSize</a> = 4</td></tr>
+<tr class="memdesc:a177d205346380d47ae47b52079e5ffaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size in bits.  <a href="ir__LG_8cpp.html#a177d205346380d47ae47b52079e5ffaf">More...</a><br /></td></tr>
+<tr class="separator:a177d205346380d47ae47b52079e5ffaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53adfa7c31344cd206c29b0d0191514c"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__LG_8cpp.html#a53adfa7c31344cd206c29b0d0191514c">kLgAcSwingHOffsetSize</a> = <a class="el" href="ir__LG_8cpp.html#a177d205346380d47ae47b52079e5ffaf">kLgAcChecksumSize</a> + 1</td></tr>
+<tr class="separator:a53adfa7c31344cd206c29b0d0191514c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac702f0112ddbcec7f78eed0d724b5b76"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__LG_8cpp.html#ac702f0112ddbcec7f78eed0d724b5b76">kLgAcSwingHSignature</a> = <a class="el" href="ir__LG_8h.html#a6f46b79e77d93deb27e4c282a0e8d5e6">kLgAcSwingHOff</a> &gt;&gt; <a class="el" href="ir__LG_8cpp.html#a53adfa7c31344cd206c29b0d0191514c">kLgAcSwingHOffsetSize</a></td></tr>
+<tr class="separator:ac702f0112ddbcec7f78eed0d724b5b76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a747516efcce40dd7a60e2c3241c78f67"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__LG_8cpp.html#a747516efcce40dd7a60e2c3241c78f67">kLgAcVaneSwingVBase</a> = 0x8813200</td></tr>
+<tr class="separator:a747516efcce40dd7a60e2c3241c78f67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support for LG protocols. LG decode originally added by Darryl Smith (based on the JVC protocol) LG send originally added by <a href="https://github.com/chaeplin">https://github.com/chaeplin</a>. </p>
-<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/arendst/Tasmota/blob/54c2eb283a02e4287640a4595e506bc6eadbd7f2/sonoff/xdrv_05_irremote.ino#L327-438">https://github.com/arendst/Tasmota/blob/54c2eb283a02e4287640a4595e506bc6eadbd7f2/sonoff/xdrv_05_irremote.ino#L327-438</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/arendst/Tasmota/blob/54c2eb283a02e4287640a4595e506bc6eadbd7f2/sonoff/xdrv_05_irremote.ino#L327-438">https://github.com/arendst/Tasmota/blob/54c2eb283a02e4287640a4595e506bc6eadbd7f2/sonoff/xdrv_05_irremote.ino#L327-438</a> </dd>
+<dd>
+<a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1513">https://github.com/crankyoldgit/IRremoteESP8266/issues/1513</a> </dd></dl>
 </div><h2 class="groupheader">Variable Documentation</h2>
 <a id="abf4db4647161db6fb2548b5200c41843"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abf4db4647161db6fb2548b5200c41843">&#9670;&nbsp;</a></span>kLg2BitMark</h2>
@@ -217,6 +230,78 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>uSeconds. </p>
+
+</div>
+</div>
+<a id="a8d8eee7c72d53d776f01e86326efd5a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d8eee7c72d53d776f01e86326efd5a8">&#9670;&nbsp;</a></span>kLgAcAKB74955603DetectionMask</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint32_t kLgAcAKB74955603DetectionMask = 0x0000080</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a177d205346380d47ae47b52079e5ffaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a177d205346380d47ae47b52079e5ffaf">&#9670;&nbsp;</a></span>kLgAcChecksumSize</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kLgAcChecksumSize = 4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Size in bits. </p>
+
+</div>
+</div>
+<a id="a53adfa7c31344cd206c29b0d0191514c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53adfa7c31344cd206c29b0d0191514c">&#9670;&nbsp;</a></span>kLgAcSwingHOffsetSize</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kLgAcSwingHOffsetSize = <a class="el" href="ir__LG_8cpp.html#a177d205346380d47ae47b52079e5ffaf">kLgAcChecksumSize</a> + 1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac702f0112ddbcec7f78eed0d724b5b76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac702f0112ddbcec7f78eed0d724b5b76">&#9670;&nbsp;</a></span>kLgAcSwingHSignature</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint32_t kLgAcSwingHSignature = <a class="el" href="ir__LG_8h.html#a6f46b79e77d93deb27e4c282a0e8d5e6">kLgAcSwingHOff</a> &gt;&gt; <a class="el" href="ir__LG_8cpp.html#a53adfa7c31344cd206c29b0d0191514c">kLgAcSwingHOffsetSize</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a747516efcce40dd7a60e2c3241c78f67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a747516efcce40dd7a60e2c3241c78f67">&#9670;&nbsp;</a></span>kLgAcVaneSwingVBase</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint32_t kLgAcVaneSwingVBase = 0x8813200</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['panasonic_7365',['PANASONIC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadaf87c99938d26a1f77d4f082c070d4660',1,'IRremoteESP8266.h']]],
-  ['panasonic_5fac_7366',['PANASONIC_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada02178d0c70511011d5f381291bb7e491',1,'IRremoteESP8266.h']]],
-  ['panasonic_5fac32_7367',['PANASONIC_AC32',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada790ec65ea3e5d3ef9dc19614521c889e',1,'IRremoteESP8266.h']]],
-  ['pioneer_7368',['PIONEER',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadadf49fef8f6e9740c92af2e25384f7846',1,'IRremoteESP8266.h']]],
-  ['pronto_7369',['PRONTO',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada5b68c32f80c4afa6e61039843b2d1f97',1,'IRremoteESP8266.h']]]
+  ['nec_7706',['NEC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada0811f93a25b0873e21979d569eeac05e',1,'IRremoteESP8266.h']]],
+  ['nec_5flike_7707',['NEC_LIKE',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada97acfde550d201fa0abc3120098fb471',1,'IRremoteESP8266.h']]],
+  ['neoclima_7708',['NEOCLIMA',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadac698e0c030768ed91207b0e63910c3e7',1,'IRremoteESP8266.h']]],
+  ['nikai_7709',['NIKAI',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada0bc180c4ab5e68798451f4799f7f9377',1,'IRremoteESP8266.h']]]
 ];

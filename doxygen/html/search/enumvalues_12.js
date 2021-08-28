@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['vestel_5fac_7399',['VESTEL_AC',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada165413c6395bde985757b5b446f76569',1,'IRremoteESP8266.h']]],
-  ['voltas_7400',['VOLTAS',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada507821565df57e34d8806d2613b1533c',1,'IRremoteESP8266.h']]]
+  ['unknown_7744',['UNKNOWN',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada6ce26a62afab55d7606ad4e92428b30c',1,'IRremoteESP8266.h']]],
+  ['unused_7745',['UNUSED',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadaa09b651ef326a9d8efcee5cc5b720ab4',1,'IRremoteESP8266.h']]]
 ];
