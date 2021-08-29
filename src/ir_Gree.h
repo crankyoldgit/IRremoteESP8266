@@ -18,6 +18,8 @@
 //   Brand: Amana,  Model: YX1FF remote
 //   Brand: Cooper & Hunter,  Model: YB1F2 remote
 //   Brand: Cooper & Hunter,  Model: CH-S09FTXG A/C
+//   Brand: Vaillant,  Model: YACIFB remote
+//   Brand: Vaillant,  Model: VAI5-035WNI A/C
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
