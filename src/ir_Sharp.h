@@ -17,6 +17,7 @@
 //   Brand: Sharp,  Model: AY-ZP40KR A/C (A907)
 //   Brand: Sharp,  Model: AH-AxSAY A/C (A907)
 //   Brand: Sharp,  Model: CRMC-A907 JBEZ remote (A907)
+//   Brand: Sharp,  Model: CRMC-A950 JBEZ (A907)
 //   Brand: Sharp,  Model: AH-PR13-GL A/C (A903)
 //   Brand: Sharp,  Model: CRMC-A903JBEZ remote (A903)
 //   Brand: Sharp,  Model: AH-XP10NRY A/C (A903)
