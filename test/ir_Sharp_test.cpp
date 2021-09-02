@@ -942,6 +942,14 @@ TEST(TestSharpAcClass, Swings) {
   ac.setSwingV(kSharpAcSwingVLowest);
   EXPECT_EQ(kSharpAcSwingVLowest, ac.getSwingV());
 
+  // Check we can force Coanda in Cool mode.
+  ac.setMode(kSharpAcCool);
+  ASSERT_EQ(kSharpAcSwingVCoanda, kSharpAcSwingVLowest);
+  ac.setSwingV(kSharpAcSwingVCoanda, true);
+  EXPECT_EQ(kSharpAcSwingVCoanda, ac.getSwingV());
+  EXPECT_FALSE(ac.getSwingToggle());
+  EXPECT_EQ(kSharpAcCool, ac.getMode());
+
   // Real messages/states
   // ref: https://github.com/crankyoldgit/IRremoteESP8266/discussions/1590#discussioncomment-1254748
   ac.stateReset();

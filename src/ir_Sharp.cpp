@@ -552,11 +552,12 @@ uint8_t IRSharpAc::getSwingV(void) const { return _.Swing; }
 /// Set the Vertical Swing setting of the A/C.
 /// @note Some positions may not work on all models.
 /// @param[in] position The desired position/setting.
-void IRSharpAc::setSwingV(const uint8_t position) {
+/// @param[in] force Do we override the safety checks and just do it?
+void IRSharpAc::setSwingV(const uint8_t position, const bool force) {
   switch (position) {
     case kSharpAcSwingVCoanda:
       // Only allowed in Heat mode.
-      if (getMode() != kSharpAcHeat) {
+      if (!force && getMode() != kSharpAcHeat) {
         setSwingV(kSharpAcSwingVLow);  // Use the next lowest setting.
         return;
       }

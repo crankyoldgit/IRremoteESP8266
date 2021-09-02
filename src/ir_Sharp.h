@@ -176,7 +176,7 @@ class IRSharpAc {
   bool getSwingToggle(void) const;
   void setSwingToggle(const bool on);
   uint8_t getSwingV(void) const;
-  void setSwingV(const uint8_t position);
+  void setSwingV(const uint8_t position, const bool force = false);
   bool getIon(void) const;
   void setIon(const bool on);
   bool getEconoToggle(void) const;
