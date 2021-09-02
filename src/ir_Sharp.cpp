@@ -555,12 +555,6 @@ uint8_t IRSharpAc::getSwingV(void) const { return _.Swing; }
 void IRSharpAc::setSwingV(const uint8_t position) {
   switch (position) {
     case kSharpAcSwingVCoanda:
-      // Only allowed in Heat mode.
-      if (getMode() != kSharpAcHeat) {
-        setSwingV(kSharpAcSwingVLow);  // Use the next lowest setting.
-        return;
-      }
-      // FALLTHRU
     case kSharpAcSwingVHigh:
     case kSharpAcSwingVMid:
     case kSharpAcSwingVLow:
