@@ -1610,7 +1610,7 @@ TEST(TestIRac, Sharp) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Model: 1 (A907), Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), "
-      "Turbo: Off, Swing(V) Toggle: On, Ion: On, Econo: -, Clean: Off";
+      "Swing(V): 7 (Auto), Turbo: Off, Ion: On, Econo: -, Clean: Off";
 
   ac.begin();
   irac.sharp(&ac,

@@ -45,6 +45,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addModelToString;
+using irutils::addSwingVToString;
 using irutils::addTempToString;
 using irutils::minsToString;
 
@@ -544,16 +545,61 @@ void IRSharpAc::setTurbo(const bool on) {
   _.Special = kSharpAcSpecialTurbo;
 }
 
+/// Get the Vertical Swing setting of the A/C.
+/// @return The position of the Vertical Swing setting.
+uint8_t IRSharpAc::getSwingV(void) const { return _.Swing; }
+
+/// Set the Vertical Swing setting of the A/C.
+/// @note Some positions may not work on all models.
+/// @param[in] position The desired position/setting.
+void IRSharpAc::setSwingV(const uint8_t position) {
+  switch (position) {
+    case kSharpAcSwingVCoanda:
+      // Only allowed in Heat mode.
+      if (getMode() != kSharpAcHeat) {
+        setSwingV(kSharpAcSwingVLow);  // Use the next lowest setting.
+        return;
+      }
+      // FALLTHRU
+    case kSharpAcSwingVHigh:
+    case kSharpAcSwingVMid:
+    case kSharpAcSwingVLow:
+    case kSharpAcSwingVAuto:
+      // All expected non-Off positions set the special bits.
+      _.Special = kSharpAcSpecialSwing;
+      // FALLTHRU
+    case kSharpAcSwingVOff1:  // Technically valid, but we don't use them.
+    case kSharpAcSwingVOff2:  // Technically valid, but we don't use them.
+    case kSharpAcSwingVOff:
+      _.Swing = position;
+  }
+}
+
+/// Convert a standard A/C vertical swing into its native setting.
+/// @param[in] position A stdAc::swingv_t position to convert.
+/// @return The equivalent native horizontal swing position.
+uint8_t IRSharpAc::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:    return kSharpAcSwingVHigh;
+    case stdAc::swingv_t::kMiddle:  return kSharpAcSwingVMid;
+    case stdAc::swingv_t::kLow:     return kSharpAcSwingVLow;
+    case stdAc::swingv_t::kLowest:  return kSharpAcSwingVCoanda;
+    case stdAc::swingv_t::kAuto:    return kSharpAcSwingVAuto;
+    default:                        return kSharpAcSwingVOff;
+  }
+}
+
 /// Get the (vertical) Swing Toggle setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRSharpAc::getSwingToggle(void) const {
-  return _.Swing == kSharpAcSwingToggle;
+  return getSwingV() == kSharpAcSwingVAuto;
 }
 
 /// Set the (vertical) Swing Toggle setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSharpAc::setSwingToggle(const bool on) {
-  _.Swing = (on ? kSharpAcSwingToggle : kSharpAcSwingNoToggle);
+  setSwingV(on ? kSharpAcSwingVAuto : kSharpAcSwingVOff);
   if (on) _.Special = kSharpAcSpecialSwing;
 }
 
@@ -765,6 +811,27 @@ stdAc::fanspeed_t IRSharpAc::toCommonFanSpeed(const uint8_t speed) const {
   }
 }
 
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] pos A native position to convert.
+/// @param[in] mode What operating mode are we in?
+/// @return The common vertical swing position.
+stdAc::swingv_t IRSharpAc::toCommonSwingV(const uint8_t pos,
+                                          const stdAc::opmode_t mode) const {
+  switch (pos) {
+    case kSharpAcSwingVHigh:   return stdAc::swingv_t::kHighest;
+    case kSharpAcSwingVMid:    return stdAc::swingv_t::kMiddle;
+    case kSharpAcSwingVLow:    return stdAc::swingv_t::kLow;
+    case kSharpAcSwingVCoanda:  // Coanda has mode dependent positionss
+      switch (mode) {
+        case stdAc::opmode_t::kCool: return stdAc::swingv_t::kHighest;
+        case stdAc::opmode_t::kHeat: return stdAc::swingv_t::kLowest;
+        default:                     return stdAc::swingv_t::kOff;
+      }
+    case kSharpAcSwingVAuto:   return stdAc::swingv_t::kAuto;
+    default:                   return stdAc::swingv_t::kOff;
+  }
+}
+
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRSharpAc::toCommon(void) const {
@@ -777,8 +844,7 @@ stdAc::state_t IRSharpAc::toCommon(void) const {
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
   result.turbo = getTurbo();
-  result.swingv = getSwingToggle() ? stdAc::swingv_t::kAuto
-                                   : stdAc::swingv_t::kOff;
+  result.swingv = toCommonSwingV(getSwingV(), result.mode);
   result.filter = _.Ion;
   result.econo = getEconoToggle();
   result.light = getLightToggle();
@@ -797,14 +863,15 @@ stdAc::state_t IRSharpAc::toCommon(void) const {
 String IRSharpAc::toString(void) const {
   String result = "";
   const sharp_ac_remote_model_t model = getModel();
-  result.reserve(160);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(170);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::SHARP_AC, getModel(), false);
 
   result += addLabeledString(isPowerSpecial() ? "-"
                                               : (getPower() ? kOnStr : kOffStr),
                              kPowerStr);
+  const uint8_t mode = _.Mode;
   result += addModeToString(
-      _.Mode,
+      mode,
       // Make the value invalid if the model doesn't support an Auto mode.
       (model == sharp_ac_remote_model_t::A907) ? kSharpAcAuto : 255,
       kSharpAcCool, kSharpAcHeat, kSharpAcDry, kSharpAcFan);
@@ -821,8 +888,22 @@ String IRSharpAc::toString(void) const {
                                kSharpAcFanAuto, kSharpAcFanAuto,
                                kSharpAcFanMed);
   }
+  result += addSwingVToString(
+      getSwingV(), kSharpAcSwingVAuto,
+      // Coanda means Highest when in Cool mode.
+      (mode == kSharpAcCool) ? kSharpAcSwingVCoanda : kSharpAcSwingVAuto,
+      kSharpAcSwingVHigh,
+      kSharpAcSwingVAuto,  // Upper Middle is unused
+      kSharpAcSwingVMid,
+      kSharpAcSwingVAuto,  // Lower Middle is unused
+      kSharpAcSwingVLow,
+      kSharpAcSwingVCoanda,
+      kSharpAcSwingVOff,
+      // Below are unused.
+      kSharpAcSwingVAuto,
+      kSharpAcSwingVAuto,
+      kSharpAcSwingVAuto);
   result += addBoolToString(getTurbo(), kTurboStr);
-  result += addBoolToString(getSwingToggle(), kSwingVToggleStr);
   result += addBoolToString(_.Ion, kIonStr);
   switch (model) {
     case sharp_ac_remote_model_t::A705:

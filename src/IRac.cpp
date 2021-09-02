@@ -1908,7 +1908,7 @@ void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan, model));
-  ac->setSwingToggle(swingv != stdAc::swingv_t::kOff);
+  ac->setSwingV(ac->convertSwingV(swingv));
   // Econo  deliberately not used as it cycles through 3 modes uncontrollably.
   // ac->setEconoToggle(econo);
   ac->setIon(filter);

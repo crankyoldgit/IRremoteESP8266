@@ -122,8 +122,16 @@ const uint8_t kSharpAcTimerHoursMax =                             0b1100;  // 12
 const uint8_t kSharpAcOffTimerType =                           0b0;
 const uint8_t kSharpAcOnTimerType =                            0b1;
 
-const uint8_t kSharpAcSwingToggle =                0b111;
-const uint8_t kSharpAcSwingNoToggle =              0b000;
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/discussions/1590#discussioncomment-1260213
+const uint8_t kSharpAcSwingVOff =    0b000;  // Stop swinging.
+const uint8_t kSharpAcSwingVHigh =   0b001;  // 0° down aka Coanda (Cool)
+const uint8_t kSharpAcSwingVOff1 =   0b010;  // Off, but go to last fixed pos.
+const uint8_t kSharpAcSwingVMid =    0b011;  // 30° down
+const uint8_t kSharpAcSwingVLow =    0b100;  // 45° down
+const uint8_t kSharpAcSwingVOff2 =   0b101;  // Off, but go to last fixed pos.
+const uint8_t kSharpAcSwingVCoanda = 0b110;  // 0° down (Cool), 75° down (Heat)
+const uint8_t kSharpAcSwingVLowest = kSharpAcSwingVCoanda;
+const uint8_t kSharpAcSwingVAuto =   0b111;  // Constant swinging
 
 const uint8_t kSharpAcSpecialPower =              0x00;
 const uint8_t kSharpAcSpecialTurbo =              0x01;
@@ -167,6 +175,8 @@ class IRSharpAc {
   void setTurbo(const bool on);
   bool getSwingToggle(void) const;
   void setSwingToggle(const bool on);
+  uint8_t getSwingV(void) const;
+  void setSwingV(const uint8_t position);
   bool getIon(void) const;
   void setIon(const bool on);
   bool getEconoToggle(void) const;
@@ -188,8 +198,12 @@ class IRSharpAc {
   static uint8_t convertFan(const stdAc::fanspeed_t speed,
                             const sharp_ac_remote_model_t model =
                                 sharp_ac_remote_model_t::A907);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
   stdAc::opmode_t toCommonMode(const uint8_t mode) const;
   stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed) const;
+  stdAc::swingv_t toCommonSwingV(
+      const uint8_t pos,
+      const stdAc::opmode_t mode = stdAc::opmode_t::kHeat) const;
   stdAc::state_t toCommon(void) const;
   String toString(void) const;
 #ifndef UNIT_TEST
