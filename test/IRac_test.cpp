@@ -1610,7 +1610,7 @@ TEST(TestIRac, Sharp) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Model: 1 (A907), Power: On, Mode: 2 (Cool), Temp: 28C, Fan: 3 (Medium), "
-      "Swing(V): 7 (Auto), Turbo: Off, Ion: On, Econo: -, Clean: Off";
+      "Swing(V): 7 (Swing), Turbo: Off, Ion: On, Econo: -, Clean: Off";
 
   ac.begin();
   irac.sharp(&ac,
@@ -1621,6 +1621,7 @@ TEST(TestIRac, Sharp) {
              28,                             // Celsius
              stdAc::fanspeed_t::kMedium,     // Fan speed
              stdAc::swingv_t::kAuto,         // Vertical swing
+             stdAc::swingv_t::kOff,          // Previous Vertical swing
              false,                          // Turbo
              false,                          // Light
              true,                           // Filter (Ion)

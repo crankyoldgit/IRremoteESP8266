@@ -565,13 +565,13 @@ void IRSharpAc::setSwingV(const uint8_t position, const bool force) {
     case kSharpAcSwingVHigh:
     case kSharpAcSwingVMid:
     case kSharpAcSwingVLow:
-    case kSharpAcSwingVAuto:
-      // All expected non-Off positions set the special bits.
+    case kSharpAcSwingVToggle:
+    case kSharpAcSwingVOff:
+    case kSharpAcSwingVLast:  // Technically valid, but we don't use it.
+      // All expected non-positions set the special bits.
       _.Special = kSharpAcSpecialSwing;
       // FALLTHRU
-    case kSharpAcSwingVOff1:  // Technically valid, but we don't use them.
-    case kSharpAcSwingVOff2:  // Technically valid, but we don't use them.
-    case kSharpAcSwingVOff:
+    case kSharpAcSwingVIgnore:
       _.Swing = position;
   }
 }
@@ -586,29 +586,28 @@ uint8_t IRSharpAc::convertSwingV(const stdAc::swingv_t position) {
     case stdAc::swingv_t::kMiddle:  return kSharpAcSwingVMid;
     case stdAc::swingv_t::kLow:     return kSharpAcSwingVLow;
     case stdAc::swingv_t::kLowest:  return kSharpAcSwingVCoanda;
-    case stdAc::swingv_t::kAuto:    return kSharpAcSwingVAuto;
-    default:                        return kSharpAcSwingVOff;
+    case stdAc::swingv_t::kAuto:    return kSharpAcSwingVToggle;
+    case stdAc::swingv_t::kOff:     return kSharpAcSwingVOff;
+    default:                        return kSharpAcSwingVIgnore;
   }
 }
 
 /// Get the (vertical) Swing Toggle setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRSharpAc::getSwingToggle(void) const {
-  return getSwingV() == kSharpAcSwingVAuto;
+  return getSwingV() == kSharpAcSwingVToggle;
 }
 
 /// Set the (vertical) Swing Toggle setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSharpAc::setSwingToggle(const bool on) {
-  setSwingV(on ? kSharpAcSwingVAuto : kSharpAcSwingVOff);
+  setSwingV(on ? kSharpAcSwingVToggle : kSharpAcSwingVIgnore);
   if (on) _.Special = kSharpAcSpecialSwing;
 }
 
 /// Get the Ion (Filter) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSharpAc::getIon(void) const {
-  return _.Ion;
-}
+bool IRSharpAc::getIon(void) const { return _.Ion; }
 
 /// Set the Ion (Filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
@@ -675,15 +674,11 @@ uint16_t IRSharpAc::getTimerTime(void) const {
 
 /// Is the Timer enabled?
 /// @return true, the setting is on. false, the setting is off.
-bool IRSharpAc::getTimerEnabled(void) const {
-  return _.TimerEnabled;
-}
+bool IRSharpAc::getTimerEnabled(void) const { return _.TimerEnabled; }
 
 /// Get the current timer type.
 /// @return true, It's an "On" timer. false, It's an "Off" timer.
-bool IRSharpAc::getTimerType(void) const {
-  return _.TimerType;
-}
+bool IRSharpAc::getTimerType(void) const { return _.TimerType; }
 
 /// Set or cancel the timer function.
 /// @param[in] enable Is the timer to be enabled (true) or canceled(false)?
@@ -828,15 +823,18 @@ stdAc::swingv_t IRSharpAc::toCommonSwingV(const uint8_t pos,
         case stdAc::opmode_t::kHeat: return stdAc::swingv_t::kLowest;
         default:                     return stdAc::swingv_t::kOff;
       }
-    case kSharpAcSwingVAuto:   return stdAc::swingv_t::kAuto;
+    case kSharpAcSwingVToggle: return stdAc::swingv_t::kAuto;
     default:                   return stdAc::swingv_t::kOff;
   }
 }
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
+/// @param[in] prev Ptr to the previous state if required.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRSharpAc::toCommon(void) const {
+stdAc::state_t IRSharpAc::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result;
+  // Start with the previous state if given it.
+  if (prev != NULL) result = *prev;
   result.protocol = decode_type_t::SHARP_AC;
   result.model = getModel();
   result.power = getPower();
@@ -845,7 +843,8 @@ stdAc::state_t IRSharpAc::toCommon(void) const {
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
   result.turbo = getTurbo();
-  result.swingv = toCommonSwingV(getSwingV(), result.mode);
+  if (getSwingV() != kSharpAcSwingVIgnore)
+    result.swingv = toCommonSwingV(getSwingV(), result.mode);
   result.filter = _.Ion;
   result.econo = getEconoToggle();
   result.light = getLightToggle();
@@ -889,21 +888,28 @@ String IRSharpAc::toString(void) const {
                                kSharpAcFanAuto, kSharpAcFanAuto,
                                kSharpAcFanMed);
   }
-  result += addSwingVToString(
-      getSwingV(), kSharpAcSwingVAuto,
-      // Coanda means Highest when in Cool mode.
-      (mode == kSharpAcCool) ? kSharpAcSwingVCoanda : kSharpAcSwingVAuto,
-      kSharpAcSwingVHigh,
-      kSharpAcSwingVAuto,  // Upper Middle is unused
-      kSharpAcSwingVMid,
-      kSharpAcSwingVAuto,  // Lower Middle is unused
-      kSharpAcSwingVLow,
-      kSharpAcSwingVCoanda,
-      kSharpAcSwingVOff,
-      // Below are unused.
-      kSharpAcSwingVAuto,
-      kSharpAcSwingVAuto,
-      kSharpAcSwingVAuto);
+  if (getSwingV() == kSharpAcSwingVIgnore) {
+    result += addIntToString(kSharpAcSwingVIgnore, kSwingVStr);
+    result += kSpaceLBraceStr;
+    result += kNAStr;
+    result += ')';
+  } else {
+    result += addSwingVToString(
+        getSwingV(), 0xFF,
+        // Coanda means Highest when in Cool mode.
+        (mode == kSharpAcCool) ? kSharpAcSwingVCoanda : kSharpAcSwingVToggle,
+        kSharpAcSwingVHigh,
+        0xFF,  // Upper Middle is unused
+        kSharpAcSwingVMid,
+        0xFF,  // Lower Middle is unused
+        kSharpAcSwingVLow,
+        kSharpAcSwingVCoanda,
+        kSharpAcSwingVOff,
+        // Below are unused.
+        kSharpAcSwingVToggle,
+        0xFF,
+        0xFF);
+  }
   result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(_.Ion, kIonStr);
   switch (model) {
