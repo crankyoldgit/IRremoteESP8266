@@ -1036,6 +1036,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Bose decode");
     if (decodeBose(results, offset)) return true;
 #endif  // DECODE_BOSE
+#if DECODE_ARRIS
+    DPRINTLN("Attempting Arris decode");
+    if (decodeArris(results, offset)) return true;
+#endif  // DECODE_ARRIS
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
@@ -1811,6 +1815,7 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
                                      const int16_t excess,
                                      const bool MSBfirst,
                                      const bool GEThomas) {
+  DPRINTLN("DEBUG: Entered matchManchesterData");
   uint16_t offset = 0;
   uint64_t data = 0;
   uint16_t nr_half_periods = 0;
@@ -1824,7 +1829,10 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
   uint16_t min_remaining = nbits;
 
   // Check if there is enough capture buffer to possibly have the message.
-  if (remaining < min_remaining) return 0;  // Nope, so abort.
+  if (remaining < min_remaining) {
+    DPRINTLN("DEBUG: Ran out of capture buffer!");
+    return 0;  // Nope, so abort.
+  }
 
   // Convert to ticks. Optimisation: Saves on math/extra instructions later.
   uint16_t bank = starting_balance / kRawTick;
@@ -1847,22 +1855,39 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
   while ((offset < remaining || bank) &&
          nr_half_periods < expected_half_periods) {
     // Get the next entry if we haven't anything existing to process.
+    DPRINT("DEBUG: Offset = ");
+    DPRINTLN(offset);
     if (!bank) bank = *(data_ptr + offset++);
+    DPRINT("DEBUG: Bank = ");
+    DPRINTLN(bank * kRawTick);
     // Check if we don't have a short interval.
-    if (!match(bank, half_period, tolerance, excess))  return 0;  // Not valid.
+    DPRINTLN("DEBUG: Checking for short interval");
+    if (!match(bank, half_period, tolerance, excess)) {
+      DPRINTLN("DEBUG: It is. Exiting");
+      return 0;  // Not valid.
+    }
     // We've succeeded in matching half a period, so count it.
     nr_half_periods++;
+    DPRINT("DEBUG: Half Periods = ");
+    DPRINTLN(nr_half_periods);
     // We've now used up our bank, so refill it with the next item, unless we
     // are at the end of the capture buffer.
     // If we are assume a single half period of "space".
-    if (offset < remaining)
+    if (offset < remaining) {
+      DPRINT("DEBUG: Offset = ");
+      DPRINTLN(offset);
       bank = *(data_ptr + offset++);
-    else if (offset == remaining)
+    } else if (offset == remaining) {
       bank = raw_half_period;
-    else
+    } else {
       return 0;  // We are out of buffer, so abort!
+    }
+    DPRINT("DEBUG: Bank = ");
+    DPRINTLN(bank * kRawTick);
 
     // Shift the data along and add our new bit.
+    DPRINT("DEBUG: Adding bit: ");
+    DPRINTLN((currentBit ? "1" : "0"));
     data <<= 1;
     data |= currentBit;
 
@@ -1870,10 +1895,12 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
     if (match(bank, half_period * 2, tolerance, excess)) {
       // It is, so flip the bit we need to append, and remove a half_period of
       // time from the bank.
+      DPRINTLN("DEBUG: long interval detected");
       currentBit = !currentBit;
       bank -= raw_half_period;
     } else if (match(bank, half_period, tolerance, excess)) {
       // It is a short interval, so eat up all the time and move on.
+      DPRINTLN("DEBUG: short interval detected");
       bank = 0;
     } else if (nr_half_periods == expected_half_periods - 1 &&
                matchAtLeast(bank, half_period, tolerance, excess)) {

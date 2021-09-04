@@ -508,6 +508,9 @@
 #ifndef D_STR_ARGO
 #define D_STR_ARGO "ARGO"
 #endif  // D_STR_ARGO
+#ifndef D_STR_ARRIS
+#define D_STR_ARRIS "ARRIS"
+#endif  // D_STR_ARRIS
 #ifndef D_STR_BOSE
 #define D_STR_BOSE "BOSE"
 #endif  // D_STR_BOSE

@@ -637,6 +637,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case LG:
     case LG2:
       return 28;
+    case ARRIS:
     case CARRIER_AC:
     case ELITESCREENS:
     case EPSON:
@@ -790,7 +791,12 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     case AIWA_RC_T501:
       sendAiwaRCT501(data, nbits, min_repeat);
       break;
-#endif
+#endif  // SEND_AIWA_RC_T501
+#if SEND_ARRIS
+    case ARRIS:
+      sendArris(data, nbits, min_repeat);
+      break;
+#endif  // SEND_ARRIS
 #if SEND_BOSE
     case BOSE:
       sendBose(data, nbits, min_repeat);
