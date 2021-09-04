@@ -1893,6 +1893,7 @@ void IRac::sanyo88(IRSanyoAc88 *ac,
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] swingv_prev The previous vertical swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
@@ -1901,14 +1902,15 @@ void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
                  const bool on, const bool prev_power,
                  const stdAc::opmode_t mode,
                  const float degrees, const stdAc::fanspeed_t fan,
-                 const stdAc::swingv_t swingv, const bool turbo,
+                 const stdAc::swingv_t swingv,
+                 const stdAc::swingv_t swingv_prev, const bool turbo,
                  const bool light, const bool filter, const bool clean) {
   ac->begin();
   ac->setModel(model);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan, model));
-  ac->setSwingV(ac->convertSwingV(swingv));
+  if (swingv != swingv_prev) ac->setSwingV(ac->convertSwingV(swingv));
   // Econo  deliberately not used as it cycles through 3 modes uncontrollably.
   // ac->setEconoToggle(econo);
   ac->setIon(filter);
@@ -2495,10 +2497,10 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
 #if (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
   const bool prev_power = (prev != NULL) ? prev->power : !send.power;
 #endif  // (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
-#if SEND_LG
+#if (SEND_LG || SEND_SHARP_AC)
   const stdAc::swingv_t prev_swingv = (prev != NULL) ? prev->swingv
                                                      : stdAc::swingv_t::kOff;
-#endif  // SEND_LG
+#endif  // (SEND_LG || SEND_SHARP_AC)
   // Per vendor settings & setup.
   switch (send.protocol) {
 #if SEND_AIRWELL
@@ -2899,8 +2901,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRSharpAc ac(_pin, _inverted, _modulation);
       sharp(&ac, (sharp_ac_remote_model_t)send.model, send.power, prev_power,
-            send.mode, degC, send.fanspeed, send.swingv, send.turbo, send.light,
-            send.filter, send.clean);
+            send.mode, degC, send.fanspeed, send.swingv, prev_swingv,
+            send.turbo, send.light, send.filter, send.clean);
       break;
     }
 #endif  // SEND_SHARP_AC
@@ -4136,7 +4138,7 @@ namespace IRAcUtils {
       case decode_type_t::SHARP_AC: {
         IRSharpAc ac(kGpioUnused);
         ac.setRaw(decode->state);
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_SHARP_AC
