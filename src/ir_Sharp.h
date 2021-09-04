@@ -124,13 +124,20 @@ const uint8_t kSharpAcOnTimerType =                            0b1;
 
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/discussions/1590#discussioncomment-1260213
 const uint8_t kSharpAcSwingVIgnore = 0b000;  // Don't change the swing setting.
-const uint8_t kSharpAcSwingVHigh =   0b001;  // 0° down aka Coanda (Cool)
+const uint8_t kSharpAcSwingVHigh =   0b001;  // 0° down. Similar to Cool Coanda.
 const uint8_t kSharpAcSwingVOff =    0b010;  // Stop & Go to last fixed pos.
 const uint8_t kSharpAcSwingVMid =    0b011;  // 30° down
 const uint8_t kSharpAcSwingVLow =    0b100;  // 45° down
 const uint8_t kSharpAcSwingVLast =   0b101;  // Same as kSharpAcSwingVOff.
-const uint8_t kSharpAcSwingVCoanda = 0b110;  // 0° down (Cool), 75° down (Heat)
-const uint8_t kSharpAcSwingVLowest = kSharpAcSwingVCoanda;
+// Toggles between last fixed pos & either 75° down (Heat) or 0° down (Cool)
+// i.e. alternate between last pos <-> 75° down if in Heat mode, AND
+//      alternate between last pos <-> 0° down if in Cool mode.
+// Note: `setSwingV(kSharpAcSwingVLowest)` will only allow the Lowest setting in
+//       Heat mode, it will default to `kSharpAcSwingVLow` otherwise.
+//       If you want to set this value in other modes e.g. Cool, you must
+//       use `setSwingV`s optional `force` parameter.
+const uint8_t kSharpAcSwingVLowest = 0b110;
+const uint8_t kSharpAcSwingVCoanda = kSharpAcSwingVLowest;
 const uint8_t kSharpAcSwingVToggle = 0b111;  // Toggle Constant swinging on/off.
 
 const uint8_t kSharpAcSpecialPower =              0x00;
