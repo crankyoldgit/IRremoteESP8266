@@ -28,12 +28,12 @@ TEST(TestDecodeArris, RealExample) {
   irsend.sendRaw(rawData_1, 59, 38);
   irsend.makeDecodeResult();
 
-  ASSERT_TRUE(irrecv.decodeArris(&irsend.capture));
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::ARRIS, irsend.capture.decode_type);
   EXPECT_EQ(kArrisBits, irsend.capture.bits);
   EXPECT_EQ(0x1000085E, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
-  EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(0x85, irsend.capture.command);
 
   irsend.reset();
   const uint16_t rawData_2[115] = {
@@ -55,7 +55,7 @@ TEST(TestDecodeArris, RealExample) {
   EXPECT_EQ(kArrisBits, irsend.capture.bits);
   EXPECT_EQ(0x1000085E, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
-  EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(0x85, irsend.capture.command);
 
   const uint16_t rawData_3[51] = {
       2584, 1896, 666, 308, 338, 328, 306, 332, 640, 612, 332, 336, 310, 300,
@@ -70,8 +70,8 @@ TEST(TestDecodeArris, RealExample) {
   ASSERT_EQ(decode_type_t::ARRIS, irsend.capture.decode_type);
   EXPECT_EQ(kArrisBits, irsend.capture.bits);
   EXPECT_EQ(0x1080695D, irsend.capture.value);
-  EXPECT_EQ(0x0, irsend.capture.address);
-  EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(0x1, irsend.capture.address);
+  EXPECT_EQ(0x695, irsend.capture.command);
 }
 
 TEST(TestDecodeArris, SyntheticExample) {
@@ -87,7 +87,7 @@ TEST(TestDecodeArris, SyntheticExample) {
   EXPECT_EQ(kArrisBits, irsend.capture.bits);
   EXPECT_EQ(0x1000085E, irsend.capture.value);
   EXPECT_EQ(0x0, irsend.capture.address);
-  EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(0x85, irsend.capture.command);
 
   EXPECT_EQ(
       "f38000d50"
@@ -151,7 +151,7 @@ TEST(TestDecodeArris, SyntheticExample) {
 //     336, 608,
       "m320s640"
 //     334};  // UNKNOWN EDF1C0D0
-      "m320s5920", irsend.outputStr());
+      "m320s77184", irsend.outputStr());
 
   irsend.reset();
   irsend.sendArris(0x1080695D);
@@ -161,8 +161,8 @@ TEST(TestDecodeArris, SyntheticExample) {
   EXPECT_EQ(decode_type_t::ARRIS, irsend.capture.decode_type);
   EXPECT_EQ(kArrisBits, irsend.capture.bits);
   EXPECT_EQ(0x1080695D, irsend.capture.value);
-  EXPECT_EQ(0x0, irsend.capture.address);
-  EXPECT_EQ(0x0, irsend.capture.command);
+  EXPECT_EQ(0x1, irsend.capture.address);
+  EXPECT_EQ(0x695, irsend.capture.command);
 }
 
 TEST(TestUtils, Housekeeping) {
@@ -172,4 +172,18 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::ARRIS));
   ASSERT_EQ(kArrisBits, IRsend::defaultBits(decode_type_t::ARRIS));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::ARRIS));
+}
+
+TEST(TestSendArris, ReleaseToggle) {
+  EXPECT_EQ(0x10800F5D, IRsend::toggleArrisRelease(0x10000F55));
+  EXPECT_EQ(0x10000F55, IRsend::toggleArrisRelease(0x10800F5D));
+  EXPECT_EQ(
+      0x10800F5D,
+      IRsend::toggleArrisRelease(IRsend::toggleArrisRelease(0x10800F5D)));
+}
+
+TEST(TestSendArris, encodeArris) {
+  EXPECT_EQ(0x10800F5D, IRsend::encodeArris(0xF5, true));
+  EXPECT_EQ(0x10000F55, IRsend::encodeArris(0xF5, false));
+  EXPECT_EQ(0x1080695D, IRsend::encodeArris(0x695, true));
 }
