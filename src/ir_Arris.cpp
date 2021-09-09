@@ -24,6 +24,8 @@ const uint8_t kArrisChecksumSize = 4;
 const uint8_t kArrisCommandSize = 19;
 const uint8_t kArrisReleaseBit = kArrisChecksumSize + kArrisCommandSize;
 
+using irutils::sumNibbles;
+
 #if SEND_ARRIS
 /// Send an Arris Manchester Code formatted message.
 /// Status: STABLE / Confirmed working.
@@ -63,7 +65,7 @@ uint32_t IRsend::encodeArris(const uint32_t command, const bool release) {
   uint32_t result = 0x10000000;
   irutils::setBits(&result, kArrisChecksumSize, kArrisCommandSize, command);
   irutils::setBit(&result, kArrisReleaseBit, release);
-  return result + irutils::sumNibbles(result);
+  return result + sumNibbles(result);
 }
 #endif  // SEND_ARRIS
 
@@ -92,23 +94,30 @@ bool IRrecv::decodeArris(decode_results *results, uint16_t offset,
   if (!matchSpace(results->rawbuf[offset++], kArrisHdrSpace)) return false;
 
   // Header (part 2) + Data
-  if (!matchManchester(results->rawbuf + offset, &results->value,
+  uint64_t data = 0;
+  if (!matchManchester(results->rawbuf + offset, &data,
                        results->rawlen - offset, nbits,
                        kArrisHalfClockPeriod * 2, 0,
                        kArrisHalfClockPeriod, 0, 0,
                        false, kUseDefTol, kMarkExcess, true, false))
     return false;
 
+  // Compliance
+  if (strict)
+    // Validate the checksum.
+    if (GETBITS32(data, 0, kArrisChecksumSize) !=
+        sumNibbles(data >> kArrisChecksumSize))
+      return false;
+
   // Success
   results->decode_type = decode_type_t::ARRIS;
   results->bits = nbits;
+  results->value = data;
   // Set the address as the Release Bit for something useful.
-  results->address = static_cast<bool>(GETBIT32(results->value,
-                                                kArrisReleaseBit));
+  results->address = static_cast<bool>(GETBIT32(data, kArrisReleaseBit));
   // The last 4 bits are likely a checksum value, so skip those. Everything else
   // after the release bit. e.g. Bits 10-28
-  results->command = GETBITS32(results->value, kArrisChecksumSize,
-                               kArrisCommandSize);
+  results->command = GETBITS32(data, kArrisChecksumSize, kArrisCommandSize);
   return true;
 }
 #endif  // DECODE_ARRIS
