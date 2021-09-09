@@ -790,6 +790,13 @@
 #define SEND_BOSE           _IR_ENABLE_DEFAULT_
 #endif  // SEND_BOSE
 
+#ifndef DECODE_ARRIS
+#define DECODE_ARRIS        _IR_ENABLE_DEFAULT_
+#endif  // DECODE_ARRIS
+#ifndef SEND_ARRIS
+#define SEND_ARRIS          _IR_ENABLE_DEFAULT_
+#endif  // SEND_ARRIS
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -951,8 +958,9 @@ enum decode_type_t {
   TROTEC_3550,
   SANYO_AC88,  // 105
   BOSE,
+  ARRIS,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = BOSE,
+  kLastDecodeType = ARRIS,
 };
 
 // Message lengths & required repeat values
@@ -970,6 +978,7 @@ const uint16_t kAmcorDefaultRepeat = kSingleRepeat;
 const uint16_t kArgoStateLength = 12;
 const uint16_t kArgoBits = kArgoStateLength * 8;
 const uint16_t kArgoDefaultRepeat = kNoRepeat;
+const uint16_t kArrisBits = 32;
 const uint16_t kCoolixBits = 24;
 const uint16_t kCoolixDefaultRepeat = kSingleRepeat;
 const uint16_t kCarrierAcBits = 32;

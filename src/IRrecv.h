@@ -287,6 +287,10 @@ class IRrecv {
   bool decodeArgo(decode_results *results, uint16_t offset = kStartOffset,
                   const uint16_t nbits = kArgoBits, const bool strict = true);
 #endif  // DECODE_ARGO
+#if DECODE_ARRIS
+  bool decodeArris(decode_results *results, uint16_t offset = kStartOffset,
+                   const uint16_t nbits = kArrisBits, const bool strict = true);
+#endif  // DECODE_ARRIS
 #if DECODE_SONY
   bool decodeSony(decode_results *results, uint16_t offset = kStartOffset,
                   const uint16_t nbits = kSonyMinBits,

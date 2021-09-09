@@ -737,6 +737,12 @@ class IRsend {
   void sendBose(const uint64_t data, const uint16_t nbits = kBoseBits,
                 const uint16_t repeat = kNoRepeat);
 #endif  // SEND_BOSE
+#if SEND_ARRIS
+  void sendArris(const uint64_t data, const uint16_t nbits = kArrisBits,
+                 const uint16_t repeat = kNoRepeat);
+  static uint32_t toggleArrisRelease(const uint32_t data);
+  static uint32_t encodeArris(const uint32_t command, const bool release);
+#endif  // SEND_ARRIS
 
  protected:
 #ifdef UNIT_TEST
