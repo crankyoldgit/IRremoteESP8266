@@ -25,41 +25,104 @@ union Tcl112Protocol{
   uint8_t raw[kTcl112AcStateLength];  ///< The State in IR code form.
   struct {
     // Byte 0~2
-    uint8_t pad0[3];
+    uint8_t            :8;
+    uint8_t            :8;
+    uint8_t            :8;
     // Byte 3
-    uint8_t MsgType :2;
-    uint8_t         :6;
+    uint8_t MsgType    :2;
+    uint8_t            :6;
     // Byte 4
-    uint8_t       :8;
+    uint8_t            :8;
     // Byte 5
-    uint8_t       :2;
-    uint8_t Power :1;
-    uint8_t       :2;
-    uint8_t Quiet :1;
-    uint8_t Light :1;
-    uint8_t Econo :1;
+    uint8_t            :2;
+    uint8_t Power      :1;
+    uint8_t TimerType  :2;
+    uint8_t Quiet      :1;
+    uint8_t Light      :1;
+    uint8_t Econo      :1;
     // Byte 6
-    uint8_t Mode    :4;
-    uint8_t Health  :1;
-    uint8_t Turbo   :1;
-    uint8_t         :2;
+    uint8_t Mode       :4;
+    uint8_t Health     :1;
+    uint8_t Turbo      :1;
+    uint8_t            :2;
     // Byte 7
-    uint8_t Temp  :4;
-    uint8_t       :4;
+    uint8_t Temp       :4;
+    uint8_t            :4;
     // Byte 8
-    uint8_t Fan     :3;
-    uint8_t SwingV  :3;
-    uint8_t         :2;
-    // Byte 9~11
-    uint8_t pad1[3];
+    uint8_t Fan        :3;
+    uint8_t SwingV     :3;
+    uint8_t            :2;
+    // Byte 9
+    uint8_t            :1;  // 0
+    uint8_t OffTimer   :6;
+    uint8_t            :1;  // 0
+    // Byte 10
+    uint8_t            :1;  // 0
+    uint8_t OnTimer    :6;
+    uint8_t            :1;  // 0
+    // Byte 11
+    uint8_t            :8;  // 00000000
     // Byte 12
-    uint8_t             :3;
-    uint8_t SwingH      :1;
-    uint8_t             :1;
-    uint8_t HalfDegree  :1;
-    uint8_t             :2;
+    uint8_t            :3;
+    uint8_t SwingH     :1;
+    uint8_t            :1;
+    uint8_t HalfDegree :1;
+    uint8_t            :1;
+    uint8_t isTcl      :1;
     // Byte 13
     uint8_t Sum :8;
+  };
+};
+
+/// Native representation of a Teknopoint 112bit A/C message.
+union TeknopointProtocol{
+  uint8_t raw[kTeknopointStateLength];  ///< The State in IR code form.
+  struct {
+    // Bytes 0-4
+    uint8_t            :8;  // constant 0010001111001011001001100000000100000000
+    uint8_t            :8;
+    uint8_t            :8;
+    uint8_t            :8;
+    uint8_t            :8;
+    // Byte 5
+    uint8_t            :2;  // 0b00
+    uint8_t Power      :1;
+    uint8_t TimerType  :2;
+    uint8_t Quiet      :1;  // 1
+    uint8_t Light      :1;  // 0 - 0 =? Light on?
+    uint8_t Econo      :1;  // 0
+    // Byte  6
+    uint8_t Mode       :4;
+    uint8_t Health     :1;  // 0
+    uint8_t Turbo      :1;  // 0
+    uint8_t            :2;  // 0b00
+    // Byte 7
+    uint8_t Temp       :4;
+    uint8_t            :4;  // 0b0000
+    // Byte 8
+    uint8_t Fan_and_Night  :3;
+    uint8_t SwingV         :3;
+    uint8_t TimerIndicator :1;
+    uint8_t                :1;  // 0
+
+    // Byte 9
+    uint8_t          :1;  // 0
+    uint8_t OffTimer :6;
+    uint8_t          :1;  // 0
+    // Byte 10
+    uint8_t          :1;  // 0
+    uint8_t OnTimer  :6;
+    uint8_t          :1;  // 0
+    // Byte 11
+    uint8_t          :8;  // 00000000
+    // Byte 12
+    uint8_t            :3;  // 000
+    uint8_t SwingH     :1;  // 0
+    uint8_t            :1;  // 0
+    uint8_t HalfDegree :1;  // 0
+    uint8_t            :2;  // 00
+      // Byte 13
+    uint8_t CheckSum   :8;
   };
 };
 
@@ -113,6 +176,8 @@ class IRTcl112Ac {
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kTcl112AcStateLength);
+  tcl_ac_remote_model_t getModel(void) const;
+  void setModel(const tcl_ac_remote_model_t model);
   void on(void);
   void off(void);
   void setPower(const bool on);
@@ -135,16 +200,19 @@ class IRTcl112Ac {
   bool getLight(void) const;
   void setSwingHorizontal(const bool on);
   bool getSwingHorizontal(void) const;
-  void setSwingVertical(const bool on);
-  bool getSwingVertical(void) const;
+  void setSwingVertical(const uint8_t setting);
+  uint8_t getSwingVertical(void) const;
   void setTurbo(const bool on);
   bool getTurbo(void) const;
   void setQuiet(const bool on);
   bool getQuiet(const bool def = false) const;
+  static bool isTcl(const uint8_t state[]);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
   stdAc::state_t toCommon(const stdAc::state_t *prev = NULL) const;
   String toString(void) const;
 #ifndef UNIT_TEST

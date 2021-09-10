@@ -10,8 +10,18 @@
 
 // General housekeeping
 TEST(TestTcl112Ac, Housekeeping) {
-  ASSERT_EQ("TCL112AC", typeToString(TCL112AC));
-  ASSERT_TRUE(hasACState(TCL112AC));
+  ASSERT_EQ("TCL112AC", typeToString(decode_type_t::TCL112AC));
+  ASSERT_EQ(decode_type_t::TCL112AC, strToDecodeType("TCL112AC"));
+  ASSERT_TRUE(hasACState(decode_type_t::TCL112AC));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::TCL112AC));
+  ASSERT_EQ(kTcl112AcBits, IRsend::defaultBits(decode_type_t::TCL112AC));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::TCL112AC));
+  ASSERT_EQ(tcl_ac_remote_model_t::TAC09CHSD, IRac::strToModel("TAC09CHSD"));
+  ASSERT_EQ(irutils::modelToStr(decode_type_t::TCL112AC,
+                                tcl_ac_remote_model_t::TAC09CHSD), "TAC09CHSD");
+  ASSERT_EQ(tcl_ac_remote_model_t::GZ055BE1, IRac::strToModel("GZ055BE1"));
+  ASSERT_EQ(irutils::modelToStr(decode_type_t::TCL112AC,
+                                tcl_ac_remote_model_t::GZ055BE1), "GZ055BE1");
 }
 
 // Tests for decodeTcl112Ac().
@@ -63,9 +73,9 @@ TEST(TestDecodeTcl112Ac, DecodeRealExample) {
   EXPECT_EQ(kTcl112AcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 24C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 24C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -106,27 +116,27 @@ TEST(TestTcl112AcClass, Temperature) {
   IRTcl112Ac ac(kGpioUnused);
   ac.setRaw(temp16C);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
   ac.setRaw(temp16point5C);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 16.5C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16.5C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
   ac.setRaw(temp19point5C);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 19.5C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 19.5C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
   ac.setRaw(temp31C);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 31C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 31C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
 
   ac.setTemp(kTcl112AcTempMin);
@@ -206,9 +216,9 @@ TEST(TestTcl112AcClass, OperatingMode) {
       0x07, 0x00, 0x00, 0x00, 0x00, 0x80, 0x48};
   ac.setRaw(automode);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 8 (Auto), Temp: 24C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 8 (Auto), Temp: 24C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
 }
 
@@ -236,9 +246,9 @@ TEST(TestTcl112AcClass, Power) {
       0x0F, 0x00, 0x00, 0x00, 0x00, 0x80, 0xCB};
   ac.setRaw(on);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
 
   const uint8_t off[kTcl112AcStateLength] = {
@@ -246,9 +256,9 @@ TEST(TestTcl112AcClass, Power) {
       0x07, 0x40, 0x00, 0x00, 0x00, 0x80, 0xCB};
   ac.setRaw(off);
   EXPECT_EQ(
-      "Type: 1, Power: Off, Mode: 3 (Cool), Temp: 24C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: Off, Mode: 3 (Cool), Temp: 24C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
 }
 
@@ -263,15 +273,15 @@ TEST(TestTcl112AcClass, Checksum) {
   EXPECT_EQ(0xCB, ac.calcChecksum(temp16C));
   ac.setRaw(temp16C);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
   ac.setRaw(temp31C);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 31C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 31C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
   EXPECT_EQ(0xBC, ac.calcChecksum(temp31C));
 
@@ -337,12 +347,12 @@ TEST(TestTcl112AcClass, SwingVertical) {
   IRTcl112Ac ac(kGpioUnused);
   ac.begin();
 
-  ac.setSwingVertical(true);
-  EXPECT_TRUE(ac.getSwingVertical());
-  ac.setSwingVertical(false);
-  EXPECT_EQ(false, ac.getSwingVertical());
-  ac.setSwingVertical(true);
-  EXPECT_TRUE(ac.getSwingVertical());
+  ac.setSwingVertical(kTcl112AcSwingVOff);
+  EXPECT_EQ(kTcl112AcSwingVOff, ac.getSwingVertical());
+  ac.setSwingVertical(kTcl112AcSwingVOn);
+  EXPECT_EQ(kTcl112AcSwingVOn, ac.getSwingVertical());
+  ac.setSwingVertical(kTcl112AcSwingVOff);
+  EXPECT_EQ(kTcl112AcSwingVOff, ac.getSwingVertical());
 }
 
 TEST(TestTcl112AcClass, Turbo) {
@@ -405,6 +415,7 @@ TEST(TestTcl112AcClass, Quiet_Mute) {
 
 TEST(TestTcl112AcClass, toCommon) {
   IRTcl112Ac ac(kGpioUnused);
+  ac.setModel(tcl_ac_remote_model_t::TAC09CHSD);
   ac.setPower(true);
   ac.setMode(kTcl112AcCool);
   ac.setTemp(20);
@@ -418,7 +429,7 @@ TEST(TestTcl112AcClass, toCommon) {
   ac.setQuiet(false);
   // Now test it.
   ASSERT_EQ(decode_type_t::TCL112AC, ac.toCommon().protocol);
-  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_EQ(1, ac.toCommon().model);
   ASSERT_TRUE(ac.toCommon().power);
   ASSERT_TRUE(ac.toCommon().celsius);
   ASSERT_EQ(20, ac.toCommon().degrees);
@@ -485,9 +496,9 @@ TEST(TestDecodeTcl112Ac, Issue744) {
   IRTcl112Ac ac(kGpioUnused);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 23C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: On",
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 23C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
       ac.toString());
 }
 
@@ -527,7 +538,7 @@ TEST(TestDecodeTcl112Ac, Issue1528) {
   EXPECT_EQ(kTcl112AcBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Type: 2, Quiet: On",
+      "Model: 1 (TAC09CHSD), Type: 2, Quiet: On",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -535,7 +546,6 @@ TEST(TestDecodeTcl112Ac, Issue1528) {
 TEST(TestTcl112AcClass, SendingQuiet) {
   IRTcl112Ac ac(kGpioUnused);
   IRrecv capture(kGpioUnused);
-
 
   ac.begin();
   ac.on();
@@ -559,16 +569,37 @@ TEST(TestTcl112AcClass, SendingQuiet) {
   ASSERT_EQ(TCL112AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
   ASSERT_EQ(
-      "Type: 2, Quiet: On",
+      "Model: 1 (TAC09CHSD), Type: 2, Quiet: On",
       IRAcUtils::resultAcToString(&ac._irsend.capture));
   // Second message.
   // TCL112 uses the Mitsubishi112 decoder.
   // Skip first message.
   EXPECT_TRUE(capture.decodeMitsubishi112(&ac._irsend.capture, 229));
-  ASSERT_EQ(TCL112AC, ac._irsend.capture.decode_type);
-  ASSERT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
+  EXPECT_EQ(TCL112AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kTcl112AcBits, ac._irsend.capture.bits);
   ASSERT_EQ(
-      "Type: 1, Power: On, Mode: 3 (Cool), Temp: 24C, Fan: 0 (Auto), "
-      "Econo: Off, Health: Off, Turbo: Off, Swing(H): Off, Swing(V): Off, "
-      "Light: Off", IRAcUtils::resultAcToString(&ac._irsend.capture));
+      "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 24C, "
+      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: Off",
+      IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+TEST(TestTcl112AcClass, isTcl) {
+  const uint8_t tcl_temp16C[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x0F, 0x00, 0x00, 0x00, 0x00, 0x80, 0xCB};
+  EXPECT_TRUE(IRTcl112Ac::isTcl(tcl_temp16C));
+  const uint8_t tcl_temp31C[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xBC};
+  EXPECT_TRUE(IRTcl112Ac::isTcl(tcl_temp31C));
+  const uint8_t issue1528[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x02, 0x00, 0x60, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x85};
+  EXPECT_TRUE(IRTcl112Ac::isTcl(issue1528));
+  // Ref: https://cociweb.info/container/hvac_ir_recapture_2719.log
+  const uint8_t teknopoint[14] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x0F, 0x38, 0x00, 0x00, 0x00, 0x00, 0x83};
+  EXPECT_FALSE(IRTcl112Ac::isTcl(teknopoint));
 }

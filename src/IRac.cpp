@@ -1942,6 +1942,7 @@ void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
 #if SEND_TCL112AC
 /// Send a TCL 112-bit A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRTcl112Ac object to use.
+/// @param[in] model The A/C model to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
@@ -1953,18 +1954,19 @@ void IRac::sharp(IRSharpAc *ac, const sharp_ac_remote_model_t model,
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] econo Run the device in economical mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
-void IRac::tcl112(IRTcl112Ac *ac,
+void IRac::tcl112(IRTcl112Ac *ac, const tcl_ac_remote_model_t model,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                   const bool quiet, const bool turbo, const bool light,
                   const bool econo, const bool filter) {
   ac->begin();
+  ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwingVertical(swingv != stdAc::swingv_t::kOff);
+  ac->setSwingVertical(ac->convertSwingV(swingv));
   ac->setSwingHorizontal(swingh != stdAc::swingh_t::kOff);
   ac->setQuiet(quiet);
   ac->setTurbo(turbo);
@@ -2910,9 +2912,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case TCL112AC:
     {
       IRTcl112Ac ac(_pin, _inverted, _modulation);
-      tcl112(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-             send.swingh, send.quiet, send.turbo, send.light, send.econo,
-             send.filter);
+      tcl112(&ac, (tcl_ac_remote_model_t)send.model, send.power, send.mode,
+             degC, send.fanspeed, send.swingv, send.swingh, send.quiet,
+             send.turbo, send.light, send.econo, send.filter);
       break;
     }
 #endif  // SEND_TCL112AC
@@ -3235,6 +3237,18 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return panasonic_ac_remote_model_t::kPanasonicCkp;
   } else if (!strcasecmp(str, "RKR") || !strcasecmp(str, "PANASONICRKR")) {
     return panasonic_ac_remote_model_t::kPanasonicRkr;
+  // Sharp A/C Models
+  } else if (!strcasecmp(str, "A907")) {
+    return sharp_ac_remote_model_t::A907;
+  } else if (!strcasecmp(str, "A705")) {
+    return sharp_ac_remote_model_t::A705;
+  } else if (!strcasecmp(str, "A903")) {
+    return sharp_ac_remote_model_t::A903;
+  // TCL A/C Models
+  } else if (!strcasecmp(str, "TAC09CHSD")) {
+    return tcl_ac_remote_model_t::TAC09CHSD;
+  } else if (!strcasecmp(str, "GZ055BE1")) {
+    return tcl_ac_remote_model_t::GZ055BE1;
   // Voltas A/C models
   } else if (!strcasecmp(str, "122LZF")) {
     return voltas_ac_remote_model_t::kVoltas122LZF;
