@@ -277,6 +277,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_TECO
     case decode_type_t::TECO:
 #endif
+#if SEND_TEKNOPOINT
+    case decode_type_t::TEKNOPOINT:
+#endif  // SEND_TEKNOPOINT
 #if SEND_TOSHIBA_AC
     case decode_type_t::TOSHIBA_AC:
 #endif
@@ -2908,16 +2911,20 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_SHARP_AC
-#if SEND_TCL112AC
+#if (SEND_TCL112AC || SEND_TEKNOPOINT)
     case TCL112AC:
+    case TEKNOPOINT:
     {
       IRTcl112Ac ac(_pin, _inverted, _modulation);
-      tcl112(&ac, (tcl_ac_remote_model_t)send.model, send.power, send.mode,
+      tcl_ac_remote_model_t model = (tcl_ac_remote_model_t)send.model;
+      if (send.protocol == decode_type_t::TEKNOPOINT)
+        model = tcl_ac_remote_model_t::GZ055BE1;
+      tcl112(&ac, model, send.power, send.mode,
              degC, send.fanspeed, send.swingv, send.swingh, send.quiet,
              send.turbo, send.light, send.econo, send.filter);
       break;
     }
-#endif  // SEND_TCL112AC
+#endif  // (SEND_TCL112AC || SEND_TEKNOPOINT)
 #if SEND_TECHNIBEL_AC
     case TECHNIBEL_AC:
     {
@@ -3760,13 +3767,14 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_TECO
-#if DECODE_TCL112AC
-      case decode_type_t::TCL112AC: {
+#if (DECODE_TCL112AC || DECODE_TEKNOPOINT)
+      case decode_type_t::TCL112AC:
+      case decode_type_t::TEKNOPOINT: {
         IRTcl112Ac ac(kGpioUnused);
         ac.setRaw(result->state);
         return ac.toString();
       }
-#endif  // DECODE_TCL112AC
+#endif  // (DECODE_TCL112AC || DECODE_TEKNOPOINT)
 #if DECODE_LG
       case decode_type_t::LG:
       case decode_type_t::LG2: {
@@ -4156,14 +4164,18 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_SHARP_AC
-#if DECODE_TCL112AC
-      case decode_type_t::TCL112AC: {
+#if (DECODE_TCL112AC || DECODE_TEKNOPOINT)
+      case decode_type_t::TCL112AC:
+      case decode_type_t::TEKNOPOINT: {
         IRTcl112Ac ac(kGpioUnused);
         ac.setRaw(decode->state);
         *result = ac.toCommon(prev);
+        // Teknopoint uses the TCL protocol, but with a different model number.
+        // Just keep the original protocol type ... for now.
+        result->protocol = decode->decode_type;
         break;
       }
-#endif  // DECODE_TCL112AC
+#endif  // (DECODE_TCL112AC || DECODE_TEKNOPOINT)
 #if DECODE_TECHNIBEL_AC
       case decode_type_t::TECHNIBEL_AC: {
         IRTechnibelAc ac(kGpioUnused);
