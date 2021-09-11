@@ -1643,7 +1643,8 @@ TEST(TestIRac, Tcl112) {
   char expected[] =
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 20C, "
       "Fan: 3 (Medium), Econo: On, Health: On, Turbo: Off, "
-      "Swing(H): On, Swing(V): 0 (Auto), Light: On";
+      "Swing(H): On, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off";
 
   ac.begin();
   irac.tcl112(&ac,

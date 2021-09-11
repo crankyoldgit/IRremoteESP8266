@@ -36,7 +36,8 @@ union Tcl112Protocol{
     // Byte 5
     uint8_t            :2;
     uint8_t Power      :1;
-    uint8_t TimerType  :2;
+    uint8_t OnTimerEnabled  :1;
+    uint8_t OffTimerEnabled :1;
     uint8_t Quiet      :1;
     uint8_t Light      :1;
     uint8_t Econo      :1;
@@ -51,7 +52,8 @@ union Tcl112Protocol{
     // Byte 8
     uint8_t Fan        :3;
     uint8_t SwingV     :3;
-    uint8_t            :2;
+    uint8_t TimerIndicator :1;
+    uint8_t            :1;
     // Byte 9
     uint8_t            :1;  // 0
     uint8_t OffTimer   :6;
@@ -74,58 +76,6 @@ union Tcl112Protocol{
   };
 };
 
-/// Native representation of a Teknopoint 112bit A/C message.
-union TeknopointProtocol{
-  uint8_t raw[kTeknopointStateLength];  ///< The State in IR code form.
-  struct {
-    // Bytes 0-4
-    uint8_t            :8;  // constant 0010001111001011001001100000000100000000
-    uint8_t            :8;
-    uint8_t            :8;
-    uint8_t            :8;
-    uint8_t            :8;
-    // Byte 5
-    uint8_t            :2;  // 0b00
-    uint8_t Power      :1;
-    uint8_t TimerType  :2;
-    uint8_t Quiet      :1;  // 1
-    uint8_t Light      :1;  // 0 - 0 =? Light on?
-    uint8_t Econo      :1;  // 0
-    // Byte  6
-    uint8_t Mode       :4;
-    uint8_t Health     :1;  // 0
-    uint8_t Turbo      :1;  // 0
-    uint8_t            :2;  // 0b00
-    // Byte 7
-    uint8_t Temp       :4;
-    uint8_t            :4;  // 0b0000
-    // Byte 8
-    uint8_t Fan_and_Night  :3;
-    uint8_t SwingV         :3;
-    uint8_t TimerIndicator :1;
-    uint8_t                :1;  // 0
-
-    // Byte 9
-    uint8_t          :1;  // 0
-    uint8_t OffTimer :6;
-    uint8_t          :1;  // 0
-    // Byte 10
-    uint8_t          :1;  // 0
-    uint8_t OnTimer  :6;
-    uint8_t          :1;  // 0
-    // Byte 11
-    uint8_t          :8;  // 00000000
-    // Byte 12
-    uint8_t            :3;  // 000
-    uint8_t SwingH     :1;  // 0
-    uint8_t            :1;  // 0
-    uint8_t HalfDegree :1;  // 0
-    uint8_t            :2;  // 00
-      // Byte 13
-    uint8_t CheckSum   :8;
-  };
-};
-
 // Constants
 const uint16_t kTcl112AcHdrMark = 3000;
 const uint16_t kTcl112AcHdrSpace = 1650;
@@ -144,9 +94,11 @@ const uint8_t kTcl112AcFan =  7;
 const uint8_t kTcl112AcAuto = 8;
 
 const uint8_t kTcl112AcFanAuto = 0b000;
+const uint8_t kTcl112AcFanMin  = 0b001;  // Aka. "Night"
 const uint8_t kTcl112AcFanLow  = 0b010;
 const uint8_t kTcl112AcFanMed  = 0b011;
 const uint8_t kTcl112AcFanHigh = 0b101;
+const uint8_t kTcl112AcFanNight = kTcl112AcFanMin;
 
 const float   kTcl112AcTempMax    = 31.0;
 const float   kTcl112AcTempMin    = 16.0;
@@ -206,6 +158,10 @@ class IRTcl112Ac {
   bool getTurbo(void) const;
   void setQuiet(const bool on);
   bool getQuiet(const bool def = false) const;
+  uint16_t getOnTimer(void) const;
+  void setOnTimer(const uint16_t mins);
+  uint16_t getOffTimer(void) const;
+  void setOffTimer(const uint16_t mins);
   static bool isTcl(const uint8_t state[]);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);

@@ -75,7 +75,8 @@ TEST(TestDecodeTcl112Ac, DecodeRealExample) {
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 24C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -118,25 +119,29 @@ TEST(TestTcl112AcClass, Temperature) {
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setRaw(temp16point5C);
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16.5C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setRaw(temp19point5C);
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 19.5C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setRaw(temp31C);
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 31C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
 
   ac.setTemp(kTcl112AcTempMin);
@@ -218,7 +223,8 @@ TEST(TestTcl112AcClass, OperatingMode) {
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 8 (Auto), Temp: 24C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
 }
 
@@ -248,7 +254,8 @@ TEST(TestTcl112AcClass, Power) {
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
 
   const uint8_t off[kTcl112AcStateLength] = {
@@ -258,7 +265,8 @@ TEST(TestTcl112AcClass, Power) {
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: Off, Mode: 3 (Cool), Temp: 24C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
 }
 
@@ -275,13 +283,15 @@ TEST(TestTcl112AcClass, Checksum) {
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setRaw(temp31C);
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 31C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
   EXPECT_EQ(0xBC, ac.calcChecksum(temp31C));
 
@@ -498,7 +508,8 @@ TEST(TestDecodeTcl112Ac, Issue744) {
   EXPECT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 23C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: On",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: On, "
+      "On Timer: Off, Off Timer: Off",
       ac.toString());
 }
 
@@ -580,7 +591,8 @@ TEST(TestTcl112AcClass, SendingQuiet) {
   ASSERT_EQ(
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 24C, "
       "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 0 (Auto), Light: Off",
+      "Swing(H): Off, Swing(V): 0 (Auto), Light: Off, "
+      "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
@@ -602,4 +614,41 @@ TEST(TestTcl112AcClass, isTcl) {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
       0x0F, 0x38, 0x00, 0x00, 0x00, 0x00, 0x83};
   EXPECT_FALSE(IRTcl112Ac::isTcl(teknopoint));
+}
+
+TEST(TestTcl112AcClass, Timers) {
+  IRTcl112Ac ac(kGpioUnused);
+
+  ac.stateReset();
+  ac.setOnTimer(0);
+  ac.setOffTimer(0);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+  EXPECT_FALSE(ac._.TimerIndicator);
+  EXPECT_FALSE(ac._.OnTimerEnabled);
+  EXPECT_FALSE(ac._.OffTimerEnabled);
+
+  ac.setOnTimer(7 * 60);
+  EXPECT_EQ(7 * 60, ac.getOnTimer());
+  EXPECT_TRUE(ac._.TimerIndicator);
+  EXPECT_TRUE(ac._.OnTimerEnabled);
+  EXPECT_FALSE(ac._.OffTimerEnabled);
+
+  ac.setOnTimer(0);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_FALSE(ac._.TimerIndicator);
+  EXPECT_FALSE(ac._.OnTimerEnabled);
+  EXPECT_FALSE(ac._.OffTimerEnabled);
+
+  ac.setOffTimer(13 * 60);  // Beyond max.
+  EXPECT_EQ(12 * 60, ac.getOffTimer());
+  EXPECT_TRUE(ac._.TimerIndicator);
+  EXPECT_FALSE(ac._.OnTimerEnabled);
+  EXPECT_TRUE(ac._.OffTimerEnabled);
+
+  ac.setOffTimer(0);
+  EXPECT_EQ(0, ac.getOffTimer());
+  EXPECT_FALSE(ac._.TimerIndicator);
+  EXPECT_FALSE(ac._.OnTimerEnabled);
+  EXPECT_FALSE(ac._.OffTimerEnabled);
 }

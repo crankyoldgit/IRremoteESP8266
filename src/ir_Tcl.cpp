@@ -15,6 +15,9 @@
 
 // Constants
 
+const uint8_t kTcl112AcTimerResolution = 20;  // Minutes
+const uint16_t kTcl112AcTimerMax = 720;  // Minutes (12 hrs)
+
 using irutils::addBoolToString;
 using irutils::addFanToString;
 using irutils::addIntToString;
@@ -23,6 +26,7 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addSwingVToString;
 using irutils::addTempFloatToString;
+using irutils::minsToString;
 
 #if SEND_TCL112AC
 /// Send a TCL 112-bit A/C message.
@@ -231,6 +235,7 @@ float IRTcl112Ac::getTemp(void) const {
 void IRTcl112Ac::setFan(const uint8_t speed) {
   switch (speed) {
     case kTcl112AcFanAuto:
+    case kTcl112AcFanMin:
     case kTcl112AcFanLow:
     case kTcl112AcFanMed:
     case kTcl112AcFanHigh:
@@ -323,6 +328,36 @@ bool IRTcl112Ac::getQuiet(const bool def) const {
     return _quiet_explictly_set ? _quiet : def;
 }
 
+/// Get how long the On Timer is set for, in minutes.
+/// @return The time in nr of minutes.
+uint16_t IRTcl112Ac::getOnTimer(void) const {
+  return _.OnTimer * kTcl112AcTimerResolution;
+}
+
+/// Set or cancel the On Timer function.
+/// @param[in] mins Nr. of minutes the timer is to be set to.
+/// @note Rounds down to 20 min increments. (max: 720 mins (12h), 0 is Off)
+void IRTcl112Ac::setOnTimer(const uint16_t mins) {
+  _.OnTimer = std::min(mins, kTcl112AcTimerMax) / kTcl112AcTimerResolution;
+  _.OnTimerEnabled = _.OnTimer > 0;
+  _.TimerIndicator = _.OnTimerEnabled || _.OffTimerEnabled;
+}
+
+/// Get how long the Off Timer is set for, in minutes.
+/// @return The time in nr of minutes.
+uint16_t IRTcl112Ac::getOffTimer(void) const {
+  return _.OffTimer * kTcl112AcTimerResolution;
+}
+
+/// Set or cancel the Off Timer function.
+/// @param[in] mins Nr. of minutes the timer is to be set to.
+/// @note Rounds down to 20 min increments. (max: 720 mins (12h), 0 is Off)
+void IRTcl112Ac::setOffTimer(const uint16_t mins) {
+  _.OffTimer = std::min(mins, kTcl112AcTimerMax) / kTcl112AcTimerResolution;
+  _.OffTimerEnabled = _.OffTimer > 0;
+  _.TimerIndicator = _.OnTimerEnabled || _.OffTimerEnabled;
+}
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -341,7 +376,7 @@ uint8_t IRTcl112Ac::convertMode(const stdAc::opmode_t mode) {
 /// @return The native equivalent of the enum.
 uint8_t IRTcl112Ac::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kMin:    return kTcl112AcFanMin;
     case stdAc::fanspeed_t::kLow:    return kTcl112AcFanLow;
     case stdAc::fanspeed_t::kMedium: return kTcl112AcFanMed;
     case stdAc::fanspeed_t::kHigh:
@@ -380,7 +415,8 @@ stdAc::fanspeed_t IRTcl112Ac::toCommonFanSpeed(const uint8_t spd) {
   switch (spd) {
     case kTcl112AcFanHigh: return stdAc::fanspeed_t::kMax;
     case kTcl112AcFanMed:  return stdAc::fanspeed_t::kMedium;
-    case kTcl112AcFanLow:  return stdAc::fanspeed_t::kMin;
+    case kTcl112AcFanLow:  return stdAc::fanspeed_t::kLow;
+    case kTcl112AcFanMin:  return stdAc::fanspeed_t::kMin;
     default:               return stdAc::fanspeed_t::kAuto;
   }
 }
@@ -430,7 +466,7 @@ stdAc::state_t IRTcl112Ac::toCommon(const stdAc::state_t *prev) const {
 /// @return A human readable string.
 String IRTcl112Ac::toString(void) const {
   String result = "";
-  result.reserve(190);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(220);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::TCL112AC, getModel(), false);
   result += addIntToString(_.MsgType, D_STR_TYPE);
   switch (_.MsgType) {
@@ -452,6 +488,12 @@ String IRTcl112Ac::toString(void) const {
                                             kTcl112AcSwingVOn,  // Swing
                                             0xFF, 0xFF);  // Unused
       result += addBoolToString(getLight(), kLightStr);
+      result += addLabeledString(
+          _.OnTimerEnabled ? minsToString(getOnTimer()) : kOffStr,
+          kOnTimerStr);
+      result += addLabeledString(
+          _.OffTimerEnabled ? minsToString(getOffTimer()) : kOffStr,
+          kOffTimerStr);
       break;
     case kTcl112AcSpecial:
       result += addBoolToString(_.Quiet, kQuietStr);
