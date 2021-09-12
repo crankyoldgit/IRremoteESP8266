@@ -665,26 +665,41 @@ TEST(TestTcl112AcClass, Timers) {
   // Real messages/states
   // Per https://github.com/crankyoldgit/IRremoteESP8266/issues/1486#issuecomment-917545485
 
-  const uint8_t offtimer_1h[14] = {
+  const uint8_t ontimer_1h[14] = {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x34, 0x03,
       0x00, 0x78, 0x00, 0x06, 0x00, 0x00, 0xCA};
-  ac.setRaw(offtimer_1h);
-  EXPECT_EQ(60, ac.getOffTimer());
+  ac.setRaw(ontimer_1h);
+  EXPECT_EQ(60, ac.getOnTimer());
   EXPECT_TRUE(ac._.TimerIndicator);
-  EXPECT_FALSE(ac._.OnTimerEnabled);
-  EXPECT_TRUE(ac._.OffTimerEnabled);
+  EXPECT_TRUE(ac._.OnTimerEnabled);
+  EXPECT_FALSE(ac._.OffTimerEnabled);
 
-  const uint8_t offtimer_4h[14] = {
+  const uint8_t ontimer_4h[14] = {
       0x23, 0xCB, 0x26, 0x01, 0x00, 0x34, 0x03,
       0x00, 0x78, 0x00, 0x18, 0x00, 0x00, 0xDC};
-  ac.setRaw(offtimer_4h);
-  EXPECT_EQ(240, ac.getOffTimer());
+  ac.setRaw(ontimer_4h);
+  EXPECT_EQ(240, ac.getOnTimer());
+  EXPECT_TRUE(ac._.TimerIndicator);
+  EXPECT_TRUE(ac._.OnTimerEnabled);
+  EXPECT_FALSE(ac._.OffTimerEnabled);
+  EXPECT_EQ(
+      "Model: 2 (GZ055BE1), Type: 1, Power: On, Mode: 3 (Cool), Temp: 31C, "
+      "Fan: 0 (Auto), Swing(H): Off, Swing(V): 7 (Swing), "
+      "On Timer: 04:00, Off Timer: Off",
+      ac.toString());
+
+  const uint8_t offtimer_2h[14] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x2C, 0x08,
+      0x07, 0x78, 0x0C, 0x00, 0x00, 0x00, 0xD4};
+
+  ac.setRaw(offtimer_2h);
+  EXPECT_EQ(120, ac.getOffTimer());
   EXPECT_TRUE(ac._.TimerIndicator);
   EXPECT_FALSE(ac._.OnTimerEnabled);
   EXPECT_TRUE(ac._.OffTimerEnabled);
   EXPECT_EQ(
-      "Model: 2 (GZ055BE1), Type: 1, Power: On, Mode: 3 (Cool), Temp: 31C, "
+      "Model: 2 (GZ055BE1), Type: 1, Power: On, Mode: 8 (Auto), Temp: 24C, "
       "Fan: 0 (Auto), Swing(H): Off, Swing(V): 7 (Swing), "
-      "On Timer: Off, Off Timer: 04:00",
+      "On Timer: Off, Off Timer: 02:00",
       ac.toString());
 }

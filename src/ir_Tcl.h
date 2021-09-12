@@ -25,54 +25,54 @@ union Tcl112Protocol{
   uint8_t raw[kTcl112AcStateLength];  ///< The State in IR code form.
   struct {
     // Byte 0~2
-    uint8_t            :8;
-    uint8_t            :8;
-    uint8_t            :8;
+    uint8_t                 :8;
+    uint8_t                 :8;
+    uint8_t                 :8;
     // Byte 3
-    uint8_t MsgType    :2;
-    uint8_t            :6;
+    uint8_t MsgType         :2;
+    uint8_t                 :6;
     // Byte 4
-    uint8_t            :8;
+    uint8_t                 :8;
     // Byte 5
-    uint8_t            :2;
-    uint8_t Power      :1;
-    uint8_t OnTimerEnabled  :1;
+    uint8_t                 :2;
+    uint8_t Power           :1;
     uint8_t OffTimerEnabled :1;
-    uint8_t Quiet      :1;
-    uint8_t Light      :1;
-    uint8_t Econo      :1;
+    uint8_t OnTimerEnabled  :1;
+    uint8_t Quiet           :1;
+    uint8_t Light           :1;
+    uint8_t Econo           :1;
     // Byte 6
-    uint8_t Mode       :4;
-    uint8_t Health     :1;
-    uint8_t Turbo      :1;
-    uint8_t            :2;
+    uint8_t Mode            :4;
+    uint8_t Health          :1;
+    uint8_t Turbo           :1;
+    uint8_t                 :2;
     // Byte 7
-    uint8_t Temp       :4;
-    uint8_t            :4;
+    uint8_t Temp            :4;
+    uint8_t                 :4;
     // Byte 8
-    uint8_t Fan        :3;
-    uint8_t SwingV     :3;
-    uint8_t TimerIndicator :1;
-    uint8_t            :1;
+    uint8_t Fan             :3;
+    uint8_t SwingV          :3;
+    uint8_t TimerIndicator  :1;
+    uint8_t                 :1;
     // Byte 9
-    uint8_t            :1;  // 0
-    uint8_t OnTimer   :6;
-    uint8_t            :1;  // 0
+    uint8_t                 :1;  // 0
+    uint8_t OffTimer        :6;
+    uint8_t                 :1;  // 0
     // Byte 10
-    uint8_t            :1;  // 0
-    uint8_t OffTimer    :6;
-    uint8_t            :1;  // 0
+    uint8_t                 :1;  // 0
+    uint8_t OnTimer         :6;
+    uint8_t                 :1;  // 0
     // Byte 11
-    uint8_t            :8;  // 00000000
+    uint8_t                 :8;  // 00000000
     // Byte 12
-    uint8_t            :3;
-    uint8_t SwingH     :1;
-    uint8_t            :1;
-    uint8_t HalfDegree :1;
-    uint8_t            :1;
-    uint8_t isTcl      :1;
+    uint8_t                 :3;
+    uint8_t SwingH          :1;
+    uint8_t                 :1;
+    uint8_t HalfDegree      :1;
+    uint8_t                 :1;
+    uint8_t isTcl           :1;
     // Byte 13
-    uint8_t Sum :8;
+    uint8_t Sum             :8;
   };
 };
 
