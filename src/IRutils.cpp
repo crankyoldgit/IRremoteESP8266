@@ -586,14 +586,6 @@ namespace irutils {
           default: return kUnknownStr;
         }
         break;
-      case decode_type_t::SHARP_AC:
-        switch (model) {
-          case sharp_ac_remote_model_t::A907: return F("A907");
-          case sharp_ac_remote_model_t::A705: return F("A705");
-          case sharp_ac_remote_model_t::A903: return F("A903");
-          default: return kUnknownStr;
-        }
-        break;
       case decode_type_t::PANASONIC_AC:
         switch (model) {
           case panasonic_ac_remote_model_t::kPanasonicLke: return F("LKE");
@@ -602,6 +594,21 @@ namespace irutils {
           case panasonic_ac_remote_model_t::kPanasonicJke: return F("JKE");
           case panasonic_ac_remote_model_t::kPanasonicCkp: return F("CKP");
           case panasonic_ac_remote_model_t::kPanasonicRkr: return F("RKR");
+          default: return kUnknownStr;
+        }
+        break;
+      case decode_type_t::SHARP_AC:
+        switch (model) {
+          case sharp_ac_remote_model_t::A907: return F("A907");
+          case sharp_ac_remote_model_t::A705: return F("A705");
+          case sharp_ac_remote_model_t::A903: return F("A903");
+          default: return kUnknownStr;
+        }
+        break;
+      case decode_type_t::TCL112AC:
+        switch (model) {
+          case tcl_ac_remote_model_t::TAC09CHSD: return F("TAC09CHSD");
+          case tcl_ac_remote_model_t::GZ055BE1:  return F("GZ055BE1");
           default: return kUnknownStr;
         }
         break;
