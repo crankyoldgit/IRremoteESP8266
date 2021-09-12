@@ -361,8 +361,18 @@ TEST(TestTcl112AcClass, SwingVertical) {
   EXPECT_EQ(kTcl112AcSwingVOff, ac.getSwingVertical());
   ac.setSwingVertical(kTcl112AcSwingVOn);
   EXPECT_EQ(kTcl112AcSwingVOn, ac.getSwingVertical());
+  ac.setSwingVertical(kTcl112AcSwingVHigh);
+  EXPECT_EQ(kTcl112AcSwingVHigh, ac.getSwingVertical());
   ac.setSwingVertical(kTcl112AcSwingVOff);
   EXPECT_EQ(kTcl112AcSwingVOff, ac.getSwingVertical());
+  ac.setSwingVertical(0xFF);  // Unused value so shouldn't change from previous.
+  EXPECT_EQ(kTcl112AcSwingVOff, ac.getSwingVertical());
+
+  const uint8_t highest[kTcl112AcStateLength] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x24, 0x03,
+      0x0F, 0x08, 0x00, 0x00, 0x00, 0x00, 0x53};
+  ac.setRaw(highest);
+  EXPECT_EQ(kTcl112AcSwingVHighest, ac.getSwingVertical());
 }
 
 TEST(TestTcl112AcClass, Turbo) {

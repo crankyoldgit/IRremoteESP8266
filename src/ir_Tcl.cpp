@@ -287,6 +287,11 @@ bool IRTcl112Ac::getSwingHorizontal(void) const { return _.SwingH; }
 void IRTcl112Ac::setSwingVertical(const uint8_t setting) {
   switch (setting) {
     case kTcl112AcSwingVOff:
+    case kTcl112AcSwingVHighest:
+    case kTcl112AcSwingVHigh:
+    case kTcl112AcSwingVMiddle:
+    case kTcl112AcSwingVLow:
+    case kTcl112AcSwingVLowest:
     case kTcl112AcSwingVOn:
      _.SwingV = setting;
   }
@@ -403,8 +408,13 @@ stdAc::opmode_t IRTcl112Ac::toCommonMode(const uint8_t mode) {
 /// @return The native equivalent of the enum.
 uint8_t IRTcl112Ac::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
-    case stdAc::swingv_t::kOff: return kTcl112AcSwingVOff;
-    default:                    return kTcl112AcSwingVOn;
+    case stdAc::swingv_t::kOff:     return kTcl112AcSwingVOff;
+    case stdAc::swingv_t::kHighest: return kTcl112AcSwingVHighest;
+    case stdAc::swingv_t::kHigh:    return kTcl112AcSwingVHigh;
+    case stdAc::swingv_t::kMiddle:  return kTcl112AcSwingVMiddle;
+    case stdAc::swingv_t::kLow:     return kTcl112AcSwingVLow;
+    case stdAc::swingv_t::kLowest:  return kTcl112AcSwingVLowest;
+    default:                        return kTcl112AcSwingVOn;
   }
 }
 
@@ -483,10 +493,16 @@ String IRTcl112Ac::toString(void) const {
       result += addBoolToString(_.Turbo, kTurboStr);
       result += addBoolToString(_.SwingH, kSwingHStr);
       result += addSwingVToString(_.SwingV, kTcl112AcSwingVOff,
-                                            0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-                                            0xFF, 0xFF,  // Unused
+                                            kTcl112AcSwingVHighest,
+                                            kTcl112AcSwingVHigh,
+                                            0xFF,  // unused
+                                            kTcl112AcSwingVMiddle,
+                                            0xFF,  // unused
+                                            kTcl112AcSwingVLow,
+                                            kTcl112AcSwingVLowest,
+                                            kTcl112AcSwingVOff,
                                             kTcl112AcSwingVOn,  // Swing
-                                            0xFF, 0xFF);  // Unused
+                                            0xFF, 0xFF);  // Both Unused
       result += addBoolToString(getLight(), kLightStr);
       result += addLabeledString(
           _.OnTimerEnabled ? minsToString(getOnTimer()) : kOffStr,

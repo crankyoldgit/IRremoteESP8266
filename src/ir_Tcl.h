@@ -103,8 +103,13 @@ const uint8_t kTcl112AcFanNight = kTcl112AcFanMin;
 const float   kTcl112AcTempMax    = 31.0;
 const float   kTcl112AcTempMin    = 16.0;
 
-const uint8_t kTcl112AcSwingVOn =    0b111;
-const uint8_t kTcl112AcSwingVOff =   0b000;
+const uint8_t kTcl112AcSwingVOff =     0b000;
+const uint8_t kTcl112AcSwingVHighest = 0b001;
+const uint8_t kTcl112AcSwingVHigh =    0b010;
+const uint8_t kTcl112AcSwingVMiddle =  0b011;
+const uint8_t kTcl112AcSwingVLow =     0b100;
+const uint8_t kTcl112AcSwingVLowest =  0b101;
+const uint8_t kTcl112AcSwingVOn =      0b111;
 // MsgType
 const uint8_t kTcl112AcNormal  = 0b01;
 const uint8_t kTcl112AcSpecial = 0b10;
