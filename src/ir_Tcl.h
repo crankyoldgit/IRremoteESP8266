@@ -4,8 +4,10 @@
 /// @brief Support for TCL protocols.
 
 // Supports:
-//   Brand: Leberg,  Model: LBS-TOR07 A/C
-//   Brand: TCL,  Model: TAC-09CHSD/XA31I A/C
+//   Brand: Leberg,  Model: LBS-TOR07 A/C (TAC09CHSD)
+//   Brand: TCL,  Model: TAC-09CHSD/XA31I A/C (TAC09CHSD)
+//   Brand: Teknopoint,  Model: Allegro SSA-09H A/C (GZ055BE1)
+//   Brand: Teknopoint,  Model: GZ-055B-E1 remote (GZ055BE1)
 
 #ifndef IR_TCL_H_
 #define IR_TCL_H_
@@ -99,6 +101,7 @@ const uint8_t kTcl112AcFanLow  = 0b010;
 const uint8_t kTcl112AcFanMed  = 0b011;
 const uint8_t kTcl112AcFanHigh = 0b101;
 const uint8_t kTcl112AcFanNight = kTcl112AcFanMin;
+const uint8_t kTcl112AcFanQuiet = kTcl112AcFanMin;
 
 const float   kTcl112AcTempMax    = 31.0;
 const float   kTcl112AcTempMin    = 16.0;
