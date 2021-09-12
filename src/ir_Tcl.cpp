@@ -489,7 +489,6 @@ String IRTcl112Ac::toString(void) const {
       result += addFanToString(_.Fan, kTcl112AcFanHigh, kTcl112AcFanLow,
                                kTcl112AcFanAuto, kTcl112AcFanMin,
                                kTcl112AcFanMed);
-      result += addBoolToString(_.SwingH, kSwingHStr);
       result += addSwingVToString(_.SwingV, kTcl112AcSwingVOff,
                                             kTcl112AcSwingVHighest,
                                             kTcl112AcSwingVHigh,
@@ -502,6 +501,7 @@ String IRTcl112Ac::toString(void) const {
                                             kTcl112AcSwingVOn,  // Swing
                                             0xFF, 0xFF);  // Both Unused
       if (model != tcl_ac_remote_model_t::GZ055BE1) {
+        result += addBoolToString(_.SwingH, kSwingHStr);
         result += addBoolToString(_.Econo, kEconoStr);
         result += addBoolToString(_.Health, kHealthStr);
         result += addBoolToString(_.Turbo, kTurboStr);

@@ -1642,7 +1642,7 @@ TEST(TestIRac, Tcl112) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Model: 1 (TAC09CHSD), Type: 1, Power: On, Mode: 3 (Cool), Temp: 20C, "
-      "Fan: 3 (Medium), Swing(H): On, Swing(V): 0 (Auto), "
+      "Fan: 3 (Medium), Swing(V): 0 (Auto), Swing(H): On, "
       "Econo: On, Health: On, Turbo: Off, Light: On, "
       "On Timer: Off, Off Timer: Off";
 
