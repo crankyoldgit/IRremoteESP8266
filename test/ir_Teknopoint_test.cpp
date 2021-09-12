@@ -45,8 +45,7 @@ TEST(TestDecodeTeknopoint, RealExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Model: 2 (GZ055BE1), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, "
-      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 1 (Highest), Light: On, "
+      "Fan: 0 (Auto), Swing(H): Off, Swing(V): 1 (Highest), "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -71,8 +70,7 @@ TEST(TestDecodeTeknopoint, SyntheticExample) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Model: 2 (GZ055BE1), Type: 1, Power: On, Mode: 3 (Cool), Temp: 16C, "
-      "Fan: 0 (Auto), Econo: Off, Health: Off, Turbo: Off, "
-      "Swing(H): Off, Swing(V): 1 (Highest), Light: On, "
+      "Fan: 0 (Auto), Swing(H): Off, Swing(V): 1 (Highest), "
       "On Timer: Off, Off Timer: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 

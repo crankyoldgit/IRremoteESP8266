@@ -477,7 +477,8 @@ stdAc::state_t IRTcl112Ac::toCommon(const stdAc::state_t *prev) const {
 String IRTcl112Ac::toString(void) const {
   String result = "";
   result.reserve(220);  // Reserve some heap for the string to reduce fragging.
-  result += addModelToString(decode_type_t::TCL112AC, getModel(), false);
+  tcl_ac_remote_model_t model = getModel();
+  result += addModelToString(decode_type_t::TCL112AC, model, false);
   result += addIntToString(_.MsgType, D_STR_TYPE);
   switch (_.MsgType) {
     case kTcl112AcNormal:
@@ -486,11 +487,8 @@ String IRTcl112Ac::toString(void) const {
                                 kTcl112AcHeat, kTcl112AcDry, kTcl112AcFan);
       result += addTempFloatToString(getTemp());
       result += addFanToString(_.Fan, kTcl112AcFanHigh, kTcl112AcFanLow,
-                               kTcl112AcFanAuto, kTcl112AcFanAuto,
+                               kTcl112AcFanAuto, kTcl112AcFanMin,
                                kTcl112AcFanMed);
-      result += addBoolToString(_.Econo, kEconoStr);
-      result += addBoolToString(_.Health, kHealthStr);
-      result += addBoolToString(_.Turbo, kTurboStr);
       result += addBoolToString(_.SwingH, kSwingHStr);
       result += addSwingVToString(_.SwingV, kTcl112AcSwingVOff,
                                             kTcl112AcSwingVHighest,
@@ -503,7 +501,12 @@ String IRTcl112Ac::toString(void) const {
                                             kTcl112AcSwingVOff,
                                             kTcl112AcSwingVOn,  // Swing
                                             0xFF, 0xFF);  // Both Unused
-      result += addBoolToString(getLight(), kLightStr);
+      if (model != tcl_ac_remote_model_t::GZ055BE1) {
+        result += addBoolToString(_.Econo, kEconoStr);
+        result += addBoolToString(_.Health, kHealthStr);
+        result += addBoolToString(_.Turbo, kTurboStr);
+        result += addBoolToString(getLight(), kLightStr);
+      }
       result += addLabeledString(
           _.OnTimerEnabled ? minsToString(getOnTimer()) : kOffStr,
           kOnTimerStr);
