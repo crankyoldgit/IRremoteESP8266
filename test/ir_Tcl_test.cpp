@@ -661,4 +661,30 @@ TEST(TestTcl112AcClass, Timers) {
   EXPECT_FALSE(ac._.TimerIndicator);
   EXPECT_FALSE(ac._.OnTimerEnabled);
   EXPECT_FALSE(ac._.OffTimerEnabled);
+
+  // Real messages/states
+  // Per https://github.com/crankyoldgit/IRremoteESP8266/issues/1486#issuecomment-917545485
+
+  const uint8_t offtimer_1h[14] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x34, 0x03,
+      0x00, 0x78, 0x00, 0x06, 0x00, 0x00, 0xCA};
+  ac.setRaw(offtimer_1h);
+  EXPECT_EQ(60, ac.getOffTimer());
+  EXPECT_TRUE(ac._.TimerIndicator);
+  EXPECT_FALSE(ac._.OnTimerEnabled);
+  EXPECT_TRUE(ac._.OffTimerEnabled);
+
+  const uint8_t offtimer_4h[14] = {
+      0x23, 0xCB, 0x26, 0x01, 0x00, 0x34, 0x03,
+      0x00, 0x78, 0x00, 0x18, 0x00, 0x00, 0xDC};
+  ac.setRaw(offtimer_4h);
+  EXPECT_EQ(240, ac.getOffTimer());
+  EXPECT_TRUE(ac._.TimerIndicator);
+  EXPECT_FALSE(ac._.OnTimerEnabled);
+  EXPECT_TRUE(ac._.OffTimerEnabled);
+  EXPECT_EQ(
+      "Model: 2 (GZ055BE1), Type: 1, Power: On, Mode: 3 (Cool), Temp: 31C, "
+      "Fan: 0 (Auto), Swing(H): Off, Swing(V): 7 (Swing), "
+      "On Timer: Off, Off Timer: 04:00",
+      ac.toString());
 }

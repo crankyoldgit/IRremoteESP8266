@@ -56,11 +56,11 @@ union Tcl112Protocol{
     uint8_t            :1;
     // Byte 9
     uint8_t            :1;  // 0
-    uint8_t OffTimer   :6;
+    uint8_t OnTimer   :6;
     uint8_t            :1;  // 0
     // Byte 10
     uint8_t            :1;  // 0
-    uint8_t OnTimer    :6;
+    uint8_t OffTimer    :6;
     uint8_t            :1;  // 0
     // Byte 11
     uint8_t            :8;  // 00000000
