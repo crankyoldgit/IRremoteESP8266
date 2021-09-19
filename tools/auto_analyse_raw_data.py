@@ -104,11 +104,13 @@ class RawIRMessage():
     code = []
     nbits = len(bin_str)
     code.append(f"    // Data Section #{self.section_count}")
+    # pylint: disable=C0209
     code.append("    // e.g. data = 0x%X, nbits = %d" % (int(bin_str, 2),
                                                          nbits))
+    # pylint: enable=C0209
     code.append(f"    sendData(k{name}BitMark, k{name}OneSpace, k{name}BitMark,"
                 f" k{name}ZeroSpace, send_data, {nbits}, true);")
-    code.append("    send_data >>= %d;" % nbits)
+    code.append(f"    send_data >>= {nbits};")
     if footer:
       code.append("    // Footer")
       code.append(f"    mark(k{name}BitMark);")
@@ -122,8 +124,10 @@ class RawIRMessage():
     code.extend([
         "",
         f"  // Data Section #{self.section_count}",
+        # pylint: disable=C0209
         "  // e.g. data_result.data = 0x%X, nbits = %d" % (int(bin_str, 2),
                                                            nbits),
+        # pylint: enable=C0209
         f"  data_result = matchData(&(results->rawbuf[offset]), {nbits},",
         f"                          k{name}BitMark, k{name}OneSpace,",
         f"                          k{name}BitMark, k{name}ZeroSpace);",
@@ -158,9 +162,11 @@ class RawIRMessage():
     code.extend([
         "    // e.g.",
         f"    //   bits = {nbits}; bytes = {int(nbytes)};",
+        # pylint: disable=C0209
         "    //   *(data + pos) = {0x%s};" % (
             ", 0x".join("%02X" % int(bin_str[i:i + 8], 2)
                         for i in range(0, len(bin_str), 8))),
+        # pylint: enable=C0209
         f"    sendGeneric({firstmark}, {firstspace},",
         f"                k{name}BitMark, k{name}OneSpace,",
         f"                k{name}BitMark, k{name}ZeroSpace,",
@@ -192,9 +198,11 @@ class RawIRMessage():
         f"  // Data Section #{self.section_count}",
         "  // e.g.",
         f"  //   bits = {nbits}; bytes = {int(nbytes)};",
+        # pylint: disable=C0209
         "  //   *(results->state + pos) = {0x%s};" % (
             ", 0x".join("%02X" % int(bin_str[i:i + 8], 2)
                         for i in range(0, len(bin_str), 8))),
+        # pylint: enable=C0209
         "  used = matchGeneric(results->rawbuf + offset, results->state + pos,",
         f"                      results->rawlen - offset, {nbits},",
         f"                      {firstmark}, {firstspace},",
@@ -621,7 +629,7 @@ def decode_data(message, defines, code, name="", output=sys.stdout):
       "  results->bits = nbits;"])
 
   total_bits = total_bits + binary_value
-  output.write("\nTotal Nr. of suspected bits: %d\n" % len(total_bits))
+  output.write(f"\nTotal Nr. of suspected bits: {len(total_bits)}\n")
   defines.append(f"const uint16_t k{name}Bits = {len(total_bits)};"
                  "  // Move to IRremoteESP8266.h")
   if len(total_bits) > 64:
@@ -674,9 +682,11 @@ def generate_code(defines, code, bits_str, name="", output=sys.stdout):
                 " messages\n"
                 "// Function should be safe over 64 bits.")
       elif line == CODEGEN:
+        # pylint: disable=C0209
         line = "///   uint8_t data[k%sStateLength] = {0x%s};" % (
             name, ", 0x".join("%02X" % int(bits_str[i:i + 8], 2)
                               for i in range(0, len(bits_str), 8)))
+        # pylint: enable=C0209
       output.write(f"{line}\n")
   if len(bits_str) > 64:  # Will it fit in a uint64_t?
     output.write("\n// DANGER: More than 64 bits detected. A uint64_t for "

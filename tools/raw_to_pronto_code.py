@@ -1,4 +1,4 @@
-#!/usr/bin/python
+    #!/usr/bin/python
 """Convert IRremoteESP8266's Raw data output into Pronto Code."""
 #
 # Copyright 2020 David Conran
@@ -16,7 +16,7 @@ def parse_and_report(rawdata_str, hertz=38000, end_usecs=100000,
   # Parse the input.
   rawdata = convert_rawdata(rawdata_str)
   if verbose:
-    output.write("Found %d timing entries.\n" % len(rawdata))
+    output.write(f"Found {len(rawdata)} timing entries.\n")
 
   # Do we need to pad out the rawdata to make it even in length?
   if end_usecs > 0 and len(rawdata) % 2 == 1:
@@ -25,12 +25,13 @@ def parse_and_report(rawdata_str, hertz=38000, end_usecs=100000,
   result = ["0000"]
   # Work out the frequency code.
   pronto_freq = int(1000000.0 / (hertz * 0.241246))
+  # pylint: disable=C0209
   if verbose:
-    output.write("Pronto frequency is %X (%d Hz).\n" % (pronto_freq, hertz))
+    output.write(f"Pronto frequency is %X ({hertz} Hz).\n" % pronto_freq)
   result.append("%04X" % pronto_freq)
   period = 1000000.0 / max(1, hertz)
   if verbose:
-    output.write("Pronto period is %f uSecs.\n" % period)
+    output.write(f"Pronto period is {period} uSecs.\n")
   # Add the lengths to the code.
   if use_initial:
     result.append("%04x" % int(len(rawdata) / 2))  # Initial burst code length
@@ -38,10 +39,12 @@ def parse_and_report(rawdata_str, hertz=38000, end_usecs=100000,
   else:
     result.append("%04x" % 0)  # No Initial burst code length
     result.append("%04x" % int(len(rawdata) / 2))  # Repeat code length
+  # pylint: enable=C0209
 
   # Add the data.
   if verbose:
-    output.write("Raw data: %s " % rawdata)
+    output.write(f"Raw data: {rawdata} ")
+  # pylint: disable=C0209
   for i in rawdata:
     result.append("%04x" % int(i / period))
   if generate_code:
@@ -49,6 +52,7 @@ def parse_and_report(rawdata_str, hertz=38000, end_usecs=100000,
                                                       ", 0x".join(result)))
   else:
     output.write("Pronto code = '%s'\n" % " ".join(result))
+  # pylint: enable=C0209
 # pylint: enable=too-many-arguments
 
 
