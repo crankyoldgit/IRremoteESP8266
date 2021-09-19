@@ -3076,8 +3076,14 @@ stdAc::opmode_t IRac::strToOpmode(const char *str,
            !strcasecmp(str, "DEHUMIDIFY"))
     return stdAc::opmode_t::kDry;
   else if (!strcasecmp(str, kFanStr) ||
-           !strcasecmp(str, "FANONLY") ||
-           !strcasecmp(str, kFanOnlyStr))
+          // The following Fans strings with "only" are required to help with
+          // HomeAssistant & Google Home Climate integration.
+          // For compatibility only.
+          // Ref: https://www.home-assistant.io/integrations/google_assistant/#climate-operation-modes
+           !strcasecmp(str, kFanOnlyStr) ||
+           !strcasecmp(str, kFan_OnlyStr) ||
+           !strcasecmp(str, kFanOnlyWithSpaceStr) ||
+           !strcasecmp(str, kFanOnlyNoSpaceStr))
     return stdAc::opmode_t::kFan;
   else
     return def;

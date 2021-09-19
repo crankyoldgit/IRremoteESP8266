@@ -305,8 +305,20 @@
 #define D_STR_FAN "Fan"
 #endif  // D_STR_FAN
 #ifndef D_STR_FANONLY
-#define D_STR_FANONLY "fan_only"
+#define D_STR_FANONLY "fan-only"
 #endif  // D_STR_FANONLY
+#ifndef D_STR_FAN_ONLY
+#define D_STR_FAN_ONLY "fan_only"
+#endif  // D_STR_FAN_ONLY
+#ifndef D_STR_ONLY
+#define D_STR_ONLY "Only"
+#endif  // D_STR_ONLY
+#ifndef D_STR_FANSPACEONLY
+#define D_STR_FANSPACEONLY D_STR_FAN " " D_STR_ONLY
+#endif  // D_STR_FANSPACEONLY
+#ifndef D_STR_FANONLYNOSPACE
+#define D_STR_FANONLYNOSPACE D_STR_FAN D_STR_ONLY
+#endif  // D_STR_FANONLYNOSPACE
 #ifndef D_STR_DRY
 #define D_STR_DRY "Dry"
 #endif  // D_STR_DRY
