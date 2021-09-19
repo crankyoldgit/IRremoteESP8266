@@ -305,7 +305,7 @@
 #define D_STR_FAN "Fan"
 #endif  // D_STR_FAN
 #ifndef D_STR_FANONLY
-#define D_STR_FANONLY "fan_only"
+#define D_STR_FANONLY "Fan Only"
 #endif  // D_STR_FANONLY
 #ifndef D_STR_DRY
 #define D_STR_DRY "Dry"

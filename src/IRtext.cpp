@@ -109,7 +109,7 @@ const PROGMEM char* kCoolStr = D_STR_COOL;  ///< "Cool"
 const PROGMEM char* kHeatStr = D_STR_HEAT;  ///< "Heat"
 const PROGMEM char* kFanStr = D_STR_FAN;  ///< "Fan"
 const PROGMEM char* kDryStr = D_STR_DRY;  ///< "Dry"
-const PROGMEM char* kFanOnlyStr = D_STR_FANONLY;  ///< "fan_only"
+const PROGMEM char* kFanOnlyStr = D_STR_FANONLY;  ///< "Fan Only"
 const PROGMEM char* kRecycleStr = D_STR_RECYCLE;  ///< "Recycle"
 
 const PROGMEM char* kMaxStr = D_STR_MAX;  ///< "Max"

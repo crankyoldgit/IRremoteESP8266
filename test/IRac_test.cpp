@@ -2268,7 +2268,7 @@ TEST(TestIRac, strToOpmode) {
   EXPECT_EQ(stdAc::opmode_t::kHeat, IRac::strToOpmode("HEAT"));
   EXPECT_EQ(stdAc::opmode_t::kDry, IRac::strToOpmode("DRY"));
   EXPECT_EQ(stdAc::opmode_t::kFan, IRac::strToOpmode("FAN"));
-  EXPECT_EQ(stdAc::opmode_t::kFan, IRac::strToOpmode("FAN_ONLY"));
+  EXPECT_EQ(stdAc::opmode_t::kFan, IRac::strToOpmode("FAN ONLY"));
   EXPECT_EQ(stdAc::opmode_t::kAuto, IRac::strToOpmode("FOOBAR"));
   EXPECT_EQ(stdAc::opmode_t::kOff, IRac::strToOpmode("OFF"));
   EXPECT_EQ(stdAc::opmode_t::kOff, IRac::strToOpmode("FOOBAR",
