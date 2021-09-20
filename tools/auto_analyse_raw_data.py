@@ -104,10 +104,7 @@ class RawIRMessage():
     code = []
     nbits = len(bin_str)
     code.append(f"    // Data Section #{self.section_count}")
-    # pylint: disable=C0209
-    code.append("    // e.g. data = 0x%X, nbits = %d" % (int(bin_str, 2),
-                                                         nbits))
-    # pylint: enable=C0209
+    code.append(f"    // e.g. data = 0x{int(bin_str, 2):X}, nbits = {nbits}")
     code.append(f"    sendData(k{name}BitMark, k{name}OneSpace, k{name}BitMark,"
                 f" k{name}ZeroSpace, send_data, {nbits}, true);")
     code.append(f"    send_data >>= {nbits};")
@@ -124,10 +121,7 @@ class RawIRMessage():
     code.extend([
         "",
         f"  // Data Section #{self.section_count}",
-        # pylint: disable=C0209
-        "  // e.g. data_result.data = 0x%X, nbits = %d" % (int(bin_str, 2),
-                                                           nbits),
-        # pylint: enable=C0209
+        f"  // e.g. data_result.data = 0x{int(bin_str, 2):X}, nbits = {nbits}",
         f"  data_result = matchData(&(results->rawbuf[offset]), {nbits},",
         f"                          k{name}BitMark, k{name}OneSpace,",
         f"                          k{name}BitMark, k{name}ZeroSpace);",

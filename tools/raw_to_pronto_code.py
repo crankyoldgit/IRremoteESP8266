@@ -25,34 +25,30 @@ def parse_and_report(rawdata_str, hertz=38000, end_usecs=100000,
   result = ["0000"]
   # Work out the frequency code.
   pronto_freq = int(1000000.0 / (hertz * 0.241246))
-  # pylint: disable=C0209
   if verbose:
-    output.write(f"Pronto frequency is %X ({hertz} Hz).\n" % pronto_freq)
-  result.append("%04X" % pronto_freq)
+    output.write(f"Pronto frequency is {pronto_freq:X} ({hertz} Hz).\n")
+  result.append(f"{pronto_freq:04X}")
   period = 1000000.0 / max(1, hertz)
   if verbose:
     output.write(f"Pronto period is {period} uSecs.\n")
   # Add the lengths to the code.
   if use_initial:
-    result.append("%04x" % int(len(rawdata) / 2))  # Initial burst code length
-    result.append("%04x" % 0)  # No Repeat code length
+    result.append(f"{int(len(rawdata) / 2):04x}")  # Initial burst code length
+    result.append("0000")  # No Repeat code length
   else:
-    result.append("%04x" % 0)  # No Initial burst code length
-    result.append("%04x" % int(len(rawdata) / 2))  # Repeat code length
-  # pylint: enable=C0209
+    result.append("0000")  # No Initial burst code length
+    result.append(f"{int(len(rawdata) / 2):04x}")  # Repeat code length
 
   # Add the data.
   if verbose:
     output.write(f"Raw data: {rawdata} ")
-  # pylint: disable=C0209
   for i in rawdata:
-    result.append("%04x" % int(i / period))
+    result.append(f"{int(i / period):04x}")
   if generate_code:
-    output.write("uint16_t pronto[%d] = {0x%s};\n" % (len(result),
-                                                      ", 0x".join(result)))
+    output.write(f"uint16_t pronto[{len(result)}] = "
+                 f"{{0x{', 0x'.join(result)}}};\n")
   else:
-    output.write("Pronto code = '%s'\n" % " ".join(result))
-  # pylint: enable=C0209
+    output.write(f"Pronto code = '{' '.join(result)}'\n")
 # pylint: enable=too-many-arguments
 
 

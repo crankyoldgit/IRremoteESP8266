@@ -250,7 +250,7 @@ def initargs():
   else:
     src = pathlib.Path(ARGS.directory) / "src"
   if not src.is_dir():
-    errorexit(f"Directory not valid: {str(src)}")
+    errorexit(f"Directory not valid: {src!s}")
   ARGS.directory = src
   return ARGS
 
@@ -370,7 +370,7 @@ def generatefile():
   # get file path
   foutpath = getmdfile()
   if ARGS.verbose:
-    print(f"Output path: {str(foutpath)}")
+    print(f"Output path: {foutpath!s}")
   # write data to temp memorystream
   ftemp = StringIO()
   ret = generate(ftemp)
@@ -396,7 +396,7 @@ def main():
   return True on any issues"""
   initargs()
   if ARGS.verbose:
-    print(f"Looking for files in: {str(ARGS.directory.resolve())}")
+    print(f"Looking for files in: {ARGS.directory.resolve()!s}")
   if ARGS.noout:
     return generatenone()
   if ARGS.stdout:
