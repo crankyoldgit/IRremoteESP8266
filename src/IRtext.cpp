@@ -107,9 +107,16 @@ const PROGMEM char* kAutomaticStr = D_STR_AUTOMATIC;  ///< "Automatic"
 const PROGMEM char* kManualStr = D_STR_MANUAL;  ///< "Manual"
 const PROGMEM char* kCoolStr = D_STR_COOL;  ///< "Cool"
 const PROGMEM char* kHeatStr = D_STR_HEAT;  ///< "Heat"
-const PROGMEM char* kFanStr = D_STR_FAN;  ///< "Fan"
 const PROGMEM char* kDryStr = D_STR_DRY;  ///< "Dry"
-const PROGMEM char* kFanOnlyStr = D_STR_FANONLY;  ///< "fan_only"
+const PROGMEM char* kFanStr = D_STR_FAN;  ///< "Fan"
+// The following Fans strings with "only" are required to help with
+// HomeAssistant & Google Home Climate integration. For compatibility only.
+// Ref: https://www.home-assistant.io/integrations/google_assistant/#climate-operation-modes
+const PROGMEM char* kFanOnlyStr = D_STR_FANONLY;  ///< "fan-only"
+const PROGMEM char* kFan_OnlyStr = D_STR_FAN_ONLY;  ///< "fan_only" (legacy use)
+const PROGMEM char* kFanOnlyWithSpaceStr = D_STR_FANSPACEONLY;  ///< "Fan Only"
+const PROGMEM char* kFanOnlyNoSpaceStr = D_STR_FANONLYNOSPACE;  ///< "FanOnly"
+
 const PROGMEM char* kRecycleStr = D_STR_RECYCLE;  ///< "Recycle"
 
 const PROGMEM char* kMaxStr = D_STR_MAX;  ///< "Max"
