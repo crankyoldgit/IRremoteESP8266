@@ -3322,7 +3322,7 @@ String IRac::opmodeToString(const stdAc::opmode_t mode) {
     case stdAc::opmode_t::kDry:
       return kDryStr;
     case stdAc::opmode_t::kFan:
-      return kFanOnlyStr;
+      return kFanOnlyNoSpaceStr;
     default:
       return kUnknownStr;
   }
