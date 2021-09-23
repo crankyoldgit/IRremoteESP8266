@@ -3308,23 +3308,17 @@ String IRac::boolToString(const bool value) {
 
 /// Convert the supplied operation mode into the appropriate String.
 /// @param[in] mode The enum to be converted.
+/// @param[in] ha A flag to indicate we want GoogleHome/HomeAssistant output.
 /// @return The equivalent String for the locale.
-String IRac::opmodeToString(const stdAc::opmode_t mode) {
+String IRac::opmodeToString(const stdAc::opmode_t mode, const bool ha) {
   switch (mode) {
-    case stdAc::opmode_t::kOff:
-      return kOffStr;
-    case stdAc::opmode_t::kAuto:
-      return kAutoStr;
-    case stdAc::opmode_t::kCool:
-      return kCoolStr;
-    case stdAc::opmode_t::kHeat:
-      return kHeatStr;
-    case stdAc::opmode_t::kDry:
-      return kDryStr;
-    case stdAc::opmode_t::kFan:
-      return kFanOnlyStr;
-    default:
-      return kUnknownStr;
+    case stdAc::opmode_t::kOff:  return kOffStr;
+    case stdAc::opmode_t::kAuto: return kAutoStr;
+    case stdAc::opmode_t::kCool: return kCoolStr;
+    case stdAc::opmode_t::kHeat: return kHeatStr;
+    case stdAc::opmode_t::kDry:  return kDryStr;
+    case stdAc::opmode_t::kFan:  return ha ? kFanOnlyStr : kFanStr;
+    default:                     return kUnknownStr;
   }
 }
 
@@ -3333,20 +3327,13 @@ String IRac::opmodeToString(const stdAc::opmode_t mode) {
 /// @return The equivalent String for the locale.
 String IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kAuto:
-      return kAutoStr;
-    case stdAc::fanspeed_t::kMax:
-      return kMaxStr;
-    case stdAc::fanspeed_t::kHigh:
-      return kHighStr;
-    case stdAc::fanspeed_t::kMedium:
-      return kMediumStr;
-    case stdAc::fanspeed_t::kLow:
-      return kLowStr;
-    case stdAc::fanspeed_t::kMin:
-      return kMinStr;
-    default:
-      return kUnknownStr;
+    case stdAc::fanspeed_t::kAuto:   return kAutoStr;
+    case stdAc::fanspeed_t::kMax:    return kMaxStr;
+    case stdAc::fanspeed_t::kHigh:   return kHighStr;
+    case stdAc::fanspeed_t::kMedium: return kMediumStr;
+    case stdAc::fanspeed_t::kLow:    return kLowStr;
+    case stdAc::fanspeed_t::kMin:    return kMinStr;
+    default:                         return kUnknownStr;
   }
 }
 
@@ -3355,22 +3342,14 @@ String IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
 /// @return The equivalent String for the locale.
 String IRac::swingvToString(const stdAc::swingv_t swingv) {
   switch (swingv) {
-    case stdAc::swingv_t::kOff:
-      return kOffStr;
-    case stdAc::swingv_t::kAuto:
-      return kAutoStr;
-    case stdAc::swingv_t::kHighest:
-      return kHighestStr;
-    case stdAc::swingv_t::kHigh:
-      return kHighStr;
-    case stdAc::swingv_t::kMiddle:
-      return kMiddleStr;
-    case stdAc::swingv_t::kLow:
-      return kLowStr;
-    case stdAc::swingv_t::kLowest:
-      return kLowestStr;
-    default:
-      return kUnknownStr;
+    case stdAc::swingv_t::kOff:     return kOffStr;
+    case stdAc::swingv_t::kAuto:    return kAutoStr;
+    case stdAc::swingv_t::kHighest: return kHighestStr;
+    case stdAc::swingv_t::kHigh:    return kHighStr;
+    case stdAc::swingv_t::kMiddle:  return kMiddleStr;
+    case stdAc::swingv_t::kLow:     return kLowStr;
+    case stdAc::swingv_t::kLowest:  return kLowestStr;
+    default:                        return kUnknownStr;
   }
 }
 
@@ -3379,24 +3358,15 @@ String IRac::swingvToString(const stdAc::swingv_t swingv) {
 /// @return The equivalent String for the locale.
 String IRac::swinghToString(const stdAc::swingh_t swingh) {
   switch (swingh) {
-    case stdAc::swingh_t::kOff:
-      return kOffStr;
-    case stdAc::swingh_t::kAuto:
-      return kAutoStr;
-    case stdAc::swingh_t::kLeftMax:
-      return kLeftMaxStr;
-    case stdAc::swingh_t::kLeft:
-      return kLeftStr;
-    case stdAc::swingh_t::kMiddle:
-      return kMiddleStr;
-    case stdAc::swingh_t::kRight:
-      return kRightStr;
-    case stdAc::swingh_t::kRightMax:
-      return kRightMaxStr;
-    case stdAc::swingh_t::kWide:
-      return kWideStr;
-    default:
-      return kUnknownStr;
+    case stdAc::swingh_t::kOff:      return kOffStr;
+    case stdAc::swingh_t::kAuto:     return kAutoStr;
+    case stdAc::swingh_t::kLeftMax:  return kLeftMaxStr;
+    case stdAc::swingh_t::kLeft:     return kLeftStr;
+    case stdAc::swingh_t::kMiddle:   return kMiddleStr;
+    case stdAc::swingh_t::kRight:    return kRightStr;
+    case stdAc::swingh_t::kRightMax: return kRightMaxStr;
+    case stdAc::swingh_t::kWide:     return kWideStr;
+    default:                         return kUnknownStr;
   }
 }
 

@@ -90,7 +90,8 @@ class IRac {
   static stdAc::swingh_t strToSwingH(
       const char *str, const stdAc::swingh_t def = stdAc::swingh_t::kOff);
   static String boolToString(const bool value);
-  static String opmodeToString(const stdAc::opmode_t mode);
+  static String opmodeToString(const stdAc::opmode_t mode,
+                               const bool ha = false);
   static String fanspeedToString(const stdAc::fanspeed_t speed);
   static String swingvToString(const stdAc::swingv_t swingv);
   static String swinghToString(const stdAc::swingh_t swingh);

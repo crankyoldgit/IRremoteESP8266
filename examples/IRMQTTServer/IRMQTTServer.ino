@@ -2875,10 +2875,10 @@ void sendJsonState(const stdAc::state_t state, const String topic,
   json[KEY_PROTOCOL] = typeToString(state.protocol);
   json[KEY_MODEL] = state.model;
   json[KEY_POWER] = IRac::boolToString(state.power);
-  json[KEY_MODE] = IRac::opmodeToString(state.mode);
+  json[KEY_MODE] = IRac::opmodeToString(state.mode, ha_mode);
   // Home Assistant wants mode to be off if power is also off & vice-versa.
   if (ha_mode && (state.mode == stdAc::opmode_t::kOff || !state.power)) {
-    json[KEY_MODE] = IRac::opmodeToString(stdAc::opmode_t::kOff);
+    json[KEY_MODE] = IRac::opmodeToString(stdAc::opmode_t::kOff, ha_mode);
     json[KEY_POWER] = IRac::boolToString(false);
   }
   json[KEY_CELSIUS] = IRac::boolToString(state.celsius);
@@ -3024,7 +3024,11 @@ bool sendClimate(const String topic_prefix, const bool retain,
     diff = true;
     success &= sendInt(topic_prefix + KEY_MODEL, next.model, retain);
   }
+#ifdef MQTT_CLIMATE_HA_MODE
+  String mode_str = IRac::opmodeToString(next.mode, MQTT_CLIMATE_HA_MODE);
+#else  // MQTT_CLIMATE_HA_MODE
   String mode_str = IRac::opmodeToString(next.mode);
+#endif  // MQTT_CLIMATE_HA_MODE
   // I don't know why, but the modes need to be lower case to work with
   // Home Assistant & Google Home.
   mode_str.toLowerCase();

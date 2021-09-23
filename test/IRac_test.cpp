@@ -2339,6 +2339,10 @@ TEST(TestIRac, opmodeToString) {
   EXPECT_EQ("Auto", IRac::opmodeToString(stdAc::opmode_t::kAuto));
   EXPECT_EQ("Cool", IRac::opmodeToString(stdAc::opmode_t::kCool));
   EXPECT_EQ("UNKNOWN", IRac::opmodeToString((stdAc::opmode_t)500));
+  // Home Assistant/Google Home differences.
+  EXPECT_EQ("Fan", IRac::opmodeToString(stdAc::opmode_t::kFan, false));
+  EXPECT_EQ("fan-only", IRac::opmodeToString(stdAc::opmode_t::kFan, true));
+  EXPECT_EQ("Fan", IRac::opmodeToString(stdAc::opmode_t::kFan));  // Default
 }
 
 TEST(TestIRac, fanspeedToString) {
