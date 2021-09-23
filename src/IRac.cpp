@@ -3308,8 +3308,9 @@ String IRac::boolToString(const bool value) {
 
 /// Convert the supplied operation mode into the appropriate String.
 /// @param[in] mode The enum to be converted.
+/// @param[in] ha A flag to indicate we want GoogleHome/HomeAssistant output.
 /// @return The equivalent String for the locale.
-String IRac::opmodeToString(const stdAc::opmode_t mode) {
+String IRac::opmodeToString(const stdAc::opmode_t mode, const bool ha) {
   switch (mode) {
     case stdAc::opmode_t::kOff:
       return kOffStr;
@@ -3322,7 +3323,7 @@ String IRac::opmodeToString(const stdAc::opmode_t mode) {
     case stdAc::opmode_t::kDry:
       return kDryStr;
     case stdAc::opmode_t::kFan:
-      return kFanOnlyStr;
+      return ha ? kFanOnlyStr : kFanStr;
     default:
       return kUnknownStr;
   }
