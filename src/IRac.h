@@ -26,6 +26,7 @@
 #include "ir_Kelvinator.h"
 #include "ir_LG.h"
 #include "ir_Midea.h"
+#include "ir_Mirage.h"
 #include "ir_Mitsubishi.h"
 #include "ir_MitsubishiHeavy.h"
 #include "ir_Neoclima.h"
@@ -328,6 +329,14 @@ void electra(IRElectraAc *ac,
              const stdAc::swingv_t swingv, const bool turbo, const bool econo,
              const bool light, const int16_t sleep = -1);
 #endif  // SEND_MIDEA
+#if SEND_MIRAGE
+  void mirage(IRMirageAc *ac,
+              // const bool on,
+              const stdAc::opmode_t mode,
+              const float degrees, const stdAc::fanspeed_t fan,
+              const bool turbo, const bool light,
+              const int16_t sleep = -1, const int16_t clock = -1);
+#endif  // SEND_MIRAGE
 #if SEND_MITSUBISHI_AC
   void mitsubishi(IRMitsubishiAC *ac,
                   const bool on, const stdAc::opmode_t mode,

@@ -1,5 +1,6 @@
-// Copyright 2020 David Conran
+// Copyright 2020-2021 David Conran
 
+#include "ir_Mirage.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -11,7 +12,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("MIRAGE", typeToString(decode_type_t::MIRAGE));
   ASSERT_EQ(decode_type_t::MIRAGE, strToDecodeType("MIRAGE"));
   ASSERT_TRUE(hasACState(decode_type_t::MIRAGE));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::MIRAGE));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::MIRAGE));
   ASSERT_EQ(kMirageBits, IRsend::defaultBits(decode_type_t::MIRAGE));
   ASSERT_EQ(kMirageMinRepeat, IRsend::minRepeats(decode_type_t::MIRAGE));
 }
@@ -55,7 +56,8 @@ TEST(TestDecodeMirage, RealExample) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      ", Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -76,7 +78,8 @@ TEST(TestDecodeMirage, SyntheticExample) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      ", Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -119,6 +122,155 @@ TEST(TestDecodeMirage, RealExampleWithDodgyHardwareCapture) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      ", Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
+}
+
+TEST(TestMirageAcClass, OperatingMode) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kMirageAcCool);
+  EXPECT_EQ(kMirageAcCool, ac.getMode());
+  ac.setMode(kMirageAcHeat);
+  EXPECT_EQ(kMirageAcHeat, ac.getMode());
+  ac.setMode(kMirageAcDry);
+  EXPECT_EQ(kMirageAcDry, ac.getMode());
+  ac.setMode(kMirageAcFan);
+  EXPECT_EQ(kMirageAcFan, ac.getMode());
+  ac.setMode(kMirageAcRecycle);
+  EXPECT_EQ(kMirageAcRecycle, ac.getMode());
+  ac.setMode(255);
+  EXPECT_EQ(kMirageAcCool, ac.getMode());
+}
+
+TEST(TestMirageAcClass, HumanReadable) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+  EXPECT_EQ(
+      ", Mode: 2 (Cool), Temp: 16C, Fan: 0 (Auto), "
+      "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:00",
+      ac.toString());
+  // Ref: https://docs.google.com/spreadsheets/d/1Ucu9mOOIIJoWQjUJq_VCvwgV3EwKaRk8K2AuZgccYEk/edit#gid=0&range=C7
+  // 0x56710000201A00000C000C26010041
+  const uint8_t cool_21c_auto[kMirageStateLength] = {
+      0x56, 0x71, 0x00, 0x00, 0x20, 0x1A, 0x00, 0x00,
+      0x0C, 0x00, 0x0C, 0x26, 0x01, 0x00, 0x41};
+  ac.setRaw(cool_21c_auto);
+  EXPECT_EQ(
+      ", Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
+      "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:01",
+      ac.toString());
+
+  const uint8_t SyntheticExample[kMirageStateLength] = {
+      0x56, 0x75, 0x00, 0x00, 0x20, 0x01, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x16, 0x14, 0x26};
+  ac.setRaw(SyntheticExample);
+  EXPECT_EQ(
+      ", Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
+      ac.toString());
+}
+
+TEST(TestMirageAcClass, Temperature) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setTemp(0);
+  EXPECT_EQ(kMirageAcMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kMirageAcMaxTemp, ac.getTemp());
+
+  ac.setTemp(kMirageAcMinTemp);
+  EXPECT_EQ(kMirageAcMinTemp, ac.getTemp());
+
+  ac.setTemp(kMirageAcMaxTemp);
+  EXPECT_EQ(kMirageAcMaxTemp, ac.getTemp());
+
+  ac.setTemp(kMirageAcMinTemp - 1);
+  EXPECT_EQ(kMirageAcMinTemp, ac.getTemp());
+
+  ac.setTemp(kMirageAcMaxTemp + 1);
+  EXPECT_EQ(kMirageAcMaxTemp, ac.getTemp());
+
+  ac.setTemp(17);
+  EXPECT_EQ(17, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  ac.setTemp(30);
+  EXPECT_EQ(30, ac.getTemp());
+}
+
+TEST(TestMirageAcClass, FanSpeed) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setFan(kMirageAcFanAuto);
+  EXPECT_EQ(kMirageAcFanAuto, ac.getFan());
+  ac.setFan(kMirageAcFanLow);
+  EXPECT_EQ(kMirageAcFanLow, ac.getFan());
+  ac.setFan(kMirageAcFanMed);
+  EXPECT_EQ(kMirageAcFanMed, ac.getFan());
+  ac.setFan(kMirageAcFanHigh);
+  EXPECT_EQ(kMirageAcFanHigh, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kMirageAcFanAuto, ac.getFan());
+}
+
+TEST(TestMirageAcClass, Turbo) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+}
+
+TEST(TestMirageAcClass, Light) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_FALSE(ac.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+}
+
+TEST(TestMirageAcClass, Sleep) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+}
+
+TEST(TestMirageAcClass, Clock) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setClock(0);
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(12 * 60 * 60 + 30 * 60 + 59);  // aka. 12:30:59
+  EXPECT_EQ(12 * 60 * 60 + 30 * 60 + 59, ac.getClock());
+  ac.setClock(23 * 60 * 60 + 59 * 60 + 59);  // aka. 23:59:59
+  EXPECT_EQ(23 * 60 * 60 + 59 * 60 + 59, ac.getClock());
+  ac.setClock(24 * 60 * 60);  // aka. 24:00:00
+  EXPECT_EQ(23 * 60 * 60 + 59 * 60 + 59, ac.getClock());  // aka. 23:59:59
 }

@@ -245,7 +245,10 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_MIDEA
     case decode_type_t::MIDEA:
-#endif
+#endif  // SEND_MIDEA
+#if SEND_MIRAGE
+    case decode_type_t::MIRAGE:
+#endif  // SEND_MIRAGE
 #if SEND_MITSUBISHI_AC
     case decode_type_t::MITSUBISHI_AC:
 #endif
@@ -1474,6 +1477,44 @@ void IRac::midea(IRMideaAC *ac,
   ac->send();
 }
 #endif  // SEND_MIDEA
+
+#if SEND_MIRAGE
+/// Send a Mirage 120-bit A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRMitsubishiAC object to use.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] turbo Run the device in turbo mode.
+/// @param[in] light Turn on the Light/Display.
+/// @param[in] sleep The time in Nr. of mins to sleep for. < 0 is ignore.
+/// @note Sleep is either on or off. The time is useless.
+/// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
+void IRac::mirage(IRMirageAc *ac,
+                  // const bool on,
+                  const stdAc::opmode_t mode,
+                  const float degrees,
+                  const stdAc::fanspeed_t fan,
+                  const bool turbo, const bool light,
+                  const int16_t sleep, const int16_t clock) {
+  ac->begin();
+
+  // ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  // No SwingV setting available
+  // No SwingH setting available
+  ac->setTurbo(turbo);
+  // No Quiet setting available.
+  ac->setLight(light);
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);
+  if (clock >= 0) ac->setClock(clock * 60);  // Clock is in seconds.
+  ac->send();
+}
+#endif  // SEND_MIRAGE
 
 #if SEND_MITSUBISHI_AC
 /// Send a Mitsubishi A/C message with the supplied settings.
@@ -2850,6 +2891,16 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_MIDEA
+#if SEND_MIRAGE
+    case MIRAGE:
+    {
+      IRMirageAc ac(_pin, _inverted, _modulation);
+      mirage(&ac, /* send.power, */ send.mode, degC,
+             send.fanspeed, send.turbo, send.light,
+             send.sleep, send.clock);
+      break;
+    }
+#endif  // SEND_MIRAGE
 #if SEND_MITSUBISHI_AC
     case MITSUBISHI_AC:
     {
@@ -3664,6 +3715,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_MIDEA
+#if DECODE_MIRAGE
+      case decode_type_t::MIRAGE: {
+        IRMirageAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_MIRAGE
 #if DECODE_HAIER_AC
       case decode_type_t::HAIER_AC: {
         IRHaierAC ac(kGpioUnused);
@@ -4117,6 +4175,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_MIDEA
+#if DECODE_MIRAGE
+      case decode_type_t::MIRAGE: {
+        IRMirageAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_MIRAGE
 #if DECODE_MITSUBISHI_AC
       case decode_type_t::MITSUBISHI_AC: {
         IRMitsubishiAC ac(kGpioUnused);
