@@ -30,46 +30,47 @@ union Mirage120Protocol{
   uint8_t raw[kMirageStateLength];  ///< The state in code form.
   struct {
     // Byte 0
-    uint8_t         :8;  // Header. (0x56)
+    uint8_t               :8;  // Header. (0x56)
     // Byte 1
-    uint8_t Temp    :8;  // Celsius minus 0x5C.
+    uint8_t Temp          :8;  // Celsius minus 0x5C.
     // Byte 2
-    uint8_t         :8;  // Unknown / Unused. Typically 0x00
+    uint8_t               :8;  // Unknown / Unused. Typically 0x00
     // Byte 3
-    uint8_t         :3;  // Unknown / Unused. Typically 0x0
-    uint8_t Light   :1;  // Aka. Display. Seems linked to Sleep mode.
-    uint8_t         :4;  // Unknown / Unused. Typically 0x0
+    uint8_t               :3;  // Unknown / Unused. Typically 0x0
+    uint8_t Light         :1;  // Aka. Display. Seems linked to Sleep mode.
+    uint8_t               :4;  // Unknown / Unused. Typically 0x0
     // Byte 4
-    uint8_t Fan     :2;  // Fan Speed.
-    uint8_t         :2;  // Unknown / Unused. Typically 0x0
-    uint8_t Mode    :4;  // Cool, Heat, Dry, Fan, Recycle
+    uint8_t Fan           :2;  // Fan Speed.
+    uint8_t               :2;  // Unknown / Unused. Typically 0x0
+    uint8_t Mode          :4;  // Cool, Heat, Dry, Fan, Recycle
     // Byte 5
-    uint8_t Swing   :8;
+    uint8_t SwingAndPower :8;
     // Byte 6
-    uint8_t         :7;  // Unknown / Unused. Typically 0x00
-    uint8_t Sleep   :1;  // Sleep mode on or off.
+    uint8_t               :7;  // Unknown / Unused. Typically 0x00
+    uint8_t Sleep         :1;  // Sleep mode on or off.
     // Byte 7
-    uint8_t         :3;  // Unknown / Unused. Typically 0x0
-    uint8_t Turbo   :1;  // Sleep mode on or off. Only works in Cool mode.
-    uint8_t         :4;  // Unknown / Unused. Typically 0x0
+    uint8_t               :3;  // Unknown / Unused. Typically 0x0
+    uint8_t Turbo         :1;  // Sleep mode on or off. Only works in Cool mode.
+    uint8_t               :4;  // Unknown / Unused. Typically 0x0
     // Byte 8
-    uint8_t         :8;  // Unknown / Unused. Typically 0xC0
+    uint8_t               :8;  // Unknown / Unused. Typically 0xC0
     // Byte 9
-    uint8_t         :8;  // Unknown / Unused. Typically 0x00
+    uint8_t               :8;  // Unknown / Unused. Typically 0x00
     // Byte 10
-    uint8_t         :8;  // Unknown / Unused.
+    uint8_t               :8;  // Unknown / Unused.
     // Byte 11
-    uint8_t Seconds :8;  // Nr. of Seconds in BCD.
+    uint8_t Seconds       :8;  // Nr. of Seconds in BCD.
     // Byte 12
-    uint8_t Minutes :8;  // Nr. of Minutes in BCD.
+    uint8_t Minutes       :8;  // Nr. of Minutes in BCD.
     // Byte 13
-    uint8_t Hours   :8;  // Nr. of Hours in BCD.
+    uint8_t Hours         :8;  // Nr. of Hours in BCD.
     // Byte 14
-    uint8_t Sum     :8;  // Sum of all the previous nibbles.
+    uint8_t Sum           :8;  // Sum of all the previous nibbles.
   };
 };
 
 // Constants
+const uint8_t kMirageAcPowerOff = 0xBE;
 const uint8_t kMirageAcHeat =    0b001;  // 1
 const uint8_t kMirageAcCool =    0b010;  // 2
 const uint8_t kMirageAcDry =     0b011;  // 3

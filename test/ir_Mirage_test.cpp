@@ -56,7 +56,7 @@ TEST(TestDecodeMirage, RealExample) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      ", Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -78,7 +78,7 @@ TEST(TestDecodeMirage, SyntheticExample) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      ", Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -122,9 +122,41 @@ TEST(TestDecodeMirage, RealExampleWithDodgyHardwareCapture) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      ", Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
+}
+
+TEST(TestMirageAcClass, Power) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+
+  const uint8_t on[kMirageStateLength] = {
+      0x56, 0x75, 0x00, 0x00, 0x20, 0x01, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x16, 0x14, 0x26};
+  ac.setRaw(on);
+  EXPECT_TRUE(ac.getPower());
+  const uint8_t off[kMirageStateLength] = {
+      0x56, 0x6C, 0x00, 0x00, 0x21, 0xD8, 0x00, 0x00,
+      0x0C, 0x00, 0x0C, 0x2C, 0x23, 0x01, 0x61};
+  ac.setRaw(off);
+  EXPECT_FALSE(ac.getPower());
 }
 
 TEST(TestMirageAcClass, OperatingMode) {
@@ -149,7 +181,7 @@ TEST(TestMirageAcClass, HumanReadable) {
   IRMirageAc ac(kGpioUnused);
   ac.begin();
   EXPECT_EQ(
-      ", Mode: 2 (Cool), Temp: 16C, Fan: 0 (Auto), "
+      "Power: On, Mode: 2 (Cool), Temp: 16C, Fan: 0 (Auto), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:00",
       ac.toString());
   // Ref: https://docs.google.com/spreadsheets/d/1Ucu9mOOIIJoWQjUJq_VCvwgV3EwKaRk8K2AuZgccYEk/edit#gid=0&range=C7
@@ -159,7 +191,7 @@ TEST(TestMirageAcClass, HumanReadable) {
       0x0C, 0x00, 0x0C, 0x26, 0x01, 0x00, 0x41};
   ac.setRaw(cool_21c_auto);
   EXPECT_EQ(
-      ", Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
+      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:01",
       ac.toString());
 
@@ -168,7 +200,7 @@ TEST(TestMirageAcClass, HumanReadable) {
       0x00, 0x00, 0x16, 0x14, 0x26};
   ac.setRaw(SyntheticExample);
   EXPECT_EQ(
-      ", Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       ac.toString());
 }

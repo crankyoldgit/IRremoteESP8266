@@ -331,8 +331,7 @@ void electra(IRElectraAc *ac,
 #endif  // SEND_MIDEA
 #if SEND_MIRAGE
   void mirage(IRMirageAc *ac,
-              // const bool on,
-              const stdAc::opmode_t mode,
+              const bool on, const stdAc::opmode_t mode,
               const float degrees, const stdAc::fanspeed_t fan,
               const bool turbo, const bool light,
               const int16_t sleep = -1, const int16_t clock = -1);

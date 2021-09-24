@@ -1264,12 +1264,12 @@ TEST(TestIRac, Mirage) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      ", Mode: 3 (Dry), Temp: 27C, Fan: 2 (Medium), "
+      "Power: On, Mode: 3 (Dry), Temp: 27C, Fan: 2 (Medium), "
       "Turbo: Off, Light: Off, Sleep: On, Clock: 17:31";
 
   ac.begin();
   irac.mirage(&ac,
-              // true,                        // Power
+              true,                        // Power
               stdAc::opmode_t::kDry,       // Mode
               27,                          // Degrees (Celsius)
               stdAc::fanspeed_t::kMedium,  // Fan speed

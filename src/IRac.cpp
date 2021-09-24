@@ -1481,6 +1481,7 @@ void IRac::midea(IRMideaAC *ac,
 #if SEND_MIRAGE
 /// Send a Mirage 120-bit A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRMitsubishiAC object to use.
+/// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
@@ -1490,7 +1491,7 @@ void IRac::midea(IRMideaAC *ac,
 /// @note Sleep is either on or off. The time is useless.
 /// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
 void IRac::mirage(IRMirageAc *ac,
-                  // const bool on,
+                  const bool on,
                   const stdAc::opmode_t mode,
                   const float degrees,
                   const stdAc::fanspeed_t fan,
@@ -1498,7 +1499,7 @@ void IRac::mirage(IRMirageAc *ac,
                   const int16_t sleep, const int16_t clock) {
   ac->begin();
 
-  // ac->setPower(on);
+  ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
@@ -2895,7 +2896,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case MIRAGE:
     {
       IRMirageAc ac(_pin, _inverted, _modulation);
-      mirage(&ac, /* send.power, */ send.mode, degC,
+      mirage(&ac, send.power, send.mode, degC,
              send.fanspeed, send.turbo, send.light,
              send.sleep, send.clock);
       break;

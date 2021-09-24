@@ -146,7 +146,6 @@ uint8_t IRMirageAc::calculateChecksum(const uint8_t *data) {
   return sumNibbles(data, kMirageStateLength - 1);
 }
 
-/* DISABLED until we get power control.
 /// Set the requested power state of the A/C to on.
 void IRMirageAc::on(void) { setPower(true); }
 
@@ -156,15 +155,18 @@ void IRMirageAc::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMirageAc::setPower(bool on) {
-  _.Power = on;
+  if (on)
+    _.SwingAndPower -= getPower() ? 0 : kMirageAcPowerOff;
+  else
+    _.SwingAndPower += getPower() ? kMirageAcPowerOff : 0;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRMirageAc::getPower(void) const {
-  return _.Power;
+  return _.SwingAndPower < kMirageAcPowerOff;
 }
-*/
+
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
@@ -311,7 +313,7 @@ stdAc::state_t IRMirageAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::MIRAGE;
   result.model = -1;  // No models used.
-  result.power = true;
+  result.power = getPower();
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
@@ -336,7 +338,7 @@ stdAc::state_t IRMirageAc::toCommon(void) const {
 String IRMirageAc::toString(void) const {
   String result = "";
   result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  // result += addBoolToString(_.Power, kPowerStr, false);
+  result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(_.Mode, 0xFF, kMirageAcCool,
                             kMirageAcHeat, kMirageAcDry,
                             kMirageAcFan);
@@ -351,5 +353,4 @@ String IRMirageAc::toString(void) const {
   result += addLabeledString(minsToString(getClock() / 60), kClockStr);
   return result;
 }
-
 #endif  // DECODE_MIRAGE
