@@ -76,6 +76,8 @@ bool IRrecv::decodeMirage(decode_results *results, uint16_t offset,
                     kMirageBitMark, kMirageZeroSpace,
                     kMirageBitMark, kMirageGap, true,
                     kUseDefTol, kMarkExcess, false)) return false;
+  // Compliance
+  if (strict && !IRMirageAc::validChecksum(results->state)) return false;
 
   // Success
   results->decode_type = decode_type_t::MIRAGE;

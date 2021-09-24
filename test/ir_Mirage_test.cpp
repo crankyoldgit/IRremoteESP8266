@@ -306,3 +306,14 @@ TEST(TestMirageAcClass, Clock) {
   ac.setClock(24 * 60 * 60);  // aka. 24:00:00
   EXPECT_EQ(23 * 60 * 60 + 59 * 60 + 59, ac.getClock());  // aka. 23:59:59
 }
+
+TEST(TestMirageAcClass, Checksums) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  const uint8_t SyntheticExample[kMirageStateLength] = {
+      0x56, 0x75, 0x00, 0x00, 0x20, 0x01, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x16, 0x14, 0x26};
+  EXPECT_TRUE(IRMirageAc::validChecksum(SyntheticExample));
+  EXPECT_EQ(0x26, IRMirageAc::calculateChecksum(SyntheticExample));
+}
