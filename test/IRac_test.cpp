@@ -1265,6 +1265,7 @@ TEST(TestIRac, Mirage) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 3 (Dry), Temp: 27C, Fan: 2 (Medium), "
+      "Swing(V): 9 (High), "
       "Turbo: Off, Light: Off, Sleep: On, Clock: 17:31";
 
   ac.begin();
@@ -1273,6 +1274,7 @@ TEST(TestIRac, Mirage) {
               stdAc::opmode_t::kDry,       // Mode
               27,                          // Degrees (Celsius)
               stdAc::fanspeed_t::kMedium,  // Fan speed
+              stdAc::swingv_t::kHigh,      // Veritical Swing
               false,                       // Turbo
               false,                       // Light
               8 * 60 + 0,                  // Sleep time

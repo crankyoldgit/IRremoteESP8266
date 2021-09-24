@@ -44,7 +44,8 @@ union Mirage120Protocol{
     uint8_t               :2;  // Unknown / Unused. Typically 0x0
     uint8_t Mode          :4;  // Cool, Heat, Dry, Fan, Recycle
     // Byte 5
-    uint8_t SwingAndPower :8;
+    uint8_t               :1;  // Unknown
+    uint8_t SwingAndPower :7;
     // Byte 6
     uint8_t               :7;  // Unknown / Unused. Typically 0x00
     uint8_t Sleep         :1;  // Sleep mode on or off.
@@ -70,7 +71,6 @@ union Mirage120Protocol{
 };
 
 // Constants
-const uint8_t kMirageAcPowerOff = 0xBE;
 const uint8_t kMirageAcHeat =    0b001;  // 1
 const uint8_t kMirageAcCool =    0b010;  // 2
 const uint8_t kMirageAcDry =     0b011;  // 3
@@ -86,6 +86,15 @@ const uint8_t kMirageAcMinTemp = 16;  // 16C
 const uint8_t kMirageAcMaxTemp = 32;  // 32C
 const uint8_t kMirageAcTempOffset = 0x5C;
 
+const uint8_t kMirageAcPowerOff = 0x5F;
+const uint8_t kMirageAcSwingVLowest =   0b0011;  // 3
+const uint8_t kMirageAcSwingVLow =      0b0101;  // 5
+const uint8_t kMirageAcSwingVMiddle =   0b0111;  // 7
+const uint8_t kMirageAcSwingVHigh =     0b1001;  // 9
+const uint8_t kMirageAcSwingVHighest =  0b1011;  // 11
+const uint8_t kMirageAcSwingVAuto =     0b1101;  // 13
+
+
 /// Class for handling detailed Mirage 120-bit A/C messages.
 /// @note Inspired and derived from the work done at: https://github.com/r45635/HVAC-IR-Control
 /// @warning Consider this very alpha code. Seems to work, but not validated.
@@ -94,7 +103,6 @@ class IRMirageAc {
   explicit IRMirageAc(const uint16_t pin, const bool inverted = false,
                       const bool use_modulation = true);
   void stateReset(void);
-  static bool validChecksum(const uint8_t* data);
 #if SEND_MIRAGE
   void send(const uint16_t repeat = kMirageMinRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
@@ -124,15 +132,17 @@ class IRMirageAc {
   bool getLight(void) const;
   void setSleep(const bool on);
   bool getSleep(void) const;
+  void setSwingV(const uint8_t position);
+  uint8_t getSwingV(void) const;
 
+  static bool validChecksum(const uint8_t* data);
+  static uint8_t calculateChecksum(const uint8_t* data);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static uint8_t convertSwingV(const stdAc::swingv_t position);
-  static uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
-  static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
   stdAc::state_t toCommon(void) const;
   String toString(void) const;
 #ifndef UNIT_TEST
@@ -146,6 +156,5 @@ class IRMirageAc {
 #endif  // UNIT_TEST
   Mirage120Protocol _;
   void checksum(void);
-  static uint8_t calculateChecksum(const uint8_t* data);
 };
 #endif  // IR_MIRAGE_H_

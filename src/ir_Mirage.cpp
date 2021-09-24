@@ -259,6 +259,32 @@ void IRMirageAc::setClock(const uint32_t nr_of_seconds) {
   _.Hours = uint8ToBcd(remaining);
 }
 
+/// Set the Vertical Swing setting/position of the A/C.
+/// @param[in] position The desired swing setting.
+void IRMirageAc::setSwingV(const uint8_t position) {
+  const bool power = getPower();
+  switch (position) {
+    case kMirageAcSwingVLowest:
+    case kMirageAcSwingVLow:
+    case kMirageAcSwingVMiddle:
+    case kMirageAcSwingVHigh:
+    case kMirageAcSwingVHighest:
+    case kMirageAcSwingVAuto:
+      _.SwingAndPower = position;
+      // Power needs to be reapplied after overwriting SwingAndPower
+      setPower(power);
+      break;
+    default:  // Default to Auto for anything else.
+      setSwingV(kMirageAcSwingVAuto);
+  }
+}
+
+/// Get the Vertical Swing setting/position of the A/C.
+/// @return The desired Vertical Swing setting/position.
+uint8_t IRMirageAc::getSwingV(void) const {
+  return _.SwingAndPower - (getPower() ? 0 : kMirageAcPowerOff);
+}
+
 /// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
@@ -309,6 +335,34 @@ uint8_t IRMirageAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRMirageAc::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:     return kMirageAcSwingVHighest;
+    case stdAc::swingv_t::kHigh:        return kMirageAcSwingVHigh;
+    case stdAc::swingv_t::kMiddle:      return kMirageAcSwingVMiddle;
+    case stdAc::swingv_t::kLow:         return kMirageAcSwingVLow;
+    case stdAc::swingv_t::kLowest:      return kMirageAcSwingVLowest;
+    default:                            return kMirageAcSwingVAuto;
+  }
+}
+
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] pos A native position to convert.
+/// @return The common vertical swing position.
+stdAc::swingv_t IRMirageAc::toCommonSwingV(const uint8_t pos) {
+  switch (pos) {
+    case kMirageAcSwingVHighest: return stdAc::swingv_t::kHighest;
+    case kMirageAcSwingVHigh:    return stdAc::swingv_t::kHigh;
+    case kMirageAcSwingVMiddle:  return stdAc::swingv_t::kMiddle;
+    case kMirageAcSwingVLow:     return stdAc::swingv_t::kLow;
+    case kMirageAcSwingVLowest:  return stdAc::swingv_t::kLowest;
+    default:                     return stdAc::swingv_t::kAuto;
+  }
+}
+
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRMirageAc::toCommon(void) const {
@@ -320,11 +374,11 @@ stdAc::state_t IRMirageAc::toCommon(void) const {
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
+  result.swingv = toCommonSwingV(getSwingV());
   result.turbo = getTurbo();
   result.light = getLight();
   result.sleep = getSleep() ? 0 : -1;
   // Not supported.
-  result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.clean = false;
@@ -349,6 +403,16 @@ String IRMirageAc::toString(void) const {
                            kMirageAcFanLow,
                            kMirageAcFanAuto, kMirageAcFanAuto,
                            kMirageAcFanMed);
+  result += addSwingVToString(getSwingV(),
+                              kMirageAcSwingVAuto,
+                              kMirageAcSwingVHighest,
+                              kMirageAcSwingVHigh,
+                              0xFF,  // Unused.
+                              kMirageAcSwingVMiddle,
+                              0xFF,  // Unused.
+                              kMirageAcSwingVLow,
+                              kMirageAcSwingVLowest,
+                              0xFF, 0xFF, 0xFF, 0xFF);  // Unused.
   result += addBoolToString(_.Turbo, kTurboStr);
   result += addBoolToString(_.Light, kLightStr);
   result += addBoolToString(_.Sleep, kSleepStr);

@@ -1485,6 +1485,7 @@ void IRac::midea(IRMideaAC *ac,
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
 /// @param[in] turbo Run the device in turbo mode.
 /// @param[in] light Turn on the Light/Display.
 /// @param[in] sleep The time in Nr. of mins to sleep for. < 0 is ignore.
@@ -1494,7 +1495,7 @@ void IRac::mirage(IRMirageAc *ac,
                   const bool on,
                   const stdAc::opmode_t mode,
                   const float degrees,
-                  const stdAc::fanspeed_t fan,
+                  const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                   const bool turbo, const bool light,
                   const int16_t sleep, const int16_t clock) {
   ac->begin();
@@ -1503,7 +1504,7 @@ void IRac::mirage(IRMirageAc *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  // No SwingV setting available
+  ac->setSwingV(ac->convertSwingV(swingv));
   // No SwingH setting available
   ac->setTurbo(turbo);
   // No Quiet setting available.
@@ -2897,7 +2898,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRMirageAc ac(_pin, _inverted, _modulation);
       mirage(&ac, send.power, send.mode, degC,
-             send.fanspeed, send.turbo, send.light,
+             send.fanspeed, send.swingv, send.turbo, send.light,
              send.sleep, send.clock);
       break;
     }

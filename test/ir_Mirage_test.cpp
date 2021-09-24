@@ -57,6 +57,7 @@ TEST(TestDecodeMirage, RealExample) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Swing(V): 0 (UNKNOWN), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -73,12 +74,12 @@ TEST(TestDecodeMirage, SyntheticExample) {
   irsend.makeDecodeResult();
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
-  ASSERT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(decode_type_t::MIRAGE, irsend.capture.decode_type);
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Swing(V): 0 (UNKNOWN), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -123,6 +124,7 @@ TEST(TestDecodeMirage, RealExampleWithDodgyHardwareCapture) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Swing(V): 0 (UNKNOWN), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -182,6 +184,7 @@ TEST(TestMirageAcClass, HumanReadable) {
   ac.begin();
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 16C, Fan: 0 (Auto), "
+      "Swing(V): 13 (Auto), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:00",
       ac.toString());
   // Ref: https://docs.google.com/spreadsheets/d/1Ucu9mOOIIJoWQjUJq_VCvwgV3EwKaRk8K2AuZgccYEk/edit#gid=0&range=C7
@@ -192,6 +195,7 @@ TEST(TestMirageAcClass, HumanReadable) {
   ac.setRaw(cool_21c_auto);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
+      "Swing(V): 13 (Auto), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:01",
       ac.toString());
 
@@ -201,6 +205,7 @@ TEST(TestMirageAcClass, HumanReadable) {
   ac.setRaw(SyntheticExample);
   EXPECT_EQ(
       "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
+      "Swing(V): 0 (UNKNOWN), "
       "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
       ac.toString());
 }
@@ -316,4 +321,24 @@ TEST(TestMirageAcClass, Checksums) {
       0x00, 0x00, 0x16, 0x14, 0x26};
   EXPECT_TRUE(IRMirageAc::validChecksum(SyntheticExample));
   EXPECT_EQ(0x26, IRMirageAc::calculateChecksum(SyntheticExample));
+}
+
+TEST(TestMirageAcClass, SwingV) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSwingV(kMirageAcSwingVAuto);
+  EXPECT_EQ(kMirageAcSwingVAuto, ac.getSwingV());
+
+  ac.setSwingV(kMirageAcSwingVHigh);
+  EXPECT_EQ(kMirageAcSwingVHigh, ac.getSwingV());
+
+  ac.setSwingV(0xFF);
+  EXPECT_EQ(kMirageAcSwingVAuto, ac.getSwingV());
+
+  ac.setSwingV(kMirageAcSwingVLowest);
+  EXPECT_EQ(kMirageAcSwingVLowest, ac.getSwingV());
+
+  ac.setSwingV(kMirageAcSwingVLowest - 1);
+  EXPECT_EQ(kMirageAcSwingVAuto, ac.getSwingV());
 }
