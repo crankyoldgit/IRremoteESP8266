@@ -157,6 +157,17 @@ void IRMirageAc::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMirageAc::setPower(bool on) {
+  // In order to change the power setting, it seems must be less than
+  // kMirageAcPowerOff. kMirageAcPowerOff is larger than half of the possible
+  // value stored in the allocated bit space.
+  // Thus if the value is larger than kMirageAcPowerOff the power is off.
+  // Less than, then power is on.
+  // We can't just aribitarily add or subtract the value (which analysis
+  // indicates is how the power status changes. Very weird, I know!) as that is
+  // not an idempotent action, we must check if the addition or substraction is
+  // needed first. e.g. via getPower()
+  // i.e. If we added or subtracted twice, we would cause a wrap of the integer
+  // and not get the desired result.
   if (on)
     _.SwingAndPower -= getPower() ? 0 : kMirageAcPowerOff;
   else
