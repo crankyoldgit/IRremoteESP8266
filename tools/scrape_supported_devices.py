@@ -10,15 +10,32 @@ import time
 
 CODE_URL = "https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_"
 
-BRAND_MODEL = re.compile(r"Brand: *(?P<brand>.+), *Model: *(?P<model>.+)")
-ENUMS = re.compile(r"enum (\w+) {(.+?)};", re.DOTALL)
-ENUM_ENTRY = re.compile(r"^\s+(\w+)", re.MULTILINE)
-DECODED_PROTOCOLS = re.compile(r".*(?:results->decode_type *=.*?|"
-                               r"typeguess\s*=\s*decode_type_t::)(\w+);")
-AC_FN = re.compile(r"ir_(.+)\.h")
-AC_MODEL_ENUM_RE = re.compile(r"(.+)_ac_remote_model_t")
+BRAND_MODEL = re.compile(r"""
+  Brand:\s{1,20}  # "Brand:" label followd by between 1 and 20 whitespace chars.
+  \b(?P<brand>.{1,40})\b  # The actual brand of the device, max 40 chars.
+  \s{0,10},       # Followed by at most 10 whitespace chars, then a comma.
+  \s{1,20}        # The between 1 and 20 whitespace chars.
+  Model:\s{1,20}  # "Model:" label followd by between 1 and 20 whitespace chars.
+  \b(?P<model>.{1,80})  # The model info of the device, max 80 chars.
+  \s{0,5}$        # Followed by at most 5 whitespaces before the end of line.
+  """, re.VERBOSE)
+ENUMS = re.compile(r"enum (\w{1,60}) {(.{1,5000}?)};", re.DOTALL)
+ENUM_ENTRY = re.compile(r"^\s{1,80}(\w{1,80})", re.MULTILINE)
+DECODED_PROTOCOLS = re.compile(r"""
+  .{0,80}  # Ignore upto an 80 char line of whitespace/code etc.
+  # Now look for code that looks like we are assigning the Protocol type.
+  # There are two typical styles used:
+  (?:results->decode_type  # The first style.
+     |  # Or
+     typeguess)            # The second style
+  \s{0,5}=\s{0,5}  # The assignment operator and potential whitespace
+  (?:decode_type_t::)?  # The protocol could have an optional type prefix.
+  (\w{1,40});  # Finally, the last word of code should be the Protocol.
+  """, re.VERBOSE)
+AC_FN = re.compile(r"ir_(.{1,80})\.h")
+AC_MODEL_ENUM_RE = re.compile(r"(.{1,40})_ac_remote_model_t")
 IRSEND_FN_RE = re.compile(r"IRsend\.h")
-ALL_FN = re.compile(r"ir_(.+)\.(h|cpp)")
+ALL_FN = re.compile(r"ir_(.{1,80})\.(h|cpp)")
 
 EXCLUDED_PROTOCOLS = ["UNKNOWN", "UNUSED", "kLastDecodeType", "typeguess"]
 EXCLUDED_ACS = ["Magiquest", "NEC"]
