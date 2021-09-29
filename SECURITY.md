@@ -10,9 +10,9 @@ A new release version of the library will be published, _if required_, to addres
 
 ## Reporting a Vulnerability
 
-Please report any _sensitive_, _critical_, or _urgent_ vulnerablities directly to _David Conran (crankyoldgit@users.noreply.github.com)_ **and** _Christian Nilsson (NiKiZe@users.noreply.github.com)_.
+Please report any _sensitive_, _critical_, or _urgent_ vulnerablities directly to _David Conran (david@xyzzy.com.au)_ **and** <a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/new/choose">create an issue</a> saying you need to communicate an important security issue. i.e. _Sensitive_ details in the email, _General_ details in the Issue. Two different notification paths to help make sure it's seen.
 
-After we have assessed the issue, we will work out how we will handle the matter and let you know how to proceed.
+After assessing the issue, we will work out how we will handle the matter and let you know how to proceed.
 
 If the vulnerablity is neither _sensitive_, _critical_, or _urgent_, please just create a <a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/new/choose">new issue</a> as per normal.
 
