@@ -1,4 +1,4 @@
 # Directories & files to ignore from release archives
 docs export-ignore
 assets export-ignore
-SECURITY.md expore-ignore
+SECURITY.md export-ignore
