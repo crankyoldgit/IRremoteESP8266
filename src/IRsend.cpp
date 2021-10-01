@@ -1303,6 +1303,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendWhirlpoolAC(state, nbytes);
       break;
 #endif  // SEND_WHIRLPOOL_AC
+#if SEND_RHOSS
+    case RHOSS:
+      sendRhoss(state, nbytes);
+      break;
+#endif
     default:
       return false;
   }

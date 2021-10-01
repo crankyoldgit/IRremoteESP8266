@@ -770,6 +770,10 @@ class IRrecv {
   bool decodeBose(decode_results *results, uint16_t offset = kStartOffset,
                   const uint16_t nbits = kBoseBits, const bool strict = true);
 #endif  // DECODE_BOSE
+#if DECODE_RHOSS
+  bool decodeRhoss(decode_results *results, uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kRhossBits, const bool strict = true);
+#endif  // DECODE_RHOSS
 };
 
 #endif  // IRRECV_H_
