@@ -43,9 +43,28 @@ void IRsend::sendRhoss(const unsigned char data[], const uint16_t nbytes,
                        const uint16_t repeat) {
   // Check if we have enough bytes to send a proper message.
   if (nbytes < kRhossStateLength) return;
-  sendGeneric(kRhossHdrMark, kRhossHdrSpace, kRhossBitMark, kRhossOneSpace,
-             kRhossBitMark, kRhossZeroSpace, kRhossFooterMark, kRhossGap,
-             data, nbytes, kRhossFreq, false, repeat, kDutyDefault);
+
+  // Setup
+  enableIROut(kRhossFreq, kDutyDefault);
+  // We always send a message, even for repeat=0, hence '<= repeat'.
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Header
+    mark(kRhossHdrMark);
+    space(kRhossHdrSpace);
+
+    // Data
+    for (uint16_t i = 0; i < nbytes; i++) {
+      sendData(kRhossBitMark, kRhossOneSpace, kRhossBitMark, kRhossZeroSpace, *(data + i), 8, false);
+    }
+
+    // Footer
+    mark(kRhossFooterMark);    
+    space(kRhossZeroSpace);    
+    mark(kRhossFooterMark);
+
+    // Gap
+    space(kRhossGap);
+  }
 }
 #endif  // SEND_RHOSS
 
@@ -68,15 +87,22 @@ bool IRrecv::decodeRhoss(decode_results *results, uint16_t offset,
                       results->rawlen - offset, kRhossStateLength * 8,
                       kRhossHdrMark, kRhossHdrSpace,
                       kRhossBitMark, kRhossOneSpace,
-                      kRhossBitMark, kRhossZeroSpace, 0, 0, false, kUseDefTol, kMarkExcess, false);
+                      kRhossBitMark, kRhossZeroSpace, 
+                      kRhossFooterMark, 0, 
+					  false, kUseDefTol, kMarkExcess, false);
+					  
   if (!used) return false;
   offset += used;
 
-  for(int i = 0; i < kRhossStateLength; i++) {
-    DPRINT(i);
-    DPRINT(" ");
-    DPRINTLN(results->state[i]);
-  }
+  #ifdef DEBUG
+    #if DEBUG
+      for(int i = 0; i < kRhossStateLength; i++) {
+        DPRINT(i);
+        DPRINT(" ");
+        DPRINTLN(results->state[i]);
+      }
+    #endif
+  #endif
 
   if (strict && !IRRhossAc::validChecksum(results->state)) return false;
 
