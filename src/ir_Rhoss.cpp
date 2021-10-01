@@ -159,6 +159,7 @@ bool IRRhossAc::validChecksum(const uint8_t state[], const uint16_t length) {
 /// Update the checksum value for the internal state.
 void IRRhossAc::checksum(void) {
   _.CRC = IRRhossAc::calcChecksum(_.raw, kRhossStateLength);
+  _.raw[kRhossStateLength - 1] = _.CRC;
 }
 
 /// Reset the internals of the object to a known good state.

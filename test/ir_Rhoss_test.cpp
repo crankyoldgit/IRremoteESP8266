@@ -75,11 +75,11 @@ TEST(TestDecodeRhoss, SyntheticSelfDecode) {
       "Power: On, Swing(V): Off, Mode: 5 (Auto), Fan: 0 (Auto), Temp: 21C",
       ac.toString());
 }
-/*
-// Tests for IRAmcorAc class.
 
-TEST(TestAmcorAcClass, Power) {
-  IRAmcorAc ac(0);
+// Tests for IRRhossAc class.
+
+TEST(TestRhossAcClass, Power) {
+  IRRhossAc ac(0);
   ac.begin();
 
   ac.on();
@@ -95,27 +95,27 @@ TEST(TestAmcorAcClass, Power) {
   EXPECT_FALSE(ac.getPower());
 }
 
-TEST(TestAmcorAcClass, Temperature) {
-  IRAmcorAc ac(0);
+TEST(TestRhossAcClass, Temperature) {
+  IRRhossAc ac(0);
   ac.begin();
 
   ac.setTemp(0);
-  EXPECT_EQ(kAmcorMinTemp, ac.getTemp());
+  EXPECT_EQ(kRhossMinTemp, ac.getTemp());
 
   ac.setTemp(255);
-  EXPECT_EQ(kAmcorMaxTemp, ac.getTemp());
+  EXPECT_EQ(kRhossMaxTemp, ac.getTemp());
 
-  ac.setTemp(kAmcorMinTemp);
-  EXPECT_EQ(kAmcorMinTemp, ac.getTemp());
+  ac.setTemp(kRhossMinTemp);
+  EXPECT_EQ(kRhossMinTemp, ac.getTemp());
 
-  ac.setTemp(kAmcorMaxTemp);
-  EXPECT_EQ(kAmcorMaxTemp, ac.getTemp());
+  ac.setTemp(kRhossMaxTemp);
+  EXPECT_EQ(kRhossMaxTemp, ac.getTemp());
 
-  ac.setTemp(kAmcorMinTemp - 1);
-  EXPECT_EQ(kAmcorMinTemp, ac.getTemp());
+  ac.setTemp(kRhossMinTemp - 1);
+  EXPECT_EQ(kRhossMinTemp, ac.getTemp());
 
-  ac.setTemp(kAmcorMaxTemp + 1);
-  EXPECT_EQ(kAmcorMaxTemp, ac.getTemp());
+  ac.setTemp(kRhossMaxTemp + 1);
+  EXPECT_EQ(kRhossMaxTemp, ac.getTemp());
 
   ac.setTemp(17);
   EXPECT_EQ(17, ac.getTemp());
@@ -130,50 +130,51 @@ TEST(TestAmcorAcClass, Temperature) {
   EXPECT_EQ(29, ac.getTemp());
 }
 
-TEST(TestAmcorAcClass, OperatingMode) {
-  IRAmcorAc ac(0);
+
+TEST(TestRhossAcClass, OperatingMode) {
+  IRRhossAc ac(0);
   ac.begin();
 
-  ac.setMode(kAmcorAuto);
-  EXPECT_EQ(kAmcorAuto, ac.getMode());
+  ac.setMode(kRhossAuto);
+  EXPECT_EQ(kRhossAuto, ac.getMode());
 
-  ac.setMode(kAmcorCool);
-  EXPECT_EQ(kAmcorCool, ac.getMode());
+  ac.setMode(kRhossCool);
+  EXPECT_EQ(kRhossCool, ac.getMode());
 
-  ac.setMode(kAmcorHeat);
-  EXPECT_EQ(kAmcorHeat, ac.getMode());
+  ac.setMode(kRhossHeat);
+  EXPECT_EQ(kRhossHeat, ac.getMode());
 
-  ac.setMode(kAmcorDry);
-  EXPECT_EQ(kAmcorDry, ac.getMode());
+  ac.setMode(kRhossDry);
+  EXPECT_EQ(kRhossDry, ac.getMode());
 
-  ac.setMode(kAmcorFan);
-  EXPECT_EQ(kAmcorFan, ac.getMode());
+  ac.setMode(kRhossFan);
+  EXPECT_EQ(kRhossFan, ac.getMode());
 
-  ac.setMode(kAmcorAuto + 1);
-  EXPECT_EQ(kAmcorAuto, ac.getMode());
+  ac.setMode(kRhossAuto + 1);
+  EXPECT_EQ(kRhossAuto, ac.getMode());
 
   ac.setMode(255);
-  EXPECT_EQ(kAmcorAuto, ac.getMode());
+  EXPECT_EQ(kRhossAuto, ac.getMode());
 }
 
-TEST(TestAmcorAcClass, FanSpeed) {
-  IRAmcorAc ac(0);
+TEST(TestRhossAcClass, FanSpeed) {
+  IRRhossAc ac(0);
   ac.begin();
 
   ac.setFan(0);
-  EXPECT_EQ(kAmcorFanAuto, ac.getFan());
+  EXPECT_EQ(kRhossFanAuto, ac.getFan());
 
   ac.setFan(255);
-  EXPECT_EQ(kAmcorFanAuto, ac.getFan());
+  EXPECT_EQ(kRhossFanAuto, ac.getFan());
 
-  ac.setFan(kAmcorFanMax);
-  EXPECT_EQ(kAmcorFanMax, ac.getFan());
+  ac.setFan(kRhossFanMax);
+  EXPECT_EQ(kRhossFanMax, ac.getFan());
 
-  ac.setFan(kAmcorFanMax + 1);
-  EXPECT_EQ(kAmcorFanAuto, ac.getFan());
+  ac.setFan(kRhossFanMax + 1);
+  EXPECT_EQ(kRhossFanAuto, ac.getFan());
 
-  ac.setFan(kAmcorFanMax - 1);
-  EXPECT_EQ(kAmcorFanMax - 1, ac.getFan());
+  ac.setFan(kRhossFanMax - 1);
+  EXPECT_EQ(kRhossFanMax - 1, ac.getFan());
 
   ac.setFan(1);
   EXPECT_EQ(1, ac.getFan());
@@ -184,82 +185,78 @@ TEST(TestAmcorAcClass, FanSpeed) {
   ac.setFan(3);
   EXPECT_EQ(3, ac.getFan());
 }
+TEST(TestRhossAcClass, Checksums) {
+  uint8_t state[kRhossStateLength] = { 0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
 
-TEST(TestAmcorAcClass, Checksums) {
-  uint8_t state[kAmcorStateLength] = {
-      0x01, 0x41, 0x30, 0x00, 0x00, 0x30, 0x00, 0x0C};
-
-  ASSERT_EQ(0x0C, IRAmcorAc::calcChecksum(state));
-  EXPECT_TRUE(IRAmcorAc::validChecksum(state));
+  ASSERT_EQ(0x33, IRRhossAc::calcChecksum(state));
+  EXPECT_TRUE(IRRhossAc::validChecksum(state));
   // Change the array so the checksum is invalid.
   state[0] ^= 0xFF;
-  EXPECT_FALSE(IRAmcorAc::validChecksum(state));
+  EXPECT_FALSE(IRRhossAc::validChecksum(state));
   // Restore the previous change, and change another byte.
   state[0] ^= 0xFF;
   state[4] ^= 0xFF;
-  EXPECT_FALSE(IRAmcorAc::validChecksum(state));
+  EXPECT_FALSE(IRRhossAc::validChecksum(state));
   state[4] ^= 0xFF;
-  EXPECT_TRUE(IRAmcorAc::validChecksum(state));
+  EXPECT_TRUE(IRRhossAc::validChecksum(state));
 
   // Additional known good states.
-  uint8_t knownGood1[kAmcorStateLength] = {
-      0x01, 0x11, 0x3E, 0x00, 0x00, 0x30, 0x00, 0x17};
-  EXPECT_TRUE(IRAmcorAc::validChecksum(knownGood1));
-  ASSERT_EQ(0x17, IRAmcorAc::calcChecksum(knownGood1));
-  uint8_t knownGood2[kAmcorStateLength] = {
-      0x01, 0x22, 0x26, 0x00, 0x00, 0x30, 0x00, 0x10};
-  EXPECT_TRUE(IRAmcorAc::validChecksum(knownGood2));
-  ASSERT_EQ(0x10, IRAmcorAc::calcChecksum(knownGood2));
-  uint8_t knownGood3[kAmcorStateLength] = {
-      0x01, 0x41, 0x24, 0x00, 0x00, 0xC0, 0x00, 0x18};
-  EXPECT_TRUE(IRAmcorAc::validChecksum(knownGood3));
-  ASSERT_EQ(0x18, IRAmcorAc::calcChecksum(knownGood3));
+  uint8_t knownGood1[kRhossStateLength] = { 0xAA, 0x06, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x34 };
+  EXPECT_TRUE(IRRhossAc::validChecksum(knownGood1));
+  ASSERT_EQ(0x17, IRRhossAc::calcChecksum(knownGood1));
 
-  // For a recalculation.
-  uint8_t knownBad[kAmcorStateLength] = {
-      // Same as knownGood3 except for the checksum.
-      0x01, 0x41, 0x24, 0x00, 0x00, 0xC0, 0x00, 0x00};
-  EXPECT_FALSE(IRAmcorAc::validChecksum(knownBad));
-  IRAmcorAc ac(0);
+  uint8_t knownGood2[kRhossStateLength] = { 0xAA, 0x07, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x35 };
+  EXPECT_TRUE(IRRhossAc::validChecksum(knownGood2));
+  ASSERT_EQ(0x10, IRRhossAc::calcChecksum(knownGood2));
+  
+  uint8_t knownGood3[kRhossStateLength] = { 0xAA, 0x07, 0x60, 0x00, 0x53, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x38 };
+  EXPECT_TRUE(IRRhossAc::validChecksum(knownGood3));
+  ASSERT_EQ(0x18, IRRhossAc::calcChecksum(knownGood3));
+
+  // For a recalculation, same as knownGood3 except for the checksum.
+  uint8_t knownBad[kRhossStateLength] = { 0xAA, 0x07, 0x60, 0x00, 0x53, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00 };
+  EXPECT_FALSE(IRRhossAc::validChecksum(knownBad));
+  IRRhossAc ac(0);
   ac.setRaw(knownBad);
-  EXPECT_STATE_EQ(knownGood3, ac.getRaw(), kAmcorBits);
+  EXPECT_STATE_EQ(knownGood3, ac.getRaw(), kRhossBits);
 }
 
-TEST(TestAmcorAcClass, Max) {
-  IRAmcorAc ac(0);
+/*
+TEST(TestRhossAcClass, Max) {
+  IRRhossAc ac(0);
   ac.begin();
 
-  ac.setMode(kAmcorCool);
+  ac.setMode(kRhossCool);
   ac.setMax(true);
-  EXPECT_EQ(kAmcorCool, ac.getMode());
-  EXPECT_EQ(kAmcorMinTemp, ac.getTemp());
+  EXPECT_EQ(kRhossCool, ac.getMode());
+  EXPECT_EQ(kRhossMinTemp, ac.getTemp());
   EXPECT_TRUE(ac.getMax());
   ac.setMax(false);
-  EXPECT_EQ(kAmcorCool, ac.getMode());
-  EXPECT_EQ(kAmcorMinTemp, ac.getTemp());
+  EXPECT_EQ(kRhossCool, ac.getMode());
+  EXPECT_EQ(kRhossMinTemp, ac.getTemp());
   EXPECT_FALSE(ac.getMax());
 
-  ac.setMode(kAmcorHeat);
+  ac.setMode(kRhossHeat);
   ac.setMax(true);
-  EXPECT_EQ(kAmcorHeat, ac.getMode());
-  EXPECT_EQ(kAmcorMaxTemp, ac.getTemp());
+  EXPECT_EQ(kRhossHeat, ac.getMode());
+  EXPECT_EQ(kRhossMaxTemp, ac.getTemp());
   EXPECT_TRUE(ac.getMax());
   ac.setMax(false);
-  EXPECT_EQ(kAmcorHeat, ac.getMode());
-  EXPECT_EQ(kAmcorMaxTemp, ac.getTemp());
+  EXPECT_EQ(kRhossHeat, ac.getMode());
+  EXPECT_EQ(kRhossMaxTemp, ac.getTemp());
   EXPECT_FALSE(ac.getMax());
 
-  ac.setMode(kAmcorAuto);
+  ac.setMode(kRhossAuto);
   ac.setTemp(25);
   ac.setMax(true);
-  EXPECT_EQ(kAmcorAuto, ac.getMode());
+  EXPECT_EQ(kRhossAuto, ac.getMode());
   EXPECT_EQ(25, ac.getTemp());
   EXPECT_FALSE(ac.getMax());
 
   // Test known real data.
-  uint8_t lo[kAmcorStateLength] = {
+  uint8_t lo[kRhossStateLength] = {
       0x01, 0x41, 0x18, 0x00, 0x00, 0x30, 0x03, 0x15};
-  uint8_t hi[kAmcorStateLength] = {
+  uint8_t hi[kRhossStateLength] = {
       0x01, 0x12, 0x40, 0x00, 0x00, 0x30, 0x03, 0x0E};
   ac.setRaw(lo);
   EXPECT_EQ("Power: On, Mode: 1 (Cool), Fan: 4 (Auto), Temp: 12C, Max: On",
