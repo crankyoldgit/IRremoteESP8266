@@ -1,4 +1,4 @@
-// Copyright 2019-2020 - David Conran (@crankyoldgit)
+// Copyright 2019-2021 - David Conran (@crankyoldgit)
 
 /// @file IRtext.cpp
 /// @warning If you add or remove an entry in this file, you should run:
