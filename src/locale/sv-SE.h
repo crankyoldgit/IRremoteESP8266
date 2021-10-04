@@ -186,4 +186,4 @@
     "Detta resultat är inte pålitligt före problemet är åtgärdat. " \
     "Editera & öka `kCaptureBufferSize`."
 
-#endif
+#endif  // LOCALE_SV_SE_H_
