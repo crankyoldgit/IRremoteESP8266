@@ -180,7 +180,7 @@
 #define D_STR_MESGDESC "Meddelande beskr."
 #define D_STR_TOLERANCE "Tolerans"
 #define D_STR_IRRECVDUMP_STARTUP \
-    "IRrecvDump har nu startats och väntar på IR signalre på PIN %d"
+    "IRrecvDump har nu startats och väntar på IR signaler på PIN %d"
 #define D_WARN_BUFFERFULL \
     "VARNING: IR koden är för stor för att rymmas i bufferminnet (>= %d). " \
     "Detta resultat är inte pålitligt innan problemet är åtgärdat. " \
