@@ -29,7 +29,7 @@
 #define D_STR_TIMER "Timer"
 #define D_STR_ONTIMER D_STR_TIMER " " D_STR_ON
 #define D_STR_OFFTIMER D_STR_TIMER " " D_STR_OFF
-#define D_STR_TIMERMODE D_STR_MODE " " D_STR_TIMER 
+#define D_STR_TIMERMODE D_STR_MODE " " D_STR_TIMER
 #define D_STR_CLOCK "Relógio"
 #define D_STR_COMMAND "Comando"
 #define D_STR_HEALTH "Saúde"
