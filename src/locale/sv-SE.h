@@ -11,7 +11,7 @@
 #define D_STR_ON "På"
 #define D_STR_OFF "Av"
 #define D_STR_MODE "Läge"
-#define D_STR_TOGGLE "Toggla"
+#define D_STR_TOGGLE "Växla"
 #define D_STR_TURBO "Turbo"
 #define D_STR_SUPER "Super"
 #define D_STR_SLEEP "Sova"
@@ -124,7 +124,7 @@
 #define D_STR_LO "Låg"
 #define D_STR_LOWEST "Lägsta"
 #define D_STR_RIGHT "Höger"
-#define D_STR_MAXRIGHT D_STR_MAX " höger" D_STR_RIGHT
+#define D_STR_MAXRIGHT D_STR_MAX " höger"
 #define D_STR_RIGHTMAX_NOSPACE D_STR_MAX D_STR_RIGHT
 #define D_STR_LEFT "Vänster"
 #define D_STR_MAXLEFT D_STR_MAX " vänster"
@@ -134,19 +134,19 @@
 #define D_STR_TOP "Topp"
 #define D_STR_BOTTOM "Botten"
 
-#define D_STR_ECONOTOGGLE "Toggla eko"
-#define D_STR_EYEAUTO "Auto öga"
-#define D_STR_LIGHTTOGGLE "Toggla svag"
-#define D_STR_OUTSIDEQUIET "Tyst ute"
-#define D_STR_POWERTOGGLE "Toggla strömläge"
+#define D_STR_ECONOTOGGLE D_STR_TOGGLE " eko"
+#define D_STR_EYEAUTO D_STR_AUTO " öga"
+#define D_STR_LIGHTTOGGLE D_STR_TOGGLE " svag"
+#define D_STR_OUTSIDEQUIET D_STR_QUIET " ute"
+#define D_STR_POWERTOGGLE D_STR_TOGGLE " strömläge"
 #define D_STR_POWERBUTTON "Strömknapp"
 #define D_STR_PREVIOUSPOWER "Föregående strömläge"
 #define D_STR_DISPLAYTEMP "Displaytemp"
 #define D_STR_SENSORTEMP "Sensortemp"
 #define D_STR_SLEEP_TIMER "Sovtimer"
 #define D_STR_SWINGVMODE D_STR_SWINGV " läge"
-#define D_STR_SWINGVTOGGLE "Toggla sving(v)"
-#define D_STR_TURBOTOGGLE "Toggla turbo"
+#define D_STR_SWINGVTOGGLE D_STR_TOGGLE " sving(v)"
+#define D_STR_TURBOTOGGLE D_STR_TOGGLE " turbo"
 
 // Separatorer
 #define D_CHR_TIME_SEP ':'
@@ -155,13 +155,13 @@
 #define D_STR_COLONSPACE ": "
 
 #define D_STR_DAY "Dag"
-#define D_STR_DAYS "Dagar"
+#define D_STR_DAYS D_STR_DAY "ar"
 #define D_STR_HOUR "Timme"
 #define D_STR_HOURS "Timmar"
 #define D_STR_MINUTE "Minut"
-#define D_STR_MINUTES "Minuter"
+#define D_STR_MINUTES D_STR_MINUTE "er"
 #define D_STR_SECOND "Sekund"
-#define D_STR_SECONDS "Sekunder"
+#define D_STR_SECONDS D_STR_MINUTE "er"
 #define D_STR_NOW "Nu"
 #define D_STR_THREELETTERDAYS "SönMånTisOnsTorFreLör"
 
@@ -183,7 +183,7 @@
     "IRrecvDump har nu startats och väntar på IR signalre på PIN %d"
 #define D_WARN_BUFFERFULL \
     "VARNING: IR koden är för stor för att rymmas i bufferminnet (>= %d). " \
-    "Detta resultat är inte pålitligt före problemet är åtgärdat. " \
-    "Editera & öka `kCaptureBufferSize`."
+    "Detta resultat är inte pålitligt innan problemet är åtgärdat. " \
+    "Redigera och öka `kCaptureBufferSize`."
 
 #endif  // LOCALE_SV_SE_H_
