@@ -59,6 +59,9 @@
 #define STRCASECMP strcasecmp
 #endif  // ESP8266
 #endif  // STRCASECMP
+#ifndef PSTR
+#define PSTR
+#endif
 
 /// Class constructor
 /// @param[in] pin Gpio pin to use when transmitting IR messages.
@@ -3076,14 +3079,14 @@ stdAc::opmode_t IRac::strToOpmode(const char *str,
            !STRCASECMP(str, kStopStr))
     return stdAc::opmode_t::kOff;
   else if (!STRCASECMP(str, kCoolStr) ||
-           !STRCASECMP(str, F("COOLING")))
+           !STRCASECMP(str, PSTR("COOLING")))
     return stdAc::opmode_t::kCool;
   else if (!STRCASECMP(str, kHeatStr) ||
-           !STRCASECMP(str, F("HEATING")))
+           !STRCASECMP(str, PSTR("HEATING")))
     return stdAc::opmode_t::kHeat;
   else if (!STRCASECMP(str, kDryStr) ||
-           !STRCASECMP(str, F("DRYING")) ||
-           !STRCASECMP(str, F("DEHUMIDIFY")))
+           !STRCASECMP(str, PSTR("DRYING")) ||
+           !STRCASECMP(str, PSTR("DEHUMIDIFY")))
     return stdAc::opmode_t::kDry;
   else if (!STRCASECMP(str, kFanStr) ||
           // The following Fans strings with "only" are required to help with
@@ -3185,8 +3188,8 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
            !STRCASECMP(str, kStopStr))
     return stdAc::swingh_t::kOff;
   else if (!STRCASECMP(str, kLeftMaxStr) ||                  // "LeftMax"
-           !STRCASECMP(str, F(D_STR_LEFT " " D_STR_MAX)) ||  // "Left Max"
-           !STRCASECMP(str, F(D_STR_MAX D_STR_LEFT)) ||      // "MaxLeft"
+           !STRCASECMP(str, PSTR(D_STR_LEFT " " D_STR_MAX)) ||  // "Left Max"
+           !STRCASECMP(str, PSTR(D_STR_MAX D_STR_LEFT)) ||      // "MaxLeft"
            !STRCASECMP(str, kMaxLeftStr))                    // "Max Left"
     return stdAc::swingh_t::kLeftMax;
   else if (!STRCASECMP(str, kLeftStr))
@@ -3200,8 +3203,8 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
   else if (!STRCASECMP(str, kRightStr))
     return stdAc::swingh_t::kRight;
   else if (!STRCASECMP(str, kRightMaxStr) ||                  // "RightMax"
-           !STRCASECMP(str, F(D_STR_RIGHT " " D_STR_MAX)) ||  // "Right Max"
-           !STRCASECMP(str, F(D_STR_MAX D_STR_RIGHT)) ||      // "MaxRight"
+           !STRCASECMP(str, PSTR(D_STR_RIGHT " " D_STR_MAX)) ||  // "Right Max"
+           !STRCASECMP(str, PSTR(D_STR_MAX D_STR_RIGHT)) ||      // "MaxRight"
            !STRCASECMP(str, kMaxRightStr))                    // "Max Right"
     return stdAc::swingh_t::kRightMax;
   else if (!STRCASECMP(str, kWideStr))
@@ -3217,77 +3220,77 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
 /// @return The equivalent enum.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
   // Gree
-  if (!STRCASECMP(str, F("YAW1F"))) {
+  if (!STRCASECMP(str, PSTR("YAW1F"))) {
     return gree_ac_remote_model_t::YAW1F;
-  } else if (!STRCASECMP(str, F("YBOFB"))) {
+  } else if (!STRCASECMP(str, PSTR("YBOFB"))) {
     return gree_ac_remote_model_t::YBOFB;
   // HitachiAc1 models
-  } else if (!STRCASECMP(str, F("R-LT0541-HTA-A"))) {
+  } else if (!STRCASECMP(str, PSTR("R-LT0541-HTA-A"))) {
     return hitachi_ac1_remote_model_t::R_LT0541_HTA_A;
-  } else if (!STRCASECMP(str, F("R-LT0541-HTA-B"))) {
+  } else if (!STRCASECMP(str, PSTR("R-LT0541-HTA-B"))) {
     return hitachi_ac1_remote_model_t::R_LT0541_HTA_B;
   // Fujitsu A/C models
-  } else if (!STRCASECMP(str, F("ARRAH2E"))) {
+  } else if (!STRCASECMP(str, PSTR("ARRAH2E"))) {
     return fujitsu_ac_remote_model_t::ARRAH2E;
-  } else if (!STRCASECMP(str, F("ARDB1"))) {
+  } else if (!STRCASECMP(str, PSTR("ARDB1"))) {
     return fujitsu_ac_remote_model_t::ARDB1;
-  } else if (!STRCASECMP(str, F("ARREB1E"))) {
+  } else if (!STRCASECMP(str, PSTR("ARREB1E"))) {
     return fujitsu_ac_remote_model_t::ARREB1E;
-  } else if (!STRCASECMP(str, F("ARJW2"))) {
+  } else if (!STRCASECMP(str, PSTR("ARJW2"))) {
     return fujitsu_ac_remote_model_t::ARJW2;
-  } else if (!STRCASECMP(str, F("ARRY4"))) {
+  } else if (!STRCASECMP(str, PSTR("ARRY4"))) {
     return fujitsu_ac_remote_model_t::ARRY4;
   // LG A/C models
-  } else if (!STRCASECMP(str, F("GE6711AR2853M"))) {
+  } else if (!STRCASECMP(str, PSTR("GE6711AR2853M"))) {
     return lg_ac_remote_model_t::GE6711AR2853M;
-  } else if (!STRCASECMP(str, F("AKB75215403"))) {
+  } else if (!STRCASECMP(str, PSTR("AKB75215403"))) {
     return lg_ac_remote_model_t::AKB75215403;
-  } else if (!STRCASECMP(str, F("AKB74955603"))) {
+  } else if (!STRCASECMP(str, PSTR("AKB74955603"))) {
     return lg_ac_remote_model_t::AKB74955603;
-  } else if (!STRCASECMP(str, F("AKB73757604"))) {
+  } else if (!STRCASECMP(str, PSTR("AKB73757604"))) {
     return lg_ac_remote_model_t::AKB73757604;
   // Panasonic A/C families
-  } else if (!STRCASECMP(str, F("LKE")) ||
-             !STRCASECMP(str, F("PANASONICLKE"))) {
+  } else if (!STRCASECMP(str, PSTR("LKE")) ||
+             !STRCASECMP(str, PSTR("PANASONICLKE"))) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
-  } else if (!STRCASECMP(str, F("NKE")) ||
-             !STRCASECMP(str, F("PANASONICNKE"))) {
+  } else if (!STRCASECMP(str, PSTR("NKE")) ||
+             !STRCASECMP(str, PSTR("PANASONICNKE"))) {
     return panasonic_ac_remote_model_t::kPanasonicNke;
-  } else if (!STRCASECMP(str, F("DKE")) ||
-             !STRCASECMP(str, F("PANASONICDKE")) ||
-             !STRCASECMP(str, F("PKR")) ||
-             !STRCASECMP(str, F("PANASONICPKR"))) {
+  } else if (!STRCASECMP(str, PSTR("DKE")) ||
+             !STRCASECMP(str, PSTR("PANASONICDKE")) ||
+             !STRCASECMP(str, PSTR("PKR")) ||
+             !STRCASECMP(str, PSTR("PANASONICPKR"))) {
     return panasonic_ac_remote_model_t::kPanasonicDke;
-  } else if (!STRCASECMP(str, F("JKE")) ||
-             !STRCASECMP(str, F("PANASONICJKE"))) {
+  } else if (!STRCASECMP(str, PSTR("JKE")) ||
+             !STRCASECMP(str, PSTR("PANASONICJKE"))) {
     return panasonic_ac_remote_model_t::kPanasonicJke;
-  } else if (!STRCASECMP(str, F("CKP")) ||
-             !STRCASECMP(str, F("PANASONICCKP"))) {
+  } else if (!STRCASECMP(str, PSTR("CKP")) ||
+             !STRCASECMP(str, PSTR("PANASONICCKP"))) {
     return panasonic_ac_remote_model_t::kPanasonicCkp;
-  } else if (!STRCASECMP(str, F("RKR")) ||
-             !STRCASECMP(str, F("PANASONICRKR"))) {
+  } else if (!STRCASECMP(str, PSTR("RKR")) ||
+             !STRCASECMP(str, PSTR("PANASONICRKR"))) {
     return panasonic_ac_remote_model_t::kPanasonicRkr;
   // Sharp A/C Models
-  } else if (!STRCASECMP(str, F("A907"))) {
+  } else if (!STRCASECMP(str, PSTR("A907"))) {
     return sharp_ac_remote_model_t::A907;
-  } else if (!STRCASECMP(str, F("A705"))) {
+  } else if (!STRCASECMP(str, PSTR("A705"))) {
     return sharp_ac_remote_model_t::A705;
-  } else if (!STRCASECMP(str, F("A903"))) {
+  } else if (!STRCASECMP(str, PSTR("A903"))) {
     return sharp_ac_remote_model_t::A903;
   // TCL A/C Models
-  } else if (!STRCASECMP(str, F("TAC09CHSD"))) {
+  } else if (!STRCASECMP(str, PSTR("TAC09CHSD"))) {
     return tcl_ac_remote_model_t::TAC09CHSD;
-  } else if (!STRCASECMP(str, F("GZ055BE1"))) {
+  } else if (!STRCASECMP(str, PSTR("GZ055BE1"))) {
     return tcl_ac_remote_model_t::GZ055BE1;
   // Voltas A/C models
-  } else if (!STRCASECMP(str, F("122LZF"))) {
+  } else if (!STRCASECMP(str, PSTR("122LZF"))) {
     return voltas_ac_remote_model_t::kVoltas122LZF;
   // Whirlpool A/C models
-  } else if (!STRCASECMP(str, F("DG11J13A")) ||
-             !STRCASECMP(str, F("DG11J104")) ||
-             !STRCASECMP(str, F("DG11J1-04"))) {
+  } else if (!STRCASECMP(str, PSTR("DG11J13A")) ||
+             !STRCASECMP(str, PSTR("DG11J104")) ||
+             !STRCASECMP(str, PSTR("DG11J1-04"))) {
     return whirlpool_ac_remote_model_t::DG11J13A;
-  } else if (!STRCASECMP(str, F("DG11J191"))) {
+  } else if (!STRCASECMP(str, PSTR("DG11J191"))) {
     return whirlpool_ac_remote_model_t::DG11J191;
   } else {
     int16_t number = atoi(str);
@@ -3304,12 +3307,12 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
 /// @return The equivalent boolean value.
 bool IRac::strToBool(const char *str, const bool def) {
   if (!STRCASECMP(str, kOnStr) ||
-      !STRCASECMP(str, F("1")) ||
+      !STRCASECMP(str, PSTR("1")) ||
       !STRCASECMP(str, kYesStr) ||
       !STRCASECMP(str, kTrueStr))
     return true;
   else if (!STRCASECMP(str, kOffStr) ||
-           !STRCASECMP(str, F("0")) ||
+           !STRCASECMP(str, PSTR("0")) ||
            !STRCASECMP(str, kNoStr) ||
            !STRCASECMP(str, kFalseStr))
     return false;
