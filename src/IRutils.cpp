@@ -21,14 +21,14 @@
 // functions to handle the strings stored in the flash address space.
 #ifndef STRCASECMP
 #if defined(ESP8266)
-#define STRCASECMP strcasecmp_P
+#define STRCASECMP(LHS, RHS) strcasecmp_P(LHS, reinterpret_cast<const char* const>(RHS))
 #else  // ESP8266
 #define STRCASECMP strcasecmp
 #endif  // ESP8266
 #endif  // STRCASECMP
 #ifndef STRLEN
 #if defined(ESP8266)
-#define STRLEN strlen_P
+#define STRLEN(X) strlen_P(reinterpret_cast<const char* const>(X))
 #else  // ESP8266
 #define STRLEN strlen
 #endif  // ESP8266
@@ -110,7 +110,7 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 /// @param[in] str A C-style string containing a protocol name or number.
 /// @return A decode_type_t enum. (decode_type_t::UNKNOWN if no match.)
 decode_type_t strToDecodeType(const char * const str) {
-  const char *ptr = kAllProtocolNamesStr;
+  auto *ptr = reinterpret_cast<const char* const>(kAllProtocolNamesStr);
   uint16_t length = STRLEN(ptr);
   for (uint16_t i = 0; length; i++) {
     if (!STRCASECMP(str, ptr)) return (decode_type_t)i;
@@ -134,7 +134,7 @@ decode_type_t strToDecodeType(const char * const str) {
 String typeToString(const decode_type_t protocol, const bool isRepeat) {
   String result = "";
   result.reserve(30);  // Size of longest protocol name + " (Repeat)"
-  const char *ptr = kAllProtocolNamesStr;
+  auto *ptr = reinterpret_cast<const char* const>(kAllProtocolNamesStr);
   if (protocol > kLastDecodeType || protocol == decode_type_t::UNKNOWN) {
     result = kUnknownStr;
   } else {
