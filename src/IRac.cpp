@@ -2359,6 +2359,7 @@ void IRac::transcold(IRTranscoldAc *ac,
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
+/// @param[in] swing The swing setting.
 void IRac::rhoss(IRRhossAc *ac,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swing) {

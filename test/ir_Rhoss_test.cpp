@@ -21,11 +21,12 @@ TEST(TestSendRhoss, SendDataOnly) {
   IRsendTest irsend(0);
   irsend.begin();
 
-  uint8_t expectedState[kRhossStateLength] = { 0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
+  uint8_t expectedState[kRhossStateLength] = {
+    0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
 
   irsend.reset();
   irsend.sendRhoss(expectedState);
-  
+
   EXPECT_EQ(
     "f38000d50"
     "m3042s4248"
@@ -43,8 +44,7 @@ TEST(TestSendRhoss, SendDataOnly) {
     "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
     "m650s457m650"
     "s100000",
-    irsend.outputStr()
-  );
+    irsend.outputStr());
 }
 
 TEST(TestDecodeRhoss, SyntheticSelfDecode) {
@@ -52,7 +52,8 @@ TEST(TestDecodeRhoss, SyntheticSelfDecode) {
   IRrecv irrecv(0);
   IRRhossAc ac(0);
 
-  uint8_t expectedState[kRhossStateLength] = { 0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
+  uint8_t expectedState[kRhossStateLength] = {
+    0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
 
   irsend.begin();
   irsend.reset();
@@ -73,13 +74,16 @@ TEST(TestDecodeRhoss, StrictDecode) {
   IRrecv irrecv(0);
   IRRhossAc ac(0);
 
-  uint8_t expectedState[kRhossStateLength] = { 0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
+  uint8_t expectedState[kRhossStateLength] = {
+    0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
 
   irsend.begin();
   irsend.reset();
   irsend.sendRhoss(expectedState);
   irsend.makeDecodeResult();
-  ASSERT_TRUE(irrecv.decodeRhoss(&irsend.capture, kStartOffset, kRhossBits, true));
+  ASSERT_TRUE(
+    irrecv.decodeRhoss(&irsend.capture,
+                      kStartOffset, kRhossBits, true));
   EXPECT_EQ(RHOSS, irsend.capture.decode_type);
   EXPECT_EQ(kRhossBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
@@ -214,7 +218,8 @@ TEST(TestRhossAcClass, Swing) {
 }
 
 TEST(TestRhossAcClass, Checksums) {
-  uint8_t state[kRhossStateLength] = { 0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
+  uint8_t state[kRhossStateLength] = {
+    0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
 
   ASSERT_EQ(0x33, IRRhossAc::calcChecksum(state));
   EXPECT_TRUE(IRRhossAc::validChecksum(state));
@@ -229,20 +234,24 @@ TEST(TestRhossAcClass, Checksums) {
   EXPECT_TRUE(IRRhossAc::validChecksum(state));
 
   // Additional known good states.
-  uint8_t knownGood1[kRhossStateLength] = { 0xAA, 0x06, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x34 };
+  uint8_t knownGood1[kRhossStateLength] = {
+    0xAA, 0x06, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x34 };
   EXPECT_TRUE(IRRhossAc::validChecksum(knownGood1));
   ASSERT_EQ(0x34, IRRhossAc::calcChecksum(knownGood1));
 
-  uint8_t knownGood2[kRhossStateLength] = { 0xAA, 0x07, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x35 };
+  uint8_t knownGood2[kRhossStateLength] = {
+    0xAA, 0x07, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x35 };
   EXPECT_TRUE(IRRhossAc::validChecksum(knownGood2));
   ASSERT_EQ(0x35, IRRhossAc::calcChecksum(knownGood2));
-  
-  uint8_t knownGood3[kRhossStateLength] = { 0xAA, 0x07, 0x60, 0x00, 0x53, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x38 };
+
+  uint8_t knownGood3[kRhossStateLength] = {
+    0xAA, 0x07, 0x60, 0x00, 0x53, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x38 };
   EXPECT_TRUE(IRRhossAc::validChecksum(knownGood3));
   ASSERT_EQ(0x38, IRRhossAc::calcChecksum(knownGood3));
 
   // Validate calculation of CRC, same as knownGood3 except for the checksum.
-  uint8_t knownBad[kRhossStateLength] = { 0xAA, 0x07, 0x60, 0x00, 0x53, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00 };
+  uint8_t knownBad[kRhossStateLength] = {
+    0xAA, 0x07, 0x60, 0x00, 0x53, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00 };
   EXPECT_FALSE(IRRhossAc::validChecksum(knownBad));
   IRRhossAc ac(0);
   ac.setRaw(knownBad);

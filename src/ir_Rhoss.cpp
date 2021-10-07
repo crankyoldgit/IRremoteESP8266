@@ -4,12 +4,9 @@
 /// @brief Support for Rhoss protocols.
 /// @note
 
-// Supports:
-//   Brand: Rhoss, Model: Idrowall MPCV 20-30-35-40
-
 #include "ir_Rhoss.h"
 #include <algorithm>
-#include <cstring> 
+#include <cstring>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtext.h"
@@ -50,12 +47,15 @@ void IRsend::sendRhoss(const unsigned char data[], const uint16_t nbytes,
 
     // Data
     for (uint16_t i = 0; i < nbytes; i++) {
-      sendData(kRhossBitMark, kRhossOneSpace, kRhossBitMark, kRhossZeroSpace, *(data + i), 8, false);
+      sendData(kRhossBitMark, kRhossOneSpace,
+                kRhossBitMark, kRhossZeroSpace,
+                *(data + i), 8,
+                false);
     }
 
     // Footer
-    mark(kRhossFooterMark);    
-    space(kRhossZeroSpace);    
+    mark(kRhossFooterMark);
+    space(kRhossZeroSpace);
     mark(kRhossFooterMark);
 
     // Gap
@@ -74,7 +74,6 @@ void IRsend::sendRhoss(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] strict Flag indicating if we should perform strict matching.
 bool IRrecv::decodeRhoss(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
- 
   if (strict && nbits != kRhossBits) return false;
 
   uint16_t used;
@@ -83,10 +82,10 @@ bool IRrecv::decodeRhoss(decode_results *results, uint16_t offset,
                       results->rawlen - offset, kRhossStateLength * 8,
                       kRhossHdrMark, kRhossHdrSpace,
                       kRhossBitMark, kRhossOneSpace,
-                      kRhossBitMark, kRhossZeroSpace, 
-                      kRhossFooterMark, 0, 
-					  false, kUseDefTol, kMarkExcess, false);
-					  
+                      kRhossBitMark, kRhossZeroSpace,
+                      kRhossFooterMark, 0,
+                      false, kUseDefTol, kMarkExcess, false);
+
   if (!used) return false;
   offset += used;
 
@@ -98,7 +97,7 @@ bool IRrecv::decodeRhoss(decode_results *results, uint16_t offset,
   // No need to record the state as we stored it as we decoded it.
   // As we use result->state, we don't record value, address, or command as it
   // is a union data type.
-  return true;   
+  return true;
 }
 
 #endif  // DECODE_RHOSS
@@ -315,7 +314,7 @@ stdAc::opmode_t IRRhossAc::toCommonMode(const uint8_t mode) {
     case kRhossModeCool: return stdAc::opmode_t::kCool;
     case kRhossModeHeat: return stdAc::opmode_t::kHeat;
     case kRhossModeDry: return stdAc::opmode_t::kDry;
-    case kRhossModeFan: return stdAc::opmode_t::kFan;    
+    case kRhossModeFan: return stdAc::opmode_t::kFan;
     case kRhossModeAuto: return stdAc::opmode_t::kAuto;
     default: return stdAc::opmode_t::kAuto;
   }
@@ -330,7 +329,7 @@ stdAc::fanspeed_t IRRhossAc::toCommonFanSpeed(const uint8_t speed) {
     case kRhossFanMed: return stdAc::fanspeed_t::kMedium;
     case kRhossFanMin: return stdAc::fanspeed_t::kMin;
     case kRhossFanAuto:
-    default: 
+    default:
       return stdAc::fanspeed_t::kAuto;
   }
 }

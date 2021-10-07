@@ -2,10 +2,10 @@
 
 /// @file
 /// @brief Rhoss A/C protocol.
-/// @see 
+/// @see
 /// @remark
 // Supports:
-//   Brand: Rhoss,  Model: Idrowall
+//   Brand: Rhoss, Model: Idrowall MPCV 20-30-35-40
 
 #ifndef IR_RHOSS_H_
 #define IR_RHOSS_H_
@@ -27,32 +27,32 @@ union RhossProtocol{
   uint8_t raw[kRhossStateLength];  // The state of the IR remote.
   struct {
     // Byte 0
-    uint8_t       :8; // Typically 0xAA
+    uint8_t       :8;  // Typically 0xAA
     // Byte 1
     uint8_t Temp  :4;
-    uint8_t       :4; // Typically 0x0
+    uint8_t       :4;  // Typically 0x0
     // Byte 2
-    uint8_t       :8; // Typically 0x60
+    uint8_t       :8;  // Typically 0x60
     // Byte 3
-    uint8_t       :8; // Typically 0x0
+    uint8_t       :8;  // Typically 0x0
     // Byte 4
     uint8_t Fan   :2;
-    uint8_t       :2; // Typically 0x0
+    uint8_t       :2;  // Typically 0x0
     uint8_t Mode  :4;
     // Byte 5
     uint8_t Swing :1;
-    uint8_t       :5; // Typically 0x0
+    uint8_t       :5;  // Typically 0x0
     uint8_t Power :2;
     // Byte 6
-    uint8_t       :8; // Typically 0x54  
+    uint8_t       :8;  // Typically 0x54
     // Byte 7
-    uint8_t       :8; // Typically 0x0
+    uint8_t       :8;  // Typically 0x0
     // Byte 8
-    uint8_t       :8; // Typically 0x0
+    uint8_t       :8;  // Typically 0x0
     // Byte 9
-    uint8_t       :8; // Typically 0x0
+    uint8_t       :8;  // Typically 0x0
     // Byte 10
-    uint8_t       :8; // Typically 0x0
+    uint8_t       :8;  // Typically 0x0
     // Byte 11
     uint8_t CRC   :8;
   };
@@ -86,7 +86,7 @@ const uint8_t kRhossSwingOff =  0b0;  // 0x0
 
 const uint8_t kRhossDefaultFan = kRhossFanAuto;
 const uint8_t kRhossDefaultMode = kRhossModeCool;
-const uint8_t kRhossDefaultTemp = 21; // Celsius
+const uint8_t kRhossDefaultTemp = 21;  // Celsius
 const bool kRhossDefaultPower = false;
 const bool kRhossDefaultSwing = false;
 

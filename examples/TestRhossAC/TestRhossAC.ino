@@ -9,8 +9,10 @@
 #include <IRutils.h>
 #include <ir_Rhoss.h>
 
-const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-const uint16_t kIrRecvLed = 14;  // ESP8266 GPIO pin to use. Recommended: 14 (D5).
+// ESP8266 GPIO pin to use. Recommended: 4 (D2).
+const uint16_t kIrLed = 4;
+// ESP8266 GPIO pin to use. Recommended: 14 (D5).
+const uint16_t kIrRecvLed = 14;
 const uint16_t kIrMaxBuffer = 1024;
 const uint16_t kIrTimeout = 50;
 IRRhossAc ac(kIrLed);  // Set the GPIO to be used to sending the message.
@@ -28,10 +30,10 @@ void setup() {
 
 void loop() {
 #if DECODE_RHOSS
-  if(irrecv.decode(&decode_results)) {
+  if (irrecv.decode(&decode_results)) {
     Serial.println("Decoded a message");
-    
-    if(decode_results.decode_type == RHOSS) {
+
+    if (decode_results.decode_type == RHOSS) {
       Serial.println("Rhoss message decoded");
       Serial.println(resultToSourceCode(&decode_results));
       Serial.println(resultToHumanReadableBasic(&decode_results));
