@@ -16,11 +16,12 @@
 #endif
 
 #ifndef FPSTR
-#define FPSTR(X) X // Also pretend we have flash-string helper class cast.
+#define FPSTR(X) X  // Also pretend we have flash-string helper class cast.
 #endif
 
 // Common
-/// @note Use `char array[]`, not `char *array`, otherwise PROGMEM only applies to the pointer and not the actual data.
+/// @note Use `char array[]`, not `char *array`, otherwise PROGMEM only applies
+/// to the pointer and not the actual data.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1493#issuecomment-933111219
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1614#issuecomment-928894559
 
