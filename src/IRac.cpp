@@ -49,6 +49,7 @@
 #include "ir_Vestel.h"
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
+#include "ir_Rhoss.h"
 
 /// Class constructor
 /// @param[in] pin Gpio pin to use when transmitting IR messages.
@@ -300,6 +301,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_VOLTAS
     case decode_type_t::VOLTAS:
+#endif
+#if SEND_RHOSS
+    case decode_type_t::RHOSS:
 #endif
     case decode_type_t::WHIRLPOOL_AC:
       return true;
@@ -2348,6 +2352,34 @@ void IRac::transcold(IRTranscoldAc *ac,
 }
 #endif  // SEND_TRANSCOLD
 
+#if SEND_RHOSS
+/// Send an Rhoss A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRRhossAc object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+void IRac::rhoss(IRRhossAc *ac,
+                const bool on, const stdAc::opmode_t mode, const float degrees,
+                const stdAc::fanspeed_t fan, const stdAc::swingv_t swing) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setSwing(ac->convertSwing(swing));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  // No Quiet setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Turbo setting available.
+  // No Economy setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  ac->send();
+}
+#endif  // SEND_RHOSS
+
 /// Create a new state base on the provided state that has been suitably fixed.
 /// @note This is for use with Home Assistant, which requires mode to be off if
 ///   the power is off.
@@ -3015,6 +3047,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_TRANSCOLD_AC
+#if SEND_RHOSS
+    case RHOSS:
+    {
+      IRRhossAc ac(_pin, _inverted, _modulation);
+      rhoss(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv);
+      break;
+    }
+#endif  // SEND_RHOSS
     default:
       return false;  // Fail, didn't match anything.
   }
@@ -3767,6 +3807,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_TRANSCOLD
+#if DECODE_RHOSS
+    case decode_type_t::RHOSS: {
+      IRRhossAc ac(kGpioUnused);
+      ac.setRaw(result->state);
+      return ac.toString();
+    }
+#endif  // DECODE_RHOSS
       default:
         return "";
     }
@@ -4232,6 +4279,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_TRANSCOLD
+#if DECODE_RHOSS
+      case decode_type_t::RHOSS: {
+        IRRhossAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_RHOSS
       default:
         return false;
     }

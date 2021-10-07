@@ -835,6 +835,9 @@
 #ifndef D_STR_ZEPEAL
 #define D_STR_ZEPEAL "ZEPEAL"
 #endif  // D_STR_ZEPEAL
+#ifndef D_STR_RHOSS
+#define D_STR_RHOSS "RHOSS"
+#endif  // D_STR_RHOSS
 
 // IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP

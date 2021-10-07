@@ -1040,6 +1040,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Arris decode");
     if (decodeArris(results, offset)) return true;
 #endif  // DECODE_ARRIS
+#if DECODE_RHOSS
+    DPRINTLN("Attempting Rhoss decode");
+    if (decodeRhoss(results, offset)) return true;
+#endif  // DECODE_RHOSS
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
@@ -1433,10 +1437,13 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                               const uint8_t tolerance,
                               const int16_t excess,
                               const bool MSBfirst) {
+
   // If we are expecting byte sizes, check it's a factor of 8 or fail.
   if (!use_bits && nbits % 8 != 0)  return 0;
+  
   // Calculate if we expect a trailing space in the data section.
   const bool kexpectspace = footermark || (onespace != zerospace);
+
   // Calculate how much remaining buffer is required.
   uint16_t min_remaining = nbits * 2 - (kexpectspace ? 0 : 1);
 
@@ -1455,7 +1462,6 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
   if (hdrspace && !matchSpace(*(data_ptr + offset++), hdrspace, tolerance,
                               excess))
     return 0;
-
   // Data
   if (use_bits) {  // Bits.
     match_result_t result = IRrecv::matchData(data_ptr + offset, nbits,
