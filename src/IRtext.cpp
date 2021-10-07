@@ -19,12 +19,6 @@
 #define FPSTR(X) X  // Also pretend we have flash-string helper class cast.
 #endif
 
-// Common
-/// @note Use `char array[]`, not `char *array`, otherwise PROGMEM only applies
-/// to the pointer and not the actual data.
-/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1493#issuecomment-933111219
-/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1614#issuecomment-928894559
-
 #define IRTEXT_CONST_BLOB_NAME(NAME)\
     NAME ## Blob
 
@@ -38,6 +32,7 @@
     static IRTEXT_CONST_BLOB_DECL(NAME) { VALUE };\
     IRTEXT_CONST_PTR(NAME) PROGMEM { FPSTR(&(NAME ## Blob)[0]) }
 
+// Common
 IRTEXT_CONST_STRING(kUnknownStr, D_STR_UNKNOWN);  ///< "Unknown"
 IRTEXT_CONST_STRING(kProtocolStr, D_STR_PROTOCOL);  ///< "Protocol"
 IRTEXT_CONST_STRING(kPowerStr, D_STR_POWER);  ///< "Power"
