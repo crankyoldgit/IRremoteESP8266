@@ -1,9 +1,7 @@
 // Copyright 2021 Tom Rosenback
 
 /// @file
-/// @brief Rhoss A/C protocol.
-/// @see
-/// @remark
+/// @brief Support for Rhoss A/C protocol
 // Supports:
 //   Brand: Rhoss, Model: Idrowall MPCV 20-30-35-40
 
@@ -54,7 +52,7 @@ union RhossProtocol{
     // Byte 10
     uint8_t       :8;  // Typically 0x0
     // Byte 11
-    uint8_t CRC   :8;
+    uint8_t Sum   :8;
   };
 };
 
@@ -66,19 +64,19 @@ const uint8_t kRhossFanMed =   0b10;
 const uint8_t kRhossFanMax =   0b11;
 const uint8_t kRhossFanAuto =  0b00;
 // Modes
-const uint8_t kRhossModeHeat =     0b0001;
-const uint8_t kRhossModeCool =     0b0010;
-const uint8_t kRhossModeDry =      0b0011;
-const uint8_t kRhossModeFan =      0b0100;
-const uint8_t kRhossModeAuto =     0b0101;
+const uint8_t kRhossModeHeat = 0b0001;
+const uint8_t kRhossModeCool = 0b0010;
+const uint8_t kRhossModeDry =  0b0011;
+const uint8_t kRhossModeFan =  0b0100;
+const uint8_t kRhossModeAuto = 0b0101;
 
 // Temperature
 const uint8_t kRhossTempMin = 16;  // Celsius
 const uint8_t kRhossTempMax = 30;  // Celsius
 
 // Power
-const uint8_t kRhossPowerOn =   0b10;  // 0xC
-const uint8_t kRhossPowerOff =  0b01;  // 0x3
+const uint8_t kRhossPowerOn =  0b10;  // 0x2
+const uint8_t kRhossPowerOff = 0b01;  // 0x1
 
 // Swing
 const uint8_t kRhossSwingOn =   0b1;  // 0x1
@@ -128,10 +126,8 @@ class IRRhossAc {
   void setRaw(const uint8_t state[]);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
-  static uint8_t convertSwing(const stdAc::swingv_t state);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  static stdAc::swingv_t toCommonSwing(const uint8_t state);
   stdAc::state_t toCommon(void) const;
   String toString(void) const;
 #ifndef UNIT_TEST

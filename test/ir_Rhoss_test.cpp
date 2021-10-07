@@ -18,7 +18,7 @@ TEST(TestUtils, Housekeeping) {
 
 // Test sending typical data only.
 TEST(TestSendRhoss, SendDataOnly) {
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   irsend.begin();
 
   uint8_t expectedState[kRhossStateLength] = {
@@ -47,8 +47,146 @@ TEST(TestSendRhoss, SendDataOnly) {
     irsend.outputStr());
 }
 
+// Test send typical data with repeats
+TEST(TestSendRhoss, SendWithRepeats) {
+  IRsendTest irsend(kGpioUnused);
+  irsend.begin();
+
+  irsend.reset();
+
+uint8_t expectedState[kRhossStateLength] = {
+    0xAA, 0x05, 0x60, 0x00, 0x50, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x33 };
+
+  irsend.sendRhoss(expectedState, kRhossStateLength, 0);  // 0 repeats.
+  EXPECT_EQ(
+      "f38000d50"
+      "m3042s4248"
+      "m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457m648s1545"
+      "m648s1545m648s457m648s1545m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s1545m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s1545m648s457m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s1545"
+      "m648s457m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
+      "m650s457m650"
+      "s100000",
+      irsend.outputStr());
+
+  irsend.sendRhoss(expectedState, kRhossStateLength, 2);  // 2 repeats.
+  EXPECT_EQ(
+      "f38000d50"
+      "m3042s4248"
+      "m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457m648s1545"
+      "m648s1545m648s457m648s1545m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s1545m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s1545m648s457m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s1545"
+      "m648s457m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
+      "m650s457m650"
+      "s100000"
+      "m3042s4248"
+      "m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457m648s1545"
+      "m648s1545m648s457m648s1545m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s1545m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s1545m648s457m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s1545"
+      "m648s457m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
+      "m650s457m650"
+      "s100000"
+      "m3042s4248"
+      "m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457m648s1545"
+      "m648s1545m648s457m648s1545m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s1545m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s1545m648s457m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s1545"
+      "m648s457m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
+      "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
+      "m650s457m650"
+      "s100000",
+      irsend.outputStr());
+}
+
+// Test send raw data
+TEST(TestSendRhoss, RawData) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+  irsend.reset();
+
+  // Power on, mode cool, fan auto, swing off, temp 20
+  const uint16_t rawData[197] = {
+    3044, 4248,
+    648, 458, 650, 1540, 646, 458, 650, 1538,
+    650, 458, 650, 1538, 650, 458, 650, 1540,   // byte 0
+    648, 458, 650, 458, 650, 1540, 646, 484,
+    624, 456, 650, 456, 650, 456, 650, 456,     // byte 1
+    650, 456, 650, 456, 650, 456, 650, 456,
+    650, 458, 650, 1540, 650, 1538, 650, 456,   // byte 2
+    650, 456, 650, 456, 650, 456, 650, 458,
+    650, 456, 650, 456, 650, 456, 650, 458,     // byte 3
+    650, 458, 650, 456, 650, 458, 650, 458,
+    650, 458, 650, 1538, 650, 458, 650, 458,    // byte 4
+    650, 458, 648, 458, 674, 434, 648, 458,
+    672, 434, 648, 458, 650, 458, 648, 1540,    // byte 5
+    672, 434, 650, 458, 672, 1518, 644, 488,
+    622, 1540, 644, 464, 672, 1516, 672, 434,   // byte 6
+    672, 434, 672, 434, 650, 458, 648, 458,
+    672, 434, 674, 434, 672, 434, 650, 458,     // byte 7
+    672, 434, 648, 458, 650, 458, 672, 434,
+    672, 436, 648, 458, 648, 456, 650, 458,     // byte 8
+    650, 458, 650, 456, 674, 434, 650, 458,
+    650, 456, 650, 458, 674, 432, 650, 458,     // byte 9
+    650, 456, 650, 456, 650, 458, 648, 458,
+    674, 432, 650, 456, 674, 434, 650, 458,     // byte 10
+    650, 458, 650, 1538, 650, 458, 650, 458,
+    650, 456, 650, 458, 650, 456, 650, 458,     // byte 11
+    650, 456,
+    650 };  // UNKNOWN 93E7BDB2
+
+  irsend.sendRaw(rawData,  197, 38);
+  irsend.makeDecodeResult();
+
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(RHOSS, irsend.capture.decode_type);
+  EXPECT_EQ(kRhossBits, irsend.capture.bits);
+
+  uint8_t expected[kRhossStateLength] = {
+      0xAA, 0x04, 0x60, 0x00, 0x20, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x02 };
+  EXPECT_STATE_EQ(expected, irsend.capture.state, kRhossBits);
+
+  EXPECT_EQ(
+      "Power: On, Swing(V): Off, Mode: 2 (Cool), Fan: 0 (Auto), Temp: 20C",
+      IRAcUtils::resultAcToString(&irsend.capture));
+
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+// Test synthetic decode
 TEST(TestDecodeRhoss, SyntheticSelfDecode) {
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(0);
   IRRhossAc ac(0);
 
@@ -69,8 +207,9 @@ TEST(TestDecodeRhoss, SyntheticSelfDecode) {
       ac.toString());
 }
 
+// Test strict decoding
 TEST(TestDecodeRhoss, StrictDecode) {
-  IRsendTest irsend(0);
+  IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(0);
   IRRhossAc ac(0);
 
@@ -92,8 +231,6 @@ TEST(TestDecodeRhoss, StrictDecode) {
       "Power: On, Swing(V): Off, Mode: 5 (Auto), Fan: 0 (Auto), Temp: 21C",
       ac.toString());
 }
-
-
 
 // Tests for IRRhossAc class.
 
@@ -249,7 +386,8 @@ TEST(TestRhossAcClass, Checksums) {
   EXPECT_TRUE(IRRhossAc::validChecksum(knownGood3));
   ASSERT_EQ(0x38, IRRhossAc::calcChecksum(knownGood3));
 
-  // Validate calculation of CRC, same as knownGood3 except for the checksum.
+  // Validate calculation of checksum,
+  // same as knownGood3 except for the checksum.
   uint8_t knownBad[kRhossStateLength] = {
     0xAA, 0x07, 0x60, 0x00, 0x53, 0x80, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00 };
   EXPECT_FALSE(IRRhossAc::validChecksum(knownBad));

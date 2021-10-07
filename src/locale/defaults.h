@@ -748,6 +748,9 @@
 #ifndef D_STR_RCMM
 #define D_STR_RCMM "RCMM"
 #endif  // D_STR_RCMM
+#ifndef D_STR_RHOSS
+#define D_STR_RHOSS "RHOSS"
+#endif  // D_STR_RHOSS
 #ifndef D_STR_SAMSUNG
 #define D_STR_SAMSUNG "SAMSUNG"
 #endif  // D_STR_SAMSUNG
@@ -835,9 +838,6 @@
 #ifndef D_STR_ZEPEAL
 #define D_STR_ZEPEAL "ZEPEAL"
 #endif  // D_STR_ZEPEAL
-#ifndef D_STR_RHOSS
-#define D_STR_RHOSS "RHOSS"
-#endif  // D_STR_RHOSS
 
 // IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP

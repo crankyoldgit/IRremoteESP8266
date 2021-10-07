@@ -36,6 +36,7 @@
 #include "ir_MitsubishiHeavy.h"
 #include "ir_Neoclima.h"
 #include "ir_Panasonic.h"
+#include "ir_Rhoss.h"
 #include "ir_Samsung.h"
 #include "ir_Sanyo.h"
 #include "ir_Sharp.h"
@@ -49,7 +50,6 @@
 #include "ir_Vestel.h"
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
-#include "ir_Rhoss.h"
 
 /// Class constructor
 /// @param[in] pin Gpio pin to use when transmitting IR messages.
@@ -257,6 +257,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_PANASONIC_AC32
     case decode_type_t::PANASONIC_AC32:
 #endif
+#if SEND_RHOSS
+    case decode_type_t::RHOSS:
+#endif
 #if SEND_SAMSUNG_AC
     case decode_type_t::SAMSUNG_AC:
 #endif
@@ -301,9 +304,6 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_VOLTAS
     case decode_type_t::VOLTAS:
-#endif
-#if SEND_RHOSS
-    case decode_type_t::RHOSS:
 #endif
     case decode_type_t::WHIRLPOOL_AC:
       return true;
@@ -2366,7 +2366,7 @@ void IRac::rhoss(IRRhossAc *ac,
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
-  ac->setSwing(ac->convertSwing(swing));
+  ac->setSwing(swing != stdAc::swingv_t::kOff);
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   // No Quiet setting available.
@@ -2906,6 +2906,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_PANASONIC_AC32
+#if SEND_RHOSS
+    case RHOSS:
+    {
+      IRRhossAc ac(_pin, _inverted, _modulation);
+      rhoss(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv);
+      break;
+    }
+#endif  // SEND_RHOSS
 #if SEND_SAMSUNG_AC
     case SAMSUNG_AC:
     {
@@ -3048,14 +3056,6 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_TRANSCOLD_AC
-#if SEND_RHOSS
-    case RHOSS:
-    {
-      IRRhossAc ac(_pin, _inverted, _modulation);
-      rhoss(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv);
-      break;
-    }
-#endif  // SEND_RHOSS
     default:
       return false;  // Fail, didn't match anything.
   }

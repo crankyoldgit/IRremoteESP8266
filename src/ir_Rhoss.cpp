@@ -2,7 +2,6 @@
 
 /// @file
 /// @brief Support for Rhoss protocols.
-/// @note
 
 #include "ir_Rhoss.h"
 #include <algorithm>
@@ -41,23 +40,11 @@ void IRsend::sendRhoss(const unsigned char data[], const uint16_t nbytes,
   enableIROut(kRhossFreq, kDutyDefault);
   // We always send a message, even for repeat=0, hence '<= repeat'.
   for (uint16_t r = 0; r <= repeat; r++) {
-    // Header
-    mark(kRhossHdrMark);
-    space(kRhossHdrSpace);
-
-    // Data
-    for (uint16_t i = 0; i < nbytes; i++) {
-      sendData(kRhossBitMark, kRhossOneSpace,
-                kRhossBitMark, kRhossZeroSpace,
-                *(data + i), 8,
-                false);
-    }
-
-    // Footer
+    sendGeneric(kRhossHdrMark, kRhossHdrSpace, kRhossBitMark,
+                kRhossOneSpace, kRhossBitMark, kRhossZeroSpace,
+                kRhossFooterMark, kRhossZeroSpace,
+                data, nbytes, kRhossFreq, false, 0, kDutyDefault);
     mark(kRhossFooterMark);
-    space(kRhossZeroSpace);
-    mark(kRhossFooterMark);
-
     // Gap
     space(kRhossGap);
   }
@@ -77,17 +64,27 @@ bool IRrecv::decodeRhoss(decode_results *results, uint16_t offset,
   if (strict && nbits != kRhossBits) return false;
 
   uint16_t used;
-  // Header + Data Block (64 bits) + Footer
+  // Header + Data Block (96 bits) + Footer
   used = matchGeneric(results->rawbuf + offset, results->state,
-                      results->rawlen - offset, kRhossStateLength * 8,
+                      results->rawlen - offset, kRhossBits,
                       kRhossHdrMark, kRhossHdrSpace,
                       kRhossBitMark, kRhossOneSpace,
                       kRhossBitMark, kRhossZeroSpace,
-                      kRhossFooterMark, 0,
+                      kRhossFooterMark, kRhossZeroSpace,
                       false, kUseDefTol, kMarkExcess, false);
 
   if (!used) return false;
   offset += used;
+
+  // Footer (Part 2)
+  if (!matchMark(results->rawbuf[offset++], kRhossFooterMark)) {
+    return false;
+  }
+
+  if (offset < results->rawlen &&
+      !matchAtLeast(results->rawbuf[offset], kRhossGap)) {
+    return false;
+  }
 
   if (strict && !IRRhossAc::validChecksum(results->state)) return false;
 
@@ -139,8 +136,8 @@ bool IRRhossAc::validChecksum(const uint8_t state[], const uint16_t length) {
 
 /// Update the checksum value for the internal state.
 void IRRhossAc::checksum(void) {
-  _.CRC = IRRhossAc::calcChecksum(_.raw, kRhossStateLength);
-  _.raw[kRhossStateLength - 1] = _.CRC;
+  _.Sum = IRRhossAc::calcChecksum(_.raw, kRhossStateLength);
+  _.raw[kRhossStateLength - 1] = _.Sum;
 }
 
 /// Reset the internals of the object to a known good state.
@@ -225,7 +222,7 @@ uint8_t IRRhossAc::getFan(void) const {
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] state true, the Swing is on. false, the Swing is off.
 void IRRhossAc::setSwing(const bool state) {
-  _.Swing = (state ? kRhossSwingOn : kRhossSwingOff);
+  _.Swing = state;
 }
 
 /// Get the Vertical Swing speed of the A/C.
@@ -295,17 +292,6 @@ uint8_t IRRhossAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a stdAc::swingv_t enum into it's native state.
-/// @param[in] state The enum to be converted.
-/// @return The native equivalent of the enum.
-uint8_t IRRhossAc::convertSwing(const stdAc::swingv_t state) {
-  switch (state) {
-    case stdAc::swingv_t::kAuto: return kRhossSwingOn;
-    case stdAc::swingv_t::kOff: return kRhossSwingOff;
-    default: return kRhossDefaultSwing;
-  }
-}
-
 /// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
@@ -331,16 +317,6 @@ stdAc::fanspeed_t IRRhossAc::toCommonFanSpeed(const uint8_t speed) {
     case kRhossFanAuto:
     default:
       return stdAc::fanspeed_t::kAuto;
-  }
-}
-
-/// Convert a native Swing into its stdAc equivalent.
-/// @param[in] state The native setting to be converted.
-/// @return The stdAc equivalent of the native setting.
-stdAc::swingv_t IRRhossAc::toCommonSwing(const uint8_t state) {
-  switch (state) {
-    case kRhossSwingOff: return stdAc::swingv_t::kOff;
-    default: return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -377,11 +353,11 @@ String IRRhossAc::toString(void) const {
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addBoolToString(getSwing(), kSwingVStr, true);
-  result += addModeToString(_.Mode, kRhossModeAuto, kRhossModeCool,
+  result += addModeToString(getMode(), kRhossModeAuto, kRhossModeCool,
                              kRhossModeHeat, kRhossModeDry, kRhossModeFan);
-  result += addFanToString(_.Fan, kRhossFanMax, kRhossFanMin,
+  result += addFanToString(getFan(), kRhossFanMax, kRhossFanMin,
                            kRhossFanAuto, kRhossFanAuto,
                            kRhossFanMed);
-  result += addTempToString(_.Temp + kRhossTempMin);
+  result += addTempToString(getTemp());
   return result;
 }
