@@ -1437,10 +1437,9 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                               const uint8_t tolerance,
                               const int16_t excess,
                               const bool MSBfirst) {
-
   // If we are expecting byte sizes, check it's a factor of 8 or fail.
   if (!use_bits && nbits % 8 != 0)  return 0;
-  
+
   // Calculate if we expect a trailing space in the data section.
   const bool kexpectspace = footermark || (onespace != zerospace);
 
