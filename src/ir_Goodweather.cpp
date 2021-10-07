@@ -348,11 +348,11 @@ String IRGoodweatherAc::toString(void) const {
                            kGoodweatherFanMed);
 
   result += addLabeledString(_.Turbo ? String(kToggleStr)
-                                     : String('-'), kTurboStr);
+                                     : String("-"), kTurboStr);
   result += addLabeledString(_.Light ? String(kToggleStr)
-                                     : String('-'), kLightStr);
+                                     : String("-"), kLightStr);
   result += addLabeledString(_.Sleep ? String(kToggleStr)
-                                     : String('-'), kSleepStr);
+                                     : String("-"), kSleepStr);
   result += addIntToString(_.Swing, kSwingStr);
   result += kSpaceLBraceStr;
   switch (_.Swing) {

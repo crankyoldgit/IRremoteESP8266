@@ -870,7 +870,7 @@ String IRSharpAc::toString(void) const {
   result.reserve(170);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::SHARP_AC, getModel(), false);
 
-  result += addLabeledString(isPowerSpecial() ? String('-')
+  result += addLabeledString(isPowerSpecial() ? String("-")
                                               : String(getPower() ? kOnStr
                                                                   : kOffStr),
                              kPowerStr);
@@ -921,12 +921,12 @@ String IRSharpAc::toString(void) const {
     case sharp_ac_remote_model_t::A705:
     case sharp_ac_remote_model_t::A903:
       result += addLabeledString(getLightToggle() ? String(kToggleStr)
-                                                  : String('-'),
+                                                  : String("-"),
                                  kLightStr);
       break;
     default:
       result += addLabeledString(getEconoToggle() ? String(kToggleStr)
-                                                  : String('-'),
+                                                  : String("-"),
                                  kEconoStr);
   }
   result += addBoolToString(_.Clean, kCleanStr);

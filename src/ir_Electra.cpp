@@ -352,7 +352,7 @@ String IRElectraAc::toString(void) const {
   result += addBoolToString(getSwingV(), kSwingVStr);
   result += addBoolToString(getSwingH(), kSwingHStr);
   result += addLabeledString(getLightToggle() ? String(kToggleStr)
-                                              : String('-'), kLightStr);
+                                              : String("-"), kLightStr);
   result += addBoolToString(_.Clean, kCleanStr);
   result += addBoolToString(_.Turbo, kTurboStr);
   return result;

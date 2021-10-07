@@ -27,13 +27,9 @@
 #define STRCASECMP strcasecmp
 #endif  // ESP8266
 #endif  // STRCASECMP
-#ifndef STRLEN
-#if defined(ESP8266)
-#define STRLEN(X) strlen_P(reinterpret_cast<const char* const>(X))
-#else  // ESP8266
-#define STRLEN strlen
-#endif  // ESP8266
-#endif  // STRLEN
+#ifndef pgm_read_byte
+#define pgm_read_byte(addr) (*reinterpret_cast<const uint8_t*>(addr))
+#endif  // pgm_read_byte
 
 /// Reverse the order of the requested least significant nr. of bits.
 /// @param[in] input Bit pattern/integer to reverse.
@@ -111,14 +107,23 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 /// @param[in] str A C-style string containing a protocol name or number.
 /// @return A decode_type_t enum. (decode_type_t::UNKNOWN if no match.)
 decode_type_t strToDecodeType(const char * const str) {
-  auto *ptr = reinterpret_cast<const char* const>(kAllProtocolNamesStr);
-  uint16_t length = STRLEN(ptr);
-  for (uint16_t i = 0; length; i++) {
-    if (!STRCASECMP(str, ptr)) return (decode_type_t)i;
-    ptr += length + 1;
-    length = STRLEN(ptr);
+  const char *ptr = kAllProtocolNamesStr;
+  const uint8_t kProtocolNameLength = 30;
+  uint32_t count = 0;
+  char protoname[kProtocolNameLength + 1] = "";
+  for (int8_t i = 0; i < kProtocolNameLength; i++) {
+    const uint8_t c = pgm_read_byte(ptr++);
+    protoname[i] = c;
+    if (!c) {  // End of the C-str.
+      if (!strncasecmp(str, protoname, kProtocolNameLength))
+        return (decode_type_t)count;  // Found it!
+      // Break out of this loop if we've reached the end. ie. protoname is empty
+      if (!i) break;
+      // Start reading in the next protocol name.
+      i = -1;
+      count++;
+    }
   }
-
   // Handle integer values of the type by converting to a string and back again.
   decode_type_t result = strToDecodeType(
       typeToString((decode_type_t)atoi(str)).c_str());
@@ -135,16 +140,24 @@ decode_type_t strToDecodeType(const char * const str) {
 String typeToString(const decode_type_t protocol, const bool isRepeat) {
   String result = "";
   result.reserve(30);  // Size of longest protocol name + " (Repeat)"
-  auto *ptr = reinterpret_cast<const char* const>(kAllProtocolNamesStr);
   if (protocol > kLastDecodeType || protocol == decode_type_t::UNKNOWN) {
     result = kUnknownStr;
   } else {
-    for (uint16_t i = 0; i <= protocol && STRLEN(ptr); i++) {
-      if (i == protocol) {
-        result = ptr;
-        break;
+    const char *ptr = kAllProtocolNamesStr;
+    bool found = false;
+    for (uint16_t i = 0;
+         i <= protocol && pgm_read_byte(ptr) && !found;
+         i++) {
+      // Read till the end of the C-str.
+      for (char c = pgm_read_byte(ptr); c ; c = pgm_read_byte(++ptr)) {
+        if (i == protocol) {
+          // We've found the string for out protocol, so add it to the result
+          // character by character.
+          found = true;
+          result += c;
+        }
       }
-      ptr += STRLEN(ptr) + 1;
+      ptr++;  // Skip over the end of the C-str NUL terminator.
     }
   }
   if (isRepeat) {
