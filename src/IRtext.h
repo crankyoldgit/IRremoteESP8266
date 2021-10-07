@@ -12,21 +12,19 @@
 // Constant text to be shared across all object files.
 // This means there is only one copy of the character/string/text etc.
 
-extern const char kTimeSep;
-
 #ifdef ESP8266
 class __FlashStringHelper;
 #define IRTEXT_CONST_PTR(NAME) const __FlashStringHelper* const NAME
-#else
+#else  // ESP8266
 #define IRTEXT_CONST_PTR(NAME) const char* const NAME
-#endif
+#endif  // ESP8266
 
+extern const char kTimeSep;
 extern IRTEXT_CONST_PTR(k10CHeatStr);
 extern IRTEXT_CONST_PTR(k3DStr);
 extern IRTEXT_CONST_PTR(k6thSenseStr);
 extern IRTEXT_CONST_PTR(k8CHeatStr);
 extern IRTEXT_CONST_PTR(kAirFlowStr);
-extern IRTEXT_CONST_PTR(kAllProtocolNamesStr);
 extern IRTEXT_CONST_PTR(kAutomaticStr);
 extern IRTEXT_CONST_PTR(kAutoStr);
 extern IRTEXT_CONST_PTR(kBeepStr);
@@ -176,5 +174,6 @@ extern IRTEXT_CONST_PTR(kWifiStr);
 extern IRTEXT_CONST_PTR(kXFanStr);
 extern IRTEXT_CONST_PTR(kYesStr);
 extern IRTEXT_CONST_PTR(kZoneFollowStr);
+extern IRTEXT_CONST_PTR(kAllProtocolNamesStr);
 
 #endif  // IRTEXT_H_
