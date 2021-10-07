@@ -54,9 +54,9 @@
 // functions to handle the strings stored in the flash address space.
 #ifndef STRCASECMP
 #if defined(ESP8266)
-#define STRCASECMP strcasecmp_P
+#define STRCASECMP(LHS, RHS) strcasecmp_P(LHS, reinterpret_cast<const char* const>(RHS))
 #else  // ESP8266
-#define STRCASECMP strcasecmp
+#define STRCASECMP(LHS, RHS) strcasecmp(LHS, RHS)
 #endif  // ESP8266
 #endif  // STRCASECMP
 #ifndef PSTR
