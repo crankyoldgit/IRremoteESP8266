@@ -295,8 +295,8 @@ uint8_t IRRhossAc::convertFan(const stdAc::fanspeed_t speed) {
   }
 }
 
-/// Convert a stdAc::fanspeed_t enum into it's native speed.
-/// @param[in] speed The enum to be converted.
+/// Convert a stdAc::swingv_t enum into it's native state.
+/// @param[in] state The enum to be converted.
 /// @return The native equivalent of the enum.
 uint8_t IRRhossAc::convertSwing(const stdAc::swingv_t state) {
   switch (state) {
@@ -334,8 +334,8 @@ stdAc::fanspeed_t IRRhossAc::toCommonFanSpeed(const uint8_t speed) {
   }
 }
 
-/// Convert a native Vertical Swing into its stdAc equivalent.
-/// @param[in] pos The native setting to be converted.
+/// Convert a native Swing into its stdAc equivalent.
+/// @param[in] state The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
 stdAc::swingv_t IRRhossAc::toCommonSwing(const uint8_t state) {
   switch (state) {
