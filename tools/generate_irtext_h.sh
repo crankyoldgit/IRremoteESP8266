@@ -26,8 +26,11 @@ cat >${OUTPUT} << EOF
 
 #ifdef ESP8266
 class __FlashStringHelper;
+#define IRTEXT_CONST_PTR_CAST(PTR)\\
+    reinterpret_cast<const __FlashStringHelper*>(PTR)
 #define IRTEXT_CONST_PTR(NAME) const __FlashStringHelper* const NAME
 #else  // ESP8266
+#define IRTEXT_CONST_PTR_CAST(PTR) PTR
 #define IRTEXT_CONST_PTR(NAME) const char* const NAME
 #endif  // ESP8266
 
