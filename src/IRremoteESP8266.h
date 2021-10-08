@@ -1212,8 +1212,8 @@ const uint16_t kMilesTag2ShotBits = 14;
 const uint16_t kMilesTag2MsgBits = 24;
 const uint16_t kMilesMinRepeat = 0;
 const uint16_t kBoseBits = 16;
-const uint16_t kRhossBits = 96;
 const uint16_t kRhossStateLength = 12;
+const uint16_t kRhossBits = kRhossStateLength * 8;
 const uint16_t kRhossDefaultRepeat = 0;
 
 

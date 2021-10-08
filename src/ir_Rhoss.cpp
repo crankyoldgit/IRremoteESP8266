@@ -16,7 +16,6 @@ const uint16_t kRhossHdrSpace = 4248;
 const uint16_t kRhossBitMark = 648;
 const uint16_t kRhossOneSpace = 1545;
 const uint16_t kRhossZeroSpace = 457;
-const uint16_t kRhossFooterMark = 650;
 const uint32_t kRhossGap = kDefaultMessageGap;
 const uint16_t kRhossFreq = 38;
 
@@ -36,15 +35,13 @@ void IRsend::sendRhoss(const unsigned char data[], const uint16_t nbytes,
   // Check if we have enough bytes to send a proper message.
   if (nbytes < kRhossStateLength) return;
 
-  // Setup
-  enableIROut(kRhossFreq, kDutyDefault);
   // We always send a message, even for repeat=0, hence '<= repeat'.
   for (uint16_t r = 0; r <= repeat; r++) {
     sendGeneric(kRhossHdrMark, kRhossHdrSpace, kRhossBitMark,
                 kRhossOneSpace, kRhossBitMark, kRhossZeroSpace,
-                kRhossFooterMark, kRhossZeroSpace,
+                kRhossBitMark, kRhossZeroSpace,
                 data, nbytes, kRhossFreq, false, 0, kDutyDefault);
-    mark(kRhossFooterMark);
+    mark(kRhossBitMark);
     // Gap
     space(kRhossGap);
   }
@@ -63,6 +60,10 @@ bool IRrecv::decodeRhoss(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
   if (strict && nbits != kRhossBits) return false;
 
+  if (results->rawlen <= 2 * nbits + kHeader +  kFooter - 1 + offset) {
+    return false;  // Can't possibly be a valid Rhoss message.
+  }
+
   uint16_t used;
   // Header + Data Block (96 bits) + Footer
   used = matchGeneric(results->rawbuf + offset, results->state,
@@ -70,14 +71,14 @@ bool IRrecv::decodeRhoss(decode_results *results, uint16_t offset,
                       kRhossHdrMark, kRhossHdrSpace,
                       kRhossBitMark, kRhossOneSpace,
                       kRhossBitMark, kRhossZeroSpace,
-                      kRhossFooterMark, kRhossZeroSpace,
+                      kRhossBitMark, kRhossZeroSpace,
                       false, kUseDefTol, kMarkExcess, false);
 
   if (!used) return false;
   offset += used;
 
   // Footer (Part 2)
-  if (!matchMark(results->rawbuf[offset++], kRhossFooterMark)) {
+  if (!matchMark(results->rawbuf[offset++], kRhossBitMark)) {
     return false;
   }
 
@@ -352,12 +353,12 @@ String IRRhossAc::toString(void) const {
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
-  result += addBoolToString(getSwing(), kSwingVStr, true);
   result += addModeToString(getMode(), kRhossModeAuto, kRhossModeCool,
                              kRhossModeHeat, kRhossModeDry, kRhossModeFan);
+  result += addTempToString(getTemp());
   result += addFanToString(getFan(), kRhossFanMax, kRhossFanMin,
                            kRhossFanAuto, kRhossFanAuto,
                            kRhossFanMed);
-  result += addTempToString(getTemp());
+  result += addBoolToString(getSwing(), kSwingVStr);
   return result;
 }

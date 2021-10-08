@@ -59,10 +59,10 @@ union RhossProtocol{
 // Constants
 
 // Fan Control
+const uint8_t kRhossFanAuto =  0b00;
 const uint8_t kRhossFanMin =   0b01;
 const uint8_t kRhossFanMed =   0b10;
 const uint8_t kRhossFanMax =   0b11;
-const uint8_t kRhossFanAuto =  0b00;
 // Modes
 const uint8_t kRhossModeHeat = 0b0001;
 const uint8_t kRhossModeCool = 0b0010;

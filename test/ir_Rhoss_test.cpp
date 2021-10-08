@@ -42,7 +42,7 @@ TEST(TestSendRhoss, SendDataOnly) {
     "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
     "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
     "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
-    "m650s457m650"
+    "m648s457m648"
     "s100000",
     irsend.outputStr());
 }
@@ -73,7 +73,7 @@ uint8_t expectedState[kRhossStateLength] = {
       "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
       "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
       "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
-      "m650s457m650"
+      "m648s457m648"
       "s100000",
       irsend.outputStr());
 
@@ -93,7 +93,7 @@ uint8_t expectedState[kRhossStateLength] = {
       "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
       "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
       "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
-      "m650s457m650"
+      "m648s457m648"
       "s100000"
       "m3042s4248"
       "m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457m648s1545"
@@ -108,7 +108,7 @@ uint8_t expectedState[kRhossStateLength] = {
       "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
       "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
       "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
-      "m650s457m650"
+      "m648s457m648"
       "s100000"
       "m3042s4248"
       "m648s457m648s1545m648s457m648s1545m648s457m648s1545m648s457m648s1545"
@@ -123,7 +123,7 @@ uint8_t expectedState[kRhossStateLength] = {
       "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
       "m648s457m648s457m648s457m648s457m648s457m648s457m648s457m648s457"
       "m648s1545m648s1545m648s457m648s457m648s1545m648s1545m648s457m648s457"
-      "m650s457m650"
+      "m648s457m648"
       "s100000",
       irsend.outputStr());
 }
@@ -135,7 +135,7 @@ TEST(TestSendRhoss, RawData) {
   irsend.begin();
   irsend.reset();
 
-  // Power on, mode cool, fan auto, swing off, temp 20
+  // Power on, mode cool, temp 20, fan auto, swing off
   const uint16_t rawData[197] = {
     3044, 4248,
     648, 458, 650, 1540, 646, 458, 650, 1538,
@@ -177,7 +177,7 @@ TEST(TestSendRhoss, RawData) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, kRhossBits);
 
   EXPECT_EQ(
-      "Power: On, Swing(V): Off, Mode: 2 (Cool), Fan: 0 (Auto), Temp: 20C",
+      "Power: On, Mode: 2 (Cool), Temp: 20C, Fan: 0 (Auto), Swing(V): Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 
   stdAc::state_t r, p;
@@ -203,7 +203,7 @@ TEST(TestDecodeRhoss, SyntheticSelfDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Swing(V): Off, Mode: 5 (Auto), Fan: 0 (Auto), Temp: 21C",
+      "Power: On, Mode: 5 (Auto), Temp: 21C, Fan: 0 (Auto), Swing(V): Off",
       ac.toString());
 }
 
@@ -228,7 +228,7 @@ TEST(TestDecodeRhoss, StrictDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   ac.setRaw(irsend.capture.state);
   EXPECT_EQ(
-      "Power: On, Swing(V): Off, Mode: 5 (Auto), Fan: 0 (Auto), Temp: 21C",
+      "Power: On, Mode: 5 (Auto), Temp: 21C, Fan: 0 (Auto), Swing(V): Off",
       ac.toString());
 }
 
@@ -297,7 +297,6 @@ TEST(TestRhossAcClass, OperatingMode) {
   ac.setMode(kRhossModeCool);
   EXPECT_EQ(kRhossModeCool, ac.getMode());
 
-  // unit not supporting heating mode
   ac.setMode(kRhossModeHeat);
   EXPECT_EQ(kRhossModeHeat, ac.getMode());
 
