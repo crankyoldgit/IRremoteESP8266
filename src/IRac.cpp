@@ -3188,10 +3188,10 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
   else if (!STRCASECMP(str, kOffStr) ||
            !STRCASECMP(str, kStopStr))
     return stdAc::swingh_t::kOff;
-  else if (!STRCASECMP(str, kLeftMaxStr) ||                  // "LeftMax"
+  else if (!STRCASECMP(str, kLeftMaxStr) ||                     // "LeftMax"
            !STRCASECMP(str, PSTR(D_STR_LEFT " " D_STR_MAX)) ||  // "Left Max"
            !STRCASECMP(str, PSTR(D_STR_MAX D_STR_LEFT)) ||      // "MaxLeft"
-           !STRCASECMP(str, kMaxLeftStr))                    // "Max Left"
+           !STRCASECMP(str, kMaxLeftStr))                       // "Max Left"
     return stdAc::swingh_t::kLeftMax;
   else if (!STRCASECMP(str, kLeftStr))
     return stdAc::swingh_t::kLeft;
@@ -3203,10 +3203,10 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
     return stdAc::swingh_t::kMiddle;
   else if (!STRCASECMP(str, kRightStr))
     return stdAc::swingh_t::kRight;
-  else if (!STRCASECMP(str, kRightMaxStr) ||                  // "RightMax"
+  else if (!STRCASECMP(str, kRightMaxStr) ||                     // "RightMax"
            !STRCASECMP(str, PSTR(D_STR_RIGHT " " D_STR_MAX)) ||  // "Right Max"
            !STRCASECMP(str, PSTR(D_STR_MAX D_STR_RIGHT)) ||      // "MaxRight"
-           !STRCASECMP(str, kMaxRightStr))                    // "Max Right"
+           !STRCASECMP(str, kMaxRightStr))                       // "Max Right"
     return stdAc::swingh_t::kRightMax;
   else if (!STRCASECMP(str, kWideStr))
     return stdAc::swingh_t::kWide;

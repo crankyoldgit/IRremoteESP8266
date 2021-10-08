@@ -37,9 +37,6 @@
 #ifndef FPSTR
 #define FPSTR(X) X
 #endif  // FPSTR
-#ifndef pgm_read_byte
-#define pgm_read_byte(addr) (*reinterpret_cast<const uint8_t*>(addr))
-#endif  // pgm_read_byte
 
 /// Reverse the order of the requested least significant nr. of bits.
 /// @param[in] input Bit pattern/integer to reverse.
