@@ -1,4 +1,4 @@
-// Copyright 2017 David Conran
+// Copyright 2017-2021 David Conran
 
 #include "IRutils.h"
 #ifndef UNIT_TEST
@@ -16,6 +16,27 @@
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
 #include "IRtext.h"
+
+// On the ESP8266 platform we need to use a set of ..._P functions
+// to handle the strings stored in the flash address space.
+#ifndef STRCASECMP
+#if defined(ESP8266)
+#define STRCASECMP(LHS, RHS) \
+    strcasecmp_P(LHS, reinterpret_cast<const char*>(RHS))
+#else  // ESP8266
+#define STRCASECMP strcasecmp
+#endif  // ESP8266
+#endif  // STRCASECMP
+#ifndef STRLEN
+#if defined(ESP8266)
+#define STRLEN(PTR) strlen_P(PTR)
+#else  // ESP8266
+#define STRLEN(PTR) strlen(PTR)
+#endif  // ESP8266
+#endif  // STRLEN
+#ifndef FPSTR
+#define FPSTR(X) X
+#endif  // FPSTR
 
 /// Reverse the order of the requested least significant nr. of bits.
 /// @param[in] input Bit pattern/integer to reverse.
@@ -93,21 +114,20 @@ void serialPrintUint64(uint64_t input, uint8_t base) {
 /// @param[in] str A C-style string containing a protocol name or number.
 /// @return A decode_type_t enum. (decode_type_t::UNKNOWN if no match.)
 decode_type_t strToDecodeType(const char * const str) {
-  const char *ptr = kAllProtocolNamesStr;
-  uint16_t length = strlen(ptr);
+  auto *ptr = reinterpret_cast<const char*>(kAllProtocolNamesStr);
+  uint16_t length = STRLEN(ptr);
   for (uint16_t i = 0; length; i++) {
-    if (!strcasecmp(str, ptr)) return (decode_type_t)i;
+    if (!STRCASECMP(str, ptr)) return (decode_type_t)i;
     ptr += length + 1;
-    length = strlen(ptr);
+    length = STRLEN(ptr);
   }
-
   // Handle integer values of the type by converting to a string and back again.
   decode_type_t result = strToDecodeType(
       typeToString((decode_type_t)atoi(str)).c_str());
   if (result > 0)
     return result;
-  else
-    return decode_type_t::UNKNOWN;
+
+  return decode_type_t::UNKNOWN;
 }
 
 /// Convert a protocol type (enum etc) to a human readable string.
@@ -117,16 +137,20 @@ decode_type_t strToDecodeType(const char * const str) {
 String typeToString(const decode_type_t protocol, const bool isRepeat) {
   String result = "";
   result.reserve(30);  // Size of longest protocol name + " (Repeat)"
-  const char *ptr = kAllProtocolNamesStr;
   if (protocol > kLastDecodeType || protocol == decode_type_t::UNKNOWN) {
     result = kUnknownStr;
   } else {
-    for (uint16_t i = 0; i <= protocol && strlen(ptr); i++) {
-      if (i == protocol) {
-        result = ptr;
-        break;
+    auto *ptr = reinterpret_cast<const char*>(kAllProtocolNamesStr);
+    if (protocol > kLastDecodeType || protocol == decode_type_t::UNKNOWN) {
+      result = kUnknownStr;
+    } else {
+      for (uint16_t i = 0; i <= protocol && STRLEN(ptr); i++) {
+        if (i == protocol) {
+          result = FPSTR(ptr);
+          break;
+        }
+        ptr += STRLEN(ptr) + 1;
       }
-      ptr += strlen(ptr) + 1;
     }
   }
   if (isRepeat) {

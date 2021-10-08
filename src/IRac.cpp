@@ -50,6 +50,20 @@
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
 
+// On the ESP8266 platform we need to use a special version of string handling
+// functions to handle the strings stored in the flash address space.
+#ifndef STRCASECMP
+#if defined(ESP8266)
+#define STRCASECMP(LHS, RHS) \
+    strcasecmp_P(LHS, reinterpret_cast<const char* const>(RHS))
+#else  // ESP8266
+#define STRCASECMP(LHS, RHS) strcasecmp(LHS, RHS)
+#endif  // ESP8266
+#endif  // STRCASECMP
+#ifndef PSTR
+#define PSTR
+#endif
+
 /// Class constructor
 /// @param[in] pin Gpio pin to use when transmitting IR messages.
 /// @param[in] inverted true, gpio output defaults to high. false, to low.
@@ -3059,31 +3073,31 @@ bool IRac::hasStateChanged(void) { return cmpStates(next, _prev); }
 /// @return The equivalent enum.
 stdAc::opmode_t IRac::strToOpmode(const char *str,
                                   const stdAc::opmode_t def) {
-  if (!strcasecmp(str, kAutoStr) ||
-      !strcasecmp(str, kAutomaticStr))
+  if (!STRCASECMP(str, kAutoStr) ||
+      !STRCASECMP(str, kAutomaticStr))
     return stdAc::opmode_t::kAuto;
-  else if (!strcasecmp(str, kOffStr) ||
-           !strcasecmp(str, kStopStr))
+  else if (!STRCASECMP(str, kOffStr) ||
+           !STRCASECMP(str, kStopStr))
     return stdAc::opmode_t::kOff;
-  else if (!strcasecmp(str, kCoolStr) ||
-           !strcasecmp(str, "COOLING"))
+  else if (!STRCASECMP(str, kCoolStr) ||
+           !STRCASECMP(str, PSTR("COOLING")))
     return stdAc::opmode_t::kCool;
-  else if (!strcasecmp(str, kHeatStr) ||
-           !strcasecmp(str, "HEATING"))
+  else if (!STRCASECMP(str, kHeatStr) ||
+           !STRCASECMP(str, PSTR("HEATING")))
     return stdAc::opmode_t::kHeat;
-  else if (!strcasecmp(str, kDryStr) ||
-           !strcasecmp(str, "DRYING") ||
-           !strcasecmp(str, "DEHUMIDIFY"))
+  else if (!STRCASECMP(str, kDryStr) ||
+           !STRCASECMP(str, PSTR("DRYING")) ||
+           !STRCASECMP(str, PSTR("DEHUMIDIFY")))
     return stdAc::opmode_t::kDry;
-  else if (!strcasecmp(str, kFanStr) ||
+  else if (!STRCASECMP(str, kFanStr) ||
           // The following Fans strings with "only" are required to help with
           // HomeAssistant & Google Home Climate integration.
           // For compatibility only.
           // Ref: https://www.home-assistant.io/integrations/google_assistant/#climate-operation-modes
-           !strcasecmp(str, kFanOnlyStr) ||
-           !strcasecmp(str, kFan_OnlyStr) ||
-           !strcasecmp(str, kFanOnlyWithSpaceStr) ||
-           !strcasecmp(str, kFanOnlyNoSpaceStr))
+           !STRCASECMP(str, kFanOnlyStr) ||
+           !STRCASECMP(str, kFan_OnlyStr) ||
+           !STRCASECMP(str, kFanOnlyWithSpaceStr) ||
+           !STRCASECMP(str, kFanOnlyNoSpaceStr))
     return stdAc::opmode_t::kFan;
   else
     return def;
@@ -3095,26 +3109,26 @@ stdAc::opmode_t IRac::strToOpmode(const char *str,
 /// @return The equivalent enum.
 stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
                                       const stdAc::fanspeed_t def) {
-  if (!strcasecmp(str, kAutoStr) ||
-      !strcasecmp(str, kAutomaticStr))
+  if (!STRCASECMP(str, kAutoStr) ||
+      !STRCASECMP(str, kAutomaticStr))
     return stdAc::fanspeed_t::kAuto;
-  else if (!strcasecmp(str, kMinStr) ||
-           !strcasecmp(str, kMinimumStr) ||
-           !strcasecmp(str, kLowestStr))
+  else if (!STRCASECMP(str, kMinStr) ||
+           !STRCASECMP(str, kMinimumStr) ||
+           !STRCASECMP(str, kLowestStr))
     return stdAc::fanspeed_t::kMin;
-  else if (!strcasecmp(str, kLowStr) ||
-           !strcasecmp(str, kLoStr))
+  else if (!STRCASECMP(str, kLowStr) ||
+           !STRCASECMP(str, kLoStr))
     return stdAc::fanspeed_t::kLow;
-  else if (!strcasecmp(str, kMedStr) ||
-           !strcasecmp(str, kMediumStr) ||
-           !strcasecmp(str, kMidStr))
+  else if (!STRCASECMP(str, kMedStr) ||
+           !STRCASECMP(str, kMediumStr) ||
+           !STRCASECMP(str, kMidStr))
     return stdAc::fanspeed_t::kMedium;
-  else if (!strcasecmp(str, kHighStr) ||
-           !strcasecmp(str, kHiStr))
+  else if (!STRCASECMP(str, kHighStr) ||
+           !STRCASECMP(str, kHiStr))
     return stdAc::fanspeed_t::kHigh;
-  else if (!strcasecmp(str, kMaxStr) ||
-           !strcasecmp(str, kMaximumStr) ||
-           !strcasecmp(str, kHighestStr))
+  else if (!STRCASECMP(str, kMaxStr) ||
+           !STRCASECMP(str, kMaximumStr) ||
+           !STRCASECMP(str, kHighestStr))
     return stdAc::fanspeed_t::kMax;
   else
     return def;
@@ -3126,36 +3140,36 @@ stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
 /// @return The equivalent enum.
 stdAc::swingv_t IRac::strToSwingV(const char *str,
                                   const stdAc::swingv_t def) {
-  if (!strcasecmp(str, kAutoStr) ||
-      !strcasecmp(str, kAutomaticStr) ||
-      !strcasecmp(str, kOnStr) ||
-      !strcasecmp(str, kSwingStr))
+  if (!STRCASECMP(str, kAutoStr) ||
+      !STRCASECMP(str, kAutomaticStr) ||
+      !STRCASECMP(str, kOnStr) ||
+      !STRCASECMP(str, kSwingStr))
     return stdAc::swingv_t::kAuto;
-  else if (!strcasecmp(str, kOffStr) ||
-           !strcasecmp(str, kStopStr))
+  else if (!STRCASECMP(str, kOffStr) ||
+           !STRCASECMP(str, kStopStr))
     return stdAc::swingv_t::kOff;
-  else if (!strcasecmp(str, kMinStr) ||
-           !strcasecmp(str, kMinimumStr) ||
-           !strcasecmp(str, kLowestStr) ||
-           !strcasecmp(str, kBottomStr) ||
-           !strcasecmp(str, kDownStr))
+  else if (!STRCASECMP(str, kMinStr) ||
+           !STRCASECMP(str, kMinimumStr) ||
+           !STRCASECMP(str, kLowestStr) ||
+           !STRCASECMP(str, kBottomStr) ||
+           !STRCASECMP(str, kDownStr))
     return stdAc::swingv_t::kLowest;
-  else if (!strcasecmp(str, kLowStr))
+  else if (!STRCASECMP(str, kLowStr))
     return stdAc::swingv_t::kLow;
-  else if (!strcasecmp(str, kMidStr) ||
-           !strcasecmp(str, kMiddleStr) ||
-           !strcasecmp(str, kMedStr) ||
-           !strcasecmp(str, kMediumStr) ||
-           !strcasecmp(str, kCentreStr))
+  else if (!STRCASECMP(str, kMidStr) ||
+           !STRCASECMP(str, kMiddleStr) ||
+           !STRCASECMP(str, kMedStr) ||
+           !STRCASECMP(str, kMediumStr) ||
+           !STRCASECMP(str, kCentreStr))
     return stdAc::swingv_t::kMiddle;
-  else if (!strcasecmp(str, kHighStr) ||
-           !strcasecmp(str, kHiStr))
+  else if (!STRCASECMP(str, kHighStr) ||
+           !STRCASECMP(str, kHiStr))
     return stdAc::swingv_t::kHigh;
-  else if (!strcasecmp(str, kHighestStr) ||
-           !strcasecmp(str, kMaxStr) ||
-           !strcasecmp(str, kMaximumStr) ||
-           !strcasecmp(str, kTopStr) ||
-           !strcasecmp(str, kUpStr))
+  else if (!STRCASECMP(str, kHighestStr) ||
+           !STRCASECMP(str, kMaxStr) ||
+           !STRCASECMP(str, kMaximumStr) ||
+           !STRCASECMP(str, kTopStr) ||
+           !STRCASECMP(str, kUpStr))
     return stdAc::swingv_t::kHighest;
   else
     return def;
@@ -3167,34 +3181,34 @@ stdAc::swingv_t IRac::strToSwingV(const char *str,
 /// @return The equivalent enum.
 stdAc::swingh_t IRac::strToSwingH(const char *str,
                                   const stdAc::swingh_t def) {
-  if (!strcasecmp(str, kAutoStr) ||
-      !strcasecmp(str, kAutomaticStr) ||
-      !strcasecmp(str, kOnStr) || !strcasecmp(str, kSwingStr))
+  if (!STRCASECMP(str, kAutoStr) ||
+      !STRCASECMP(str, kAutomaticStr) ||
+      !STRCASECMP(str, kOnStr) || !STRCASECMP(str, kSwingStr))
     return stdAc::swingh_t::kAuto;
-  else if (!strcasecmp(str, kOffStr) ||
-           !strcasecmp(str, kStopStr))
+  else if (!STRCASECMP(str, kOffStr) ||
+           !STRCASECMP(str, kStopStr))
     return stdAc::swingh_t::kOff;
-  else if (!strcasecmp(str, kLeftMaxStr) ||                // "LeftMax"
-           !strcasecmp(str, D_STR_LEFT " " D_STR_MAX) ||   // "Left Max"
-           !strcasecmp(str, D_STR_MAX D_STR_LEFT) ||       // "MaxLeft"
-           !strcasecmp(str, kMaxLeftStr))                  // "Max Left"
+  else if (!STRCASECMP(str, kLeftMaxStr) ||                     // "LeftMax"
+           !STRCASECMP(str, PSTR(D_STR_LEFT " " D_STR_MAX)) ||  // "Left Max"
+           !STRCASECMP(str, PSTR(D_STR_MAX D_STR_LEFT)) ||      // "MaxLeft"
+           !STRCASECMP(str, kMaxLeftStr))                       // "Max Left"
     return stdAc::swingh_t::kLeftMax;
-  else if (!strcasecmp(str, kLeftStr))
+  else if (!STRCASECMP(str, kLeftStr))
     return stdAc::swingh_t::kLeft;
-  else if (!strcasecmp(str, kMidStr) ||
-           !strcasecmp(str, kMiddleStr) ||
-           !strcasecmp(str, kMedStr) ||
-           !strcasecmp(str, kMediumStr) ||
-           !strcasecmp(str, kCentreStr))
+  else if (!STRCASECMP(str, kMidStr) ||
+           !STRCASECMP(str, kMiddleStr) ||
+           !STRCASECMP(str, kMedStr) ||
+           !STRCASECMP(str, kMediumStr) ||
+           !STRCASECMP(str, kCentreStr))
     return stdAc::swingh_t::kMiddle;
-  else if (!strcasecmp(str, kRightStr))
+  else if (!STRCASECMP(str, kRightStr))
     return stdAc::swingh_t::kRight;
-  else if (!strcasecmp(str, kRightMaxStr) ||               // "RightMax"
-           !strcasecmp(str, D_STR_RIGHT " " D_STR_MAX) ||  // "Right Max"
-           !strcasecmp(str, D_STR_MAX D_STR_RIGHT) ||      // "MaxRight"
-           !strcasecmp(str, kMaxRightStr))                 // "Max Right"
+  else if (!STRCASECMP(str, kRightMaxStr) ||                     // "RightMax"
+           !STRCASECMP(str, PSTR(D_STR_RIGHT " " D_STR_MAX)) ||  // "Right Max"
+           !STRCASECMP(str, PSTR(D_STR_MAX D_STR_RIGHT)) ||      // "MaxRight"
+           !STRCASECMP(str, kMaxRightStr))                       // "Max Right"
     return stdAc::swingh_t::kRightMax;
-  else if (!strcasecmp(str, kWideStr))
+  else if (!STRCASECMP(str, kWideStr))
     return stdAc::swingh_t::kWide;
   else
     return def;
@@ -3207,69 +3221,77 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
 /// @return The equivalent enum.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
   // Gree
-  if (!strcasecmp(str, "YAW1F")) {
+  if (!STRCASECMP(str, PSTR("YAW1F"))) {
     return gree_ac_remote_model_t::YAW1F;
-  } else if (!strcasecmp(str, "YBOFB")) {
+  } else if (!STRCASECMP(str, PSTR("YBOFB"))) {
     return gree_ac_remote_model_t::YBOFB;
   // HitachiAc1 models
-  } else if (!strcasecmp(str, "R-LT0541-HTA-A")) {
+  } else if (!STRCASECMP(str, PSTR("R-LT0541-HTA-A"))) {
     return hitachi_ac1_remote_model_t::R_LT0541_HTA_A;
-  } else if (!strcasecmp(str, "R-LT0541-HTA-B")) {
+  } else if (!STRCASECMP(str, PSTR("R-LT0541-HTA-B"))) {
     return hitachi_ac1_remote_model_t::R_LT0541_HTA_B;
   // Fujitsu A/C models
-  } else if (!strcasecmp(str, "ARRAH2E")) {
+  } else if (!STRCASECMP(str, PSTR("ARRAH2E"))) {
     return fujitsu_ac_remote_model_t::ARRAH2E;
-  } else if (!strcasecmp(str, "ARDB1")) {
+  } else if (!STRCASECMP(str, PSTR("ARDB1"))) {
     return fujitsu_ac_remote_model_t::ARDB1;
-  } else if (!strcasecmp(str, "ARREB1E")) {
+  } else if (!STRCASECMP(str, PSTR("ARREB1E"))) {
     return fujitsu_ac_remote_model_t::ARREB1E;
-  } else if (!strcasecmp(str, "ARJW2")) {
+  } else if (!STRCASECMP(str, PSTR("ARJW2"))) {
     return fujitsu_ac_remote_model_t::ARJW2;
-  } else if (!strcasecmp(str, "ARRY4")) {
+  } else if (!STRCASECMP(str, PSTR("ARRY4"))) {
     return fujitsu_ac_remote_model_t::ARRY4;
   // LG A/C models
-  } else if (!strcasecmp(str, "GE6711AR2853M")) {
+  } else if (!STRCASECMP(str, PSTR("GE6711AR2853M"))) {
     return lg_ac_remote_model_t::GE6711AR2853M;
-  } else if (!strcasecmp(str, "AKB75215403")) {
+  } else if (!STRCASECMP(str, PSTR("AKB75215403"))) {
     return lg_ac_remote_model_t::AKB75215403;
-  } else if (!strcasecmp(str, "AKB74955603")) {
+  } else if (!STRCASECMP(str, PSTR("AKB74955603"))) {
     return lg_ac_remote_model_t::AKB74955603;
-  } else if (!strcasecmp(str, "AKB73757604")) {
+  } else if (!STRCASECMP(str, PSTR("AKB73757604"))) {
     return lg_ac_remote_model_t::AKB73757604;
   // Panasonic A/C families
-  } else if (!strcasecmp(str, "LKE") || !strcasecmp(str, "PANASONICLKE")) {
+  } else if (!STRCASECMP(str, PSTR("LKE")) ||
+             !STRCASECMP(str, PSTR("PANASONICLKE"))) {
     return panasonic_ac_remote_model_t::kPanasonicLke;
-  } else if (!strcasecmp(str, "NKE") || !strcasecmp(str, "PANASONICNKE")) {
+  } else if (!STRCASECMP(str, PSTR("NKE")) ||
+             !STRCASECMP(str, PSTR("PANASONICNKE"))) {
     return panasonic_ac_remote_model_t::kPanasonicNke;
-  } else if (!strcasecmp(str, "DKE") || !strcasecmp(str, "PANASONICDKE") ||
-             !strcasecmp(str, "PKR") || !strcasecmp(str, "PANASONICPKR")) {
+  } else if (!STRCASECMP(str, PSTR("DKE")) ||
+             !STRCASECMP(str, PSTR("PANASONICDKE")) ||
+             !STRCASECMP(str, PSTR("PKR")) ||
+             !STRCASECMP(str, PSTR("PANASONICPKR"))) {
     return panasonic_ac_remote_model_t::kPanasonicDke;
-  } else if (!strcasecmp(str, "JKE") || !strcasecmp(str, "PANASONICJKE")) {
+  } else if (!STRCASECMP(str, PSTR("JKE")) ||
+             !STRCASECMP(str, PSTR("PANASONICJKE"))) {
     return panasonic_ac_remote_model_t::kPanasonicJke;
-  } else if (!strcasecmp(str, "CKP") || !strcasecmp(str, "PANASONICCKP")) {
+  } else if (!STRCASECMP(str, PSTR("CKP")) ||
+             !STRCASECMP(str, PSTR("PANASONICCKP"))) {
     return panasonic_ac_remote_model_t::kPanasonicCkp;
-  } else if (!strcasecmp(str, "RKR") || !strcasecmp(str, "PANASONICRKR")) {
+  } else if (!STRCASECMP(str, PSTR("RKR")) ||
+             !STRCASECMP(str, PSTR("PANASONICRKR"))) {
     return panasonic_ac_remote_model_t::kPanasonicRkr;
   // Sharp A/C Models
-  } else if (!strcasecmp(str, "A907")) {
+  } else if (!STRCASECMP(str, PSTR("A907"))) {
     return sharp_ac_remote_model_t::A907;
-  } else if (!strcasecmp(str, "A705")) {
+  } else if (!STRCASECMP(str, PSTR("A705"))) {
     return sharp_ac_remote_model_t::A705;
-  } else if (!strcasecmp(str, "A903")) {
+  } else if (!STRCASECMP(str, PSTR("A903"))) {
     return sharp_ac_remote_model_t::A903;
   // TCL A/C Models
-  } else if (!strcasecmp(str, "TAC09CHSD")) {
+  } else if (!STRCASECMP(str, PSTR("TAC09CHSD"))) {
     return tcl_ac_remote_model_t::TAC09CHSD;
-  } else if (!strcasecmp(str, "GZ055BE1")) {
+  } else if (!STRCASECMP(str, PSTR("GZ055BE1"))) {
     return tcl_ac_remote_model_t::GZ055BE1;
   // Voltas A/C models
-  } else if (!strcasecmp(str, "122LZF")) {
+  } else if (!STRCASECMP(str, PSTR("122LZF"))) {
     return voltas_ac_remote_model_t::kVoltas122LZF;
   // Whirlpool A/C models
-  } else if (!strcasecmp(str, "DG11J13A") || !strcasecmp(str, "DG11J104") ||
-             !strcasecmp(str, "DG11J1-04")) {
+  } else if (!STRCASECMP(str, PSTR("DG11J13A")) ||
+             !STRCASECMP(str, PSTR("DG11J104")) ||
+             !STRCASECMP(str, PSTR("DG11J1-04"))) {
     return whirlpool_ac_remote_model_t::DG11J13A;
-  } else if (!strcasecmp(str, "DG11J191")) {
+  } else if (!STRCASECMP(str, PSTR("DG11J191"))) {
     return whirlpool_ac_remote_model_t::DG11J191;
   } else {
     int16_t number = atoi(str);
@@ -3285,15 +3307,15 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
 /// @param[in] def The boolean value to return if no conversion was possible.
 /// @return The equivalent boolean value.
 bool IRac::strToBool(const char *str, const bool def) {
-  if (!strcasecmp(str, kOnStr) ||
-      !strcasecmp(str, "1") ||
-      !strcasecmp(str, kYesStr) ||
-      !strcasecmp(str, kTrueStr))
+  if (!STRCASECMP(str, kOnStr) ||
+      !STRCASECMP(str, PSTR("1")) ||
+      !STRCASECMP(str, kYesStr) ||
+      !STRCASECMP(str, kTrueStr))
     return true;
-  else if (!strcasecmp(str, kOffStr) ||
-           !strcasecmp(str, "0") ||
-           !strcasecmp(str, kNoStr) ||
-           !strcasecmp(str, kFalseStr))
+  else if (!STRCASECMP(str, kOffStr) ||
+           !STRCASECMP(str, PSTR("0")) ||
+           !STRCASECMP(str, kNoStr) ||
+           !STRCASECMP(str, kFalseStr))
     return false;
   else
     return def;
