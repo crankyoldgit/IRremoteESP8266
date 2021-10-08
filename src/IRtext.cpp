@@ -322,6 +322,7 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     D_STR_SANYO_AC88 "\x0"
     D_STR_BOSE "\x0"
     D_STR_ARRIS "\x0"
+    D_STR_RHOSS "\x0"
     ///< New protocol strings should be added just above this line.
     "\x0"  ///< This string requires double null termination.
 };

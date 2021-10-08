@@ -748,6 +748,9 @@
 #ifndef D_STR_RCMM
 #define D_STR_RCMM "RCMM"
 #endif  // D_STR_RCMM
+#ifndef D_STR_RHOSS
+#define D_STR_RHOSS "RHOSS"
+#endif  // D_STR_RHOSS
 #ifndef D_STR_SAMSUNG
 #define D_STR_SAMSUNG "SAMSUNG"
 #endif  // D_STR_SAMSUNG

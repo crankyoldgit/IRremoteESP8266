@@ -199,6 +199,7 @@ bool hasACState(const decode_type_t protocol) {
     case MWM:
     case NEOCLIMA:
     case PANASONIC_AC:
+    case RHOSS:
     case SAMSUNG_AC:
     case SANYO_AC:
     case SANYO_AC88:

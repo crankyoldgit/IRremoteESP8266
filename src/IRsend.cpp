@@ -739,6 +739,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kNeoclimaBits;
     case PANASONIC_AC:
       return kPanasonicAcBits;
+    case RHOSS:
+      return kRhossBits;
     case SAMSUNG_AC:
       return kSamsungAcBits;
     case SANYO_AC:
@@ -1253,6 +1255,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendPanasonicAC(state, nbytes);
       break;
 #endif  // SEND_PANASONIC_AC
+#if SEND_RHOSS
+    case RHOSS:
+      sendRhoss(state, nbytes);
+      break;
+#endif  // SEND_RHOSS
 #if SEND_SAMSUNG_AC
     case SAMSUNG_AC:
       sendSamsungAC(state, nbytes);

@@ -749,6 +749,11 @@ class IRsend {
   static uint32_t toggleArrisRelease(const uint32_t data);
   static uint32_t encodeArris(const uint32_t command, const bool release);
 #endif  // SEND_ARRIS
+#if SEND_RHOSS
+  void sendRhoss(const unsigned char data[],
+                 const uint16_t nbytes = kRhossStateLength,
+                 const uint16_t repeat = kRhossDefaultRepeat);
+#endif  // SEND_RHOSS
 
  protected:
 #ifdef UNIT_TEST

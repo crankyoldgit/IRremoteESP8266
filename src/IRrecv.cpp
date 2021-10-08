@@ -1040,6 +1040,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Arris decode");
     if (decodeArris(results, offset)) return true;
 #endif  // DECODE_ARRIS
+#if DECODE_RHOSS
+    DPRINTLN("Attempting Rhoss decode");
+    if (decodeRhoss(results, offset)) return true;
+#endif  // DECODE_RHOSS
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
