@@ -48,6 +48,8 @@ float fahrenheitToCelsius(const float deg);
 namespace irutils {
   String addBoolToString(const bool value, const String label,
                          const bool precomma = true);
+  String addToggleToString(const bool toggle, const String label,
+                           const bool precomma = true);
   String addIntToString(const uint16_t value, const String label,
                         const bool precomma = true);
   String addSignedIntToString(const int16_t value, const String label,

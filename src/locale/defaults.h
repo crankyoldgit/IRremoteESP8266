@@ -452,6 +452,9 @@
 #ifndef D_STR_COLONSPACE
 #define D_STR_COLONSPACE ": "
 #endif  // D_STR_COLONSPACE
+#ifndef D_STR_DASH
+#define D_STR_DASH "-"
+#endif  // D_STR_DASH
 
 #ifndef D_STR_DAY
 #define D_STR_DAY "Day"

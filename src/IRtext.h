@@ -50,6 +50,7 @@ extern IRTEXT_CONST_PTR(kComfortStr);
 extern IRTEXT_CONST_PTR(kCommandStr);
 extern IRTEXT_CONST_PTR(kCommaSpaceStr);
 extern IRTEXT_CONST_PTR(kCoolStr);
+extern IRTEXT_CONST_PTR(kDashStr);
 extern IRTEXT_CONST_PTR(kDaysStr);
 extern IRTEXT_CONST_PTR(kDayStr);
 extern IRTEXT_CONST_PTR(kDisplayTempStr);
