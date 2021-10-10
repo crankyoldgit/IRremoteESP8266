@@ -443,7 +443,7 @@ stdAc::state_t IRHaierAC::toCommon(void) const {
   result.econo = false;
   result.light = false;
   result.clean = false;
-  result.beep = false;
+  result.beep = true;
   result.clock = -1;
   return result;
 }
@@ -969,7 +969,7 @@ stdAc::state_t IRHaierAC176::toCommon(void) const {
   result.econo = false;
   result.light = false;
   result.clean = false;
-  result.beep = false;
+  result.beep = true;
   result.clock = -1;
   return result;
 }
