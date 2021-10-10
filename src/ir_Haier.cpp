@@ -948,6 +948,20 @@ stdAc::swingv_t IRHaierAC176::toCommonSwingV(const uint8_t pos) {
   }
 }
 
+/// Convert the Turbo setting of the A/C into native turbo setting.
+/// @param[in] speed The enum to be converted.
+/// @return true, the setting is on. false, the setting is off.
+bool IRHaierAC176::toCommonTurbo(const uint8_t speed) {
+  return speed == kHaierAcYrw02TurboHigh;
+}
+
+/// Convert the Turbo setting of the A/C into native quiet setting.
+/// @param[in] speed The enum to be converted.
+/// @return true, the setting is on. false, the setting is off.
+bool IRHaierAC176::toCommonQuiet(const uint8_t speed) {
+  return speed == kHaierAcYrw02TurboLow;
+}
+
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHaierAC176::toCommon(void) const {
@@ -962,10 +976,10 @@ stdAc::state_t IRHaierAC176::toCommon(void) const {
   result.swingv = toCommonSwingV(_.Swing);
   result.filter = _.Health;
   result.sleep = _.Sleep ? 0 : -1;
+  result.quiet = toCommonQuiet(_.Turbo);
+  result.turbo = toCommonTurbo(_.Turbo);
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
-  result.quiet = false;
-  result.turbo = false;
   result.econo = false;
   result.light = false;
   result.clean = false;

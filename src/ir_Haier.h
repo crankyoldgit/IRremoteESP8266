@@ -244,7 +244,7 @@ union HaierAc176Protocol{
     uint8_t Fan         :3;
     // Byte 6
     uint8_t OffTimerMins:6;
-    uint8_t Turbo:2;
+    uint8_t Turbo       :2;
     // Byte 7
     uint8_t OnTimerHrs  :5;
     uint8_t Mode        :3;
@@ -445,6 +445,8 @@ class IRHaierAC176 {
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  static bool toCommonTurbo(const uint8_t speed);
+  static bool toCommonQuiet(const uint8_t speed);
   stdAc::state_t toCommon(void) const;
   String toString(void) const;
 #ifndef UNIT_TEST
