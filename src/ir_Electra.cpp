@@ -28,6 +28,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::addToggleToString;
 
 #if SEND_ELECTRA_AC
 /// Send a Electra A/C formatted message.
@@ -351,8 +352,7 @@ String IRElectraAc::toString(void) const {
                            kElectraAcFanMed);
   result += addBoolToString(getSwingV(), kSwingVStr);
   result += addBoolToString(getSwingH(), kSwingHStr);
-  result += addLabeledString(getLightToggle() ? String(kToggleStr)
-                                              : String("-"), kLightStr);
+  result += addToggleToString(getLightToggle(), kLightStr);
   result += addBoolToString(_.Clean, kCleanStr);
   result += addBoolToString(_.Turbo, kTurboStr);
   return result;

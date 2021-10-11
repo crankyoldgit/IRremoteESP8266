@@ -183,11 +183,12 @@ IRTEXT_CONST_STRING(kSwingVToggleStr, D_STR_SWINGVTOGGLE);  ///<
 ///< "Swing(V) Toggle"
 IRTEXT_CONST_STRING(kTurboToggleStr, D_STR_TURBOTOGGLE);  ///< "Turbo Toggle"
 
-// Separators
+// Separators & Punctuation
 const char kTimeSep = D_CHR_TIME_SEP;  ///< ':'
 IRTEXT_CONST_STRING(kSpaceLBraceStr, D_STR_SPACELBRACE);  ///< " ("
 IRTEXT_CONST_STRING(kCommaSpaceStr, D_STR_COMMASPACE);  ///< ", "
 IRTEXT_CONST_STRING(kColonSpaceStr, D_STR_COLONSPACE);  ///< ": "
+IRTEXT_CONST_STRING(kDashStr, D_STR_DASH);  ///< "-"
 
 // IRutils
 //  - Time

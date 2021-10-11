@@ -47,6 +47,7 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addSwingVToString;
 using irutils::addTempToString;
+using irutils::addToggleToString;
 using irutils::minsToString;
 
 // Also used by Denon protocol
@@ -920,14 +921,10 @@ String IRSharpAc::toString(void) const {
   switch (model) {
     case sharp_ac_remote_model_t::A705:
     case sharp_ac_remote_model_t::A903:
-      result += addLabeledString(getLightToggle() ? String(kToggleStr)
-                                                  : String("-"),
-                                 kLightStr);
+      result += addToggleToString(getLightToggle(), kLightStr);
       break;
     default:
-      result += addLabeledString(getEconoToggle() ? String(kToggleStr)
-                                                  : String("-"),
-                                 kEconoStr);
+      result += addToggleToString(getEconoToggle(), kEconoStr);
   }
   result += addBoolToString(_.Clean, kCleanStr);
   if (_.TimerEnabled)

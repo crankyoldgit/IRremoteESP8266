@@ -540,7 +540,18 @@ namespace irutils {
   /// @return The resulting String.
   String addBoolToString(const bool value, const String label,
                          const bool precomma) {
-    return addLabeledString((value ? kOnStr : kOffStr), label, precomma);
+    return addLabeledString(value ? kOnStr : kOffStr, label, precomma);
+  }
+
+  /// Create a String with a colon separated toggle flag suitable for Humans.
+  /// e.g. "Light: Toggle", "Light: -"
+  /// @param[in] toggle The value of the toggle to come after the label.
+  /// @param[in] label The label to precede the value.
+  /// @param[in] precomma Should the output string start with ", " or not?
+  /// @return The resulting String.
+  String addToggleToString(const bool toggle, const String label,
+                           const bool precomma) {
+    return addLabeledString(toggle ? kToggleStr : kDashStr, label, precomma);
   }
 
   /// Create a String with a colon separated labeled Integer suitable for

@@ -21,6 +21,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::addToggleToString;
 
 #if SEND_GOODWEATHER
 /// Send a Goodweather HVAC formatted message.
@@ -347,12 +348,9 @@ String IRGoodweatherAc::toString(void) const {
                            kGoodweatherFanAuto, kGoodweatherFanAuto,
                            kGoodweatherFanMed);
 
-  result += addLabeledString(_.Turbo ? String(kToggleStr)
-                                     : String("-"), kTurboStr);
-  result += addLabeledString(_.Light ? String(kToggleStr)
-                                     : String("-"), kLightStr);
-  result += addLabeledString(_.Sleep ? String(kToggleStr)
-                                     : String("-"), kSleepStr);
+  result += addToggleToString(_.Turbo, kTurboStr);
+  result += addToggleToString(_.Light, kLightStr);
+  result += addToggleToString(_.Sleep, kSleepStr);
   result += addIntToString(_.Swing, kSwingStr);
   result += kSpaceLBraceStr;
   switch (_.Swing) {
