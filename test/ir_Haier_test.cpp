@@ -1102,7 +1102,7 @@ TEST(TestHaierACClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().quiet);
   ASSERT_FALSE(ac.toCommon().econo);
   ASSERT_FALSE(ac.toCommon().clean);
-  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_TRUE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().clock);
 }
 
@@ -1133,7 +1133,7 @@ TEST(TestHaierACYRW02Class, toCommon) {
   ASSERT_FALSE(ac.toCommon().quiet);
   ASSERT_FALSE(ac.toCommon().econo);
   ASSERT_FALSE(ac.toCommon().clean);
-  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_TRUE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().clock);
 }
 
