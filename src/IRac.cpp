@@ -3282,6 +3282,8 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return fujitsu_ac_remote_model_t::ARJW2;
   } else if (!STRCASECMP(str, kArry4Str)) {
     return fujitsu_ac_remote_model_t::ARRY4;
+  } else if (!STRCASECMP(str, kArrew4eStr)) {
+    return fujitsu_ac_remote_model_t::ARREW4E;
   // LG A/C models
   } else if (!STRCASECMP(str, kGe6711ar2853mStr)) {
     return lg_ac_remote_model_t::GE6711AR2853M;

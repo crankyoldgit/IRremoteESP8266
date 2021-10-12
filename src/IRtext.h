@@ -41,6 +41,7 @@ extern IRTEXT_CONST_PTR(kArdb1Str);
 extern IRTEXT_CONST_PTR(kArjw2Str);
 extern IRTEXT_CONST_PTR(kArrah2eStr);
 extern IRTEXT_CONST_PTR(kArreb1eStr);
+extern IRTEXT_CONST_PTR(kArrew4eStr);
 extern IRTEXT_CONST_PTR(kArry4Str);
 extern IRTEXT_CONST_PTR(kAutomaticStr);
 extern IRTEXT_CONST_PTR(kAutoStr);
