@@ -1,4 +1,4 @@
-// Copyright 2018 crankyoldgit
+// Copyright 2018-2021 crankyoldgit
 /// @file
 /// @brief Support for Haier A/C protocols.
 /// The specifics of reverse engineering the protocols details:
@@ -133,51 +133,6 @@ const uint8_t kHaierAcSleepBit = 0b01000000;
 #define HAIER_AC_FAN_MED kHaierAcFanMed
 #define HAIER_AC_FAN_HIGH kHaierAcFanHigh
 
-/// Native representation of a Haier YRW02 A/C message.
-union HaierYRW02Protocol{
-  uint8_t raw[kHaierACYRW02StateLength];  ///< The state in native form
-  struct {
-    // Byte 0
-    uint8_t Prefix;
-    // Byte 1
-    uint8_t Swing:4;
-    uint8_t Temp :4;  // 16C~30C
-    // Byte 2
-    uint8_t :8;
-    // Byte 3
-    uint8_t       :1;
-    uint8_t Health:1;
-    uint8_t       :6;
-    // Byte 4
-    uint8_t      :6;
-    uint8_t Power:1;
-    uint8_t      :1;
-    // Byte 5
-    uint8_t    :5;
-    uint8_t Fan:3;
-    // Byte 6
-    uint8_t      :6;
-    uint8_t Turbo:2;
-    // Byte 7
-    uint8_t     :5;
-    uint8_t Mode:3;
-    // Byte 8
-    uint8_t      :7;
-    uint8_t Sleep:1;
-    // Byte 9
-    uint8_t :8;
-    // Byte 10
-    uint8_t :8;
-    // Byte 11
-    uint8_t :8;
-    // Byte 12
-    uint8_t Button:4;
-    uint8_t       :4;
-    // Byte 13
-    uint8_t Sum;
-  };
-};
-
 const uint8_t kHaierAcYrw02Prefix = 0xA6;
 const uint8_t kHaierAc176Prefix = 0xB7;
 
@@ -192,10 +147,6 @@ const uint8_t kHaierAcYrw02FanHigh = 0b001;
 const uint8_t kHaierAcYrw02FanMed =  0b010;
 const uint8_t kHaierAcYrw02FanLow =  0b011;
 const uint8_t kHaierAcYrw02FanAuto = 0b101;  // HAIER_AC176 uses `0` in Fan2
-
-const uint8_t kHaierAcYrw02TurboOff = 0x0;
-const uint8_t kHaierAcYrw02TurboHigh = 0x1;
-const uint8_t kHaierAcYrw02TurboLow = 0x2;
 
 const uint8_t kHaierAcYrw02Auto = 0b000;  // 0
 const uint8_t kHaierAcYrw02Cool = 0b001;  // 1
@@ -244,7 +195,8 @@ union HaierAc176Protocol{
     uint8_t Fan         :3;
     // Byte 6
     uint8_t OffTimerMins:6;
-    uint8_t Turbo       :2;
+    uint8_t Turbo       :1;
+    uint8_t Quiet       :1;
     // Byte 7
     uint8_t OnTimerHrs  :5;
     uint8_t Mode        :3;
@@ -295,8 +247,6 @@ union HaierAc176Protocol{
 #define HAIER_AC_YRW02_FAN_LOW kHaierAcYrw02FanLow
 #define HAIER_AC_YRW02_FAN_AUTO kHaierAcYrw02FanAuto
 #define HAIER_AC_YRW02_TURBO_OFF kHaierAcYrw02TurboOff
-#define HAIER_AC_YRW02_TURBO_HIGH kHaierAcYrw02TurboHigh
-#define HAIER_AC_YRW02_TURBO_LOW kHaierAcYrw02TurboLow
 #define HAIER_AC_YRW02_AUTO kHaierAcYrw02Auto
 #define HAIER_AC_YRW02_COOL kHaierAcYrw02Cool
 #define HAIER_AC_YRW02_DRY kHaierAcYrw02Dry
@@ -422,8 +372,10 @@ class IRHaierAC176 {
   bool getHealth(void) const;
   void setHealth(const bool on);
 
-  uint8_t getTurbo(void) const;
-  void setTurbo(const uint8_t speed);
+  bool getTurbo(void) const;
+  void setTurbo(const bool on);
+  bool getQuiet(void) const;
+  void setQuiet(const bool on);
 
   uint8_t getSwing(void) const;
   void setSwing(const uint8_t pos);

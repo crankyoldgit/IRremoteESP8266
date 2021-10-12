@@ -629,24 +629,27 @@ uint8_t IRHaierAC176::getButton(void) const {
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired operating mode.
 void IRHaierAC176::setMode(uint8_t mode) {
-  uint8_t new_mode = mode;
-  _.Button = kHaierAcYrw02ButtonMode;
   switch (mode) {
     case kHaierAcYrw02Auto:
-    case kHaierAcYrw02Cool:
     case kHaierAcYrw02Dry:
+    case kHaierAcYrw02Fan:
+      // Turbo & Quiet is only available in Cool/Heat mode.
+      _.Turbo = false;
+      _.Quiet = false;
+      // FALL-THRU
+    case kHaierAcYrw02Cool:
     case kHaierAcYrw02Heat:
-    case kHaierAcYrw02Fan: break;
-    default: new_mode = kHaierAcYrw02Auto;  // Unexpected, default to auto mode.
+      _.Button = kHaierAcYrw02ButtonMode;
+      _.Mode = mode;
+      break;
+    default:
+      setMode(kHaierAcYrw02Auto);  // Unexpected, default to auto mode.
   }
-  _.Mode = new_mode;
 }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRHaierAC176::getMode(void) const {
-  return _.Mode;
-}
+uint8_t IRHaierAC176::getMode(void) const { return _.Mode; }
 
 /// Set the temperature.
 /// @param[in] celsius The temperature in degrees celsius.
@@ -668,9 +671,7 @@ void IRHaierAC176::setTemp(const uint8_t celsius) {
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRHaierAC176::getTemp(void) const {
-  return _.Temp + kHaierAcMinTemp;
-}
+uint8_t IRHaierAC176::getTemp(void) const { return _.Temp + kHaierAcMinTemp; }
 
 /// Set the Health (filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
@@ -681,15 +682,11 @@ void IRHaierAC176::setHealth(const bool on) {
 
 /// Get the Health (filter) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHaierAC176::getHealth(void) const {
-  return _.Health;
-}
+bool IRHaierAC176::getHealth(void) const { return _.Health; }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHaierAC176::getPower(void) const {
-  return _.Power;
-}
+bool IRHaierAC176::getPower(void) const { return _.Power; }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
@@ -706,9 +703,7 @@ void IRHaierAC176::off(void) { setPower(false); }
 
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHaierAC176::getSleep(void) const {
-  return _.Sleep;
-}
+bool IRHaierAC176::getSleep(void) const { return _.Sleep; }
 
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
@@ -718,30 +713,42 @@ void IRHaierAC176::setSleep(const bool on) {
 }
 
 /// Get the Turbo setting of the A/C.
-/// @return The current turbo speed setting.
-uint8_t IRHaierAC176::getTurbo(void) const {
-  return _.Turbo;
-}
+/// @return The current turbo setting.
+bool IRHaierAC176::getTurbo(void) const { return _.Turbo; }
 
 /// Set the Turbo setting of the A/C.
-/// @param[in] speed The desired turbo speed setting.
-/// @note Valid speeds are kHaierAcYrw02TurboOff, kHaierAcYrw02TurboLow, &
-///   kHaierAcYrw02TurboHigh.
-void IRHaierAC176::setTurbo(uint8_t speed) {
-  switch (speed) {
-    case kHaierAcYrw02TurboOff:
-    case kHaierAcYrw02TurboLow:
-    case kHaierAcYrw02TurboHigh:
-      _.Turbo = speed;
+/// @param[in] on The desired turbo setting.
+/// @note Turbo & Quiet can't be on at the same time, and only in Heat/Cool mode
+void IRHaierAC176::setTurbo(const bool on) {
+  switch (getMode()) {
+    case kHaierAcYrw02Cool:
+    case kHaierAcYrw02Heat:
+      _.Turbo = on;
       _.Button = kHaierAcYrw02ButtonTurbo;
+      if (on) _.Quiet = false;
+  }
+}
+
+/// Get the Quiet setting of the A/C.
+/// @return The current Quiet setting.
+bool IRHaierAC176::getQuiet(void) const { return _.Quiet; }
+
+/// Set the Quiet setting of the A/C.
+/// @param[in] on The desired Quiet setting.
+/// @note Turbo & Quiet can't be on at the same time, and only in Heat/Cool mode
+void IRHaierAC176::setQuiet(const bool on) {
+  switch (getMode()) {
+    case kHaierAcYrw02Cool:
+    case kHaierAcYrw02Heat:
+      _.Quiet = on;
+      _.Button = kHaierAcYrw02ButtonTurbo;
+      if (on) _.Turbo = false;
   }
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRHaierAC176::getFan(void) const {
-  return _.Fan;
-}
+uint8_t IRHaierAC176::getFan(void) const { return _.Fan; }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
@@ -948,20 +955,6 @@ stdAc::swingv_t IRHaierAC176::toCommonSwingV(const uint8_t pos) {
   }
 }
 
-/// Convert the Turbo setting of the A/C into native turbo setting.
-/// @param[in] speed The enum to be converted.
-/// @return true, the setting is on. false, the setting is off.
-bool IRHaierAC176::toCommonTurbo(const uint8_t speed) {
-  return speed == kHaierAcYrw02TurboHigh;
-}
-
-/// Convert the Turbo setting of the A/C into native quiet setting.
-/// @param[in] speed The enum to be converted.
-/// @return true, the setting is on. false, the setting is off.
-bool IRHaierAC176::toCommonQuiet(const uint8_t speed) {
-  return speed == kHaierAcYrw02TurboLow;
-}
-
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHaierAC176::toCommon(void) const {
@@ -976,8 +969,8 @@ stdAc::state_t IRHaierAC176::toCommon(void) const {
   result.swingv = toCommonSwingV(_.Swing);
   result.filter = _.Health;
   result.sleep = _.Sleep ? 0 : -1;
-  result.quiet = toCommonQuiet(_.Turbo);
-  result.turbo = toCommonTurbo(_.Turbo);
+  result.turbo = _.Turbo;
+  result.quiet = _.Quiet;
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.econo = false;
@@ -1036,22 +1029,8 @@ String IRHaierAC176::toString(void) const {
   result += addFanToString(_.Fan, kHaierAcYrw02FanHigh, kHaierAcYrw02FanLow,
                            kHaierAcYrw02FanAuto, kHaierAcYrw02FanAuto,
                            kHaierAcYrw02FanMed);
-  result += addIntToString(_.Turbo, kTurboStr);
-  result += kSpaceLBraceStr;
-  switch (_.Turbo) {
-    case kHaierAcYrw02TurboOff:
-      result += kOffStr;
-      break;
-    case kHaierAcYrw02TurboLow:
-      result += kLowStr;
-      break;
-    case kHaierAcYrw02TurboHigh:
-      result += kHighStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
+  result += addBoolToString(_.Turbo, kTurboStr);
+  result += addBoolToString(_.Quiet, kQuietStr);
   result += addIntToString(_.Swing, kSwingStr);
   result += kSpaceLBraceStr;
   switch (_.Swing) {
