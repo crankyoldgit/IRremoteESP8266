@@ -4178,6 +4178,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_PANASONIC_AC32
+#if DECODE_RHOSS
+      case decode_type_t::RHOSS: {
+        IRRhossAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_RHOSS
 #if DECODE_SAMSUNG_AC
       case decode_type_t::SAMSUNG_AC: {
         IRSamsungAc ac(kGpioUnused);
@@ -4302,14 +4310,6 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_TRANSCOLD
-#if DECODE_RHOSS
-      case decode_type_t::RHOSS: {
-        IRRhossAc ac(kGpioUnused);
-        ac.setRaw(decode->state);
-        *result = ac.toCommon();
-        break;
-      }
-#endif  // DECODE_RHOSS
       default:
         return false;
     }
