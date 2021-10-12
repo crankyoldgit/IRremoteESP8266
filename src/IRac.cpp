@@ -1116,20 +1116,21 @@ void IRac::haier(IRHaierAC *ac,
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] quiet Run the device in quiet mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::haier176(IRHaierAC176 *ac,
                     const bool on, const stdAc::opmode_t mode,
                     const float degrees, const stdAc::fanspeed_t fan,
                     const stdAc::swingv_t swingv, const bool turbo,
-                    const bool filter, const int16_t sleep) {
+                    const bool quiet, const bool filter, const int16_t sleep) {
   ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwing(ac->convertSwingV(swingv));
   // No Horizontal Swing setting available.
-  // No Quiet setting available.
+  ac->setQuiet(quiet);
   ac->setTurbo(turbo);
   // No Light setting available.
   ac->setHealth(filter);
@@ -1150,20 +1151,22 @@ void IRac::haier176(IRHaierAC176 *ac,
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] quiet Run the device in quiet mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::haierYrwo2(IRHaierACYRW02 *ac,
                       const bool on, const stdAc::opmode_t mode,
                       const float degrees, const stdAc::fanspeed_t fan,
                       const stdAc::swingv_t swingv, const bool turbo,
-                      const bool filter, const int16_t sleep) {
+                      const bool quiet, const bool filter,
+                      const int16_t sleep) {
   ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwing(ac->convertSwingV(swingv));
   // No Horizontal Swing setting available.
-  // No Quiet setting available.
+  ac->setQuiet(quiet);
   ac->setTurbo(turbo);
   // No Light setting available.
   ac->setHealth(filter);

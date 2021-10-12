@@ -789,18 +789,19 @@ TEST(TestIRac, Haier176) {
   IRrecv capture(kGpioUnused);
   const char expected[] =
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
-      "Fan: 2 (Medium), Turbo: 1 (High), Swing: 1 (Highest), Sleep: On, "
+      "Fan: 2 (Medium), Turbo: On, Quiet: Off, Swing: 1 (Highest), Sleep: On, "
       "Health: On, Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
   ac.begin();
   irac.haier176(&ac,
-             true,                        // Power
-             stdAc::opmode_t::kCool,      // Mode
-             23,                          // Celsius
-             stdAc::fanspeed_t::kMedium,  // Fan speed
-             stdAc::swingv_t::kHigh,      // Vertical swing
-             true,                        // Turbo
-             true,                        // Filter
-             8 * 60 + 0);                 // Sleep time
+                true,                        // Power
+                stdAc::opmode_t::kCool,      // Mode
+                23,                          // Celsius
+                stdAc::fanspeed_t::kMedium,  // Fan speed
+                stdAc::swingv_t::kHigh,      // Vertical swing
+                true,                        // Turbo
+                false,                       // Quiet
+                true,                        // Filter
+                8 * 60 + 0);                 // Sleep time
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
@@ -817,19 +818,20 @@ TEST(TestIRac, HaierYrwo2) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
-      "Fan: 2 (Medium), Turbo: 1 (High), Swing: 1 (Highest), Sleep: On, "
+      "Fan: 2 (Medium), Turbo: Off, Quiet: On, Swing: 1 (Highest), Sleep: On, "
       "Health: On, Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
 
   ac.begin();
   irac.haierYrwo2(&ac,
-             true,                        // Power
-             stdAc::opmode_t::kCool,      // Mode
-             23,                          // Celsius
-             stdAc::fanspeed_t::kMedium,  // Fan speed
-             stdAc::swingv_t::kHigh,      // Vertical swing
-             true,                        // Turbo
-             true,                        // Filter
-             8 * 60 + 0);                 // Sleep time
+                  true,                        // Power
+                  stdAc::opmode_t::kCool,      // Mode
+                  23,                          // Celsius
+                  stdAc::fanspeed_t::kMedium,  // Fan speed
+                  stdAc::swingv_t::kHigh,      // Vertical swing
+                  false,                       // Turbo
+                  true,                        // Quiet
+                  true,                        // Filter
+                  8 * 60 + 0);                 // Sleep time
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
