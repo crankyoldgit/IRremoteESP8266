@@ -30,6 +30,7 @@
 #include "ir_MitsubishiHeavy.h"
 #include "ir_Neoclima.h"
 #include "ir_Panasonic.h"
+#include "ir_Rhoss.h"
 #include "ir_Samsung.h"
 #include "ir_Sanyo.h"
 #include "ir_Sharp.h"
@@ -43,7 +44,6 @@
 #include "ir_Vestel.h"
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
-#include "ir_Rhoss.h"
 
 // Constants
 const int8_t kGpioUnused = -1;  ///< A placeholder for not using an actual GPIO.
@@ -388,6 +388,11 @@ void electra(IRElectraAc *ac,
                    const float degrees, const stdAc::fanspeed_t fan,
                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh);
 #endif  // SEND_PANASONIC_AC32
+#if SEND_RHOSS
+  void rhoss(IRRhossAc *ac,
+                const bool on, const stdAc::opmode_t mode, const float degrees,
+                const stdAc::fanspeed_t fan, const stdAc::swingv_t swing);
+#endif  // SEND_RHOSS
 #if SEND_SAMSUNG_AC
   void samsung(IRSamsungAc *ac,
                const bool on, const stdAc::opmode_t mode, const float degrees,
@@ -490,11 +495,6 @@ void electra(IRElectraAc *ac,
               const stdAc::fanspeed_t fan,
               const stdAc::swingv_t swingv, const stdAc::swingh_t swingh);
 #endif  // SEND_TRANSCOLD
-#if SEND_RHOSS
-  void rhoss(IRRhossAc *ac,
-                const bool on, const stdAc::opmode_t mode, const float degrees,
-                const stdAc::fanspeed_t fan, const stdAc::swingv_t swing);
-#endif  // SEND_RHOSS
 static stdAc::state_t cleanState(const stdAc::state_t state);
 static stdAc::state_t handleToggles(const stdAc::state_t desired,
                                     const stdAc::state_t *prev = NULL);
