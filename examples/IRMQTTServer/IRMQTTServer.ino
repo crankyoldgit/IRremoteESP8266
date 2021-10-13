@@ -1274,14 +1274,16 @@ void handleInfo(void) {
         String(HIDE_DUPLICATE_NETWORKS ? F("Hide") : F("Show")) + F("<br>"
     "Min " D_STR_WIFI " signal required: "
 #ifdef MIN_SIGNAL_STRENGTH
-        ) + String(static_cast<int>(MIN_SIGNAL_STRENGTH)) + F(
+        ) +  // NOLINT(whitespace/parens)
+        String(static_cast<int>(MIN_SIGNAL_STRENGTH)) + F(
 #else  // MIN_SIGNAL_STRENGTH
         "8"
 #endif  // MIN_SIGNAL_STRENGTH
         "%<br>"
     "Serial debugging: "
 #if DEBUG
-        ) + String(isSerialGpioUsedByIr() ? D_STR_OFF : D_STR_ON) + F(
+        ) +  // NOLINT(whitespace/parens)
+        String(isSerialGpioUsedByIr() ? D_STR_OFF : D_STR_ON) + F(
 #else  // DEBUG
         D_STR_OFF
 #endif  // DEBUG
@@ -2561,7 +2563,7 @@ void sendMQTTDiscovery(const char *topic) {
       // our Home Assistant Climate compatiblity mode. It causes odd behaviour
       // if both are used.
       "\"pow_cmd_t\":\"~/" MQTT_CLIMATE_CMND "/" KEY_POWER "\","
-#endif // !MQTT_CLIMATE_HA_MODE
+#endif  // !MQTT_CLIMATE_HA_MODE
       "\"mode_cmd_t\":\"~/" MQTT_CLIMATE_CMND "/" KEY_MODE "\","
       "\"mode_stat_t\":\"~/" MQTT_CLIMATE_STAT "/" KEY_MODE "\","
       // I don't know why, but the modes need to be lower case to work with
