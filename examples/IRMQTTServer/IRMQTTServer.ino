@@ -361,6 +361,12 @@
 #include <memory>
 #include <string>
 
+#ifdef ESP32
+#ifdef F
+#undef F
+#endif  // F
+#define F(string) string
+#endif  // ESP32
 using irutils::msToString;
 
 #if REPORT_VCC
