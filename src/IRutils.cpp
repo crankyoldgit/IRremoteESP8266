@@ -95,7 +95,7 @@ String uint64ToString(uint64_t input, uint8_t base) {
 /// @returns A String representation of the integer.
 String int64ToString(int64_t input, uint8_t base) {
   if (input < 0) {
-    return "-" + uint64ToString(-input, base);
+    return kDashStr + uint64ToString(-input, base);
   }
   return uint64ToString(input, base);
 }
@@ -343,7 +343,7 @@ String resultToTimingInfo(const decode_results * const results) {
 
   for (uint16_t i = 1; i < results->rawlen; i++) {
     if (i % 2 == 0)
-      output += '-';  // even
+      output += kDashStr;  // even
     else
       output += F("   +");  // odd
     value = uint64ToString(results->rawbuf[i] * kRawTick);
@@ -587,78 +587,79 @@ namespace irutils {
     switch (protocol) {
       case decode_type_t::FUJITSU_AC:
         switch (model) {
-          case fujitsu_ac_remote_model_t::ARRAH2E: return F("ARRAH2E");
-          case fujitsu_ac_remote_model_t::ARDB1: return F("ARDB1");
-          case fujitsu_ac_remote_model_t::ARREB1E: return F("ARREB1E");
-          case fujitsu_ac_remote_model_t::ARJW2: return F("ARJW2");
-          case fujitsu_ac_remote_model_t::ARRY4: return F("ARRY4");
-          case fujitsu_ac_remote_model_t::ARREW4E: return F("ARREW4E");
-          default: return kUnknownStr;
+          case fujitsu_ac_remote_model_t::ARRAH2E: return kArrah2eStr;
+          case fujitsu_ac_remote_model_t::ARDB1:   return kArdb1Str;
+          case fujitsu_ac_remote_model_t::ARREB1E: return kArreb1eStr;
+          case fujitsu_ac_remote_model_t::ARJW2:   return kArjw2Str;
+          case fujitsu_ac_remote_model_t::ARRY4:   return kArry4Str;
+          case fujitsu_ac_remote_model_t::ARREW4E: return kArrew4eStr;
+          default:                                 return kUnknownStr;
         }
         break;
       case decode_type_t::GREE:
         switch (model) {
-          case gree_ac_remote_model_t::YAW1F: return F("YAW1F");
-          case gree_ac_remote_model_t::YBOFB: return F("YBOFB");
-          default: return kUnknownStr;
+          case gree_ac_remote_model_t::YAW1F: return kYaw1fStr;
+          case gree_ac_remote_model_t::YBOFB: return kYbofbStr;
+          default:                            return kUnknownStr;
         }
         break;
       case decode_type_t::HITACHI_AC1:
         switch (model) {
           case hitachi_ac1_remote_model_t::R_LT0541_HTA_A:
-            return F("R-LT0541-HTA-A");
+            return kRlt0541htaaStr;
           case hitachi_ac1_remote_model_t::R_LT0541_HTA_B:
-            return F("R-LT0541-HTA-B");
-          default: return kUnknownStr;
+            return kRlt0541htabStr;
+          default:
+            return kUnknownStr;
         }
         break;
       case decode_type_t::LG:
       case decode_type_t::LG2:
         switch (model) {
-          case lg_ac_remote_model_t::GE6711AR2853M: return F("GE6711AR2853M");
-          case lg_ac_remote_model_t::AKB75215403:   return F("AKB75215403");
-          case lg_ac_remote_model_t::AKB74955603:   return F("AKB74955603");
-          case lg_ac_remote_model_t::AKB73757604:   return F("AKB73757604");
-          default: return kUnknownStr;
+          case lg_ac_remote_model_t::GE6711AR2853M: return kGe6711ar2853mStr;
+          case lg_ac_remote_model_t::AKB75215403:   return kAkb75215403Str;
+          case lg_ac_remote_model_t::AKB74955603:   return kAkb74955603Str;
+          case lg_ac_remote_model_t::AKB73757604:   return kAkb73757604Str;
+          default:                                  return kUnknownStr;
         }
         break;
       case decode_type_t::PANASONIC_AC:
         switch (model) {
-          case panasonic_ac_remote_model_t::kPanasonicLke: return F("LKE");
-          case panasonic_ac_remote_model_t::kPanasonicNke: return F("NKE");
-          case panasonic_ac_remote_model_t::kPanasonicDke: return F("DKE");
-          case panasonic_ac_remote_model_t::kPanasonicJke: return F("JKE");
-          case panasonic_ac_remote_model_t::kPanasonicCkp: return F("CKP");
-          case panasonic_ac_remote_model_t::kPanasonicRkr: return F("RKR");
-          default: return kUnknownStr;
+          case panasonic_ac_remote_model_t::kPanasonicLke: return kLkeStr;
+          case panasonic_ac_remote_model_t::kPanasonicNke: return kNkeStr;
+          case panasonic_ac_remote_model_t::kPanasonicDke: return kDkeStr;
+          case panasonic_ac_remote_model_t::kPanasonicJke: return kJkeStr;
+          case panasonic_ac_remote_model_t::kPanasonicCkp: return kCkpStr;
+          case panasonic_ac_remote_model_t::kPanasonicRkr: return kRkrStr;
+          default:                                         return kUnknownStr;
         }
         break;
       case decode_type_t::SHARP_AC:
         switch (model) {
-          case sharp_ac_remote_model_t::A907: return F("A907");
-          case sharp_ac_remote_model_t::A705: return F("A705");
-          case sharp_ac_remote_model_t::A903: return F("A903");
-          default: return kUnknownStr;
+          case sharp_ac_remote_model_t::A907: return kA907Str;
+          case sharp_ac_remote_model_t::A705: return kA705Str;
+          case sharp_ac_remote_model_t::A903: return kA903Str;
+          default:                            return kUnknownStr;
         }
         break;
       case decode_type_t::TCL112AC:
         switch (model) {
-          case tcl_ac_remote_model_t::TAC09CHSD: return F("TAC09CHSD");
-          case tcl_ac_remote_model_t::GZ055BE1:  return F("GZ055BE1");
-          default: return kUnknownStr;
+          case tcl_ac_remote_model_t::TAC09CHSD: return kTac09chsdStr;
+          case tcl_ac_remote_model_t::GZ055BE1:  return kGz055be1Str;
+          default:                               return kUnknownStr;
         }
         break;
       case decode_type_t::VOLTAS:
         switch (model) {
-          case voltas_ac_remote_model_t::kVoltas122LZF: return F("122LZF");
-          default: return kUnknownStr;
+          case voltas_ac_remote_model_t::kVoltas122LZF: return k122lzfStr;
+          default:                                      return kUnknownStr;
         }
         break;
       case decode_type_t::WHIRLPOOL_AC:
         switch (model) {
-          case whirlpool_ac_remote_model_t::DG11J13A: return F("DG11J13A");
-          case whirlpool_ac_remote_model_t::DG11J191: return F("DG11J191");
-          default: return kUnknownStr;
+          case whirlpool_ac_remote_model_t::DG11J13A: return kDg11j13aStr;
+          case whirlpool_ac_remote_model_t::DG11J191: return kDg11j191Str;
+          default:                                    return kUnknownStr;
         }
         break;
       default: return kUnknownStr;
@@ -733,8 +734,8 @@ namespace irutils {
     if (mode == automatic) result += kAutoStr;
     else if (mode == cool) result += kCoolStr;
     else if (mode == heat) result += kHeatStr;
-    else if (mode == dry) result += kDryStr;
-    else if (mode == fan) result += kFanStr;
+    else if (mode == dry)  result += kDryStr;
+    else if (mode == fan)  result += kFanStr;
     else
       result += kUnknownStr;
     return result + ')';
