@@ -760,7 +760,7 @@ TEST(TestIRac, Haier) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Command: 1 (On), Mode: 1 (Cool), Temp: 24C, Fan: 2 (Medium), "
-      "Swing: 1 (Up), Sleep: On, Health: On, Clock: 13:45, "
+      "Swing(V): 1 (Up), Sleep: On, Health: On, Clock: 13:45, "
       "On Timer: Off, Off Timer: Off";
 
   ac.begin();
@@ -789,7 +789,7 @@ TEST(TestIRac, Haier176) {
   IRrecv capture(kGpioUnused);
   const char expected[] =
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
-      "Fan: 2 (Medium), Turbo: On, Quiet: Off, Swing: 1 (Highest), Sleep: On, "
+      "Fan: 2 (Medium), Turbo: On, Quiet: Off, Swing(V): 1 (Highest), Sleep: On, "
       "Health: On, Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
   ac.begin();
   irac.haier176(&ac,
@@ -818,7 +818,7 @@ TEST(TestIRac, HaierYrwo2) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
-      "Fan: 2 (Medium), Turbo: Off, Quiet: On, Swing: 1 (Highest), Sleep: On, "
+      "Fan: 2 (Medium), Turbo: Off, Quiet: On, Swing(V): 1 (Highest), Sleep: On, "
       "Health: On, Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
 
   ac.begin();

@@ -1086,7 +1086,7 @@ void IRac::haier(IRHaierAC *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwing(ac->convertSwingV(swingv));
+  ac->setSwingV(ac->convertSwingV(swingv));
   // No Horizontal Swing setting available.
   // No Quiet setting available.
   // No Turbo setting available.
@@ -1125,7 +1125,7 @@ void IRac::haier176(IRHaierAC176 *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwing(ac->convertSwingV(swingv));
+  ac->setSwingV(ac->convertSwingV(swingv));
   // No Horizontal Swing setting available.
   ac->setQuiet(quiet);
   ac->setTurbo(turbo);
@@ -1161,7 +1161,7 @@ void IRac::haierYrwo2(IRHaierACYRW02 *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwing(ac->convertSwingV(swingv));
+  ac->setSwingV(ac->convertSwingV(swingv));
   // No Horizontal Swing setting available.
   ac->setQuiet(quiet);
   ac->setTurbo(turbo);
