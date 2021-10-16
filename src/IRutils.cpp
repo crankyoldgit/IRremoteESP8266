@@ -95,7 +95,10 @@ String uint64ToString(uint64_t input, uint8_t base) {
 /// @returns A String representation of the integer.
 String int64ToString(int64_t input, uint8_t base) {
   if (input < 0) {
-    return kDashStr + uint64ToString(-input, base);
+    // Using String(kDashStr) to keep compatible with old arduino
+    // frameworks. Not needed with 3.0.2.
+    ///> @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1639#issuecomment-944906016
+    return String(kDashStr) + uint64ToString(-input, base);
   }
   return uint64ToString(input, base);
 }
