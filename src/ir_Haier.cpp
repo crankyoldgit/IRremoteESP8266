@@ -1064,7 +1064,7 @@ String IRHaierAC176::toString(void) const {
       break;
     case kHaierAcYrw02ButtonSwingV:
       result += kSwingVStr;
-      break;    
+      break;
     case kHaierAcYrw02ButtonSwingH:
       result += kSwingHStr;
       break;
@@ -1114,7 +1114,7 @@ String IRHaierAC176::toString(void) const {
   switch (_.SwingH) {
     case kHaierAcYrw02SwingHOff:
       result += kOffStr;
-      break;    
+      break;
     case kHaierAcYrw02SwingHLeftMax:
       result += kLeftMaxStr;
       break;
@@ -1134,7 +1134,6 @@ String IRHaierAC176::toString(void) const {
       result += kUnknownStr;
   }
   result += ')';
-  
   result += addBoolToString(_.Sleep, kSleepStr);
   result += addBoolToString(_.Health, kHealthStr);
   const uint8_t tmode = getTimerMode();
