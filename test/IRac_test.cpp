@@ -799,7 +799,7 @@ TEST(TestIRac, Haier176) {
                 23,                          // Celsius
                 stdAc::fanspeed_t::kMedium,  // Fan speed
                 stdAc::swingv_t::kHigh,      // Vertical swing
-                stdAc::swingh_t::kOff,       // Horisontal swing
+                stdAc::swingh_t::kOff,       // Horizontal swing
                 true,                        // Turbo
                 false,                       // Quiet
                 true,                        // Filter

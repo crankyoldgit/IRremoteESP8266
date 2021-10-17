@@ -791,11 +791,11 @@ void IRHaierAC176::setSwingV(uint8_t pos) {
   _.SwingV = newpos;
 }
 
-/// Get the Horisontal Swing position setting of the A/C.
+/// Get the Horizontal Swing position setting of the A/C.
 /// @return The native position/mode.
 uint8_t IRHaierAC176::getSwingH(void) const { return _.SwingH; }
 
-/// Set the Horisontal Swing mode of the A/C.
+/// Set the Horizontal Swing mode of the A/C.
 /// @param[in] pos The position/mode to set the vanes to.
 void IRHaierAC176::setSwingH(uint8_t pos) {
   switch (pos) {
