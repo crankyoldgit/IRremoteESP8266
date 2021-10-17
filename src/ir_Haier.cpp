@@ -610,6 +610,7 @@ void IRHaierAC176::setButton(uint8_t button) {
     case kHaierAcYrw02ButtonTempUp:
     case kHaierAcYrw02ButtonTempDown:
     case kHaierAcYrw02ButtonSwingV:
+    case kHaierAcYrw02ButtonSwingH:
     case kHaierAcYrw02ButtonFan:
     case kHaierAcYrw02ButtonPower:
     case kHaierAcYrw02ButtonMode:
@@ -790,6 +791,25 @@ void IRHaierAC176::setSwingV(uint8_t pos) {
   _.SwingV = newpos;
 }
 
+/// Get the Horisontal Swing position setting of the A/C.
+/// @return The native position/mode.
+uint8_t IRHaierAC176::getSwingH(void) const { return _.SwingH; }
+
+/// Set the Horisontal Swing mode of the A/C.
+/// @param[in] pos The position/mode to set the vanes to.
+void IRHaierAC176::setSwingH(uint8_t pos) {
+  switch (pos) {
+    case kHaierAcYrw02SwingHOff:
+    case kHaierAcYrw02SwingHLeftMax:
+    case kHaierAcYrw02SwingHLeft:
+    case kHaierAcYrw02SwingHRight:
+    case kHaierAcYrw02SwingHRightMax:
+    case kHaierAcYrw02SwingHAuto: _.Button = kHaierAcYrw02ButtonSwingH; break;
+    default: return;  // Unexpected value so don't do anything.
+  }
+  _.SwingH = pos;
+}
+
 
 /// Set the Timer operating mode.
 /// @param[in] mode The timer mode to use.
@@ -916,6 +936,21 @@ uint8_t IRHaierAC176::convertSwingV(const stdAc::swingv_t position) {
   }
 }
 
+/// Convert a stdAc::swingh_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRHaierAC176::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kOff:      return kHaierAcYrw02SwingHOff;
+    case stdAc::swingh_t::kLeftMax:  return kHaierAcYrw02SwingHLeftMax;
+    case stdAc::swingh_t::kLeft:     return kHaierAcYrw02SwingHLeft;
+    case stdAc::swingh_t::kRight:    return kHaierAcYrw02SwingHRight;
+    case stdAc::swingh_t::kRightMax: return kHaierAcYrw02SwingHRightMax;
+    case stdAc::swingh_t::kAuto:     return kHaierAcYrw02SwingHAuto;
+    default:                         return kHaierAcYrw02SwingHOff;
+  }
+}
+
 /// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
@@ -955,6 +990,21 @@ stdAc::swingv_t IRHaierAC176::toCommonSwingV(const uint8_t pos) {
   }
 }
 
+/// Convert a stdAc::swingh_t enum into it's native setting.
+/// @param[in] pos The enum to be converted.
+/// @return The native equivalent of the enum.
+stdAc::swingh_t IRHaierAC176::toCommonSwingH(const uint8_t pos) {
+  switch (pos) {
+    case kHaierAcYrw02SwingHOff:      return stdAc::swingh_t::kOff;
+    case kHaierAcYrw02SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;
+    case kHaierAcYrw02SwingHLeft:     return stdAc::swingh_t::kLeft;
+    case kHaierAcYrw02SwingHRight:    return stdAc::swingh_t::kRight;
+    case kHaierAcYrw02SwingHRightMax: return stdAc::swingh_t::kRightMax;
+    case kHaierAcYrw02SwingHAuto:     return stdAc::swingh_t::kAuto;
+    default:                          return stdAc::swingh_t::kOff;
+  }
+}
+
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHaierAC176::toCommon(void) const {
@@ -967,12 +1017,12 @@ stdAc::state_t IRHaierAC176::toCommon(void) const {
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
   result.swingv = toCommonSwingV(_.SwingV);
+  result.swingh = toCommonSwingH(_.SwingH);
   result.filter = _.Health;
   result.sleep = _.Sleep ? 0 : -1;
   result.turbo = _.Turbo;
   result.quiet = _.Quiet;
   // Not supported.
-  result.swingh = stdAc::swingh_t::kOff;
   result.econo = false;
   result.light = false;
   result.clean = false;
@@ -1014,6 +1064,9 @@ String IRHaierAC176::toString(void) const {
       break;
     case kHaierAcYrw02ButtonSwingV:
       result += kSwingVStr;
+      break;    
+    case kHaierAcYrw02ButtonSwingH:
+      result += kSwingHStr;
       break;
     case kHaierAcYrw02ButtonTurbo:
       result += kTurboStr;
@@ -1056,6 +1109,32 @@ String IRHaierAC176::toString(void) const {
       result += kUnknownStr;
   }
   result += ')';
+  result += addIntToString(_.SwingH, kSwingHStr);
+  result += kSpaceLBraceStr;
+  switch (_.SwingH) {
+    case kHaierAcYrw02SwingHOff:
+      result += kOffStr;
+      break;    
+    case kHaierAcYrw02SwingHLeftMax:
+      result += kLeftMaxStr;
+      break;
+    case kHaierAcYrw02SwingHLeft:
+      result += kLeftStr;
+      break;
+    case kHaierAcYrw02SwingHRight:
+      result += kRightStr;
+      break;
+    case kHaierAcYrw02SwingHRightMax:
+      result += kRightMaxStr;
+      break;
+    case kHaierAcYrw02SwingHAuto:
+      result += kAutoStr;
+      break;
+    default:
+      result += kUnknownStr;
+  }
+  result += ')';
+  
   result += addBoolToString(_.Sleep, kSleepStr);
   result += addBoolToString(_.Health, kHealthStr);
   const uint8_t tmode = getTimerMode();

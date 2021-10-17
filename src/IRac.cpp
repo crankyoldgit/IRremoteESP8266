@@ -1112,6 +1112,7 @@ void IRac::haier(IRHaierAC *ac,
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horisontal swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] quiet Run the device in quiet mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
@@ -1119,14 +1120,15 @@ void IRac::haier(IRHaierAC *ac,
 void IRac::haier176(IRHaierAC176 *ac,
                     const bool on, const stdAc::opmode_t mode,
                     const float degrees, const stdAc::fanspeed_t fan,
-                    const stdAc::swingv_t swingv, const bool turbo,
-                    const bool quiet, const bool filter, const int16_t sleep) {
+                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                    const bool turbo, const bool quiet, const bool filter,
+                    const int16_t sleep) {
   ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(ac->convertSwingV(swingv));
-  // No Horizontal Swing setting available.
+  ac->setSwingH(ac->convertSwingH(swingh));
   ac->setQuiet(quiet);
   ac->setTurbo(turbo);
   // No Light setting available.
@@ -1147,6 +1149,7 @@ void IRac::haier176(IRHaierAC176 *ac,
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horisontal swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] quiet Run the device in quiet mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
@@ -1154,15 +1157,15 @@ void IRac::haier176(IRHaierAC176 *ac,
 void IRac::haierYrwo2(IRHaierACYRW02 *ac,
                       const bool on, const stdAc::opmode_t mode,
                       const float degrees, const stdAc::fanspeed_t fan,
-                      const stdAc::swingv_t swingv, const bool turbo,
-                      const bool quiet, const bool filter,
+                      const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                      const bool turbo, const bool quiet, const bool filter,
                       const int16_t sleep) {
   ac->begin();
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(ac->convertSwingV(swingv));
-  // No Horizontal Swing setting available.
+  ac->setSwingH(ac->convertSwingH(swingh));
   ac->setQuiet(quiet);
   ac->setTurbo(turbo);
   // No Light setting available.
@@ -2751,7 +2754,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRHaierAC176 ac(_pin, _inverted, _modulation);
       haier176(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-               send.turbo, send.filter, send.sleep);
+               send.swingh, send.turbo, send.filter, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC176
@@ -2760,7 +2763,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRHaierACYRW02 ac(_pin, _inverted, _modulation);
       haierYrwo2(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-                 send.turbo, send.filter, send.sleep);
+                 send.swingh, send.turbo, send.filter, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC_YRW02

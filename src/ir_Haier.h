@@ -143,6 +143,13 @@ const uint8_t kHaierAcYrw02SwingVBottom = 0x3;  // Only available in heat mode.
 const uint8_t kHaierAcYrw02SwingVDown = 0xA;
 const uint8_t kHaierAcYrw02SwingVAuto = 0xC;  // Airflow
 
+const uint8_t kHaierAcYrw02SwingHOff = 0x0;
+const uint8_t kHaierAcYrw02SwingHLeftMax = 0x3;
+const uint8_t kHaierAcYrw02SwingHLeft = 0x4;
+const uint8_t kHaierAcYrw02SwingHRight = 0x5;
+const uint8_t kHaierAcYrw02SwingHRightMax = 0x6;
+const uint8_t kHaierAcYrw02SwingHAuto = 0x7;
+
 const uint8_t kHaierAcYrw02FanHigh = 0b001;
 const uint8_t kHaierAcYrw02FanMed =  0b010;
 const uint8_t kHaierAcYrw02FanLow =  0b011;
@@ -157,6 +164,7 @@ const uint8_t kHaierAcYrw02Fan =  0b110;  // 5
 const uint8_t kHaierAcYrw02ButtonTempUp = 0x0;
 const uint8_t kHaierAcYrw02ButtonTempDown = 0x1;
 const uint8_t kHaierAcYrw02ButtonSwingV = 0x2;
+const uint8_t kHaierAcYrw02ButtonSwingH = 0x3;
 const uint8_t kHaierAcYrw02ButtonFan = 0x4;
 const uint8_t kHaierAcYrw02ButtonPower = 0x5;
 const uint8_t kHaierAcYrw02ButtonMode = 0x6;
@@ -180,7 +188,8 @@ union HaierAc176Protocol{
     uint8_t SwingV      :4;
     uint8_t Temp        :4;  // 16C~30C
     // Byte 2
-    uint8_t             :8;
+    uint8_t             :5;
+    uint8_t SwingH      :3;
     // Byte 3
     uint8_t             :1;
     uint8_t Health      :1;
@@ -242,6 +251,12 @@ union HaierAc176Protocol{
 #define HAIER_AC_YRW02_SWINGV_BOTTOM kHaierAcYrw02SwingVBottom
 #define HAIER_AC_YRW02_SWINGV_DOWN kHaierAcYrw02SwingVDown
 #define HAIER_AC_YRW02_SWINGV_AUTO kHaierAcYrw02SwingVAuto
+#define HAIER_AC_YRW02_SWINGH_OFF kHaierAcYrw02SwingHOff
+#define HAIER_AC_YRW02_SWINGH_LEFTMAX kHaierAcYrw02SwingHLeftMax
+#define HAIER_AC_YRW02_SWINGH_LEFT kHaierAcYrw02SwingHLeft
+#define HAIER_AC_YRW02_SWINGH_RIGHT kHaierAcYrw02SwingHRight
+#define HAIER_AC_YRW02_SWINGH_RIGHTMAX kHaierAcYrw02SwingHRightMax
+#define HAIER_AC_YRW02_SWINGH_AUTO kHaierAcYrw02SwingHAuto
 #define HAIER_AC_YRW02_FAN_HIGH kHaierAcYrw02FanHigh
 #define HAIER_AC_YRW02_FAN_MED kHaierAcYrw02FanMed
 #define HAIER_AC_YRW02_FAN_LOW kHaierAcYrw02FanLow
@@ -379,6 +394,8 @@ class IRHaierAC176 {
 
   uint8_t getSwingV(void) const;
   void setSwingV(const uint8_t pos);
+  uint8_t getSwingH(void) const;
+  void setSwingH(const uint8_t pos);
 
   void setTimerMode(const uint8_t setting);
   uint8_t getTimerMode(void) const;
@@ -394,9 +411,11 @@ class IRHaierAC176 {
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
+  static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
   static bool toCommonTurbo(const uint8_t speed);
   static bool toCommonQuiet(const uint8_t speed);
   stdAc::state_t toCommon(void) const;

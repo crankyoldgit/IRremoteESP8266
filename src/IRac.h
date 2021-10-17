@@ -261,7 +261,7 @@ void electra(IRElectraAc *ac,
   void haier176(IRHaierAC176 *ac,
                 const bool on, const stdAc::opmode_t mode,
                 const float degrees, const stdAc::fanspeed_t fan,
-                const stdAc::swingv_t swingv,
+                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                 const bool turbo, const bool quiet, const bool filter,
                 const int16_t sleep = -1);
 #endif  // SEND_HAIER_AC176
@@ -269,7 +269,7 @@ void electra(IRElectraAc *ac,
   void haierYrwo2(IRHaierACYRW02 *ac,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
-                  const stdAc::swingv_t swingv,
+                  const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                   const bool turbo, const bool quiet, const bool filter,
                   const int16_t sleep = -1);
 #endif  // SEND_HAIER_AC_YRW02
