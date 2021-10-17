@@ -686,6 +686,43 @@ TEST(TestHaierACYRW02Class, SwingV) {
   EXPECT_EQ(kHaierAcYrw02SwingVMiddle, ac.getSwingV());
 }
 
+TEST(TestHaierACYRW02Class, SwingH) {
+  IRHaierACYRW02 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSwingH(kHaierAcYrw02SwingVOff);
+  EXPECT_EQ(kHaierAcYrw02SwingHOff, ac.getSwingH());
+  EXPECT_EQ(kHaierAcYrw02ButtonSwingH, ac.getButton());
+
+  ac.setButton(kHaierAcYrw02ButtonTempUp);
+
+  ac.setSwingH(kHaierAcYrw02SwingHLeftMax);
+  EXPECT_EQ(kHaierAcYrw02SwingHLeftMax, ac.getSwingH());
+  EXPECT_EQ(kHaierAcYrw02ButtonSwingH, ac.getButton());
+
+  ac.setSwingH(kHaierAcYrw02SwingHLeft);
+  EXPECT_EQ(kHaierAcYrw02SwingHLeft, ac.getSwingH());
+  EXPECT_EQ(kHaierAcYrw02ButtonSwingH, ac.getButton());
+
+  ac.setSwingH(kHaierAcYrw02SwingHRight);
+  EXPECT_EQ(kHaierAcYrw02SwingHRight, ac.getSwingH());
+  EXPECT_EQ(kHaierAcYrw02ButtonSwingH, ac.getButton());
+
+  ac.setSwingH(kHaierAcYrw02SwingHRightMax);
+  EXPECT_EQ(kHaierAcYrw02SwingHRightMax, ac.getSwingH());
+  EXPECT_EQ(kHaierAcYrw02ButtonSwingH, ac.getButton());
+
+  ac.setSwingH(kHaierAcYrw02SwingHAuto);
+  EXPECT_EQ(kHaierAcYrw02SwingHAuto, ac.getSwingH());
+  EXPECT_EQ(kHaierAcYrw02ButtonSwingH, ac.getButton());
+
+  // Test unexpected values.
+  ac.setButton(kHaierAcYrw02ButtonTempUp);
+  ac.setSwingH(0xFF);
+  EXPECT_EQ(kHaierAcYrw02SwingHAuto, ac.getSwingH());
+  EXPECT_EQ(kHaierAcYrw02ButtonTempUp, ac.getButton());
+}
+
 TEST(TestHaierACYRW02Class, MessageConstuction) {
   IRHaierACYRW02 ac(kGpioUnused);
 
@@ -1138,6 +1175,7 @@ TEST(TestHaierACYRW02Class, toCommon) {
   ac.setTemp(20);
   ac.setFan(kHaierAcYrw02FanHigh);
   ac.setSwingV(kHaierAcYrw02SwingVTop);
+  ac.setSwingH(kHaierAcYrw02SwingHRightMax);
   ac.setHealth(true);
   ac.setSleep(true);
   // Now test it.
@@ -1150,9 +1188,9 @@ TEST(TestHaierACYRW02Class, toCommon) {
   ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
   ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
   ASSERT_EQ(stdAc::swingv_t::kHighest, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kRightMax, ac.toCommon().swingh);
   ASSERT_EQ(0, ac.toCommon().sleep);
   // Unsupported.
-  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
   ASSERT_FALSE(ac.toCommon().turbo);
   ASSERT_FALSE(ac.toCommon().light);
   ASSERT_FALSE(ac.toCommon().quiet);
