@@ -417,7 +417,7 @@ stdAc::swingv_t IRHaierAC::toCommonSwingV(const uint8_t pos) {
     case kHaierAcSwingVUp:   return stdAc::swingv_t::kHighest;
     case kHaierAcSwingVDown: return stdAc::swingv_t::kLowest;
     case kHaierAcSwingVOff:  return stdAc::swingv_t::kOff;
-    default:                return stdAc::swingv_t::kAuto;
+    default:                 return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -986,7 +986,7 @@ stdAc::swingv_t IRHaierAC176::toCommonSwingV(const uint8_t pos) {
     case kHaierAcYrw02SwingVDown:   return stdAc::swingv_t::kLow;
     case kHaierAcYrw02SwingVBottom: return stdAc::swingv_t::kLowest;
     case kHaierAcYrw02SwingVOff:    return stdAc::swingv_t::kOff;
-    default:                       return stdAc::swingv_t::kAuto;
+    default:                        return stdAc::swingv_t::kAuto;
   }
 }
 
