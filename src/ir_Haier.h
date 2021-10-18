@@ -143,7 +143,7 @@ const uint8_t kHaierAcYrw02SwingVBottom = 0x3;  // Only available in heat mode.
 const uint8_t kHaierAcYrw02SwingVDown = 0xA;
 const uint8_t kHaierAcYrw02SwingVAuto = 0xC;  // Airflow
 
-const uint8_t kHaierAcYrw02SwingHOff = 0x0;
+const uint8_t kHaierAcYrw02SwingHMiddle = 0x0;
 const uint8_t kHaierAcYrw02SwingHLeftMax = 0x3;
 const uint8_t kHaierAcYrw02SwingHLeft = 0x4;
 const uint8_t kHaierAcYrw02SwingHRight = 0x5;

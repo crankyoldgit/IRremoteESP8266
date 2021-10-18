@@ -32,6 +32,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addSwingHToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
 using irutils::minsToString;
@@ -813,7 +814,7 @@ uint8_t IRHaierAC176::getSwingH(void) const { return _.SwingH; }
 /// @param[in] pos The position/mode to set the vanes to.
 void IRHaierAC176::setSwingH(uint8_t pos) {
   switch (pos) {
-    case kHaierAcYrw02SwingHOff:
+    case kHaierAcYrw02SwingHMiddle:
     case kHaierAcYrw02SwingHLeftMax:
     case kHaierAcYrw02SwingHLeft:
     case kHaierAcYrw02SwingHRight:
@@ -955,13 +956,13 @@ uint8_t IRHaierAC176::convertSwingV(const stdAc::swingv_t position) {
 /// @return The native equivalent of the enum.
 uint8_t IRHaierAC176::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
-    case stdAc::swingh_t::kOff:      return kHaierAcYrw02SwingHOff;
+    case stdAc::swingh_t::kMiddle:   return kHaierAcYrw02SwingHMiddle;
     case stdAc::swingh_t::kLeftMax:  return kHaierAcYrw02SwingHLeftMax;
     case stdAc::swingh_t::kLeft:     return kHaierAcYrw02SwingHLeft;
     case stdAc::swingh_t::kRight:    return kHaierAcYrw02SwingHRight;
     case stdAc::swingh_t::kRightMax: return kHaierAcYrw02SwingHRightMax;
     case stdAc::swingh_t::kAuto:     return kHaierAcYrw02SwingHAuto;
-    default:                         return kHaierAcYrw02SwingHOff;
+    default:                         return kHaierAcYrw02SwingHMiddle;
   }
 }
 
@@ -1009,7 +1010,7 @@ stdAc::swingv_t IRHaierAC176::toCommonSwingV(const uint8_t pos) {
 /// @return The native equivalent of the enum.
 stdAc::swingh_t IRHaierAC176::toCommonSwingH(const uint8_t pos) {
   switch (pos) {
-    case kHaierAcYrw02SwingHOff:      return stdAc::swingh_t::kOff;
+    case kHaierAcYrw02SwingHMiddle:   return stdAc::swingh_t::kMiddle;
     case kHaierAcYrw02SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;
     case kHaierAcYrw02SwingHLeft:     return stdAc::swingh_t::kLeft;
     case kHaierAcYrw02SwingHRight:    return stdAc::swingh_t::kRight;
@@ -1049,7 +1050,7 @@ stdAc::state_t IRHaierAC176::toCommon(void) const {
 /// @return A human readable string.
 String IRHaierAC176::toString(void) const {
   String result = "";
-  result.reserve(130);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(250);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(_.Power, kPowerStr, false);
   uint8_t cmd = _.Button;
   result += addIntToString(cmd, kButtonStr);
@@ -1123,31 +1124,18 @@ String IRHaierAC176::toString(void) const {
       result += kUnknownStr;
   }
   result += ')';
-  result += addIntToString(_.SwingH, kSwingHStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingH) {
-    case kHaierAcYrw02SwingHOff:
-      result += kOffStr;
-      break;
-    case kHaierAcYrw02SwingHLeftMax:
-      result += kLeftMaxStr;
-      break;
-    case kHaierAcYrw02SwingHLeft:
-      result += kLeftStr;
-      break;
-    case kHaierAcYrw02SwingHRight:
-      result += kRightStr;
-      break;
-    case kHaierAcYrw02SwingHRightMax:
-      result += kRightMaxStr;
-      break;
-    case kHaierAcYrw02SwingHAuto:
-      result += kAutoStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
+  result += addSwingHToString(_.SwingH, kHaierAcYrw02SwingHAuto,
+                              kHaierAcYrw02SwingHLeftMax,
+                              kHaierAcYrw02SwingHLeft,
+                              kHaierAcYrw02SwingHMiddle,
+                              kHaierAcYrw02SwingHRight,
+                              kHaierAcYrw02SwingHRightMax,
+                              // Below are unused.
+                              kHaierAcYrw02SwingHMiddle,
+                              kHaierAcYrw02SwingHMiddle,
+                              kHaierAcYrw02SwingHMiddle,
+                              kHaierAcYrw02SwingHMiddle,
+                              kHaierAcYrw02SwingHMiddle);
   result += addBoolToString(_.Sleep, kSleepStr);
   result += addBoolToString(_.Health, kHealthStr);
   const uint8_t tmode = getTimerMode();
