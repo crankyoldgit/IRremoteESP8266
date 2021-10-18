@@ -391,8 +391,8 @@ class IRHaierAC176 {
   uint8_t getSwingH(void) const;
   void setSwingH(const uint8_t pos);
 
- /// This functions for backward compatibility.
- /// Use getSwingV() and setSwingV() instead.
+  /// This functions for backward compatibility.
+  /// Use getSwingV() and setSwingV() instead.
   uint8_t getSwing(void) const;
   void setSwing(const uint8_t pos);
 
