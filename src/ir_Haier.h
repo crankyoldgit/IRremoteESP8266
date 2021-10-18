@@ -245,18 +245,12 @@ union HaierAc176Protocol{
 };
 
 // Legacy Haier YRW02 remote defines.
-#define HAIER_AC_YRW02_SWINGV_OFF kHaierAcYrw02SwingVOff
-#define HAIER_AC_YRW02_SWINGV_TOP kHaierAcYrw02SwingVTop
-#define HAIER_AC_YRW02_SWINGV_MIDDLE kHaierAcYrw02SwingVMiddle
-#define HAIER_AC_YRW02_SWINGV_BOTTOM kHaierAcYrw02SwingVBottom
-#define HAIER_AC_YRW02_SWINGV_DOWN kHaierAcYrw02SwingVDown
-#define HAIER_AC_YRW02_SWINGV_AUTO kHaierAcYrw02SwingVAuto
-#define HAIER_AC_YRW02_SWINGH_OFF kHaierAcYrw02SwingHOff
-#define HAIER_AC_YRW02_SWINGH_LEFTMAX kHaierAcYrw02SwingHLeftMax
-#define HAIER_AC_YRW02_SWINGH_LEFT kHaierAcYrw02SwingHLeft
-#define HAIER_AC_YRW02_SWINGH_RIGHT kHaierAcYrw02SwingHRight
-#define HAIER_AC_YRW02_SWINGH_RIGHTMAX kHaierAcYrw02SwingHRightMax
-#define HAIER_AC_YRW02_SWINGH_AUTO kHaierAcYrw02SwingHAuto
+#define HAIER_AC_YRW02_SWING_OFF kHaierAcYrw02SwingOff
+#define HAIER_AC_YRW02_SWING_TOP kHaierAcYrw02SwingTop
+#define HAIER_AC_YRW02_SWING_MIDDLE kHaierAcYrw02SwingMiddle
+#define HAIER_AC_YRW02_SWING_BOTTOM kHaierAcYrw02SwingBottom
+#define HAIER_AC_YRW02_SWING_DOWN kHaierAcYrw02SwingDown
+#define HAIER_AC_YRW02_SWING_AUTO kHaierAcYrw02SwingAuto
 #define HAIER_AC_YRW02_FAN_HIGH kHaierAcYrw02FanHigh
 #define HAIER_AC_YRW02_FAN_MED kHaierAcYrw02FanMed
 #define HAIER_AC_YRW02_FAN_LOW kHaierAcYrw02FanLow
@@ -269,7 +263,7 @@ union HaierAc176Protocol{
 #define HAIER_AC_YRW02_FAN kHaierAcYrw02Fan
 #define HAIER_AC_YRW02_BUTTON_TEMP_UP kHaierAcYrw02ButtonTempUp
 #define HAIER_AC_YRW02_BUTTON_TEMP_DOWN kHaierAcYrw02ButtonTempDown
-#define HAIER_AC_YRW02_BUTTON_SWINGV kHaierAcYrw02ButtonSwingV
+#define HAIER_AC_YRW02_BUTTON_SWING kHaierAcYrw02ButtonSwing
 #define HAIER_AC_YRW02_BUTTON_FAN kHaierAcYrw02ButtonFan
 #define HAIER_AC_YRW02_BUTTON_POWER kHaierAcYrw02ButtonPower
 #define HAIER_AC_YRW02_BUTTON_MODE kHaierAcYrw02ButtonMode
