@@ -765,6 +765,20 @@ void IRHaierAC176::setFan(uint8_t speed) {
   }
 }
 
+/// For backward compatibility. Use getSwingV() instead.
+/// Get the Vertical Swing position setting of the A/C.
+/// @return The native position/mode.
+uint8_t IRHaierAC176::getSwing(void) const {
+  return IRHaierAC176::getSwingV();
+}
+
+/// For backward compatibility. Use setSwingV() instead.
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] pos The position/mode to set the vanes to.
+void IRHaierAC176::setSwing(uint8_t pos) {
+  return IRHaierAC176::setSwingV(pos);
+}
+
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
 uint8_t IRHaierAC176::getSwingV(void) const { return _.SwingV; }
