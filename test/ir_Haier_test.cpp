@@ -128,8 +128,8 @@ TEST(TestHaierACClass, Command) {
   EXPECT_EQ(kHaierAcCmdTimerCancel, ac.getCommand());
   ac.setCommand(kHaierAcCmdHealth);
   EXPECT_EQ(kHaierAcCmdHealth, ac.getCommand());
-  ac.setCommand(kHaierAcCmdSwingV);
-  EXPECT_EQ(kHaierAcCmdSwingV, ac.getCommand());
+  ac.setCommand(kHaierAcCmdSwing);
+  EXPECT_EQ(kHaierAcCmdSwing, ac.getCommand());
   ac.setCommand(kHaierAcCmdOn);
   EXPECT_EQ(kHaierAcCmdOn, ac.getCommand());
   ac.setCommand(kHaierAcCmdOff);
@@ -251,15 +251,15 @@ TEST(TestHaierACClass, SwingV) {
 
   ac.setSwingV(kHaierAcSwingVUp);
   EXPECT_EQ(kHaierAcSwingVUp, ac.getSwingV());
-  EXPECT_EQ(kHaierAcCmdSwingV, ac.getCommand());
+  EXPECT_EQ(kHaierAcCmdSwing, ac.getCommand());
 
   ac.setSwingV(kHaierAcSwingVDown);
   EXPECT_EQ(kHaierAcSwingVDown, ac.getSwingV());
-  EXPECT_EQ(kHaierAcCmdSwingV, ac.getCommand());
+  EXPECT_EQ(kHaierAcCmdSwing, ac.getCommand());
 
   ac.setSwingV(kHaierAcSwingVChg);
   EXPECT_EQ(kHaierAcSwingVChg, ac.getSwingV());
-  EXPECT_EQ(kHaierAcCmdSwingV, ac.getCommand());
+  EXPECT_EQ(kHaierAcCmdSwing, ac.getCommand());
 }
 
 TEST(TestHaierACClass, CurrentTime) {

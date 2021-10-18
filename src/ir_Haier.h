@@ -82,7 +82,7 @@ const uint8_t kHaierAcCmdSleep =       0b1000;
 const uint8_t kHaierAcCmdTimerSet =    0b1001;
 const uint8_t kHaierAcCmdTimerCancel = 0b1010;
 const uint8_t kHaierAcCmdHealth =      0b1100;
-const uint8_t kHaierAcCmdSwingV =      0b1101;
+const uint8_t kHaierAcCmdSwing =       0b1101;
 
 const uint8_t kHaierAcSwingVOff =  0b00;
 const uint8_t kHaierAcSwingVUp =   0b01;
@@ -118,7 +118,7 @@ const uint8_t kHaierAcSleepBit = 0b01000000;
 #define HAIER_AC_CMD_TIMER_SET kHaierAcCmdTimerSet
 #define HAIER_AC_CMD_TIMER_CANCEL kHaierAcCmdTimerCancel
 #define HAIER_AC_CMD_HEALTH kHaierAcCmdHealth
-#define HAIER_AC_CMD_SWINGV kHaierAcCmdSwingV
+#define HAIER_AC_CMD_SWINGV kHaierAcCmdSwing
 #define HAIER_AC_SWINGV_OFF kHaierAcSwingVOff
 #define HAIER_AC_SWINGV_UP kHaierAcSwingVUp
 #define HAIER_AC_SWINGV_DOWN kHaierAcSwingVDown

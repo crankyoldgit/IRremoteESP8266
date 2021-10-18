@@ -162,7 +162,7 @@ void IRHaierAC::setCommand(const uint8_t command) {
     case kHaierAcCmdTimerSet:
     case kHaierAcCmdTimerCancel:
     case kHaierAcCmdHealth:
-    case kHaierAcCmdSwingV:
+    case kHaierAcCmdSwing:
       _.Command = command;
   }
 }
@@ -336,7 +336,7 @@ void IRHaierAC::setSwingV(const uint8_t state) {
     case kHaierAcSwingVUp:
     case kHaierAcSwingVDown:
     case kHaierAcSwingVChg:
-      _.Command = kHaierAcCmdSwingV;
+      _.Command = kHaierAcCmdSwing;
       _.SwingV = state;
       break;
   }
@@ -491,7 +491,7 @@ String IRHaierAC::toString(void) const {
     case kHaierAcCmdHealth:
       result += kHealthStr;
       break;
-    case kHaierAcCmdSwingV:
+    case kHaierAcCmdSwing:
       result += kSwingVStr;
       break;
     default:
