@@ -453,7 +453,7 @@ stdAc::state_t IRHaierAC::toCommon(void) const {
 /// @return A human readable string.
 String IRHaierAC::toString(void) const {
   String result = "";
-  result.reserve(150);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(170);  // Reserve some heap for the string to reduce fragging.
   uint8_t cmd = _.Command;
   result += addIntToString(cmd, kCommandStr, false);
   result += kSpaceLBraceStr;
