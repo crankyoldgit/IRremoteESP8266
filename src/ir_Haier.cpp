@@ -776,9 +776,7 @@ uint8_t IRHaierAC176::getSwing(void) const {
 /// For backward compatibility. Use setSwingV() instead.
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] pos The position/mode to set the vanes to.
-void IRHaierAC176::setSwing(uint8_t pos) {
-  return IRHaierAC176::setSwingV(pos);
-}
+void IRHaierAC176::setSwing(uint8_t pos) { setSwingV(pos); }
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
