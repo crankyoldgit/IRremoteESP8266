@@ -760,7 +760,7 @@ TEST(TestIRac, Haier) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Command: 1 (On), Mode: 1 (Cool), Temp: 24C, Fan: 2 (Medium), "
-      "Swing: 1 (Up), Sleep: On, Health: On, Clock: 13:45, "
+      "Swing(V): 1 (Up), Sleep: On, Health: On, Clock: 13:45, "
       "On Timer: Off, Off Timer: Off";
 
   ac.begin();
@@ -789,8 +789,9 @@ TEST(TestIRac, Haier176) {
   IRrecv capture(kGpioUnused);
   const char expected[] =
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
-      "Fan: 2 (Medium), Turbo: On, Quiet: Off, Swing: 1 (Highest), Sleep: On, "
-      "Health: On, Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
+      "Fan: 2 (Medium), Turbo: On, Quiet: Off, Swing(V): 1 (Highest), "
+      "Swing(H): 0 (Middle), Sleep: On, Health: On, "
+      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
   ac.begin();
   irac.haier176(&ac,
                 true,                        // Power
@@ -798,6 +799,7 @@ TEST(TestIRac, Haier176) {
                 23,                          // Celsius
                 stdAc::fanspeed_t::kMedium,  // Fan speed
                 stdAc::swingv_t::kHigh,      // Vertical swing
+                stdAc::swingh_t::kOff,       // Horizontal swing
                 true,                        // Turbo
                 false,                       // Quiet
                 true,                        // Filter
@@ -818,8 +820,9 @@ TEST(TestIRac, HaierYrwo2) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
-      "Fan: 2 (Medium), Turbo: Off, Quiet: On, Swing: 1 (Highest), Sleep: On, "
-      "Health: On, Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
+      "Fan: 2 (Medium), Turbo: Off, Quiet: On, Swing(V): 1 (Highest), "
+      "Swing(H): 7 (Auto), Sleep: On, Health: On, "
+      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
 
   ac.begin();
   irac.haierYrwo2(&ac,
@@ -828,6 +831,7 @@ TEST(TestIRac, HaierYrwo2) {
                   23,                          // Celsius
                   stdAc::fanspeed_t::kMedium,  // Fan speed
                   stdAc::swingv_t::kHigh,      // Vertical swing
+                  stdAc::swingh_t::kAuto,      // Vertical swing
                   false,                       // Turbo
                   true,                        // Quiet
                   true,                        // Filter
