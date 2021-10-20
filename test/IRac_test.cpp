@@ -560,7 +560,8 @@ TEST(TestIRac, Electra) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Power: On, Mode: 6 (Fan), Temp: 26C, Fan: 1 (High), "
-      "Swing(V): On, Swing(H): On, Light: Toggle, Clean: On, Turbo: On";
+      "Swing(V): On, Swing(H): On, Light: Toggle, Clean: On, Turbo: On, "
+      "IFeel: Off";
 
   ac.begin();
   irac.electra(&ac,

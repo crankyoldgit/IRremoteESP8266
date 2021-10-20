@@ -1,4 +1,4 @@
-// Copyright 2018, 2019 David Conran
+// Copyright 2018-2021 David Conran
 /// @file
 /// @brief Support for Electra A/C protocols.
 /// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/AUXHeatpumpIR.cpp
@@ -310,6 +310,37 @@ bool IRElectraAc::getTurbo(void) const {
   return _.Turbo;
 }
 
+/// Get the IFeel mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRElectraAc::getIFeel(void) const { return _.IFeel; }
+
+/// Set the IFeel mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRElectraAc::setIFeel(const bool on) {
+  _.IFeel = on;
+  if (_.IFeel)
+    // Make sure there is a reasonable value in _.IFeelTemp
+    setIFeelTemp(getIFeelTemp());
+  else
+    // Clear any previous stored temp..
+    _.IFeelTemp = kElectraAcIFeelMinTemp;
+}
+
+/// Set the temperature for the IFeel mode.
+/// @param[in] temp The temperature in degrees celsius.
+void IRElectraAc::setIFeelTemp(const uint8_t temp) {
+  _.IFeelTemp = std::min(kElectraAcIFeelMaxTemp,
+                         std::max(kElectraAcIFeelMinTemp, temp)) +
+      kElectraAcIFeelTempDelta;
+}
+
+/// Get the current temperature setting for the IFeel mode.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRElectraAc::getIFeelTemp(void) const {
+  return std::max(kElectraAcIFeelTempDelta, _.IFeelTemp) -
+      kElectraAcIFeelTempDelta;
+}
+
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRElectraAc::toCommon(void) const {
@@ -342,7 +373,7 @@ stdAc::state_t IRElectraAc::toCommon(void) const {
 /// @return A human readable string.
 String IRElectraAc::toString(void) const {
   String result = "";
-  result.reserve(130);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(160);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, kElectraAcAuto, kElectraAcCool,
                             kElectraAcHeat, kElectraAcDry, kElectraAcFan);
@@ -355,6 +386,13 @@ String IRElectraAc::toString(void) const {
   result += addToggleToString(getLightToggle(), kLightStr);
   result += addBoolToString(_.Clean, kCleanStr);
   result += addBoolToString(_.Turbo, kTurboStr);
+  result += addBoolToString(_.IFeel, kIFeelStr);
+  if (_.IFeel) {
+    result += kCommaSpaceStr;
+    result += kIFeelStr;
+    result += ' ';
+    result += addTempToString(getIFeelTemp(), true, false);
+  }
   return result;
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2019 David Conran
+// Copyright 2019-2021 David Conran
 /// @file
 /// @brief Support for Electra A/C protocols.
 /// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/AUXHeatpumpIR.cpp
@@ -9,6 +9,10 @@
 //   Brand: Electra,  Model: Classic INV 17 / AXW12DCS A/C
 //   Brand: Electra,  Model: YKR-M/003E remote
 //   Brand: Frigidaire,  Model: FGPC102AB1 A/C
+//   Brand: Subtropic,  Model: SUB-07HN1_18Y A/C
+//   Brand: Subtropic,  Model: YKR-H/102E remote
+//   Brand: Centek,  Model: SCT-65Q09 A/C
+//   Brand: Centek,  Model: YKR-P/002E remote
 
 #ifndef IR_ELECTRA_H_
 #define IR_ELECTRA_H_
@@ -46,10 +50,12 @@ union ElectraProtocol {
     uint8_t Turbo   :1;
     uint8_t         :1;
     // Byte 6
-    uint8_t         :5;
+    uint8_t         :3;
+    uint8_t IFeel   :1;
+    uint8_t         :1;
     uint8_t Mode    :3;
     // Byte 7
-    uint8_t         :8;
+    uint8_t IFeelTemp :8;
     // Byte 8
     uint8_t         :8;
     // Byte 9
@@ -93,6 +99,11 @@ const uint8_t kElectraAcLightToggleMask = 0x11;
 // and known OFF values of 0x08 (0b00001000) & 0x05 (0x00000101)
 const uint8_t kElectraAcLightToggleOff = 0x08;
 
+// Re: Byte[7]. Or Delta == 0xA and Temperature are stored in last 6 bits,
+// and bit 7 stores Unknown flag
+const uint8_t kElectraAcIFeelTempDelta = 0x4A;
+const uint8_t kElectraAcIFeelMinTemp = 0;    // 0C
+const uint8_t kElectraAcIFeelMaxTemp = 50;   // 50C
 
 // Classes
 /// Class for handling detailed Electra A/C messages.
@@ -130,6 +141,10 @@ class IRElectraAc {
   bool getLightToggle(void) const;
   void setTurbo(const bool on);
   bool getTurbo(void) const;
+  void setIFeel(const bool on);
+  bool getIFeel(void) const;
+  void setIFeelTemp(const uint8_t temp);
+  uint8_t getIFeelTemp(void) const;
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kElectraAcStateLength);
