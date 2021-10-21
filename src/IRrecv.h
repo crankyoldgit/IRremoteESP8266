@@ -18,7 +18,7 @@
 const uint16_t kHeader = 2;        // Usual nr. of header entries.
 const uint16_t kFooter = 2;        // Usual nr. of footer (stop bits) entries.
 const uint16_t kStartOffset = 1;   // Usual rawbuf entry to start from.
-#define MS_TO_USEC(x) (x * 1000U)  // Convert milli-Seconds to micro-Seconds.
+#define MS_TO_USEC(x) ((x) * 1000U)  // Convert milli-Seconds to micro-Seconds.
 // Marks tend to be 100us too long, and spaces 100us too short
 // when received due to sensor lag.
 const uint16_t kMarkExcess = 50;
