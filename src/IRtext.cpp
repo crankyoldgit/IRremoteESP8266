@@ -139,7 +139,7 @@ IRTEXT_CONST_STRING(kFanStr, D_STR_FAN);  ///< "Fan"
 // HomeAssistant & Google Home Climate integration. For compatibility only.
 // Ref: https://www.home-assistant.io/integrations/google_assistant/#climate-operation-modes
 IRTEXT_CONST_STRING(kFanOnlyStr, D_STR_FANONLY);  ///< "fan-only"
-IRTEXT_CONST_STRING(kFan_OnlyStr, D_STR_FAN_ONLY);  ///< "fan_only" (legacy)
+IRTEXT_CONST_STRING(kFan_OnlyStr, D_STR_FAN_ONLY);  ///< "fan_only" (HA/legacy)
 IRTEXT_CONST_STRING(kFanOnlyWithSpaceStr, D_STR_FANSPACEONLY);  ///< "Fan Only"
 IRTEXT_CONST_STRING(kFanOnlyNoSpaceStr, D_STR_FANONLYNOSPACE);  ///< "FanOnly"
 
