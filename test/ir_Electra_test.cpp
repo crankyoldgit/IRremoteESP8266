@@ -366,7 +366,7 @@ TEST(TestIRElectraAcClass, ConstructKnownState) {
                   ac.getRaw(), kElectraAcBits);
 }
 
-TEST(TestIRElectraAcClass, IFeel) {
+TEST(TestIRElectraAcClass, IFeelAndSensor) {
   IRElectraAc ac(kGpioUnused);
   ac.stateReset();
   // Test a real example.
@@ -375,38 +375,60 @@ TEST(TestIRElectraAcClass, IFeel) {
       0x64, 0x00, 0x20, 0x00, 0x1E, 0x7C};
   ac.setRaw(ifeel_on);
   EXPECT_TRUE(ac.getIFeel());
-  EXPECT_EQ(26, ac.getIFeelTemp());
+  EXPECT_EQ(26, ac.getSensorTemp());
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 21C, Fan: 5 (Auto), "
       "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: Off, "
-      "IFeel: On, IFeel Temp: 26C",
+      "IFeel: On, Sensor Temp: 26C",
       ac.toString());
 
   ac.stateReset();
   EXPECT_FALSE(ac.getIFeel());
-  EXPECT_EQ(kElectraAcIFeelMinTemp, ac.getIFeelTemp());
+  EXPECT_EQ(kElectraAcSensorMinTemp, ac.getSensorTemp());
 
   ac.setIFeel(true);
   EXPECT_TRUE(ac.getIFeel());
-  EXPECT_EQ(kElectraAcIFeelMinTemp, ac.getIFeelTemp());
+  EXPECT_EQ(kElectraAcSensorMinTemp, ac.getSensorTemp());
 
-  ac.setIFeelTemp(kElectraAcIFeelMaxTemp);
-  EXPECT_EQ(kElectraAcIFeelMaxTemp, ac.getIFeelTemp());
+  ac.setSensorTemp(kElectraAcSensorMaxTemp);
+  EXPECT_EQ(kElectraAcSensorMaxTemp, ac.getSensorTemp());
 
-  ac.setIFeelTemp(kElectraAcIFeelMaxTemp + 1);
-  EXPECT_EQ(kElectraAcIFeelMaxTemp, ac.getIFeelTemp());
+  ac.setSensorTemp(kElectraAcSensorMaxTemp + 1);
+  EXPECT_EQ(kElectraAcSensorMaxTemp, ac.getSensorTemp());
 
   ac.setIFeel(false);
   EXPECT_FALSE(ac.getIFeel());
-  EXPECT_EQ(kElectraAcIFeelMinTemp, ac.getIFeelTemp());
-  EXPECT_EQ(0, ac._.IFeelTemp);
+  EXPECT_EQ(kElectraAcSensorMinTemp, ac.getSensorTemp());
+  EXPECT_EQ(0, ac._.SensorTemp);
 
   ac.setIFeel(true);
-  ac.setIFeelTemp(kElectraAcIFeelMinTemp);
+  ac.setSensorTemp(kElectraAcSensorMinTemp);
   EXPECT_TRUE(ac.getIFeel());
-  EXPECT_EQ(kElectraAcIFeelMinTemp, ac.getIFeelTemp());
+  EXPECT_EQ(kElectraAcSensorMinTemp, ac.getSensorTemp());
 
-  ac.setIFeelTemp(26);  // Celsius
+  ac.setSensorTemp(26);  // Celsius
   EXPECT_TRUE(ac.getIFeel());
-  EXPECT_EQ(26, ac.getIFeelTemp());
+  EXPECT_EQ(26, ac.getSensorTemp());
+
+  EXPECT_FALSE(ac.getSensorUpdate());
+  ac.setSensorUpdate(true);
+  EXPECT_TRUE(ac.getSensorUpdate());
+  EXPECT_EQ("Sensor Temp: 26C", ac.toString());
+  ac.setSensorUpdate(false);
+  EXPECT_FALSE(ac.getSensorUpdate());
+
+  const uint8_t sensor_update_28C[kElectraAcStateLength] = {
+      0xC3, 0x9F, 0xE0, 0x40, 0xA0, 0x00, 0x88,
+      0x66, 0x00, 0x30, 0x00, 0x1E, 0x5E};
+  ac.setRaw(sensor_update_28C);
+  EXPECT_TRUE(ac.getSensorUpdate());
+  EXPECT_EQ(28, ac.getSensorTemp());
+  EXPECT_EQ("Sensor Temp: 28C", ac.toString());
+  ac.setSensorUpdate(false);
+  EXPECT_FALSE(ac.getSensorUpdate());
+  EXPECT_EQ(
+      "Power: On, Mode: 4 (Heat), Temp: 27C, Fan: 5 (Auto), "
+      "Swing(V): Off, Swing(H): Off, Light: -, Clean: Off, Turbo: Off, "
+      "IFeel: On, Sensor Temp: 28C",
+      ac.toString());
 }

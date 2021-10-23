@@ -319,26 +319,41 @@ bool IRElectraAc::getIFeel(void) const { return _.IFeel; }
 void IRElectraAc::setIFeel(const bool on) {
   _.IFeel = on;
   if (_.IFeel)
-    // Make sure there is a reasonable value in _.IFeelTemp
-    setIFeelTemp(getIFeelTemp());
+    // Make sure there is a reasonable value in _.SensorTemp
+    setSensorTemp(getSensorTemp());
   else
     // Clear any previous stored temp..
-    _.IFeelTemp = kElectraAcIFeelMinTemp;
+    _.SensorTemp = kElectraAcSensorMinTemp;
 }
 
-/// Set the temperature for the IFeel mode.
+/// Get the silent Sensor Update setting of the message.
+/// i.e. Is this _just_ a sensor temp update message from the remote?
+/// @note The A/C just takes the sensor temp value from the message and
+/// will not follow any of the other settings in the message.
+/// @return true, the setting is on. false, the setting is off.
+bool IRElectraAc::getSensorUpdate(void) const { return _.SensorUpdate; }
+
+/// Set the silent Sensor Update setting of the message.
+/// i.e. Is this _just_ a sensor temp update message from the remote?
+/// @note The A/C will just take the sensor temp value from the message and
+/// will not follow any of the other settings in the message. If set, the A/C
+/// unit will also not beep in response to the message.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRElectraAc::setSensorUpdate(const bool on) { _.SensorUpdate = on; }
+
+/// Set the Sensor temperature for the IFeel mode.
 /// @param[in] temp The temperature in degrees celsius.
-void IRElectraAc::setIFeelTemp(const uint8_t temp) {
-  _.IFeelTemp = std::min(kElectraAcIFeelMaxTemp,
-                         std::max(kElectraAcIFeelMinTemp, temp)) +
-      kElectraAcIFeelTempDelta;
+void IRElectraAc::setSensorTemp(const uint8_t temp) {
+  _.SensorTemp = std::min(kElectraAcSensorMaxTemp,
+                          std::max(kElectraAcSensorMinTemp, temp)) +
+      kElectraAcSensorTempDelta;
 }
 
-/// Get the current temperature setting for the IFeel mode.
+/// Get the current sensor temperature setting for the IFeel mode.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRElectraAc::getIFeelTemp(void) const {
-  return std::max(kElectraAcIFeelTempDelta, _.IFeelTemp) -
-      kElectraAcIFeelTempDelta;
+uint8_t IRElectraAc::getSensorTemp(void) const {
+  return std::max(kElectraAcSensorTempDelta, _.SensorTemp) -
+      kElectraAcSensorTempDelta;
 }
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
@@ -374,24 +389,24 @@ stdAc::state_t IRElectraAc::toCommon(void) const {
 String IRElectraAc::toString(void) const {
   String result = "";
   result.reserve(160);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(_.Power, kPowerStr, false);
-  result += addModeToString(_.Mode, kElectraAcAuto, kElectraAcCool,
-                            kElectraAcHeat, kElectraAcDry, kElectraAcFan);
-  result += addTempToString(getTemp());
-  result += addFanToString(_.Fan, kElectraAcFanHigh, kElectraAcFanLow,
-                           kElectraAcFanAuto, kElectraAcFanAuto,
-                           kElectraAcFanMed);
-  result += addBoolToString(getSwingV(), kSwingVStr);
-  result += addBoolToString(getSwingH(), kSwingHStr);
-  result += addToggleToString(getLightToggle(), kLightStr);
-  result += addBoolToString(_.Clean, kCleanStr);
-  result += addBoolToString(_.Turbo, kTurboStr);
-  result += addBoolToString(_.IFeel, kIFeelStr);
-  if (_.IFeel) {
-    result += kCommaSpaceStr;
-    result += kIFeelStr;
-    result += ' ';
-    result += addTempToString(getIFeelTemp(), true, false);
+  if (!_.SensorUpdate) {
+    result += addBoolToString(_.Power, kPowerStr, false);
+    result += addModeToString(_.Mode, kElectraAcAuto, kElectraAcCool,
+                              kElectraAcHeat, kElectraAcDry, kElectraAcFan);
+    result += addTempToString(getTemp());
+    result += addFanToString(_.Fan, kElectraAcFanHigh, kElectraAcFanLow,
+                             kElectraAcFanAuto, kElectraAcFanAuto,
+                             kElectraAcFanMed);
+    result += addBoolToString(getSwingV(), kSwingVStr);
+    result += addBoolToString(getSwingH(), kSwingHStr);
+    result += addToggleToString(getLightToggle(), kLightStr);
+    result += addBoolToString(_.Clean, kCleanStr);
+    result += addBoolToString(_.Turbo, kTurboStr);
+    result += addBoolToString(_.IFeel, kIFeelStr);
+  }
+  if (_.IFeel || _.SensorUpdate) {
+    result += addIntToString(getSensorTemp(), kSensorTempStr, !_.SensorUpdate);
+    result += 'C';
   }
   return result;
 }

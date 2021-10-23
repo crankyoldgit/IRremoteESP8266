@@ -41,7 +41,9 @@ union ElectraProtocol {
     uint8_t         :5;
     uint8_t SwingH  :3;
     // Byte 3
-    uint8_t         :8;
+    uint8_t              :6;
+    uint8_t SensorUpdate :1;
+    uint8_t              :1;
     // Byte 4
     uint8_t         :5;
     uint8_t Fan     :3;
@@ -55,7 +57,7 @@ union ElectraProtocol {
     uint8_t         :1;
     uint8_t Mode    :3;
     // Byte 7
-    uint8_t IFeelTemp :8;
+    uint8_t SensorTemp :8;
     // Byte 8
     uint8_t         :8;
     // Byte 9
@@ -101,9 +103,9 @@ const uint8_t kElectraAcLightToggleOff = 0x08;
 
 // Re: Byte[7]. Or Delta == 0xA and Temperature are stored in last 6 bits,
 // and bit 7 stores Unknown flag
-const uint8_t kElectraAcIFeelTempDelta = 0x4A;
-const uint8_t kElectraAcIFeelMinTemp = 0;    // 0C
-const uint8_t kElectraAcIFeelMaxTemp = 50;   // 50C
+const uint8_t kElectraAcSensorTempDelta = 0x4A;
+const uint8_t kElectraAcSensorMinTemp = 0;    // 0C
+const uint8_t kElectraAcSensorMaxTemp = 50;   // 50C
 
 // Classes
 /// Class for handling detailed Electra A/C messages.
@@ -143,8 +145,10 @@ class IRElectraAc {
   bool getTurbo(void) const;
   void setIFeel(const bool on);
   bool getIFeel(void) const;
-  void setIFeelTemp(const uint8_t temp);
-  uint8_t getIFeelTemp(void) const;
+  void setSensorUpdate(const bool on);
+  bool getSensorUpdate(void) const;
+  void setSensorTemp(const uint8_t temp);
+  uint8_t getSensorTemp(void) const;
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kElectraAcStateLength);
