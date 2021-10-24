@@ -1084,6 +1084,9 @@ String IRHaierAC176::toString(void) const {
     case kHaierAcYrw02ButtonTurbo:
       result += kTurboStr;
       break;
+    case kHaierAcYrw02ButtonTimer:
+      result += kTimerStr;
+      break;
     default:
       result += kUnknownStr;
   }

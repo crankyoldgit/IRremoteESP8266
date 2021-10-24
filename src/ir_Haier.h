@@ -161,16 +161,18 @@ const uint8_t kHaierAcYrw02Dry =  0b010;  // 2
 const uint8_t kHaierAcYrw02Heat = 0b100;  // 4
 const uint8_t kHaierAcYrw02Fan =  0b110;  // 5
 
-const uint8_t kHaierAcYrw02ButtonTempUp = 0x0;
-const uint8_t kHaierAcYrw02ButtonTempDown = 0x1;
-const uint8_t kHaierAcYrw02ButtonSwingV = 0x2;
-const uint8_t kHaierAcYrw02ButtonSwingH = 0x3;
-const uint8_t kHaierAcYrw02ButtonFan = 0x4;
-const uint8_t kHaierAcYrw02ButtonPower = 0x5;
-const uint8_t kHaierAcYrw02ButtonMode = 0x6;
-const uint8_t kHaierAcYrw02ButtonHealth = 0x7;
-const uint8_t kHaierAcYrw02ButtonTurbo = 0x8;
-const uint8_t kHaierAcYrw02ButtonSleep = 0xB;
+const uint8_t kHaierAcYrw02ButtonTempUp =   0b00000;
+const uint8_t kHaierAcYrw02ButtonTempDown = 0b00001;
+const uint8_t kHaierAcYrw02ButtonSwingV =   0b00010;
+const uint8_t kHaierAcYrw02ButtonSwingH =   0b00011;
+const uint8_t kHaierAcYrw02ButtonFan =      0b00100;
+const uint8_t kHaierAcYrw02ButtonPower =    0b00101;
+const uint8_t kHaierAcYrw02ButtonMode =     0b00110;
+const uint8_t kHaierAcYrw02ButtonHealth =   0b00111;
+const uint8_t kHaierAcYrw02ButtonTurbo =    0b01000;
+const uint8_t kHaierAcYrw02ButtonSleep =    0b01011;
+const uint8_t kHaierAcYrw02ButtonTimer =    0b10000;
+const uint8_t kHaierAcYrw02ButtonLock =     0b10100;
 
 const uint8_t kHaierAcYrw02NoTimers       = 0b000;
 const uint8_t kHaierAcYrw02OffTimer       = 0b001;
@@ -220,8 +222,9 @@ union HaierAc176Protocol{
     // Byte 11
     uint8_t             :8;
     // Byte 12
-    uint8_t Button      :4;
-    uint8_t             :4;
+    uint8_t Button      :5;
+    uint8_t Lock        :1;
+    uint8_t             :2;
     // Byte 13
     uint8_t Sum         :8;
     // Byte 14

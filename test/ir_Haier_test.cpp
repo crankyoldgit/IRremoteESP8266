@@ -1401,7 +1401,7 @@ TEST(TestHaierAC176Class, Timers) {
   ac.setRaw(timer30m);
   EXPECT_EQ(kHaierAcYrw02OnTimer, ac.getTimerMode());
   EXPECT_EQ(
-      "Power: Off, Button: 0 (Temp Up), Mode: 0 (Auto), Temp: 24C, "
+      "Power: Off, Button: 16 (Timer), Mode: 0 (Auto), Temp: 24C, "
       "Fan: 5 (Auto), Turbo: Off, Quiet: Off, Swing(V): 2 (Middle), "
       "Swing(H): 0 (Middle), Sleep: Off, Health: Off, "
       "Timer Mode: 2 (On), On Timer: 00:30, Off Timer: Off",
@@ -1409,21 +1409,21 @@ TEST(TestHaierAC176Class, Timers) {
   ac.setRaw(timeroff);
   EXPECT_EQ(kHaierAcYrw02NoTimers, ac.getTimerMode());
   EXPECT_EQ(
-      "Power: On, Button: 0 (Temp Up), Mode: 0 (Auto), Temp: 24C, "
+      "Power: On, Button: 16 (Timer), Mode: 0 (Auto), Temp: 24C, "
       "Fan: 5 (Auto), Turbo: Off, Quiet: Off, Swing(V): 2 (Middle), "
       "Swing(H): 0 (Middle), Sleep: Off, Health: Off, "
       "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off",
       ac.toString());
   ac.setRaw(timeroffthenon);
   EXPECT_EQ(
-      "Power: On, Button: 0 (Temp Up), Mode: 0 (Auto), Temp: 24C, "
+      "Power: On, Button: 16 (Timer), Mode: 0 (Auto), Temp: 24C, "
       "Fan: 5 (Auto), Turbo: Off, Quiet: Off, Swing(V): 2 (Middle), "
       "Swing(H): 0 (Middle), Sleep: Off, Health: Off, "
       "Timer Mode: 5 (Off-On), On Timer: 08:00, Off Timer: 00:30",
       ac.toString());
   ac.setTimerMode(kHaierAcYrw02OnThenOffTimer);
   EXPECT_EQ(
-      "Power: On, Button: 0 (Temp Up), Mode: 0 (Auto), Temp: 24C, "
+      "Power: On, Button: 16 (Timer), Mode: 0 (Auto), Temp: 24C, "
       "Fan: 5 (Auto), Turbo: Off, Quiet: Off, Swing(V): 2 (Middle), "
       "Swing(H): 0 (Middle), Sleep: Off, Health: Off, "
       "Timer Mode: 4 (On-Off), On Timer: 08:00, Off Timer: 00:30",
@@ -1432,7 +1432,7 @@ TEST(TestHaierAC176Class, Timers) {
   EXPECT_EQ(0, ac.getOnTimer());
   EXPECT_EQ(30, ac.getOffTimer());
   EXPECT_EQ(
-      "Power: On, Button: 0 (Temp Up), Mode: 0 (Auto), Temp: 24C, "
+      "Power: On, Button: 16 (Timer), Mode: 0 (Auto), Temp: 24C, "
       "Fan: 5 (Auto), Turbo: Off, Quiet: Off, Swing(V): 2 (Middle), "
       "Swing(H): 0 (Middle), Sleep: Off, Health: Off, "
       "Timer Mode: 1 (Off), On Timer: Off, Off Timer: 00:30",
@@ -1441,7 +1441,7 @@ TEST(TestHaierAC176Class, Timers) {
   EXPECT_EQ(0, ac.getOnTimer());
   EXPECT_EQ(0, ac.getOffTimer());
   EXPECT_EQ(
-      "Power: On, Button: 0 (Temp Up), Mode: 0 (Auto), Temp: 24C, "
+      "Power: On, Button: 16 (Timer), Mode: 0 (Auto), Temp: 24C, "
       "Fan: 5 (Auto), Turbo: Off, Quiet: Off, Swing(V): 2 (Middle), "
       "Swing(H): 0 (Middle), Sleep: Off, Health: Off, "
       "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off",
