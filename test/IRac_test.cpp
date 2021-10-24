@@ -19,6 +19,7 @@
 #include "ir_Kelvinator.h"
 #include "ir_LG.h"
 #include "ir_Midea.h"
+#include "ir_Mirage.h"
 #include "ir_Mitsubishi.h"
 #include "ir_MitsubishiHeavy.h"
 #include "ir_Neoclima.h"
@@ -1253,6 +1254,37 @@ TEST(TestIRac, Midea) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(MIDEA, ac._irsend.capture.decode_type);
   ASSERT_EQ(kMideaBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
+TEST(TestIRac, Mirage) {
+  IRMirageAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 3 (Dry), Temp: 27C, Fan: 2 (Medium), "
+      "Swing(V): 9 (High), "
+      "Turbo: Off, Light: Off, Sleep: On, Clock: 17:31";
+
+  ac.begin();
+  irac.mirage(&ac,
+              true,                        // Power
+              stdAc::opmode_t::kDry,       // Mode
+              27,                          // Degrees (Celsius)
+              stdAc::fanspeed_t::kMedium,  // Fan speed
+              stdAc::swingv_t::kHigh,      // Veritical Swing
+              false,                       // Turbo
+              false,                       // Light
+              8 * 60 + 0,                  // Sleep time
+              17 * 60 + 31);               // Clock
+
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(MIRAGE, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kMirageBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
