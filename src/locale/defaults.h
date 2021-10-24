@@ -291,6 +291,9 @@
 #ifndef D_STR_VANE
 #define D_STR_VANE "Vane"
 #endif  // D_STR_VANE
+#ifndef D_STR_LOCK
+#define D_STR_LOCK "Lock"
+#endif  // D_STR_LOCK
 
 #ifndef D_STR_AUTO
 #define D_STR_AUTO "Auto"

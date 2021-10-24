@@ -406,6 +406,9 @@ class IRHaierAC176 {
   void setOffTimer(const uint16_t mins);
   uint16_t getOffTimer(void) const;
 
+  bool getLock(void) const;
+  void setLock(const bool on);
+
   uint8_t* getRaw(void);
   virtual void setRaw(const uint8_t new_code[]);
   static bool validChecksum(const uint8_t state[],

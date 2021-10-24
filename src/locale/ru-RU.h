@@ -84,6 +84,7 @@
 #define D_STR_SPECIAL "Специальный"
 #define D_STR_RECYCLE "Рециркуляция"
 #define D_STR_VANE "Жалюзи"
+#define D_STR_LOCK "Блокировка"
 #define D_STR_AUTO "Авто"
 #define D_STR_AUTOMATIC "Автоматический"
 #define D_STR_MANUAL "Ручной"
