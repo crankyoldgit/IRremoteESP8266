@@ -447,11 +447,15 @@ void IRSamsungAc::off(void) { setPower(false); }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRSamsungAc::setPower(const bool on) { _.Power = (on ? 0b11 : 0b00); }
+void IRSamsungAc::setPower(const bool on) {
+  _.Power1 = _.Power2 = (on ? 0b11 : 0b00);
+}
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSamsungAc::getPower(void) const { return _.Power == 0b11; }
+bool IRSamsungAc::getPower(void) const {
+  return _.Power1 == 0b11 && _.Power2 == 0b11;
+}
 
 /// Set the temperature.
 /// @param[in] temp The temperature in degrees celsius.

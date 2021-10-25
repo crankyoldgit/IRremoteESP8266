@@ -1685,10 +1685,10 @@ TEST(TestIRSamsungAcClass, Issue1648) {
   const uint8_t extended_offState[kSamsungAcExtendedStateLength] = {
       0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
       0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
-      0x01, 0xC2, 0xFE, 0x71, 0x90, 0x15, 0xF0};
+      0x01, 0xE2, 0xFE, 0x71, 0x90, 0x15, 0xC0};
   const uint8_t short_offState[kSamsungAcStateLength] = {
       0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
-      0x01, 0xC2, 0xFE, 0x71, 0x90, 0x15, 0xF0};
+      0x01, 0xE2, 0xFE, 0x71, 0x90, 0x15, 0xC0};
   const String offText = "Power: Off, Mode: 1 (Cool), Temp: 25C, Fan: 2 (Low), "
                          "Swing: Off, Beep: Off, Clean: Off, Quiet: Off, "
                          "Powerful: Off, Breeze: Off, Light: On, Ion: Off";
@@ -1763,4 +1763,44 @@ TEST(TestIRSamsungAcClass, Issue1648) {
     ac._irsend.reset();
     // End of "loop()" code.
   }
+
+  // Data from https://github.com/crankyoldgit/IRremoteESP8266/issues/1648#issuecomment-950822399
+  const uint8_t expectedState[kSamsungAcExtendedStateLength] = {
+      0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
+      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
+      0x01, 0x12, 0xAF, 0x71, 0x80, 0x15, 0xC0};
+  const String expectedText = "Power: Off, Mode: 1 (Cool), Temp: 24C, "
+                              "Fan: 2 (Low), Swing: On, Beep: Off, Clean: Off, "
+                              "Quiet: Off, Powerful: Off, Breeze: Off, "
+                              "Light: On, Ion: Off";
+
+  ac.stateReset();
+  ac.setRaw(expectedState, kSamsungAcExtendedStateLength);
+  EXPECT_EQ(expectedText, ac.toString());
+
+  // Try to generate the same message.
+  ac.stateReset();
+  ac.off();
+  ac.setMode(kSamsungAcCool);
+  ac.setTemp(24);
+  ac.setFan(kSamsungAcFanLow);
+  ac.setSwing(true);
+  ac.setBeep(false);
+  ac.setClean(false);
+  ac.setQuiet(false);
+  ac.setPowerful(false);
+  ac.setBreeze(false);
+  ac.setDisplay(true);
+  ac.setIon(false);
+  EXPECT_EQ(expectedText, ac.toString());
+
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+  EXPECT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, ac._irsend.capture.state,
+                  ac._irsend.capture.bits);
+  EXPECT_EQ(expectedText, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ac._irsend.reset();
 }
