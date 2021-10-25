@@ -119,6 +119,7 @@ extern IRTEXT_CONST_PTR(kLightStr);
 extern IRTEXT_CONST_PTR(kLightToggleStr);
 extern IRTEXT_CONST_PTR(kLkeStr);
 extern IRTEXT_CONST_PTR(kLoStr);
+extern IRTEXT_CONST_PTR(kLockStr);
 extern IRTEXT_CONST_PTR(kLoudStr);
 extern IRTEXT_CONST_PTR(kLowerStr);
 extern IRTEXT_CONST_PTR(kLowestStr);

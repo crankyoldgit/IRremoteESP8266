@@ -618,6 +618,7 @@ void IRHaierAC176::setButton(uint8_t button) {
     case kHaierAcYrw02ButtonHealth:
     case kHaierAcYrw02ButtonTurbo:
     case kHaierAcYrw02ButtonSleep:
+    case kHaierAcYrw02ButtonLock:
       _.Button = button;
   }
 }
@@ -907,6 +908,17 @@ uint16_t IRHaierAC176::getOffTimer(void) const {
   return _.OffTimerHrs * 60 + _.OffTimerMins;
 }
 
+/// Get the Lock setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRHaierAC176::getLock(void) const { return _.Lock; }
+
+/// Set the Lock setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRHaierAC176::setLock(const bool on) {
+  _.Button = kHaierAcYrw02ButtonLock;
+  _.Lock = on;
+}
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -1048,7 +1060,7 @@ stdAc::state_t IRHaierAC176::toCommon(void) const {
 /// @return A human readable string.
 String IRHaierAC176::toString(void) const {
   String result = "";
-  result.reserve(250);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(260);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(_.Power, kPowerStr, false);
   uint8_t cmd = _.Button;
   result += addIntToString(cmd, kButtonStr);
@@ -1083,6 +1095,12 @@ String IRHaierAC176::toString(void) const {
       break;
     case kHaierAcYrw02ButtonTurbo:
       result += kTurboStr;
+      break;
+    case kHaierAcYrw02ButtonTimer:
+      result += kTimerStr;
+      break;
+    case kHaierAcYrw02ButtonLock:
+      result += kLockStr;
       break;
     default:
       result += kUnknownStr;
@@ -1169,6 +1187,7 @@ String IRHaierAC176::toString(void) const {
   result += addLabeledString((tmode != kHaierAcYrw02NoTimers &&
                               tmode != kHaierAcYrw02OnTimer) ?
       minsToString(getOffTimer()) : kOffStr, kOffTimerStr);
+  result += addBoolToString(_.Lock, kLockStr);
   return result;
 }
 // End of IRHaierAC176 class.

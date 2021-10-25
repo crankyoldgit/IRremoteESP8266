@@ -123,6 +123,7 @@ IRTEXT_CONST_STRING(kTypeStr, D_STR_TYPE);  ///< "Type"
 IRTEXT_CONST_STRING(kSpecialStr, D_STR_SPECIAL);  ///< "Special"
 IRTEXT_CONST_STRING(kIdStr, D_STR_ID);  ///< "Id" / Device Identifier
 IRTEXT_CONST_STRING(kVaneStr, D_STR_VANE);  ///< "Vane"
+IRTEXT_CONST_STRING(kLockStr, D_STR_LOCK);  ///< "Lock"
 
 IRTEXT_CONST_STRING(kAutoStr, D_STR_AUTO);  ///< "Auto"
 IRTEXT_CONST_STRING(kAutomaticStr, D_STR_AUTOMATIC);  ///< "Automatic"

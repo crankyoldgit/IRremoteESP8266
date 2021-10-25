@@ -793,7 +793,7 @@ TEST(TestIRac, Haier176) {
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
       "Fan: 2 (Medium), Turbo: On, Quiet: Off, Swing(V): 1 (Highest), "
       "Swing(H): 0 (Middle), Sleep: On, Health: On, "
-      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
+      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off";
   ac.begin();
   irac.haier176(&ac,
                 true,                        // Power
@@ -824,7 +824,7 @@ TEST(TestIRac, HaierYrwo2) {
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
       "Fan: 2 (Medium), Turbo: Off, Quiet: On, Swing(V): 1 (Highest), "
       "Swing(H): 7 (Auto), Sleep: On, Health: On, "
-      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off";
+      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off";
 
   ac.begin();
   irac.haierYrwo2(&ac,
