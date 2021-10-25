@@ -830,8 +830,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Samsung AC (extended) decode");
     // Check the extended size first, as it should fail fast due to longer
     // length.
-    if (decodeSamsungAC(results, offset, kSamsungAcExtendedBits, false))
-      return true;
+    if (decodeSamsungAC(results, offset, kSamsungAcExtendedBits)) return true;
     // Now check for the more common length.
     DPRINTLN("Attempting Samsung AC decode");
     if (decodeSamsungAC(results, offset, kSamsungAcBits)) return true;

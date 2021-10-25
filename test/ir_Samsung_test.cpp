@@ -1671,3 +1671,96 @@ TEST(TestIRSamsungAcClass, SectionChecksums) {
   EXPECT_EQ(IRSamsungAc::getSectionChecksum(extended_off + 14),
             IRSamsungAc::calcSectionChecksum(extended_off + 14));
 }
+
+TEST(TestIRSamsungAcClass, Issue1648) {
+  IRSamsungAc ac(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  const uint8_t onState[kSamsungAcExtendedStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
+      0x01, 0xC2, 0xFE, 0x71, 0x90, 0x15, 0xF0};
+  const String onText = "Power: On, Mode: 1 (Cool), Temp: 25C, Fan: 2 (Low), "
+                        "Swing: Off, Beep: Off, Clean: Off, Quiet: Off, "
+                        "Powerful: Off, Breeze: Off, Light: On, Ion: Off";
+  const uint8_t extended_offState[kSamsungAcExtendedStateLength] = {
+      0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
+      0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
+      0x01, 0xC2, 0xFE, 0x71, 0x90, 0x15, 0xF0};
+  const uint8_t short_offState[kSamsungAcStateLength] = {
+      0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
+      0x01, 0xC2, 0xFE, 0x71, 0x90, 0x15, 0xF0};
+  const String offText = "Power: Off, Mode: 1 (Cool), Temp: 25C, Fan: 2 (Low), "
+                         "Swing: Off, Beep: Off, Clean: Off, Quiet: Off, "
+                         "Powerful: Off, Breeze: Off, Light: On, Ion: Off";
+  const uint8_t coolState[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xC2, 0xFE, 0x71, 0x90, 0x15, 0xF0};
+
+  // "setup()"" from provided code.
+  ac.begin();  // User code
+  ac.off();  // User code
+  ac.setFan(kSamsungAcFanLow);  // User code
+  ac.setMode(kSamsungAcCool);  // User code
+  ac.setTemp(25);  // User code
+  ac.setSwing(false);  // User code
+
+  // Go through "loop()" from provided code.
+  for (uint8_t i = 0; i < 2; i++) {
+    ac.on();  // User code
+    ac.send();  // User code
+
+    // Verify what was sent.
+    ac._irsend.makeDecodeResult();
+    EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+    EXPECT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+    EXPECT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
+    EXPECT_STATE_EQ(onState, ac._irsend.capture.state, ac._irsend.capture.bits);
+    EXPECT_EQ(onText, IRAcUtils::resultAcToString(&ac._irsend.capture));
+    EXPECT_TRUE(ac._lastsentpowerstate);
+    ac._irsend.reset();
+
+    ac.setMode(kSamsungAcCool);  // User code
+    ac.send();  // User code
+
+    // Verify what was sent.
+    ac._irsend.makeDecodeResult();
+    EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+    EXPECT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+    EXPECT_EQ(kSamsungAcBits, ac._irsend.capture.bits);
+    EXPECT_STATE_EQ(coolState, ac._irsend.capture.state,
+                   ac._irsend.capture.bits);
+    EXPECT_EQ(onText, IRAcUtils::resultAcToString(&ac._irsend.capture));
+    ac._irsend.reset();
+    EXPECT_TRUE(ac._lastsentpowerstate);
+    EXPECT_FALSE(ac._forcepower);
+
+    ac.off();  // User code
+    ac.send();  // User code
+
+    // Verify what was sent.
+    ac._irsend.makeDecodeResult();
+    EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+    EXPECT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+    EXPECT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
+    EXPECT_STATE_EQ(extended_offState, ac._irsend.capture.state,
+                    ac._irsend.capture.bits);
+    EXPECT_EQ(offText, IRAcUtils::resultAcToString(&ac._irsend.capture));
+    EXPECT_FALSE(ac._lastsentpowerstate);
+    ac._irsend.reset();
+
+    ac.off();  // User code
+    ac.send();  // User code
+
+    // Verify what was sent.
+    ac._irsend.makeDecodeResult();
+    EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+    EXPECT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+    EXPECT_EQ(kSamsungAcBits, ac._irsend.capture.bits);
+    EXPECT_STATE_EQ(short_offState, ac._irsend.capture.state,
+                    ac._irsend.capture.bits);
+    EXPECT_EQ(offText, IRAcUtils::resultAcToString(&ac._irsend.capture));
+    EXPECT_FALSE(ac._lastsentpowerstate);
+    ac._irsend.reset();
+    // End of "loop()" code.
+  }
+}

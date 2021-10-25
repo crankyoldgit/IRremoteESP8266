@@ -43,36 +43,40 @@ union SamsungProtocol{
   uint8_t raw[kSamsungAcExtendedStateLength];  ///< State in code form.
   struct {
     // Byte 0
-    uint8_t :8;
+    uint8_t         :8;
     // Byte 1
     uint8_t         :4;
-    uint8_t Quiet1  :1;
-    uint8_t Power1  :1;
-    uint8_t         :2;
-    // Byte 2~4
-    uint8_t pad0[3];
+    uint8_t         :4;  // Sum1Lower
+    // Byte 2
+    uint8_t         :4;  // Sum1Upper
+    uint8_t         :4;
+    // Byte 3
+    uint8_t         :8;
+    // Byte 4
+    uint8_t         :8;
     // Byte 5
     uint8_t         :5;
-    uint8_t Quiet5  :1;
+    uint8_t Quiet   :1;
     uint8_t         :2;
     // Byte 6
     uint8_t         :4;
-    uint8_t Power6  :2;
+    uint8_t Power   :2;
     uint8_t         :2;
     // Byte 7
-    uint8_t :8;
+    uint8_t         :8;
     // Byte 8
-    uint8_t Powerful8 :8;
+    uint8_t         :4;
+    uint8_t         :4;  // Sum2Lower
     // Byte 9
-    uint8_t       :4;
-    uint8_t Swing :3;
-    uint8_t       :1;
+    uint8_t         :4;  // Sum1Upper
+    uint8_t Swing   :3;
+    uint8_t         :1;
     // Byte 10
-    uint8_t             :1;
-    uint8_t Powerful10  :3;
-    uint8_t Display     :1;
-    uint8_t             :2;
-    uint8_t Clean10     :1;
+    uint8_t           :1;
+    uint8_t Powerful  :3;
+    uint8_t Display   :1;
+    uint8_t           :2;
+    uint8_t Clean10   :1;
     // Byte 11
     uint8_t Ion     :1;
     uint8_t Clean11 :1;
@@ -146,10 +150,9 @@ union SamsungProtocol{
 };
 
 // Constants
-const uint8_t kSamsungAcPowerfulMask8 = 0b01010000;
 const uint8_t kSamsungAcSwingMove =                0b010;
 const uint8_t kSamsungAcSwingStop =                0b111;
-const uint8_t kSamsungAcPowerful10On =                     0b011;
+const uint8_t kSamsungAcPowerfulOn =                       0b011;
 const uint8_t kSamsungAcBreezeOn =                         0b101;
 const uint8_t kSamsungAcMinTemp  = 16;  // C   Mask 0b11110000
 const uint8_t kSamsungAcMaxTemp  = 30;  // C   Mask 0b11110000

@@ -372,9 +372,9 @@ void IRSamsungAc::send(const uint16_t repeat, const bool calcchecksum) {
 /// Samsung A/C requires an extended length message when you want to
 /// change the power operating mode of the A/C unit.
 void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
+  _lastsentpowerstate = getPower();  // Remember the last power state sent.
   static const uint8_t extended_middle_section[kSamsungAcSectionLength] = {
       0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00};
-  if (calcchecksum) checksum();
   // Copy/convert the internal state to an extended state by
   // copying the second section to the third section, and inserting the extended
   // middle (second) section.
@@ -383,13 +383,13 @@ void IRSamsungAc::sendExtended(const uint16_t repeat, const bool calcchecksum) {
               kSamsungAcSectionLength);
   std::memcpy(_.raw + kSamsungAcSectionLength, extended_middle_section,
               kSamsungAcSectionLength);
+  if (calcchecksum) checksum();
   // Send it.
   _irsend.sendSamsungAC(_.raw, kSamsungAcExtendedStateLength, repeat);
   // Now revert it by copying the third section over the second section.
   std::memcpy(_.raw + kSamsungAcSectionLength,
-              _.raw + 2* kSamsungAcSectionLength,
+              _.raw + 2 * kSamsungAcSectionLength,
               kSamsungAcSectionLength);
-  _lastsentpowerstate = getPower();  // Remember the last power state sent.
 }
 
 /// Send the special extended "On" message as the library can't seem to
@@ -447,16 +447,11 @@ void IRSamsungAc::off(void) { setPower(false); }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRSamsungAc::setPower(const bool on) {
-  _.Power1 = !on;  // Cleared when on.
-  _.Power6 = (on ? 0b11 : 0b00);
-}
+void IRSamsungAc::setPower(const bool on) { _.Power = (on ? 0b11 : 0b00); }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSamsungAc::getPower(void) const {
-  return (_.Power6 == 0b11) && !_.Power1;
-}
+bool IRSamsungAc::getPower(void) const { return _.Power == 0b11; }
 
 /// Set the temperature.
 /// @param[in] temp The temperature in degrees celsius.
@@ -565,15 +560,12 @@ void IRSamsungAc::setClean(const bool on) {
 
 /// Get the Quiet setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSamsungAc::getQuiet(void) const {
-  return !_.Quiet1 && _.Quiet5;
-}
+bool IRSamsungAc::getQuiet(void) const { return _.Quiet; }
 
 /// Set the Quiet setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setQuiet(const bool on) {
-  _.Quiet1 = !on;  // Cleared when on.
-  _.Quiet5 = on;
+  _.Quiet = on;
   if (on) {
     // Quiet mode seems to set fan speed to auto.
     setFan(kSamsungAcFanAuto);
@@ -584,8 +576,7 @@ void IRSamsungAc::setQuiet(const bool on) {
 /// Get the Powerful (Turbo) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRSamsungAc::getPowerful(void) const {
-  return !(_.Powerful8 & kSamsungAcPowerfulMask8) &&
-         (_.Powerful10 == kSamsungAcPowerful10On) &&
+  return (_.Powerful == kSamsungAcPowerfulOn) &&
          (_.Fan == kSamsungAcFanTurbo);
 }
 
@@ -593,14 +584,12 @@ bool IRSamsungAc::getPowerful(void) const {
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setPowerful(const bool on) {
   uint8_t off_value = getBreeze() ? kSamsungAcBreezeOn : 0b000;
-  _.Powerful10 = (on ? kSamsungAcPowerful10On : off_value);
+  _.Powerful = (on ? kSamsungAcPowerfulOn : off_value);
   if (on) {
-    _.Powerful8 &= ~kSamsungAcPowerfulMask8;  // Bit needs to be cleared.
     // Powerful mode sets fan speed to Turbo.
     setFan(kSamsungAcFanTurbo);
     setQuiet(false);  // Powerful 'on' is mutually exclusive to Quiet.
   } else {
-    _.Powerful8 |= kSamsungAcPowerfulMask8;  // Bit needs to be set.
     // Turning off Powerful mode sets fan speed to Auto if we were in Turbo mode
     if (_.Fan == kSamsungAcFanTurbo) setFan(kSamsungAcFanAuto);
   }
@@ -618,7 +607,7 @@ bool IRSamsungAc::getBreeze(void) const {
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
 void IRSamsungAc::setBreeze(const bool on) {
-  uint8_t off_value = getPowerful() ? kSamsungAcPowerful10On : 0b000;
+  const uint8_t off_value = getPowerful() ? kSamsungAcPowerfulOn : 0b000;
   _.Breeze = (on ? kSamsungAcBreezeOn : off_value);
   if (on) {
     setFan(kSamsungAcFanAuto);
@@ -628,27 +617,19 @@ void IRSamsungAc::setBreeze(const bool on) {
 
 /// Get the Display (Light/LED) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSamsungAc::getDisplay(void) const {
-  return _.Display;
-}
+bool IRSamsungAc::getDisplay(void) const { return _.Display; }
 
 /// Set the Display (Light/LED) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRSamsungAc::setDisplay(const bool on) {
-  _.Display = on;
-}
+void IRSamsungAc::setDisplay(const bool on) { _.Display = on; }
 
 /// Get the Ion (Filter) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSamsungAc::getIon(void) const {
-  return _.Ion;
-}
+bool IRSamsungAc::getIon(void) const { return _.Ion; }
 
 /// Set the Ion (Filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRSamsungAc::setIon(const bool on) {
-  _.Ion = on;
-}
+void IRSamsungAc::setIon(const bool on) { _.Ion = on; }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
@@ -811,9 +792,6 @@ bool IRrecv::decodeSamsungAC(decode_results *results, uint16_t offset,
     offset += used;
   }
   // Compliance
-  // Is the signature correct?
-  DPRINTLN("DEBUG: Checking signature.");
-  if (results->state[0] != 0x02 || results->state[2] != 0x0F) return false;
   if (strict) {
     // Is the checksum valid?
     if (!IRSamsungAc::validChecksum(results->state, nbits / 8)) {
