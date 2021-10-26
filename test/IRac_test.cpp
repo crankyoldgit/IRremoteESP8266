@@ -731,7 +731,8 @@ TEST(TestIRac, Gree) {
       "Model: 1 (YAW1F), Power: On, Mode: 1 (Cool), Temp: 71F, "
       "Fan: 2 (Medium), Turbo: Off, IFeel: Off, WiFi: Off, XFan: On, "
       "Light: On, Sleep: On, Swing(V) Mode: Manual, "
-      "Swing(V): 3 (UNKNOWN), Timer: Off, Display Temp: 0 (Off)";
+      "Swing(V): 3 (UNKNOWN), Swing(H): 5 (Right), Timer: Off, "
+      "Display Temp: 0 (Off)";
 
   ac.begin();
   irac.gree(&ac,
@@ -742,6 +743,7 @@ TEST(TestIRac, Gree) {
             71,                             // Degrees (F)
             stdAc::fanspeed_t::kMedium,     // Fan speed
             stdAc::swingv_t::kHigh,         // Vertical swing
+            stdAc::swingh_t::kRight,        // Horizontal swing
             false,                          // Turbo
             true,                           // Light
             true,                           // Clean (aka Mold/XFan)
