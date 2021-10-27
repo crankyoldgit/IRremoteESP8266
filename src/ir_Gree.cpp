@@ -350,6 +350,14 @@ void IRGreeAC::setTurbo(const bool on) { _.Turbo = on; }
 /// @return true, the setting is on. false, the setting is off.
 bool IRGreeAC::getTurbo(void) const { return _.Turbo; }
 
+/// Set the Econo setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRGreeAC::setEcono(const bool on) { _.Econo = on; }
+
+/// Get the Econo setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRGreeAC::getEcono(void) const { return _.Econo; }
+
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] automatic Do we use the automatic setting?
 /// @param[in] position The position/mode to set the vanes to.
@@ -581,12 +589,12 @@ stdAc::state_t IRGreeAC::toCommon(void) {
     result.swingv = toCommonSwingV(_.SwingV);
   result.swingh = toCommonSwingH(_.SwingH);
   result.turbo = _.Turbo;
+  result.econo = _.Econo;
   result.light = _.Light;
   result.clean = _.Xfan;
   result.sleep = _.Sleep ? 0 : -1;
   // Not supported.
   result.quiet = false;
-  result.econo = false;
   result.filter = false;
   result.beep = false;
   result.clock = -1;
@@ -606,6 +614,7 @@ String IRGreeAC::toString(void) {
   result += addFanToString(_.Fan, kGreeFanMax, kGreeFanMin, kGreeFanAuto,
                            kGreeFanAuto, kGreeFanMed);
   result += addBoolToString(_.Turbo, kTurboStr);
+  result += addBoolToString(_.Econo, kEconoStr);
   result += addBoolToString(_.IFeel, kIFeelStr);
   result += addBoolToString(_.WiFi, kWifiStr);
   result += addBoolToString(_.Xfan, kXFanStr);

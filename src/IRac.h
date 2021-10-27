@@ -249,7 +249,7 @@ void electra(IRElectraAc *ac,
             const bool on, const stdAc::opmode_t mode, const bool celsius,
             const float degrees, const stdAc::fanspeed_t fan,
             const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-            const bool turbo, const bool light,
+            const bool turbo, const bool econo, const bool light,
             const bool clean, const int16_t sleep = -1);
 #endif  // SEND_GREE
 #if SEND_HAIER_AC

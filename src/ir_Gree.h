@@ -73,12 +73,14 @@ union GreeProtocol{
     uint8_t IFeel       :1;
     uint8_t unknown2    :3;  // value = 0b100
     uint8_t WiFi        :1;
-    uint8_t :0;
+    uint8_t             :1;
     // Byte 6
-    uint8_t :8;
+    uint8_t             :8;
     // Byte 7
-    uint8_t :4;
-    uint8_t Sum:4;
+    uint8_t             :2;
+    uint8_t Econo       :1;
+    uint8_t             :1;
+    uint8_t Sum         :4;
   };
 };
 
@@ -185,6 +187,8 @@ class IRGreeAC {
   bool getSleep(void) const;
   void setTurbo(const bool on);
   bool getTurbo(void) const;
+  void setEcono(const bool on);
+  bool getEcono(void) const;
   void setIFeel(const bool on);
   bool getIFeel(void) const;
   void setWiFi(const bool on);
