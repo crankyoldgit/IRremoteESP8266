@@ -1133,7 +1133,22 @@ TEST(TestIRac, Issue1513) {
           stdAc::swingh_t::kOff,                // Horizontal swing
           true);                                // Light
   ac._irsend.makeDecodeResult();
-  // All sent, we assume the above  works. Just need to switch to swing off now.
+  EXPECT_EQ(121, ac._irsend.capture.rawlen);
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(
+      "Model: 2 (AKB75215403), Power: On, Mode: 4 (Heat), Temp: 26C, "
+      "Fan: 0 (Quiet)",
+      IRAcUtils::resultAcToString(&ac._irsend.capture));
+
+  // The next should be a SwingV On.
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 61));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  EXPECT_EQ(kLgAcSwingVSwing, ac._irsend.capture.value);
+  ASSERT_EQ("Model: 3 (AKB74955603), Swing(V): 20 (Swing)",
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
   ac._irsend.reset();
   ac.stateReset();
   ac.send();
@@ -1168,6 +1183,79 @@ TEST(TestIRac, Issue1513) {
   ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
   EXPECT_EQ(kLgAcSwingVOff, ac._irsend.capture.value);
   ASSERT_EQ("Model: 3 (AKB74955603), Swing(V): 21 (Off)",
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1651#issuecomment-952811720
+TEST(TestIRac, Issue1651) {
+  // Simulate sending a state with a SwingV off, then followed by a SwingV Auto.
+  IRLgAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  ac.begin();
+  // IRhvac {"Vendor":"LG2","Model":3,"Mode":"Auto","Power":"On","Celsius":"On",
+  //         "Temp":15,"FanSpeed":"Auto","SwingV":"Off","SwingH":"Off",
+  //         "Quiet":"Off","Turbo":"Off","Econo":"Off","Light":"On",
+  //         "Filter":"Off","Clean":"Off","Beep":"Off","Sleep":-1}
+  ac._irsend.reset();
+  irac.lg(&ac,
+          lg_ac_remote_model_t::AKB74955603,    // Model
+          true,                                 // Power
+          stdAc::opmode_t::kAuto,               // Mode
+          15,                                   // Degrees C (Note: 16C is min)
+          stdAc::fanspeed_t::kAuto,             // Fan speed
+          stdAc::swingv_t::kOff,                // Vertical swing
+          stdAc::swingv_t::kOff,                // Vertical swing (previous)
+          stdAc::swingh_t::kOff,                // Horizontal swing
+          true);                                // Light
+  ac._irsend.makeDecodeResult();
+  // As we are not making a change of the SwingV state, there should only be
+  // one message. (i.e. 60 + 1)
+  EXPECT_EQ(61, ac._irsend.capture.rawlen);
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(
+      "Model: 2 (AKB75215403), Power: On, Mode: 3 (Auto), Temp: 16C, "
+      "Fan: 5 (Auto)",
+      IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ac._irsend.reset();
+  ac.stateReset();
+  ac.send();
+  // IRhvac {"Vendor":"LG2","Model":3,"Mode":"Auto","Power":"On","Celsius":"On",
+  //         "Temp":15,"FanSpeed":"Max","SwingV":"Auto","SwingH":"Off",
+  //         "Quiet":"Off","Turbo":"Off","Econo":"Off","Light":"On",
+  //         "Filter":"Off","Clean":"Off","Beep":"Off","Sleep":-1}
+  ac._irsend.makeDecodeResult();
+  ac._irsend.reset();
+  irac.lg(&ac,
+          lg_ac_remote_model_t::AKB74955603,    // Model
+          true,                                 // Power
+          stdAc::opmode_t::kAuto,               // Mode
+          15,                                   // Degrees C (Note: 16C is min)
+          stdAc::fanspeed_t::kMax,              // Fan speed
+          stdAc::swingv_t::kAuto,               // Vertical swing
+          stdAc::swingv_t::kOff,                // Vertical swing (previous)
+          stdAc::swingh_t::kOff,                // Horizontal swing
+          true);                                // Light
+  ac._irsend.makeDecodeResult();
+  // There should only be two messages.
+  EXPECT_EQ(121, ac._irsend.capture.rawlen);
+  // First message should be normal.
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  ASSERT_EQ(
+      "Model: 2 (AKB75215403), Power: On, Mode: 3 (Auto), Temp: 16C, "
+      "Fan: 4 (Maximum)",
+      IRAcUtils::resultAcToString(&ac._irsend.capture));
+  // The next should be a SwingV Off.
+  EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 61));
+  ASSERT_EQ(LG2, ac._irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
+  EXPECT_EQ(kLgAcSwingVSwing, ac._irsend.capture.value);
+  ASSERT_EQ("Model: 3 (AKB74955603), Swing(V): 20 (Swing)",
             IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
 
