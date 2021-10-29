@@ -3438,7 +3438,7 @@ String IRac::opmodeToString(const stdAc::opmode_t mode, const bool ha) {
     case stdAc::opmode_t::kCool: return kCoolStr;
     case stdAc::opmode_t::kHeat: return kHeatStr;
     case stdAc::opmode_t::kDry:  return kDryStr;
-    case stdAc::opmode_t::kFan:  return ha ? kFanOnlyStr : kFanStr;
+    case stdAc::opmode_t::kFan:  return ha ? kFan_OnlyStr : kFanStr;
     default:                     return kUnknownStr;
   }
 }
