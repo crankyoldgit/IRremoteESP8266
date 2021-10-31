@@ -584,7 +584,7 @@ void IRHaierAC176::stateReset(void) {
   std::memset(_.raw, 0, sizeof _.raw);
   _.Prefix = kHaierAcYrw02Prefix;
   _.Prefix2 = kHaierAc176Prefix;
-  _.Temp = kHaierAcDefTemp - kHaierAcMinTemp;
+  _.Temp = kHaierAcYrw02DefTempC - kHaierAcYrw02MinTempC;
   _.Health = true;
   setFan(kHaierAcYrw02FanAuto);
   _.Power = true;
@@ -654,27 +654,101 @@ void IRHaierAC176::setMode(uint8_t mode) {
 /// @return The current operating mode setting.
 uint8_t IRHaierAC176::getMode(void) const { return _.Mode; }
 
-/// Set the temperature.
-/// @param[in] celsius The temperature in degrees celsius.
-void IRHaierAC176::setTemp(const uint8_t celsius) {
-  uint8_t temp = celsius;
-  if (temp < kHaierAcMinTemp)
-    temp = kHaierAcMinTemp;
-  else if (temp > kHaierAcMaxTemp)
-    temp = kHaierAcMaxTemp;
+/// Set the default temperature units to use.
+/// @param[in] on Use Fahrenheit as the units.
+///   true is Fahrenheit, false is Celsius.
+void IRHaierAC176::setUseFahrenheit(const bool on) { _.UseFahrenheit = on; }
 
-  uint8_t old_temp = getTemp();
-  if (old_temp == temp) return;
-  if (old_temp > temp)
-    _.Button = kHaierAcYrw02ButtonTempDown;
-  else
-    _.Button = kHaierAcYrw02ButtonTempUp;
-  _.Temp = temp - kHaierAcMinTemp;
+/// Get the default temperature units in use.
+/// @return true is Fahrenheit, false is Celsius.
+bool IRHaierAC176::getUseFahrenheit(void) const { return _.UseFahrenheit; }
+
+/// Set the temperature.
+/// @param[in] degree The temperature in degrees.
+/// @param[in] fahrenheit Use units of Fahrenheit and set that as units used.
+void IRHaierAC176::setTemp(const uint8_t degree, const bool fahrenheit) {
+  if (fahrenheit) {
+    uint8_t temp = degree;
+    if (temp < kHaierAcYrw02MinTempF)
+      temp = kHaierAcYrw02MinTempF;
+    else if (temp > kHaierAcYrw02MaxTempF)
+      temp = kHaierAcYrw02MaxTempF;
+
+    uint8_t old_temp = getTemp();
+    if (old_temp == temp) return;
+    if (old_temp > temp)
+      _.Button = kHaierAcYrw02ButtonTempDown;
+    else
+      _.Button = kHaierAcYrw02ButtonTempUp;
+
+    if (degree >= 77) { temp++; }
+    if (degree >= 79) { temp++; }
+    // See at IRHaierAC176::getTemp() comments for clarification
+    _.ExtraDegreeF = temp % 2;
+    _.Temp = (temp - kHaierAcYrw02MinTempF -_.ExtraDegreeF) >> 1;
+    _.UseFahrenheit = true;
+  } else {
+    uint8_t temp = degree;
+    if (temp < kHaierAcYrw02MinTempC)
+      temp = kHaierAcYrw02MinTempC;
+    else if (temp > kHaierAcYrw02MaxTempC)
+      temp = kHaierAcYrw02MaxTempC;
+
+    uint8_t old_temp = getTemp();
+    if (old_temp == temp) return;
+    if (old_temp > temp)
+      _.Button = kHaierAcYrw02ButtonTempDown;
+    else
+      _.Button = kHaierAcYrw02ButtonTempUp;
+    _.Temp = temp - kHaierAcYrw02MinTempC;
+    _.UseFahrenheit = false;
+  }
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRHaierAC176::getTemp(void) const { return _.Temp + kHaierAcMinTemp; }
+uint8_t IRHaierAC176::getTemp(void) const {
+  if (!_.UseFahrenheit) { return _.Temp + kHaierAcYrw02MinTempC; }
+  uint8_t degree = _.Temp*2 + kHaierAcYrw02MinTempF + _.ExtraDegreeF;
+  // The way of coding the temperature in degree Fahrenheit is
+  // kHaierAcYrw02MinTempF + Temp*2 + ExtraDegreeF, for example
+  // Temp = 0b0011, ExtraDegreeF = 0b1, temperature is 60 + 3*2 + 1 = 67F
+  // But around 78F there is unconsistency, see table below
+  //
+  // | Fahrenheit | Temp   | ExtraDegreeF |
+  // |    60F     | 0b0000 |     0b0      |
+  // |    61F     | 0b0000 |     0b1      |
+  // |    62F     | 0b0001 |     0b0      |
+  // |    63F     | 0b0001 |     0b1      |
+  // |    64F     | 0b0010 |     0b0      |
+  // |    65F     | 0b0010 |     0b1      |
+  // |    66F     | 0b0011 |     0b0      |
+  // |    67F     | 0b0011 |     0b1      |
+  // |    68F     | 0b0100 |     0b0      |
+  // |    69F     | 0b0100 |     0b1      |
+  // |    70F     | 0b0101 |     0b0      |
+  // |    71F     | 0b0101 |     0b1      |
+  // |    72F     | 0b0110 |     0b0      |
+  // |    73F     | 0b0110 |     0b1      |
+  // |    74F     | 0b0111 |     0b0      |
+  // |    75F     | 0b0111 |     0b1      |
+  // |    76F     | 0b1000 |     0b0      |
+  // |  Not Used  | 0b1000 |     0b1      |
+  // |    77F     | 0b1001 |     0b0      |
+  // |  Not Used  | 0b1001 |     0b1      |
+  // |    78F     | 0b1010 |     0b0      |
+  // |    79F     | 0b1010 |     0b1      |
+  // |    80F     | 0b1011 |     0b0      |
+  // |    81F     | 0b1011 |     0b1      |
+  // |    82F     | 0b1100 |     0b0      |
+  // |    83F     | 0b1100 |     0b1      |
+  // |    84F     | 0b1101 |     0b0      |
+  // |    86F     | 0b1110 |     0b0      |
+  // |    85F     | 0b1101 |     0b1      |
+  if (degree >= 78) { degree--; }
+  if (degree >= 79) { degree--; }
+  return degree;
+}
 
 /// Set the Health (filter) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
@@ -1038,7 +1112,7 @@ stdAc::state_t IRHaierAC176::toCommon(void) const {
   result.model = -1;  // No models used.
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
-  result.celsius = true;
+  result.celsius = !_.UseFahrenheit;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
   result.swingv = toCommonSwingV(_.SwingV);
@@ -1109,7 +1183,7 @@ String IRHaierAC176::toString(void) const {
   result += addModeToString(_.Mode, kHaierAcYrw02Auto, kHaierAcYrw02Cool,
                             kHaierAcYrw02Heat, kHaierAcYrw02Dry,
                             kHaierAcYrw02Fan);
-  result += addTempToString(getTemp());
+  result += addTempToString(getTemp(), !_.UseFahrenheit);
   result += addFanToString(_.Fan, kHaierAcYrw02FanHigh, kHaierAcYrw02FanLow,
                            kHaierAcYrw02FanAuto, kHaierAcYrw02FanAuto,
                            kHaierAcYrw02FanMed);

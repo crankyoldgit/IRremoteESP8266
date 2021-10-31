@@ -133,6 +133,12 @@ const uint8_t kHaierAcSleepBit = 0b01000000;
 #define HAIER_AC_FAN_MED kHaierAcFanMed
 #define HAIER_AC_FAN_HIGH kHaierAcFanHigh
 
+const uint8_t kHaierAcYrw02MinTempC = 16;
+const uint8_t kHaierAcYrw02MaxTempC = 30;
+const uint8_t kHaierAcYrw02MinTempF = 60;
+const uint8_t kHaierAcYrw02MaxTempF = 86;
+const uint8_t kHaierAcYrw02DefTempC = 25;
+
 const uint8_t kHaierAcYrw02Prefix = 0xA6;
 const uint8_t kHaierAc176Prefix = 0xB7;
 
@@ -218,7 +224,10 @@ union HaierAc176Protocol{
     // Byte 9
     uint8_t             :8;
     // Byte 10
-    uint8_t             :8;
+    uint8_t ExtraDegreeF :1;
+    uint8_t              :4;
+    uint8_t UseFahrenheit:1;
+    uint8_t              :2;
     // Byte 11
     uint8_t             :8;
     // Byte 12
@@ -365,7 +374,9 @@ class IRHaierAC176 {
   void setButton(const uint8_t button);
   uint8_t getButton(void) const;
 
-  void setTemp(const uint8_t temp);
+  void setUseFahrenheit(const bool on);
+  bool getUseFahrenheit(void) const;
+  void setTemp(const uint8_t temp, const bool fahrenheit = false);
   uint8_t getTemp(void) const;
 
   void setFan(const uint8_t speed);
