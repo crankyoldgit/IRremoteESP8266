@@ -56,9 +56,9 @@ TEST(TestDecodeMirage, RealExample) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (UNKNOWN), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Swing(V): 0 (Off), Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -78,9 +78,9 @@ TEST(TestDecodeMirage, SyntheticExample) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (UNKNOWN), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Swing(V): 0 (Off), Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -123,9 +123,9 @@ TEST(TestDecodeMirage, RealExampleWithDodgyHardwareCapture) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (UNKNOWN), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Swing(V): 0 (Off), Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -182,10 +182,12 @@ TEST(TestMirageAcClass, OperatingMode) {
 TEST(TestMirageAcClass, HumanReadable) {
   IRMirageAc ac(kGpioUnused);
   ac.begin();
+
+  // Tests for the KKG9AC1 model.
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 16C, Fan: 0 (Auto), "
-      "Swing(V): 13 (Auto), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:00",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 16C, "
+      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Swing(V): 13 (Auto), Clock: 00:00",
       ac.toString());
   // Ref: https://docs.google.com/spreadsheets/d/1Ucu9mOOIIJoWQjUJq_VCvwgV3EwKaRk8K2AuZgccYEk/edit#gid=0&range=C7
   // 0x56710000201A00000C000C26010041
@@ -194,9 +196,9 @@ TEST(TestMirageAcClass, HumanReadable) {
       0x0C, 0x00, 0x0C, 0x26, 0x01, 0x00, 0x41};
   ac.setRaw(cool_21c_auto);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
-      "Swing(V): 13 (Auto), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:01",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 21C, "
+      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Swing(V): 13 (Auto), Clock: 00:01",
       ac.toString());
 
   const uint8_t SyntheticExample[kMirageStateLength] = {
@@ -204,9 +206,19 @@ TEST(TestMirageAcClass, HumanReadable) {
       0x00, 0x00, 0x16, 0x14, 0x26};
   ac.setRaw(SyntheticExample);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (UNKNOWN), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Swing(V): 0 (Off), Clock: 14:16",
+      ac.toString());
+
+  // Tests for the KKG29AC1 model.
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
+  EXPECT_EQ(
+      "Model: 2 (KKG29AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Swing(V): Off, Swing(H): Off, "
+      "Filter: Off, Clean: -, On Timer: Off, Off Timer: Off, "
+      "IFeel: Off",
       ac.toString());
 }
 
@@ -341,4 +353,19 @@ TEST(TestMirageAcClass, SwingV) {
 
   ac.setSwingV(kMirageAcSwingVLowest - 1);
   EXPECT_EQ(kMirageAcSwingVAuto, ac.getSwingV());
+}
+
+TEST(TestMirageAcClass, getModel) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+  const uint8_t KKG9AC1[kMirageStateLength] = {
+      0x56, 0x6C, 0x00, 0x00, 0x20, 0xD8, 0x00, 0x00,
+      0x0C, 0x32, 0x0B, 0x00, 0x32, 0x0F, 0x64};
+  EXPECT_EQ(mirage_ac_remote_model_t::KKG9AC1, IRMirageAc::getModel(KKG9AC1));
+
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1573#issuecomment-955722044
+  const uint8_t KKG29AC1[kMirageStateLength] = {
+      0x56, 0x74, 0x00, 0x00, 0x12, 0x00, 0x40, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1D};
+  EXPECT_EQ(mirage_ac_remote_model_t::KKG29AC1, IRMirageAc::getModel(KKG29AC1));
 }

@@ -586,6 +586,12 @@
 #ifndef D_STR_AKB73757604
 #define D_STR_AKB73757604 "AKB73757604"
 #endif  // D_STR_AKB73757604
+#ifndef D_STR_KKG9AC1
+#define D_STR_KKG9AC1 "KKG9AC1"
+#endif  // D_STR_KKG9AC1
+#ifndef D_STR_KKG29AC1
+#define D_STR_KKG29AC1 "KKG29AC1"
+#endif  // D_STR_KKG9AC1
 #ifndef D_STR_LKE
 #define D_STR_LKE "LKE"
 #endif  // D_STR_LKE

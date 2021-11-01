@@ -330,10 +330,12 @@ void electra(IRElectraAc *ac,
              const bool light, const int16_t sleep = -1);
 #endif  // SEND_MIDEA
 #if SEND_MIRAGE
-  void mirage(IRMirageAc *ac,
+  void mirage(IRMirageAc *ac, const mirage_ac_remote_model_t model,
               const bool on, const stdAc::opmode_t mode,
               const float degrees, const stdAc::fanspeed_t fan,
-              const stdAc::swingv_t swingv, const bool turbo, const bool light,
+              const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+              const bool turbo, const bool quiet, const bool light,
+              const bool filter, const bool clean,
               const int16_t sleep = -1, const int16_t clock = -1);
 #endif  // SEND_MIRAGE
 #if SEND_MITSUBISHI_AC

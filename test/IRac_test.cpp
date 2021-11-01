@@ -1352,30 +1352,65 @@ TEST(TestIRac, Mirage) {
   IRMirageAc ac(kGpioUnused);
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
-  char expected[] =
-      "Power: On, Mode: 3 (Dry), Temp: 27C, Fan: 2 (Medium), "
-      "Swing(V): 9 (High), "
-      "Turbo: Off, Light: Off, Sleep: On, Clock: 17:31";
+  stdAc::state_t r, p;
+  const char expected_KKG9AC1[] =
+      "Model: 1 (KKG9AC1), Power: On, Mode: 3 (Dry), Temp: 27C, "
+      "Fan: 2 (Medium), Turbo: Off, Light: Off, Sleep: On, "
+      "Swing(V): 9 (High), Clock: 17:31";
 
   ac.begin();
   irac.mirage(&ac,
-              true,                        // Power
-              stdAc::opmode_t::kDry,       // Mode
-              27,                          // Degrees (Celsius)
-              stdAc::fanspeed_t::kMedium,  // Fan speed
-              stdAc::swingv_t::kHigh,      // Veritical Swing
-              false,                       // Turbo
-              false,                       // Light
-              8 * 60 + 0,                  // Sleep time
-              17 * 60 + 31);               // Clock
+              mirage_ac_remote_model_t::KKG9AC1,  // Model
+              true,                               // Power
+              stdAc::opmode_t::kDry,              // Mode
+              27,                                 // Degrees (Celsius)
+              stdAc::fanspeed_t::kMedium,         // Fan speed
+              stdAc::swingv_t::kHigh,             // Veritical Swing
+              stdAc::swingh_t::kLeft,             // Horizontal Swing
+              false,                              // Turbo
+              true,                               // Quiet
+              false,                              // Light
+              true,                               // Filter
+              false,                              // Clean
+              8 * 60 + 0,                         // Sleep time
+              17 * 60 + 31);                      // Clock
 
-  ASSERT_EQ(expected, ac.toString());
+  ASSERT_EQ(expected_KKG9AC1, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(MIRAGE, ac._irsend.capture.decode_type);
   ASSERT_EQ(kMirageBits, ac._irsend.capture.bits);
-  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
-  stdAc::state_t r, p;
+  ASSERT_EQ(expected_KKG9AC1, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+
+  const char expected_KKG29AC1[] =
+      "Model: 2 (KKG29AC1), Power: On, Mode: 3 (Dry), Temp: 27C, "
+      "Fan: 2 (Medium), Turbo: Off, Light: Off, Sleep: On, "
+      "Swing(V): On, Swing(H): On, Filter: On, Clean: -, "
+      "On Timer: Off, Off Timer: Off, IFeel: Off";
+  ac._irsend.reset();
+  irac.mirage(&ac,
+              mirage_ac_remote_model_t::KKG29AC1,  // Model
+              true,                                // Power
+              stdAc::opmode_t::kDry,               // Mode
+              27,                                  // Degrees (Celsius)
+              stdAc::fanspeed_t::kMedium,          // Fan speed
+              stdAc::swingv_t::kHigh,              // Veritical Swing
+              stdAc::swingh_t::kLeft,              // Horizontal Swing
+              false,                               // Turbo
+              true,                                // Quiet
+              false,                               // Light
+              true,                                // Filter
+              false,                               // Clean
+              8 * 60 + 0,                          // Sleep time
+              17 * 60 + 31);                       // Clock
+  ASSERT_EQ(expected_KKG29AC1, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(MIRAGE, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kMirageBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected_KKG29AC1,
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 

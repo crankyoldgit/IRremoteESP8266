@@ -626,6 +626,13 @@ namespace irutils {
           default:                                  return kUnknownStr;
         }
         break;
+      case decode_type_t::MIRAGE:
+        switch (model) {
+          case mirage_ac_remote_model_t::KKG9AC1:  return kKkg9ac1Str;
+          case mirage_ac_remote_model_t::KKG29AC1: return kKkg29ac1Str;
+          default:                                 return kUnknownStr;
+        }
+        break;
       case decode_type_t::PANASONIC_AC:
         switch (model) {
           case panasonic_ac_remote_model_t::kPanasonicLke: return kLkeStr;

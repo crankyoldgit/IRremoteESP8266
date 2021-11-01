@@ -21,9 +21,11 @@ using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addModelToString;
 using irutils::addSwingHToString;
 using irutils::addSwingVToString;
 using irutils::addTempToString;
+using irutils::addToggleToString;
 using irutils::minsToString;
 using irutils::bcdToUint8;
 using irutils::uint8ToBcd;
@@ -129,6 +131,60 @@ uint8_t *IRMirageAc::getRaw(void) {
 /// @param[in] data A valid code for this protocol.
 void IRMirageAc::setRaw(const uint8_t *data) {
   std::memcpy(_.raw, data, kMirageStateLength);
+  _model = getModel(true);
+}
+
+/// Guess the Mirage remote model from the supplied state code.
+/// @param[in] state A valid state code for this protocol.
+/// @return The model code.
+mirage_ac_remote_model_t IRMirageAc::getModel(const uint8_t *state) {
+  Mirage120Protocol prot;
+  std::memcpy(prot.raw, state, kMirageStateLength);
+  // If the minutes or seconds or raw[10] are set, it's a KKG9AC1
+  if (prot.Minutes || prot.Seconds || prot.raw[10])
+    return mirage_ac_remote_model_t::KKG9AC1;
+  // Check for KKG29AC1 specific settings.
+  if (prot.RecycleHeat || prot.Filter || prot.Sleep_Kkg29ac1 ||
+      prot.CleanToggle || prot.IFeel)
+    return mirage_ac_remote_model_t::KKG29AC1;
+  else
+    return mirage_ac_remote_model_t::KKG9AC1;
+}
+
+/// Get the model code of the interal message state.
+/// @param[in] useRaw If set, we try to get the model info from just the state.
+/// @return The model code.
+mirage_ac_remote_model_t IRMirageAc::getModel(const bool useRaw) const {
+  return useRaw ? getModel(_.raw) : _model;
+}
+
+/// Set the model code of the interal message state.
+/// @param[in] model The desired model to use for the settings.
+void IRMirageAc::setModel(mirage_ac_remote_model_t model) {
+  if (model != _model) {  // Only change things if we need to.
+    // Save the old settings.
+    stdAc::state_t old = toCommon();
+    uint16_t ontimer = getOnTimer();
+    uint16_t offtimer = getOffTimer();
+    // Change the model.
+    _model = model;
+    // Restore/Convert the settings.
+    setPower(old.power);
+    setTemp(old.degrees);
+    setMode(convertMode(old.mode));
+    setFan(convertFan(old.fanspeed));
+    setTurbo(old.turbo);
+    setSleep(old.sleep >= 0);
+    setLight(old.light);
+    setSwingV(convertSwingV(old.swingv));
+    setSwingH(old.swingh != stdAc::swingh_t::kOff);
+    setQuiet(old.quiet);
+    setCleanToggle(old.clean);
+    setFilter(old.filter);
+    setClock(old.clock * 60);  // setClock() expects seconds, not minutes.
+    setOnTimer(ontimer);
+    setOffTimer(offtimer);
+  }
 }
 
 /// Calculate and set the checksum values for the internal state.
@@ -157,29 +213,39 @@ void IRMirageAc::off(void) { setPower(false); }
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMirageAc::setPower(bool on) {
-  // In order to change the power setting, it seems must be less than
-  // kMirageAcPowerOff. kMirageAcPowerOff is larger than half of the possible
-  // value stored in the allocated bit space.
-  // Thus if the value is larger than kMirageAcPowerOff the power is off.
-  // Less than, then power is on.
-  // We can't just aribitarily add or subtract the value (which analysis
-  // indicates is how the power status changes. Very weird, I know!) as that is
-  // not an idempotent action, we must check if the addition or substraction is
-  // needed first. e.g. via getPower()
-  // i.e. If we added or subtracted twice, we would cause a wrap of the integer
-  // and not get the desired result.
-  if (on)
-    _.SwingAndPower -= getPower() ? 0 : kMirageAcPowerOff;
-  else
-    _.SwingAndPower += getPower() ? kMirageAcPowerOff : 0;
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.Power = on ? 0b11 : 0b00;
+      break;
+    default:
+      // In order to change the power setting, it seems must be less than
+      // kMirageAcPowerOff. kMirageAcPowerOff is larger than half of the
+      // possible value stored in the allocated bit space.
+      // Thus if the value is larger than kMirageAcPowerOff the power is off.
+      // Less than, then power is on.
+      // We can't just aribitarily add or subtract the value (which analysis
+      // indicates is how the power status changes. Very weird, I know!) as that
+      // is not an idempotent action, we must check if the addition or
+      // substraction is needed first. e.g. via getPower()
+      // i.e. If we added or subtracted twice, we would cause a wrap of the
+      // integer and not get the desired result.
+      if (on)
+        _.SwingAndPower -= getPower() ? 0 : kMirageAcPowerOff;
+      else
+        _.SwingAndPower += getPower() ? kMirageAcPowerOff : 0;
+  }
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRMirageAc::getPower(void) const {
-  return _.SwingAndPower < kMirageAcPowerOff;
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      return _.Power == 0b11;
+    default:
+      return _.SwingAndPower < kMirageAcPowerOff;
+  }
 }
-
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
@@ -228,62 +294,118 @@ uint8_t IRMirageAc::getFan(void) const { return _.Fan; }
 /// Change the Turbo setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRMirageAc::setTurbo(bool on) {
-  _.Turbo = (on && (getMode() == kMirageAcCool));
+  const bool value = (on && (getMode() == kMirageAcCool));
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.Turbo_Kkg29ac1 = value;
+      break;
+    default:
+      _.Turbo_Kkg9ac1 = value;
+  }
 }
 
 /// Get the value of the current Turbo setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMirageAc::getTurbo(void) const { return _.Turbo; }
+bool IRMirageAc::getTurbo(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1: return _.Turbo_Kkg29ac1;
+    default:                                 return _.Turbo_Kkg9ac1;
+  }
+}
 
 /// Change the Sleep setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRMirageAc::setSleep(bool on) { _.Sleep = on; }
+void IRMirageAc::setSleep(bool on) {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.Sleep_Kkg29ac1 = on;
+      break;
+    default:
+      _.Sleep_Kkg9ac1 = on;
+  }
+}
 
 /// Get the value of the current Sleep setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMirageAc::getSleep(void) const { return _.Sleep; }
+bool IRMirageAc::getSleep(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1: return _.Sleep_Kkg29ac1;
+    default:                                 return _.Sleep_Kkg9ac1;
+  }
+}
 
 /// Change the Light/Display setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRMirageAc::setLight(bool on) { _.Light = on; }
+void IRMirageAc::setLight(bool on) {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.LightToggle_Kkg29ac1 = on;
+      break;
+    default:
+      _.Light_Kkg9ac1 = on;
+  }
+}
 
 /// Get the value of the current Light/Display setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMirageAc::getLight(void) const { return _.Light; }
+bool IRMirageAc::getLight(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1: return _.LightToggle_Kkg29ac1;
+    default:                                 return _.Light_Kkg9ac1;
+  }
+}
 
 /// Get the clock time of the A/C unit.
 /// @return Nr. of seconds past midnight.
 uint32_t IRMirageAc::getClock(void) const {
-  return ((bcdToUint8(_.Hours) * 60) + bcdToUint8(_.Minutes)) * 60 +
-      bcdToUint8(_.Seconds);
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      return 0;
+    default:
+      return ((bcdToUint8(_.Hours) * 60) + bcdToUint8(_.Minutes)) * 60 +
+          bcdToUint8(_.Seconds);
+  }
 }
 
 /// Set the clock time on the A/C unit.
 /// @param[in] nr_of_seconds Nr. of seconds past midnight.
 void IRMirageAc::setClock(const uint32_t nr_of_seconds) {
-  uint32_t remaining = std::min(
-      nr_of_seconds, (uint32_t)(24 * 60 * 60 - 1));  // Limit to 23:59:59.
-  _.Seconds = uint8ToBcd(remaining % 60);
-  remaining /= 60;
-  _.Minutes = uint8ToBcd(remaining % 60);
-  remaining /= 60;
-  _.Hours = uint8ToBcd(remaining);
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.Minutes = _.Seconds = 0;  // No clock setting. Clear it just in case.
+      break;
+    default:
+      uint32_t remaining = std::min(
+          nr_of_seconds, (uint32_t)(24 * 60 * 60 - 1));  // Limit to 23:59:59.
+      _.Seconds = uint8ToBcd(remaining % 60);
+      remaining /= 60;
+      _.Minutes = uint8ToBcd(remaining % 60);
+      remaining /= 60;
+      _.Hours = uint8ToBcd(remaining);
+  }
 }
 
 /// Set the Vertical Swing setting/position of the A/C.
 /// @param[in] position The desired swing setting.
 void IRMirageAc::setSwingV(const uint8_t position) {
-  const bool power = getPower();
   switch (position) {
+    case kMirageAcSwingVOff:
     case kMirageAcSwingVLowest:
     case kMirageAcSwingVLow:
     case kMirageAcSwingVMiddle:
     case kMirageAcSwingVHigh:
     case kMirageAcSwingVHighest:
     case kMirageAcSwingVAuto:
-      _.SwingAndPower = position;
-      // Power needs to be reapplied after overwriting SwingAndPower
-      setPower(power);
+      switch (_model) {
+        case mirage_ac_remote_model_t::KKG29AC1:
+          _.SwingV = (position != kMirageAcSwingVOff);
+          break;
+        default:
+          const bool power = getPower();
+          _.SwingAndPower = position;
+          // Power needs to be reapplied after overwriting SwingAndPower
+          setPower(power);
+      }
       break;
     default:  // Default to Auto for anything else.
       setSwingV(kMirageAcSwingVAuto);
@@ -293,7 +415,194 @@ void IRMirageAc::setSwingV(const uint8_t position) {
 /// Get the Vertical Swing setting/position of the A/C.
 /// @return The desired Vertical Swing setting/position.
 uint8_t IRMirageAc::getSwingV(void) const {
-  return _.SwingAndPower - (getPower() ? 0 : kMirageAcPowerOff);
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      return _.SwingV;
+    default:
+      return _.SwingAndPower - (getPower() ? 0 : kMirageAcPowerOff);
+  }
+}
+
+/// Set the Horizontal Swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMirageAc::setSwingH(const bool on) {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.SwingH = on;
+      break;
+    default:
+      break;
+  }
+}
+
+/// Get the Horizontal Swing setting of the A/C.
+/// @return on true, the setting is on. false, the setting is off.
+bool IRMirageAc::getSwingH(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1: return _.SwingH;
+    default:                                 return false;
+  }
+}
+
+/// Set the Quiet setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMirageAc::setQuiet(const bool on) {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.Quiet = on;
+      break;
+    default:
+      break;
+  }
+}
+
+/// Get the Quiet setting of the A/C.
+/// @return on true, the setting is on. false, the setting is off.
+bool IRMirageAc::getQuiet(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1: return _.Quiet;
+    default:                                 return false;
+  }
+}
+
+/// Set the CleanToggle setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMirageAc::setCleanToggle(const bool on) {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.CleanToggle = on;
+      break;
+    default:
+      break;
+  }
+}
+
+/// Get the Clean Toggle setting of the A/C.
+/// @return on true, the setting is on. false, the setting is off.
+bool IRMirageAc::getCleanToggle(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1: return _.CleanToggle;
+    default:                                 return false;
+  }
+}
+
+/// Set the Filter setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMirageAc::setFilter(const bool on) {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.Filter = on;
+      break;
+    default:
+      break;
+  }
+}
+
+/// Get the Filter setting of the A/C.
+/// @return on true, the setting is on. false, the setting is off.
+bool IRMirageAc::getFilter(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1: return _.Filter;
+    default:                                 return false;
+  }
+}
+
+/// Set the IFeel setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRMirageAc::setIFeel(const bool on) {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.IFeel = on;
+      if (!on) _.SensorTemp = 0;
+      break;
+    default:
+      break;
+  }
+}
+
+/// Get the IFeel setting of the A/C.
+/// @return on true, the setting is on. false, the setting is off.
+bool IRMirageAc::getIFeel(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1: return _.IFeel;
+    default:                                 return false;
+  }
+}
+
+/// Set the Sensor Temp setting of the A/C's remote.
+/// @param[in] degrees The desired sensor temp. in degrees celsius.
+void IRMirageAc::setSensorTemp(const uint8_t degrees) {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.SensorTemp = std::min(kMirageAcSensorTempMax, degrees) +
+          kMirageAcSensorTempOffset;
+      break;
+    default:
+      break;
+  }
+}
+
+/// Get the Sensor Temp setting of the A/C's remote.
+/// @return The current setting for the sensor temp. in degrees celsius.
+uint16_t IRMirageAc::getSensorTemp(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      return _.SensorTemp - kMirageAcSensorTempOffset;
+    default:
+      return false;
+  }
+}
+
+/// Get the number of minutes the On Timer is currently set for.
+/// @return Nr. of Minutes the timer is set for. 0, is the timer is not in use.
+uint16_t IRMirageAc::getOnTimer(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      return _.OnTimerEnable ? _.OnTimerHours * 60 + _.OnTimerMins : 0;
+    default:
+      return 0;
+  }
+}
+
+/// Set the number of minutes for the On Timer.
+/// @param[in] nr_of_mins How long to set the timer for. 0 disables the timer.
+void IRMirageAc::setOnTimer(const uint16_t nr_of_mins) {
+  uint16_t mins = std::min(nr_of_mins, (uint16_t)(24 * 60));
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.OnTimerEnable = (mins > 0);
+      _.OnTimerHours = mins / 60;
+      _.OnTimerMins = mins % 60;
+      break;
+    default:
+      break;
+  }
+}
+
+/// Get the number of minutes the Off Timer is currently set for.
+/// @return Nr. of Minutes the timer is set for. 0, is the timer is not in use.
+uint16_t IRMirageAc::getOffTimer(void) const {
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      return _.OffTimerEnable ? _.OffTimerHours * 60 + _.OffTimerMins : 0;
+    default:
+      return 0;
+  }
+}
+
+/// Set the number of minutes for the Off Timer.
+/// @param[in] nr_of_mins How long to set the timer for. 0 disables the timer.
+void IRMirageAc::setOffTimer(const uint16_t nr_of_mins) {
+  uint16_t mins = std::min(nr_of_mins, (uint16_t)(24 * 60));
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      _.OffTimerEnable = (mins > 0);
+      _.OffTimerHours = mins / 60;
+      _.OffTimerMins = mins % 60;
+      break;
+    default:
+      break;
+  }
 }
 
 /// Convert a native mode into its stdAc equivalent.
@@ -356,6 +665,7 @@ uint8_t IRMirageAc::convertSwingV(const stdAc::swingv_t position) {
     case stdAc::swingv_t::kMiddle:      return kMirageAcSwingVMiddle;
     case stdAc::swingv_t::kLow:         return kMirageAcSwingVLow;
     case stdAc::swingv_t::kLowest:      return kMirageAcSwingVLowest;
+    case stdAc::swingv_t::kOff:         return kMirageAcSwingVOff;
     default:                            return kMirageAcSwingVAuto;
   }
 }
@@ -370,7 +680,8 @@ stdAc::swingv_t IRMirageAc::toCommonSwingV(const uint8_t pos) {
     case kMirageAcSwingVMiddle:  return stdAc::swingv_t::kMiddle;
     case kMirageAcSwingVLow:     return stdAc::swingv_t::kLow;
     case kMirageAcSwingVLowest:  return stdAc::swingv_t::kLowest;
-    default:                     return stdAc::swingv_t::kAuto;
+    case kMirageAcSwingVAuto:    return stdAc::swingv_t::kAuto;
+    default:                     return stdAc::swingv_t::kOff;
   }
 }
 
@@ -379,24 +690,24 @@ stdAc::swingv_t IRMirageAc::toCommonSwingV(const uint8_t pos) {
 stdAc::state_t IRMirageAc::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::MIRAGE;
-  result.model = -1;  // No models used.
+  result.model = _model;
   result.power = getPower();
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.swingv = toCommonSwingV(getSwingV());
+  result.swingh = getSwingH() ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.turbo = getTurbo();
   result.light = getLight();
+  result.clean = getCleanToggle();
+  result.filter = getFilter();
   result.sleep = getSleep() ? 0 : -1;
+  result.quiet = getQuiet();
+  result.clock = getClock() / 60;
   // Not supported.
-  result.swingh = stdAc::swingh_t::kOff;
-  result.quiet = false;
-  result.clean = false;
   result.econo = false;
-  result.filter = false;
   result.beep = false;
-  result.clock = -1;
   return result;
 }
 
@@ -404,8 +715,9 @@ stdAc::state_t IRMirageAc::toCommon(void) const {
 /// @return A string containing the settings in human-readable form.
 String IRMirageAc::toString(void) const {
   String result = "";
-  result.reserve(110);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(getPower(), kPowerStr, false);
+  result.reserve(240);  // Reserve some heap for the string to reduce fragging.
+  result += addModelToString(decode_type_t::MIRAGE, _model, false);
+  result += addBoolToString(getPower(), kPowerStr);
   result += addModeToString(_.Mode, 0xFF, kMirageAcCool,
                             kMirageAcHeat, kMirageAcDry,
                             kMirageAcFan);
@@ -414,20 +726,41 @@ String IRMirageAc::toString(void) const {
                            kMirageAcFanLow,
                            kMirageAcFanAuto, kMirageAcFanAuto,
                            kMirageAcFanMed);
-  result += addSwingVToString(getSwingV(),
-                              kMirageAcSwingVAuto,
-                              kMirageAcSwingVHighest,
-                              kMirageAcSwingVHigh,
-                              0xFF,  // Unused.
-                              kMirageAcSwingVMiddle,
-                              0xFF,  // Unused.
-                              kMirageAcSwingVLow,
-                              kMirageAcSwingVLowest,
-                              0xFF, 0xFF, 0xFF, 0xFF);  // Unused.
-  result += addBoolToString(_.Turbo, kTurboStr);
-  result += addBoolToString(_.Light, kLightStr);
-  result += addBoolToString(_.Sleep, kSleepStr);
-  result += addLabeledString(minsToString(getClock() / 60), kClockStr);
+  result += addBoolToString(getTurbo(), kTurboStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addBoolToString(getSleep(), kSleepStr);
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      result += addBoolToString(_.SwingV, kSwingVStr);
+      result += addBoolToString(_.SwingH, kSwingHStr);
+      result += addBoolToString(_.Filter, kFilterStr);
+      result += addToggleToString(_.CleanToggle, kCleanStr);
+      result += addLabeledString(getOnTimer() ? minsToString(getOnTimer())
+                                              : kOffStr,
+                                 kOnTimerStr);
+      result += addLabeledString(getOffTimer() ? minsToString(getOffTimer())
+                                               : kOffStr,
+                                 kOffTimerStr);
+      result += addBoolToString(_.IFeel, kIFeelStr);
+      if (_.IFeel) {
+        result += addIntToString(getSensorTemp(), kSensorTempStr);
+        result += 'C';
+      }
+      break;
+    default:
+      result += addSwingVToString(getSwingV(),
+                                  kMirageAcSwingVAuto,
+                                  kMirageAcSwingVHighest,
+                                  kMirageAcSwingVHigh,
+                                  0xFF,  // Unused.
+                                  kMirageAcSwingVMiddle,
+                                  0xFF,  // Unused.
+                                  kMirageAcSwingVLow,
+                                  kMirageAcSwingVLowest,
+                                  kMirageAcSwingVOff,
+                                  0xFF, 0xFF, 0xFF);  // Unused.
+      result += addLabeledString(minsToString(getClock() / 60), kClockStr);
+  }
   return result;
 }
 #endif  // DECODE_MIRAGE
