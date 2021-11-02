@@ -1112,6 +1112,7 @@ void IRac::haier(IRHaierAC *ac,
 /// @param[in, out] ac A Ptr to an IRHaierAC176 object to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
@@ -1122,12 +1123,15 @@ void IRac::haier(IRHaierAC *ac,
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::haier176(IRHaierAC176 *ac,
                     const bool on, const stdAc::opmode_t mode,
-                    const float degrees, const stdAc::fanspeed_t fan,
-                    const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                    const bool celsius, const float degrees,
+                    const stdAc::fanspeed_t fan,
+                    const stdAc::swingv_t swingv,
+                    const stdAc::swingh_t swingh,
                     const bool turbo, const bool quiet, const bool filter,
                     const int16_t sleep) {
   ac->begin();
   ac->setMode(ac->convertMode(mode));
+  ac->setUseFahrenheit(!celsius);
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(ac->convertSwingV(swingv));
@@ -1149,6 +1153,7 @@ void IRac::haier176(IRHaierAC176 *ac,
 /// @param[in, out] ac A Ptr to an IRHaierACYRW02 object to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
@@ -1159,13 +1164,15 @@ void IRac::haier176(IRHaierAC176 *ac,
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::haierYrwo2(IRHaierACYRW02 *ac,
                       const bool on, const stdAc::opmode_t mode,
-                      const float degrees, const stdAc::fanspeed_t fan,
+                      const bool celsius, const float degrees,
+                      const stdAc::fanspeed_t fan,
                       const stdAc::swingv_t swingv,
                       const stdAc::swingh_t swingh,
                       const bool turbo, const bool quiet, const bool filter,
                       const int16_t sleep) {
   ac->begin();
   ac->setMode(ac->convertMode(mode));
+  ac->setUseFahrenheit(!celsius);
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(ac->convertSwingV(swingv));
@@ -2797,8 +2804,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HAIER_AC176:
     {
       IRHaierAC176 ac(_pin, _inverted, _modulation);
-      haier176(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-               send.swingh, send.turbo, send.filter, send.sleep);
+      haier176(&ac, send.power, send.mode, send.celsius, send.degrees,
+               send.fanspeed, send.swingv, send.swingh, send.turbo,
+               send.filter, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC176
@@ -2806,8 +2814,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HAIER_AC_YRW02:
     {
       IRHaierACYRW02 ac(_pin, _inverted, _modulation);
-      haierYrwo2(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-                 send.swingh, send.turbo, send.filter, send.sleep);
+      haierYrwo2(&ac, send.power, send.mode, send.celsius, send.degrees,
+                 send.fanspeed, send.swingv, send.swingh, send.turbo,
+                 send.filter, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC_YRW02

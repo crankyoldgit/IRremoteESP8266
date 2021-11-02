@@ -798,7 +798,8 @@ TEST(TestIRac, Haier176) {
   irac.haier176(&ac,
                 true,                        // Power
                 stdAc::opmode_t::kCool,      // Mode
-                23,                          // Celsius
+                true,                        // Celsius
+                23,                          // Degrees
                 stdAc::fanspeed_t::kMedium,  // Fan speed
                 stdAc::swingv_t::kHigh,      // Vertical swing
                 stdAc::swingh_t::kOff,       // Horizontal swing
@@ -830,7 +831,8 @@ TEST(TestIRac, HaierYrwo2) {
   irac.haierYrwo2(&ac,
                   true,                        // Power
                   stdAc::opmode_t::kCool,      // Mode
-                  23,                          // Celsius
+                  true,                        // Celsius
+                  23,                          // Degrees
                   stdAc::fanspeed_t::kMedium,  // Fan speed
                   stdAc::swingv_t::kHigh,      // Vertical swing
                   stdAc::swingh_t::kAuto,      // Vertical swing
