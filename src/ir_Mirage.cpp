@@ -117,6 +117,7 @@ void IRMirageAc::begin(void) { _irsend.begin(); }
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRMirageAc::send(const uint16_t repeat) {
   _irsend.sendMirage(getRaw(), kMirageStateLength, repeat);
+  setCleanToggle(false);  // Clean Toggle is reset after each send.
 }
 #endif  // SEND_MITSUBISHI_AC
 
@@ -138,17 +139,19 @@ void IRMirageAc::setRaw(const uint8_t *data) {
 /// @param[in] state A valid state code for this protocol.
 /// @return The model code.
 mirage_ac_remote_model_t IRMirageAc::getModel(const uint8_t *state) {
-  Mirage120Protocol prot;
-  std::memcpy(prot.raw, state, kMirageStateLength);
-  // If the minutes or seconds or raw[10] are set, it's a KKG9AC1
-  if (prot.Minutes || prot.Seconds || prot.raw[10])
+  Mirage120Protocol p;
+  std::memcpy(p.raw, state, kMirageStateLength);
+  // Check for things specific to KKG9AC1
+  if ((p.Minutes || p.Seconds) &&  // Is part of the clock set?
+      // Are the timer times set, but not enabled?
+      (!p.OffTimerEnable && (p.OffTimerHours || p.OffTimerMins)) &&
+      (!p.OnTimerEnable && (p.OnTimerHours || p.OnTimerMins)))
     return mirage_ac_remote_model_t::KKG9AC1;
   // Check for KKG29AC1 specific settings.
-  if (prot.RecycleHeat || prot.Filter || prot.Sleep_Kkg29ac1 ||
-      prot.CleanToggle || prot.IFeel)
+  if (p.RecycleHeat || p.Filter || p.Sleep_Kkg29ac1 || p.CleanToggle ||
+      p.IFeel || p.OffTimerEnable || p.OnTimerEnable)
     return mirage_ac_remote_model_t::KKG29AC1;
-  else
-    return mirage_ac_remote_model_t::KKG9AC1;
+  return mirage_ac_remote_model_t::KKG9AC1;  // Default.
 }
 
 /// Get the model code of the interal message state.
@@ -163,9 +166,11 @@ mirage_ac_remote_model_t IRMirageAc::getModel(const bool useRaw) const {
 void IRMirageAc::setModel(mirage_ac_remote_model_t model) {
   if (model != _model) {  // Only change things if we need to.
     // Save the old settings.
-    stdAc::state_t old = toCommon();
-    uint16_t ontimer = getOnTimer();
-    uint16_t offtimer = getOffTimer();
+    const stdAc::state_t old = toCommon();
+    const uint16_t ontimer = getOnTimer();
+    const uint16_t offtimer = getOffTimer();
+    const bool ifeel = getIFeel();
+    const uint8_t sensor = getSensorTemp();
     // Change the model.
     _model = model;
     // Restore/Convert the settings.
@@ -184,6 +189,8 @@ void IRMirageAc::setModel(mirage_ac_remote_model_t model) {
     setClock(old.clock * 60);  // setClock() expects seconds, not minutes.
     setOnTimer(ontimer);
     setOffTimer(offtimer);
+    setIFeel(ifeel);
+    setSensorTemp(sensor);
   }
 }
 
@@ -417,7 +424,7 @@ void IRMirageAc::setSwingV(const uint8_t position) {
 uint8_t IRMirageAc::getSwingV(void) const {
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
-      return _.SwingV;
+      return _.SwingV ? kMirageAcSwingVAuto : kMirageAcSwingVOff;
     default:
       return _.SwingAndPower - (getPower() ? 0 : kMirageAcPowerOff);
   }
@@ -513,7 +520,12 @@ void IRMirageAc::setIFeel(const bool on) {
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
       _.IFeel = on;
-      if (!on) _.SensorTemp = 0;
+      if (on) {
+        // If no previous sensor temp, default to currently desired temp.
+        if (!_.SensorTemp) _.SensorTemp = getTemp();
+      } else {
+        _.SensorTemp = 0;  // When turning it off, clear the Sensor Temp.
+      }
       break;
     default:
       break;
