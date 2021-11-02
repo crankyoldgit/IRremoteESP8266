@@ -179,6 +179,7 @@ const uint8_t kHaierAcYrw02ButtonTurbo =    0b01000;
 const uint8_t kHaierAcYrw02ButtonSleep =    0b01011;
 const uint8_t kHaierAcYrw02ButtonTimer =    0b10000;
 const uint8_t kHaierAcYrw02ButtonLock =     0b10100;
+const uint8_t kHaierAcYrw02ButtonCF =       0b11010;
 
 const uint8_t kHaierAcYrw02NoTimers       = 0b000;
 const uint8_t kHaierAcYrw02OffTimer       = 0b001;

@@ -619,6 +619,7 @@ void IRHaierAC176::setButton(uint8_t button) {
     case kHaierAcYrw02ButtonTurbo:
     case kHaierAcYrw02ButtonSleep:
     case kHaierAcYrw02ButtonLock:
+    case kHaierAcYrw02ButtonCF:
       _.Button = button;
   }
 }
@@ -667,41 +668,36 @@ bool IRHaierAC176::getUseFahrenheit(void) const { return _.UseFahrenheit; }
 /// @param[in] degree The temperature in degrees.
 /// @param[in] fahrenheit Use units of Fahrenheit and set that as units used.
 void IRHaierAC176::setTemp(const uint8_t degree, const bool fahrenheit) {
+  uint8_t old_temp = getTemp();
+  if (old_temp == degree) return;
+
+  if (_.UseFahrenheit == fahrenheit) {
+    if (old_temp > degree)
+      _.Button = kHaierAcYrw02ButtonTempDown;
+    else
+      _.Button = kHaierAcYrw02ButtonTempUp;
+  }
+  else
+    _.Button = kHaierAcYrw02ButtonCF;
+  _.UseFahrenheit = fahrenheit;
+
+  uint8_t temp = degree;
   if (fahrenheit) {
-    uint8_t temp = degree;
     if (temp < kHaierAcYrw02MinTempF)
       temp = kHaierAcYrw02MinTempF;
     else if (temp > kHaierAcYrw02MaxTempF)
       temp = kHaierAcYrw02MaxTempF;
-
-    uint8_t old_temp = getTemp();
-    if (old_temp == temp) return;
-    if (old_temp > temp)
-      _.Button = kHaierAcYrw02ButtonTempDown;
-    else
-      _.Button = kHaierAcYrw02ButtonTempUp;
-
     if (degree >= 77) { temp++; }
     if (degree >= 79) { temp++; }
     // See at IRHaierAC176::getTemp() comments for clarification
     _.ExtraDegreeF = temp % 2;
     _.Temp = (temp - kHaierAcYrw02MinTempF -_.ExtraDegreeF) >> 1;
-    _.UseFahrenheit = true;
   } else {
-    uint8_t temp = degree;
     if (temp < kHaierAcYrw02MinTempC)
       temp = kHaierAcYrw02MinTempC;
     else if (temp > kHaierAcYrw02MaxTempC)
       temp = kHaierAcYrw02MaxTempC;
-
-    uint8_t old_temp = getTemp();
-    if (old_temp == temp) return;
-    if (old_temp > temp)
-      _.Button = kHaierAcYrw02ButtonTempDown;
-    else
-      _.Button = kHaierAcYrw02ButtonTempUp;
     _.Temp = temp - kHaierAcYrw02MinTempC;
-    _.UseFahrenheit = false;
   }
 }
 
@@ -1175,6 +1171,9 @@ String IRHaierAC176::toString(void) const {
       break;
     case kHaierAcYrw02ButtonLock:
       result += kLockStr;
+      break;
+    case kHaierAcYrw02ButtonCF:
+      result += kCelsiusFahrenheitStr;
       break;
     default:
       result += kUnknownStr;

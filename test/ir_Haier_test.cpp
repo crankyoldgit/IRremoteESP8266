@@ -540,6 +540,9 @@ TEST(TestHaierACYRW02Class, Temperature) {
   ac.setTemp(78, true);
   EXPECT_EQ(78, ac.getTemp());
 
+  ac.setTemp(24);
+  EXPECT_EQ(kHaierAcYrw02ButtonCF, ac.getButton());
+
   ac.setTemp(0);
   EXPECT_EQ(kHaierAcYrw02MinTempC, ac.getTemp());
   EXPECT_EQ(kHaierAcYrw02ButtonTempDown, ac.getButton());
