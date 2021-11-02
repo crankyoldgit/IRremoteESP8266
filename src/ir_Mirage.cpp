@@ -117,7 +117,15 @@ void IRMirageAc::begin(void) { _irsend.begin(); }
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRMirageAc::send(const uint16_t repeat) {
   _irsend.sendMirage(getRaw(), kMirageStateLength, repeat);
-  setCleanToggle(false);  // Clean Toggle is reset after each send.
+  // Reset any toggles after a send.
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      setCleanToggle(false);
+      setLight(false);  // For this model (only), Light is a toggle.
+      break;
+    default:
+      break;
+  }
 }
 #endif  // SEND_MITSUBISHI_AC
 
@@ -222,7 +230,7 @@ void IRMirageAc::off(void) { setPower(false); }
 void IRMirageAc::setPower(bool on) {
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
-      _.Power = on ? 0b11 : 0b00;
+      _.Power = on ? 0b00 : 0b11;
       break;
     default:
       // In order to change the power setting, it seems must be less than
@@ -248,7 +256,7 @@ void IRMirageAc::setPower(bool on) {
 bool IRMirageAc::getPower(void) const {
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
-      return _.Power == 0b11;
+      return _.Power == 0b00;
     default:
       return _.SwingAndPower < kMirageAcPowerOff;
   }
@@ -343,6 +351,7 @@ bool IRMirageAc::getSleep(void) const {
 
 /// Change the Light/Display setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
+/// @note Light is a toggle on the KKG29AC1 model.
 void IRMirageAc::setLight(bool on) {
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
@@ -355,6 +364,7 @@ void IRMirageAc::setLight(bool on) {
 
 /// Get the value of the current Light/Display setting.
 /// @return true, the setting is on. false, the setting is off.
+/// @note Light is a toggle on the KKG29AC1 model.
 bool IRMirageAc::getLight(void) const {
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1: return _.LightToggle_Kkg29ac1;
@@ -631,13 +641,26 @@ stdAc::opmode_t IRMirageAc::toCommonMode(const uint8_t mode) {
 
 /// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
+/// @param[in] model The model type to use to influence the conversion.
 /// @return The stdAc equivalent of the native setting.
-stdAc::fanspeed_t IRMirageAc::toCommonFanSpeed(const uint8_t speed) {
-  switch (speed) {
-    case kMirageAcFanHigh:  return stdAc::fanspeed_t::kHigh;
-    case kMirageAcFanMed:   return stdAc::fanspeed_t::kMedium;
-    case kMirageAcFanLow:   return stdAc::fanspeed_t::kLow;
-    default:                return stdAc::fanspeed_t::kAuto;
+stdAc::fanspeed_t IRMirageAc::toCommonFanSpeed(const uint8_t speed,
+    const mirage_ac_remote_model_t model) {
+  switch (model) {
+      case mirage_ac_remote_model_t::KKG29AC1:
+      switch (speed) {
+        case kMirageAcKKG29AC1FanHigh:  return stdAc::fanspeed_t::kHigh;
+        case kMirageAcKKG29AC1FanMed:   return stdAc::fanspeed_t::kMedium;
+        case kMirageAcKKG29AC1FanLow:   return stdAc::fanspeed_t::kLow;
+        default:                        return stdAc::fanspeed_t::kAuto;
+      }
+      break;
+    default:
+      switch (speed) {
+        case kMirageAcFanHigh:  return stdAc::fanspeed_t::kHigh;
+        case kMirageAcFanMed:   return stdAc::fanspeed_t::kMedium;
+        case kMirageAcFanLow:   return stdAc::fanspeed_t::kLow;
+        default:                return stdAc::fanspeed_t::kAuto;
+      }
   }
 }
 
@@ -655,12 +678,25 @@ uint8_t IRMirageAc::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
+/// @param[in] model The model type to use to influence the conversion.
 /// @return The native equivalent of the enum.
-uint8_t IRMirageAc::convertFan(const stdAc::fanspeed_t speed) {
+uint8_t IRMirageAc::convertFan(const stdAc::fanspeed_t speed,
+                               const mirage_ac_remote_model_t model) {
+  uint8_t low;
+  uint8_t med;
+  switch (model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      low = kMirageAcKKG29AC1FanLow;
+      med = kMirageAcKKG29AC1FanMed;
+      break;
+    default:
+      low = kMirageAcFanLow;
+      med = kMirageAcFanMed;
+  }
   switch (speed) {
     case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow:    return kMirageAcFanLow;
-    case stdAc::fanspeed_t::kMedium: return kMirageAcFanMed;
+    case stdAc::fanspeed_t::kLow:    return low;
+    case stdAc::fanspeed_t::kMedium: return med;
     case stdAc::fanspeed_t::kHigh:
     case stdAc::fanspeed_t::kMax:    return kMirageAcFanHigh;
     default:                         return kMirageAcFanAuto;
@@ -707,7 +743,7 @@ stdAc::state_t IRMirageAc::toCommon(void) const {
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(getFan());
+  result.fanspeed = toCommonFanSpeed(getFan(), _model);
   result.swingv = toCommonSwingV(getSwingV());
   result.swingh = getSwingH() ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.turbo = getTurbo();
@@ -734,15 +770,24 @@ String IRMirageAc::toString(void) const {
                             kMirageAcHeat, kMirageAcDry,
                             kMirageAcFan);
   result += addTempToString(getTemp());
-  result += addFanToString(_.Fan, kMirageAcFanHigh,
-                           kMirageAcFanLow,
-                           kMirageAcFanAuto, kMirageAcFanAuto,
-                           kMirageAcFanMed);
+  uint8_t fanlow;
+  uint8_t fanmed;
+  switch (_model) {
+    case mirage_ac_remote_model_t::KKG29AC1:
+      fanlow = kMirageAcKKG29AC1FanLow;
+      fanmed = kMirageAcKKG29AC1FanMed;
+      break;
+    default:
+      fanlow = kMirageAcFanLow;
+      fanmed = kMirageAcFanMed;
+  }
+  result += addFanToString(_.Fan, kMirageAcFanHigh, fanlow, kMirageAcFanAuto,
+                           kMirageAcFanAuto, fanmed);
   result += addBoolToString(getTurbo(), kTurboStr);
-  result += addBoolToString(getLight(), kLightStr);
   result += addBoolToString(getSleep(), kSleepStr);
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
+      result += addToggleToString(getLight(), kLightStr);
       result += addBoolToString(_.SwingV, kSwingVStr);
       result += addBoolToString(_.SwingH, kSwingHStr);
       result += addBoolToString(_.Filter, kFilterStr);
@@ -760,6 +805,7 @@ String IRMirageAc::toString(void) const {
       }
       break;
     default:
+      result += addBoolToString(getLight(), kLightStr);
       result += addSwingVToString(getSwingV(),
                                   kMirageAcSwingVAuto,
                                   kMirageAcSwingVHighest,

@@ -1508,7 +1508,7 @@ void IRac::mirage(IRMirageAc *ac, const mirage_ac_remote_model_t model,
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
-  ac->setFan(ac->convertFan(fan));
+  ac->setFan(ac->convertFan(fan, model));
   ac->setSwingV(ac->convertSwingV(swingv));
   ac->setSwingH(swingh != stdAc::swingh_t::kOff);
   ac->setTurbo(turbo);
@@ -2532,6 +2532,8 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         result.power = desired.power ^ prev->power;
         break;
       case decode_type_t::MIRAGE:
+        if (desired.model == mirage_ac_remote_model_t::KKG29AC1)
+          result.light = desired.light ^ prev->light;
         result.clean = desired.clean ^ prev->clean;
         break;
       case decode_type_t::PANASONIC_AC:

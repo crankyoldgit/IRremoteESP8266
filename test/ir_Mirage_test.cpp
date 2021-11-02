@@ -57,7 +57,7 @@ TEST(TestDecodeMirage, RealExample) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
-      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
       "Swing(V): 0 (Off), Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -79,7 +79,7 @@ TEST(TestDecodeMirage, SyntheticExample) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
-      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
       "Swing(V): 0 (Off), Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -124,7 +124,7 @@ TEST(TestDecodeMirage, RealExampleWithDodgyHardwareCapture) {
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
-      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
       "Swing(V): 0 (Off), Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -197,7 +197,7 @@ TEST(TestMirageAcClass, HumanReadable) {
   // Tests for the KKG9AC1 model.
   EXPECT_EQ(
       "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 16C, "
-      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
       "Swing(V): 13 (Auto), Clock: 00:00",
       ac.toString());
   // Ref: https://docs.google.com/spreadsheets/d/1Ucu9mOOIIJoWQjUJq_VCvwgV3EwKaRk8K2AuZgccYEk/edit#gid=0&range=C7
@@ -208,7 +208,7 @@ TEST(TestMirageAcClass, HumanReadable) {
   ac.setRaw(cool_21c_auto);
   EXPECT_EQ(
       "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 21C, "
-      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
       "Swing(V): 13 (Auto), Clock: 00:01",
       ac.toString());
 
@@ -218,7 +218,7 @@ TEST(TestMirageAcClass, HumanReadable) {
   ac.setRaw(SyntheticExample);
   EXPECT_EQ(
       "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
-      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
       "Swing(V): 0 (Off), Clock: 14:16",
       ac.toString());
 
@@ -226,7 +226,7 @@ TEST(TestMirageAcClass, HumanReadable) {
   ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
   EXPECT_EQ(
       "Model: 2 (KKG29AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
-      "Fan: 0 (Auto), Turbo: Off, Light: Off, Sleep: Off, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: -, "
       "Swing(V): Off, Swing(H): Off, "
       "Filter: Off, Clean: -, On Timer: Off, Off Timer: Off, "
       "IFeel: Off",

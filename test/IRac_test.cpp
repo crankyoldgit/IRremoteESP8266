@@ -1355,7 +1355,7 @@ TEST(TestIRac, Mirage) {
   stdAc::state_t r, p;
   const char expected_KKG9AC1[] =
       "Model: 1 (KKG9AC1), Power: On, Mode: 3 (Dry), Temp: 27C, "
-      "Fan: 2 (Medium), Turbo: Off, Light: Off, Sleep: On, "
+      "Fan: 2 (Medium), Turbo: Off, Sleep: On, Light: Off, "
       "Swing(V): 9 (High), Clock: 17:31";
 
   ac.begin();
@@ -1385,7 +1385,7 @@ TEST(TestIRac, Mirage) {
 
   const char expected_KKG29AC1[] =
       "Model: 2 (KKG29AC1), Power: On, Mode: 3 (Dry), Temp: 27C, "
-      "Fan: 2 (Medium), Turbo: Off, Light: Off, Sleep: On, "
+      "Fan: 3 (Medium), Turbo: Off, Sleep: On, Light: -, "
       "Swing(V): On, Swing(H): On, Filter: On, Clean: -, "
       "On Timer: Off, Off Timer: Off, IFeel: Off";
   ac._irsend.reset();

@@ -169,6 +169,10 @@ const uint8_t kMirageAcFanAuto = 0b00;  // 0
 const uint8_t kMirageAcFanHigh = 0b01;  // 1
 const uint8_t kMirageAcFanMed =  0b10;  // 2
 const uint8_t kMirageAcFanLow =  0b11;  // 3
+const uint8_t kMirageAcKKG29AC1FanAuto = 0b00;  // 0
+const uint8_t kMirageAcKKG29AC1FanHigh = 0b01;  // 1
+const uint8_t kMirageAcKKG29AC1FanLow =  0b10;  // 2
+const uint8_t kMirageAcKKG29AC1FanMed =  0b11;  // 3
 
 const uint8_t kMirageAcMinTemp = 16;  // 16C
 const uint8_t kMirageAcMaxTemp = 32;  // 32C
@@ -247,10 +251,12 @@ class IRMirageAc {
   static bool validChecksum(const uint8_t* data);
   static uint8_t calculateChecksum(const uint8_t* data);
   static uint8_t convertMode(const stdAc::opmode_t mode);
-  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed,
+      const mirage_ac_remote_model_t model = mirage_ac_remote_model_t::KKG9AC1);
   static uint8_t convertSwingV(const stdAc::swingv_t position);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
-  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed,
+      const mirage_ac_remote_model_t model = mirage_ac_remote_model_t::KKG9AC1);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   stdAc::state_t toCommon(void) const;
   String toString(void) const;
