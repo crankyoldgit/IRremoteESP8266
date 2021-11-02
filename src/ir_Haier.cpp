@@ -676,9 +676,9 @@ void IRHaierAC176::setTemp(const uint8_t degree, const bool fahrenheit) {
       _.Button = kHaierAcYrw02ButtonTempDown;
     else
       _.Button = kHaierAcYrw02ButtonTempUp;
+  } else {
+      _.Button = kHaierAcYrw02ButtonCF;
   }
-  else
-    _.Button = kHaierAcYrw02ButtonCF;
   _.UseFahrenheit = fahrenheit;
 
   uint8_t temp = degree;
