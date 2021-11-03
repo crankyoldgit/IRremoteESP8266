@@ -741,7 +741,7 @@ uint8_t IRHaierAC176::getTemp(void) const {
   // |    84F     | 0b1101 |     0b0      |
   // |    86F     | 0b1110 |     0b0      |
   // |    85F     | 0b1101 |     0b1      |
-  if (degree >= 78) { degree--; }
+  if (degree >= 77) { degree--; }
   if (degree >= 79) { degree--; }
   return degree;
 }
