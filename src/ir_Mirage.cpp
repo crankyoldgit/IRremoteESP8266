@@ -40,6 +40,9 @@ const uint16_t kMirageZeroSpace = 545;           ///< uSeconds
 const uint32_t kMirageGap = kDefaultMessageGap;  ///< uSeconds (just a guess)
 const uint16_t kMirageFreq = 38000;              ///< Hz. (Just a guess)
 
+const uint8_t kMirageAcKKG29AC1PowerOn  = 0b00;  // 0
+const uint8_t kMirageAcKKG29AC1PowerOff = 0b11;  // 3
+
 
 #if SEND_MIRAGE
 /// Send a Mirage formatted message.
@@ -230,7 +233,7 @@ void IRMirageAc::off(void) { setPower(false); }
 void IRMirageAc::setPower(bool on) {
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
-      _.Power = on ? 0b00 : 0b11;
+      _.Power = on ? kMirageAcKKG29AC1PowerOn : kMirageAcKKG29AC1PowerOff;
       break;
     default:
       // In order to change the power setting, it seems must be less than
@@ -256,7 +259,7 @@ void IRMirageAc::setPower(bool on) {
 bool IRMirageAc::getPower(void) const {
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
-      return _.Power == 0b00;
+      return _.Power == kMirageAcKKG29AC1PowerOn;
     default:
       return _.SwingAndPower < kMirageAcPowerOff;
   }
