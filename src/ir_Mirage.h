@@ -9,7 +9,7 @@
 //   Brand: Mirage,  Model: VLU series A/C
 //   Brand: Maxell,  Model: MX-CH18CF A/C
 //   Brand: Maxell,  Model: KKG9A-C1 remote
-//   Brand: Tronitechnik,  Model: A/C
+//   Brand: Tronitechnik,  Model: Reykir 9000 A/C
 //   Brand: Tronitechnik,  Model: KKG29A-C1 remote
 
 #ifndef IR_MIRAGE_H_
