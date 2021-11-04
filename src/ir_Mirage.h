@@ -246,7 +246,7 @@ class IRMirageAc {
   void setOnTimer(const uint16_t nr_of_mins);
   void setOffTimer(const uint16_t nr_of_mins);
   mirage_ac_remote_model_t getModel(const bool useRaw = false) const;
-  void setModel(mirage_ac_remote_model_t model);
+  void setModel(const mirage_ac_remote_model_t model);
   static mirage_ac_remote_model_t getModel(const uint8_t *state);
   static bool validChecksum(const uint8_t* data);
   static uint8_t calculateChecksum(const uint8_t* data);
@@ -259,6 +259,7 @@ class IRMirageAc {
       const mirage_ac_remote_model_t model = mirage_ac_remote_model_t::KKG9AC1);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   stdAc::state_t toCommon(void) const;
+  void fromCommon(const stdAc::state_t state);
   String toString(void) const;
 #ifndef UNIT_TEST
 

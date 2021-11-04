@@ -226,7 +226,7 @@ TEST(TestMirageAcClass, HumanReadable) {
   ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
   EXPECT_EQ(
       "Model: 2 (KKG29AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
-      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: -, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Quiet: Off, Light: -, "
       "Swing(V): Off, Swing(H): Off, "
       "Filter: Off, Clean: -, On Timer: Off, Off Timer: Off, "
       "IFeel: Off",

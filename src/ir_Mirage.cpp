@@ -110,6 +110,7 @@ void IRMirageAc::stateReset(void) {
       0x56, 0x6C, 0x00, 0x00, 0x20, 0x1A, 0x00, 0x00,
       0x0C, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x42};
   setRaw(kReset);
+  _model = mirage_ac_remote_model_t::KKG9AC1;
 }
 
 /// Set up hardware to be able to send a message.
@@ -149,20 +150,25 @@ void IRMirageAc::setRaw(const uint8_t *data) {
 /// Guess the Mirage remote model from the supplied state code.
 /// @param[in] state A valid state code for this protocol.
 /// @return The model code.
+/// @note This result isn't perfect. Both protocols can look the same but have
+///       wildly different settings.
 mirage_ac_remote_model_t IRMirageAc::getModel(const uint8_t *state) {
   Mirage120Protocol p;
   std::memcpy(p.raw, state, kMirageStateLength);
-  // Check for things specific to KKG9AC1
-  if ((p.Minutes || p.Seconds) &&  // Is part of the clock set?
-      // Are the timer times set, but not enabled?
-      (!p.OffTimerEnable && (p.OffTimerHours || p.OffTimerMins)) &&
-      (!p.OnTimerEnable && (p.OnTimerHours || p.OnTimerMins)))
-    return mirage_ac_remote_model_t::KKG9AC1;
   // Check for KKG29AC1 specific settings.
   if (p.RecycleHeat || p.Filter || p.Sleep_Kkg29ac1 || p.CleanToggle ||
       p.IFeel || p.OffTimerEnable || p.OnTimerEnable)
     return mirage_ac_remote_model_t::KKG29AC1;
-  return mirage_ac_remote_model_t::KKG9AC1;  // Default.
+  // Check for things specific to KKG9AC1
+  if ((p.Minutes || p.Seconds) ||  // Is part of the clock set?
+      // Are the timer times set, but not enabled? (enable check filtered above)
+      (p.OffTimerHours || p.OffTimerMins) ||
+      (p.OnTimerHours || p.OnTimerMins))
+    return mirage_ac_remote_model_t::KKG9AC1;
+  // As the above test has a 1 in 3600+ (for 1 second an hour) chance of a false
+  // negative in theory, we are going assume that anything left should be a
+  // KKG29AC1 model.
+  return mirage_ac_remote_model_t::KKG29AC1;  // Default.
 }
 
 /// Get the model code of the interal message state.
@@ -174,30 +180,18 @@ mirage_ac_remote_model_t IRMirageAc::getModel(const bool useRaw) const {
 
 /// Set the model code of the interal message state.
 /// @param[in] model The desired model to use for the settings.
-void IRMirageAc::setModel(mirage_ac_remote_model_t model) {
+void IRMirageAc::setModel(const mirage_ac_remote_model_t model) {
   if (model != _model) {  // Only change things if we need to.
     // Save the old settings.
-    const stdAc::state_t old = toCommon();
+    stdAc::state_t state = toCommon();
     const uint16_t ontimer = getOnTimer();
     const uint16_t offtimer = getOffTimer();
     const bool ifeel = getIFeel();
     const uint8_t sensor = getSensorTemp();
     // Change the model.
-    _model = model;
+    state.model = model;
     // Restore/Convert the settings.
-    setPower(old.power);
-    setTemp(old.degrees);
-    setMode(convertMode(old.mode));
-    setFan(convertFan(old.fanspeed));
-    setTurbo(old.turbo);
-    setSleep(old.sleep >= 0);
-    setLight(old.light);
-    setSwingV(convertSwingV(old.swingv));
-    setSwingH(old.swingh != stdAc::swingh_t::kOff);
-    setQuiet(old.quiet);
-    setCleanToggle(old.clean);
-    setFilter(old.filter);
-    setClock(old.clock * 60);  // setClock() expects seconds, not minutes.
+    fromCommon(state);
     setOnTimer(ontimer);
     setOffTimer(offtimer);
     setIFeel(ifeel);
@@ -762,6 +756,31 @@ stdAc::state_t IRMirageAc::toCommon(void) const {
   return result;
 }
 
+/// Convert & set a stdAc::state_t to its equivalent internal settings.
+/// @param[in] state The desired state in stdAc::state_t form.
+void IRMirageAc::fromCommon(const stdAc::state_t state) {
+  stateReset();
+  _model = (mirage_ac_remote_model_t)state.model;  // Set directly to avoid loop
+  setPower(state.power);
+  setTemp(state.celsius ? state.degrees : fahrenheitToCelsius(state.degrees));
+  setMode(convertMode(state.mode));
+  setFan(convertFan(state.fanspeed, _model));
+  setTurbo(state.turbo);
+  setSleep(state.sleep >= 0);
+  setLight(state.light);
+  setSwingV(convertSwingV(state.swingv));
+  setSwingH(state.swingh != stdAc::swingh_t::kOff);
+  setQuiet(state.quiet);
+  setCleanToggle(state.clean);
+  setFilter(state.filter);
+  // setClock() expects seconds, not minutes.
+  setClock((state.clock > 0) ? state.clock * 60 : 0);
+  // Non-common settings.
+  setOnTimer(0);
+  setOffTimer(0);
+  setIFeel(false);
+}
+
 /// Convert the internal state into a human readable string.
 /// @return A string containing the settings in human-readable form.
 String IRMirageAc::toString(void) const {
@@ -780,7 +799,7 @@ String IRMirageAc::toString(void) const {
       fanlow = kMirageAcKKG29AC1FanLow;
       fanmed = kMirageAcKKG29AC1FanMed;
       break;
-    default:
+    default:  // e.g. Model KKG9AC1
       fanlow = kMirageAcFanLow;
       fanmed = kMirageAcFanMed;
   }
@@ -790,6 +809,7 @@ String IRMirageAc::toString(void) const {
   result += addBoolToString(getSleep(), kSleepStr);
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
+      result += addBoolToString(_.Quiet, kQuietStr);
       result += addToggleToString(getLight(), kLightStr);
       result += addBoolToString(_.SwingV, kSwingVStr);
       result += addBoolToString(_.SwingH, kSwingHStr);
@@ -807,7 +827,7 @@ String IRMirageAc::toString(void) const {
         result += 'C';
       }
       break;
-    default:
+    default:  // e.g. Model KKG9AC1
       result += addBoolToString(getLight(), kLightStr);
       result += addSwingVToString(getSwingV(),
                                   kMirageAcSwingVAuto,
