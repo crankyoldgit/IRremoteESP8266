@@ -261,17 +261,19 @@ void electra(IRElectraAc *ac,
 #if SEND_HAIER_AC176
   void haier176(IRHaierAC176 *ac,
                 const bool on, const stdAc::opmode_t mode,
-                const float degrees, const stdAc::fanspeed_t fan,
-                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                const bool turbo, const bool quiet, const bool filter,
+                const bool celsius, const float degrees,
+                const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                const stdAc::swingh_t swingh, const bool turbo,
+                const bool quiet, const bool filter,
                 const int16_t sleep = -1);
 #endif  // SEND_HAIER_AC176
 #if SEND_HAIER_AC_YRW02
   void haierYrwo2(IRHaierACYRW02 *ac,
                   const bool on, const stdAc::opmode_t mode,
-                  const float degrees, const stdAc::fanspeed_t fan,
-                  const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                  const bool turbo, const bool quiet, const bool filter,
+                  const bool celsius, const float degrees,
+                  const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                  const stdAc::swingh_t swingh, const bool turbo,
+                  const bool quiet, const bool filter,
                   const int16_t sleep = -1);
 #endif  // SEND_HAIER_AC_YRW02
 #if SEND_HITACHI_AC

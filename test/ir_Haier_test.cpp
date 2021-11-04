@@ -476,24 +476,24 @@ TEST(TestHaierACYRW02Class, Temperature) {
   IRHaierACYRW02 ac(kGpioUnused);
   ac.begin();
 
-  ac.setTemp(kHaierAcMinTemp);
-  EXPECT_EQ(kHaierAcMinTemp, ac.getTemp());
+  ac.setTemp(kHaierAcYrw02MinTempC);
+  EXPECT_EQ(kHaierAcYrw02MinTempC, ac.getTemp());
 
   ac.setButton(kHaierAcYrw02ButtonPower);
-  ac.setTemp(kHaierAcMinTemp + 1);
-  EXPECT_EQ(kHaierAcMinTemp + 1, ac.getTemp());
+  ac.setTemp(kHaierAcYrw02MinTempC + 1);
+  EXPECT_EQ(kHaierAcYrw02MinTempC + 1, ac.getTemp());
   EXPECT_EQ(kHaierAcYrw02ButtonTempUp, ac.getButton());
 
-  ac.setTemp(kHaierAcMaxTemp);
-  EXPECT_EQ(kHaierAcMaxTemp, ac.getTemp());
+  ac.setTemp(kHaierAcYrw02MaxTempC);
+  EXPECT_EQ(kHaierAcYrw02MaxTempC, ac.getTemp());
   EXPECT_EQ(kHaierAcYrw02ButtonTempUp, ac.getButton());
 
-  ac.setTemp(kHaierAcMinTemp - 1);
-  EXPECT_EQ(kHaierAcMinTemp, ac.getTemp());
+  ac.setTemp(kHaierAcYrw02MinTempC - 1);
+  EXPECT_EQ(kHaierAcYrw02MinTempC, ac.getTemp());
   EXPECT_EQ(kHaierAcYrw02ButtonTempDown, ac.getButton());
 
-  ac.setTemp(kHaierAcMaxTemp + 1);
-  EXPECT_EQ(kHaierAcMaxTemp, ac.getTemp());
+  ac.setTemp(kHaierAcYrw02MaxTempC + 1);
+  EXPECT_EQ(kHaierAcYrw02MaxTempC, ac.getTemp());
   EXPECT_EQ(kHaierAcYrw02ButtonTempUp, ac.getButton());
 
   ac.setTemp(23);
@@ -504,8 +504,47 @@ TEST(TestHaierACYRW02Class, Temperature) {
   EXPECT_EQ(23, ac.getTemp());
   EXPECT_EQ(kHaierAcYrw02ButtonPower, ac.getButton());
 
+  ac.setTemp(kHaierAcYrw02MinTempF, true);
+  EXPECT_EQ(kHaierAcYrw02MinTempF, ac.getTemp());
+
+  ac.setButton(kHaierAcYrw02ButtonPower);
+  ac.setTemp(kHaierAcYrw02MinTempF + 1, true);
+  EXPECT_EQ(kHaierAcYrw02MinTempF + 1, ac.getTemp());
+  EXPECT_EQ(kHaierAcYrw02ButtonTempUp, ac.getButton());
+
+  ac.setTemp(kHaierAcYrw02MaxTempF, true);
+  EXPECT_EQ(kHaierAcYrw02MaxTempF, ac.getTemp());
+  EXPECT_EQ(kHaierAcYrw02ButtonTempUp, ac.getButton());
+
+  ac.setTemp(kHaierAcYrw02MinTempF - 1, true);
+  EXPECT_EQ(kHaierAcYrw02MinTempF, ac.getTemp());
+  EXPECT_EQ(kHaierAcYrw02ButtonTempDown, ac.getButton());
+
+  ac.setTemp(kHaierAcYrw02MaxTempF + 1, true);
+  EXPECT_EQ(kHaierAcYrw02MaxTempF, ac.getTemp());
+  EXPECT_EQ(kHaierAcYrw02ButtonTempUp, ac.getButton());
+
+  ac.setTemp(66, true);
+  EXPECT_EQ(66, ac.getTemp());
+  EXPECT_EQ(kHaierAcYrw02ButtonTempDown, ac.getButton());
+  ac.setButton(kHaierAcYrw02ButtonPower);
+  ac.setTemp(66, true);
+  EXPECT_EQ(66, ac.getTemp());
+  EXPECT_EQ(kHaierAcYrw02ButtonPower, ac.getButton());
+
+  // Test specific cases for converting to Fahrenheit
+  ac.setTemp(76, true);
+  EXPECT_EQ(76, ac.getTemp());
+  ac.setTemp(77, true);
+  EXPECT_EQ(77, ac.getTemp());
+  ac.setTemp(78, true);
+  EXPECT_EQ(78, ac.getTemp());
+
+  ac.setTemp(24);
+  EXPECT_EQ(kHaierAcYrw02ButtonCF, ac.getButton());
+
   ac.setTemp(0);
-  EXPECT_EQ(kHaierAcMinTemp, ac.getTemp());
+  EXPECT_EQ(kHaierAcYrw02MinTempC, ac.getTemp());
   EXPECT_EQ(kHaierAcYrw02ButtonTempDown, ac.getButton());
 
   ac.setTemp(255);
@@ -760,12 +799,13 @@ TEST(TestHaierACYRW02Class, MessageConstuction) {
       "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off",
       ac.toString());
 
+  ac.setTemp(75, true);
   ac.setSwingV(kHaierAcYrw02SwingVMiddle);
   ac.setHealth(false);
   ac.setSleep(true);
   ac.setTurbo(true);
   EXPECT_EQ(
-      "Power: On, Button: 8 (Turbo), Mode: 1 (Cool), Temp: 21C, "
+      "Power: On, Button: 8 (Turbo), Mode: 1 (Cool), Temp: 75F, "
       "Fan: 1 (High), Turbo: On, Quiet: Off, Swing(V): 2 (Middle), "
       "Swing(H): 0 (Middle), Sleep: On, Health: Off, "
       "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off",
