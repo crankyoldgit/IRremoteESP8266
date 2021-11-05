@@ -41,7 +41,7 @@
 /// Native representation of a Samsung A/C message.
 union SamsungProtocol{
   uint8_t raw[kSamsungAcExtendedStateLength];  ///< State in code form.
-  struct {
+  struct {  // Standard message map
     // Byte 0
     uint8_t         :8;
     // Byte 1
@@ -72,11 +72,11 @@ union SamsungProtocol{
     uint8_t Swing   :3;
     uint8_t         :1;
     // Byte 10
-    uint8_t           :1;
-    uint8_t Powerful  :3;
-    uint8_t Display   :1;
-    uint8_t           :2;
-    uint8_t Clean10   :1;
+    uint8_t            :1;
+    uint8_t FanSpecial :3;  // Powerful, Breeze/WindFree
+    uint8_t Display    :1;
+    uint8_t            :2;
+    uint8_t Clean10    :1;
     // Byte 11
     uint8_t Ion     :1;
     uint8_t Clean11 :1;
@@ -94,60 +94,67 @@ union SamsungProtocol{
     uint8_t Power2 :2;
     uint8_t        :2;
   };
-  struct {
+  struct {  // Extended message map
     // 1st Section
     // Byte 0
-    uint8_t           :8;
+    uint8_t                :8;
     // Byte 1
-    uint8_t           :4;
-    uint8_t Sum1Lower :4;
+    uint8_t                :4;
+    uint8_t Sum1Lower      :4;
     // Byte 2
-    uint8_t Sum1Upper :4;
-    uint8_t           :4;
+    uint8_t Sum1Upper      :4;
+    uint8_t                :4;
     // Byte 3
-    uint8_t           :8;
+    uint8_t                :8;
     // Byte 4
-    uint8_t           :8;
+    uint8_t                :8;
     // Byte 5
-    uint8_t           :8;
+    uint8_t                :8;
     // Byte 6
-    uint8_t           :8;
+    uint8_t                :8;
     // 2nd Section
     // Byte 7
-    uint8_t           :8;
+    uint8_t                :8;
     // Byte 8
-    uint8_t           :4;
-    uint8_t Sum2Lower :4;
+    uint8_t                :4;
+    uint8_t Sum2Lower      :4;
     // Byte 9
-    uint8_t Sum2Upper :4;
-    uint8_t           :4;
+    uint8_t Sum2Upper      :4;
+    uint8_t OffTimeMins    :3;  // In units of 10's of mins
+    uint8_t OffTimeHrs1    :1;  // LSB of the number of hours.
     // Byte 10
-    uint8_t           :1;
-    uint8_t Breeze    :3;  // WindFree
-    uint8_t           :4;
+    uint8_t OffTimeHrs2    :4;  // MSBs of the number of hours.
+    uint8_t OnTimeMins     :3;  // In units of 10's of mins
+    uint8_t OnTimeHrs1     :1;  // LSB of the number of hours.
     // Byte 11
-    uint8_t           :8;
+    uint8_t OnTimeHrs2     :4;  // MSBs of the number of hours.
+    uint8_t                :4;
     // Byte 12
-    uint8_t           :8;
+    uint8_t OffTimeDay     :1;
+    uint8_t OnTimerEnable  :1;
+    uint8_t OffTimerEnable :1;
+    uint8_t Sleep          :1;
+    uint8_t OnTimeDay      :1;
+    uint8_t                :3;
     // Byte 13
-    uint8_t           :8;
+    uint8_t                :8;
     // 3rd Section
     // Byte 14
-    uint8_t           :8;
+    uint8_t                :8;
     // Byte 15
-    uint8_t           :4;
-    uint8_t Sum3Lower :4;
+    uint8_t                :4;
+    uint8_t Sum3Lower      :4;
     // Byte 16
-    uint8_t Sum3Upper :4;
-    uint8_t           :4;
+    uint8_t Sum3Upper      :4;
+    uint8_t                :4;
     // Byte 17
-    uint8_t           :8;
+    uint8_t                :8;
     // Byte 18
-    uint8_t           :8;
+    uint8_t                :8;
     // Byte 19
-    uint8_t           :8;
+    uint8_t                :8;
     // Byte 20
-    uint8_t           :8;
+    uint8_t                :8;
   };
 };
 
@@ -181,10 +188,8 @@ class IRSamsungAc {
                        const bool use_modulation = true);
   void stateReset(const bool forcepower = true, const bool initialPower = true);
 #if SEND_SAMSUNG_AC
-  void send(const uint16_t repeat = kSamsungAcDefaultRepeat,
-            const bool calcchecksum = true);
-  void sendExtended(const uint16_t repeat = kSamsungAcDefaultRepeat,
-                    const bool calcchecksum = true);
+  void send(const uint16_t repeat = kSamsungAcDefaultRepeat);
+  void sendExtended(const uint16_t repeat = kSamsungAcDefaultRepeat);
   void sendOn(const uint16_t repeat = kSamsungAcDefaultRepeat);
   void sendOff(const uint16_t repeat = kSamsungAcDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
@@ -220,6 +225,10 @@ class IRSamsungAc {
   bool getDisplay(void) const;
   void setIon(const bool on);
   bool getIon(void) const;
+  uint16_t getOnTimer(void) const;
+  void setOnTimer(const uint16_t nr_of_mins);
+  uint16_t getOffTimer(void) const;
+  void setOffTimer(const uint16_t nr_of_mins);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSamsungAcStateLength);
@@ -245,7 +254,17 @@ class IRSamsungAc {
   SamsungProtocol _;
   bool _forcepower;  ///< Hack to know when we need to send a special power mesg
   bool _lastsentpowerstate;
+  bool _OnTimerEnable;
+  bool _OffTimerEnable;
+  uint16_t _OnTimer;
+  uint16_t _OffTimer;
+  uint16_t _lastOnTimer;
+  uint16_t _lastOffTimer;
   void checksum(void);
+  uint16_t _getOnTimer(void) const;
+  uint16_t _getOffTimer(void) const;
+  void _setOnTimer(void);
+  void _setOffTimer(void);
 };
 
 #endif  // IR_SAMSUNG_H_

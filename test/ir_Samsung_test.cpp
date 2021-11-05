@@ -1804,3 +1804,123 @@ TEST(TestIRSamsungAcClass, Issue1648) {
   EXPECT_EQ(expectedText, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ac._irsend.reset();
 }
+
+TEST(TestIRSamsungAcClass, Timers) {
+  IRSamsungAc ac(kGpioUnused);
+  ac.begin();
+
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1277#issuecomment-961836703
+  const uint8_t on_timer_30m[kSamsungAcExtendedStateLength] = {
+      0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
+      0x01, 0xA2, 0x0F, 0x30, 0x00, 0x02, 0x00,
+      0x01, 0x02, 0xFF, 0x71, 0x40, 0x11, 0xC0};
+  const uint8_t off_timer_1h_on_timer_10m[kSamsungAcExtendedStateLength] = {
+      0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
+      0x01, 0x92, 0x8F, 0x10, 0x00, 0x06, 0x00,
+      0x01, 0x02, 0xFF, 0x71, 0x40, 0x11, 0xC0};
+  const uint8_t off_timer_1h_on_timer_0m[kSamsungAcExtendedStateLength] = {
+      0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
+      0x01, 0xA2, 0x8F, 0x00, 0x00, 0x06, 0x00,
+      0x01, 0x02, 0xFF, 0x71, 0x40, 0x11, 0xC0};
+
+  ac.setRaw(on_timer_30m, kSamsungAcExtendedStateLength);
+  EXPECT_EQ(
+      "Power: Off, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Light: On, Ion: Off, On Timer: 00:30",
+      ac.toString());
+  ac.setRaw(off_timer_1h_on_timer_10m, kSamsungAcExtendedStateLength);
+  EXPECT_EQ(
+      "Power: Off, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Light: On, Ion: Off, On Timer: 00:10, Off Timer: 01:00",
+      ac.toString());
+  ac.setRaw(off_timer_1h_on_timer_0m, kSamsungAcExtendedStateLength);
+  EXPECT_EQ(
+      "Power: Off, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Light: On, Ion: Off, On Timer: 00:00, Off Timer: 01:00",
+      ac.toString());
+
+  // https://cryptpad.fr/sheet/#/2/sheet/view/r9k8pmELYEjLyC71cD7EsThEYgKGLJygREZ5pVfNkS8/
+  // Row 155
+  const uint8_t off_timer_11h_on_timer_6h[kSamsungAcExtendedStateLength] = {
+      0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
+      0x01, 0x62, 0x8F, 0x05, 0x03, 0x06, 0x00,
+      0x01, 0x02, 0xFF, 0x71, 0x40, 0x11, 0xC0};
+  ac.setRaw(off_timer_11h_on_timer_6h, kSamsungAcExtendedStateLength);
+  EXPECT_EQ(
+      "Power: Off, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Light: On, Ion: Off, On Timer: 06:00, Off Timer: 11:00",
+      ac.toString());
+
+  ac.stateReset(false);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOnTimer(0);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOffTimer(0);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  // On Timer only
+  ac.setOnTimer(30);
+  EXPECT_EQ(30, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOnTimer(90);  // 1h30m
+  EXPECT_EQ(90, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOnTimer(85);  // 1h25m -> 1h20m
+  EXPECT_EQ(80, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOnTimer(23 * 60 + 59);  // 23:59
+  EXPECT_EQ(23 * 60 + 50, ac.getOnTimer());  // 23:50
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOnTimer(24 * 60 + 30);  // 24:30
+  EXPECT_EQ(24 * 60, ac.getOnTimer());  // 24:00 (Max)
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  // Off Timer only
+  ac.setOnTimer(0);
+  ac.setOffTimer(0);
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOffTimer(30);
+  EXPECT_EQ(30, ac.getOffTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setOffTimer(90);  // 1h30m
+  EXPECT_EQ(90, ac.getOffTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setOffTimer(85);  // 1h25m -> 1h20m
+  EXPECT_EQ(80, ac.getOffTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setOffTimer(23 * 60 + 59);  // 23:59
+  EXPECT_EQ(23 * 60 + 50, ac.getOffTimer());  // 23:50
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setOffTimer(24 * 60 + 30);  // 24:30
+  EXPECT_EQ(24 * 60, ac.getOffTimer());  // 24:00 (Max)
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  // Both Timers
+  ac.setOnTimer(24 * 60);  // 24:00
+  EXPECT_EQ(24 * 60, ac.getOnTimer());  // 24:00 (Max)
+  EXPECT_EQ(24 * 60, ac.getOffTimer());  // 24:00 (Max)
+
+  ac.setOnTimer(1 * 60 + 30);  // 1:30
+  ac.setOffTimer(11 * 60);  // 11:00
+  EXPECT_EQ(1 * 60 + 30, ac.getOnTimer());
+  EXPECT_EQ(11 * 60, ac.getOffTimer());
+}
