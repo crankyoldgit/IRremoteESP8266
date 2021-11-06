@@ -18,10 +18,11 @@
 //   Brand: Samsung,  Model: AH59-02692E Soundbar remote (SAMSUNG36)
 //   Brand: Samsung,  Model: HW-J551 Soundbar (SAMSUNG36)
 //   Brand: Samsung,  Model: AR09FSSDAWKNFA A/C (SAMSUNG_AC)
+//   Brand: Samsung,  Model: AR09HSFSBWKN A/C (SAMSUNG_AC)
 //   Brand: Samsung,  Model: AR12KSFPEWQNET A/C (SAMSUNG_AC)
 //   Brand: Samsung,  Model: AR12HSSDBWKNEU A/C (SAMSUNG_AC)
 //   Brand: Samsung,  Model: AR12NXCXAWKXEU A/C (SAMSUNG_AC)
-//   Brand: Samsung,  Model: AR09HSFSBWKN A/C (SAMSUNG_AC)
+//   Brand: Samsung,  Model: AR12TXEAAWKNEU A/C (SAMSUNG_AC)
 //   Brand: Samsung,  Model: DB93-14195A remote (SAMSUNG_AC)
 
 #ifndef IR_SAMSUNG_H_
@@ -186,7 +187,7 @@ class IRSamsungAc {
  public:
   explicit IRSamsungAc(const uint16_t pin, const bool inverted = false,
                        const bool use_modulation = true);
-  void stateReset(const bool forcepower = true, const bool initialPower = true);
+  void stateReset(const bool extended = true, const bool initialPower = true);
 #if SEND_SAMSUNG_AC
   void send(const uint16_t repeat = kSamsungAcDefaultRepeat);
   void sendExtended(const uint16_t repeat = kSamsungAcDefaultRepeat);
@@ -229,6 +230,8 @@ class IRSamsungAc {
   void setOnTimer(const uint16_t nr_of_mins);
   uint16_t getOffTimer(void) const;
   void setOffTimer(const uint16_t nr_of_mins);
+  uint16_t getSleepTimer(void) const;
+  void setSleepTimer(const uint16_t nr_of_mins);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kSamsungAcStateLength);
@@ -252,10 +255,12 @@ class IRSamsungAc {
   /// @endcond
 #endif  // UNIT_TEST
   SamsungProtocol _;
-  bool _forcepower;  ///< Hack to know when we need to send a special power mesg
+  bool _forceextended;  ///< Flag to know when we need to send an extended mesg.
   bool _lastsentpowerstate;
   bool _OnTimerEnable;
   bool _OffTimerEnable;
+  bool _Sleep;
+  bool _lastSleep;
   uint16_t _OnTimer;
   uint16_t _OffTimer;
   uint16_t _lastOnTimer;
@@ -265,6 +270,7 @@ class IRSamsungAc {
   uint16_t _getOffTimer(void) const;
   void _setOnTimer(void);
   void _setOffTimer(void);
+  void _setSleepTimer(void);
 };
 
 #endif  // IR_SAMSUNG_H_

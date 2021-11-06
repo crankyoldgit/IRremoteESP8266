@@ -276,19 +276,21 @@ IRSamsungAc::IRSamsungAc(const uint16_t pin, const bool inverted,
 }
 
 /// Reset the internal state of the emulation.
-/// @param[in] forcepower A flag indicating if force sending a special power
+/// @param[in] extended A flag indicating if force sending a special extended
 ///   message with the first `send()` call.
 /// @param[in] initialPower Set the initial power state. True, on. False, off.
-void IRSamsungAc::stateReset(const bool forcepower, const bool initialPower) {
+void IRSamsungAc::stateReset(const bool extended, const bool initialPower) {
   static const uint8_t kReset[kSamsungAcExtendedStateLength] = {
       0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
       0x01, 0x02, 0xAE, 0x71, 0x00, 0x15, 0xF0};
   std::memcpy(_.raw, kReset, kSamsungAcExtendedStateLength);
-  _forcepower = forcepower;
+  _forceextended = extended;
   _lastsentpowerstate = initialPower;
   setPower(initialPower);
   _OnTimerEnable = false;
   _OffTimerEnable = false;
+  _Sleep = false;
+  _lastSleep = false;
   _OnTimer = _OffTimer = _lastOnTimer = _lastOffTimer = 0;
 }
 
@@ -358,9 +360,10 @@ void IRSamsungAc::checksum(void) {
 /// @note Use for most function/mode/settings changes to the unit.
 ///   i.e. When the device is already running.
 void IRSamsungAc::send(const uint16_t repeat) {
-  // Do we need to send a the special (extended) message?
-  if (getPower() != _lastsentpowerstate || _forcepower ||
-      (_lastOnTimer != _OnTimer) || (_lastOffTimer != _OffTimer))  // We do.
+  // Do we need to send a special (extended) message?
+  if (getPower() != _lastsentpowerstate || _forceextended ||
+      (_lastOnTimer != _OnTimer) || (_lastOffTimer != _OffTimer) ||
+      (_Sleep != _lastSleep))  // We do.
     sendExtended(repeat);
   else  // No, it's just a normal message.
     _irsend.sendSamsungAC(getRaw(), kSamsungAcStateLength, repeat);
@@ -385,7 +388,7 @@ void IRSamsungAc::sendExtended(const uint16_t repeat) {
   std::memcpy(_.raw + kSamsungAcSectionLength, extended_middle_section,
               kSamsungAcSectionLength);
   _setOnTimer();
-  _setOffTimer();
+  _setSleepTimer();  // This also sets any Off Timer if needed too.
   // Send it.
   _irsend.sendSamsungAC(getRaw(), kSamsungAcExtendedStateLength, repeat);
   // Now revert it by copying the third section over the second section.
@@ -393,7 +396,7 @@ void IRSamsungAc::sendExtended(const uint16_t repeat) {
               _.raw + 2 * kSamsungAcSectionLength,
               kSamsungAcSectionLength);
 
-  _forcepower = false;  // Power has now been sent, so clear the flag if set.
+  _forceextended = false;  // It has now been sent, so clear the flag if set.
 }
 
 /// Send the special extended "On" message as the library can't seem to
@@ -440,6 +443,7 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   if (length > kSamsungAcStateLength) {
     _OnTimerEnable = _.OnTimerEnable;
     _OffTimerEnable = _.OffTimerEnable;
+    _Sleep = _.Sleep;
     _OnTimer = _getOnTimer();
     _OffTimer = _getOffTimer();
     for (uint8_t i = kSamsungAcStateLength; i < length; i++)
@@ -685,13 +689,30 @@ void IRSamsungAc::_setOffTimer(void) {
   _.OffTimeHrs2 = hours >> 1;
 }
 
+// Set the current Sleep Timer value of the A/C into the raw extended state.
+void IRSamsungAc::_setSleepTimer(void) {
+  _setOffTimer();
+  // The Sleep mode/timer should only be engaged if an off time has been set.
+  _.Sleep = _Sleep && _OffTimerEnable;
+}
+
 /// Get the On Timer setting of the A/C.
 /// @return The Nr. of minutes the On Timer is set for.
 uint16_t IRSamsungAc::getOnTimer(void) const { return _OnTimer; }
 
 /// Get the Off Timer setting of the A/C.
 /// @return The Nr. of minutes the Off Timer is set for.
-uint16_t IRSamsungAc::getOffTimer(void) const { return _OffTimer; }
+/// @note Sleep & Off Timer share the same timer.
+uint16_t IRSamsungAc::getOffTimer(void) const {
+  return _Sleep ? 0 : _OffTimer;
+}
+
+/// Get the Sleep Timer setting of the A/C.
+/// @return The Nr. of minutes the Off Timer is set for.
+/// @note Sleep & Off Timer share the same timer.
+uint16_t IRSamsungAc::getSleepTimer(void) const {
+  return _Sleep ? _OffTimer : 0;
+}
 
 #define TIMER_RESOLUTION(mins) \
     (((std::min((mins), (uint16_t)(24 * 60))) / 10) * 10)
@@ -699,17 +720,32 @@ uint16_t IRSamsungAc::getOffTimer(void) const { return _OffTimer; }
 /// Set the On Timer value of the A/C.
 /// @param[in] nr_of_mins The number of minutes the timer should be.
 /// @note The timer time only has a resolution of 10 mins.
+/// @note Setting the On Timer active will cancel the Sleep timer/setting.
 void IRSamsungAc::setOnTimer(const uint16_t nr_of_mins) {
   // Limit to one day, and round down to nearest 10 min increment.
   _OnTimer = TIMER_RESOLUTION(nr_of_mins);
+  if (_OnTimer) _Sleep = false;
 }
 
 /// Set the Off Timer value of the A/C.
 /// @param[in] nr_of_mins The number of minutes the timer should be.
 /// @note The timer time only has a resolution of 10 mins.
+/// @note Setting the Off Timer active will cancel the Sleep timer/setting.
 void IRSamsungAc::setOffTimer(const uint16_t nr_of_mins) {
   // Limit to one day, and round down to nearest 10 min increment.
   _OffTimer = TIMER_RESOLUTION(nr_of_mins);
+  if (_OffTimer) _Sleep = false;
+}
+
+/// Set the Sleep Timer value of the A/C.
+/// @param[in] nr_of_mins The number of minutes the timer should be.
+/// @note The timer time only has a resolution of 10 mins.
+/// @note Sleep timer acts as an Off timer, and cancels any On Timer.
+void IRSamsungAc::setSleepTimer(const uint16_t nr_of_mins) {
+  // Limit to one day, and round down to nearest 10 min increment.
+  _OffTimer = TIMER_RESOLUTION(nr_of_mins);
+  if (_OffTimer) setOnTimer(0);  // Clear the on timer if set.
+  _Sleep = _OffTimer > 0;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -784,10 +820,10 @@ stdAc::state_t IRSamsungAc::toCommon(void) const {
   result.beep = _.Beep;
   result.light = _.Display;
   result.filter = _.Ion;
+  result.sleep = _Sleep ? getSleepTimer() : -1;
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.econo = false;
-  result.sleep = -1;
   result.clock = -1;
   return result;
 }
@@ -837,7 +873,8 @@ String IRSamsungAc::toString(void) const {
   if (_OnTimerEnable)
     result += addLabeledString(minsToString(_OnTimer), kOnTimerStr);
   if (_OffTimerEnable)
-    result += addLabeledString(minsToString(_OffTimer), kOffTimerStr);
+    result += addLabeledString(minsToString(_OffTimer),
+                               _Sleep ? kSleepTimerStr : kOffTimerStr);
   return result;
 }
 

@@ -1622,7 +1622,7 @@ TEST(TestIRac, Samsung) {
   IRSamsungAc ac(kGpioUnused);
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
-  char expected[] =
+  const char expected[] =
       "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), Swing: On, "
       "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
       "Light: On, Ion: Off";
@@ -1640,8 +1640,10 @@ TEST(TestIRac, Samsung) {
                false,                       // Filter (Ion)
                true,                        // Clean
                true,                        // Beep
+               -1,                          // Sleep
                true,                        // Previous power state
-               false);                      // with dopower Off
+               -1,                          // Previous Sleep
+               false);                      // Force Extended
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
@@ -1664,15 +1666,47 @@ TEST(TestIRac, Samsung) {
                false,                       // Filter (Ion)
                true,                        // Clean
                true,                        // Beep
+               -1,                          // Sleep
                true,                        // Previous power state
-               true);                       // with dopower On
+               -1,                          // Previous Sleep
+               true);                       // Force Extended
   ASSERT_EQ(expected, ac.toString());  // Class should be in the desired mode.
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
-  // We expect an extended state because of `dopower`.
+  // We expect an extended state because of `Force Extended`.
   ASSERT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+
+  ac._irsend.reset();
+  const char sleep[] =
+      "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), Swing: On, "
+      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
+      "Light: On, Ion: Off, Sleep Timer: 08:00";
+  irac.samsung(&ac,
+               true,                        // Power
+               stdAc::opmode_t::kAuto,      // Mode
+               28,                          // Celsius
+               stdAc::fanspeed_t::kMedium,  // Fan speed
+               stdAc::swingv_t::kAuto,      // Vertical swing
+               true,                        // Quiet
+               false,                       // Turbo
+               true,                        // Light (Display)
+               false,                       // Filter (Ion)
+               true,                        // Clean
+               true,                        // Beep
+               8 * 60,                      // Sleep
+               true,                        // Previous power state
+               -1,                          // Previous Sleep
+               false);                      // Force Extended
+  ASSERT_EQ(sleep, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+  // We expect an extended state because of the change in `sleep`.
+  ASSERT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
+  ASSERT_EQ(sleep, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 

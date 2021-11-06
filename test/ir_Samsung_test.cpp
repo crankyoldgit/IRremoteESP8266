@@ -1732,7 +1732,7 @@ TEST(TestIRSamsungAcClass, Issue1648) {
     EXPECT_EQ(onText, IRAcUtils::resultAcToString(&ac._irsend.capture));
     ac._irsend.reset();
     EXPECT_TRUE(ac._lastsentpowerstate);
-    EXPECT_FALSE(ac._forcepower);
+    EXPECT_FALSE(ac._forceextended);
 
     ac.off();  // User code
     ac.send();  // User code
@@ -1923,4 +1923,56 @@ TEST(TestIRSamsungAcClass, Timers) {
   ac.setOffTimer(11 * 60);  // 11:00
   EXPECT_EQ(1 * 60 + 30, ac.getOnTimer());
   EXPECT_EQ(11 * 60, ac.getOffTimer());
+}
+
+TEST(TestIRSamsungAcClass, Sleep) {
+  IRSamsungAc ac(kGpioUnused);
+  ac.begin();
+
+  // https://cryptpad.fr/sheet/#/2/sheet/view/r9k8pmELYEjLyC71cD7EsThEYgKGLJygREZ5pVfNkS8/
+  const uint8_t sleep_8h[kSamsungAcExtendedStateLength] = {
+      0x02, 0x82, 0x0F, 0x00, 0x00, 0x10, 0xF0,
+      0x01, 0xA2, 0x0F, 0x04, 0x00, 0x0C, 0x00,
+      0x01, 0xE2, 0xFE, 0x71, 0x40, 0x11, 0xF0};
+  ac.setRaw(sleep_8h, kSamsungAcExtendedStateLength);
+  EXPECT_EQ(8 * 60, ac.getSleepTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), Swing: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Light: On, Ion: Off, Sleep Timer: 08:00",
+      ac.toString());
+
+  ac.stateReset(false);
+  EXPECT_EQ(0, ac.getSleepTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOnTimer(60);
+  ac.setOffTimer(90);
+  EXPECT_EQ(0, ac.getSleepTimer());
+  EXPECT_EQ(60, ac.getOnTimer());
+  EXPECT_EQ(90, ac.getOffTimer());
+
+  ac.setSleepTimer(120);
+  EXPECT_EQ(120, ac.getSleepTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setSleepTimer(24 * 60 + 31);  // 24h31m
+  EXPECT_EQ(24 * 60, ac.getSleepTimer());  // 24h (Max)
+
+  ac.setSleepTimer(35);  // 45m
+  EXPECT_EQ(30, ac.getSleepTimer());  // 30m (Only stored in 10m increments).
+
+  ac.setOnTimer(60);  // Seting an On Timer should clear the sleep setting.
+  EXPECT_EQ(0, ac.getSleepTimer());
+  EXPECT_EQ(60, ac.getOnTimer());
+
+  ac.setSleepTimer(120);
+  ac.setOffTimer(90);  // Setting an Off Timer will clear the sleep setting.
+  EXPECT_EQ(0, ac.getSleepTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(90, ac.getOffTimer());
 }
