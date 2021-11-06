@@ -1847,18 +1847,21 @@ void IRac::panasonic32(IRPanasonicAc32 *ac,
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
 /// @param[in] beep Enable/Disable beeps when receiving IR messages.
+/// @param[in] sleep Nr. of minutes for sleep mode. <= 0 is Off, > 0 is on.
 /// @param[in] prevpower The power setting from the previous A/C state.
-/// @param[in] forcepower Do we force send the special power message?
+/// @param[in] prevsleep Nr. of minutes for sleep from the previous A/C state.
+/// @param[in] forceextended Do we force sending the special extended message?
 void IRac::samsung(IRSamsungAc *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees,
                    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                    const bool quiet, const bool turbo, const bool light,
                    const bool filter, const bool clean,
-                   const bool beep, const bool prevpower,
-                   const bool forcepower) {
+                   const bool beep, const int16_t sleep,
+                   const bool prevpower, const int16_t prevsleep,
+                   const bool forceextended) {
   ac->begin();
-  ac->stateReset(forcepower, prevpower);
+  ac->stateReset(forceextended || (sleep != prevsleep), prevpower);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
@@ -1872,7 +1875,7 @@ void IRac::samsung(IRSamsungAc *ac,
   ac->setIon(filter);
   ac->setClean(clean);
   ac->setBeep(beep);
-  // No Sleep setting available.
+  ac->setSleepTimer((sleep <= 0) ? 0 : sleep);
   // No Clock setting available.
   // Do setMode() again as it can affect fan speed.
   ac->setMode(ac->convertMode(mode));
@@ -2602,6 +2605,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   // Construct a pointer-safe previous power state incase prev is NULL/NULLPTR.
 #if (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
   const bool prev_power = (prev != NULL) ? prev->power : !send.power;
+  const int16_t prev_sleep = (prev != NULL) ? prev->sleep : -1;
 #endif  // (SEND_HITACHI_AC1 || SEND_SAMSUNG_AC || SEND_SHARP_AC)
 #if (SEND_LG || SEND_SHARP_AC)
   const stdAc::swingv_t prev_swingv = (prev != NULL) ? prev->swingv
@@ -3000,7 +3004,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRSamsungAc ac(_pin, _inverted, _modulation);
       samsung(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
               send.quiet, send.turbo, send.light, send.filter, send.clean,
-              send.beep, prev_power);
+              send.beep, send.sleep, prev_power, prev_sleep);
       break;
     }
 #endif  // SEND_SAMSUNG_AC

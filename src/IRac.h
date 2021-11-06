@@ -409,8 +409,9 @@ void electra(IRElectraAc *ac,
                const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                const bool quiet, const bool turbo, const bool light,
                const bool filter, const bool clean,
-               const bool beep, const bool prevpower = true,
-               const bool forcepower = true);
+               const bool beep, const int16_t sleep = -1,
+               const bool prevpower = true, const int16_t prevsleep = -1,
+               const bool forceextended = true);
 #endif  // SEND_SAMSUNG_AC
 #if SEND_SANYO_AC
   void sanyo(IRSanyoAc *ac,
