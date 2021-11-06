@@ -7,6 +7,7 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
 /// @see http://elektrolab.wz.cz/katalog/samsung_protocol.pdf
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1538 (Checksum)
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1277 (Timers)
 
 // Supports:
 //   Brand: Samsung,  Model: UA55H6300 TV (SAMSUNG)
@@ -24,6 +25,7 @@
 //   Brand: Samsung,  Model: AR12NXCXAWKXEU A/C (SAMSUNG_AC)
 //   Brand: Samsung,  Model: AR12TXEAAWKNEU A/C (SAMSUNG_AC)
 //   Brand: Samsung,  Model: DB93-14195A remote (SAMSUNG_AC)
+//   Brand: Samsung,  Model: DB96-24901C remote (SAMSUNG_AC)
 
 #ifndef IR_SAMSUNG_H_
 #define IR_SAMSUNG_H_
