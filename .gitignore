@@ -51,3 +51,8 @@ tools/mode2_decode
 
 # Mac extended attributes
 .DS_Store
+/.vs
+/src/ir_Mitsubishi_NNR.h
+/src/ir_Mitsubishi_NNR.cpp
+/src/IRac_NNR.h
+/src/IRac_NNR.cpp

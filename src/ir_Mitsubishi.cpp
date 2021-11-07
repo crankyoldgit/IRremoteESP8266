@@ -454,6 +454,26 @@ void IRMitsubishiAC::setMode(const uint8_t mode) {
   _.Mode = mode;
 }
 
+/// Set the Economy (i-SAVE) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// Normal minimum temp is 16C, and i-SAVE mode works as a gate to enable AC to use 10C as setting. However, when Remote control shows 10C, it still emits 16C on the "Temp" bits, 
+/// and instead it uses other bits to indicate a target temp of 10C. Slightly strange, but I guess it's to keep compatibility to systems without i-SAVE.
+/// i-SAVE only has this 10C functionality when the AC is already in Heat mode. In all other modes, minimum temp is 16C.
+/// I have found no other difference between normal Heat mode and i-SAVE other than the ability to go to 10C.
+/// In this implementation, i-SAVE mode is ONLY used to enable the AC temperature setting to 10C. Therefore "Temp" is set to 16 disregarding what the remote shows, and mode is set to Heat.
+/// 
+void IRMitsubishiAC::setEcono(bool isave) {
+    _.iSave = isave;
+    if (isave) setMode(kMitsubishiAcHeat);
+    if (isave) setTemp(kMitsubishiAcMinTemp);
+}
+
+/// Get the Economical (i-SAVE) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRMitsubishiAC::getEcono(void) const {
+    return _.iSave;
+}
+
 /// Set the requested vane (Vertical Swing) operation mode of the a/c unit.
 /// @note On some models, this represents the Right vertical vane.
 /// @param[in] position The position/mode to set the vane to.
@@ -694,10 +714,11 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) const {
   result.swingv = toCommonSwingV(_.Vane);
   result.swingh = toCommonSwingH(_.WideVane);
   result.quiet = getFan() == kMitsubishiAcFanSilent;
+  // Supported by MSZ-FH series
+  result.econo = getEcono();
   // Not supported.
   result.turbo = false;
   result.clean = false;
-  result.econo = false;
   result.filter = false;
   result.light = false;
   result.beep = false;
@@ -725,6 +746,7 @@ String IRMitsubishiAC::toString(void) const {
   result += addModeToString(_.Mode, kMitsubishiAcAuto, kMitsubishiAcCool,
                             kMitsubishiAcHeat, kMitsubishiAcDry,
                             kMitsubishiAcFan);
+  result += addBoolToString(_.iSave, kEconoStr);
   result += addTempFloatToString(getTemp());
   result += addFanToString(getFan(), kMitsubishiAcFanRealMax,
                            kMitsubishiAcFanRealMax - 3,

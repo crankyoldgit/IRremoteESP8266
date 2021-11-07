@@ -341,6 +341,7 @@ void electra(IRElectraAc *ac,
 #if SEND_MITSUBISHI_AC
   void mitsubishi(IRMitsubishiAC *ac,
                   const bool on, const stdAc::opmode_t mode,
+                  const bool iSave,
                   const float degrees,
                   const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                   const stdAc::swingh_t swingh,
