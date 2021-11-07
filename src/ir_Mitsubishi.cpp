@@ -454,7 +454,7 @@ void IRMitsubishiAC::setMode(const uint8_t mode) {
   _.Mode = mode;
 }
 
-/// Set the Economy (i-SAVE) mode of the A/C.
+/// Set the iSave10C (i-SAVE) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// Normal minimum temp is 16C, and i-SAVE mode works as a gate to enable AC to use 10C as setting. However, when Remote control shows 10C, it still emits 16C on the "Temp" bits, 
 /// and instead it uses other bits to indicate a target temp of 10C. Slightly strange, but I guess it's to keep compatibility to systems without i-SAVE.
@@ -462,16 +462,16 @@ void IRMitsubishiAC::setMode(const uint8_t mode) {
 /// I have found no other difference between normal Heat mode and i-SAVE other than the ability to go to 10C.
 /// In this implementation, i-SAVE mode is ONLY used to enable the AC temperature setting to 10C. Therefore "Temp" is set to 16 disregarding what the remote shows, and mode is set to Heat.
 /// 
-void IRMitsubishiAC::setEcono(bool isave) {
-    _.iSave = isave;
-    if (isave) setMode(kMitsubishiAcHeat);
-    if (isave) setTemp(kMitsubishiAcMinTemp);
+void IRMitsubishiAC::setiSave10C(bool iSave10C) {
+    _.iSave10C = iSave10C;
+    if (iSave10C) setMode(kMitsubishiAcHeat);
+    if (iSave10C) setTemp(kMitsubishiAcMinTemp);
 }
 
-/// Get the Economical (i-SAVE) mode of the A/C.
+/// Get the iSave10C (i-SAVE) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiAC::getEcono(void) const {
-    return _.iSave;
+bool IRMitsubishiAC::getiSave10C(void) const {
+    return _.iSave10C;
 }
 
 /// Set the requested vane (Vertical Swing) operation mode of the a/c unit.
@@ -715,10 +715,11 @@ stdAc::state_t IRMitsubishiAC::toCommon(void) const {
   result.swingh = toCommonSwingH(_.WideVane);
   result.quiet = getFan() == kMitsubishiAcFanSilent;
   // Supported by MSZ-FH series
-  result.econo = getEcono();
+//  result.iSave10C = getiSave10C();
   // Not supported.
   result.turbo = false;
   result.clean = false;
+  result.econo = false;
   result.filter = false;
   result.light = false;
   result.beep = false;
@@ -746,7 +747,7 @@ String IRMitsubishiAC::toString(void) const {
   result += addModeToString(_.Mode, kMitsubishiAcAuto, kMitsubishiAcCool,
                             kMitsubishiAcHeat, kMitsubishiAcDry,
                             kMitsubishiAcFan);
-  result += addBoolToString(_.iSave, kEconoStr);
+  result += addBoolToString(_.iSave10C, k10CHeatStr);
   result += addTempFloatToString(getTemp());
   result += addFanToString(getFan(), kMitsubishiAcFanRealMax,
                            kMitsubishiAcFanRealMax - 3,

@@ -89,9 +89,9 @@ union Mitsubishi144Protocol{
     // Byte 14
     uint8_t          :8;
     // Byte 15
-    uint8_t : 5;
-    uint8_t iSave : 1;  //i-SAVE: 1 if in Heat mode AND iSave os on, and temperature THEN set to 10C
-    uint8_t : 2;
+    uint8_t          :5;
+    uint8_t iSave10C :1;  //i-SAVE: 1 if in Heat mode AND iSave os on, and temperature THEN set to 10C
+    uint8_t          :2;
     // Byte 16
     uint8_t          :3;
     uint8_t VaneLeft :3;  // SwingV(Left)
@@ -277,8 +277,8 @@ class IRMitsubishiAC {
   uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
   uint8_t getMode(void) const;
-  bool getEcono(void) const;    //1 = in i-Save mode and temp = 10C
-  void setEcono(bool);          //1 = set to i-Save mode when temp = 10C on remote. "Temp" byte is not affected by this(!). 10C temp is implied through other bits
+  bool getiSave10C(void) const;    //1 = in i-Save mode and temp = 10C
+  void setiSave10C(bool);          //1 = set to i-Save mode when temp = 10C on remote. "Temp" byte is not affected by this(!). 10C temp is implied through other bits
   void setVane(const uint8_t position);
   void setWideVane(const uint8_t position);
   uint8_t getVane(void) const;

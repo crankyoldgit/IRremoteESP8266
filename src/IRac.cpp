@@ -1539,7 +1539,7 @@ void IRac::mirage(IRMirageAc *ac,
 /// @note Clock can only be set in 10 minute increments. i.e. % 10.
 void IRac::mitsubishi(IRMitsubishiAC *ac,
                       const bool on, const stdAc::opmode_t mode,
-                      const bool iSave,
+                      const bool iSave10C,
                       const float degrees,
                       const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                       const stdAc::swingh_t swingh,
@@ -1554,7 +1554,7 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
   ac->setVane(ac->convertSwingV(swingv));
   ac->setWideVane(ac->convertSwingH(swingh));
   if (quiet) ac->setFan(kMitsubishiAcFanSilent);
-  ac->setEcono(iSave);
+  ac->setiSave10C(iSave10C);
 
   // No Turbo setting available.
   // No Light setting available.
