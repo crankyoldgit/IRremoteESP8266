@@ -1,5 +1,5 @@
 // Copyright 2009 Ken Shirriff
-// Copyright 2017, 2018, 2019 David Conran
+// Copyright 2017-2021 David Conran
 /// @file
 /// @brief Support for Samsung protocols.
 /// Samsung originally added from https://github.com/shirriff/Arduino-IRremote/
@@ -61,6 +61,13 @@ const uint16_t kSamsung36HdrSpace = 4438;  /// < uSeconds
 const uint16_t kSamsung36BitMark = 512;  /// < uSeconds
 const uint16_t kSamsung36OneSpace = 1468;  /// < uSeconds
 const uint16_t kSamsung36ZeroSpace = 490;  /// < uSeconds
+
+const uint8_t kSamsungAcSwingV =                   0b010;
+const uint8_t kSamsungAcSwingH =                   0b011;
+const uint8_t kSamsungAcSwingBoth =                0b100;
+const uint8_t kSamsungAcSwingOff =                 0b111;
+const uint8_t kSamsungAcPowerfulOn =                       0b011;
+const uint8_t kSamsungAcBreezeOn =                         0b101;
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -535,18 +542,48 @@ uint8_t IRSamsungAc::getFan(void) const {
 
 /// Get the vertical swing setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-/// @todo (Hollako) Explain why sometimes the LSB of remote_state[9] is a 1.
-/// e.g. 0xAE or 0XAF for swing move.
 bool IRSamsungAc::getSwing(void) const {
-  return _.Swing == kSamsungAcSwingMove;
+  switch (_.Swing) {
+    case kSamsungAcSwingV:
+    case kSamsungAcSwingBoth: return true;
+    default:                  return false;
+  }
 }
 
 /// Set the vertical swing setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-/// @todo (Hollako) Explain why sometimes the LSB of remote_state[9] is a 1.
-///   e.g. 0xAE or 0XAF for swing move.
 void IRSamsungAc::setSwing(const bool on) {
-  _.Swing = (on ? kSamsungAcSwingMove : kSamsungAcSwingStop);
+  switch (_.Swing) {
+    case kSamsungAcSwingBoth:
+    case kSamsungAcSwingH:
+      _.Swing = on ? kSamsungAcSwingBoth : kSamsungAcSwingH;
+      break;
+    default:
+      _.Swing = on ? kSamsungAcSwingV : kSamsungAcSwingOff;
+  }
+}
+
+/// Get the horizontal swing setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSamsungAc::getSwingH(void) const {
+  switch (_.Swing) {
+    case kSamsungAcSwingH:
+    case kSamsungAcSwingBoth: return true;
+    default:                  return false;
+  }
+}
+
+/// Set the horizontal swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSamsungAc::setSwingH(const bool on) {
+  switch (_.Swing) {
+    case kSamsungAcSwingV:
+    case kSamsungAcSwingBoth:
+      _.Swing = on ? kSamsungAcSwingBoth : kSamsungAcSwingV;
+      break;
+    default:
+      _.Swing = on ? kSamsungAcSwingH : kSamsungAcSwingOff;
+  }
 }
 
 /// Get the Beep setting of the A/C.
@@ -812,8 +849,8 @@ stdAc::state_t IRSamsungAc::toCommon(void) const {
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
-  result.swingv = getSwing() ? stdAc::swingv_t::kAuto :
-                                     stdAc::swingv_t::kOff;
+  result.swingv = getSwing() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.swingh = getSwingH() ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.quiet = getQuiet();
   result.turbo = getPowerful();
   result.clean = getClean();
@@ -822,7 +859,6 @@ stdAc::state_t IRSamsungAc::toCommon(void) const {
   result.filter = _.Ion;
   result.sleep = _Sleep ? getSleepTimer() : -1;
   // Not supported.
-  result.swingh = stdAc::swingh_t::kOff;
   result.econo = false;
   result.clock = -1;
   return result;
@@ -832,7 +868,7 @@ stdAc::state_t IRSamsungAc::toCommon(void) const {
 /// @return A human readable string.
 String IRSamsungAc::toString(void) const {
   String result = "";
-  result.reserve(115);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(220);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(_.Mode, kSamsungAcAuto, kSamsungAcCool,
                             kSamsungAcHeat, kSamsungAcDry,
@@ -862,7 +898,8 @@ String IRSamsungAc::toString(void) const {
       break;
   }
   result += ')';
-  result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getSwing(), kSwingVStr);
+  result += addBoolToString(getSwingH(), kSwingHStr);
   result += addBoolToString(_.Beep, kBeepStr);
   result += addBoolToString(getClean(), kCleanStr);
   result += addBoolToString(getQuiet(), kQuietStr);

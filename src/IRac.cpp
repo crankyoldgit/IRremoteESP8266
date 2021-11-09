@@ -1841,6 +1841,7 @@ void IRac::panasonic32(IRPanasonicAc32 *ac,
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
 /// @param[in] quiet Run the device in quiet/silent mode.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] light Turn on the LED/Display mode.
@@ -1854,7 +1855,8 @@ void IRac::panasonic32(IRPanasonicAc32 *ac,
 void IRac::samsung(IRSamsungAc *ac,
                    const bool on, const stdAc::opmode_t mode,
                    const float degrees,
-                   const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                   const stdAc::fanspeed_t fan,
+                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                    const bool quiet, const bool turbo, const bool light,
                    const bool filter, const bool clean,
                    const bool beep, const int16_t sleep,
@@ -1867,7 +1869,7 @@ void IRac::samsung(IRSamsungAc *ac,
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setSwing(swingv != stdAc::swingv_t::kOff);
-  // No Horizontal swing setting available.
+  ac->setSwingH(swingh != stdAc::swingh_t::kOff);
   ac->setQuiet(quiet);
   ac->setPowerful(turbo);
   ac->setDisplay(light);
@@ -3003,8 +3005,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRSamsungAc ac(_pin, _inverted, _modulation);
       samsung(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-              send.quiet, send.turbo, send.light, send.filter, send.clean,
-              send.beep, send.sleep, prev_power, prev_sleep);
+              send.swingh, send.quiet, send.turbo, send.light, send.filter,
+              send.clean, send.beep, send.sleep, prev_power, prev_sleep);
       break;
     }
 #endif  // SEND_SAMSUNG_AC

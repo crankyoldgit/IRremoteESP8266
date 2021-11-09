@@ -1623,7 +1623,8 @@ TEST(TestIRac, Samsung) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   const char expected[] =
-      "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), Swing: On, "
+      "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
+      "Swing(V): On, Swing(H): On, "
       "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
       "Light: On, Ion: Off";
 
@@ -1634,6 +1635,7 @@ TEST(TestIRac, Samsung) {
                28,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
                stdAc::swingv_t::kAuto,      // Vertical swing
+               stdAc::swingh_t::kAuto,      // Horizontal swing
                true,                        // Quiet
                false,                       // Turbo
                true,                        // Light (Display)
@@ -1660,6 +1662,7 @@ TEST(TestIRac, Samsung) {
                28,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
                stdAc::swingv_t::kAuto,      // Vertical swing
+               stdAc::swingh_t::kAuto,      // Horizontal swing
                true,                        // Quiet
                false,                       // Turbo
                true,                        // Light (Display)
@@ -1681,7 +1684,8 @@ TEST(TestIRac, Samsung) {
 
   ac._irsend.reset();
   const char sleep[] =
-      "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), Swing: On, "
+      "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
+      "Swing(V): On, Swing(H): Off, "
       "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
       "Light: On, Ion: Off, Sleep Timer: 08:00";
   irac.samsung(&ac,
@@ -1690,6 +1694,7 @@ TEST(TestIRac, Samsung) {
                28,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
                stdAc::swingv_t::kAuto,      // Vertical swing
+               stdAc::swingh_t::kOff,       // Horizontal swing
                true,                        // Quiet
                false,                       // Turbo
                true,                        // Light (Display)

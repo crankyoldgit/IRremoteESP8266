@@ -1,4 +1,4 @@
-// Copyright 2018 David Conran
+// Copyright 2018-2021 David Conran
 /// @file
 /// @brief Support for Samsung protocols.
 /// Samsung originally added from https://github.com/shirriff/Arduino-IRremote/
@@ -162,10 +162,6 @@ union SamsungProtocol{
 };
 
 // Constants
-const uint8_t kSamsungAcSwingMove =                0b010;
-const uint8_t kSamsungAcSwingStop =                0b111;
-const uint8_t kSamsungAcPowerfulOn =                       0b011;
-const uint8_t kSamsungAcBreezeOn =                         0b101;
 const uint8_t kSamsungAcMinTemp  = 16;  // C   Mask 0b11110000
 const uint8_t kSamsungAcMaxTemp  = 30;  // C   Mask 0b11110000
 const uint8_t kSamsungAcAutoTemp = 25;  // C   Mask 0b11110000
@@ -214,6 +210,8 @@ class IRSamsungAc {
   uint8_t getMode(void) const;
   void setSwing(const bool on);
   bool getSwing(void) const;
+  void setSwingH(const bool on);
+  bool getSwingH(void) const;
   void setBeep(const bool on);
   bool getBeep(void) const;
   void setClean(const bool on);
