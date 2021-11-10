@@ -1625,7 +1625,7 @@ TEST(TestIRac, Samsung) {
   const char expected[] =
       "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
       "Swing(V): On, Swing(H): On, "
-      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
+      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off";
 
   ac.begin();
@@ -1638,6 +1638,7 @@ TEST(TestIRac, Samsung) {
                stdAc::swingh_t::kAuto,      // Horizontal swing
                true,                        // Quiet
                false,                       // Turbo
+               false,                       // Econo
                true,                        // Light (Display)
                false,                       // Filter (Ion)
                true,                        // Clean
@@ -1665,6 +1666,7 @@ TEST(TestIRac, Samsung) {
                stdAc::swingh_t::kAuto,      // Horizontal swing
                true,                        // Quiet
                false,                       // Turbo
+               false,                       // Econo
                true,                        // Light (Display)
                false,                       // Filter (Ion)
                true,                        // Clean
@@ -1686,7 +1688,7 @@ TEST(TestIRac, Samsung) {
   const char sleep[] =
       "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
       "Swing(V): On, Swing(H): Off, "
-      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
+      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off, Sleep Timer: 08:00";
   irac.samsung(&ac,
                true,                        // Power
@@ -1697,6 +1699,7 @@ TEST(TestIRac, Samsung) {
                stdAc::swingh_t::kOff,       // Horizontal swing
                true,                        // Quiet
                false,                       // Turbo
+               false,                       // Econo
                true,                        // Light (Display)
                false,                       // Filter (Ion)
                true,                        // Clean

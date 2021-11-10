@@ -599,12 +599,23 @@ TEST(TestIRSamsungAcClass, SetAndGetPowerful) {
   EXPECT_FALSE(ac.getPowerful());
   EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
 
-  // Breeze and Powerful/Turbo are mutually exclusive.
+  // Breeze, Econo, and Powerful/Turbo are mutually exclusive.
   ac.setPowerful(true);
   EXPECT_TRUE(ac.getPowerful());
+  EXPECT_FALSE(ac.getBreeze());
+  EXPECT_FALSE(ac.getEcono());
   ac.setBreeze(true);
   EXPECT_TRUE(ac.getBreeze());
   EXPECT_FALSE(ac.getPowerful());
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  EXPECT_FALSE(ac.getBreeze());
+  EXPECT_FALSE(ac.getPowerful());
+  ac.setPowerful(true);
+  EXPECT_TRUE(ac.getPowerful());
+  EXPECT_FALSE(ac.getBreeze());
+  EXPECT_FALSE(ac.getEcono());
 
   // Actual powerful on & off states from:
   // https://github.com/crankyoldgit/IRremoteESP8266/issues/734#issuecomment-500120270
@@ -617,8 +628,8 @@ TEST(TestIRSamsungAcClass, SetAndGetPowerful) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 7 (Turbo), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: On, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: On, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 
   uint8_t off[kSamsungAcStateLength] = {
@@ -630,8 +641,8 @@ TEST(TestIRSamsungAcClass, SetAndGetPowerful) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 }
 
@@ -654,6 +665,44 @@ TEST(TestIRSamsungAcClass, QuietAndPowerfulAreMutuallyExclusive) {
   EXPECT_TRUE(ac.getQuiet());
   EXPECT_FALSE(ac.getPowerful());
   EXPECT_NE(kSamsungAcFanTurbo, ac.getFan());
+}
+
+TEST(TestIRSamsungAcClass, SetAndGetEcono) {
+  IRSamsungAc ac(kGpioUnused);
+  ac.begin();
+  EXPECT_FALSE(ac.getEcono());
+  ac.setFan(kSamsungAcFanMed);
+  ac.setSwing(false);
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  EXPECT_FALSE(ac.getBreeze());
+  EXPECT_FALSE(ac.getPowerful());
+  EXPECT_TRUE(ac.getSwing());  // Econo turns on swingv.
+  EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());  // And sets the fan to Auto.
+  ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+  EXPECT_FALSE(ac.getBreeze());
+  EXPECT_FALSE(ac.getPowerful());
+
+  // Breeze, Econo, and Powerful/Turbo are mutually exclusive.
+  // But that is tested in `SetAndGetPowerful`
+
+  // Actual econo on state from:
+  // https://cryptpad.fr/sheet/#/2/sheet/view/r9k8pmELYEjLyC71cD7EsThEYgKGLJygREZ5pVfNkS8/
+  // Row: 33
+  uint8_t on[kSamsungAcStateLength] = {
+      0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
+      0x01, 0xD2, 0xAE, 0x7F, 0x80, 0x11, 0xF0};
+  ac.setRaw(on, kSamsungAcStateLength);
+  EXPECT_TRUE(ac.getEcono());
+  EXPECT_TRUE(ac.getSwing());
+  EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
+  EXPECT_EQ(
+      "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 0 (Auto), "
+      "Swing(V): On, Swing(H): Off, Beep: Off, Clean: Off, "
+      "Quiet: Off, Powerful: Off, Econo: On, Breeze: Off, "
+      "Light: On, Ion: Off",
+      ac.toString());
 }
 
 TEST(TestIRSamsungAcClass, ChecksumCalculation) {
@@ -693,8 +742,8 @@ TEST(TestIRSamsungAcClass, HumanReadable) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 2 (Low), "
       "Swing(V): On, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Econo: Off, "
+      "Breeze: Off, Light: On, Ion: Off",
       ac.toString());
   ac.setTemp(kSamsungAcMaxTemp);
   ac.setMode(kSamsungAcHeat);
@@ -706,14 +755,14 @@ TEST(TestIRSamsungAcClass, HumanReadable) {
   EXPECT_EQ(
       "Power: Off, Mode: 4 (Heat), Temp: 30C, Fan: 5 (High), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: On, Clean: On, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: On, Clean: On, Quiet: Off, Powerful: Off, Econo: Off, "
+      "Breeze: Off, Light: On, Ion: Off",
       ac.toString());
   ac.setQuiet(true);
   EXPECT_EQ(
       "Power: Off, Mode: 4 (Heat), Temp: 30C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
+      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off",
       ac.toString());
   ac.setQuiet(false);
@@ -721,7 +770,7 @@ TEST(TestIRSamsungAcClass, HumanReadable) {
   EXPECT_EQ(
       "Power: Off, Mode: 4 (Heat), Temp: 30C, Fan: 7 (Turbo), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: On, Clean: On, Quiet: Off, Powerful: On, Breeze: Off, "
+      "Beep: On, Clean: On, Quiet: Off, Powerful: On, Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off",
       ac.toString());
   ac.setIon(true);
@@ -729,7 +778,7 @@ TEST(TestIRSamsungAcClass, HumanReadable) {
   EXPECT_EQ(
       "Power: Off, Mode: 4 (Heat), Temp: 30C, Fan: 7 (Turbo), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: On, Clean: On, Quiet: Off, Powerful: On, Breeze: Off, "
+      "Beep: On, Clean: On, Quiet: Off, Powerful: On, Econo: Off, Breeze: Off, "
       "Light: Off, Ion: On",
       ac.toString());
 }
@@ -832,8 +881,8 @@ TEST(TestDecodeSamsungAC, DecodeRealExample) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 2 (Low), "
       "Swing(V): On, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 }
 
@@ -883,8 +932,8 @@ TEST(TestDecodeSamsungAC, DecodeRealExample2) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 }
 
@@ -944,8 +993,8 @@ TEST(TestDecodeSamsungAC, DecodePowerOnSample) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 24C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 }
 
@@ -1006,8 +1055,8 @@ TEST(TestDecodeSamsungAC, DecodePowerOffSample) {
   EXPECT_EQ(
       "Power: Off, Mode: 1 (Cool), Temp: 24C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 }
 
@@ -1055,8 +1104,8 @@ TEST(TestDecodeSamsungAC, DecodeHeatSample) {
   EXPECT_EQ(
       "Power: On, Mode: 4 (Heat), Temp: 17C, Fan: 0 (Auto), "
       "Swing(V): On, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 }
 
@@ -1101,8 +1150,8 @@ TEST(TestDecodeSamsungAC, DecodeCoolSample) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -1163,8 +1212,8 @@ TEST(TestDecodeSamsungAC, Issue604DecodeExtended) {
   EXPECT_EQ(
       "Power: Off, Mode: 4 (Heat), Temp: 30C, Fan: 0 (Auto), "
       "Swing(V): On, Swing(H): On, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 }
 
@@ -1348,7 +1397,8 @@ TEST(TestIRSamsungAcClass, Issue604SendPowerHack) {
   std::string text = "Power: On, Mode: 1 (Cool), Temp: 23C, Fan: 4 (Med), "
                      "Swing(V): On, Swing(H): Off, "
                      "Beep: Off, Clean: Off, Quiet: Off, "
-                     "Powerful: Off, Breeze: Off, Light: On, Ion: Off";
+                     "Powerful: Off, Econo: Off, Breeze: Off, "
+                     "Light: On, Ion: Off";
   // Don't do a setPower()/on()/off() as that will trigger the special message.
   // So it should only be the normal "settings" message.
   ac.setTemp(23);
@@ -1483,8 +1533,8 @@ TEST(TestDecodeSamsungAC, Issue734QuietSetting) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: On, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: On, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 
   // Make sure the ac class state is in something wildly different first.
@@ -1507,8 +1557,8 @@ TEST(TestDecodeSamsungAC, Issue734QuietSetting) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: On, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: On, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
   // Check it matches the known good/expected state.
   EXPECT_STATE_EQ(expectedState, ac.getRaw(), kSamsungAcBits);
@@ -1559,8 +1609,8 @@ TEST(TestDecodeSamsungAC, Issue734PowerfulOff) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 16C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 }
 
@@ -1594,8 +1644,8 @@ TEST(TestIRSamsungAcClass, SetAndGetBreeze) {
   EXPECT_EQ(
       "Power: On, Mode: 3 (Fan), Temp: 24C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: On, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: On, Light: On, Ion: Off",
       ac.toString());
   // MODE FAN, 24C WINDFREE OFF, FAN = LOW
   const uint8_t off[14] = {
@@ -1606,8 +1656,8 @@ TEST(TestIRSamsungAcClass, SetAndGetBreeze) {
   EXPECT_EQ(
       "Power: On, Mode: 3 (Fan), Temp: 24C, Fan: 2 (Low), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off",
       ac.toString());
 }
 
@@ -1657,8 +1707,8 @@ TEST(TestDecodeSamsungAC, Issue1227VeryPoorSignal) {
   EXPECT_EQ(
       "Power: On, Mode: 0 (Auto), Temp: 17C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: Off, Ion: Off",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: Off, Ion: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -1724,7 +1774,8 @@ TEST(TestIRSamsungAcClass, Issue1648) {
   const String onText = "Power: On, Mode: 1 (Cool), Temp: 25C, Fan: 2 (Low), "
                         "Swing(V): Off, Swing(H): Off, "
                         "Beep: Off, Clean: Off, Quiet: Off, "
-                        "Powerful: Off, Breeze: Off, Light: On, Ion: Off";
+                        "Powerful: Off, Econo: Off, Breeze: Off, "
+                        "Light: On, Ion: Off";
   const uint8_t extended_offState[kSamsungAcExtendedStateLength] = {
       0x02, 0xB2, 0x0F, 0x00, 0x00, 0x00, 0xC0,
       0x01, 0xD2, 0x0F, 0x00, 0x00, 0x00, 0x00,
@@ -1735,7 +1786,8 @@ TEST(TestIRSamsungAcClass, Issue1648) {
   const String offText = "Power: Off, Mode: 1 (Cool), Temp: 25C, Fan: 2 (Low), "
                          "Swing(V): Off, Swing(H): Off, "
                          "Beep: Off, Clean: Off, Quiet: Off, "
-                         "Powerful: Off, Breeze: Off, Light: On, Ion: Off";
+                         "Powerful: Off, Econo: Off, Breeze: Off, "
+                         "Light: On, Ion: Off";
   const uint8_t coolState[kSamsungAcStateLength] = {
       0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0,
       0x01, 0xC2, 0xFE, 0x71, 0x90, 0x15, 0xF0};
@@ -1816,8 +1868,8 @@ TEST(TestIRSamsungAcClass, Issue1648) {
   const String expectedText = "Power: Off, Mode: 1 (Cool), Temp: 24C, "
                               "Fan: 2 (Low), Swing(V): On, Swing(H): Off, "
                               "Beep: Off, Clean: Off, "
-                              "Quiet: Off, Powerful: Off, Breeze: Off, "
-                              "Light: On, Ion: Off";
+                              "Quiet: Off, Powerful: Off, Econo: Off, "
+                              "Breeze: Off, Light: On, Ion: Off";
 
   ac.stateReset();
   ac.setRaw(expectedState, kSamsungAcExtendedStateLength);
@@ -1872,21 +1924,23 @@ TEST(TestIRSamsungAcClass, Timers) {
   EXPECT_EQ(
       "Power: Off, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
-      "Light: On, Ion: Off, On Timer: 00:30",
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, Light: On, Ion: Off, On Timer: 00:30",
       ac.toString());
   ac.setRaw(off_timer_1h_on_timer_10m, kSamsungAcExtendedStateLength);
   EXPECT_EQ(
       "Power: Off, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off, On Timer: 00:10, Off Timer: 01:00",
       ac.toString());
   ac.setRaw(off_timer_1h_on_timer_0m, kSamsungAcExtendedStateLength);
   EXPECT_EQ(
       "Power: Off, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off, On Timer: 00:00, Off Timer: 01:00",
       ac.toString());
 
@@ -1900,7 +1954,8 @@ TEST(TestIRSamsungAcClass, Timers) {
   EXPECT_EQ(
       "Power: Off, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off, On Timer: 06:00, Off Timer: 11:00",
       ac.toString());
 
@@ -1990,7 +2045,8 @@ TEST(TestIRSamsungAcClass, Sleep) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 20C, Fan: 0 (Auto), "
       "Swing(V): Off, Swing(H): Off, "
-      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, Breeze: Off, "
+      "Beep: Off, Clean: Off, Quiet: Off, Powerful: Off, "
+      "Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off, Sleep Timer: 08:00",
       ac.toString());
 

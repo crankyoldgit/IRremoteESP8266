@@ -76,7 +76,7 @@ union SamsungProtocol{
     uint8_t         :1;
     // Byte 10
     uint8_t            :1;
-    uint8_t FanSpecial :3;  // Powerful, Breeze/WindFree
+    uint8_t FanSpecial :3;  // Powerful, Breeze/WindFree, Econo
     uint8_t Display    :1;
     uint8_t            :2;
     uint8_t Clean10    :1;
@@ -222,6 +222,8 @@ class IRSamsungAc {
   bool getPowerful(void) const;
   void setBreeze(const bool on);
   bool getBreeze(void) const;
+  void setEcono(const bool on);
+  bool getEcono(void) const;
   void setDisplay(const bool on);
   bool getDisplay(void) const;
   void setIon(const bool on);

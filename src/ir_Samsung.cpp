@@ -71,6 +71,7 @@ const uint8_t kSamsungAcSwingOff =      0b111;
 const uint8_t kSamsungAcFanSpecialOff = 0b000;
 const uint8_t kSamsungAcPowerfulOn =    0b011;
 const uint8_t kSamsungAcBreezeOn =      0b101;
+const uint8_t kSamsungAcEconoOn =       0b111;
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -639,8 +640,8 @@ bool IRSamsungAc::getPowerful(void) const {
 /// Set the Powerful (Turbo) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setPowerful(const bool on) {
-  uint8_t off_value = getBreeze() ? kSamsungAcBreezeOn
-                                  : kSamsungAcFanSpecialOff;
+  uint8_t off_value = (getBreeze() || getEcono()) ? _.FanSpecial
+                                                  : kSamsungAcFanSpecialOff;
   _.FanSpecial = (on ? kSamsungAcPowerfulOn : off_value);
   if (on) {
     // Powerful mode sets fan speed to Turbo.
@@ -664,12 +665,33 @@ bool IRSamsungAc::getBreeze(void) const {
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
 void IRSamsungAc::setBreeze(const bool on) {
-  const uint8_t off_value = getPowerful() ? kSamsungAcPowerfulOn
-                                          : kSamsungAcFanSpecialOff;
+  const uint8_t off_value = (getPowerful() ||
+                             getEcono()) ? _.FanSpecial
+                                         : kSamsungAcFanSpecialOff;
   _.FanSpecial = (on ? kSamsungAcBreezeOn : off_value);
   if (on) {
     setFan(kSamsungAcFanAuto);
     setSwing(false);
+  }
+}
+
+/// Get the current Economy (Eco) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSamsungAc::getEcono(void) const {
+  return (_.FanSpecial == kSamsungAcEconoOn) &&
+         (_.Fan == kSamsungAcFanAuto && getSwing());
+}
+
+/// Set the current Economy (Eco) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSamsungAc::setEcono(const bool on) {
+  const uint8_t off_value = (getBreeze() ||
+                             getPowerful()) ? _.FanSpecial
+                                            : kSamsungAcFanSpecialOff;
+  _.FanSpecial = (on ? kSamsungAcEconoOn : off_value);
+  if (on) {
+    setFan(kSamsungAcFanAuto);
+    setSwing(true);
   }
 }
 
@@ -858,13 +880,13 @@ stdAc::state_t IRSamsungAc::toCommon(void) const {
   result.swingh = getSwingH() ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.quiet = getQuiet();
   result.turbo = getPowerful();
+  result.econo = getEcono();
   result.clean = getClean();
   result.beep = _.Beep;
   result.light = _.Display;
   result.filter = _.Ion;
   result.sleep = _Sleep ? getSleepTimer() : -1;
   // Not supported.
-  result.econo = false;
   result.clock = -1;
   return result;
 }
@@ -873,7 +895,7 @@ stdAc::state_t IRSamsungAc::toCommon(void) const {
 /// @return A human readable string.
 String IRSamsungAc::toString(void) const {
   String result = "";
-  result.reserve(220);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(230);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(_.Mode, kSamsungAcAuto, kSamsungAcCool,
                             kSamsungAcHeat, kSamsungAcDry,
@@ -909,6 +931,7 @@ String IRSamsungAc::toString(void) const {
   result += addBoolToString(getClean(), kCleanStr);
   result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addBoolToString(getEcono(), kEconoStr);
   result += addBoolToString(getBreeze(), kBreezeStr);
   result += addBoolToString(_.Display, kLightStr);
   result += addBoolToString(_.Ion, kIonStr);
