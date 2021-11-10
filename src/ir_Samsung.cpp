@@ -62,12 +62,15 @@ const uint16_t kSamsung36BitMark = 512;  /// < uSeconds
 const uint16_t kSamsung36OneSpace = 1468;  /// < uSeconds
 const uint16_t kSamsung36ZeroSpace = 490;  /// < uSeconds
 
-const uint8_t kSamsungAcSwingV =                   0b010;
-const uint8_t kSamsungAcSwingH =                   0b011;
-const uint8_t kSamsungAcSwingBoth =                0b100;
-const uint8_t kSamsungAcSwingOff =                 0b111;
-const uint8_t kSamsungAcPowerfulOn =                       0b011;
-const uint8_t kSamsungAcBreezeOn =                         0b101;
+// _.Swing
+const uint8_t kSamsungAcSwingV =        0b010;
+const uint8_t kSamsungAcSwingH =        0b011;
+const uint8_t kSamsungAcSwingBoth =     0b100;
+const uint8_t kSamsungAcSwingOff =      0b111;
+// _.FanSpecial
+const uint8_t kSamsungAcFanSpecialOff = 0b000;
+const uint8_t kSamsungAcPowerfulOn =    0b011;
+const uint8_t kSamsungAcBreezeOn =      0b101;
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -636,7 +639,8 @@ bool IRSamsungAc::getPowerful(void) const {
 /// Set the Powerful (Turbo) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setPowerful(const bool on) {
-  uint8_t off_value = getBreeze() ? kSamsungAcBreezeOn : 0b000;
+  uint8_t off_value = getBreeze() ? kSamsungAcBreezeOn
+                                  : kSamsungAcFanSpecialOff;
   _.FanSpecial = (on ? kSamsungAcPowerfulOn : off_value);
   if (on) {
     // Powerful mode sets fan speed to Turbo.
@@ -660,7 +664,8 @@ bool IRSamsungAc::getBreeze(void) const {
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
 void IRSamsungAc::setBreeze(const bool on) {
-  const uint8_t off_value = getPowerful() ? kSamsungAcPowerfulOn : 0b000;
+  const uint8_t off_value = getPowerful() ? kSamsungAcPowerfulOn
+                                          : kSamsungAcFanSpecialOff;
   _.FanSpecial = (on ? kSamsungAcBreezeOn : off_value);
   if (on) {
     setFan(kSamsungAcFanAuto);
