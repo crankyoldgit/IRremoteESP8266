@@ -1354,30 +1354,55 @@ TEST(TestIRac, Mirage) {
   IRMirageAc ac(kGpioUnused);
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
-  char expected[] =
-      "Power: On, Mode: 3 (Dry), Temp: 27C, Fan: 2 (Medium), "
-      "Swing(V): 9 (High), "
-      "Turbo: Off, Light: Off, Sleep: On, Clock: 17:31";
+  stdAc::state_t state, r, p;
+  const char expected_KKG9AC1[] =
+      "Model: 1 (KKG9AC1), Power: On, Mode: 3 (Dry), Temp: 27C, "
+      "Fan: 2 (Medium), Turbo: Off, Sleep: On, Light: Off, "
+      "Swing(V): 9 (High), Clock: 17:31";
 
   ac.begin();
-  irac.mirage(&ac,
-              true,                        // Power
-              stdAc::opmode_t::kDry,       // Mode
-              27,                          // Degrees (Celsius)
-              stdAc::fanspeed_t::kMedium,  // Fan speed
-              stdAc::swingv_t::kHigh,      // Veritical Swing
-              false,                       // Turbo
-              false,                       // Light
-              8 * 60 + 0,                  // Sleep time
-              17 * 60 + 31);               // Clock
 
-  ASSERT_EQ(expected, ac.toString());
+  state.model = mirage_ac_remote_model_t::KKG9AC1;
+  state.power = true;
+  state.mode = stdAc::opmode_t::kDry;
+  state.celsius = true;
+  state.degrees = 27;
+  state.fanspeed = stdAc::fanspeed_t::kMedium;
+  state.swingv = stdAc::swingv_t::kHigh;
+  state.swingh = stdAc::swingh_t::kLeft;
+  state.turbo = false;
+  state.quiet = true;
+  state.light = false;
+  state.filter = true;
+  state.clean = false;
+  state.sleep = 8 * 60 + 0;
+  state.clock = 17 * 60 + 31;
+  state.beep = false;
+  irac.mirage(&ac, state);
+
+  ASSERT_EQ(expected_KKG9AC1, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(MIRAGE, ac._irsend.capture.decode_type);
   ASSERT_EQ(kMirageBits, ac._irsend.capture.bits);
-  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
-  stdAc::state_t r, p;
+  ASSERT_EQ(expected_KKG9AC1, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+
+  const char expected_KKG29AC1[] =
+      "Model: 2 (KKG29AC1), Power: On, Mode: 3 (Dry), Temp: 27C, "
+      "Fan: 3 (Medium), Turbo: Off, Sleep: On, Quiet: On, Light: -, "
+      "Swing(V): On, Swing(H): On, Filter: On, Clean: -, "
+      "On Timer: Off, Off Timer: Off, IFeel: Off";
+  ac._irsend.reset();
+  state.model = mirage_ac_remote_model_t::KKG29AC1;
+  irac.mirage(&ac, state);
+  ASSERT_EQ(expected_KKG29AC1, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(MIRAGE, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kMirageBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected_KKG29AC1,
+            IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 

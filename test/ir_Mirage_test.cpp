@@ -56,9 +56,9 @@ TEST(TestDecodeMirage, RealExample) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (UNKNOWN), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
+      "Swing(V): 0 (Off), Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -78,9 +78,9 @@ TEST(TestDecodeMirage, SyntheticExample) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (UNKNOWN), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
+      "Swing(V): 0 (Off), Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -123,9 +123,9 @@ TEST(TestDecodeMirage, RealExampleWithDodgyHardwareCapture) {
   ASSERT_EQ(kMirageBits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (UNKNOWN), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
+      "Swing(V): 0 (Off), Clock: 14:16",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
@@ -133,6 +133,7 @@ TEST(TestMirageAcClass, Power) {
   IRMirageAc ac(kGpioUnused);
   ac.begin();
 
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);
   ac.on();
   EXPECT_TRUE(ac.getPower());
   ac.on();
@@ -159,6 +160,16 @@ TEST(TestMirageAcClass, Power) {
       0x0C, 0x00, 0x0C, 0x2C, 0x23, 0x01, 0x61};
   ac.setRaw(off);
   EXPECT_FALSE(ac.getPower());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
 }
 
 TEST(TestMirageAcClass, OperatingMode) {
@@ -182,10 +193,12 @@ TEST(TestMirageAcClass, OperatingMode) {
 TEST(TestMirageAcClass, HumanReadable) {
   IRMirageAc ac(kGpioUnused);
   ac.begin();
+
+  // Tests for the KKG9AC1 model.
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 16C, Fan: 0 (Auto), "
-      "Swing(V): 13 (Auto), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:00",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 16C, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
+      "Swing(V): 13 (Auto), Clock: 00:00",
       ac.toString());
   // Ref: https://docs.google.com/spreadsheets/d/1Ucu9mOOIIJoWQjUJq_VCvwgV3EwKaRk8K2AuZgccYEk/edit#gid=0&range=C7
   // 0x56710000201A00000C000C26010041
@@ -194,9 +207,9 @@ TEST(TestMirageAcClass, HumanReadable) {
       0x0C, 0x00, 0x0C, 0x26, 0x01, 0x00, 0x41};
   ac.setRaw(cool_21c_auto);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 21C, Fan: 0 (Auto), "
-      "Swing(V): 13 (Auto), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 00:01",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 21C, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
+      "Swing(V): 13 (Auto), Clock: 00:01",
       ac.toString());
 
   const uint8_t SyntheticExample[kMirageStateLength] = {
@@ -204,9 +217,19 @@ TEST(TestMirageAcClass, HumanReadable) {
       0x00, 0x00, 0x16, 0x14, 0x26};
   ac.setRaw(SyntheticExample);
   EXPECT_EQ(
-      "Power: On, Mode: 2 (Cool), Temp: 25C, Fan: 0 (Auto), "
-      "Swing(V): 0 (UNKNOWN), "
-      "Turbo: Off, Light: Off, Sleep: Off, Clock: 14:16",
+      "Model: 1 (KKG9AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Light: Off, "
+      "Swing(V): 0 (Off), Clock: 14:16",
+      ac.toString());
+
+  // Tests for the KKG29AC1 model.
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
+  EXPECT_EQ(
+      "Model: 2 (KKG29AC1), Power: On, Mode: 2 (Cool), Temp: 25C, "
+      "Fan: 0 (Auto), Turbo: Off, Sleep: Off, Quiet: Off, Light: -, "
+      "Swing(V): Off, Swing(H): Off, "
+      "Filter: Off, Clean: -, On Timer: Off, Off Timer: Off, "
+      "IFeel: Off",
       ac.toString());
 }
 
@@ -266,6 +289,15 @@ TEST(TestMirageAcClass, Turbo) {
   IRMirageAc ac(kGpioUnused);
   ac.begin();
 
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
   ac.setTurbo(true);
   EXPECT_TRUE(ac.getTurbo());
   ac.setTurbo(false);
@@ -278,6 +310,15 @@ TEST(TestMirageAcClass, Light) {
   IRMirageAc ac(kGpioUnused);
   ac.begin();
 
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+  ac.setLight(false);
+  EXPECT_FALSE(ac.getLight());
+  ac.setLight(true);
+  EXPECT_TRUE(ac.getLight());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
   ac.setLight(true);
   EXPECT_TRUE(ac.getLight());
   ac.setLight(false);
@@ -290,6 +331,15 @@ TEST(TestMirageAcClass, Sleep) {
   IRMirageAc ac(kGpioUnused);
   ac.begin();
 
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
   ac.setSleep(true);
   EXPECT_TRUE(ac.getSleep());
   ac.setSleep(false);
@@ -302,6 +352,7 @@ TEST(TestMirageAcClass, Clock) {
   IRMirageAc ac(kGpioUnused);
   ac.begin();
 
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);  // This model supports time.
   ac.setClock(0);
   EXPECT_EQ(0, ac.getClock());
   ac.setClock(12 * 60 * 60 + 30 * 60 + 59);  // aka. 12:30:59
@@ -310,6 +361,11 @@ TEST(TestMirageAcClass, Clock) {
   EXPECT_EQ(23 * 60 * 60 + 59 * 60 + 59, ac.getClock());
   ac.setClock(24 * 60 * 60);  // aka. 24:00:00
   EXPECT_EQ(23 * 60 * 60 + 59 * 60 + 59, ac.getClock());  // aka. 23:59:59
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);  // This model has no clock.
+  EXPECT_EQ(0, ac.getClock());
+  ac.setClock(12 * 60 * 60 + 30 * 60 + 59);  // aka. 12:30:59
+  EXPECT_EQ(0, ac.getClock());
 }
 
 TEST(TestMirageAcClass, Checksums) {
@@ -327,6 +383,9 @@ TEST(TestMirageAcClass, SwingV) {
   IRMirageAc ac(kGpioUnused);
   ac.begin();
 
+  // Set the model to one with full swingv support.
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);
+
   ac.setSwingV(kMirageAcSwingVAuto);
   EXPECT_EQ(kMirageAcSwingVAuto, ac.getSwingV());
 
@@ -341,4 +400,192 @@ TEST(TestMirageAcClass, SwingV) {
 
   ac.setSwingV(kMirageAcSwingVLowest - 1);
   EXPECT_EQ(kMirageAcSwingVAuto, ac.getSwingV());
+
+  // Set the model to one with limited swingv support.
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
+
+  ac.setSwingV(kMirageAcSwingVAuto);
+  EXPECT_EQ(kMirageAcSwingVAuto, ac.getSwingV());
+  ac.setSwingV(kMirageAcSwingVOff);
+  EXPECT_EQ(kMirageAcSwingVOff, ac.getSwingV());
+  ac.setSwingV(kMirageAcSwingVHigh);
+  EXPECT_EQ(kMirageAcSwingVAuto, ac.getSwingV());
+  ac.setSwingV(0xFF);
+  EXPECT_EQ(kMirageAcSwingVAuto, ac.getSwingV());
+  ac.setSwingV(kMirageAcSwingVOff);
+  EXPECT_EQ(kMirageAcSwingVOff, ac.getSwingV());
+}
+
+TEST(TestMirageAcClass, SwingH) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);
+  ac.setSwingH(true);
+  EXPECT_FALSE(ac.getSwingH());
+  ac.setSwingH(false);
+  EXPECT_FALSE(ac.getSwingH());
+  ac.setSwingH(true);
+  EXPECT_FALSE(ac.getSwingH());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
+  ac.setSwingH(true);
+  EXPECT_TRUE(ac.getSwingH());
+  ac.setSwingH(false);
+  EXPECT_FALSE(ac.getSwingH());
+  ac.setSwingH(true);
+  EXPECT_TRUE(ac.getSwingH());
+}
+
+TEST(TestMirageAcClass, Filter) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);  // No Support
+  ac.setFilter(true);
+  EXPECT_FALSE(ac.getFilter());
+  ac.setFilter(false);
+  EXPECT_FALSE(ac.getFilter());
+  ac.setFilter(true);
+  EXPECT_FALSE(ac.getFilter());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);  // Supported
+  ac.setFilter(true);
+  EXPECT_TRUE(ac.getFilter());
+  ac.setFilter(false);
+  EXPECT_FALSE(ac.getFilter());
+  ac.setFilter(true);
+  EXPECT_TRUE(ac.getFilter());
+}
+
+TEST(TestMirageAcClass, Quiet) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);  // No Support
+  ac.setQuiet(true);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_FALSE(ac.getQuiet());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);  // Supported
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  ac.setQuiet(false);
+  EXPECT_FALSE(ac.getQuiet());
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+}
+
+TEST(TestMirageAcClass, CleanToggle) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);
+  ac.setCleanToggle(true);
+  EXPECT_FALSE(ac.getCleanToggle());
+  ac.setCleanToggle(false);
+  EXPECT_FALSE(ac.getCleanToggle());
+  ac.setCleanToggle(true);
+  EXPECT_FALSE(ac.getCleanToggle());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);
+  ac.setCleanToggle(true);
+  EXPECT_TRUE(ac.getCleanToggle());
+  ac.setCleanToggle(false);
+  EXPECT_FALSE(ac.getCleanToggle());
+  ac.setCleanToggle(true);
+  EXPECT_TRUE(ac.getCleanToggle());
+  ac.send();  // Should be reset when sent.
+  EXPECT_FALSE(ac.getCleanToggle());
+}
+
+TEST(TestMirageAcClass, Timers) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);  // No timer support
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+  ac.setOnTimer(12 * 60 + 37);  // 12:37
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+  ac.setOffTimer(17 * 60 + 5);  // 17:05
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);  // Timer supported
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOnTimer(12 * 60 + 37);  // 12:37
+  EXPECT_EQ(12 * 60 + 37, ac.getOnTimer());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOffTimer(17 * 60 + 5);  // 17:05
+  EXPECT_EQ(17 * 60 + 5, ac.getOffTimer());
+  EXPECT_EQ(12 * 60 + 37, ac.getOnTimer());
+  ac.setOnTimer(0);  // Off/Disabled
+  EXPECT_EQ(0, ac.getOnTimer());
+  EXPECT_EQ(17 * 60 + 5, ac.getOffTimer());
+  ac.setOffTimer(0);  // Off/Disabled
+  EXPECT_EQ(0, ac.getOffTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  ac.setOnTimer(12 * 60 + 37);  // 12:37
+  ac.setOffTimer(17 * 60 + 5);  // 17:05
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);  // No timer support
+  EXPECT_EQ(0, ac.getOffTimer());
+  EXPECT_EQ(0, ac.getOnTimer());
+}
+
+TEST(TestMirageAcClass, IFeelAndSensorTemp) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setModel(mirage_ac_remote_model_t::KKG9AC1);  // No support
+  EXPECT_FALSE(ac.getIFeel());
+  EXPECT_EQ(0, ac.getSensorTemp());
+  ac.setIFeel(true);
+  EXPECT_FALSE(ac.getIFeel());
+  EXPECT_EQ(0, ac.getSensorTemp());
+  ac.setSensorTemp(20);  // 20C
+  EXPECT_FALSE(ac.getIFeel());
+  EXPECT_EQ(0, ac.getSensorTemp());
+
+  ac.setModel(mirage_ac_remote_model_t::KKG29AC1);  // Supported
+  EXPECT_FALSE(ac.getIFeel());
+  EXPECT_EQ(0, ac.getSensorTemp());
+  ac.setIFeel(true);
+  EXPECT_TRUE(ac.getIFeel());
+  EXPECT_EQ(0, ac.getSensorTemp());
+  ac.setSensorTemp(25);  // 25C
+  EXPECT_TRUE(ac.getIFeel());
+  EXPECT_EQ(25, ac.getSensorTemp());
+  ac.setIFeel(false);
+  EXPECT_FALSE(ac.getIFeel());
+}
+
+TEST(TestMirageAcClass, getModel) {
+  IRMirageAc ac(kGpioUnused);
+  ac.begin();
+  const uint8_t KKG9AC1[kMirageStateLength] = {
+      0x56, 0x6C, 0x00, 0x00, 0x20, 0xD8, 0x00, 0x00,
+      0x0C, 0x32, 0x0B, 0x00, 0x32, 0x0F, 0x64};
+  EXPECT_EQ(mirage_ac_remote_model_t::KKG9AC1, IRMirageAc::getModel(KKG9AC1));
+
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1573#issuecomment-955722044
+  const uint8_t KKG29AC1[kMirageStateLength] = {
+      0x56, 0x74, 0x00, 0x00, 0x12, 0x00, 0x40, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1D};
+  EXPECT_EQ(mirage_ac_remote_model_t::KKG29AC1, IRMirageAc::getModel(KKG29AC1));
+
+  // https://github.com/crankyoldgit/IRremoteESP8266/issues/1573#issuecomment-962362540
+  const uint8_t KKG29AC1_2[kMirageStateLength] = {
+      0x56, 0x72, 0x00, 0x00, 0x23, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x19};
+  EXPECT_EQ(mirage_ac_remote_model_t::KKG29AC1,
+            IRMirageAc::getModel(KKG29AC1_2));
 }

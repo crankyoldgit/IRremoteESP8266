@@ -111,6 +111,8 @@ extern IRTEXT_CONST_PTR(kIFeelStr);
 extern IRTEXT_CONST_PTR(kInsideStr);
 extern IRTEXT_CONST_PTR(kIonStr);
 extern IRTEXT_CONST_PTR(kJkeStr);
+extern IRTEXT_CONST_PTR(kKkg29ac1Str);
+extern IRTEXT_CONST_PTR(kKkg9ac1Str);
 extern IRTEXT_CONST_PTR(kLastStr);
 extern IRTEXT_CONST_PTR(kLeftMaxNoSpaceStr);
 extern IRTEXT_CONST_PTR(kLeftMaxStr);

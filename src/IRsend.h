@@ -142,6 +142,12 @@ enum hitachi_ac1_remote_model_t {
   R_LT0541_HTA_B,      // (2) R-LT0541-HTA Remote in "B" setting.
 };
 
+/// MIRAGE A/C model numbers
+enum mirage_ac_remote_model_t {
+  KKG9AC1 = 1,  // (1) KKG9A-C1 Remote. (Default)
+  KKG29AC1,     // (2) KKG29A-C1 Remote.
+};
+
 /// Panasonic A/C model numbers
 enum panasonic_ac_remote_model_t {
   kPanasonicUnknown = 0,
