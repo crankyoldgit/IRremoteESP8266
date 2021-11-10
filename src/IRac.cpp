@@ -1039,15 +1039,18 @@ void IRac::goodweather(IRGoodweatherAc *ac,
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] econo Toggle the device's economical mode.
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
                 const bool on, const stdAc::opmode_t mode, const bool celsius,
                 const float degrees, const stdAc::fanspeed_t fan,
-                const stdAc::swingv_t swingv, const bool turbo,
-                const bool light, const bool clean, const int16_t sleep) {
+                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                const bool turbo, const bool econo, const bool light,
+                const bool clean, const int16_t sleep) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
@@ -1056,11 +1059,12 @@ void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
   ac->setFan(ac->convertFan(fan));
   ac->setSwingVertical(swingv == stdAc::swingv_t::kAuto,  // Set auto flag.
                        ac->convertSwingV(swingv));
+  ac->setSwingHorizontal(ac->convertSwingH(swingh));
   ac->setLight(light);
   ac->setTurbo(turbo);
+  ac->setEcono(econo);
   ac->setXFan(clean);
   ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
-  // No Horizontal Swing setting available.
   // No Econo setting available.
   // No Filter setting available.
   // No Beep setting available.
@@ -2766,8 +2770,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRGreeAC ac(_pin, (gree_ac_remote_model_t)send.model, _inverted,
                   _modulation);
       gree(&ac, (gree_ac_remote_model_t)send.model, send.power, send.mode,
-           send.celsius, send.degrees, send.fanspeed, send.swingv, send.turbo,
-           send.light, send.clean, send.sleep);
+           send.celsius, send.degrees, send.fanspeed, send.swingv, send.swingh,
+           send.turbo, send.econo, send.light, send.clean, send.sleep);
       break;
     }
 #endif  // SEND_GREE
