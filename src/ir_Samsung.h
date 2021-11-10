@@ -58,7 +58,8 @@ union SamsungProtocol{
     // Byte 4
     uint8_t         :8;
     // Byte 5
-    uint8_t         :5;
+    uint8_t         :4;
+    uint8_t Sleep5  :1;
     uint8_t Quiet   :1;
     uint8_t         :2;
     // Byte 6
@@ -136,7 +137,7 @@ union SamsungProtocol{
     uint8_t OffTimeDay     :1;
     uint8_t OnTimerEnable  :1;
     uint8_t OffTimerEnable :1;
-    uint8_t Sleep          :1;
+    uint8_t Sleep12        :1;
     uint8_t OnTimeDay      :1;
     uint8_t                :3;
     // Byte 13

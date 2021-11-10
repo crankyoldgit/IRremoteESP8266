@@ -2082,3 +2082,43 @@ TEST(TestIRSamsungAcClass, Sleep) {
   EXPECT_EQ(0, ac.getOnTimer());
   EXPECT_EQ(90, ac.getOffTimer());
 }
+
+TEST(TestIRSamsungAcClass, BuildKnownSleepSate) {
+  // For https://github.com/crankyoldgit/IRremoteESP8266/issues/1277#issuecomment-965047193
+  IRSamsungAc ac(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  ac.begin();
+  const uint8_t expectedState[kSamsungAcExtendedStateLength] = {
+      0x02, 0x82, 0x0F, 0x00, 0x00, 0x10, 0xF0,
+      0x01, 0xA2, 0x0F, 0x04, 0x00, 0x0C, 0x00,
+      0x01, 0xD2, 0xFE, 0x71, 0x50, 0x41, 0xF0};
+  const char expectedStr[] = "Power: On, Mode: 4 (Heat), Temp: 21C, "
+      "Fan: 0 (Auto), Swing(V): Off, Swing(H): Off, Beep: Off, Clean: Off, "
+      "Quiet: Off, Powerful: Off, Econo: Off, Breeze: Off, "
+      "Light: On, Ion: Off, Sleep Timer: 08:00";
+  ac.setPower(true);
+  ac.setMode(kSamsungAcHeat);
+  ac.setTemp(21);
+  ac.setFan(kSamsungAcFanAuto);
+  ac.setSwing(false);
+  ac.setSwingH(false);
+  ac.setBeep(false);
+  ac.setClean(false);
+  ac.setQuiet(false);
+  ac.setPowerful(false);
+  ac.setEcono(false);
+  ac.setBreeze(false);
+  ac.setDisplay(true);
+  ac.setIon(false);
+  ac.setSleepTimer(8 * 60);
+  EXPECT_EQ(expectedStr, ac.toString());
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+  EXPECT_EQ(SAMSUNG_AC, ac._irsend.capture.decode_type);
+  EXPECT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, ac._irsend.capture.state,
+                  ac._irsend.capture.bits);
+  EXPECT_EQ(expectedStr, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  ac._irsend.reset();
+}

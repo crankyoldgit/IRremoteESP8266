@@ -454,7 +454,7 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   if (length > kSamsungAcStateLength) {
     _OnTimerEnable = _.OnTimerEnable;
     _OffTimerEnable = _.OffTimerEnable;
-    _Sleep = _.Sleep;
+    _Sleep = _.Sleep5 && _.Sleep12;
     _OnTimer = _getOnTimer();
     _OffTimer = _getOffTimer();
     for (uint8_t i = kSamsungAcStateLength; i < length; i++)
@@ -757,7 +757,8 @@ void IRSamsungAc::_setOffTimer(void) {
 void IRSamsungAc::_setSleepTimer(void) {
   _setOffTimer();
   // The Sleep mode/timer should only be engaged if an off time has been set.
-  _.Sleep = _Sleep && _OffTimerEnable;
+  _.Sleep5 = _Sleep && _OffTimerEnable;
+  _.Sleep12 = _.Sleep5;
 }
 
 /// Get the On Timer setting of the A/C.
@@ -788,6 +789,7 @@ uint16_t IRSamsungAc::getSleepTimer(void) const {
 void IRSamsungAc::setOnTimer(const uint16_t nr_of_mins) {
   // Limit to one day, and round down to nearest 10 min increment.
   _OnTimer = TIMER_RESOLUTION(nr_of_mins);
+  _OnTimerEnable = _OnTimer > 0;
   if (_OnTimer) _Sleep = false;
 }
 
@@ -798,6 +800,7 @@ void IRSamsungAc::setOnTimer(const uint16_t nr_of_mins) {
 void IRSamsungAc::setOffTimer(const uint16_t nr_of_mins) {
   // Limit to one day, and round down to nearest 10 min increment.
   _OffTimer = TIMER_RESOLUTION(nr_of_mins);
+  _OffTimerEnable = _OffTimer > 0;
   if (_OffTimer) _Sleep = false;
 }
 
@@ -810,6 +813,7 @@ void IRSamsungAc::setSleepTimer(const uint16_t nr_of_mins) {
   _OffTimer = TIMER_RESOLUTION(nr_of_mins);
   if (_OffTimer) setOnTimer(0);  // Clear the on timer if set.
   _Sleep = _OffTimer > 0;
+  _OffTimerEnable = _Sleep;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
