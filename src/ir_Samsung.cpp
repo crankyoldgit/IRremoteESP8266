@@ -1,5 +1,5 @@
 // Copyright 2009 Ken Shirriff
-// Copyright 2017, 2018, 2019 David Conran
+// Copyright 2017-2021 David Conran
 /// @file
 /// @brief Support for Samsung protocols.
 /// Samsung originally added from https://github.com/shirriff/Arduino-IRremote/
@@ -61,6 +61,17 @@ const uint16_t kSamsung36HdrSpace = 4438;  /// < uSeconds
 const uint16_t kSamsung36BitMark = 512;  /// < uSeconds
 const uint16_t kSamsung36OneSpace = 1468;  /// < uSeconds
 const uint16_t kSamsung36ZeroSpace = 490;  /// < uSeconds
+
+// _.Swing
+const uint8_t kSamsungAcSwingV =        0b010;
+const uint8_t kSamsungAcSwingH =        0b011;
+const uint8_t kSamsungAcSwingBoth =     0b100;
+const uint8_t kSamsungAcSwingOff =      0b111;
+// _.FanSpecial
+const uint8_t kSamsungAcFanSpecialOff = 0b000;
+const uint8_t kSamsungAcPowerfulOn =    0b011;
+const uint8_t kSamsungAcBreezeOn =      0b101;
+const uint8_t kSamsungAcEconoOn =       0b111;
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
@@ -443,7 +454,7 @@ void IRSamsungAc::setRaw(const uint8_t new_code[], const uint16_t length) {
   if (length > kSamsungAcStateLength) {
     _OnTimerEnable = _.OnTimerEnable;
     _OffTimerEnable = _.OffTimerEnable;
-    _Sleep = _.Sleep;
+    _Sleep = _.Sleep5 && _.Sleep12;
     _OnTimer = _getOnTimer();
     _OffTimer = _getOffTimer();
     for (uint8_t i = kSamsungAcStateLength; i < length; i++)
@@ -535,18 +546,48 @@ uint8_t IRSamsungAc::getFan(void) const {
 
 /// Get the vertical swing setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-/// @todo (Hollako) Explain why sometimes the LSB of remote_state[9] is a 1.
-/// e.g. 0xAE or 0XAF for swing move.
 bool IRSamsungAc::getSwing(void) const {
-  return _.Swing == kSamsungAcSwingMove;
+  switch (_.Swing) {
+    case kSamsungAcSwingV:
+    case kSamsungAcSwingBoth: return true;
+    default:                  return false;
+  }
 }
 
 /// Set the vertical swing setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-/// @todo (Hollako) Explain why sometimes the LSB of remote_state[9] is a 1.
-///   e.g. 0xAE or 0XAF for swing move.
 void IRSamsungAc::setSwing(const bool on) {
-  _.Swing = (on ? kSamsungAcSwingMove : kSamsungAcSwingStop);
+  switch (_.Swing) {
+    case kSamsungAcSwingBoth:
+    case kSamsungAcSwingH:
+      _.Swing = on ? kSamsungAcSwingBoth : kSamsungAcSwingH;
+      break;
+    default:
+      _.Swing = on ? kSamsungAcSwingV : kSamsungAcSwingOff;
+  }
+}
+
+/// Get the horizontal swing setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSamsungAc::getSwingH(void) const {
+  switch (_.Swing) {
+    case kSamsungAcSwingH:
+    case kSamsungAcSwingBoth: return true;
+    default:                  return false;
+  }
+}
+
+/// Set the horizontal swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSamsungAc::setSwingH(const bool on) {
+  switch (_.Swing) {
+    case kSamsungAcSwingV:
+    case kSamsungAcSwingBoth:
+      _.Swing = on ? kSamsungAcSwingBoth : kSamsungAcSwingV;
+      break;
+    default:
+      _.Swing = on ? kSamsungAcSwingH : kSamsungAcSwingOff;
+  }
 }
 
 /// Get the Beep setting of the A/C.
@@ -599,7 +640,8 @@ bool IRSamsungAc::getPowerful(void) const {
 /// Set the Powerful (Turbo) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRSamsungAc::setPowerful(const bool on) {
-  uint8_t off_value = getBreeze() ? kSamsungAcBreezeOn : 0b000;
+  uint8_t off_value = (getBreeze() || getEcono()) ? _.FanSpecial
+                                                  : kSamsungAcFanSpecialOff;
   _.FanSpecial = (on ? kSamsungAcPowerfulOn : off_value);
   if (on) {
     // Powerful mode sets fan speed to Turbo.
@@ -623,11 +665,33 @@ bool IRSamsungAc::getBreeze(void) const {
 /// @param[in] on true, the setting is on. false, the setting is off.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1062
 void IRSamsungAc::setBreeze(const bool on) {
-  const uint8_t off_value = getPowerful() ? kSamsungAcPowerfulOn : 0b000;
+  const uint8_t off_value = (getPowerful() ||
+                             getEcono()) ? _.FanSpecial
+                                         : kSamsungAcFanSpecialOff;
   _.FanSpecial = (on ? kSamsungAcBreezeOn : off_value);
   if (on) {
     setFan(kSamsungAcFanAuto);
     setSwing(false);
+  }
+}
+
+/// Get the current Economy (Eco) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRSamsungAc::getEcono(void) const {
+  return (_.FanSpecial == kSamsungAcEconoOn) &&
+         (_.Fan == kSamsungAcFanAuto && getSwing());
+}
+
+/// Set the current Economy (Eco) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRSamsungAc::setEcono(const bool on) {
+  const uint8_t off_value = (getBreeze() ||
+                             getPowerful()) ? _.FanSpecial
+                                            : kSamsungAcFanSpecialOff;
+  _.FanSpecial = (on ? kSamsungAcEconoOn : off_value);
+  if (on) {
+    setFan(kSamsungAcFanAuto);
+    setSwing(true);
   }
 }
 
@@ -693,7 +757,8 @@ void IRSamsungAc::_setOffTimer(void) {
 void IRSamsungAc::_setSleepTimer(void) {
   _setOffTimer();
   // The Sleep mode/timer should only be engaged if an off time has been set.
-  _.Sleep = _Sleep && _OffTimerEnable;
+  _.Sleep5 = _Sleep && _OffTimerEnable;
+  _.Sleep12 = _.Sleep5;
 }
 
 /// Get the On Timer setting of the A/C.
@@ -724,6 +789,7 @@ uint16_t IRSamsungAc::getSleepTimer(void) const {
 void IRSamsungAc::setOnTimer(const uint16_t nr_of_mins) {
   // Limit to one day, and round down to nearest 10 min increment.
   _OnTimer = TIMER_RESOLUTION(nr_of_mins);
+  _OnTimerEnable = _OnTimer > 0;
   if (_OnTimer) _Sleep = false;
 }
 
@@ -734,6 +800,7 @@ void IRSamsungAc::setOnTimer(const uint16_t nr_of_mins) {
 void IRSamsungAc::setOffTimer(const uint16_t nr_of_mins) {
   // Limit to one day, and round down to nearest 10 min increment.
   _OffTimer = TIMER_RESOLUTION(nr_of_mins);
+  _OffTimerEnable = _OffTimer > 0;
   if (_OffTimer) _Sleep = false;
 }
 
@@ -746,6 +813,7 @@ void IRSamsungAc::setSleepTimer(const uint16_t nr_of_mins) {
   _OffTimer = TIMER_RESOLUTION(nr_of_mins);
   if (_OffTimer) setOnTimer(0);  // Clear the on timer if set.
   _Sleep = _OffTimer > 0;
+  _OffTimerEnable = _Sleep;
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -812,18 +880,17 @@ stdAc::state_t IRSamsungAc::toCommon(void) const {
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
-  result.swingv = getSwing() ? stdAc::swingv_t::kAuto :
-                                     stdAc::swingv_t::kOff;
+  result.swingv = getSwing() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.swingh = getSwingH() ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.quiet = getQuiet();
   result.turbo = getPowerful();
+  result.econo = getEcono();
   result.clean = getClean();
   result.beep = _.Beep;
   result.light = _.Display;
   result.filter = _.Ion;
   result.sleep = _Sleep ? getSleepTimer() : -1;
   // Not supported.
-  result.swingh = stdAc::swingh_t::kOff;
-  result.econo = false;
   result.clock = -1;
   return result;
 }
@@ -832,7 +899,7 @@ stdAc::state_t IRSamsungAc::toCommon(void) const {
 /// @return A human readable string.
 String IRSamsungAc::toString(void) const {
   String result = "";
-  result.reserve(115);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(230);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(_.Mode, kSamsungAcAuto, kSamsungAcCool,
                             kSamsungAcHeat, kSamsungAcDry,
@@ -862,11 +929,13 @@ String IRSamsungAc::toString(void) const {
       break;
   }
   result += ')';
-  result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getSwing(), kSwingVStr);
+  result += addBoolToString(getSwingH(), kSwingHStr);
   result += addBoolToString(_.Beep, kBeepStr);
   result += addBoolToString(getClean(), kCleanStr);
   result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(getPowerful(), kPowerfulStr);
+  result += addBoolToString(getEcono(), kEconoStr);
   result += addBoolToString(getBreeze(), kBreezeStr);
   result += addBoolToString(_.Display, kLightStr);
   result += addBoolToString(_.Ion, kIonStr);

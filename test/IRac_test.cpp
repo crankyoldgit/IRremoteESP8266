@@ -1651,8 +1651,9 @@ TEST(TestIRac, Samsung) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   const char expected[] =
-      "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), Swing: On, "
-      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
+      "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
+      "Swing(V): On, Swing(H): On, "
+      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off";
 
   ac.begin();
@@ -1662,8 +1663,10 @@ TEST(TestIRac, Samsung) {
                28,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
                stdAc::swingv_t::kAuto,      // Vertical swing
+               stdAc::swingh_t::kAuto,      // Horizontal swing
                true,                        // Quiet
                false,                       // Turbo
+               false,                       // Econo
                true,                        // Light (Display)
                false,                       // Filter (Ion)
                true,                        // Clean
@@ -1688,8 +1691,10 @@ TEST(TestIRac, Samsung) {
                28,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
                stdAc::swingv_t::kAuto,      // Vertical swing
+               stdAc::swingh_t::kAuto,      // Horizontal swing
                true,                        // Quiet
                false,                       // Turbo
+               false,                       // Econo
                true,                        // Light (Display)
                false,                       // Filter (Ion)
                true,                        // Clean
@@ -1709,8 +1714,9 @@ TEST(TestIRac, Samsung) {
 
   ac._irsend.reset();
   const char sleep[] =
-      "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), Swing: On, "
-      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Breeze: Off, "
+      "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
+      "Swing(V): On, Swing(H): Off, "
+      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off, Sleep Timer: 08:00";
   irac.samsung(&ac,
                true,                        // Power
@@ -1718,8 +1724,10 @@ TEST(TestIRac, Samsung) {
                28,                          // Celsius
                stdAc::fanspeed_t::kMedium,  // Fan speed
                stdAc::swingv_t::kAuto,      // Vertical swing
+               stdAc::swingh_t::kOff,       // Horizontal swing
                true,                        // Quiet
                false,                       // Turbo
+               false,                       // Econo
                true,                        // Light (Display)
                false,                       // Filter (Ion)
                true,                        // Clean
