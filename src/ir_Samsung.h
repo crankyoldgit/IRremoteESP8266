@@ -92,11 +92,11 @@ union SamsungProtocol{
     uint8_t Mode  :3;
     uint8_t       :1;
     // Byte 13
-    uint8_t        :2;
-    uint8_t Beep   :1;
-    uint8_t        :1;
-    uint8_t Power2 :2;
-    uint8_t        :2;
+    uint8_t            :2;
+    uint8_t BeepToggle :1;
+    uint8_t            :1;
+    uint8_t Power2     :2;
+    uint8_t            :2;
   };
   struct {  // Extended message map
     // 1st Section

@@ -1823,7 +1823,7 @@ void IRac::panasonic32(IRPanasonicAc32 *ac,
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
-/// @param[in] beep Enable/Disable beeps when receiving IR messages.
+/// @param[in] beep Toggle beep setting for receiving IR messages.
 /// @param[in] sleep Nr. of minutes for sleep mode. <= 0 is Off, > 0 is on.
 /// @param[in] prevpower The power setting from the previous A/C state.
 /// @param[in] prevsleep Nr. of minutes for sleep from the previous A/C state.
@@ -1853,7 +1853,7 @@ void IRac::samsung(IRSamsungAc *ac,
   ac->setEcono(econo);
   ac->setIon(filter);
   ac->setClean(clean);
-  ac->setBeep(beep);
+  ac->setBeep(beep);  // Toggle
   ac->setSleepTimer((sleep <= 0) ? 0 : sleep);
   // No Clock setting available.
   // Do setMode() again as it can affect fan speed.
@@ -2524,6 +2524,9 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         // CKP models use a power mode toggle.
         if (desired.model == panasonic_ac_remote_model_t::kPanasonicCkp)
           result.power = desired.power ^ prev->power;
+        break;
+      case decode_type_t::SAMSUNG_AC:
+        result.beep = desired.beep ^ prev->beep;
         break;
       default:
         {};
