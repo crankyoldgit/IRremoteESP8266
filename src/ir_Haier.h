@@ -13,8 +13,10 @@
 //   Brand: Haier,  Model: HSU07-HEA03 remote (HAIER_AC)
 //   Brand: Haier,  Model: YR-W02 remote (HAIER_AC_YRW02)
 //   Brand: Haier,  Model: HSU-09HMC203 A/C (HAIER_AC_YRW02)
+//   Brand: Haier,  Model: V9014557 M47 8D remote (HAIER_AC176)
 //   Brand: Mabe,   Model: MMI18HDBWCA6MI8 A/C (HAIER_AC176)
 //   Brand: Mabe,   Model: V12843 HJ200223 remote (HAIER_AC176)
+//   Brand: Daichi, Model: D-H A/C (HAIER_AC176)
 
 #ifndef IR_HAIER_H_
 #define IR_HAIER_H_
