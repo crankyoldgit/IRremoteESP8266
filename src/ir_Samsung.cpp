@@ -79,6 +79,7 @@ using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::addToggleToString;
 using irutils::minsToString;
 
 #if SEND_SAMSUNG
@@ -590,17 +591,13 @@ void IRSamsungAc::setSwingH(const bool on) {
   }
 }
 
-/// Get the Beep setting of the A/C.
+/// Get the Beep toggle setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRSamsungAc::getBeep(void) const {
-  return _.Beep;
-}
+bool IRSamsungAc::getBeep(void) const { return _.BeepToggle; }
 
-/// Set the Beep setting of the A/C.
+/// Set the Beep toggle setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRSamsungAc::setBeep(const bool on) {
-  _.Beep = on;
-}
+void IRSamsungAc::setBeep(const bool on) { _.BeepToggle = on; }
 
 /// Get the Clean setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
@@ -886,7 +883,7 @@ stdAc::state_t IRSamsungAc::toCommon(void) const {
   result.turbo = getPowerful();
   result.econo = getEcono();
   result.clean = getClean();
-  result.beep = _.Beep;
+  result.beep = _.BeepToggle;
   result.light = _.Display;
   result.filter = _.Ion;
   result.sleep = _Sleep ? getSleepTimer() : -1;
@@ -931,7 +928,7 @@ String IRSamsungAc::toString(void) const {
   result += ')';
   result += addBoolToString(getSwing(), kSwingVStr);
   result += addBoolToString(getSwingH(), kSwingHStr);
-  result += addBoolToString(_.Beep, kBeepStr);
+  result += addToggleToString(_.BeepToggle, kBeepStr);
   result += addBoolToString(getClean(), kCleanStr);
   result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(getPowerful(), kPowerfulStr);

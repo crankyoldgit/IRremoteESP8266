@@ -1652,8 +1652,8 @@ TEST(TestIRac, Samsung) {
   IRrecv capture(kGpioUnused);
   const char expected[] =
       "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
-      "Swing(V): On, Swing(H): On, "
-      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
+      "Swing(V): On, Swing(H): On, Beep: Toggle, "
+      "Clean: On, Quiet: On, Powerful: Off, ""Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off";
 
   ac.begin();
@@ -1716,7 +1716,7 @@ TEST(TestIRac, Samsung) {
   const char sleep[] =
       "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
       "Swing(V): On, Swing(H): Off, "
-      "Beep: On, Clean: On, Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
+      "Beep: -, Clean: On, Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off, Sleep Timer: 08:00";
   irac.samsung(&ac,
                true,                        // Power
@@ -1731,7 +1731,7 @@ TEST(TestIRac, Samsung) {
                true,                        // Light (Display)
                false,                       // Filter (Ion)
                true,                        // Clean
-               true,                        // Beep
+               false,                       // Beep
                8 * 60,                      // Sleep
                true,                        // Previous power state
                -1,                          // Previous Sleep
