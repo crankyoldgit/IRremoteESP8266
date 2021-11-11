@@ -1114,6 +1114,7 @@ void IRac::haier(IRHaierAC *ac,
 #if SEND_HAIER_AC176
 /// Send a Haier 176 bit A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRHaierAC176 object to use.
+/// @param[in] model The A/C model to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
@@ -1125,7 +1126,7 @@ void IRac::haier(IRHaierAC *ac,
 /// @param[in] quiet Run the device in quiet mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
-void IRac::haier176(IRHaierAC176 *ac,
+void IRac::haier176(IRHaierAC176 *ac, const haier_ac176_remote_model_t model,
                     const bool on, const stdAc::opmode_t mode,
                     const bool celsius, const float degrees,
                     const stdAc::fanspeed_t fan,
@@ -1134,6 +1135,7 @@ void IRac::haier176(IRHaierAC176 *ac,
                     const bool turbo, const bool quiet, const bool filter,
                     const int16_t sleep) {
   ac->begin();
+  ac->setModel(model);
   ac->setMode(ac->convertMode(mode));
   ac->setUseFahrenheit(!celsius);
   ac->setTemp(degrees);
@@ -2792,9 +2794,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HAIER_AC176:
     {
       IRHaierAC176 ac(_pin, _inverted, _modulation);
-      haier176(&ac, send.power, send.mode, send.celsius, send.degrees,
-               send.fanspeed, send.swingv, send.swingh, send.turbo,
-               send.filter, send.sleep);
+      haier176(&ac, (haier_ac176_remote_model_t)send.model, send.power,
+               send.mode, send.celsius, send.degrees, send.fanspeed,
+               send.swingv, send.swingh, send.turbo, send.filter, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC176

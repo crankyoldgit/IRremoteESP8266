@@ -32,6 +32,7 @@ using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
+using irutils::addModelToString;
 using irutils::addSwingHToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
@@ -582,7 +583,7 @@ bool IRHaierAC176::validChecksum(const uint8_t state[], const uint16_t length) {
 /// Reset the internal state to a fixed known good state.
 void IRHaierAC176::stateReset(void) {
   std::memset(_.raw, 0, sizeof _.raw);
-  _.Prefix = kHaierAcYrw02Prefix;
+  _.Model = kHaierAcYrw02ModelA;
   _.Prefix2 = kHaierAc176Prefix;
   _.Temp = kHaierAcYrw02DefTempC - kHaierAcYrw02MinTempC;
   _.Health = true;
@@ -621,6 +622,27 @@ void IRHaierAC176::setButton(uint8_t button) {
     case kHaierAcYrw02ButtonLock:
     case kHaierAcYrw02ButtonCF:
       _.Button = button;
+  }
+}
+
+/// Get/Detect the model of the A/C.
+/// @return The enum of the compatible model.
+haier_ac176_remote_model_t IRHaierAC176::getModel(void) const {
+  switch (_.Model) {
+    case kHaierAcYrw02ModelB: return haier_ac176_remote_model_t::V9014557_B;
+    default:                  return haier_ac176_remote_model_t::V9014557_A;
+  }
+}
+
+/// Set the model of the A/C to emulate.
+/// @param[in] model The enum of the appropriate model.
+void IRHaierAC176::setModel(haier_ac176_remote_model_t model) {
+  switch (model) {
+    case haier_ac176_remote_model_t::V9014557_B:
+      _.Model = kHaierAcYrw02ModelB;
+      break;
+    default:
+      _.Model = kHaierAcYrw02ModelA;
   }
 }
 
@@ -1106,7 +1128,7 @@ stdAc::swingh_t IRHaierAC176::toCommonSwingH(const uint8_t pos) {
 stdAc::state_t IRHaierAC176::toCommon(void) const {
   stdAc::state_t result;
   result.protocol = decode_type_t::HAIER_AC_YRW02;
-  result.model = -1;  // No models used.
+  result.model = getModel();
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
   result.celsius = !_.UseFahrenheit;
@@ -1131,8 +1153,9 @@ stdAc::state_t IRHaierAC176::toCommon(void) const {
 /// @return A human readable string.
 String IRHaierAC176::toString(void) const {
   String result = "";
-  result.reserve(260);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(_.Power, kPowerStr, false);
+  result.reserve(280);  // Reserve some heap for the string to reduce fragging.
+  result += addModelToString(decode_type_t::HAIER_AC176, getModel(), false);
+  result += addBoolToString(_.Power, kPowerStr, true);
   uint8_t cmd = _.Button;
   result += addIntToString(cmd, kButtonStr);
   result += kSpaceLBraceStr;
@@ -1367,7 +1390,7 @@ bool IRrecv::decodeHaierACYRW02(decode_results* results, uint16_t offset,
 
   // Compliance
   if (strict) {
-    if (results->state[0] != kHaierAcYrw02Prefix) return false;
+    if (results->state[0] != kHaierAcYrw02ModelA) return false;
     if (!IRHaierACYRW02::validChecksum(results->state, nbits / 8)) return false;
   }
 
@@ -1400,7 +1423,8 @@ bool IRrecv::decodeHaierAC176(decode_results* results, uint16_t offset,
 
   // Compliance
   if (strict) {
-    if (results->state[0] != kHaierAcYrw02Prefix) return false;
+    if ((results->state[0] != kHaierAcYrw02ModelA) &&
+        (results->state[0] != kHaierAcYrw02ModelB)) return false;
     if (!IRHaierAC176::validChecksum(results->state, nbits / 8)) return false;
   }
 

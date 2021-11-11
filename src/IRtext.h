@@ -218,6 +218,8 @@ extern IRTEXT_CONST_PTR(kTypeStr);
 extern IRTEXT_CONST_PTR(kUnknownStr);
 extern IRTEXT_CONST_PTR(kUpperStr);
 extern IRTEXT_CONST_PTR(kUpStr);
+extern IRTEXT_CONST_PTR(kV9014557AStr);
+extern IRTEXT_CONST_PTR(kV9014557BStr);
 extern IRTEXT_CONST_PTR(kVaneStr);
 extern IRTEXT_CONST_PTR(kWallStr);
 extern IRTEXT_CONST_PTR(kWeeklyTimerStr);

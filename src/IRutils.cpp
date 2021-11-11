@@ -606,6 +606,16 @@ namespace irutils {
           default:                            return kUnknownStr;
         }
         break;
+      case decode_type_t::HAIER_AC176:
+        switch (model) {
+          case haier_ac176_remote_model_t::V9014557_A:
+            return kV9014557AStr;
+          case haier_ac176_remote_model_t::V9014557_B:
+            return kV9014557BStr;
+          default:
+            return kUnknownStr;
+        }
+        break;
       case decode_type_t::HITACHI_AC1:
         switch (model) {
           case hitachi_ac1_remote_model_t::R_LT0541_HTA_A:

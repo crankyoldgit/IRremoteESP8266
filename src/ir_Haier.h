@@ -139,7 +139,8 @@ const uint8_t kHaierAcYrw02MinTempF = 60;
 const uint8_t kHaierAcYrw02MaxTempF = 86;
 const uint8_t kHaierAcYrw02DefTempC = 25;
 
-const uint8_t kHaierAcYrw02Prefix = 0xA6;
+const uint8_t kHaierAcYrw02ModelA = 0xA6;
+const uint8_t kHaierAcYrw02ModelB = 0x59;
 const uint8_t kHaierAc176Prefix = 0xB7;
 
 const uint8_t kHaierAcYrw02SwingVOff = 0x0;
@@ -192,7 +193,7 @@ union HaierAc176Protocol{
   uint8_t raw[kHaierAC176StateLength];  ///< The state in native form
   struct {
     // Byte 0
-    uint8_t Prefix      :8;
+    uint8_t Model       :8;
     // Byte 1
     uint8_t SwingV      :4;
     uint8_t Temp        :4;  // 16C~30C
@@ -371,6 +372,9 @@ class IRHaierAC176 {
 #endif  // SEND_HAIER_AC176
   void begin(void);
   void stateReset(void);
+
+  void setModel(const haier_ac176_remote_model_t model);
+  haier_ac176_remote_model_t getModel(void) const;
 
   void setButton(const uint8_t button);
   uint8_t getButton(void) const;
