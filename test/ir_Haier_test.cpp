@@ -1236,6 +1236,7 @@ TEST(TestHaierACYRW02Class, toCommon) {
   ac.setSwingH(kHaierAcYrw02SwingHRightMax);
   ac.setHealth(true);
   ac.setSleep(true);
+  ac.setTurbo(true);
   // Now test it.
   ASSERT_EQ(decode_type_t::HAIER_AC_YRW02, ac.toCommon().protocol);
   ASSERT_EQ(-1, ac.toCommon().model);
@@ -1248,10 +1249,10 @@ TEST(TestHaierACYRW02Class, toCommon) {
   ASSERT_EQ(stdAc::swingv_t::kHighest, ac.toCommon().swingv);
   ASSERT_EQ(stdAc::swingh_t::kRightMax, ac.toCommon().swingh);
   ASSERT_EQ(0, ac.toCommon().sleep);
-  // Unsupported.
-  ASSERT_FALSE(ac.toCommon().turbo);
-  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_TRUE(ac.toCommon().turbo);
   ASSERT_FALSE(ac.toCommon().quiet);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().light);
   ASSERT_FALSE(ac.toCommon().econo);
   ASSERT_FALSE(ac.toCommon().clean);
   ASSERT_TRUE(ac.toCommon().beep);
