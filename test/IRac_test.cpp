@@ -1653,7 +1653,7 @@ TEST(TestIRac, Samsung) {
   const char expected[] =
       "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
       "Swing(V): On, Swing(H): On, Beep: Toggle, "
-      "Clean: On, Quiet: On, Powerful: Off, ""Econo: Off, Breeze: Off, "
+      "Clean: Toggle, Quiet: On, Powerful: Off, ""Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off";
 
   ac.begin();
@@ -1669,7 +1669,7 @@ TEST(TestIRac, Samsung) {
                false,                       // Econo
                true,                        // Light (Display)
                false,                       // Filter (Ion)
-               true,                        // Clean
+               true,                        // Clean (Toggle)
                true,                        // Beep
                -1,                          // Sleep
                true,                        // Previous power state
@@ -1697,7 +1697,7 @@ TEST(TestIRac, Samsung) {
                false,                       // Econo
                true,                        // Light (Display)
                false,                       // Filter (Ion)
-               true,                        // Clean
+               true,                        // Clean (Toggle)
                true,                        // Beep
                -1,                          // Sleep
                true,                        // Previous power state
@@ -1715,8 +1715,8 @@ TEST(TestIRac, Samsung) {
   ac._irsend.reset();
   const char sleep[] =
       "Power: On, Mode: 0 (Auto), Temp: 28C, Fan: 6 (Auto), "
-      "Swing(V): On, Swing(H): Off, "
-      "Beep: -, Clean: On, Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
+      "Swing(V): On, Swing(H): Off, Beep: -, Clean: Toggle, "
+      "Quiet: On, Powerful: Off, Econo: Off, Breeze: Off, "
       "Light: On, Ion: Off, Sleep Timer: 08:00";
   irac.samsung(&ac,
                true,                        // Power
@@ -1730,7 +1730,7 @@ TEST(TestIRac, Samsung) {
                false,                       // Econo
                true,                        // Light (Display)
                false,                       // Filter (Ion)
-               true,                        // Clean
+               true,                        // Clean (Toggle)
                false,                       // Beep
                8 * 60,                      // Sleep
                true,                        // Previous power state

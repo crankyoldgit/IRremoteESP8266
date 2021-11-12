@@ -1822,7 +1822,7 @@ void IRac::panasonic32(IRPanasonicAc32 *ac,
 /// @param[in] econo Run the device in economical mode.
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
-/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
+/// @param[in] clean Toggle the self-cleaning mode. e.g. Mould, dry filters etc
 /// @param[in] beep Toggle beep setting for receiving IR messages.
 /// @param[in] sleep Nr. of minutes for sleep mode. <= 0 is Off, > 0 is on.
 /// @param[in] prevpower The power setting from the previous A/C state.
@@ -1852,7 +1852,7 @@ void IRac::samsung(IRSamsungAc *ac,
   ac->setDisplay(light);
   ac->setEcono(econo);
   ac->setIon(filter);
-  ac->setClean(clean);
+  ac->setClean(clean);  // Toggle
   ac->setBeep(beep);  // Toggle
   ac->setSleepTimer((sleep <= 0) ? 0 : sleep);
   // No Clock setting available.
@@ -2527,6 +2527,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         break;
       case decode_type_t::SAMSUNG_AC:
         result.beep = desired.beep ^ prev->beep;
+        result.clean = desired.clean ^ prev->clean;
         break;
       default:
         {};

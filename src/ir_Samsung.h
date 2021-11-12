@@ -76,16 +76,16 @@ union SamsungProtocol{
     uint8_t Swing   :3;
     uint8_t         :1;
     // Byte 10
-    uint8_t            :1;
-    uint8_t FanSpecial :3;  // Powerful, Breeze/WindFree, Econo
-    uint8_t Display    :1;
-    uint8_t            :2;
-    uint8_t Clean10    :1;
+    uint8_t               :1;
+    uint8_t FanSpecial    :3;  // Powerful, Breeze/WindFree, Econo
+    uint8_t Display       :1;
+    uint8_t               :2;
+    uint8_t CleanToggle10 :1;
     // Byte 11
-    uint8_t Ion     :1;
-    uint8_t Clean11 :1;
-    uint8_t         :2;
-    uint8_t Temp    :4;
+    uint8_t Ion           :1;
+    uint8_t CleanToggle11 :1;
+    uint8_t               :2;
+    uint8_t Temp          :4;
     // Byte 12
     uint8_t       :1;
     uint8_t Fan   :3;
