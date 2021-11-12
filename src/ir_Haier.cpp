@@ -1155,7 +1155,7 @@ String IRHaierAC176::toString(void) const {
   String result = "";
   result.reserve(280);  // Reserve some heap for the string to reduce fragging.
   result += addModelToString(decode_type_t::HAIER_AC176, getModel(), false);
-  result += addBoolToString(_.Power, kPowerStr, true);
+  result += addBoolToString(_.Power, kPowerStr);
   uint8_t cmd = _.Button;
   result += addIntToString(cmd, kButtonStr);
   result += kSpaceLBraceStr;

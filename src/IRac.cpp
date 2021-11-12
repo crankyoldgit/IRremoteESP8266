@@ -3315,12 +3315,18 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
 /// @param[in] str A Ptr to a C-style string to be converted.
 /// @param[in] def The enum to return if no conversion was possible.
 /// @return The equivalent enum.
+/// @note After adding a new model you should update modelToStr() too.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
   // Gree
   if (!STRCASECMP(str, kYaw1fStr)) {
     return gree_ac_remote_model_t::YAW1F;
   } else if (!STRCASECMP(str, kYbofbStr)) {
     return gree_ac_remote_model_t::YBOFB;
+  // Haier models
+  } else if (!STRCASECMP(str, kV9014557AStr)) {
+    return haier_ac176_remote_model_t::V9014557_A;
+  } else if (!STRCASECMP(str, kV9014557BStr)) {
+    return haier_ac176_remote_model_t::V9014557_B;
   // HitachiAc1 models
   } else if (!STRCASECMP(str, kRlt0541htaaStr)) {
     return hitachi_ac1_remote_model_t::R_LT0541_HTA_A;
