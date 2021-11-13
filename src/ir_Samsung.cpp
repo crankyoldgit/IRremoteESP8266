@@ -644,9 +644,6 @@ void IRSamsungAc::setPowerful(const bool on) {
     // Powerful mode sets fan speed to Turbo.
     setFan(kSamsungAcFanTurbo);
     setQuiet(false);  // Powerful 'on' is mutually exclusive to Quiet.
-  } else {
-    // Turning off Powerful mode sets fan speed to Auto if we were in Turbo mode
-    if (_.Fan == kSamsungAcFanTurbo) setFan(kSamsungAcFanAuto);
   }
 }
 
