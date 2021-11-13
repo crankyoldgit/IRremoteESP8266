@@ -597,7 +597,6 @@ TEST(TestIRSamsungAcClass, SetAndGetPowerful) {
   EXPECT_EQ(kSamsungAcFanTurbo, ac.getFan());
   ac.setPowerful(false);
   EXPECT_FALSE(ac.getPowerful());
-  EXPECT_EQ(kSamsungAcFanAuto, ac.getFan());
 
   // Breeze, Econo, and Powerful/Turbo are mutually exclusive.
   ac.setPowerful(true);
