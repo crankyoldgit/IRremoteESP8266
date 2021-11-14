@@ -793,23 +793,24 @@ TEST(TestIRac, Haier176) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   const char expected[] =
-      "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
-      "Fan: 2 (Medium), Turbo: On, Quiet: Off, Swing(V): 1 (Highest), "
-      "Swing(H): 0 (Middle), Sleep: On, Health: On, "
+      "Model: 1 (V9014557-A), Power: On, Button: 5 (Power), "
+      "Mode: 1 (Cool), Temp: 23C, Fan: 2 (Medium), Turbo: On, Quiet: Off, "
+      "Swing(V): 1 (Highest), Swing(H): 0 (Middle), Sleep: On, Health: On, "
       "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off";
   ac.begin();
   irac.haier176(&ac,
-                true,                        // Power
-                stdAc::opmode_t::kCool,      // Mode
-                true,                        // Celsius
-                23,                          // Degrees
-                stdAc::fanspeed_t::kMedium,  // Fan speed
-                stdAc::swingv_t::kHigh,      // Vertical swing
-                stdAc::swingh_t::kOff,       // Horizontal swing
-                true,                        // Turbo
-                false,                       // Quiet
-                true,                        // Filter
-                8 * 60 + 0);                 // Sleep time
+                haier_ac176_remote_model_t::V9014557_A,  // Model
+                true,                                    // Power
+                stdAc::opmode_t::kCool,                  // Mode
+                true,                                    // Celsius
+                23,                                      // Degrees
+                stdAc::fanspeed_t::kMedium,              // Fan speed
+                stdAc::swingv_t::kHigh,                  // Vertical swing
+                stdAc::swingh_t::kOff,                   // Horizontal swing
+                true,                                    // Turbo
+                false,                                   // Quiet
+                true,                                    // Filter
+                8 * 60 + 0);                             // Sleep time
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
@@ -825,9 +826,9 @@ TEST(TestIRac, HaierYrwo2) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
-      "Fan: 2 (Medium), Turbo: Off, Quiet: On, Swing(V): 1 (Highest), "
-      "Swing(H): 7 (Auto), Sleep: On, Health: On, "
+      "Model: 1 (V9014557-A), Power: On, Button: 5 (Power), "
+      "Mode: 1 (Cool), Temp: 23C, Fan: 2 (Medium), Turbo: Off, Quiet: On, "
+      "Swing(V): 1 (Highest), Swing(H): 7 (Auto), Sleep: On, Health: On, "
       "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off";
 
   ac.begin();

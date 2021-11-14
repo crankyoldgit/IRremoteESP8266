@@ -586,6 +586,7 @@ namespace irutils {
   /// @param[in] protocol The IR protocol.
   /// @param[in] model The model number for that protocol.
   /// @return The resulting String.
+  /// @note After adding a new model you should update IRac::strToModel() too.
   String modelToStr(const decode_type_t protocol, const int16_t model) {
     switch (protocol) {
       case decode_type_t::FUJITSU_AC:
@@ -604,6 +605,16 @@ namespace irutils {
           case gree_ac_remote_model_t::YAW1F: return kYaw1fStr;
           case gree_ac_remote_model_t::YBOFB: return kYbofbStr;
           default:                            return kUnknownStr;
+        }
+        break;
+      case decode_type_t::HAIER_AC176:
+        switch (model) {
+          case haier_ac176_remote_model_t::V9014557_A:
+            return kV9014557AStr;
+          case haier_ac176_remote_model_t::V9014557_B:
+            return kV9014557BStr;
+          default:
+            return kUnknownStr;
         }
         break;
       case decode_type_t::HITACHI_AC1:

@@ -1114,6 +1114,7 @@ void IRac::haier(IRHaierAC *ac,
 #if SEND_HAIER_AC176
 /// Send a Haier 176 bit A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRHaierAC176 object to use.
+/// @param[in] model The A/C model to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
@@ -1125,7 +1126,7 @@ void IRac::haier(IRHaierAC *ac,
 /// @param[in] quiet Run the device in quiet mode.
 /// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
-void IRac::haier176(IRHaierAC176 *ac,
+void IRac::haier176(IRHaierAC176 *ac, const haier_ac176_remote_model_t model,
                     const bool on, const stdAc::opmode_t mode,
                     const bool celsius, const float degrees,
                     const stdAc::fanspeed_t fan,
@@ -1134,6 +1135,7 @@ void IRac::haier176(IRHaierAC176 *ac,
                     const bool turbo, const bool quiet, const bool filter,
                     const int16_t sleep) {
   ac->begin();
+  ac->setModel(model);
   ac->setMode(ac->convertMode(mode));
   ac->setUseFahrenheit(!celsius);
   ac->setTemp(degrees);
@@ -2795,9 +2797,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case HAIER_AC176:
     {
       IRHaierAC176 ac(_pin, _inverted, _modulation);
-      haier176(&ac, send.power, send.mode, send.celsius, send.degrees,
-               send.fanspeed, send.swingv, send.swingh, send.turbo,
-               send.filter, send.sleep);
+      haier176(&ac, (haier_ac176_remote_model_t)send.model, send.power,
+               send.mode, send.celsius, send.degrees, send.fanspeed,
+               send.swingv, send.swingh, send.turbo, send.filter, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC176
@@ -3316,12 +3318,18 @@ stdAc::swingh_t IRac::strToSwingH(const char *str,
 /// @param[in] str A Ptr to a C-style string to be converted.
 /// @param[in] def The enum to return if no conversion was possible.
 /// @return The equivalent enum.
+/// @note After adding a new model you should update modelToStr() too.
 int16_t IRac::strToModel(const char *str, const int16_t def) {
   // Gree
   if (!STRCASECMP(str, kYaw1fStr)) {
     return gree_ac_remote_model_t::YAW1F;
   } else if (!STRCASECMP(str, kYbofbStr)) {
     return gree_ac_remote_model_t::YBOFB;
+  // Haier models
+  } else if (!STRCASECMP(str, kV9014557AStr)) {
+    return haier_ac176_remote_model_t::V9014557_A;
+  } else if (!STRCASECMP(str, kV9014557BStr)) {
+    return haier_ac176_remote_model_t::V9014557_B;
   // HitachiAc1 models
   } else if (!STRCASECMP(str, kRlt0541htaaStr)) {
     return hitachi_ac1_remote_model_t::R_LT0541_HTA_A;
