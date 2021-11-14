@@ -66,6 +66,9 @@
 #ifndef D_STR_ECONO
 #define D_STR_ECONO "Econo"
 #endif  // D_STR_ECONO
+#ifndef D_STR_ECOCOOL
+#define D_STR_ECOCOOL "Ecocool"
+#endif  // D_STR_ECOCOOL
 #ifndef D_STR_SWING
 #define D_STR_SWING "Swing"
 #endif  // D_STR_SWING
@@ -120,6 +123,9 @@
 #ifndef D_STR_IFEEL
 #define D_STR_IFEEL "IFeel"
 #endif  // D_STR_IFEEL
+#ifndef D_STR_ISEE
+#define D_STR_ISEE "ISee"
+#endif  // D_STR_ISEE
 #ifndef D_STR_HUMID
 #define D_STR_HUMID "Humid"
 #endif  // D_STR_HUMID
@@ -207,6 +213,18 @@
 #ifndef D_STR_SENSOR
 #define D_STR_SENSOR "Sensor"
 #endif  // D_STR_SENSOR
+#ifndef D_STR_ABSENSEDETECT
+#define D_STR_ABSENSEDETECT "Absense detect"
+#endif  // D_STR_ABSENSEDETECT
+#ifndef D_STR_DIRECTINDIRECTMODE
+#define D_STR_DIRECTINDIRECTMODE "Direct / Indirect mode"
+#endif  // D_STR_DIRECTINDIRECTMODE
+#ifndef D_STR_DIRECT
+#define D_STR_DIRECT "Direct"
+#endif  // D_STR_DIRECT
+#ifndef D_STR_INDIRECT
+#define D_STR_INDIRECT "Indirect"
+#endif  // D_STR_INDIRECT
 #ifndef D_STR_DISPLAY
 #define D_STR_DISPLAY "Display"
 #endif  // D_STR_DISPLAY
@@ -231,6 +249,9 @@
 #ifndef D_STR_AIRFLOW
 #define D_STR_AIRFLOW "Air Flow"
 #endif  // D_STR_AIRFLOW
+#ifndef D_STR_NATURALFLOW
+#define D_STR_NATURALFLOW "Natural Flow"
+#endif  // D_STR_NATURALFLOW
 #ifndef D_STR_STEP
 #define D_STR_STEP "Step"
 #endif  // D_STR_STEP
