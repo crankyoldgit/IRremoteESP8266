@@ -541,7 +541,7 @@ TEST(TestHaierACYRW02Class, Temperature) {
   EXPECT_EQ(78, ac.getTemp());
 
   ac.setTemp(24);
-  EXPECT_EQ(kHaierAcYrw02ButtonCF, ac.getButton());
+  EXPECT_EQ(kHaierAcYrw02ButtonCFAB, ac.getButton());
 
   ac.setTemp(0);
   EXPECT_EQ(kHaierAcYrw02MinTempC, ac.getTemp());
@@ -1514,12 +1514,12 @@ TEST(TestHaierAC176Class, Models) {
   ac.setButton(kHaierAcYrw02ButtonTempUp);
   ac.setModel(haier_ac176_remote_model_t::V9014557_B);
   EXPECT_EQ(haier_ac176_remote_model_t::V9014557_B, ac.getModel());
-  EXPECT_EQ(kHaierAcYrw02ButtonCF, ac.getButton());
+  EXPECT_EQ(kHaierAcYrw02ButtonCFAB, ac.getButton());
 
   ac.setButton(kHaierAcYrw02ButtonTempDown);
   ac.setModel(haier_ac176_remote_model_t::V9014557_A);
   EXPECT_EQ(haier_ac176_remote_model_t::V9014557_A, ac.getModel());
-  EXPECT_EQ(kHaierAcYrw02ButtonCF, ac.getButton());
+  EXPECT_EQ(kHaierAcYrw02ButtonCFAB, ac.getButton());
 
   // Real data.
   const uint8_t setmodelb[kHaierAC176StateLength] = {

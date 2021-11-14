@@ -620,7 +620,7 @@ void IRHaierAC176::setButton(uint8_t button) {
     case kHaierAcYrw02ButtonTurbo:
     case kHaierAcYrw02ButtonSleep:
     case kHaierAcYrw02ButtonLock:
-    case kHaierAcYrw02ButtonCF:
+    case kHaierAcYrw02ButtonCFAB:
       _.Button = button;
   }
 }
@@ -637,7 +637,7 @@ haier_ac176_remote_model_t IRHaierAC176::getModel(void) const {
 /// Set the model of the A/C to emulate.
 /// @param[in] model The enum of the appropriate model.
 void IRHaierAC176::setModel(haier_ac176_remote_model_t model) {
-  _.Button = kHaierAcYrw02ButtonCF;
+  _.Button = kHaierAcYrw02ButtonCFAB;
   switch (model) {
     case haier_ac176_remote_model_t::V9014557_B:
       _.Model = kHaierAcYrw02ModelB;
@@ -700,7 +700,7 @@ void IRHaierAC176::setTemp(const uint8_t degree, const bool fahrenheit) {
     else
       _.Button = kHaierAcYrw02ButtonTempUp;
   } else {
-      _.Button = kHaierAcYrw02ButtonCF;
+      _.Button = kHaierAcYrw02ButtonCFAB;
   }
   _.UseFahrenheit = fahrenheit;
 
@@ -1197,7 +1197,7 @@ String IRHaierAC176::toString(void) const {
     case kHaierAcYrw02ButtonLock:
       result += kLockStr;
       break;
-    case kHaierAcYrw02ButtonCF:
+    case kHaierAcYrw02ButtonCFAB:
       result += kCelsiusFahrenheitStr;
       break;
     default:
