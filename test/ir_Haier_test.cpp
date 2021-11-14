@@ -1505,3 +1505,32 @@ TEST(TestHaierAC176Class, Timers) {
       "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off",
       ac.toString());
 }
+
+TEST(TestHaierAC176Class, Models) {
+  IRHaierAC176 ac(kGpioUnused);
+  ac.begin();
+  EXPECT_EQ(haier_ac176_remote_model_t::V9014557_A, ac.getModel());
+
+  ac.setButton(kHaierAcYrw02ButtonTempUp);
+  ac.setModel(haier_ac176_remote_model_t::V9014557_B);
+  EXPECT_EQ(haier_ac176_remote_model_t::V9014557_B, ac.getModel());
+  EXPECT_EQ(kHaierAcYrw02ButtonCF, ac.getButton());
+
+  ac.setButton(kHaierAcYrw02ButtonTempDown);
+  ac.setModel(haier_ac176_remote_model_t::V9014557_A);
+  EXPECT_EQ(haier_ac176_remote_model_t::V9014557_A, ac.getModel());
+  EXPECT_EQ(kHaierAcYrw02ButtonCF, ac.getButton());
+
+  // Real data.
+  const uint8_t setmodelb[kHaierAC176StateLength] = {
+      0x59, 0x82, 0x00, 0x00, 0x40, 0x60, 0x00, 0xC0, 0x00, 0x00, 0x00,
+      0x00, 0x1A, 0x55, 0xB7, 0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x77};
+  ac.setRaw(setmodelb);
+  EXPECT_EQ(haier_ac176_remote_model_t::V9014557_B, ac.getModel());
+  EXPECT_EQ(
+      "Model: 2 (V9014557-B), Power: On, Button: 26 (Celsius/Fahrenheit), "
+      "Mode: 6 (Fan), Temp: 24C, Fan: 3 (Low), Turbo: Off, Quiet: Off, "
+      "Swing(V): 2 (Middle), Swing(H): 0 (Middle), Sleep: Off, Health: Off, "
+      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off",
+      ac.toString());
+}

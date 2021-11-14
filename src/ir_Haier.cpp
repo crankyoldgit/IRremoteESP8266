@@ -637,6 +637,7 @@ haier_ac176_remote_model_t IRHaierAC176::getModel(void) const {
 /// Set the model of the A/C to emulate.
 /// @param[in] model The enum of the appropriate model.
 void IRHaierAC176::setModel(haier_ac176_remote_model_t model) {
+  _.Button = kHaierAcYrw02ButtonCF;
   switch (model) {
     case haier_ac176_remote_model_t::V9014557_B:
       _.Model = kHaierAcYrw02ModelB;
