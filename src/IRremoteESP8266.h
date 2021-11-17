@@ -798,11 +798,18 @@
 #endif  // SEND_ARRIS
 
 #ifndef DECODE_RHOSS
-#define DECODE_RHOSS         _IR_ENABLE_DEFAULT_
+#define DECODE_RHOSS        _IR_ENABLE_DEFAULT_
 #endif  // DECODE_RHOSS
 #ifndef SEND_RHOSS
-#define SEND_RHOSS           _IR_ENABLE_DEFAULT_
+#define SEND_RHOSS          _IR_ENABLE_DEFAULT_
 #endif  // SEND_RHOSS
+
+#ifndef DECODE_AIRTON
+#define DECODE_AIRTON       _IR_ENABLE_DEFAULT_
+#endif  // DECODE_AIRTON
+#ifndef SEND_AIRTON
+#define SEND_AIRTON         _IR_ENABLE_DEFAULT_
+#endif  // SEND_AIRTON
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
@@ -967,14 +974,17 @@ enum decode_type_t {
   BOSE,
   ARRIS,
   RHOSS,
+  AIRTON,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = RHOSS,
+  kLastDecodeType = AIRTON,
 };
 
 // Message lengths & required repeat values
 const uint16_t kNoRepeat = 0;
 const uint16_t kSingleRepeat = 1;
 
+const uint16_t kAirtonBits = 56;
+const uint16_t kAirtonDefaultRepeat = kNoRepeat;
 const uint16_t kAirwellBits = 34;
 const uint16_t kAirwellMinRepeats = 2;
 const uint16_t kAiwaRcT501Bits = 15;

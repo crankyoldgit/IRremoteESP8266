@@ -774,6 +774,11 @@ class IRrecv {
   bool decodeRhoss(decode_results *results, uint16_t offset = kStartOffset,
                    const uint16_t nbits = kRhossBits, const bool strict = true);
 #endif  // DECODE_RHOSS
+#if DECODE_AIRTON
+  bool decodeAirton(decode_results *results, uint16_t offset = kStartOffset,
+                    const uint16_t nbits = kAirtonBits,
+                    const bool strict = true);
+#endif  // DECODE_AIRTON
 };
 
 #endif  // IRRECV_H_
