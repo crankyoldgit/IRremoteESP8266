@@ -669,6 +669,9 @@
 #endif  // D_STR_DG11J191
 
 // Protocols Names
+#ifndef D_STR_AIRTON
+#define D_STR_AIRTON "AIRTON"
+#endif  // D_STR_AIRTON
 #ifndef D_STR_AIRWELL
 #define D_STR_AIRWELL "AIRWELL"
 #endif  // D_STR_AIRWELL

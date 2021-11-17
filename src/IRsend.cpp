@@ -666,6 +666,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case MIDEA:
     case PANASONIC:
       return 48;
+    case AIRTON:
     case ECOCLIM:
     case MAGIQUEST:
     case VESTEL_AC:
@@ -784,6 +785,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
   uint16_t min_repeat __attribute__((unused)) =
       std::max(IRsend::minRepeats(type), repeat);
   switch (type) {
+#if SEND_AIRTON
+    case AIRTON:
+      sendAirton(data, nbits, min_repeat);
+      break;
+#endif  // SEND_AIRTON
 #if SEND_AIRWELL
     case AIRWELL:
       sendAirwell(data, nbits, min_repeat);

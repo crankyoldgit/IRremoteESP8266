@@ -766,6 +766,10 @@ class IRsend {
                  const uint16_t nbytes = kRhossStateLength,
                  const uint16_t repeat = kRhossDefaultRepeat);
 #endif  // SEND_RHOSS
+#if SEND_AIRTON
+  void sendAirton(const uint64_t data, const uint16_t nbits = kAirtonBits,
+                  const uint16_t repeat = kAirtonDefaultRepeat);
+#endif  // SEND_AIRTON
 
  protected:
 #ifdef UNIT_TEST
