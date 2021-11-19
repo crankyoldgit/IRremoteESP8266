@@ -21,7 +21,7 @@ const uint16_t kAirtonFreq = 38000;  // Hz. (Just a guess)
 #if SEND_AIRTON
 // Function should be safe up to 64 bits.
 /// Send a Airton formatted message.
-/// Status: BETA / Probably works. Needs to be tested with a real device.
+/// Status: STABLE / Confirmed working.
 /// @param[in] data containing the IR command.
 /// @param[in] nbits Nr. of bits to send. usually kAirtonBits
 /// @param[in] repeat Nr. of times the message is to be repeated.
@@ -37,7 +37,7 @@ void IRsend::sendAirton(const uint64_t data, const uint16_t nbits,
 
 #if DECODE_AIRTON
 /// Decode the supplied Airton message.
-/// Status: STABLE / Expected to work. LSBF ordering confirmed via temperature.
+/// Status: STABLE / Confirmed working. LSBF ordering confirmed via temperature.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
