@@ -79,6 +79,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a12ba9cf1830a886649a80c3cc5fdce2b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#a12ba9cf1830a886649a80c3cc5fdce2b">addBoolToString</a> (const bool value, const <a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a> label, const bool precomma)</td></tr>
 <tr class="memdesc:a12ba9cf1830a886649a80c3cc5fdce2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a String with a colon separated flag suitable for Humans. e.g. "Power: On".  <a href="namespaceirutils.html#a12ba9cf1830a886649a80c3cc5fdce2b">More...</a><br /></td></tr>
 <tr class="separator:a12ba9cf1830a886649a80c3cc5fdce2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68dee7bc57c52919bc77df0c886a8b71"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#a68dee7bc57c52919bc77df0c886a8b71">addToggleToString</a> (const bool toggle, const <a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a> label, const bool precomma)</td></tr>
+<tr class="memdesc:a68dee7bc57c52919bc77df0c886a8b71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a String with a colon separated toggle flag suitable for Humans. e.g. "Light: Toggle", "Light: -".  <a href="namespaceirutils.html#a68dee7bc57c52919bc77df0c886a8b71">More...</a><br /></td></tr>
+<tr class="separator:a68dee7bc57c52919bc77df0c886a8b71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a772e623c4b60208200e02afbaec66651"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#a772e623c4b60208200e02afbaec66651">addIntToString</a> (const uint16_t value, const <a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a> label, const bool precomma)</td></tr>
 <tr class="memdesc:a772e623c4b60208200e02afbaec66651"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a String with a colon separated labeled Integer suitable for Humans. e.g. "Foo: 23".  <a href="namespaceirutils.html#a772e623c4b60208200e02afbaec66651">More...</a><br /></td></tr>
 <tr class="separator:a772e623c4b60208200e02afbaec66651"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -898,6 +901,51 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a68dee7bc57c52919bc77df0c886a8b71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68dee7bc57c52919bc77df0c886a8b71">&#9670;&nbsp;</a></span>addToggleToString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a> irutils::addToggleToString </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>toggle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td>
+          <td class="paramname"><em>label</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>precomma</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a String with a colon separated toggle flag suitable for Humans. e.g. "Light: Toggle", "Light: -". </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">toggle</td><td>The value of the toggle to come after the label. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">label</td><td>The label to precede the value. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">precomma</td><td>Should the output string start with ", " or not? </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The resulting String. </dd></dl>
+
+</div>
+</div>
 <a id="af18c4abfd0ed9f4b3a099ecec1999ee7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af18c4abfd0ed9f4b3a099ecec1999ee7">&#9670;&nbsp;</a></span>bcdToUint8()</h2>
 
@@ -1196,6 +1244,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The resulting String. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>After adding a new model you should update <a class="el" href="classIRac.html#a7036fbbb918d644a98b5efa16374a256" title="Convert the supplied str into the appropriate enum.">IRac::strToModel()</a> too. </dd></dl>
 
 </div>
 </div>

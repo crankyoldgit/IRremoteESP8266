@@ -1,12 +1,8 @@
 var searchData=
 [
-  ['tcl112protocol_3937',['Tcl112Protocol',['../unionTcl112Protocol.html',1,'']]],
-  ['technibelprotocol_3938',['TechnibelProtocol',['../unionTechnibelProtocol.html',1,'']]],
-  ['tecoprotocol_3939',['TecoProtocol',['../unionTecoProtocol.html',1,'']]],
-  ['timerms_3940',['TimerMs',['../classTimerMs.html',1,'']]],
-  ['toshibaprotocol_3941',['ToshibaProtocol',['../unionToshibaProtocol.html',1,'']]],
-  ['transcoldprotocol_3942',['TranscoldProtocol',['../unionTranscoldProtocol.html',1,'']]],
-  ['trotec3550protocol_3943',['Trotec3550Protocol',['../unionTrotec3550Protocol.html',1,'']]],
-  ['trotecprotocol_3944',['TrotecProtocol',['../unionTrotecProtocol.html',1,'']]],
-  ['trumaprotocol_3945',['TrumaProtocol',['../unionTrumaProtocol.html',1,'']]]
+  ['samsungprotocol_3984',['SamsungProtocol',['../unionSamsungProtocol.html',1,'']]],
+  ['sanyoac88protocol_3985',['SanyoAc88Protocol',['../unionSanyoAc88Protocol.html',1,'']]],
+  ['sanyoprotocol_3986',['SanyoProtocol',['../unionSanyoProtocol.html',1,'']]],
+  ['sharpprotocol_3987',['SharpProtocol',['../unionSharpProtocol.html',1,'']]],
+  ['state_5ft_3988',['state_t',['../structstdAc_1_1state__t.html',1,'stdAc']]]
 ];
