@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['panasonic_5fac_5fremote_5fmodel_5ft_7588',['panasonic_ac_remote_model_t',['../IRsend_8h.html#a1b797a5e5176ac0eef49810bf7f40e6f',1,'IRsend.h']]]
+  ['opmode_5ft_7680',['opmode_t',['../namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f',1,'stdAc']]]
 ];

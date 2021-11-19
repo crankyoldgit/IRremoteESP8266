@@ -110,6 +110,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5b0994f37df6846137b564eeb322f21b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a5b0994f37df6846137b564eeb322f21b">setRaw</a> (const uint8_t new_code[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#a23ba2f5af02242e14ae7eefcd066152e">kTcl112AcStateLength</a>)</td></tr>
 <tr class="memdesc:a5b0994f37df6846137b564eeb322f21b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRTcl112Ac.html#a5b0994f37df6846137b564eeb322f21b">More...</a><br /></td></tr>
 <tr class="separator:a5b0994f37df6846137b564eeb322f21b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad13fe14c6ce0b9a64b87d0e6939e7657"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRsend_8h.html#a3a3ca37af46bf2f69ec66fef91b5115f">tcl_ac_remote_model_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#ad13fe14c6ce0b9a64b87d0e6939e7657">getModel</a> (void) const</td></tr>
+<tr class="memdesc:ad13fe14c6ce0b9a64b87d0e6939e7657"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get/Detect the model of the A/C.  <a href="classIRTcl112Ac.html#ad13fe14c6ce0b9a64b87d0e6939e7657">More...</a><br /></td></tr>
+<tr class="separator:ad13fe14c6ce0b9a64b87d0e6939e7657"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36d618f6a8a695b4ad7a3b4d2c3ddb82"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a36d618f6a8a695b4ad7a3b4d2c3ddb82">setModel</a> (const <a class="el" href="IRsend_8h.html#a3a3ca37af46bf2f69ec66fef91b5115f">tcl_ac_remote_model_t</a> model)</td></tr>
+<tr class="memdesc:a36d618f6a8a695b4ad7a3b4d2c3ddb82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the model of the A/C to emulate.  <a href="classIRTcl112Ac.html#a36d618f6a8a695b4ad7a3b4d2c3ddb82">More...</a><br /></td></tr>
+<tr class="separator:a36d618f6a8a695b4ad7a3b4d2c3ddb82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bbf7f0b9753b516fda0544c17b15b8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a0bbf7f0b9753b516fda0544c17b15b8a">on</a> (void)</td></tr>
 <tr class="memdesc:a0bbf7f0b9753b516fda0544c17b15b8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the requested power state of the A/C to on.  <a href="classIRTcl112Ac.html#a0bbf7f0b9753b516fda0544c17b15b8a">More...</a><br /></td></tr>
 <tr class="separator:a0bbf7f0b9753b516fda0544c17b15b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -164,12 +170,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa39f0f91e6a59477c914189817ae5518"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#aa39f0f91e6a59477c914189817ae5518">getSwingHorizontal</a> (void) const</td></tr>
 <tr class="memdesc:aa39f0f91e6a59477c914189817ae5518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the horizontal swing setting of the A/C.  <a href="classIRTcl112Ac.html#aa39f0f91e6a59477c914189817ae5518">More...</a><br /></td></tr>
 <tr class="separator:aa39f0f91e6a59477c914189817ae5518"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53f702dcc66de81f6e7e03d538a6946d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a53f702dcc66de81f6e7e03d538a6946d">setSwingVertical</a> (const bool <a class="el" href="classIRTcl112Ac.html#a0bbf7f0b9753b516fda0544c17b15b8a">on</a>)</td></tr>
-<tr class="memdesc:a53f702dcc66de81f6e7e03d538a6946d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the vertical swing setting of the A/C.  <a href="classIRTcl112Ac.html#a53f702dcc66de81f6e7e03d538a6946d">More...</a><br /></td></tr>
-<tr class="separator:a53f702dcc66de81f6e7e03d538a6946d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac997659c2ab82cfa1bf8eaa11fc0efc1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#ac997659c2ab82cfa1bf8eaa11fc0efc1">getSwingVertical</a> (void) const</td></tr>
-<tr class="memdesc:ac997659c2ab82cfa1bf8eaa11fc0efc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vertical swing setting of the A/C.  <a href="classIRTcl112Ac.html#ac997659c2ab82cfa1bf8eaa11fc0efc1">More...</a><br /></td></tr>
-<tr class="separator:ac997659c2ab82cfa1bf8eaa11fc0efc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd9ffbbbb7de4dbda8f9c023e3f263a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#afd9ffbbbb7de4dbda8f9c023e3f263a8">setSwingVertical</a> (const uint8_t setting)</td></tr>
+<tr class="memdesc:afd9ffbbbb7de4dbda8f9c023e3f263a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the vertical swing setting of the A/C.  <a href="classIRTcl112Ac.html#afd9ffbbbb7de4dbda8f9c023e3f263a8">More...</a><br /></td></tr>
+<tr class="separator:afd9ffbbbb7de4dbda8f9c023e3f263a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ab8cfeceddf98e427ae4d15342b1a68"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a8ab8cfeceddf98e427ae4d15342b1a68">getSwingVertical</a> (void) const</td></tr>
+<tr class="memdesc:a8ab8cfeceddf98e427ae4d15342b1a68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vertical swing setting of the A/C.  <a href="classIRTcl112Ac.html#a8ab8cfeceddf98e427ae4d15342b1a68">More...</a><br /></td></tr>
+<tr class="separator:a8ab8cfeceddf98e427ae4d15342b1a68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99e3b3e2f0cc627b6d872d04b35d6230"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a99e3b3e2f0cc627b6d872d04b35d6230">setTurbo</a> (const bool <a class="el" href="classIRTcl112Ac.html#a0bbf7f0b9753b516fda0544c17b15b8a">on</a>)</td></tr>
 <tr class="memdesc:a99e3b3e2f0cc627b6d872d04b35d6230"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Turbo setting of the A/C.  <a href="classIRTcl112Ac.html#a99e3b3e2f0cc627b6d872d04b35d6230">More...</a><br /></td></tr>
 <tr class="separator:a99e3b3e2f0cc627b6d872d04b35d6230"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,6 +188,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8fba373363f2422c855edda8578a97d1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a8fba373363f2422c855edda8578a97d1">getQuiet</a> (const bool def=false) const</td></tr>
 <tr class="memdesc:a8fba373363f2422c855edda8578a97d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Quiet setting of the A/C.  <a href="classIRTcl112Ac.html#a8fba373363f2422c855edda8578a97d1">More...</a><br /></td></tr>
 <tr class="separator:a8fba373363f2422c855edda8578a97d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15ecd741098cfa6caa4d12a427734f2c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a15ecd741098cfa6caa4d12a427734f2c">getOnTimer</a> (void) const</td></tr>
+<tr class="memdesc:a15ecd741098cfa6caa4d12a427734f2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get how long the On Timer is set for, in minutes.  <a href="classIRTcl112Ac.html#a15ecd741098cfa6caa4d12a427734f2c">More...</a><br /></td></tr>
+<tr class="separator:a15ecd741098cfa6caa4d12a427734f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a757c07a38c2236ce5c9b5f23a71a4b15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a757c07a38c2236ce5c9b5f23a71a4b15">setOnTimer</a> (const uint16_t mins)</td></tr>
+<tr class="memdesc:a757c07a38c2236ce5c9b5f23a71a4b15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set or cancel the On Timer function.  <a href="classIRTcl112Ac.html#a757c07a38c2236ce5c9b5f23a71a4b15">More...</a><br /></td></tr>
+<tr class="separator:a757c07a38c2236ce5c9b5f23a71a4b15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad483ed47bf7932158e264dcc97b401af"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#ad483ed47bf7932158e264dcc97b401af">getOffTimer</a> (void) const</td></tr>
+<tr class="memdesc:ad483ed47bf7932158e264dcc97b401af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get how long the Off Timer is set for, in minutes.  <a href="classIRTcl112Ac.html#ad483ed47bf7932158e264dcc97b401af">More...</a><br /></td></tr>
+<tr class="separator:ad483ed47bf7932158e264dcc97b401af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb444a1d026b0d199ead49217869a6d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#adb444a1d026b0d199ead49217869a6d8">setOffTimer</a> (const uint16_t mins)</td></tr>
+<tr class="memdesc:adb444a1d026b0d199ead49217869a6d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set or cancel the Off Timer function.  <a href="classIRTcl112Ac.html#adb444a1d026b0d199ead49217869a6d8">More...</a><br /></td></tr>
+<tr class="separator:adb444a1d026b0d199ead49217869a6d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6035b0bb25c4d8972cae2c95f1416d85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a6035b0bb25c4d8972cae2c95f1416d85">toCommon</a> (const <a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> *prev=NULL) const</td></tr>
 <tr class="memdesc:a6035b0bb25c4d8972cae2c95f1416d85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRTcl112Ac.html#a6035b0bb25c4d8972cae2c95f1416d85">More...</a><br /></td></tr>
 <tr class="separator:a6035b0bb25c4d8972cae2c95f1416d85"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -197,18 +215,27 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a204bc37ffadf72ed31b305197c4803f4"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a204bc37ffadf72ed31b305197c4803f4">validChecksum</a> (uint8_t state[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#a23ba2f5af02242e14ae7eefcd066152e">kTcl112AcStateLength</a>)</td></tr>
 <tr class="memdesc:a204bc37ffadf72ed31b305197c4803f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify the checksum is valid for a given state.  <a href="classIRTcl112Ac.html#a204bc37ffadf72ed31b305197c4803f4">More...</a><br /></td></tr>
 <tr class="separator:a204bc37ffadf72ed31b305197c4803f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3b4fe63ee61649c36b442dbbc3fd4ad"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#ae3b4fe63ee61649c36b442dbbc3fd4ad">isTcl</a> (const uint8_t state[])</td></tr>
+<tr class="memdesc:ae3b4fe63ee61649c36b442dbbc3fd4ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the supplied state looks like a TCL112AC message.  <a href="classIRTcl112Ac.html#ae3b4fe63ee61649c36b442dbbc3fd4ad">More...</a><br /></td></tr>
+<tr class="separator:ae3b4fe63ee61649c36b442dbbc3fd4ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac063653636319a9451590b08abbfecdc"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#ac063653636319a9451590b08abbfecdc">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
 <tr class="memdesc:ac063653636319a9451590b08abbfecdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRTcl112Ac.html#ac063653636319a9451590b08abbfecdc">More...</a><br /></td></tr>
 <tr class="separator:ac063653636319a9451590b08abbfecdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f8178f8f646ed9892eefa40bbff4fb1"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a3f8178f8f646ed9892eefa40bbff4fb1">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
 <tr class="memdesc:a3f8178f8f646ed9892eefa40bbff4fb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRTcl112Ac.html#a3f8178f8f646ed9892eefa40bbff4fb1">More...</a><br /></td></tr>
 <tr class="separator:a3f8178f8f646ed9892eefa40bbff4fb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02e966af5129144bfe6ef62b4a3ceef2"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a02e966af5129144bfe6ef62b4a3ceef2">convertSwingV</a> (const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> position)</td></tr>
+<tr class="memdesc:a02e966af5129144bfe6ef62b4a3ceef2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43" title="Common A/C settings for Vertical Swing.">stdAc::swingv_t</a> enum into it's native setting.  <a href="classIRTcl112Ac.html#a02e966af5129144bfe6ef62b4a3ceef2">More...</a><br /></td></tr>
+<tr class="separator:a02e966af5129144bfe6ef62b4a3ceef2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a230a8d768089d869efdea6589b0a9e37"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a230a8d768089d869efdea6589b0a9e37">toCommonMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a230a8d768089d869efdea6589b0a9e37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRTcl112Ac.html#a230a8d768089d869efdea6589b0a9e37">More...</a><br /></td></tr>
 <tr class="separator:a230a8d768089d869efdea6589b0a9e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66843ee5b53ce9be1aef3774b8df5c84"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a66843ee5b53ce9be1aef3774b8df5c84">toCommonFanSpeed</a> (const uint8_t speed)</td></tr>
 <tr class="memdesc:a66843ee5b53ce9be1aef3774b8df5c84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRTcl112Ac.html#a66843ee5b53ce9be1aef3774b8df5c84">More...</a><br /></td></tr>
 <tr class="separator:a66843ee5b53ce9be1aef3774b8df5c84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a27bddca116b617b331018c1672f35f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRTcl112Ac.html#a3a27bddca116b617b331018c1672f35f">toCommonSwingV</a> (const uint8_t setting)</td></tr>
+<tr class="memdesc:a3a27bddca116b617b331018c1672f35f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native vertical swing postion to it's common equivalent.  <a href="classIRTcl112Ac.html#a3a27bddca116b617b331018c1672f35f">More...</a><br /></td></tr>
+<tr class="separator:a3a27bddca116b617b331018c1672f35f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -486,6 +513,41 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a02e966af5129144bfe6ef62b4a3ceef2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02e966af5129144bfe6ef62b4a3ceef2">&#9670;&nbsp;</a></span>convertSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t IRTcl112Ac::convertSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a>&#160;</td>
+          <td class="paramname"><em>position</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert a <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43" title="Common A/C settings for Vertical Swing.">stdAc::swingv_t</a> enum into it's native setting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">position</td><td>The enum to be converted. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
+
+</div>
+</div>
 <a id="a7a097fd243a9f0c9f965d2299996cd32"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7a097fd243a9f0c9f965d2299996cd32">&#9670;&nbsp;</a></span>getEcono()</h2>
 
@@ -591,6 +653,69 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ad13fe14c6ce0b9a64b87d0e6939e7657"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad13fe14c6ce0b9a64b87d0e6939e7657">&#9670;&nbsp;</a></span>getModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="IRsend_8h.html#a3a3ca37af46bf2f69ec66fef91b5115f">tcl_ac_remote_model_t</a> IRTcl112Ac::getModel </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get/Detect the model of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>The enum of the compatible model. </dd></dl>
+
+</div>
+</div>
+<a id="ad483ed47bf7932158e264dcc97b401af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad483ed47bf7932158e264dcc97b401af">&#9670;&nbsp;</a></span>getOffTimer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t IRTcl112Ac::getOffTimer </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get how long the Off Timer is set for, in minutes. </p>
+<dl class="section return"><dt>Returns</dt><dd>The time in nr of minutes. </dd></dl>
+
+</div>
+</div>
+<a id="a15ecd741098cfa6caa4d12a427734f2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15ecd741098cfa6caa4d12a427734f2c">&#9670;&nbsp;</a></span>getOnTimer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t IRTcl112Ac::getOnTimer </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get how long the On Timer is set for, in minutes. </p>
+<dl class="section return"><dt>Returns</dt><dd>The time in nr of minutes. </dd></dl>
+
+</div>
+</div>
 <a id="a631d9d1addb03f18708fbec9d2480651"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a631d9d1addb03f18708fbec9d2480651">&#9670;&nbsp;</a></span>getPower()</h2>
 
@@ -681,14 +806,14 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac997659c2ab82cfa1bf8eaa11fc0efc1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac997659c2ab82cfa1bf8eaa11fc0efc1">&#9670;&nbsp;</a></span>getSwingVertical()</h2>
+<a id="a8ab8cfeceddf98e427ae4d15342b1a68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ab8cfeceddf98e427ae4d15342b1a68">&#9670;&nbsp;</a></span>getSwingVertical()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool IRTcl112Ac::getSwingVertical </td>
+          <td class="memname">uint8_t IRTcl112Ac::getSwingVertical </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -698,7 +823,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the vertical swing setting of the A/C. </p>
-<dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The current setting. </dd></dl>
 
 </div>
 </div>
@@ -742,6 +867,43 @@ Private Attributes</h2></td></tr>
 
 <p>Get the Turbo setting of the A/C. </p>
 <dl class="section return"><dt>Returns</dt><dd>true, the setting is on. false, the setting is off. </dd></dl>
+
+</div>
+</div>
+<a id="ae3b4fe63ee61649c36b442dbbc3fd4ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3b4fe63ee61649c36b442dbbc3fd4ad">&#9670;&nbsp;</a></span>isTcl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRTcl112Ac::isTcl </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>state</em>[]</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check the supplied state looks like a TCL112AC message. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The array to verify the checksum of. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Assumes the state is the correct size. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if the state looks like a TCL112AC message. Otherwise, false. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>This is just a guess. </dd></dl>
 
 </div>
 </div>
@@ -943,6 +1105,86 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a36d618f6a8a695b4ad7a3b4d2c3ddb82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36d618f6a8a695b4ad7a3b4d2c3ddb82">&#9670;&nbsp;</a></span>setModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRTcl112Ac::setModel </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="IRsend_8h.html#a3a3ca37af46bf2f69ec66fef91b5115f">tcl_ac_remote_model_t</a>&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the model of the A/C to emulate. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">model</td><td>The enum of the appropriate model. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="adb444a1d026b0d199ead49217869a6d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb444a1d026b0d199ead49217869a6d8">&#9670;&nbsp;</a></span>setOffTimer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRTcl112Ac::setOffTimer </td>
+          <td>(</td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>mins</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set or cancel the Off Timer function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mins</td><td>Nr. of minutes the timer is to be set to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Rounds down to 20 min increments. (max: 720 mins (12h), 0 is Off) </dd></dl>
+
+</div>
+</div>
+<a id="a757c07a38c2236ce5c9b5f23a71a4b15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a757c07a38c2236ce5c9b5f23a71a4b15">&#9670;&nbsp;</a></span>setOnTimer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRTcl112Ac::setOnTimer </td>
+          <td>(</td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>mins</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set or cancel the On Timer function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mins</td><td>Nr. of minutes the timer is to be set to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Rounds down to 20 min increments. (max: 720 mins (12h), 0 is Off) </dd></dl>
+
+</div>
+</div>
 <a id="ad2367d2481f94f14b9c4f7b378711b7e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad2367d2481f94f14b9c4f7b378711b7e">&#9670;&nbsp;</a></span>setPower()</h2>
 
@@ -1058,8 +1300,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a53f702dcc66de81f6e7e03d538a6946d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53f702dcc66de81f6e7e03d538a6946d">&#9670;&nbsp;</a></span>setSwingVertical()</h2>
+<a id="afd9ffbbbb7de4dbda8f9c023e3f263a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd9ffbbbb7de4dbda8f9c023e3f263a8">&#9670;&nbsp;</a></span>setSwingVertical()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1067,8 +1309,8 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRTcl112Ac::setSwingVertical </td>
           <td>(</td>
-          <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>on</em></td><td>)</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>setting</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1077,7 +1319,7 @@ Private Attributes</h2></td></tr>
 <p>Set the vertical swing setting of the A/C. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">setting</td><td>The value of the desired setting. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1251,6 +1493,41 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native setting. </dd></dl>
+
+</div>
+</div>
+<a id="a3a27bddca116b617b331018c1672f35f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a27bddca116b617b331018c1672f35f">&#9670;&nbsp;</a></span>toCommonSwingV()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">stdAc::swingv_t</a> IRTcl112Ac::toCommonSwingV </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>setting</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert a native vertical swing postion to it's common equivalent. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">setting</td><td>A native position to convert. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The common vertical swing position. </dd></dl>
 
 </div>
 </div>
