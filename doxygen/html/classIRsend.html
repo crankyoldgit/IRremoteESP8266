@@ -492,6 +492,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5051a6d33741d8b2b2ddd5c48903f96c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a5051a6d33741d8b2b2ddd5c48903f96c">sendBose</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#ae5680dcf6d8674e21b3864b8ba2f9718">kBoseBits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
 <tr class="memdesc:a5051a6d33741d8b2b2ddd5c48903f96c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Bose formatted message. Status: STABLE / Known working.  <a href="classIRsend.html#a5051a6d33741d8b2b2ddd5c48903f96c">More...</a><br /></td></tr>
 <tr class="separator:a5051a6d33741d8b2b2ddd5c48903f96c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d34400451c49a0f5a9586593d7c7250"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a9d34400451c49a0f5a9586593d7c7250">sendArris</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#af2f4e097aef5fa0ec5526936e93108d8">kArrisBits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
+<tr class="memdesc:a9d34400451c49a0f5a9586593d7c7250"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an Arris Manchester Code formatted message. Status: STABLE / Confirmed working.  <a href="classIRsend.html#a9d34400451c49a0f5a9586593d7c7250">More...</a><br /></td></tr>
+<tr class="separator:a9d34400451c49a0f5a9586593d7c7250"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9606615e22486e44324f0f1607dcb621"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a9606615e22486e44324f0f1607dcb621">sendRhoss</a> (const unsigned char data[], const uint16_t nbytes=<a class="el" href="IRremoteESP8266_8h.html#a279be665d626310b042ed6c4be9676e5">kRhossStateLength</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#af54dd9a02bd56d596eb7fde295171d13">kRhossDefaultRepeat</a>)</td></tr>
+<tr class="memdesc:a9606615e22486e44324f0f1607dcb621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Rhoss HVAC formatted message. Status: STABLE / Reported as working.  <a href="classIRsend.html#a9606615e22486e44324f0f1607dcb621">More...</a><br /></td></tr>
+<tr class="separator:a9606615e22486e44324f0f1607dcb621"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afac688e29ab6d353df66f10b05756137"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#afac688e29ab6d353df66f10b05756137">sendAirton</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#ab06de29233ff774258079130f7343a6d">kAirtonBits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1b8ca81fc8970bd3263eda3fb332c152">kAirtonDefaultRepeat</a>)</td></tr>
+<tr class="memdesc:afac688e29ab6d353df66f10b05756137"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Airton formatted message. Status: STABLE / Confirmed working.  <a href="classIRsend.html#afac688e29ab6d353df66f10b05756137">More...</a><br /></td></tr>
+<tr class="separator:afac688e29ab6d353df66f10b05756137"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -504,6 +513,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a99c88ec9f8426003738a9a1682595b9a"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a99c88ec9f8426003738a9a1682595b9a">encodeMetz</a> (const uint8_t address, const uint8_t command, const bool toggle=false)</td></tr>
 <tr class="memdesc:a99c88ec9f8426003738a9a1682595b9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode a Metz address, command, and toggle bits into a code suitable for use with <a class="el" href="classIRsend.html#ab98023283eca787f7bb8bcb47f79ed01" title="Send a Metz formatted message. Status: Beta / Needs testing against a real device.">sendMetz()</a>.  <a href="classIRsend.html#a99c88ec9f8426003738a9a1682595b9a">More...</a><br /></td></tr>
 <tr class="separator:a99c88ec9f8426003738a9a1682595b9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12573e27cc112988a7e3244c3a7ba5b1"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a12573e27cc112988a7e3244c3a7ba5b1">toggleArrisRelease</a> (const uint32_t data)</td></tr>
+<tr class="memdesc:a12573e27cc112988a7e3244c3a7ba5b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flip the toggle button release bits of an Arris message. Used to indicate a change of remote button's state. e.g. Press vs. Release.  <a href="classIRsend.html#a12573e27cc112988a7e3244c3a7ba5b1">More...</a><br /></td></tr>
+<tr class="separator:a12573e27cc112988a7e3244c3a7ba5b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3b7af08519c742044bca88dbd1ea007"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#ab3b7af08519c742044bca88dbd1ea007">encodeArris</a> (const uint32_t command, const bool release)</td></tr>
+<tr class="memdesc:ab3b7af08519c742044bca88dbd1ea007"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a raw 32-bit Arris message code from the supplied command &amp; release setting.  <a href="classIRsend.html#ab3b7af08519c742044bca88dbd1ea007">More...</a><br /></td></tr>
+<tr class="separator:ab3b7af08519c742044bca88dbd1ea007"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -861,6 +876,53 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Integer timing functions &amp; math mean we can't do fractions of microseconds timing. Thus minor changes to the freq &amp; duty values may have limited effect. You've been warned. </dd></dl>
+
+</div>
+</div>
+<a id="ab3b7af08519c742044bca88dbd1ea007"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3b7af08519c742044bca88dbd1ea007">&#9670;&nbsp;</a></span>encodeArris()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t IRsend::encodeArris </td>
+          <td>(</td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>command</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>release</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct a raw 32-bit Arris message code from the supplied command &amp; release setting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">command</td><td>The command code. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">release</td><td>The button/command action: press (false), release (true) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A raw 32-bit Arris message code suitable for <a class="el" href="classIRsend.html#a9d34400451c49a0f5a9586593d7c7250" title="Send an Arris Manchester Code formatted message. Status: STABLE / Confirmed working.">sendArris()</a> etc. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Sequence of bits = header + release + command + checksum. </dd></dl>
 
 </div>
 </div>
@@ -1741,6 +1803,50 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="afac688e29ab6d353df66f10b05756137"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afac688e29ab6d353df66f10b05756137">&#9670;&nbsp;</a></span>sendAirton()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRsend::sendAirton </td>
+          <td>(</td>
+          <td class="paramtype">const uint64_t&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#ab06de29233ff774258079130f7343a6d">kAirtonBits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a1b8ca81fc8970bd3263eda3fb332c152">kAirtonDefaultRepeat</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a Airton formatted message. Status: STABLE / Confirmed working. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>containing the IR command. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>Nr. of bits to send. usually kAirtonBits </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>Nr. of times the message is to be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a5b180d3845b45af38a19b72e6fa8e0c0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5b180d3845b45af38a19b72e6fa8e0c0">&#9670;&nbsp;</a></span>sendAirwell()</h2>
 
@@ -1916,6 +2022,51 @@ Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a9d34400451c49a0f5a9586593d7c7250"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d34400451c49a0f5a9586593d7c7250">&#9670;&nbsp;</a></span>sendArris()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRsend::sendArris </td>
+          <td>(</td>
+          <td class="paramtype">const uint64_t&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#af2f4e097aef5fa0ec5526936e93108d8">kArrisBits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send an Arris Manchester Code formatted message. Status: STABLE / Confirmed working. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of bits of the message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>The number of times the command is to be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1595">https://github.com/crankyoldgit/IRremoteESP8266/issues/1595</a> </dd></dl>
 
 </div>
 </div>
@@ -5874,6 +6025,50 @@ Use this method if you want to send the results of <code>decodePanasonic</code>.
 
 </div>
 </div>
+<a id="a9606615e22486e44324f0f1607dcb621"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9606615e22486e44324f0f1607dcb621">&#9670;&nbsp;</a></span>sendRhoss()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRsend::sendRhoss </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned char&#160;</td>
+          <td class="paramname"><em>data</em>[], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbytes</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a279be665d626310b042ed6c4be9676e5">kRhossStateLength</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#af54dd9a02bd56d596eb7fde295171d13">kRhossDefaultRepeat</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a Rhoss HVAC formatted message. Status: STABLE / Reported as working. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbytes</td><td>The number of bytes of message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>The number of times the command is to be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a5252dd159aad713c099de6728ac56d81"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5252dd159aad713c099de6728ac56d81">&#9670;&nbsp;</a></span>sendSAMSUNG()</h2>
 
@@ -7171,6 +7366,41 @@ Use this method if you want to send the results of <code>decodePanasonic</code>.
 
 </div>
 </div>
+<a id="a12573e27cc112988a7e3244c3a7ba5b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12573e27cc112988a7e3244c3a7ba5b1">&#9670;&nbsp;</a></span>toggleArrisRelease()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t IRsend::toggleArrisRelease </td>
+          <td>(</td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Flip the toggle button release bits of an Arris message. Used to indicate a change of remote button's state. e.g. Press vs. Release. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The existing Arris message. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A data message suitable for use in <a class="el" href="classIRsend.html#a9d34400451c49a0f5a9586593d7c7250" title="Send an Arris Manchester Code formatted message. Status: STABLE / Confirmed working.">sendArris()</a> with the release bits flipped. </dd></dl>
+
+</div>
+</div>
 <a id="a42a78d4a3ef0f88b54bee488320344da"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a42a78d4a3ef0f88b54bee488320344da">&#9670;&nbsp;</a></span>toggleRC5()</h2>
 
@@ -7440,10 +7670,12 @@ For RC-6 (36-bits/Xbox-360), it is the 16th least significant bit. </dd></dl>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="IRsend_8h_source.html">IRsend.h</a></li>
+<li>src/<a class="el" href="ir__Airton_8cpp.html">ir_Airton.cpp</a></li>
 <li>src/<a class="el" href="ir__Airwell_8cpp.html">ir_Airwell.cpp</a></li>
 <li>src/<a class="el" href="ir__Aiwa_8cpp.html">ir_Aiwa.cpp</a></li>
 <li>src/<a class="el" href="ir__Amcor_8cpp.html">ir_Amcor.cpp</a></li>
 <li>src/<a class="el" href="ir__Argo_8cpp.html">ir_Argo.cpp</a></li>
+<li>src/<a class="el" href="ir__Arris_8cpp.html">ir_Arris.cpp</a></li>
 <li>src/<a class="el" href="ir__Bose_8cpp.html">ir_Bose.cpp</a></li>
 <li>src/<a class="el" href="ir__Carrier_8cpp.html">ir_Carrier.cpp</a></li>
 <li>src/<a class="el" href="ir__Coolix_8cpp.html">ir_Coolix.cpp</a></li>
@@ -7489,6 +7721,7 @@ For RC-6 (36-bits/Xbox-360), it is the 16th least significant bit. </dd></dl>
 <li>src/<a class="el" href="ir__Pronto_8cpp.html">ir_Pronto.cpp</a></li>
 <li>src/<a class="el" href="ir__RC5__RC6_8cpp.html">ir_RC5_RC6.cpp</a></li>
 <li>src/<a class="el" href="ir__RCMM_8cpp.html">ir_RCMM.cpp</a></li>
+<li>src/<a class="el" href="ir__Rhoss_8cpp.html">ir_Rhoss.cpp</a></li>
 <li>src/<a class="el" href="ir__Samsung_8cpp.html">ir_Samsung.cpp</a></li>
 <li>src/<a class="el" href="ir__Sanyo_8cpp.html">ir_Sanyo.cpp</a></li>
 <li>src/<a class="el" href="ir__Sharp_8cpp.html">ir_Sharp.cpp</a></li>
@@ -7513,9 +7746,9 @@ For RC-6 (36-bits/Xbox-360), it is the 16th least significant bit. </dd></dl>
 </ul>
 </div><!-- contents -->
 <div class="ttc" id="aclassIRsend_html_a0b349351e2ba19f87e6b01cde7e67c49"><div class="ttname"><a href="classIRsend.html#a0b349351e2ba19f87e6b01cde7e67c49">IRsend::sendPronto</a></div><div class="ttdeci">void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat=kNoRepeat)</div><div class="ttdoc">Send a Pronto Code formatted message. Status: STABLE / Known working.</div><div class="ttdef"><b>Definition:</b> ir_Pronto.cpp:56</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a336bd721135fc8b869941cd3aa73646e"><div class="ttname"><a href="IRremoteESP8266_8h.html#a336bd721135fc8b869941cd3aa73646e">kVoltasStateLength</a></div><div class="ttdeci">const uint16_t kVoltasStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1193</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_ab18df94a82b365ff30caaabb05a9fcaf"><div class="ttname"><a href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a></div><div class="ttdeci">const uint16_t kCoronaAcStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:982</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a112408429fb4a5cca22a66a351453bad"><div class="ttname"><a href="IRremoteESP8266_8h.html#a112408429fb4a5cca22a66a351453bad">kSonyMinRepeat</a></div><div class="ttdeci">const uint16_t kSonyMinRepeat</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1161</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a336bd721135fc8b869941cd3aa73646e"><div class="ttname"><a href="IRremoteESP8266_8h.html#a336bd721135fc8b869941cd3aa73646e">kVoltasStateLength</a></div><div class="ttdeci">const uint16_t kVoltasStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1220</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_ab18df94a82b365ff30caaabb05a9fcaf"><div class="ttname"><a href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a></div><div class="ttdeci">const uint16_t kCoronaAcStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1009</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a112408429fb4a5cca22a66a351453bad"><div class="ttname"><a href="IRremoteESP8266_8h.html#a112408429fb4a5cca22a66a351453bad">kSonyMinRepeat</a></div><div class="ttdeci">const uint16_t kSonyMinRepeat</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1188</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
