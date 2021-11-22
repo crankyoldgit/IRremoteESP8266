@@ -1,6 +1,7 @@
 // Copyright 2019-2021 David Conran
 
 #include <string>
+#include "ir_Airton.h"
 #include "ir_Airwell.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
@@ -43,6 +44,36 @@
 #include "gtest/gtest.h"
 
 // Tests for IRac class.
+
+TEST(TestIRac, Airton) {
+  IRAirtonAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  const char expected[] =
+      "Power: On, Mode: 1 (Cool), Fan: 5 (Maximum), Temp: 18C, "
+      "Swing(V): On, Econo: On, Turbo: On, Light: On, Health: On, Sleep: On";
+
+  ac.begin();
+  irac.airton(&ac,
+              true,                        // Power
+              stdAc::opmode_t::kCool,      // Mode
+              18,                          // Celsius
+              stdAc::fanspeed_t::kMax,     // Fan speed
+              stdAc::swingv_t::kAuto,      // Vertical Swing
+              true,                        // Turbo
+              true,                        // Light/Display/LED
+              true,                        // Econo (Eco)
+              true,                        // Filter (Health)
+              9 * 60 + 12);                // Sleep (09:12)
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(AIRTON, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kAirtonBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
 
 TEST(TestIRac, Airwell) {
   IRAirwellAc ac(kGpioUnused);
