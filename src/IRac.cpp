@@ -338,11 +338,18 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] light Turn on the LED/Display mode.
+/// @param[in] econo Run the device in economical mode.
+/// @param[in] filter Turn on the (ion/pollen/health/etc) filter mode.
+/// @param[in] sleep Nr. of minutes for sleep mode.
+/// @note -1 is Off, >= 0 is on.
 void IRac::airton(IRAirtonAc *ac,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
-                  const stdAc::swingv_t swingv, const bool light) {
+                  const stdAc::swingv_t swingv, const bool turbo,
+                  const bool light, const bool econo, const bool filter,
+                  const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -351,12 +358,12 @@ void IRac::airton(IRAirtonAc *ac,
   ac->setSwingV(swingv != stdAc::swingv_t::kOff);
   // No Quiet setting available.
   ac->setLight(light);
-  // No Filter setting available.
-  // No Turbo setting available.
-  // No Economy setting available.
+  ac->setHealth(filter);
+  ac->setTurbo(turbo);
+  ac->setEcono(econo);
   // No Clean setting available.
   // No Beep setting available.
-  // No Sleep setting available.
+  ac->setSleep(sleep >= 0);  // Convert to a boolean.
   ac->send();
 }
 #endif  // SEND_AIRTON
@@ -2643,7 +2650,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRAirtonAc ac(_pin, _inverted, _modulation);
       airton(&ac, send.power, send.mode, degC, send.fanspeed,
-             send.swingv, send.light);
+             send.swingv, send.turbo, send.light, send.econo, send.filter,
+             send.sleep);
       break;
     }
 #endif  // SEND_AIRTON

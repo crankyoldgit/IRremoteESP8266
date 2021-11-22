@@ -50,17 +50,21 @@ TEST(TestIRac, Airton) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   const char expected[] =
-      "Power: On, Mode: 4 (Heat), Fan: 3 (Medium), Temp: 18C, "
-      "Swing(V): On, Light: On";
+      "Power: On, Mode: 1 (Cool), Fan: 5 (Maximum), Temp: 18C, "
+      "Swing(V): On, Econo: On, Turbo: On, Light: On, Health: On, Sleep: On";
 
   ac.begin();
   irac.airton(&ac,
               true,                        // Power
-              stdAc::opmode_t::kHeat,      // Mode
+              stdAc::opmode_t::kCool,      // Mode
               18,                          // Celsius
-              stdAc::fanspeed_t::kMedium,  // Fan speed
+              stdAc::fanspeed_t::kMax,     // Fan speed
               stdAc::swingv_t::kAuto,      // Vertical Swing
-              true);                       // Light/Display/LED
+              true,                        // Turbo
+              true,                        // Light/Display/LED
+              true,                        // Econo (Eco)
+              true,                        // Filter (Health)
+              9 * 60 + 12);                // Sleep (09:12)
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));

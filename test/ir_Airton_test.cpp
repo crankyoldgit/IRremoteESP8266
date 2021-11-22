@@ -37,7 +37,8 @@ TEST(TestDecodeAirton, RealExample) {
   EXPECT_EQ(0x0, irsend.capture.command);
   EXPECT_EQ(
       "Power: On, Mode: 4 (Heat), Fan: 0 (Auto), Temp: 25C, "
-      "Swing(V): Off, Light: Off",
+      "Swing(V): Off, Econo: Off, Turbo: Off, Light: Off, "
+      "Health: Off, Sleep: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -222,9 +223,106 @@ TEST(TestIRAirtonAcClass, ConstructKnownExamples) {
   ac.setTemp(25);
   ac.setSwingV(false);
   ac.setLight(false);
+  ac.setTurbo(false);
+  ac.setSleep(false);
+  ac.setEcono(false);
+  ac.setHealth(false);
   EXPECT_EQ(
       "Power: On, Mode: 4 (Heat), Fan: 0 (Auto), Temp: 25C, "
-      "Swing(V): Off, Light: Off",
+      "Swing(V): Off, Econo: Off, Turbo: Off, Light: Off, "
+      "Health: Off, Sleep: Off",
       ac.toString());
   EXPECT_EQ(0x5E1400090C11D3, ac.getRaw());
+}
+
+TEST(TestIRAirtonAcClass, Turbo) {
+  IRAirtonAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+  EXPECT_NE(kAirtonFanMax, ac.getFan());
+  ac.setTurbo(true);
+  EXPECT_TRUE(ac.getTurbo());
+  EXPECT_EQ(kAirtonFanMax, ac.getFan());
+  ac.setTurbo(false);
+  EXPECT_FALSE(ac.getTurbo());
+
+  // Known Turbo on state
+  ac.setRaw(0x92040000D911D3);
+  EXPECT_TRUE(ac.getTurbo());
+}
+
+TEST(TestIRAirtonAcClass, Sleep) {
+  IRAirtonAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kAirtonCool);  // Sleep is available in Cool mode.
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+  ac.setSleep(false);
+  EXPECT_FALSE(ac.getSleep());
+
+  ac.setSleep(true);
+  // Sleep is available in Heat mode, but changing modes resets it.
+  ac.setMode(kAirtonHeat);
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_TRUE(ac.getSleep());
+
+  ac.setMode(kAirtonAuto);  // Sleep is NOT available in Auto mode.
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_FALSE(ac.getSleep());
+
+  ac.setMode(kAirtonFan);  // Sleep is NOT available in Fan mode.
+  EXPECT_FALSE(ac.getSleep());
+  ac.setSleep(true);
+  EXPECT_FALSE(ac.getSleep());
+
+  // Known Sleep on state
+  ac.setRaw(0xA00600000911D3);
+  EXPECT_TRUE(ac.getSleep());
+  EXPECT_NE(kAirtonAuto, ac.getMode());
+  EXPECT_NE(kAirtonFan, ac.getMode());
+}
+
+TEST(TestIRAirtonAcClass, Health) {
+  IRAirtonAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setHealth(false);
+  EXPECT_FALSE(ac.getHealth());
+  ac.setHealth(true);
+  EXPECT_TRUE(ac.getHealth());
+  ac.setHealth(false);
+  EXPECT_FALSE(ac.getHealth());
+
+  // Known Health on state
+  ac.setRaw(0xE5C900000911D3);
+  EXPECT_TRUE(ac.getHealth());
+}
+
+TEST(TestIRAirtonAcClass, Econo) {
+  IRAirtonAc ac(kGpioUnused);
+  ac.begin();
+  ac.setMode(kAirtonCool);  // Econo is only available in Cool.
+  ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_TRUE(ac.getEcono());
+  ac.setEcono(false);
+  EXPECT_FALSE(ac.getEcono());
+
+  ac.setEcono(true);
+  ac.setMode(kAirtonHeat);  // Econo is only available in Cool, not Heat!
+  EXPECT_FALSE(ac.getEcono());
+  ac.setEcono(true);
+  EXPECT_FALSE(ac.getEcono());
+
+  // Known Econo on state
+  ac.setRaw(0xE5C900000911D3);
+  EXPECT_TRUE(ac.getEcono());
 }

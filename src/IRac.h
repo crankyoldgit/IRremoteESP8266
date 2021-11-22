@@ -114,7 +114,9 @@ class IRac {
   void airton(IRAirtonAc *ac,
               const bool on, const stdAc::opmode_t mode,
               const float degrees, const stdAc::fanspeed_t fan,
-              const stdAc::swingv_t swingv, const bool light);
+              const stdAc::swingv_t swingv, const bool turbo,
+              const bool light, const bool econo, const bool filter,
+              const int16_t sleep = -1);
 #endif  // SEND_AIRTON
 #if SEND_AIRWELL
   void airwell(IRAirwellAc *ac,

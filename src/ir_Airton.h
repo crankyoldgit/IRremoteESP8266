@@ -32,7 +32,7 @@ union AirtonProtocol{
     uint8_t Mode      :3;  // Operating Mode
     uint8_t Power     :1;  // Power Control
     uint8_t Fan       :3;
-    uint8_t           :1;  // Unknown / Unused.
+    uint8_t Turbo     :1;
     // Byte 3
     uint8_t Temp      :4;  // Degrees Celsius (+16 offset)
     uint8_t           :4;  // Unknown / Unused.
@@ -40,12 +40,14 @@ union AirtonProtocol{
     uint8_t SwingV    :1;
     uint8_t           :7;  // Unknown / Unused.
     // Byte 5
-    uint8_t           :2;  // Unknown / Unused.
-    uint8_t LightOff  :1;
-    uint8_t LightOn1  :1;
-    uint8_t HeatPower :1;
-    uint8_t           :2;  // Unknown / Unused.
-    uint8_t LightOn2  :1;
+    uint8_t Econo     :1;
+    uint8_t Sleep     :1;
+    uint8_t NotAutoOn :1;
+    uint8_t           :1;  // Unknown / Unused.
+    uint8_t HeatOn    :1;
+    uint8_t           :1;  // Unknown / Unused.
+    uint8_t Health    :1;
+    uint8_t Light     :1;
     // Byte 6
     uint8_t Sum       :8;  // Sepecial checksum value
   };
@@ -98,6 +100,14 @@ class IRAirtonAc {
   void setRaw(const uint64_t data);
   void setLight(const bool on);
   bool getLight(void) const;
+  void setEcono(const bool on);
+  bool getEcono(void) const;
+  void setTurbo(const bool on);
+  bool getTurbo(void) const;
+  void setHealth(const bool on);
+  bool getHealth(void) const;
+  void setSleep(const bool on);
+  bool getSleep(void) const;
   void setSwingV(const bool on);
   bool getSwingV(void) const;
   static bool validChecksum(const uint64_t data);

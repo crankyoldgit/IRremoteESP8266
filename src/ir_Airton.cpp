@@ -153,16 +153,25 @@ uint8_t IRAirtonAc::getMode(void) const { return _.Mode; }
 /// Set the desired operation mode.
 /// @param[in] mode The desired operation mode.
 void IRAirtonAc::setMode(const uint8_t mode) {
+  // Changing the mode always removes the sleep setting.
+  if (mode != _.Mode) setSleep(false);
+  // Set the actual mode.
   _.Mode = (mode > kAirtonHeat) ? kAirtonAuto : mode;
+  // Handle special settings for each mode.
   switch (_.Mode) {
     case kAirtonAuto:
       setTemp(25);  // Auto has a fixed temp.
+      _.NotAutoOn = !getPower();
       break;
     case kAirtonHeat:
       // When powered on and in Heat mode, set a special bit.
-      _.HeatPower = getPower();
-      break;
+      _.HeatOn = getPower();
+      // FALL-THRU
+    default:
+      _.NotAutoOn = true;
   }
+  // Reset the economy setting if we need to.
+  setEcono(getEcono());
 }
 
 /// Convert a stdAc::opmode_t enum into its native mode.
@@ -253,17 +262,57 @@ bool IRAirtonAc::getSwingV(void) const { return _.SwingV; }
 
 /// Set the Light/LED/Display setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRAirtonAc::setLight(const bool on) {
-  _.LightOn1 = on;
-  _.LightOn2 = on;
-  _.LightOff = !on;
-}
+void IRAirtonAc::setLight(const bool on) { _.Light = on; }
 
 /// Get the Light/LED/Display setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRAirtonAc::getLight(void) const {
-  return _.LightOn1 && _.LightOn2 && !_.LightOff;
+bool IRAirtonAc::getLight(void) const { return _.Light; }
+
+/// Set the Economy setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @note Only available in Cool mode.
+void IRAirtonAc::setEcono(const bool on) {
+  _.Econo = on && (getMode() == kAirtonCool);
 }
+
+/// Get the Economy setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRAirtonAc::getEcono(void) const { return _.Econo; }
+
+/// Set the Turbo setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRAirtonAc::setTurbo(const bool on) {
+  _.Turbo = on;
+  // Pressing the turbo button sets the fan to max as well.
+  if (on) setFan(kAirtonFanMax);
+}
+
+/// Get the Turbo setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRAirtonAc::getTurbo(void) const { return _.Turbo; }
+
+/// Set the Sleep setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @note Sleep not available in fan or auto mode.
+void IRAirtonAc::setSleep(const bool on) {
+  switch (getMode()) {
+    case kAirtonAuto:
+    case kAirtonFan:  _.Sleep = false; break;
+    default:          _.Sleep = on;
+  }
+}
+
+/// Get the Sleep setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRAirtonAc::getSleep(void) const { return _.Sleep; }
+
+/// Set the Health/Filter setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRAirtonAc::setHealth(const bool on) { _.Health = on; }
+
+/// Get the Health/Filter setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRAirtonAc::getHealth(void) const { return _.Health; }
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
@@ -276,17 +325,17 @@ stdAc::state_t IRAirtonAc::toCommon(void) const {
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.swingv = getSwingV() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.econo = getEcono();
+  result.turbo = getTurbo();
+  result.filter = getHealth();
   result.light = getLight();
+  result.sleep = getSleep() ? 0 : -1;
   // Not supported.
   result.model = -1;
-  result.turbo = false;
   result.swingh = stdAc::swingh_t::kOff;
-  result.filter = false;
-  result.econo = false;
   result.quiet = false;
   result.clean = false;
   result.beep = false;
-  result.sleep = -1;
   result.clock = -1;
   return result;
 }
@@ -295,7 +344,7 @@ stdAc::state_t IRAirtonAc::toCommon(void) const {
 /// @return A human readable string.
 String IRAirtonAc::toString(void) const {
   String result = "";
-  result.reserve(90);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(135);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(_.Mode, kAirtonAuto, kAirtonCool,
                             kAirtonHeat, kAirtonDry, kAirtonFan);
@@ -304,6 +353,10 @@ String IRAirtonAc::toString(void) const {
                            kAirtonFanMax);
   result += addTempToString(getTemp());
   result += addBoolToString(getSwingV(), kSwingVStr);
+  result += addBoolToString(getEcono(), kEconoStr);
+  result += addBoolToString(getTurbo(), kTurboStr);
   result += addBoolToString(getLight(), kLightStr);
+  result += addBoolToString(getHealth(), kHealthStr);
+  result += addBoolToString(getSleep(), kSleepStr);
   return result;
 }
