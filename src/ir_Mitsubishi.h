@@ -95,7 +95,7 @@ union Mitsubishi144Protocol{
     uint8_t DirectIndirect:2;
     uint8_t AbsenseDetect :1;
     uint8_t               :2;
-    uint8_t iSave10C      :1; //i-SAVE:mode=Heat AND iSave=on AND 10C on remote
+    uint8_t iSave10C      :1;  // i-SAVE:mode=Heat & iSave=on AND 10C on remote
     uint8_t               :2;
     // Byte 16
     uint8_t               :1;
@@ -287,9 +287,6 @@ class IRMitsubishiAC {
   uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
   uint8_t getMode(void) const;
-  /// 1 = set to i-Save when temp=10C on remote.
-  /// "Temp" byte is not affected by this; 
-  /// 10C temp is implied through other bits.
   void setiSave10C(const bool state);
   bool getiSave10C(void) const;
   void setISee(const bool state);
@@ -302,7 +299,7 @@ class IRMitsubishiAC {
   bool getAbsenseDetect(void) const;
   void setNaturalFlow(const bool state);
   bool getNaturalFlow(void) const;
-  void setVane(const uint8_t position); // on some models this controls RIGHT vane
+  void setVane(const uint8_t position);  // controls RIGHT vane on some models
   uint8_t getVane(void) const;
   void setVaneLeft(const uint8_t position);
   uint8_t getVaneLeft(void) const;
