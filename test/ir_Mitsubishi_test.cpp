@@ -915,7 +915,7 @@ TEST(TestMitsubishiACClass, HumanReadable) {
       "Clock: 17:10, On Timer: 00:00, Off Timer: 00:00, Timer: -, "
       "Weekly Timer: Off"
       ", 10C Heat: Off, ISee: Off, Ecocool: Off, Absense detect: Off, "
-      "Direct / Indirect mode: 0, Natural Flow: Off",
+      "Direct / Indirect Mode: 0, Natural Flow: Off",
       ac.toString());
   ac.setTemp(21.5);
   ac.setWeeklyTimerEnabled(true);
@@ -925,7 +925,7 @@ TEST(TestMitsubishiACClass, HumanReadable) {
       "Clock: 17:10, On Timer: 00:00, Off Timer: 00:00, Timer: -, "
       "Weekly Timer: On"
       ", 10C Heat: Off, ISee: Off, Ecocool: Off, Absense detect: Off, "
-      "Direct / Indirect mode: 0, Natural Flow: Off",
+      "Direct / Indirect Mode: 0, Natural Flow: Off",
       ac.toString());
 }
 
@@ -1440,7 +1440,7 @@ TEST(TestDecodeMitsubishiAC, Issue891) {
       "Clock: 00:00, On Timer: 00:00, Off Timer: 00:00, Timer: -, "
       "Weekly Timer: Off"
       ", 10C Heat: Off, ISee: Off, Ecocool: Off, Absense detect: Off, "
-      "Direct / Indirect mode: 0, Natural Flow: Off",
+      "Direct / Indirect Mode: 0, Natural Flow: Off",
       ac.toString());
 }
 
