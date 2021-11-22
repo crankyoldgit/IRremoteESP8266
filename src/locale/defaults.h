@@ -216,8 +216,6 @@
 #ifndef D_STR_ABSENSEDETECT
 #define D_STR_ABSENSEDETECT "Absense detect"
 #endif  // D_STR_ABSENSEDETECT
-
-
 #ifndef D_STR_DIRECT
 #define D_STR_DIRECT "Direct"
 #endif  // D_STR_DIRECT
@@ -225,14 +223,8 @@
 #define D_STR_INDIRECT "Indirect"
 #endif  // D_STR_INDIRECT
 #ifndef D_STR_DIRECTINDIRECTMODE
-#define D_STR_DIRECTINDIRECTMODE  D_STR_DIRECT " / " D_STR_INDIRECT " " D_STR_MODE
+#define D_STR_DIRECTINDIRECTMODE D_STR_DIRECT " / " D_STR_INDIRECT " " D_STR_MODE
 #endif  // D_STR_DIRECTINDIRECTMODE
-
-
-
-
-
-
 #ifndef D_STR_DISPLAY
 #define D_STR_DISPLAY "Display"
 #endif  // D_STR_DISPLAY

@@ -83,9 +83,9 @@ IRTEXT_CONST_STRING(k8CHeatStr, D_STR_8C_HEAT);  ///< "8C Heat"
 IRTEXT_CONST_STRING(k10CHeatStr, D_STR_10C_HEAT);  ///< "10C Heat"
 IRTEXT_CONST_STRING(kISeeStr, D_STR_ISEE);  ///< "ISee"
 IRTEXT_CONST_STRING(kEcocoolStr, D_STR_ECOCOOL);  ///< "Ecocool"
-IRTEXT_CONST_STRING(kAbsenseDetectStr, D_STR_ABSENSEDETECT);  
+IRTEXT_CONST_STRING(kAbsenseDetectStr, D_STR_ABSENSEDETECT);
                                                    ///< "AbsenseDetect"
-IRTEXT_CONST_STRING(kDirectIndirectModeStr, D_STR_DIRECTINDIRECTMODE);  
+IRTEXT_CONST_STRING(kDirectIndirectModeStr, D_STR_DIRECTINDIRECTMODE);
                                                    ///< "Direct/Indirect mode"
 IRTEXT_CONST_STRING(kDirectStr, D_STR_DIRECT);  ///< "Direct"
 IRTEXT_CONST_STRING(kIndirectStr, D_STR_INDIRECT);  ///< "Indirect"
