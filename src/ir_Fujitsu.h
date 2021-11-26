@@ -33,6 +33,7 @@
 //   Brand: Fujitsu,  Model: ASU12RLF A/C (ARREB1E)
 //   Brand: Fujitsu,  Model: AR-REW4E remote (ARREW4E)
 //   Brand: Fujitsu,  Model: ASYG09KETA-B A/C (ARREW4E)
+//   Brand: Fujitsu,  Model: AR-REB4E remote (ARREB1E)
 
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_
