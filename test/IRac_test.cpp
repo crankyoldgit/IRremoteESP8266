@@ -1989,7 +1989,7 @@ TEST(TestIRac, Toshiba) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Temp: 29C, Power: On, Mode: 2 (Dry), Fan: 2 (UNKNOWN), "
-      "Turbo: Off, Econo: On";
+      "Turbo: Off, Econo: On, Filter: Off";
 
   ac.begin();
   irac.toshiba(&ac,
@@ -1999,7 +1999,8 @@ TEST(TestIRac, Toshiba) {
                stdAc::fanspeed_t::kLow,   // Fan speed
                stdAc::swingv_t::kOff,     // Vertical Swing
                false,                     // Turbo
-               true);                     // Econo
+               true,                      // Econo
+               false);                    // Filter
   ASSERT_EQ(expected, ac.toString());
   ASSERT_EQ(kToshibaACStateLengthLong, ac.getStateLength());
   ac._irsend.makeDecodeResult();
@@ -2904,7 +2905,7 @@ TEST(TestIRac, Issue1250) {
   // Now send the state so we can actually decode/capture what we sent.
   char expected_on[] =
       "Temp: 19C, Power: On, Mode: 4 (Fan), Fan: 0 (Auto), "
-      "Turbo: Off, Econo: Off";
+      "Turbo: Off, Econo: Off, Filter: Off";
   ac._irsend.reset();
   irac.toshiba(&ac,
                irac.next.power,     // Power
@@ -2913,7 +2914,8 @@ TEST(TestIRac, Issue1250) {
                irac.next.fanspeed,  // Fan speed
                irac.next.swingv,    // Vertical Swing
                irac.next.turbo,     // Turbo
-               irac.next.econo);    // Econo
+               irac.next.econo,     // Econo
+               irac.next.filter);   // Filter
   ASSERT_EQ(expected_on, ac.toString());
   ASSERT_EQ(kToshibaACStateLength, ac.getStateLength());
   ac._irsend.makeDecodeResult();
@@ -2929,7 +2931,8 @@ TEST(TestIRac, Issue1250) {
   irac.sendAc();
   // Now send the state so we can actually decode/capture what we sent.
   char expected_off[] =
-      "Temp: 19C, Power: Off, Fan: 0 (Auto), Turbo: Off, Econo: Off";
+      "Temp: 19C, Power: Off, Fan: 0 (Auto), Turbo: Off, Econo: Off, "
+      "Filter: Off";
   ac._irsend.reset();
   irac.toshiba(&ac,
                irac.next.power,     // Power
@@ -2938,7 +2941,8 @@ TEST(TestIRac, Issue1250) {
                irac.next.fanspeed,  // Fan speed
                irac.next.swingv,    // Vertical Swing
                irac.next.turbo,     // Turbo
-               irac.next.econo);    // Econo
+               irac.next.econo,     // Econo
+               irac.next.filter);   // Filter
   ASSERT_EQ(expected_off, ac.toString());
   ASSERT_EQ(kToshibaACStateLength, ac.getStateLength());
   ac._irsend.makeDecodeResult();
