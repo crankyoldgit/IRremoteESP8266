@@ -8,6 +8,7 @@
 /// @see https://docs.google.com/spreadsheets/d/1yidE2fvaO9kpCHfKafIdH31q4uaskYR1OwwrkyOxbp0/edit?usp=drivesdk
 /// @see https://www.toshiba-carrier.co.jp/global/about/index.htm
 /// @see http://www.toshiba-carrier.co.th/AboutUs/Pages/CompanyProfile.aspx
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1692
 
 // Supports:
 //   Brand: Toshiba,  Model: RAS-B13N3KV2
@@ -50,28 +51,31 @@ union ToshibaProtocol{
     ///<   1 (56 bit message)
     ///<   3 (72 bit message)
     ///<   4 (80 bit message)
-    uint8_t Length  :8;
+    uint8_t Length   :8;
     // Byte[3] - The bit-inverted value of the "length" byte.
-    uint8_t :8;
+    uint8_t          :8;
     // Byte[4]
-    uint8_t         :3;
-    uint8_t LongMsg :1;
-    uint8_t         :1;
-    uint8_t ShortMsg:1;
-    uint8_t         :2;
+    uint8_t          :3;
+    uint8_t LongMsg  :1;
+    uint8_t          :1;
+    uint8_t ShortMsg :1;
+    uint8_t          :2;
     // Byte[5]
-    uint8_t Swing :3;
-    uint8_t       :1;
-    uint8_t Temp  :4;
+    uint8_t Swing    :3;
+    uint8_t          :1;
+    uint8_t Temp     :4;
     // Byte[6]
-    uint8_t Mode  :3;
-    uint8_t       :2;
-    uint8_t Fan   :3;
+    uint8_t Mode     :3;
+    uint8_t          :2;
+    uint8_t Fan      :3;
     // Byte[7]
-    uint8_t :8;
+    uint8_t          :4;
+    uint8_t Filter   :1;
+    uint8_t          :3;
+
     // Byte[8]
     // (Checksum for 72 bit messages, Eco/Turbo for long 80 bit messages)
-    uint8_t EcoTurbo  :8;
+    uint8_t EcoTurbo :8;
   };
 };
 
@@ -144,6 +148,8 @@ class IRToshibaAC {
   bool getTurbo(void) const;
   void setEcono(const bool on);
   bool getEcono(void) const;
+  void setFilter(const bool on);
+  bool getFilter(void) const;
   void setMode(const uint8_t mode);
   uint8_t getMode(const bool raw = false) const;
   void setRaw(const uint8_t newState[],
