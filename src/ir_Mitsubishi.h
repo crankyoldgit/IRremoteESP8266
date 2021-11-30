@@ -287,8 +287,8 @@ class IRMitsubishiAC {
   uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
   uint8_t getMode(void) const;
-  void setiSave10C(const bool state);
-  bool getiSave10C(void) const;
+  void setISave10C(const bool state);
+  bool getISave10C(void) const;
   void setISee(const bool state);
   bool getISee(void) const;
   void setDirectIndirect(const uint8_t position);
