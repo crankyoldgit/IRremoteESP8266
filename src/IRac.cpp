@@ -1572,6 +1572,7 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
   ac->setVane(ac->convertSwingV(swingv));
   ac->setWideVane(ac->convertSwingH(swingh));
   if (quiet) ac->setFan(kMitsubishiAcFanSilent);
+  ac->setISave10C(false);
   // No Turbo setting available.
   // No Light setting available.
   // No Filter setting available.
