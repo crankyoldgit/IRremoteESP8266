@@ -233,6 +233,5 @@ extern IRTEXT_CONST_PTR(kAbsenseDetectStr);
 extern IRTEXT_CONST_PTR(kDirectIndirectModeStr);
 extern IRTEXT_CONST_PTR(kDirectStr);
 extern IRTEXT_CONST_PTR(kIndirectStr);
-extern IRTEXT_CONST_PTR(kNaturalFlowStr);
 
 #endif  // IRTEXT_H_

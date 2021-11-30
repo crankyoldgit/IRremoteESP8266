@@ -400,7 +400,7 @@ void IRMitsubishiAC::setTemp(const float degrees) {
   _.HalfDegree = nrHalfDegrees & 1;
   _.Temp = static_cast<uint8_t>(nrHalfDegrees / 2 - kMitsubishiAcMinTemp);
   // If temp is modified, iSave10C cannot be ON (because temp is then > 10C)
-  setiSave10C(false);
+  setISave10C(false);
 }
 
 /// Get the current temperature setting.
@@ -456,13 +456,13 @@ void IRMitsubishiAC::setMode(const uint8_t mode) {
   _.Mode = mode;
   // iSave10C can only be on in Heat mode.
   if (mode != kMitsubishiAcHeat) {
-      setiSave10C(false);
+      setISave10C(false);
   }
 }
 
 /// Set the iSave10C (i-SAVE) mode of the A/C.
 /// @param[in] state true, the setting is on. false, the setting is off.
-/// Normal minimum temp is 16C, and i-SAVE mode works as a gate to enable AC
+/// @note Normal minimum temp is 16C; i-SAVE mode works as gate to enable AC
 /// to use 10C as setting. However, when Remote control shows 10C, it still
 /// emits 16C on the "Temp" bits, and instead it uses other bits to indicate
 /// a target temp of 10C.
@@ -475,7 +475,7 @@ void IRMitsubishiAC::setMode(const uint8_t mode) {
 /// In this implementation, i-SAVE mode is ONLY used to enable the AC
 /// temperature setting to 10C. Therefore "Temp" is set to 16 disregarding
 /// what the remote shows, and mode is set to Heat.
-void IRMitsubishiAC::setiSave10C(const bool state) {
+void IRMitsubishiAC::setISave10C(const bool state) {
   if (state) setMode(kMitsubishiAcHeat);
   if (state) setTemp(kMitsubishiAcMinTemp);
   _.iSave10C = state;
@@ -483,7 +483,7 @@ void IRMitsubishiAC::setiSave10C(const bool state) {
 
 /// Get the iSave10C (i-SAVE) mode of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRMitsubishiAC::getiSave10C(void) const {
+bool IRMitsubishiAC::getISave10C(void) const {
   return _.iSave10C;
 }
 
@@ -877,10 +877,10 @@ String IRMitsubishiAC::toString(void) const {
   result += addBoolToString(_.WeeklyTimer, kWeeklyTimerStr);
   result += addBoolToString(_.iSave10C, k10CHeatStr);
   result += addBoolToString(_.ISee, kISeeStr);
-  result += addBoolToString(_.Ecocool, kEcocoolStr);
+  result += addBoolToString(_.Ecocool, kEconoStr);
   result += addBoolToString(_.AbsenseDetect, kAbsenseDetectStr);
   result += addIntToString(_.DirectIndirect, kDirectIndirectModeStr);
-  result += addBoolToString(_.NaturalFlow, kNaturalFlowStr);
+  result += addBoolToString(_.NaturalFlow, kFreshStr);
   return result;
 }
 

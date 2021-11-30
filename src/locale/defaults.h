@@ -66,9 +66,6 @@
 #ifndef D_STR_ECONO
 #define D_STR_ECONO "Econo"
 #endif  // D_STR_ECONO
-#ifndef D_STR_ECOCOOL
-#define D_STR_ECOCOOL "Ecocool"
-#endif  // D_STR_ECOCOOL
 #ifndef D_STR_SWING
 #define D_STR_SWING "Swing"
 #endif  // D_STR_SWING
@@ -250,9 +247,6 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_AIRFLOW
 #define D_STR_AIRFLOW "Air Flow"
 #endif  // D_STR_AIRFLOW
-#ifndef D_STR_NATURALFLOW
-#define D_STR_NATURALFLOW "Natural Flow"
-#endif  // D_STR_NATURALFLOW
 #ifndef D_STR_STEP
 #define D_STR_STEP "Step"
 #endif  // D_STR_STEP

@@ -1390,8 +1390,8 @@ TEST(TestIRac, Mitsubishi) {
       "Swing(V): 0 (Auto), Swing(H): 3 (Middle), "
       "Clock: 14:30, On Timer: 00:00, Off Timer: 00:00, Timer: -, "
       "Weekly Timer: Off"
-      ", 10C Heat: Off, ISee: Off, Ecocool: Off, Absense detect: Off, "
-      "Direct / Indirect Mode: 0, Natural Flow: Off";
+      ", 10C Heat: Off, ISee: Off, Econo: Off, Absense detect: Off, "
+      "Direct / Indirect Mode: 0, Fresh: Off";
 
   ac.begin();
   irac.mitsubishi(&ac,
