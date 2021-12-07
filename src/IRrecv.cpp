@@ -695,9 +695,9 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     if (decodeSharp(results, offset)) return true;
 #endif
 #if DECODE_COOLIX
-    DPRINTLN("Attempting Coolix decode");
+    DPRINTLN("Attempting Coolix 24-bit decode");
     if (decodeCOOLIX(results, offset)) return true;
-#endif
+#endif  // DECODE_COOLIX
 #if DECODE_NIKAI
     DPRINTLN("Attempting Nikai decode");
     if (decodeNikai(results, offset)) return true;
@@ -1047,6 +1047,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Airton decode");
     if (decodeAirton(results, offset)) return true;
 #endif  // DECODE_AIRTON
+#if DECODE_COOLIX48
+    DPRINTLN("Attempting Coolix 48-bit decode");
+    if (decodeCoolix48(results, offset)) return true;
+#endif  // DECODE_COOLIX48
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
