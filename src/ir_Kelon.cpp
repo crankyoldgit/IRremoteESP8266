@@ -440,7 +440,7 @@ stdAc::fanspeed_t IRKelonAc::toCommonFanSpeed(const uint8_t speed) {
 /// Convert the internal A/C object state to it's stdAc::state_t equivalent.
 /// @return A stdAc::state_t containing the current settings.
 stdAc::state_t IRKelonAc::toCommon(const stdAc::state_t *prev) const {
-  stdAc::state_t result{};
+  stdAc::state_t result;
   result.protocol = decode_type_t::KELON;
   result.model = -1;  // Unused.
   result.mode = toCommonMode(getMode());
