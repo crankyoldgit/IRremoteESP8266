@@ -57,7 +57,7 @@
 #ifndef STRCASECMP
 #if defined(ESP8266)
 #define STRCASECMP(LHS, RHS) \
-    strcasecmp_P(LHS, reinterpret_cast<const char* const>(RHS))
+    strcasecmp_P(LHS, reinterpret_cast<const char*>(RHS))
 #else  // ESP8266
 #define STRCASECMP(LHS, RHS) strcasecmp(LHS, RHS)
 #endif  // ESP8266
