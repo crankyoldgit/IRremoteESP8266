@@ -94,7 +94,7 @@ namespace stdAc {
   };
 
   /// Structure to hold a common A/C state.
-  typedef struct {
+  struct state_t {
     decode_type_t protocol;
     int16_t model;
     bool power;
@@ -113,7 +113,7 @@ namespace stdAc {
     bool beep;
     int16_t sleep;
     int16_t clock;
-  } state_t;
+  };
 };  // namespace stdAc
 
 /// Fujitsu A/C model numbers
