@@ -62,3 +62,10 @@ jobs:
       env:
         PLATFORMIO_BUILD_CACHE_DIR: "../../.pio/buildcache"
       run: pio run --jobs 2 --project-dir ${{ matrix.project }}
+
+  Build_Examples:
+    needs: Build_Example
+    runs-on: ubuntu-latest
+    steps:
+    - name: done
+      run: echo ok
