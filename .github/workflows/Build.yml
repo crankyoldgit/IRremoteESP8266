@@ -46,12 +46,12 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.platformio
-        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+        key: ${{ runner.os }}-${{ hashFiles('**/platformio.ini') }}
     - name: Cache PlatformIO build
       uses: actions/cache@v2
       with:
         path: .pio
-        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+        key: ${{ runner.os }}-${{ matrix.project }}
     - name: Set up Python
       uses: actions/setup-python@v2
     - name: Install PlatformIO
