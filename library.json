@@ -46,11 +46,5 @@
   ],
   "exclude": [".github", "extras", "docs", "assets"],
   "frameworks": "arduino",
-  "platforms": ["espressif8266", "espressif32"],
-  "build": {
-    "flags": [
-      "-Lsrc",
-      "-lsrc"
-    ]
-  }
+  "platforms": ["espressif8266", "espressif32"]
 }
