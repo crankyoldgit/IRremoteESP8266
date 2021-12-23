@@ -27,7 +27,9 @@ CPPFLAGS += -DUNIT_TEST -D_IR_LOCALE_=en-AU
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread -std=gnu++11
 
-all : gc_decode mode2_decode code_to_raw
+objects = $(patsubst %.cpp,%,$(wildcard *.cpp))
+
+all : $(objects)
 
 run_tests : all
 	failed=""; \
@@ -50,7 +52,7 @@ run-% : all
 	python3 ./$*.py;
 
 clean :
-	rm -f  *.o *.pyc gc_decode mode2_decode code_to_raw
+	rm -f  *.o *.pyc $(objects)
 
 
 # Keep all intermediate files.
@@ -84,10 +86,7 @@ IRrecv.o : $(USER_DIR)/IRrecv.cpp $(USER_DIR)/IRrecv.h $(USER_DIR)/IRremoteESP82
 
 # new specific targets goes above this line
 
-%_decode : $(COMMON_OBJ) %_decode.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
-
-code_to_raw : $(COMMON_OBJ) code_to_raw.o
+$(objects) : %: $(COMMON_OBJ) %.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 ir_%.o : $(USER_DIR)/ir_%.h $(USER_DIR)/ir_%.cpp $(COMMON_DEPS) $(GTEST_HEADERS)
