@@ -51,7 +51,10 @@ jobs:
       uses: actions/cache@v2
       with:
         path: .pio
-        key: ${{ runner.os }}-${{ matrix.project }}
+        key: pio-${{ runner.os }}-${{ matrix.project }}
+        restore-keys: |
+          pio-${{ runner.os }}-
+          pio-
     - name: Set up Python
       uses: actions/setup-python@v2
     - name: Install PlatformIO
