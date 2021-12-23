@@ -12,6 +12,8 @@
 // Ref: https://docs.google.com/spreadsheets/d/1zzDEUQ52y7MZ7_xCU3pdjdqbRXOwZLsbTGvKWcicqCI/
 // Ref: https://www.corona.co.jp/box/download.php?id=145060636229
 
+// dummy change
+
 #ifndef IR_CORONA_H_
 #define IR_CORONA_H_
 
