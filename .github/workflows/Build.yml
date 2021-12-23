@@ -7,9 +7,31 @@ on:
     branches: [ master ]
 
 jobs:
-  Build_Examples:
-
+  Gen_Matrix:
+    outputs:
+      matrix: ${{ steps.files.outputs.matrix }}
     runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: set the list
+      id: files
+      run: |
+        JSONI=$(find . -name platformio.ini -type f | sed 's,/platformio.ini$,,' | xargs -n 1 -I {} echo -e '"{}",')
+
+        # Remove last "," and add closing brackets
+        if [[ $JSONI == *, ]]; then
+        JSONI="${JSONI%?}"
+        fi
+        JSONI=${JSONI//$'\n'}
+        echo $JSONI
+        # Set output
+        echo "::set-output name=matrix::[${JSONI}]"
+  Build_Examples:
+    needs: Gen_Matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ${{fromJson(needs.Gen_Matrix.outputs.matrix)}}
 
     steps:
     - uses: actions/checkout@v2
@@ -39,4 +61,4 @@ jobs:
     - name: Build all the examples
       env:
         PLATFORMIO_BUILD_CACHE_DIR: "../../.pio/buildcache"
-      run: find . -name platformio.ini -type f | sed 's,/platformio.ini$,,' | xargs --verbose -n 1 pio run --jobs 2 --project-dir
+      run: pio run --jobs 2 --project-dir ${{ matrix.project }}
