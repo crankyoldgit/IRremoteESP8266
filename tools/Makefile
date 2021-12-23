@@ -35,6 +35,10 @@ run_tests : all
 	  echo "RUNNING: $${py_unittest}"; \
 		python3 ./$${py_unittest} || failed="$${failed} $${py_unittest}"; \
 	done; \
+	for shell_unittest in *_test.sh; do \
+	  echo "RUNNING: $${shell_unittest}"; \
+		bash ./$${shell_unittest} || failed="$${failed} $${shell_unittest}"; \
+	done; \
 	if [ -n "$${failed}" ]; then \
 		echo "FAIL: :-( :-( Unit test(s)$${failed} failed! :-( :-("; exit 1; \
 	else \
