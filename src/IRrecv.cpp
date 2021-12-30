@@ -356,7 +356,9 @@ void IRrecv::enableIRIn(const bool pullup) {
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
   timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
   // Note: Interrupt needs to be attached before it can be enabled or disabled.
-  timerAttachInterrupt(timer, &read_timeout, true);
+  // Note: EDGE (true) is not supported, use LEVEL (false). Ref: #1713
+  // See: https://github.com/espressif/arduino-esp32/blob/caef4006af491130136b219c1205bdcf8f08bf2b/cores/esp32/esp32-hal-timer.c#L224-L227
+  timerAttachInterrupt(timer, &read_timeout, false);
 #endif  // ESP32
 
   // Initialise state machine variables
