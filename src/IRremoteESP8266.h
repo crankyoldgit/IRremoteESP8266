@@ -52,8 +52,29 @@
 #include <string>
 #endif  // UNIT_TEST
 
-// Library Version
-#define _IRREMOTEESP8266_VERSION_ "2.8.0"
+// Library Version Information
+// Major version number (X.x.x)
+#define _IRREMOTEESP8266_VERSION_MAJOR 2
+// Minor version number (x.X.x)
+#define _IRREMOTEESP8266_VERSION_MINOR 8
+// Patch version number (x.x.X)
+#define _IRREMOTEESP8266_VERSION_PATCH 0
+// Macro to convert version info into an integer
+#define _IRREMOTEESP8266_VERSION_VAL(major, minor, patch) \
+                                    ((major << 16) | (minor << 8) | (patch))
+// Macro to convert literal into a string
+#define MKSTR(x) #x
+// Integer version
+#define _IRREMOTEESP8266_VERSION _IRREMOTEESP8266_VERSION_VAL(\
+    _IRREMOTEESP8266_VERSION_MAJOR, \
+    _IRREMOTEESP8266_VERSION_MINOR, \
+    _IRREMOTEESP8266_VERSION_PATCH)
+// String version
+#define _IRREMOTEESP8266_VERSION_STR MKSTR(_IRREMOTEESP8266_VERSION_MAJOR) "." \
+                                     MKSTR(_IRREMOTEESP8266_VERSION_MINOR) "." \
+                                     MKSTR(_IRREMOTEESP8266_VERSION_PATCH)
+// String version (DEPRECATED)
+#define _IRREMOTEESP8266_VERSION_ _IRREMOTEESP8266_VERSION_STR
 
 // Set the language & locale for the library. See the `locale` dir for options.
 #ifndef _IR_LOCALE_
