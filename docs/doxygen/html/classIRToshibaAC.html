@@ -141,6 +141,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a13c884468baf27828c61ffd526d0e297"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a13c884468baf27828c61ffd526d0e297">getEcono</a> (void) const</td></tr>
 <tr class="memdesc:a13c884468baf27828c61ffd526d0e297"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Economy mode setting of the A/C.  <a href="classIRToshibaAC.html#a13c884468baf27828c61ffd526d0e297">More...</a><br /></td></tr>
 <tr class="separator:a13c884468baf27828c61ffd526d0e297"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab03e94cb3eaa29da89b745bcea61970"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#aab03e94cb3eaa29da89b745bcea61970">setFilter</a> (const bool <a class="el" href="classIRToshibaAC.html#abdc35338e4a18132d56bf6b46ddea590">on</a>)</td></tr>
+<tr class="memdesc:aab03e94cb3eaa29da89b745bcea61970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the filter (Pure/Ion Filter) setting of the A/C.  <a href="classIRToshibaAC.html#aab03e94cb3eaa29da89b745bcea61970">More...</a><br /></td></tr>
+<tr class="separator:aab03e94cb3eaa29da89b745bcea61970"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c21e933cd302f09d0ef07d81afbf13e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#a7c21e933cd302f09d0ef07d81afbf13e">getFilter</a> (void) const</td></tr>
+<tr class="memdesc:a7c21e933cd302f09d0ef07d81afbf13e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the filter (Pure/Ion Filter) setting of the A/C.  <a href="classIRToshibaAC.html#a7c21e933cd302f09d0ef07d81afbf13e">More...</a><br /></td></tr>
+<tr class="separator:a7c21e933cd302f09d0ef07d81afbf13e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa001cddc464d6cbcc342e5e4c7af13ff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRToshibaAC.html#aa001cddc464d6cbcc342e5e4c7af13ff">setMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:aa001cddc464d6cbcc342e5e4c7af13ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the operating mode of the A/C.  <a href="classIRToshibaAC.html#aa001cddc464d6cbcc342e5e4c7af13ff">More...</a><br /></td></tr>
 <tr class="separator:aa001cddc464d6cbcc342e5e4c7af13ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -585,6 +591,27 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a7c21e933cd302f09d0ef07d81afbf13e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c21e933cd302f09d0ef07d81afbf13e">&#9670;&nbsp;</a></span>getFilter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRToshibaAC::getFilter </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the filter (Pure/Ion Filter) setting of the A/C. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if the current setting is on. Otherwise, false. </dd></dl>
+
+</div>
+</div>
 <a id="a146624d75ab5f6c23a75fe87918edadd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a146624d75ab5f6c23a75fe87918edadd">&#9670;&nbsp;</a></span>getInternalStateLength()</h2>
 
@@ -902,6 +929,32 @@ Private Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>The desired setting (0 is Auto, 1-5 is the speed, 5 is Max) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aab03e94cb3eaa29da89b745bcea61970"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab03e94cb3eaa29da89b745bcea61970">&#9670;&nbsp;</a></span>setFilter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRToshibaAC::setFilter </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>on</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the filter (Pure/Ion Filter) setting of the A/C. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">on</td><td>true, the setting is on. false, the setting is off. </td></tr>
   </table>
   </dd>
 </dl>
