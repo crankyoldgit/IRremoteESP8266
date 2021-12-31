@@ -3,7 +3,7 @@
 ## _v2.8.1 (20220101)_
 
 **[Bug Fixes]**
-- Arduino ESP32 Core v2.0.2+ crashes due to our timer hack. (#1715 #1715)
+- Arduino ESP32 Core v2.0.2+ crashes due to our timer hack. (#1715 #1713)
 - SONY: Fix old Sony CD-Player Remote (12 Bit) (#1714)
 
 **[Features]**
