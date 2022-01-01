@@ -130,6 +130,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aeb5202fa0093ee6b7e07d4290229fbd2"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#aeb5202fa0093ee6b7e07d4290229fbd2">sumNibbles</a> (const uint64_t data, const uint8_t count, const uint8_t init, const bool nibbleonly)</td></tr>
 <tr class="memdesc:aeb5202fa0093ee6b7e07d4290229fbd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sum all the nibbles together in an integer.  <a href="namespaceirutils.html#aeb5202fa0093ee6b7e07d4290229fbd2">More...</a><br /></td></tr>
 <tr class="separator:aeb5202fa0093ee6b7e07d4290229fbd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a7bf48efe34a7721d961f68f8fc2c00"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#a1a7bf48efe34a7721d961f68f8fc2c00">sumBytes</a> (const uint64_t data, const uint8_t count, const uint8_t init, const bool byteonly)</td></tr>
+<tr class="memdesc:a1a7bf48efe34a7721d961f68f8fc2c00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sum all the bytes together in an integer.  <a href="namespaceirutils.html#a1a7bf48efe34a7721d961f68f8fc2c00">More...</a><br /></td></tr>
+<tr class="separator:a1a7bf48efe34a7721d961f68f8fc2c00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af18c4abfd0ed9f4b3a099ecec1999ee7"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceirutils.html#af18c4abfd0ed9f4b3a099ecec1999ee7">bcdToUint8</a> (const uint8_t bcd)</td></tr>
 <tr class="memdesc:af18c4abfd0ed9f4b3a099ecec1999ee7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a byte of Binary Coded Decimal(BCD) into an Integer.  <a href="namespaceirutils.html#af18c4abfd0ed9f4b3a099ecec1999ee7">More...</a><br /></td></tr>
 <tr class="separator:af18c4abfd0ed9f4b3a099ecec1999ee7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1654,6 +1657,58 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a1a7bf48efe34a7721d961f68f8fc2c00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a7bf48efe34a7721d961f68f8fc2c00">&#9670;&nbsp;</a></span>sumBytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t irutils::sumBytes </td>
+          <td>(</td>
+          <td class="paramtype">const uint64_t&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>init</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>byteonly</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sum all the bytes together in an integer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The integer to be summed. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">count</td><td>The number of bytes to sum. Starts from LSB. Max of 8. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">init</td><td>Starting value of the calculation to use. (Default is 0) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">byteonly</td><td>true, the result is 8 bits. false, it's 16 bits. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The 8/16-bit calculated result of all the bytes and init value. </dd></dl>
 
 </div>
 </div>

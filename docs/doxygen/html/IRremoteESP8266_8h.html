@@ -222,7 +222,9 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadad1340a6d559add811fc396d780740fd8">ARRIS</a>, 
 <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada28d0b7c937b3c0768ee68c6f52112702">RHOSS</a>, 
 <a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada88cc2d786c7bffb8e416e60fbb4c8ff8">AIRTON</a>, 
-<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = AIRTON
+<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fada2b03f7428984a70f363e4f8c90caf5f7">COOLIX48</a>, 
+<br />
+&#160;&#160;<a class="el" href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59">kLastDecodeType</a> = COOLIX48
 <br />
  }</td></tr>
 <tr class="memdesc:ad5b287a488a8c1b7b8661f029ab56fad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumerator for defining and numbering of supported IR protocol.  <a href="IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad">More...</a><br /></td></tr>
@@ -264,6 +266,8 @@ Variables</h2></td></tr>
 <tr class="separator:af2f4e097aef5fa0ec5526936e93108d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed48c68a637e4b45b80bbf4964ea79f9"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#aed48c68a637e4b45b80bbf4964ea79f9">kCoolixBits</a> = 24</td></tr>
 <tr class="separator:aed48c68a637e4b45b80bbf4964ea79f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4b73f8c255d57c3b49605796c18e5dd"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#ac4b73f8c255d57c3b49605796c18e5dd">kCoolix48Bits</a> = <a class="el" href="IRremoteESP8266_8h.html#aed48c68a637e4b45b80bbf4964ea79f9">kCoolixBits</a> * 2</td></tr>
+<tr class="separator:ac4b73f8c255d57c3b49605796c18e5dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa89410d369d71738c8cbefae6ac3b00f"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#aa89410d369d71738c8cbefae6ac3b00f">kCoolixDefaultRepeat</a> = <a class="el" href="IRremoteESP8266_8h.html#a46835b1e2d279570fd818749e88180d4">kSingleRepeat</a></td></tr>
 <tr class="separator:aa89410d369d71738c8cbefae6ac3b00f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a668d9ac84f7dae61c35534b842d4956b"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRremoteESP8266_8h.html#a668d9ac84f7dae61c35534b842d4956b">kCarrierAcBits</a> = 32</td></tr>
@@ -855,6 +859,7 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadad1340a6d559add811fc396d780740fd8"></a>ARRIS&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada28d0b7c937b3c0768ee68c6f52112702"></a>RHOSS&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada88cc2d786c7bffb8e416e60fbb4c8ff8"></a>AIRTON&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fada2b03f7428984a70f363e4f8c90caf5f7"></a>COOLIX48&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ad5b287a488a8c1b7b8661f029ab56fadab09881b84bf9d61af99e62a85cce0b59"></a>kLastDecodeType&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
@@ -1149,6 +1154,20 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint16_t kCarrierAcMinRepeat = <a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac4b73f8c255d57c3b49605796c18e5dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4b73f8c255d57c3b49605796c18e5dd">&#9670;&nbsp;</a></span>kCoolix48Bits</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kCoolix48Bits = <a class="el" href="IRremoteESP8266_8h.html#aed48c68a637e4b45b80bbf4964ea79f9">kCoolixBits</a> * 2</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -4238,8 +4257,8 @@ Variables</h2></td></tr>
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1173</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1172</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a5cd69a192be51634ce72a40398a6c0d7"><div class="ttname"><a href="IRremoteESP8266_8h.html#a5cd69a192be51634ce72a40398a6c0d7">kSanyoLC7461CommandBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461CommandBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1203</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a7e15e988acbea0fb4dfaee6f5bfa12d0"><div class="ttname"><a href="IRremoteESP8266_8h.html#a7e15e988acbea0fb4dfaee6f5bfa12d0">kSanyoLC7461AddressBits</a></div><div class="ttdeci">const uint16_t kSanyoLC7461AddressBits</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1202</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
