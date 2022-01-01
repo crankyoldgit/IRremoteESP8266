@@ -267,8 +267,11 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:a66289f6a462557ad26e6c0a64f36cf02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Whynter message. Status: STABLE / Working. Strict mode is ALPHA.  <a href="classIRrecv.html#a66289f6a462557ad26e6c0a64f36cf02">More...</a><br /></td></tr>
 <tr class="separator:a66289f6a462557ad26e6c0a64f36cf02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a964af7e72e2133688f0596c718cb98ca"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a964af7e72e2133688f0596c718cb98ca">decodeCOOLIX</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#aed48c68a637e4b45b80bbf4964ea79f9">kCoolixBits</a>, const bool strict=true)</td></tr>
-<tr class="memdesc:a964af7e72e2133688f0596c718cb98ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Coolix A/C message. Status: STABLE / Known Working.  <a href="classIRrecv.html#a964af7e72e2133688f0596c718cb98ca">More...</a><br /></td></tr>
+<tr class="memdesc:a964af7e72e2133688f0596c718cb98ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Coolix 24-bit A/C message. Status: STABLE / Known Working.  <a href="classIRrecv.html#a964af7e72e2133688f0596c718cb98ca">More...</a><br /></td></tr>
 <tr class="separator:a964af7e72e2133688f0596c718cb98ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afed15d4ac83a02a990b164d62fa06626"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#afed15d4ac83a02a990b164d62fa06626">decodeCoolix48</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#ac4b73f8c255d57c3b49605796c18e5dd">kCoolix48Bits</a>, const bool strict=true)</td></tr>
+<tr class="memdesc:afed15d4ac83a02a990b164d62fa06626"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Coolix 48-bit A/C message. Status: BETA / Probably Working.  <a href="classIRrecv.html#afed15d4ac83a02a990b164d62fa06626">More...</a><br /></td></tr>
+<tr class="separator:afed15d4ac83a02a990b164d62fa06626"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b1bd1c817cb43bc3755126191b7f4a2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a0b1bd1c817cb43bc3755126191b7f4a2">decodeDenon</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a29160117e25f3dfc1cb899a4a53bc238">kDenonBits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:a0b1bd1c817cb43bc3755126191b7f4a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Delonghi A/C message. Status: STABLE / Should work fine.  <a href="classIRrecv.html#a0b1bd1c817cb43bc3755126191b7f4a2">More...</a><br /></td></tr>
 <tr class="separator:a0b1bd1c817cb43bc3755126191b7f4a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1699,7 +1702,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Decode the supplied Coolix A/C message. Status: STABLE / Known Working. </p>
+<p>Decode the supplied Coolix 24-bit A/C message. Status: STABLE / Known Working. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decode result. </td></tr>
@@ -1710,6 +1713,67 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
+
+</div>
+</div>
+<a id="afed15d4ac83a02a990b164d62fa06626"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afed15d4ac83a02a990b164d62fa06626">&#9670;&nbsp;</a></span>decodeCoolix48()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::decodeCoolix48 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecode__results.html">decode_results</a> *&#160;</td>
+          <td class="paramname"><em>results</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>offset</em> = <code><a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#ac4b73f8c255d57c3b49605796c18e5dd">kCoolix48Bits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>strict</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decode the supplied Coolix 48-bit A/C message. Status: BETA / Probably Working. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decode result. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1694">https://github.com/crankyoldgit/IRremoteESP8266/issues/1694</a> </dd></dl>
 
 </div>
 </div>

@@ -237,9 +237,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3cafe475a58234a0d3aa655a2464be75"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a3cafe475a58234a0d3aa655a2464be75">sendRCMM</a> (uint64_t data, uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a2bfaf393c2d77a594f2a0a5a763e84f5">kRCMMBits</a>, uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
 <tr class="memdesc:a3cafe475a58234a0d3aa655a2464be75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Philips RC-MM packet. Status: STABLE / Should be working.  <a href="classIRsend.html#a3cafe475a58234a0d3aa655a2464be75">More...</a><br /></td></tr>
 <tr class="separator:a3cafe475a58234a0d3aa655a2464be75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a088af5f0d76965c61fe5716f7b8f2b61"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a088af5f0d76965c61fe5716f7b8f2b61">sendCOOLIX</a> (uint64_t data, uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#aed48c68a637e4b45b80bbf4964ea79f9">kCoolixBits</a>, uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#aa89410d369d71738c8cbefae6ac3b00f">kCoolixDefaultRepeat</a>)</td></tr>
-<tr class="memdesc:a088af5f0d76965c61fe5716f7b8f2b61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Coolix message Status: STABLE / Confirmed Working.  <a href="classIRsend.html#a088af5f0d76965c61fe5716f7b8f2b61">More...</a><br /></td></tr>
-<tr class="separator:a088af5f0d76965c61fe5716f7b8f2b61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc0ec836bf660e69baf33d61ae4ea567"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#abc0ec836bf660e69baf33d61ae4ea567">sendCOOLIX</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#aed48c68a637e4b45b80bbf4964ea79f9">kCoolixBits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#aa89410d369d71738c8cbefae6ac3b00f">kCoolixDefaultRepeat</a>)</td></tr>
+<tr class="memdesc:abc0ec836bf660e69baf33d61ae4ea567"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Coolix 24-bit message Status: STABLE / Confirmed Working.  <a href="classIRsend.html#abc0ec836bf660e69baf33d61ae4ea567">More...</a><br /></td></tr>
+<tr class="separator:abc0ec836bf660e69baf33d61ae4ea567"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7766941b9857e1c969e8cfdc6745a202"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a7766941b9857e1c969e8cfdc6745a202">sendCoolix48</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#ac4b73f8c255d57c3b49605796c18e5dd">kCoolix48Bits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#aa89410d369d71738c8cbefae6ac3b00f">kCoolixDefaultRepeat</a>)</td></tr>
+<tr class="memdesc:a7766941b9857e1c969e8cfdc6745a202"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Coolix 48-bit message. Status: ALPHA / Untested.  <a href="classIRsend.html#a7766941b9857e1c969e8cfdc6745a202">More...</a><br /></td></tr>
+<tr class="separator:a7766941b9857e1c969e8cfdc6745a202"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07188366deed3dd902cba80a711cf220"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRsend.html#a07188366deed3dd902cba80a711cf220">sendWhynter</a> (const uint64_t data, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a4553f6670e241a67104d45216a4ebd98">kWhynterBits</a>, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a1a49dde7ffbd753f7756cf0c9dc6d826">kNoRepeat</a>)</td></tr>
 <tr class="memdesc:a07188366deed3dd902cba80a711cf220"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a Whynter message. Status: STABLE.  <a href="classIRsend.html#a07188366deed3dd902cba80a711cf220">More...</a><br /></td></tr>
 <tr class="separator:a07188366deed3dd902cba80a711cf220"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2246,8 +2249,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a088af5f0d76965c61fe5716f7b8f2b61"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a088af5f0d76965c61fe5716f7b8f2b61">&#9670;&nbsp;</a></span>sendCOOLIX()</h2>
+<a id="abc0ec836bf660e69baf33d61ae4ea567"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc0ec836bf660e69baf33d61ae4ea567">&#9670;&nbsp;</a></span>sendCOOLIX()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2255,19 +2258,19 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname">void IRsend::sendCOOLIX </td>
           <td>(</td>
-          <td class="paramtype">uint64_t&#160;</td>
+          <td class="paramtype">const uint64_t&#160;</td>
           <td class="paramname"><em>data</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramtype">const uint16_t&#160;</td>
           <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#aed48c68a637e4b45b80bbf4964ea79f9">kCoolixBits</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramtype">const uint16_t&#160;</td>
           <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#aa89410d369d71738c8cbefae6ac3b00f">kCoolixDefaultRepeat</a></code>&#160;</td>
         </tr>
         <tr>
@@ -2278,7 +2281,7 @@ Private Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Send a Coolix message Status: STABLE / Confirmed Working. </p>
+<p>Send a Coolix 24-bit message Status: STABLE / Confirmed Working. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The message to be sent. </td></tr>
@@ -2288,6 +2291,52 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a href="https://github.com/z3t0/Arduino-IRremote/blob/master/ir_COOLIX.cpp">https://github.com/z3t0/Arduino-IRremote/blob/master/ir_COOLIX.cpp</a> </dd></dl>
+
+</div>
+</div>
+<a id="a7766941b9857e1c969e8cfdc6745a202"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7766941b9857e1c969e8cfdc6745a202">&#9670;&nbsp;</a></span>sendCoolix48()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRsend::sendCoolix48 </td>
+          <td>(</td>
+          <td class="paramtype">const uint64_t&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#ac4b73f8c255d57c3b49605796c18e5dd">kCoolix48Bits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#aa89410d369d71738c8cbefae6ac3b00f">kCoolixDefaultRepeat</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a Coolix 48-bit message. Status: ALPHA / Untested. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of bits of message to be sent. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>The number of times the command is to be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1694">https://github.com/crankyoldgit/IRremoteESP8266/issues/1694</a> </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This is effectively the same as <code><a class="el" href="classIRsend.html#abc0ec836bf660e69baf33d61ae4ea567" title="Send a Coolix 24-bit message Status: STABLE / Confirmed Working.">sendCOOLIX()</a></code> except requiring the bit flipping be done prior to the call. </dd></dl>
 
 </div>
 </div>
@@ -7746,9 +7795,9 @@ For RC-6 (36-bits/Xbox-360), it is the 16th least significant bit. </dd></dl>
 </ul>
 </div><!-- contents -->
 <div class="ttc" id="aclassIRsend_html_a0b349351e2ba19f87e6b01cde7e67c49"><div class="ttname"><a href="classIRsend.html#a0b349351e2ba19f87e6b01cde7e67c49">IRsend::sendPronto</a></div><div class="ttdeci">void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat=kNoRepeat)</div><div class="ttdoc">Send a Pronto Code formatted message. Status: STABLE / Known working.</div><div class="ttdef"><b>Definition:</b> ir_Pronto.cpp:56</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a336bd721135fc8b869941cd3aa73646e"><div class="ttname"><a href="IRremoteESP8266_8h.html#a336bd721135fc8b869941cd3aa73646e">kVoltasStateLength</a></div><div class="ttdeci">const uint16_t kVoltasStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1220</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_ab18df94a82b365ff30caaabb05a9fcaf"><div class="ttname"><a href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a></div><div class="ttdeci">const uint16_t kCoronaAcStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1009</div></div>
-<div class="ttc" id="aIRremoteESP8266_8h_html_a112408429fb4a5cca22a66a351453bad"><div class="ttname"><a href="IRremoteESP8266_8h.html#a112408429fb4a5cca22a66a351453bad">kSonyMinRepeat</a></div><div class="ttdeci">const uint16_t kSonyMinRepeat</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1188</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a336bd721135fc8b869941cd3aa73646e"><div class="ttname"><a href="IRremoteESP8266_8h.html#a336bd721135fc8b869941cd3aa73646e">kVoltasStateLength</a></div><div class="ttdeci">const uint16_t kVoltasStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1250</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_ab18df94a82b365ff30caaabb05a9fcaf"><div class="ttname"><a href="IRremoteESP8266_8h.html#ab18df94a82b365ff30caaabb05a9fcaf">kCoronaAcStateLength</a></div><div class="ttdeci">const uint16_t kCoronaAcStateLength</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1039</div></div>
+<div class="ttc" id="aIRremoteESP8266_8h_html_a112408429fb4a5cca22a66a351453bad"><div class="ttname"><a href="IRremoteESP8266_8h.html#a112408429fb4a5cca22a66a351453bad">kSonyMinRepeat</a></div><div class="ttdeci">const uint16_t kSonyMinRepeat</div><div class="ttdef"><b>Definition:</b> IRremoteESP8266.h:1218</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
