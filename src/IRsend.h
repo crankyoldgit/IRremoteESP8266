@@ -172,10 +172,10 @@ enum sharp_ac_remote_model_t {
   A903 = 3,  // 820 too
 };
 
-/// TCL A/C model numbers
+/// TCL (& Teknopoint) A/C model numbers
 enum tcl_ac_remote_model_t {
   TAC09CHSD = 1,
-  GZ055BE1 = 2,
+  GZ055BE1 = 2,  // Also Teknopoint GZ01-BEJ0-000
 };
 
 /// Voltas A/C model numbers
