@@ -856,6 +856,15 @@ TEST(TestUtils, Housekeeping) {
             IRsend::defaultBits(decode_type_t::HITACHI_AC344));
   ASSERT_EQ(kNoRepeat,
             IRsend::minRepeats(decode_type_t::HITACHI_AC344));
+
+  ASSERT_EQ("HITACHI_AC264", typeToString(decode_type_t::HITACHI_AC264));
+  ASSERT_EQ(decode_type_t::HITACHI_AC264, strToDecodeType("HITACHI_AC264"));
+  ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC264));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC264));
+  ASSERT_EQ(kHitachiAc264Bits,
+            IRsend::defaultBits(decode_type_t::HITACHI_AC264));
+  ASSERT_EQ(kNoRepeat,
+            IRsend::minRepeats(decode_type_t::HITACHI_AC264));
 }
 
 // Decode a 'real' HitachiAc424 message.
@@ -1983,4 +1992,99 @@ TEST(TestIRHitachiAc344Class, SwingV) {
   EXPECT_STATE_EQ(turn_on_swingv, ac.getRaw(), kHitachiAc344Bits);
   ac.setSwingV(false);
   EXPECT_FALSE(ac.getSwingV());
+}
+
+// Decode a 'real' HitachiAc264 message.
+TEST(TestDecodeHitachiAc264, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expected[kHitachiAc264StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92,
+      0x6D, 0x13, 0xEC, 0x6C, 0x93, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x16, 0xE9, 0xC1, 0x3E, 0x00,
+      0xFF, 0x00, 0xFF};
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1729#issuecomment-1006938712
+  const uint16_t rawData[531] = {
+      3392, 1752, 372, 1356, 344, 504, 344, 504, 344, 480, 370, 480, 370, 478,
+      370, 478, 372, 480, 370, 478, 370, 480, 370, 478, 370, 480, 370, 1330,
+      370, 478, 370, 480, 370, 478, 370, 478, 370, 480, 370, 478, 370, 480, 370,
+      504, 346, 504, 344, 480, 370, 504, 346, 478, 370, 478, 370, 478, 372, 480,
+      370, 480, 370, 504, 346, 1330, 370, 480, 370, 1356, 346, 1330, 370, 1354,
+      346, 1328, 370, 1330, 370, 1328, 370, 478, 372, 1330, 370, 1328, 370,
+      1356, 346, 1354, 344, 1328, 372, 1354, 344, 1356, 344, 1330, 370, 1328,
+      372, 480, 370, 478, 370, 504, 346, 478, 372, 476, 372, 504, 346, 480, 370,
+      504, 344, 478, 372, 504, 344, 1328, 372, 1328, 372, 478, 370, 504, 346,
+      1330, 370, 1328, 372, 1328, 370, 1356, 344, 478, 370, 478, 370, 1356, 344,
+      1328, 372, 480, 370, 478, 372, 504, 346, 1330, 370, 478, 370, 480, 370,
+      1330, 370, 478, 370, 480, 370, 1328, 370, 1330, 370, 480, 372, 1352, 346,
+      1328, 372, 504, 346, 1328, 370, 1328, 370, 480, 370, 1328, 372, 1328, 370,
+      504, 344, 478, 372, 1330, 370, 478, 370, 480, 370, 480, 370, 478, 370,
+      480, 370, 1356, 346, 1328, 370, 480, 370, 1330, 370, 1330, 370, 1330, 370,
+      478, 370, 506, 344, 1328, 372, 1328, 372, 478, 372, 1330, 370, 1328, 372,
+      478, 370, 1330, 370, 1328, 372, 504, 344, 480, 370, 1330, 370, 504, 344,
+      504, 346, 1354, 346, 504, 346, 478, 372, 478, 370, 480, 370, 478, 370,
+      492, 358, 478, 370, 478, 370, 1328, 372, 1330, 370, 1328, 372, 1354, 346,
+      1328, 372, 1328, 370, 1330, 370, 1328, 372, 476, 372, 504, 346, 478, 372,
+      480, 370, 480, 370, 504, 344, 478, 370, 480, 370, 1328, 370, 1330, 372,
+      1328, 370, 1330, 370, 1330, 370, 1330, 368, 1330, 370, 1330, 370, 480,
+      370, 480, 370, 478, 370, 504, 344, 480, 370, 478, 370, 504, 344, 478, 372,
+      1328, 370, 1330, 370, 1330, 370, 1330, 370, 1328, 372, 1356, 344, 1330,
+      370, 1330, 370, 480, 370, 478, 370, 482, 368, 480, 370, 480, 370, 480,
+      370, 480, 370, 480, 370, 1330, 370, 1354, 346, 1330, 370, 1354, 346, 1330,
+      370, 1330, 370, 1330, 370, 1330, 370, 504, 346, 480, 370, 478, 372, 478,
+      372, 504, 344, 480, 370, 480, 370, 504, 344, 1330, 370, 1328, 370, 1330,
+      372, 1328, 370, 1354, 346, 1328, 370, 1330, 370, 1330, 370, 478, 370,
+      1330, 370, 1328, 372, 480, 370, 1330, 370, 480, 370, 480, 370, 480, 370,
+      1356, 344, 478, 370, 506, 344, 1330, 370, 478, 370, 1330, 372, 1354, 346,
+      1354, 346, 1328, 370, 478, 372, 478, 370, 480, 370, 504, 346, 480, 370,
+      1328, 370, 1330, 370, 478, 370, 1330, 370, 1328, 370, 1330, 372, 1354,
+      344, 1328, 372, 504, 346, 478, 370, 504, 346, 504, 346, 478, 370, 478,
+      370, 482, 368, 480, 370, 478, 370, 480, 370, 1328, 372, 1328, 370, 1330,
+      370, 1328, 370, 1328, 370, 1330, 370, 1354, 346, 1328, 372, 478, 370, 478,
+      370, 478, 372, 478, 372, 478, 372, 478, 372, 478, 370, 478, 372, 1330,
+      370, 1328, 370, 1328, 372, 1328, 372, 1330, 444, 1256, 370, 1330, 370,
+      1330, 442};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 531, kHitachiAcFreq);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC264, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc264Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc264Bits);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+// Decode a 'Synthetic' HitachiAc264 message.
+TEST(TestDecodeHitachiAc264, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1729#issuecomment-1006938712
+  const uint8_t expected[kHitachiAc264StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92,
+      0x6D, 0x13, 0xEC, 0x6C, 0x93, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x16, 0xE9, 0xC1, 0x3E, 0x00,
+      0xFF, 0x00, 0xFF};
+
+  irsend.reset();
+  irsend.sendHitachiAc264(expected);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(HITACHI_AC264, irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc264Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc264Bits);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
