@@ -1599,8 +1599,8 @@ String IRHitachiAc344::toString(void) const {
 
 #if SEND_HITACHI_AC264
 /// Send a Hitachi 33-byte/264-bit A/C message (HITACHI_AC264)
-///  Basically the same as sendHitachiAC() except different size.
-/// Status: Beta / Probably works.
+/// Basically the same as sendHitachiAC() except different size.
+/// Status: STABLE / Reported as working.
 /// @param[in] data An array of bytes containing the IR command.
 /// @param[in] nbytes Nr. of bytes of data in the array.
 /// @param[in] repeat Nr. of times the message is to be repeated. (Default = 0).
