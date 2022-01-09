@@ -1166,8 +1166,8 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   DPRINT(". Matching: ");
   DPRINT(measured);
   DPRINT(" >= ");
-  DPRINT(ticksLow(std::min(desired, MS_TO_USEC(params.timeout)), tolerance,
-                  delta));
+  DPRINT(ticksLow(std::min(desired, (uint32_t)MS_TO_USEC(params.timeout)),
+                  tolerance, delta));
   DPRINT(" [min(");
   DPRINT(ticksLow(desired, tolerance, delta));
   DPRINT(", ");
