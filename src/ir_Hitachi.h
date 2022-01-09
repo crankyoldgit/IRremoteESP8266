@@ -7,6 +7,7 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1056
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1060
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1134
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1729
 
 // Supports:
 //   Brand: Hitachi,  Model: RAS-35THA6 remote
@@ -19,6 +20,8 @@
 //   Brand: Hitachi,  Model: R-LT0541-HTA/Y.K.1.1-1 V2.3 remote (HITACHI_AC1)
 //   Brand: Hitachi,  Model: RAS-22NK A/C (HITACHI_AC344)
 //   Brand: Hitachi,  Model: RF11T1 remote (HITACHI_AC344)
+//   Brand: Hitachi,  Model: RAR-2P2 remote (HITACHI_AC264)
+//   Brand: Hitachi,  Model: RAK-25NH5 A/C (HITACHI_AC264)
 
 #ifndef IR_HITACHI_H_
 #define IR_HITACHI_H_

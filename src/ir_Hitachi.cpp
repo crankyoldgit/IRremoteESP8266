@@ -56,7 +56,8 @@ using irutils::checkInvertedBytePairs;
 using irutils::invertBytePairs;
 using irutils::minsToString;
 
-#if (SEND_HITACHI_AC || SEND_HITACHI_AC2 || SEND_HITACHI_AC344)
+#if (SEND_HITACHI_AC || SEND_HITACHI_AC2 || SEND_HITACHI_AC264 || \
+     SEND_HITACHI_AC344)
 /// Send a Hitachi 28-byte/224-bit A/C formatted message. (HITACHI_AC)
 /// Status: STABLE / Working.
 /// @param[in] data The message to be sent.
@@ -68,13 +69,20 @@ void IRsend::sendHitachiAC(const unsigned char data[], const uint16_t nbytes,
   if (nbytes < kHitachiAcStateLength)
     return;  // Not enough bytes to send a proper message.
 
-  const bool MSBfirst = (nbytes == kHitachiAc344StateLength) ? false : true;
+  bool MSBfirst = true;
+  switch (nbytes) {
+    case kHitachiAc264StateLength:
+    case kHitachiAc344StateLength:
+      MSBfirst = false;
+  }
+
   sendGeneric(kHitachiAcHdrMark, kHitachiAcHdrSpace, kHitachiAcBitMark,
               kHitachiAcOneSpace, kHitachiAcBitMark, kHitachiAcZeroSpace,
               kHitachiAcBitMark, kHitachiAcMinGap, data, nbytes, 38, MSBfirst,
               repeat, 50);
 }
-#endif  // (SEND_HITACHI_AC || SEND_HITACHI_AC2 || SEND_HITACHI_AC344)
+#endif  // (SEND_HITACHI_AC || SEND_HITACHI_AC2 || SEND_HITACHI_AC264 ||
+        //  SEND_HITACHI_AC344)
 
 #if SEND_HITACHI_AC1
 /// Send a Hitachi 13 byte/224-bit A/C formatted message. (HITACHI_AC1)
@@ -82,7 +90,7 @@ void IRsend::sendHitachiAC(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
-/// @note Basically the same as sendHitatchiAC() except different size & header.
+/// @note Basically the same as sendHitachiAC() except different size & header.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/453
 void IRsend::sendHitachiAC1(const unsigned char data[], const uint16_t nbytes,
                             const uint16_t repeat) {
@@ -97,7 +105,7 @@ void IRsend::sendHitachiAC1(const unsigned char data[], const uint16_t nbytes,
 
 #if SEND_HITACHI_AC2
 /// Send a Hitachi 53 byte/424-bit A/C formatted message. (HITACHI_AC2)
-///   Basically the same as sendHitatchiAC() except different size.
+///   Basically the same as sendHitachiAC() except different size.
 /// Status: STABLE / Expected to work.
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
@@ -112,7 +120,7 @@ void IRsend::sendHitachiAC2(const unsigned char data[], const uint16_t nbytes,
 
 #if SEND_HITACHI_AC344
 /// Send a Hitachi A/C 43-byte/344-bit message. (HITACHI_AC344)
-///  Basically the same as sendHitatchiAC() except different size.
+///  Basically the same as sendHitachiAC() except different size.
 /// Status: Beta / Probably works.
 /// @param[in] data An array of bytes containing the IR command.
 /// @param[in] nbytes Nr. of bytes of data in the array.
@@ -827,7 +835,7 @@ String IRHitachiAc1::toString(void) const {
 }
 
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || \
-     DECODE_HITACHI_AC344)
+     DECODE_HITACHI_AC344 || DECODE_HITACHI_AC264)
 /// Decode the supplied Hitachi A/C message.
 /// Status: STABLE / Expected to work.
 /// @param[in,out] results Ptr to the data to decode & where to store the result
@@ -835,7 +843,7 @@ String IRHitachiAc1::toString(void) const {
 ///   raw data. Typically/Defaults to kStartOffset.
 /// @param[in] nbits The number of data bits to expect.
 ///   Typically kHitachiAcBits, kHitachiAc1Bits, kHitachiAc2Bits,
-///   kHitachiAc344Bits
+///   kHitachiAc344Bits, kHitachiAc264Bits
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @param[in] MSBfirst Is the data per byte stored in MSB First (true) or
 ///   LSB First order(false)?
@@ -843,6 +851,7 @@ String IRHitachiAc1::toString(void) const {
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/417
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/453
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1134
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1729
 bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict,
                              const bool MSBfirst) {
@@ -853,6 +862,7 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
       case kHitachiAcBits:
       case kHitachiAc1Bits:
       case kHitachiAc2Bits:
+      case kHitachiAc264Bits:
       case kHitachiAc344Bits:
         break;  // Okay to continue.
       default:
@@ -879,16 +889,20 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
 
   // Compliance
   if (strict) {
-    if (nbits / 8 == kHitachiAcStateLength &&
-        !IRHitachiAc::validChecksum(results->state, kHitachiAcStateLength))
-      return false;
-    if (nbits / 8 == kHitachiAc1StateLength &&
-       !IRHitachiAc1::validChecksum(results->state, kHitachiAc1StateLength))
-      return false;
-    if (nbits / 8 == kHitachiAc344StateLength &&
-        !IRHitachiAc3::hasInvertedStates(results->state,
-                                         kHitachiAc344StateLength))
-      return false;
+    const uint16_t nbytes = nbits / 8;
+    switch (nbytes) {
+      case kHitachiAcStateLength:
+        if (!IRHitachiAc::validChecksum(results->state, nbytes)) return false;
+        break;
+      case kHitachiAc1StateLength:
+        if (!IRHitachiAc1::validChecksum(results->state, nbytes)) return false;
+        break;
+      case kHitachiAc264StateLength:
+      case kHitachiAc344StateLength:
+        if (!IRHitachiAc3::hasInvertedStates(results->state, nbytes))
+          return false;
+        break;
+    }
   }
 
   // Success
@@ -898,6 +912,9 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
       break;
     case kHitachiAc2Bits:
       results->decode_type = decode_type_t::HITACHI_AC2;
+      break;
+    case kHitachiAc264Bits:
+      results->decode_type = decode_type_t::HITACHI_AC264;
       break;
     case kHitachiAc344Bits:
       results->decode_type = decode_type_t::HITACHI_AC344;
@@ -913,7 +930,7 @@ bool IRrecv::decodeHitachiAC(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // (DECODE_HITACHI_AC || DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 ||
-        //  DECODE_HITACHI_AC344)
+        //  DECODE_HITACHI_AC344 || DECODE_HITACHI_AC264)
 
 #if SEND_HITACHI_AC424
 /// Send a Hitachi 53-byte/424-bit A/C formatted message. (HITACHI_AC424)
@@ -1578,3 +1595,24 @@ String IRHitachiAc344::toString(void) const {
   result += ')';
   return result;
 }
+
+
+#if SEND_HITACHI_AC264
+/// Send a Hitachi 33-byte/264-bit A/C message (HITACHI_AC264)
+/// Basically the same as sendHitachiAC() except different size.
+/// Status: STABLE / Reported as working.
+/// @param[in] data An array of bytes containing the IR command.
+/// @param[in] nbytes Nr. of bytes of data in the array.
+/// @param[in] repeat Nr. of times the message is to be repeated. (Default = 0).
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1729
+void IRsend::sendHitachiAc264(const unsigned char data[], const uint16_t nbytes,
+                              const uint16_t repeat) {
+  if (nbytes < kHitachiAc264StateLength)
+    return;  // Not enough bytes to send a proper message.
+  sendHitachiAC(data, nbytes, repeat);
+}
+#endif  // SEND_HITACHI_AC264
+
+#if DECODE_HITACHI_AC264
+// For Decoding HITACHI_AC264, see `decodeHitachiAC`
+#endif  // DECODE_HITACHI_AC264
