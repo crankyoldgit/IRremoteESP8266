@@ -1503,7 +1503,7 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] quiet Run the device in quiet/silent mode.
-/// @param[in] prev_quiet The device's previous quiet/silent mode.
+/// @param[in] quiet_prev The device's previous quiet/silent mode.
 /// @param[in] turbo Toggle the device's turbo/powerful mode.
 /// @param[in] econo Toggle the device's economical mode.
 /// @param[in] light Toggle the LED/Display mode.
