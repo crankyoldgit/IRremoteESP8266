@@ -24,6 +24,7 @@
 //   Brand: Danby,  Model: R09C/BCGE remote (MIDEA)
 //   Brand: Trotec,  Model: TROTEC PAC 3900 X (MIDEA)
 //   Brand: Trotec,  Model: RG57H(B)/BGE remote (MIDEA)
+//   Brand: Lennox,  Model: M0STAT60Q-1 remote (MIDEA)
 
 #ifndef IR_MIDEA_H_
 #define IR_MIDEA_H_
@@ -123,9 +124,16 @@ const uint8_t kMideaACFanHigh = 3;  // 0b11
   // const uint64_t kMideaACToggleIonizer = 0xA201FFFFFF7C;
   kSwingVToggleStr = kIonStr;
 #endif  // DANBY_DAC
-const uint64_t kMideaACToggleEcono = 0xA202FFFFFF7E;
-const uint64_t kMideaACToggleLight = 0xA208FFFFFF75;
-const uint64_t kMideaACToggleTurbo = 0xA209FFFFFF74;
+const uint64_t kMideaACToggleEcono =            0xA202FFFFFF7E;
+const uint64_t kMideaACToggleLight =            0xA208FFFFFF75;
+const uint64_t kMideaACToggleTurbo =            0xA209FFFFFF74;
+// Mode must be Auto, Cool, or Dry
+const uint64_t kMideaACToggleSelfClean =        0xA20DFFFFFF70;
+// 8C Heat AKA Freeze Protection
+const uint64_t kMideaACToggle8CHeat =           0xA20FFFFFFF73;  // Only in Heat
+const uint64_t kMideaACQuietOn =                0xA212FFFFFF6E;
+const uint64_t kMideaACQuietOff =               0xA213FFFFFF6F;
+
 const uint8_t kMideaACTypeCommand = 0b001;  ///< Message type
 const uint8_t kMideaACTypeSpecial = 0b010;  ///< Message type
 const uint8_t kMideaACTypeFollow =  0b100;  ///< Message type
@@ -202,6 +210,16 @@ class IRMideaAC {
   bool isLightToggle(void) const;
   void setLightToggle(const bool on);
   bool getLightToggle(void);
+  bool isCleanToggle(void) const;
+  void setCleanToggle(const bool on);
+  bool getCleanToggle(void);
+  bool is8CHeatToggle(void) const;
+  void set8CHeatToggle(const bool on);
+  bool get8CHeatToggle(void);
+  bool isQuiet(void) const;
+  void setQuiet(const bool on);
+  void setQuiet(const bool on, const bool prev);
+  bool getQuiet(void) const;
   uint8_t getType(void) const;
   bool isOnTimerEnabled(void) const;
   uint16_t getOnTimer(void) const;
@@ -225,13 +243,17 @@ class IRMideaAC {
   /// @endcond
 #endif  // UNIT_TEST
   MideaProtocol _;
+  bool _CleanToggle;
+  bool _EconoToggle;
+  bool _8CHeatToggle;
+  bool _LightToggle;
+  bool _Quiet;
+  bool _Quiet_prev;
   bool _SwingVToggle;
   #if KAYSUN_AC
   bool _SwingVStep;
   #endif  // KAYSUN_AC
-  bool _EconoToggle;
   bool _TurboToggle;
-  bool _LightToggle;
   void checksum(void);
   static uint8_t calcChecksum(const uint64_t state);
   void setType(const uint8_t type);
