@@ -25,6 +25,7 @@
 //   Brand: Trotec,  Model: TROTEC PAC 3900 X (MIDEA)
 //   Brand: Trotec,  Model: RG57H(B)/BGE remote (MIDEA)
 //   Brand: Lennox,  Model: M0STAT60Q-1 remote (MIDEA)
+//   Brand: Lennox,  Model: RG57A6/BGEFU1 remote (MIDEA)
 
 #ifndef IR_MIDEA_H_
 #define IR_MIDEA_H_
