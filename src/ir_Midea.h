@@ -5,6 +5,7 @@
 /// Midea added by crankyoldgit & bwze
 /// @see https://docs.google.com/spreadsheets/d/1TZh4jWrx4h9zzpYUI9aYXMl1fYOiqu-xVuOOMqagxrs/edit?usp=sharing
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1342#issuecomment-733721085
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1733
 
 // Supports:
 //   Brand: Pioneer System,  Model: RYBO12GMFILCAD A/C (12K BTU) (MIDEA)
@@ -24,8 +25,9 @@
 //   Brand: Danby,  Model: R09C/BCGE remote (MIDEA)
 //   Brand: Trotec,  Model: TROTEC PAC 3900 X (MIDEA)
 //   Brand: Trotec,  Model: RG57H(B)/BGE remote (MIDEA)
-//   Brand: Lennox,  Model: M0STAT60Q-1 remote (MIDEA)
 //   Brand: Lennox,  Model: RG57A6/BGEFU1 remote (MIDEA)
+//   Brand: Lennox,  Model: MWMA009S4-3P A/C (MIDEA)
+//   Brand: Lennox,  Model: MWMA012S4-3P A/C (MIDEA)
 
 #ifndef IR_MIDEA_H_
 #define IR_MIDEA_H_
