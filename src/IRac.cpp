@@ -1502,16 +1502,21 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] quiet Run the device in quiet/silent mode.
+/// @param[in] quiet_prev The device's previous quiet/silent mode.
 /// @param[in] turbo Toggle the device's turbo/powerful mode.
 /// @param[in] econo Toggle the device's economical mode.
 /// @param[in] light Toggle the LED/Display mode.
+/// @param[in] clean Turn on the self-cleaning mode. e.g. XFan, dry filters etc
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 /// @note On Danby A/C units, swingv controls the Ion Filter instead.
 void IRac::midea(IRMideaAC *ac,
                  const bool on, const stdAc::opmode_t mode, const bool celsius,
                  const float degrees, const stdAc::fanspeed_t fan,
-                 const stdAc::swingv_t swingv, const bool turbo,
-                 const bool econo, const bool light, const int16_t sleep) {
+                 const stdAc::swingv_t swingv,
+                 const bool quiet, const bool quiet_prev,
+                 const bool turbo, const bool econo, const bool light,
+                 const bool clean, const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -1520,12 +1525,12 @@ void IRac::midea(IRMideaAC *ac,
   ac->setFan(ac->convertFan(fan));
   ac->setSwingVToggle(swingv != stdAc::swingv_t::kOff);
   // No Horizontal swing setting available.
-  // No Quiet setting available.
+  ac->setQuiet(quiet, quiet_prev);
   ac->setTurboToggle(turbo);
   ac->setEconoToggle(econo);
   ac->setLightToggle(light);
   // No Filter setting available.
-  // No Clean setting available.
+  ac->setCleanToggle(clean);
   // No Beep setting available.
   ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
   // No Clock setting available.
@@ -2530,6 +2535,7 @@ stdAc::state_t IRac::handleToggles(const stdAc::state_t desired,
         result.turbo = desired.turbo ^ prev->turbo;
         result.econo = desired.econo ^ prev->econo;
         result.light = desired.light ^ prev->light;
+        result.clean = desired.clean ^ prev->clean;
         // FALL THRU
       case decode_type_t::CORONA_AC:
       case decode_type_t::HITACHI_AC344:
@@ -2645,6 +2651,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
   const stdAc::swingv_t prev_swingv = (prev != NULL) ? prev->swingv
                                                      : stdAc::swingv_t::kOff;
 #endif  // (SEND_LG || SEND_SHARP_AC)
+#if SEND_MIDEA
+  const bool prev_quiet = (prev != NULL) ? prev->quiet : !send.quiet;
+#endif  // SEND_MIDEA
   // Per vendor settings & setup.
   switch (send.protocol) {
 #if SEND_AIRTON
@@ -2945,8 +2954,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRMideaAC ac(_pin, _inverted, _modulation);
       midea(&ac, send.power, send.mode, send.celsius, send.degrees,
-            send.fanspeed, send.swingv, send.turbo, send.econo, send.light,
-            send.sleep);
+            send.fanspeed, send.swingv, send.quiet, prev_quiet, send.turbo,
+            send.econo, send.light, send.sleep);
       break;
     }
 #endif  // SEND_MIDEA
