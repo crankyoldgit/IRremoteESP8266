@@ -105,7 +105,9 @@ union Hitachi424Protocol{
     // Byte 26
     uint8_t       :8;
     // Byte 27
-    uint8_t Power :8;
+    uint8_t       :4;
+    uint8_t Power :1;
+    uint8_t       :3;
     // Byte 28~34
     uint8_t pad2[7];
     // Byte 35
@@ -162,9 +164,6 @@ const uint8_t kHitachiAc344FanMedium = kHitachiAc424FanMedium;
 const uint8_t kHitachiAc344FanHigh = kHitachiAc424FanHigh;
 const uint8_t kHitachiAc344FanAuto = kHitachiAc424FanAuto;
 const uint8_t kHitachiAc344FanMax = kHitachiAc424FanMax;
-
-const uint8_t kHitachiAc424PowerOn = 0xF1;
-const uint8_t kHitachiAc424PowerOff = 0xE1;
 
 const uint8_t kHitachiAc344SwingHAuto = 0;              // 0b000
 const uint8_t kHitachiAc344SwingHRightMax = 1;          // 0b001
@@ -242,6 +241,57 @@ const uint8_t kHitachiAc1Sleep4 =                            0b100;
 // Checksum
 const uint8_t kHitachiAc1ChecksumStartByte = 5;
 
+
+/// Native representation of a Hitachi 164-bit A/C message.
+union HitachiAC264Protocol{
+  uint8_t raw[kHitachiAc264StateLength];  ///< The state in native code.
+  struct {
+    // Bytes 0~10
+    uint8_t pad0[11];
+    // Byte 11
+    uint8_t Button  :8;
+    // Byte 12
+    uint8_t         :8;
+    // Byte 13
+    uint8_t         :2;
+    uint8_t Temp    :6;
+    // Byte 14
+    uint8_t         :8;
+    // Bytes 14~24
+    uint8_t pad1[10];
+    // Byte 25
+    uint8_t Mode    :4;
+    uint8_t Fan     :4;
+    // Byte 26
+    uint8_t         :8;
+    // Byte 27
+    uint8_t         :4;
+    uint8_t Power   :1;
+    uint8_t         :3;
+    // Byte 28
+    uint8_t         :8;
+    // Bytes 29~32
+    uint8_t pad2[4];
+  };
+};
+
+// HitachiAc264
+const uint8_t kHitachiAc264ButtonPowerMode = kHitachiAc424ButtonPowerMode;
+const uint8_t kHitachiAc264ButtonFan = kHitachiAc424ButtonFan;
+const uint8_t kHitachiAc264ButtonTempDown = kHitachiAc424ButtonTempDown;
+const uint8_t kHitachiAc264ButtonTempUp = kHitachiAc424ButtonTempUp;
+const uint8_t kHitachiAc264ButtonSwingV = kHitachiAc424ButtonSwingV;
+const uint8_t kHitachiAc264MinTemp = kHitachiAc424MinTemp;   // 16C
+const uint8_t kHitachiAc264MaxTemp = kHitachiAc424MaxTemp;   // 32C
+const uint8_t kHitachiAc264Fan = kHitachiAc424Fan;
+const uint8_t kHitachiAc264Cool = kHitachiAc424Cool;
+const uint8_t kHitachiAc264Dry = kHitachiAc424Dry;
+const uint8_t kHitachiAc264Heat = kHitachiAc424Heat;
+const uint8_t kHitachiAc264FanMin = kHitachiAc424FanMin;
+const uint8_t kHitachiAc264FanLow = kHitachiAc424FanMin;
+const uint8_t kHitachiAc264FanMedium = kHitachiAc424FanMedium;
+const uint8_t kHitachiAc264FanHigh = kHitachiAc424FanHigh;
+const uint8_t kHitachiAc264FanAuto = kHitachiAc424FanAuto;
 
 // Classes
 /// Class for handling detailed Hitachi 224-bit A/C messages.
@@ -372,6 +422,7 @@ class IRHitachiAc1 {
 
 /// Class for handling detailed Hitachi 53-byte/424-bit A/C messages.
 class IRHitachiAc424 {
+  friend class IRHitachiAc264;
   friend class IRHitachiAc344;
  public:
   explicit IRHitachiAc424(const uint16_t pin, const bool inverted = false,
@@ -392,7 +443,7 @@ class IRHitachiAc424 {
   bool getPower(void) const;
   void setTemp(const uint8_t temp, bool setPrevious = true);
   uint8_t getTemp(void) const;
-  void setFan(const uint8_t speed);
+  virtual void setFan(const uint8_t speed);
   uint8_t getFan(void) const;
   uint8_t getButton(void) const;
   void setButton(const uint8_t button);
@@ -404,9 +455,9 @@ class IRHitachiAc424 {
   virtual void setRaw(const uint8_t new_code[],
                       const uint16_t length = kHitachiAc424StateLength);
   static uint8_t convertMode(const stdAc::opmode_t mode);
-  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  virtual uint8_t convertFan(const stdAc::fanspeed_t speed) const;
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
-  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  virtual stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed) const;
   virtual stdAc::state_t toCommon(void) const;
   virtual String toString(void) const;
 #ifndef UNIT_TEST
@@ -476,6 +527,24 @@ class IRHitachiAc344: public IRHitachiAc424 {
   uint8_t getSwingH(void) const;
   static uint8_t convertSwingH(const stdAc::swingh_t position);
   static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
+  String toString(void) const override;
+};
+
+/// Class for handling detailed Hitachi 264-bit A/C messages.
+class IRHitachiAc264: public IRHitachiAc424 {
+ public:
+  explicit IRHitachiAc264(const uint16_t pin, const bool inverted = false,
+                          const bool use_modulation = true);
+  void stateReset(void) override;
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kHitachiAc264StateLength) override;
+  void setFan(const uint8_t speed) override;
+  uint8_t convertFan(const stdAc::fanspeed_t speed) const override;
+  stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed) const override;
+  stdAc::state_t toCommon(void) const override;
+#if SEND_HITACHI_AC264
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat) override;
+#endif  // SEND_HITACHI_AC264
   String toString(void) const override;
 };
 #endif  // IR_HITACHI_H_

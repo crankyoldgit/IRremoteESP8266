@@ -860,7 +860,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("HITACHI_AC264", typeToString(decode_type_t::HITACHI_AC264));
   ASSERT_EQ(decode_type_t::HITACHI_AC264, strToDecodeType("HITACHI_AC264"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC264));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC264));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC264));
   ASSERT_EQ(kHitachiAc264Bits,
             IRsend::defaultBits(decode_type_t::HITACHI_AC264));
   ASSERT_EQ(kNoRepeat,
@@ -2056,10 +2056,11 @@ TEST(TestDecodeHitachiAc264, RealExample) {
   ASSERT_EQ(kHitachiAc264Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc264Bits);
   EXPECT_EQ(
-      "",
+      "Power: Off, Mode: 6 (Heat), Temp: 27C, Fan: 1 (Min), "
+      "Button: 19 (Power/Mode)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // Decode a 'Synthetic' HitachiAc264 message.
@@ -2083,8 +2084,30 @@ TEST(TestDecodeHitachiAc264, SyntheticExample) {
   ASSERT_EQ(kHitachiAc264Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc264Bits);
   EXPECT_EQ(
-      "",
+      "Power: Off, Mode: 6 (Heat), Temp: 27C, Fan: 1 (Min), "
+      "Button: 19 (Power/Mode)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+TEST(TestIRHitachiAc264Class, ConstructKnownState) {
+  IRHitachiAc264 ac(kGpioUnused);
+  // hot/power off/ fan 1 /27°C
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1729#issuecomment-1006938712
+  const uint8_t expected[kHitachiAc264StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92,
+      0x6D, 0x13, 0xEC, 0x6C, 0x93, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x16, 0xE9, 0xC1, 0x3E, 0x00,
+      0xFF, 0x00, 0xFF};
+  ac.stateReset();
+  ac.setMode(kHitachiAc264Heat);
+  ac.setFan(kHitachiAc264FanMin);
+  ac.setTemp(27);
+  ac.setPower(false);
+  EXPECT_EQ(
+      "Power: Off, Mode: 6 (Heat), Temp: 27C, Fan: 1 (Min), "
+      "Button: 19 (Power/Mode)",
+      ac.toString());
+  EXPECT_STATE_EQ(expected, ac.getRaw(), kHitachiAc264Bits);
 }
