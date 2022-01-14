@@ -401,7 +401,7 @@ stdAc::fanspeed_t IRKelvinatorAC::toCommonFanSpeed(const uint8_t speed) {
 /// Convert the internal A/C object state to it's stdAc::state_t equivalent.
 /// @return A stdAc::state_t containing the current settings.
 stdAc::state_t IRKelvinatorAC::toCommon(void) const {
-  stdAc::state_t result;
+  stdAc::state_t result{};
   result.protocol = decode_type_t::KELVINATOR;
   result.model = -1;  // Unused.
   result.power = _.Power;

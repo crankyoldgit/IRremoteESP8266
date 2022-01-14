@@ -381,7 +381,7 @@ stdAc::fanspeed_t IRHitachiAc::toCommonFanSpeed(const uint8_t speed) {
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHitachiAc::toCommon(void) const {
-  stdAc::state_t result;
+  stdAc::state_t result{};
   result.protocol = decode_type_t::HITACHI_AC;
   result.model = -1;  // No models used.
   result.power = _.Power;
@@ -781,7 +781,7 @@ stdAc::fanspeed_t IRHitachiAc1::toCommonFanSpeed(const uint8_t speed) {
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHitachiAc1::toCommon(void) const {
-  stdAc::state_t result;
+  stdAc::state_t result{};
   result.protocol = decode_type_t::HITACHI_AC1;
   result.model = getModel();
   result.power = _.Power;
@@ -1261,7 +1261,7 @@ stdAc::fanspeed_t IRHitachiAc424::toCommonFanSpeed(const uint8_t speed) {
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRHitachiAc424::toCommon(void) const {
-  stdAc::state_t result;
+  stdAc::state_t result{};
   result.protocol = decode_type_t::HITACHI_AC424;
   result.model = -1;  // No models used.
   result.power = getPower();
