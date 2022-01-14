@@ -71,7 +71,6 @@ IRac::IRac(const uint16_t pin, const bool inverted, const bool use_modulation) {
   _pin = pin;
   _inverted = inverted;
   _modulation = use_modulation;
-  initState(&next);
   this->markAsSent();
 }
 
@@ -132,11 +131,8 @@ void IRac::initState(stdAc::state_t *state,
 /// @param[out] state A Ptr to where the settings will be stored.
 /// @note Sets all the parameters to reasonable base/automatic defaults.
 void IRac::initState(stdAc::state_t *state) {
-  initState(state, decode_type_t::UNKNOWN, -1, false, stdAc::opmode_t::kOff,
-            25, true,  // 25 degrees Celsius
-            stdAc::fanspeed_t::kAuto, stdAc::swingv_t::kOff,
-            stdAc::swingh_t::kOff, false, false, false, false, false, false,
-            false, -1, -1);
+  stdAc::state_t def;
+  *state = def;
 }
 
 /// Get the current internal A/C climate state.

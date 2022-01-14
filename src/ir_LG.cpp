@@ -740,7 +740,7 @@ uint8_t IRLgAc::convertVaneSwingV(const stdAc::swingv_t swingv) {
 /// @param[in] prev Ptr to the previous state if required.
 /// @return The stdAc equivalent of the native settings.
 stdAc::state_t IRLgAc::toCommon(const stdAc::state_t *prev) const {
-  stdAc::state_t result;
+  stdAc::state_t result{};
   // Start with the previous state if given it.
   if (prev != NULL) {
     result = *prev;

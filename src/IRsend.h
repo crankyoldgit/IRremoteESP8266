@@ -95,24 +95,24 @@ enum class swingh_t {
 
 /// Structure to hold a common A/C state.
 struct state_t {
-  decode_type_t protocol;
-  int16_t model;
-  bool power;
-  stdAc::opmode_t mode;
-  float degrees;
-  bool celsius;
-  stdAc::fanspeed_t fanspeed;
-  stdAc::swingv_t swingv;
-  stdAc::swingh_t swingh;
-  bool quiet;
-  bool turbo;
-  bool econo;
-  bool light;
-  bool filter;
-  bool clean;
-  bool beep;
-  int16_t sleep;
-  int16_t clock;
+  decode_type_t protocol = decode_type_t::UNKNOWN;
+  int16_t model = -1;  // `-1` means unused.
+  bool power = false;
+  stdAc::opmode_t mode = stdAc::opmode_t::kOff;
+  float degrees = 25;
+  bool celsius = true;
+  stdAc::fanspeed_t fanspeed = stdAc::fanspeed_t::kAuto;
+  stdAc::swingv_t swingv = stdAc::swingv_t::kOff;
+  stdAc::swingh_t swingh = stdAc::swingh_t::kOff;
+  bool quiet = false;
+  bool turbo = false;
+  bool econo = false;
+  bool light = false;
+  bool filter = false;
+  bool clean = false;
+  bool beep = false;
+  int16_t sleep = -1;  // `-1` means off.
+  int16_t clock = -1;  // `-1` means not set.
 };
 };  // namespace stdAc
 

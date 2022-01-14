@@ -2965,7 +2965,6 @@ TEST(TestIRac, Issue1250) {
 TEST(TestIRac, Issue1339) {
   IRac irac(kGpioUnused);
   stdAc::state_t to_send;
-  IRac::initState(&to_send);
 
   to_send.protocol = decode_type_t::SAMSUNG_AC;
   ASSERT_TRUE(irac.sendAc(to_send, NULL));
@@ -3029,4 +3028,21 @@ TEST(TestIRac, Issue1424) {
   EXPECT_EQ(irac.next.swingv, stdAc::swingv_t::kOff);
   // Confirm the state really did change.
   ASSERT_TRUE(IRac::cmpStates(irac.next, copy_of_next_pre_receive));
+}
+
+// Confirm/check that the default initialisation of a state_t is as expected.
+TEST(TestIRac, initState) {
+  IRac irac(kGpioUnused);
+  stdAc::state_t builtin_init{};
+  stdAc::state_t custom_init;
+  stdAc::state_t no_init;
+  IRac::initState(&custom_init);
+
+  EXPECT_FALSE(IRac::cmpStates(builtin_init, custom_init));
+  builtin_init.protocol = decode_type_t::SAMSUNG_AC;
+  EXPECT_TRUE(IRac::cmpStates(builtin_init, custom_init));
+  EXPECT_FALSE(IRac::cmpStates(no_init, custom_init));
+  EXPECT_EQ(-1, builtin_init.model);
+  EXPECT_EQ(stdAc::swingv_t::kOff, builtin_init.swingv);
+  EXPECT_EQ(decode_type_t::UNKNOWN, no_init.protocol);
 }

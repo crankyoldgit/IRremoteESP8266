@@ -496,7 +496,7 @@ stdAc::fanspeed_t IRCoolixAC::toCommonFanSpeed(const uint8_t speed) {
 /// @param[in] prev Ptr to the previous state if required.
 /// @return A stdAc::state_t state.
 stdAc::state_t IRCoolixAC::toCommon(const stdAc::state_t *prev) const {
-  stdAc::state_t result;
+  stdAc::state_t result{};
   // Start with the previous state if given it.
   if (prev != NULL) {
     result = *prev;
