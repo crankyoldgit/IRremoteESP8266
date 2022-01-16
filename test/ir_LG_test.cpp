@@ -1126,3 +1126,40 @@ TEST(TestIRLgAcClass, SwingVOffAfterAuto) {
   ASSERT_EQ("Model: 3 (AKB74955603), Swing(V): 21 (Off)",
             IRAcUtils::resultAcToString(&ac._irsend.capture));
 }
+
+TEST(TestIRLgAcClass, Issue1737) {
+  // Simulate getting a light toggle while the ac class/prev state thinks the
+  // device is on.
+  IRLgAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setModel(lg_ac_remote_model_t::AKB74955603);
+  ac.setPower(true);
+  ac.setMode(kLgAcFan);
+  ac.setTemp(18);
+  ac.setFan(kLgAcFanLowest);
+  stdAc::state_t prev = ac.toCommon();
+  EXPECT_TRUE(prev.power);
+  EXPECT_TRUE(ac.toCommon().power);
+  EXPECT_TRUE(ac.toCommon(&prev).power);
+
+  ac.setRaw(kLgAcLightToggle);
+  EXPECT_TRUE(ac.isLightToggle());
+
+  EXPECT_FALSE(ac.toCommon().power);  // No previous state, so should be false.
+  EXPECT_TRUE(ac.toCommon(&prev).power);
+
+  // A better simulation of the desired use case.
+  IRsendTest irsend(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  irsend.begin();
+  irsend.reset();
+  irsend.sendLG2(kLgAcLightToggle);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&irsend.capture));
+  ASSERT_EQ(LG2, irsend.capture.decode_type);  // Not "LG"
+  ASSERT_EQ(kLgBits, irsend.capture.bits);
+  stdAc::state_t result;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+  EXPECT_TRUE(result.power);
+}
