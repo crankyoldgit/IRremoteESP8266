@@ -2197,4 +2197,16 @@ TEST(TestIRHitachiAc264Class, Issue1729_PowerOntoOff) {
   EXPECT_FALSE(off.power);
   EXPECT_EQ(stdAc::opmode_t::kHeat, off.mode);
   EXPECT_EQ(25, off.degrees);
+
+  // Verify that handleToggles() isn't screwing anything up.
+  IRac common(kGpioUnused);
+  stdAc::state_t toggle_state;
+  toggle_state = common.handleToggles(on, &prev);
+  EXPECT_FALSE(common.cmpStates(on, prev));  // They are the same.
+  EXPECT_FALSE(common.cmpStates(on, toggle_state));  // They are the same.
+  toggle_state = common.handleToggles(off, &on);
+  EXPECT_TRUE(common.cmpStates(off, on));  // They are different.
+  EXPECT_FALSE(common.cmpStates(off, toggle_state));  // They are the same.
+  EXPECT_EQ(off.protocol, decode_type_t::HITACHI_AC264);
+  // That confirms handleToggles() isn't causing any grief.
 }
