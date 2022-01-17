@@ -2111,3 +2111,90 @@ TEST(TestIRHitachiAc264Class, ConstructKnownState) {
       ac.toString());
   EXPECT_STATE_EQ(expected, ac.getRaw(), kHitachiAc264Bits);
 }
+
+TEST(TestIRHitachiAc264Class, Issue1729_PowerOntoOff) {
+  IRHitachiAc264 ac(kGpioUnused);
+
+  const String on_str = "Power: On, Mode: 6 (Heat), Temp: 25C, Fan: 5 (Auto), "
+                        "Button: 19 (Power/Mode)";
+  const String off_str = "Power: Off, Mode: 6 (Heat), Temp: 25C, "
+                         "Fan: 5 (Auto), Button: 19 (Power/Mode)";
+  const uint8_t off_state[kHitachiAc264StateLength] = {
+     0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92,
+     0x6D, 0x13, 0xEC, 0x64, 0x9B, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+     0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x56, 0xA9, 0xC1, 0x3E, 0x00,
+     0xFF, 0x00, 0xFF};
+  // Simulate at the `IRHitachiAc264` class level.
+  ac.stateReset();
+  // Create an On state.
+  ac.setMode(kHitachiAc264Heat);
+  ac.setTemp(25);
+  ac.setFan(kHitachiAc264FanAuto);
+  ac.setPower(true);
+  EXPECT_EQ(on_str, ac.toString());
+  ac.send();  // Send it
+  EXPECT_EQ(on_str, ac.toString());  // Check it is still the same.
+
+  // Now construct the "Off" state.
+  ac.setMode(kHitachiAc264Heat);
+  ac.setTemp(25);
+  ac.setFan(kHitachiAc264FanAuto);
+  ac.setPower(false);
+
+  EXPECT_EQ(off_str, ac.toString());
+  EXPECT_STATE_EQ(off_state, ac.getRaw(), kHitachiAc264Bits);
+  ac.send();  // Send it
+  EXPECT_EQ(off_str, ac.toString());  // Check it is still the same "off" state.
+  EXPECT_STATE_EQ(off_state, ac.getRaw(), kHitachiAc264Bits);
+
+  // Simulate at the `IRac` class level.
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+
+  ac.stateReset();
+  ac._irsend.reset();
+
+  // Create a power on state & send it.
+  irac.hitachi264(&ac,
+                  true,                         // Power
+                  stdAc::opmode_t::kHeat,       // Mode
+                  25,                           // Celsius
+                  stdAc::fanspeed_t::kAuto);    // Fan speed
+
+  ASSERT_EQ(on_str, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HITACHI_AC264, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc264Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(on_str, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t on, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &on, &prev));
+  EXPECT_EQ(decode_type_t::HITACHI_AC264, on.protocol);
+  EXPECT_TRUE(on.power);
+  EXPECT_EQ(stdAc::opmode_t::kHeat, on.mode);
+  EXPECT_EQ(25, on.degrees);
+
+  ac.stateReset();
+  ac._irsend.reset();
+  // Create a power off state & send it.
+  prev = on;
+  irac.hitachi264(&ac,
+                  false,                        // Power
+                  stdAc::opmode_t::kHeat,       // Mode
+                  25,                           // Celsius
+                  stdAc::fanspeed_t::kAuto);    // Fan speed
+
+  ASSERT_EQ(off_str, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HITACHI_AC264, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc264Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(off_str, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  EXPECT_STATE_EQ(off_state, ac._irsend.capture.state, ac._irsend.capture.bits);
+  stdAc::state_t off;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &off, &prev));
+  EXPECT_EQ(decode_type_t::HITACHI_AC264, off.protocol);
+  EXPECT_FALSE(off.power);
+  EXPECT_EQ(stdAc::opmode_t::kHeat, off.mode);
+  EXPECT_EQ(25, off.degrees);
+}
