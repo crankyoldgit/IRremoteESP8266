@@ -752,13 +752,18 @@ stdAc::state_t IRLgAc::toCommon(const stdAc::state_t *prev) const {
     result.swingv = toCommonSwingV(getSwingV());
   }
   result.protocol = _protocol;
+  if (isLightToggle()) {
+    result.light = !result.light;
+    return result;
+  } else {
+    result.light = _light;
+  }
   result.model = getModel();
   result.power = getPower();
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
-  result.light = isLightToggle() ? !result.light : _light;
   if (isSwingV()) result.swingv = toCommonSwingV(getSwingV());
   if (isVaneSwingV())
     result.swingv = toCommonVaneSwingV(VANESWINGVPOS(getVaneCode(_.raw)));
