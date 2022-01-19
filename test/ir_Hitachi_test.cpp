@@ -2199,14 +2199,35 @@ TEST(TestIRHitachiAc264Class, Issue1729_PowerOntoOff) {
   EXPECT_EQ(25, off.degrees);
 
   // Verify that handleToggles() isn't screwing anything up.
-  IRac common(kGpioUnused);
   stdAc::state_t toggle_state;
-  toggle_state = common.handleToggles(on, &prev);
-  EXPECT_FALSE(common.cmpStates(on, prev));  // They are the same.
-  EXPECT_FALSE(common.cmpStates(on, toggle_state));  // They are the same.
-  toggle_state = common.handleToggles(off, &on);
-  EXPECT_TRUE(common.cmpStates(off, on));  // They are different.
-  EXPECT_FALSE(common.cmpStates(off, toggle_state));  // They are the same.
+  toggle_state = irac.handleToggles(on, &prev);
+  EXPECT_FALSE(irac.cmpStates(on, prev));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(on, toggle_state));  // They are the same.
+  toggle_state = irac.handleToggles(off, &on);
+  EXPECT_TRUE(irac.cmpStates(off, on));  // They are different.
+  EXPECT_FALSE(irac.cmpStates(off, toggle_state));  // They are the same.
   EXPECT_EQ(off.protocol, decode_type_t::HITACHI_AC264);
+  EXPECT_FALSE(off.power);
   // That confirms handleToggles() isn't causing any grief.
+
+  // Check that IRac copies & modifies the states as we expect.
+  irac.next = on;  // Copy in the "on" state we constructed earlier.
+  irac.sendAc();  // Send it.
+  irac.markAsSent();  // Confirm it was sent.
+  EXPECT_FALSE(irac.cmpStates(on, irac.getStatePrev()));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(on, irac.getState()));  // They are the same.
+
+  irac.next.power = false;  // Turn off the power.
+  EXPECT_TRUE(irac.cmpStates(on, irac.getState()));  // They are the different.
+  EXPECT_FALSE(off.power);
+  EXPECT_FALSE(irac.cmpStates(off, irac.getState()));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(off, irac.next));  // They are the same.
+  irac.sendAc();  // Send it.
+  irac.markAsSent();  // Confirm it was sent.
+  EXPECT_FALSE(irac.cmpStates(off, irac.getStatePrev()));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(off, irac.getState()));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(off, irac.next));  // They are the same.
+  EXPECT_FALSE(irac.getStatePrev().power);
+  EXPECT_FALSE(irac.getState().power);
+  EXPECT_FALSE(irac.next.power);
 }
