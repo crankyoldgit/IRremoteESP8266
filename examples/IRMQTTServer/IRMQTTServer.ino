@@ -2863,7 +2863,8 @@ bool sendInt(const String topic, const int32_t num, const bool retain) {
 bool sendBool(const String topic, const bool on, const bool retain) {
 #if MQTT_ENABLE
   mqttSentCounter++;
-  return mqtt_client.publish(topic.c_str(), (on ? "on" : "off"), retain);
+  return mqtt_client.publish(topic.c_str(), (on ? D_STR_ON : D_STR_OFF),
+                             retain);
 #else  // MQTT_ENABLE
   return true;
 #endif  // MQTT_ENABLE
@@ -2991,12 +2992,14 @@ void updateClimate(stdAc::state_t *state, const String str,
   } else if (str.equals(prefix + F(KEY_POWER))) {
     state->power = IRac::strToBool(payload.c_str());
 #if MQTT_CLIMATE_HA_MODE
+    // When in Home Assistant mode, Power Off, means turn the Mode to Off too.
     if (!state->power) state->mode = stdAc::opmode_t::kOff;
 #endif  // MQTT_CLIMATE_HA_MODE
   } else if (str.equals(prefix + F(KEY_MODE))) {
     state->mode = IRac::strToOpmode(payload.c_str());
 #if MQTT_CLIMATE_HA_MODE
-    state->power = (state->mode != stdAc::opmode_t::kOff);
+    // When in Home Assistant mode, a Mode of Off, means turn the Power off too.
+    if (state->mode == stdAc::opmode_t::kOff) state->power = false;
 #endif  // MQTT_CLIMATE_HA_MODE
   } else if (str.equals(prefix + F(KEY_TEMP))) {
     state->degrees = payload.toFloat();
@@ -3055,7 +3058,7 @@ bool sendClimate(const String topic_prefix, const bool retain,
   // Home Assistant want's these two bound together.
   if (prev.power != next.power || prev.mode != next.mode || forceMQTT) {
     success &= sendBool(topic_prefix + KEY_POWER, next.power, retain);
-    if (!next.power) mode_str = F("off");
+    if (!next.power) mode_str = kOffStr;
 #else  // MQTT_CLIMATE_HA_MODE
   // In non-Home Assistant mode, power and mode are not bound together.
   if (prev.power != next.power || forceMQTT) {
