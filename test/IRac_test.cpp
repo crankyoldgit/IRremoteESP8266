@@ -944,6 +944,35 @@ TEST(TestIRac, Hitachi1) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
+TEST(TestIRac, Hitachi264) {
+  IRHitachiAc264 ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected_swingon[] =
+      "Power: On, Mode: 6 (Heat), Temp: 25C, Fan: 4 (High), "
+      "Button: 19 (Power/Mode)";
+
+  ac.begin();
+  irac.hitachi264(&ac,
+                  true,                         // Power
+                  stdAc::opmode_t::kHeat,       // Mode
+                  25,                           // Celsius
+                  stdAc::fanspeed_t::kMax);     // Fan speed
+
+  ASSERT_EQ(expected_swingon, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HITACHI_AC264, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc264Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected_swingon, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  EXPECT_EQ(decode_type_t::HITACHI_AC264, r.protocol);
+  EXPECT_TRUE(r.power);
+  EXPECT_EQ(stdAc::opmode_t::kHeat, r.mode);
+  EXPECT_EQ(25, r.degrees);
+}
+
 TEST(TestIRac, Hitachi344) {
   IRHitachiAc344 ac(kGpioUnused);
   IRac irac(kGpioUnused);

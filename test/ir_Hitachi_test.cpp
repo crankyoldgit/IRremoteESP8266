@@ -860,7 +860,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("HITACHI_AC264", typeToString(decode_type_t::HITACHI_AC264));
   ASSERT_EQ(decode_type_t::HITACHI_AC264, strToDecodeType("HITACHI_AC264"));
   ASSERT_TRUE(hasACState(decode_type_t::HITACHI_AC264));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC264));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HITACHI_AC264));
   ASSERT_EQ(kHitachiAc264Bits,
             IRsend::defaultBits(decode_type_t::HITACHI_AC264));
   ASSERT_EQ(kNoRepeat,
@@ -2056,10 +2056,11 @@ TEST(TestDecodeHitachiAc264, RealExample) {
   ASSERT_EQ(kHitachiAc264Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc264Bits);
   EXPECT_EQ(
-      "",
+      "Power: Off, Mode: 6 (Heat), Temp: 27C, Fan: 1 (Min), "
+      "Button: 19 (Power/Mode)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
 // Decode a 'Synthetic' HitachiAc264 message.
@@ -2083,8 +2084,150 @@ TEST(TestDecodeHitachiAc264, SyntheticExample) {
   ASSERT_EQ(kHitachiAc264Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected, irsend.capture.state, kHitachiAc264Bits);
   EXPECT_EQ(
-      "",
+      "Power: Off, Mode: 6 (Heat), Temp: 27C, Fan: 1 (Min), "
+      "Button: 19 (Power/Mode)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+TEST(TestIRHitachiAc264Class, ConstructKnownState) {
+  IRHitachiAc264 ac(kGpioUnused);
+  // hot/power off/ fan 1 /27°C
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1729#issuecomment-1006938712
+  const uint8_t expected[kHitachiAc264StateLength] = {
+      0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92,
+      0x6D, 0x13, 0xEC, 0x6C, 0x93, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+      0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x16, 0xE9, 0xC1, 0x3E, 0x00,
+      0xFF, 0x00, 0xFF};
+  ac.stateReset();
+  ac.setMode(kHitachiAc264Heat);
+  ac.setFan(kHitachiAc264FanMin);
+  ac.setTemp(27);
+  ac.setPower(false);
+  EXPECT_EQ(
+      "Power: Off, Mode: 6 (Heat), Temp: 27C, Fan: 1 (Min), "
+      "Button: 19 (Power/Mode)",
+      ac.toString());
+  EXPECT_STATE_EQ(expected, ac.getRaw(), kHitachiAc264Bits);
+}
+
+TEST(TestIRHitachiAc264Class, Issue1729_PowerOntoOff) {
+  IRHitachiAc264 ac(kGpioUnused);
+
+  const String on_str = "Power: On, Mode: 6 (Heat), Temp: 25C, Fan: 5 (Auto), "
+                        "Button: 19 (Power/Mode)";
+  const String off_str = "Power: Off, Mode: 6 (Heat), Temp: 25C, "
+                         "Fan: 5 (Auto), Button: 19 (Power/Mode)";
+  const uint8_t off_state[kHitachiAc264StateLength] = {
+     0x01, 0x10, 0x00, 0x40, 0xBF, 0xFF, 0x00, 0xCC, 0x33, 0x92,
+     0x6D, 0x13, 0xEC, 0x64, 0x9B, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+     0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x56, 0xA9, 0xC1, 0x3E, 0x00,
+     0xFF, 0x00, 0xFF};
+  // Simulate at the `IRHitachiAc264` class level.
+  ac.stateReset();
+  // Create an On state.
+  ac.setMode(kHitachiAc264Heat);
+  ac.setTemp(25);
+  ac.setFan(kHitachiAc264FanAuto);
+  ac.setPower(true);
+  EXPECT_EQ(on_str, ac.toString());
+  ac.send();  // Send it
+  EXPECT_EQ(on_str, ac.toString());  // Check it is still the same.
+
+  // Now construct the "Off" state.
+  ac.setMode(kHitachiAc264Heat);
+  ac.setTemp(25);
+  ac.setFan(kHitachiAc264FanAuto);
+  ac.setPower(false);
+
+  EXPECT_EQ(off_str, ac.toString());
+  EXPECT_STATE_EQ(off_state, ac.getRaw(), kHitachiAc264Bits);
+  ac.send();  // Send it
+  EXPECT_EQ(off_str, ac.toString());  // Check it is still the same "off" state.
+  EXPECT_STATE_EQ(off_state, ac.getRaw(), kHitachiAc264Bits);
+
+  // Simulate at the `IRac` class level.
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+
+  ac.stateReset();
+  ac._irsend.reset();
+
+  // Create a power on state & send it.
+  irac.hitachi264(&ac,
+                  true,                         // Power
+                  stdAc::opmode_t::kHeat,       // Mode
+                  25,                           // Celsius
+                  stdAc::fanspeed_t::kAuto);    // Fan speed
+
+  ASSERT_EQ(on_str, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HITACHI_AC264, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc264Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(on_str, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t on, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &on, &prev));
+  EXPECT_EQ(decode_type_t::HITACHI_AC264, on.protocol);
+  EXPECT_TRUE(on.power);
+  EXPECT_EQ(stdAc::opmode_t::kHeat, on.mode);
+  EXPECT_EQ(25, on.degrees);
+
+  ac.stateReset();
+  ac._irsend.reset();
+  // Create a power off state & send it.
+  prev = on;
+  irac.hitachi264(&ac,
+                  false,                        // Power
+                  stdAc::opmode_t::kHeat,       // Mode
+                  25,                           // Celsius
+                  stdAc::fanspeed_t::kAuto);    // Fan speed
+
+  ASSERT_EQ(off_str, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HITACHI_AC264, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHitachiAc264Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(off_str, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  EXPECT_STATE_EQ(off_state, ac._irsend.capture.state, ac._irsend.capture.bits);
+  stdAc::state_t off;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &off, &prev));
+  EXPECT_EQ(decode_type_t::HITACHI_AC264, off.protocol);
+  EXPECT_FALSE(off.power);
+  EXPECT_EQ(stdAc::opmode_t::kHeat, off.mode);
+  EXPECT_EQ(25, off.degrees);
+
+  // Verify that handleToggles() isn't screwing anything up.
+  stdAc::state_t toggle_state;
+  toggle_state = irac.handleToggles(on, &prev);
+  EXPECT_FALSE(irac.cmpStates(on, prev));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(on, toggle_state));  // They are the same.
+  toggle_state = irac.handleToggles(off, &on);
+  EXPECT_TRUE(irac.cmpStates(off, on));  // They are different.
+  EXPECT_FALSE(irac.cmpStates(off, toggle_state));  // They are the same.
+  EXPECT_EQ(off.protocol, decode_type_t::HITACHI_AC264);
+  EXPECT_FALSE(off.power);
+  // That confirms handleToggles() isn't causing any grief.
+
+  // Check that IRac copies & modifies the states as we expect.
+  irac.next = on;  // Copy in the "on" state we constructed earlier.
+  irac.sendAc();  // Send it.
+  irac.markAsSent();  // Confirm it was sent.
+  EXPECT_FALSE(irac.cmpStates(on, irac.getStatePrev()));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(on, irac.getState()));  // They are the same.
+
+  irac.next.power = false;  // Turn off the power.
+  EXPECT_TRUE(irac.cmpStates(on, irac.getState()));  // They are the different.
+  EXPECT_FALSE(off.power);
+  EXPECT_FALSE(irac.cmpStates(off, irac.getState()));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(off, irac.next));  // They are the same.
+  irac.sendAc();  // Send it.
+  irac.markAsSent();  // Confirm it was sent.
+  EXPECT_FALSE(irac.cmpStates(off, irac.getStatePrev()));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(off, irac.getState()));  // They are the same.
+  EXPECT_FALSE(irac.cmpStates(off, irac.next));  // They are the same.
+  EXPECT_FALSE(irac.getStatePrev().power);
+  EXPECT_FALSE(irac.getState().power);
+  EXPECT_FALSE(irac.next.power);
 }
