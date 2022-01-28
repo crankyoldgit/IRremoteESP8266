@@ -847,6 +847,13 @@
 #define SEND_AIRTON         _IR_ENABLE_DEFAULT_
 #endif  // SEND_AIRTON
 
+#ifndef DECODE_KELON168
+#define DECODE_KELON168     _IR_ENABLE_DEFAULT_
+#endif  // DECODE_KELON168
+#ifndef SEND_KELON168
+#define SEND_KELON168       _IR_ENABLE_DEFAULT_
+#endif  // SEND_KELON168
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -862,6 +869,7 @@
      DECODE_VOLTAS || DECODE_MIRAGE || DECODE_HAIER_AC176 || \
      DECODE_TEKNOPOINT || DECODE_KELON || DECODE_TROTEC_3550 || \
      DECODE_SANYO_AC88 || DECODE_RHOSS || DECODE_HITACHI_AC264 || \
+     DECODE_KELON168 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1013,8 +1021,9 @@ enum decode_type_t {
   AIRTON,
   COOLIX48,  // 110
   HITACHI_AC264,
+  KELON168,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = HITACHI_AC264,
+  kLastDecodeType = KELON168,
 };
 
 // Message lengths & required repeat values
@@ -1134,6 +1143,8 @@ const uint16_t kInaxBits = 24;
 const uint16_t kInaxMinRepeat = kSingleRepeat;
 const uint16_t kJvcBits = 16;
 const uint16_t kKelonBits = 48;
+const uint16_t kKelon168StateLength = 21;
+const uint16_t kKelon168Bits = kKelon168StateLength * 8;
 const uint16_t kKelvinatorStateLength = 16;
 const uint16_t kKelvinatorBits = kKelvinatorStateLength * 8;
 const uint16_t kKelvinatorDefaultRepeat = kNoRepeat;

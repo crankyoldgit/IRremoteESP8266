@@ -760,6 +760,11 @@ class IRsend {
   void sendKelon(const uint64_t data, const uint16_t nbits = kKelonBits,
                  const uint16_t repeat = kNoRepeat);
 #endif  // SEND_KELON
+#if SEND_KELON168
+  void sendKelon168(const unsigned char data[],
+                    const uint16_t nbytes = kKelon168StateLength,
+                    const uint16_t repeat = kNoRepeat);
+#endif  // SEND_KELON168
 #if SEND_BOSE
   void sendBose(const uint64_t data, const uint16_t nbits = kBoseBits,
                 const uint16_t repeat = kNoRepeat);

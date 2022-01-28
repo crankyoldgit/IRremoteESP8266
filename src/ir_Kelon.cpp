@@ -1,7 +1,8 @@
 // Copyright 2021 Davide Depau
+// Copyright 2022 David Conran
 
 /// @file
-/// @brief Support for Kelan AC protocol.
+/// @brief Support for Kelon AC protocols.
 /// Both sending and decoding should be functional for models of series
 /// KELON ON/OFF 9000-12000.
 /// All features of the standard remote are implemented.
@@ -12,6 +13,7 @@
 ///    - Fahrenheit.
 
 #include <algorithm>
+#include <cassert>
 
 #include "ir_Kelon.h"
 
@@ -39,8 +41,13 @@ const uint16_t kKelonZeroSpace = 600;
 const uint32_t kKelonGap = 2 * kDefaultMessageGap;
 const uint16_t kKelonFreq = 38000;
 
+const uint32_t kKelon168FooterSpace = 8000;
+const uint16_t kKelon168Section1Size = 6;
+const uint16_t kKelon168Section2Size = 8;
+const uint16_t kKelon168Section3Size = 7;
+
 #if SEND_KELON
-/// Send a Kelon message.
+/// Send a Kelon 48-bit message.
 /// Status: STABLE / Working.
 /// @param[in] data The data to be transmitted.
 /// @param[in] nbits Nr. of bits of data to be sent.
@@ -52,12 +59,12 @@ void IRsend::sendKelon(const uint64_t data, const uint16_t nbits,
               kKelonBitMark, kKelonZeroSpace,
               kKelonBitMark, kKelonGap,
               data, nbits, kKelonFreq, false,  // LSB First.
-              repeat, 50);
+              repeat, kDutyDefault);
 }
 #endif  // SEND_KELON
 
 #if DECODE_KELON
-/// Decode the supplied Kelon message.
+/// Decode the supplied Kelon 48-bit message.
 /// Status: STABLE / Working.
 /// @param[in,out] results Ptr to the data to decode & where to store the result
 /// @param[in] offset The starting index to use when attempting to decode the
@@ -440,3 +447,105 @@ String IRKelonAc::toString() const {
     result += addBoolToString(true, kSwingVToggleStr);
   return result;
 }
+
+#if SEND_KELON168
+/// Send a Kelon 168 bit / 21 byte message.
+/// Status: BETA / Probably works.
+/// @param[in] data The data to be transmitted.
+/// @param[in] nbytes Nr. of bytes of data to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+void IRsend::sendKelon168(const uint8_t data[], const uint16_t nbytes,
+                          const uint16_t repeat) {
+  assert(kKelon168StateLength == kKelon168Section1Size + kKelon168Section2Size +
+                                 kKelon168Section3Size);
+  // Enough bytes to send a proper message?
+  if (nbytes < kKelon168StateLength) return;
+
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Section #1 (48 bits)
+    sendGeneric(kKelonHdrMark, kKelonHdrSpace,
+                kKelonBitMark, kKelonOneSpace,
+                kKelonBitMark, kKelonZeroSpace,
+                kKelonBitMark, kKelon168FooterSpace,
+                data, kKelon168Section1Size, kKelonFreq, false,  // LSB First.
+                0,  // No repeats here
+                kDutyDefault);
+    // Section #2 (64 bits)
+    sendGeneric(0, 0,
+                kKelonBitMark, kKelonOneSpace,
+                kKelonBitMark, kKelonZeroSpace,
+                kKelonBitMark, kKelon168FooterSpace,
+                data + kKelon168Section1Size, kKelon168Section2Size,
+                kKelonFreq, false,  // LSB First.
+                0,  // No repeats here
+                kDutyDefault);
+    // Section #3 (56 bits)
+    sendGeneric(0, 0,
+                kKelonBitMark, kKelonOneSpace,
+                kKelonBitMark, kKelonZeroSpace,
+                kKelonBitMark, kKelonGap,
+                data + kKelon168Section1Size + kKelon168Section2Size,
+                nbytes - (kKelon168Section1Size + kKelon168Section2Size),
+                kKelonFreq, false,  // LSB First.
+                0,  // No repeats here
+                kDutyDefault);
+  }
+}
+#endif  // SEND_KELON168
+
+#if DECODE_KELON168
+/// Decode the supplied Kelon 168 bit / 21 byte message.
+/// Status: BETA / Probably Working.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+bool IRrecv::decodeKelon168(decode_results *results, uint16_t offset,
+                            const uint16_t nbits, const bool strict) {
+  if (strict && nbits != kKelon168Bits) return false;
+  if (results->rawlen <= 2 * nbits + kHeader + kFooter * 2 - 1 + offset)
+    return false;  // Can't possibly be a valid Kelon 168 bit message.
+
+  uint16_t used = 0;
+
+  used = matchGeneric(results->rawbuf + offset, results->state,
+                      results->rawlen - offset, kKelon168Section1Size * 8,
+                      kKelonHdrMark, kKelonHdrSpace,
+                      kKelonBitMark, kKelonOneSpace,
+                      kKelonBitMark, kKelonZeroSpace,
+                      kKelonBitMark, kKelon168FooterSpace,
+                      false, _tolerance, 0, false);
+  if (!used) return false;  // Failed to match.
+  offset += used;
+
+  used = matchGeneric(results->rawbuf + offset,
+                      results->state + kKelon168Section1Size,
+                      results->rawlen - offset, kKelon168Section2Size * 8,
+                      0, 0,
+                      kKelonBitMark, kKelonOneSpace,
+                      kKelonBitMark, kKelonZeroSpace,
+                      kKelonBitMark, kKelon168FooterSpace,
+                      false, _tolerance, 0, false);
+  if (!used) return false;  // Failed to match.
+  offset += used;
+
+  used = matchGeneric(results->rawbuf + offset,
+                      results->state + (kKelon168Section1Size +
+                                        kKelon168Section2Size),
+                      results->rawlen - offset,
+                      nbits - (kKelon168Section1Size +
+                               kKelon168Section2Size) * 8,
+                      0, 0,
+                      kKelonBitMark, kKelonOneSpace,
+                      kKelonBitMark, kKelonZeroSpace,
+                      kKelonBitMark, kKelonGap,
+                      true, _tolerance, 0, false);
+  if (!used) return false;  // Failed to match.
+
+  results->decode_type = decode_type_t::KELON168;
+  results->bits = nbits;
+  return true;
+}
+#endif  // DECODE_KELON168
