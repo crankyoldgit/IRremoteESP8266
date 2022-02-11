@@ -57,7 +57,7 @@ void setup() {
   ac.setFan(1);
   ac.setMode(kKelvinatorCool);
   ac.setTemp(26);
-  ac.setSwingVertical(false);
+  ac.setSwingVertical(false, kKelvinatorSwingLastPos);
   ac.setSwingHorizontal(true);
   ac.setXFan(true);
   ac.setIonFilter(false);

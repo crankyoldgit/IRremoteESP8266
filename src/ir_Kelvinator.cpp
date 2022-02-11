@@ -279,7 +279,7 @@ void IRKelvinatorAC::setMode(const uint8_t mode) {
 /// @param[in] position The position/mode to set the vanes to.
 void IRKelvinatorAC::setSwingVertical(const bool automatic,
                                       const uint8_t position) {
-  _.SwingAuto = automatic;
+  _.SwingAuto = (automatic || _.SwingH);
   uint8_t new_position = position;
   if (!automatic) {
     switch (position) {
@@ -308,7 +308,9 @@ void IRKelvinatorAC::setSwingVertical(const bool automatic,
 
 /// Get the Vertical Swing Automatic mode setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRKelvinatorAC::getSwingVerticalAuto(void) const { return _.SwingAuto; }
+bool IRKelvinatorAC::getSwingVerticalAuto(void) const {
+  return _.SwingV & 0b0001; 
+}
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
@@ -320,7 +322,7 @@ uint8_t IRKelvinatorAC::getSwingVerticalPosition(void) const {
 /// @param[in] on The desired setting.
 void IRKelvinatorAC::setSwingHorizontal(const bool on) {
   _.SwingH = on;
-  _.SwingAuto = (on || _.SwingV);
+  _.SwingAuto = (on || (_.SwingV & 0b0001));
 }
 
 /// Is the horizontal swing setting on?
@@ -485,20 +487,7 @@ String IRKelvinatorAC::toString(void) const {
   result += addBoolToString(_.IonFilter, kIonStr);
   result += addBoolToString(_.Light, kLightStr);
   result += addBoolToString(_.SwingH, kSwingHStr);
-  result += addLabeledString(_.SwingAuto ? kAutoStr : kManualStr,
-                             kSwingVModeStr);
   result += addIntToString(_.SwingV, kSwingVStr);
-  result += kSpaceLBraceStr;
-  switch (_.SwingV) {
-    case kKelvinatorSwingLastPos:
-      result += kLastStr;
-      break;
-    case kKelvinatorSwingAuto:
-      result += kAutoStr;
-      break;
-    default: result += kUnknownStr;
-  }
-  result += ')';
   return result;
 }
 
