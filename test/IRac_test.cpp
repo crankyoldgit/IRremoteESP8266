@@ -1076,7 +1076,7 @@ TEST(TestIRac, Kelvinator) {
   char expected[] =
       "Power: On, Mode: 1 (Cool), Temp: 19C, Fan: 3 (Medium), Turbo: Off, "
       "Quiet: Off, XFan: On, Ion: On, Light: On, "
-      "Swing(H): Off, Swing(V): Off";
+      "Swing(H): Off, Swing(V): 0";
 
   ac.begin();
   irac.kelvinator(&ac,

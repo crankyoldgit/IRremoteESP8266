@@ -255,7 +255,7 @@ TEST(TestKelvinatorClass, VaneSwing) {
 
   EXPECT_FALSE(irkelv.getSwingVerticalAuto());
   EXPECT_EQ(kKelvinatorSwingLastPos, irkelv.getSwingVerticalPosition());
-  
+
   irkelv.setSwingVertical(true, kKelvinatorSwingAuto);
   EXPECT_TRUE(irkelv.getSwingVerticalAuto());
   EXPECT_EQ(kKelvinatorSwingAuto, irkelv.getSwingVerticalPosition());
