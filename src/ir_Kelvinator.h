@@ -126,16 +126,6 @@ const uint8_t kKelvinatorSwingUpAuto     = 0b1011;  // 11
 #define KELVINATOR_BASIC_FAN_MAX kKelvinatorBasicFanMax
 #define KELVINATOR_AUTO_TEMP kKelvinatorAutoTemp
 #define KELVINATOR_AUTO kKelvinatorAuto
-#define KELVINATOR_SWING_LAST_POS kKelvinatorSwingLastPos
-#define KELVINATOR_SWING_AUTO kKelvinatorSwingAuto
-#define KELVINATOR_SWING_UP kKelvinatorSwingUp
-#define KELVINATOR_SWING_MIDDLE_UP kKelvinatorSwingMiddleUp
-#define KELVINATOR_SWING_MIDDLE kKelvinatorSwingMiddle
-#define KELVINATOR_SWING_MIDDLE_DOWN kKelvinatorSwingMiddleDown
-#define KELVINATOR_SWING_DOWN kKelvinatorSwingDown
-#define KELVINATOR_SWING_DOWN_AUTO kKelvinatorSwingDownAuto
-#define KELVINATOR_SWING_MIDDLE_AUTO kKelvinatorSwingMiddleAuto
-#define KELVINATOR_SWING_UP_AUTO kKelvinatorSwingUpAuto
 
 // Classes
 /// Class for handling detailed Kelvinator A/C messages.

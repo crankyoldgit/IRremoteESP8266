@@ -277,7 +277,8 @@ void IRKelvinatorAC::setMode(const uint8_t mode) {
 /// Set the Vertical Swing mode of the A/C.
 /// @param[in] automatic Do we use the automatic setting?
 /// @param[in] position The position/mode to set the vanes to.
-void IRKelvinatorAC::setSwingVertical(const bool automatic, const uint8_t position) {
+void IRKelvinatorAC::setSwingVertical(const bool automatic,
+                                      const uint8_t position) {
   _.SwingAuto = automatic;
   uint8_t new_position = position;
   if (!automatic) {
@@ -311,7 +312,9 @@ bool IRKelvinatorAC::getSwingVerticalAuto(void) const { return _.SwingAuto; }
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
-uint8_t IRKelvinatorAC::getSwingVerticalPosition(void) const { return _.SwingV; }
+uint8_t IRKelvinatorAC::getSwingVerticalPosition(void) const {
+  return _.SwingV; 
+}
 
 /// Control the current horizontal swing setting.
 /// @param[in] on The desired setting.
