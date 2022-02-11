@@ -309,13 +309,13 @@ void IRKelvinatorAC::setSwingVertical(const bool automatic,
 /// Get the Vertical Swing Automatic mode setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRKelvinatorAC::getSwingVerticalAuto(void) const {
-  return _.SwingV & 0b0001; 
+  return _.SwingV & 0b0001;
 }
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
 uint8_t IRKelvinatorAC::getSwingVerticalPosition(void) const {
-  return _.SwingV; 
+  return _.SwingV;
 }
 
 /// Control the current horizontal swing setting.
