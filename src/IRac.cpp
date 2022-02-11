@@ -1465,7 +1465,8 @@ void IRac::kelvinator(IRKelvinatorAC *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan((uint8_t)fan);  // No conversion needed.
-  ac->setSwingVertical((int8_t)swingv >= 0);
+  ac->setSwingVertical(swingv == stdAc::swingv_t::kAuto,  // Set auto flag.
+                       ac->convertSwingV(swingv));
   ac->setSwingHorizontal((int8_t)swingh >= 0);
   ac->setQuiet(quiet);
   ac->setTurbo(turbo);

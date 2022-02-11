@@ -274,24 +274,50 @@ void IRKelvinatorAC::setMode(const uint8_t mode) {
   }
 }
 
-/// Control the current vertical swing setting.
-/// @param[in] on The desired setting.
-void IRKelvinatorAC::setSwingVertical(const bool on) {
-  _.SwingV = on;
-  _.VentSwing = (on || _.SwingH);
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] automatic Do we use the automatic setting?
+/// @param[in] position The position/mode to set the vanes to.
+void IRKelvinatorAC::setSwingVertical(const bool automatic, const uint8_t position) {
+  _.SwingAuto = automatic;
+  uint8_t new_position = position;
+  if (!automatic) {
+    switch (position) {
+      case kKelvinatorSwingUp:
+      case kKelvinatorSwingMiddleUp:
+      case kKelvinatorSwingMiddle:
+      case kKelvinatorSwingMiddleDown:
+      case kKelvinatorSwingDown:
+        break;
+      default:
+        new_position = kKelvinatorSwingLastPos;
+    }
+  } else {
+    switch (position) {
+      case kKelvinatorSwingAuto:
+      case kKelvinatorSwingDownAuto:
+      case kKelvinatorSwingMiddleAuto:
+      case kKelvinatorSwingUpAuto:
+        break;
+      default:
+        new_position = kKelvinatorSwingAuto;
+    }
+  }
+  _.SwingV = new_position;
 }
 
-/// Is the vertical swing setting on?
-/// @return The current value.
-bool IRKelvinatorAC::getSwingVertical(void) const {
-  return _.SwingV;
-}
+/// Get the Vertical Swing Automatic mode setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRKelvinatorAC::getSwingVerticalAuto(void) const { return _.SwingAuto; }
+
+/// Get the Vertical Swing position setting of the A/C.
+/// @return The native position/mode.
+uint8_t IRKelvinatorAC::getSwingVerticalPosition(void) const { return _.SwingV; }
 
 /// Control the current horizontal swing setting.
 /// @param[in] on The desired setting.
 void IRKelvinatorAC::setSwingHorizontal(const bool on) {
   _.SwingH = on;
-  _.VentSwing = (on || _.SwingV);
+  _.SwingAuto = (on || _.SwingV);
 }
 
 /// Is the horizontal swing setting on?
@@ -378,6 +404,20 @@ uint8_t IRKelvinatorAC::convertMode(const stdAc::opmode_t mode) {
   }
 }
 
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] swingv The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRKelvinatorAC::convertSwingV(const stdAc::swingv_t swingv) {
+  switch (swingv) {
+    case stdAc::swingv_t::kHighest: return kKelvinatorSwingUp;
+    case stdAc::swingv_t::kHigh:    return kKelvinatorSwingMiddleUp;
+    case stdAc::swingv_t::kMiddle:  return kKelvinatorSwingMiddle;
+    case stdAc::swingv_t::kLow:     return kKelvinatorSwingMiddleDown;
+    case stdAc::swingv_t::kLowest:  return kKelvinatorSwingDown;
+    default:                        return kKelvinatorSwingAuto;
+  }
+}
+
 /// Convert a native mode to it's stdAc::opmode_t equivalent.
 /// @param[in] mode A native operating mode value.
 /// @return The stdAc::opmode_t equivalent.
@@ -442,7 +482,20 @@ String IRKelvinatorAC::toString(void) const {
   result += addBoolToString(_.IonFilter, kIonStr);
   result += addBoolToString(_.Light, kLightStr);
   result += addBoolToString(_.SwingH, kSwingHStr);
-  result += addBoolToString(_.SwingV, kSwingVStr);
+  result += addLabeledString(_.SwingAuto ? kAutoStr : kManualStr,
+                             kSwingVModeStr);
+  result += addIntToString(_.SwingV, kSwingVStr);
+  result += kSpaceLBraceStr;
+  switch (_.SwingV) {
+    case kKelvinatorSwingLastPos:
+      result += kLastStr;
+      break;
+    case kKelvinatorSwingAuto:
+      result += kAutoStr;
+      break;
+    default: result += kUnknownStr;
+  }
+  result += ')';
   return result;
 }
 
