@@ -254,40 +254,40 @@ TEST(TestKelvinatorClass, VaneSwing) {
   EXPECT_TRUE(irkelv.getSwingHorizontal());
 
   EXPECT_FALSE(irkelv.getSwingVerticalAuto());
-  EXPECT_EQ(kKelvinatorSwingLastPos, irkelv.getSwingVerticalPosition());
+  EXPECT_EQ(kKelvinatorSwingVOff, irkelv.getSwingVerticalPosition());
 
-  irkelv.setSwingVertical(true, kKelvinatorSwingAuto);
+  irkelv.setSwingVertical(true, kKelvinatorSwingVAuto);
   EXPECT_TRUE(irkelv.getSwingVerticalAuto());
-  EXPECT_EQ(kKelvinatorSwingAuto, irkelv.getSwingVerticalPosition());
+  EXPECT_EQ(kKelvinatorSwingVAuto, irkelv.getSwingVerticalPosition());
   EXPECT_TRUE(irkelv.getSwingHorizontal());
 
-  irkelv.setSwingVertical(false, kKelvinatorSwingMiddle);
+  irkelv.setSwingVertical(false, kKelvinatorSwingVMiddle);
   EXPECT_FALSE(irkelv.getSwingVerticalAuto());
-  EXPECT_EQ(kKelvinatorSwingMiddle, irkelv.getSwingVerticalPosition());
+  EXPECT_EQ(kKelvinatorSwingVMiddle, irkelv.getSwingVerticalPosition());
   EXPECT_TRUE(irkelv.getSwingHorizontal());
 
   irkelv.setSwingHorizontal(false);
   EXPECT_FALSE(irkelv.getSwingHorizontal());
 
-  irkelv.setSwingVertical(true, kKelvinatorSwingDownAuto);
+  irkelv.setSwingVertical(true, kKelvinatorSwingVLowAuto);
   EXPECT_TRUE(irkelv.getSwingVerticalAuto());
-  EXPECT_EQ(kKelvinatorSwingDownAuto, irkelv.getSwingVerticalPosition());
+  EXPECT_EQ(kKelvinatorSwingVLowAuto, irkelv.getSwingVerticalPosition());
   EXPECT_FALSE(irkelv.getSwingHorizontal());
 
   // Out of bounds.
   irkelv.setSwingVertical(false, 255);
   EXPECT_FALSE(irkelv.getSwingVerticalAuto());
-  EXPECT_EQ(kKelvinatorSwingLastPos, irkelv.getSwingVerticalPosition());
-  irkelv.setSwingVertical(false, kKelvinatorSwingAuto);
+  EXPECT_EQ(kKelvinatorSwingVOff, irkelv.getSwingVerticalPosition());
+  irkelv.setSwingVertical(false, kKelvinatorSwingVAuto);
   EXPECT_FALSE(irkelv.getSwingVerticalAuto());
-  EXPECT_EQ(kKelvinatorSwingLastPos, irkelv.getSwingVerticalPosition());
+  EXPECT_EQ(kKelvinatorSwingVOff, irkelv.getSwingVerticalPosition());
 
   irkelv.setSwingVertical(true, 255);
   EXPECT_TRUE(irkelv.getSwingVerticalAuto());
-  EXPECT_EQ(kKelvinatorSwingAuto, irkelv.getSwingVerticalPosition());
-  irkelv.setSwingVertical(true, kKelvinatorSwingDown);
+  EXPECT_EQ(kKelvinatorSwingVAuto, irkelv.getSwingVerticalPosition());
+  irkelv.setSwingVertical(true, kKelvinatorSwingVLowest);
   EXPECT_TRUE(irkelv.getSwingVerticalAuto());
-  EXPECT_EQ(kKelvinatorSwingAuto, irkelv.getSwingVerticalPosition());
+  EXPECT_EQ(kKelvinatorSwingVAuto, irkelv.getSwingVerticalPosition());
 }
 
 TEST(TestKelvinatorClass, QuietMode) {
@@ -445,7 +445,7 @@ TEST(TestKelvinatorClass, HumanReadable) {
   EXPECT_EQ(
       "Power: Off, Mode: 0 (Auto), Temp: 16C, Fan: 0 (Auto), Turbo: Off, "
       "Quiet: Off, XFan: Off, Ion: Off, Light: Off, "
-      "Swing(H): Off, Swing(V): 0",
+      "Swing(H): Off, Swing(V): 0 (Off)",
       irkelv.toString());
   irkelv.on();
   irkelv.setMode(kKelvinatorCool);
@@ -458,7 +458,7 @@ TEST(TestKelvinatorClass, HumanReadable) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 25C, Fan: 5 (High), Turbo: Off, "
       "Quiet: Off, XFan: On, Ion: On, Light: On, "
-      "Swing(H): On, Swing(V): 0",
+      "Swing(H): On, Swing(V): 0 (Off)",
       irkelv.toString());
 }
 
@@ -471,7 +471,7 @@ TEST(TestKelvinatorClass, MessageConstuction) {
   irkelv.setFan(1);
   irkelv.setMode(kKelvinatorCool);
   irkelv.setTemp(27);
-  irkelv.setSwingVertical(false, kKelvinatorSwingLastPos);
+  irkelv.setSwingVertical(false, kKelvinatorSwingVOff);
   irkelv.setSwingHorizontal(true);
   irkelv.setIonFilter(true);
   irkelv.setQuiet(false);
@@ -543,7 +543,7 @@ TEST(TestDecodeKelvinator, NormalSynthetic) {
   EXPECT_EQ(
       "Power: On, Mode: 1 (Cool), Temp: 27C, Fan: 1 (Low), Turbo: Off, "
       "Quiet: Off, XFan: On, Ion: Off, Light: Off, "
-      "Swing(H): Off, Swing(V): 0",
+      "Swing(H): Off, Swing(V): 0 (Off)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -561,7 +561,7 @@ TEST(TestKelvinatorClass, toCommon) {
   ac.setTurbo(true);
   ac.setLight(true);
   ac.setSwingHorizontal(false);
-  ac.setSwingVertical(true, kKelvinatorSwingAuto);
+  ac.setSwingVertical(true, kKelvinatorSwingVAuto);
 
   // Now test it.
   ASSERT_EQ(decode_type_t::KELVINATOR, ac.toCommon().protocol);

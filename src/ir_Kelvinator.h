@@ -103,16 +103,16 @@ const uint8_t kKelvinatorMinTemp = 16;   // 16C
 const uint8_t kKelvinatorMaxTemp = 30;   // 30C
 const uint8_t kKelvinatorAutoTemp = 25;  // 25C
 
-const uint8_t kKelvinatorSwingLastPos    = 0b0000;  // 0
-const uint8_t kKelvinatorSwingAuto       = 0b0001;  // 1
-const uint8_t kKelvinatorSwingUp         = 0b0010;  // 2
-const uint8_t kKelvinatorSwingMiddleUp   = 0b0011;  // 3
-const uint8_t kKelvinatorSwingMiddle     = 0b0100;  // 4
-const uint8_t kKelvinatorSwingMiddleDown = 0b0101;  // 5
-const uint8_t kKelvinatorSwingDown       = 0b0110;  // 6
-const uint8_t kKelvinatorSwingDownAuto   = 0b0111;  // 7
-const uint8_t kKelvinatorSwingMiddleAuto = 0b1001;  // 9
-const uint8_t kKelvinatorSwingUpAuto     = 0b1011;  // 11
+const uint8_t kKelvinatorSwingVOff         = 0b0000;  // 0
+const uint8_t kKelvinatorSwingVAuto        = 0b0001;  // 1
+const uint8_t kKelvinatorSwingVHighest     = 0b0010;  // 2
+const uint8_t kKelvinatorSwingVUpperMiddle = 0b0011;  // 3
+const uint8_t kKelvinatorSwingVMiddle      = 0b0100;  // 4
+const uint8_t kKelvinatorSwingVLowerMiddle = 0b0101;  // 5
+const uint8_t kKelvinatorSwingVLowest      = 0b0110;  // 6
+const uint8_t kKelvinatorSwingVLowAuto     = 0b0111;  // 7
+const uint8_t kKelvinatorSwingVMiddleAuto  = 0b1001;  // 9
+const uint8_t kKelvinatorSwingVHighAuto    = 0b1011;  // 11
 
 // Legacy defines (Deprecated)
 #define KELVINATOR_MIN_TEMP kKelvinatorMinTemp

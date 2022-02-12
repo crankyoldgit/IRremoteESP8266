@@ -53,6 +53,7 @@ using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addFanToString;
 using irutils::addTempToString;
+using irutils::addSwingVToString;
 
 #if SEND_KELVINATOR
 /// Send a Kelvinator A/C message.
@@ -283,24 +284,24 @@ void IRKelvinatorAC::setSwingVertical(const bool automatic,
   uint8_t new_position = position;
   if (!automatic) {
     switch (position) {
-      case kKelvinatorSwingUp:
-      case kKelvinatorSwingMiddleUp:
-      case kKelvinatorSwingMiddle:
-      case kKelvinatorSwingMiddleDown:
-      case kKelvinatorSwingDown:
+      case kKelvinatorSwingVHighest:
+      case kKelvinatorSwingVUpperMiddle:
+      case kKelvinatorSwingVMiddle:
+      case kKelvinatorSwingVLowerMiddle:
+      case kKelvinatorSwingVLowest:
         break;
       default:
-        new_position = kKelvinatorSwingLastPos;
+        new_position = kKelvinatorSwingVOff;
     }
   } else {
     switch (position) {
-      case kKelvinatorSwingAuto:
-      case kKelvinatorSwingDownAuto:
-      case kKelvinatorSwingMiddleAuto:
-      case kKelvinatorSwingUpAuto:
+      case kKelvinatorSwingVAuto:
+      case kKelvinatorSwingVLowAuto:
+      case kKelvinatorSwingVMiddleAuto:
+      case kKelvinatorSwingVHighAuto:
         break;
       default:
-        new_position = kKelvinatorSwingAuto;
+        new_position = kKelvinatorSwingVAuto;
     }
   }
   _.SwingV = new_position;
@@ -414,12 +415,12 @@ uint8_t IRKelvinatorAC::convertMode(const stdAc::opmode_t mode) {
 /// @return The native equivalent of the enum.
 uint8_t IRKelvinatorAC::convertSwingV(const stdAc::swingv_t swingv) {
   switch (swingv) {
-    case stdAc::swingv_t::kHighest: return kKelvinatorSwingUp;
-    case stdAc::swingv_t::kHigh:    return kKelvinatorSwingMiddleUp;
-    case stdAc::swingv_t::kMiddle:  return kKelvinatorSwingMiddle;
-    case stdAc::swingv_t::kLow:     return kKelvinatorSwingMiddleDown;
-    case stdAc::swingv_t::kLowest:  return kKelvinatorSwingDown;
-    default:                        return kKelvinatorSwingAuto;
+    case stdAc::swingv_t::kHighest: return kKelvinatorSwingVHighest;
+    case stdAc::swingv_t::kHigh:    return kKelvinatorSwingVHighAuto;
+    case stdAc::swingv_t::kMiddle:  return kKelvinatorSwingVMiddle;
+    case stdAc::swingv_t::kLow:     return kKelvinatorSwingVLowAuto;
+    case stdAc::swingv_t::kLowest:  return kKelvinatorSwingVLowest;
+    default:                        return kKelvinatorSwingVAuto;
   }
 }
 
@@ -487,7 +488,17 @@ String IRKelvinatorAC::toString(void) const {
   result += addBoolToString(_.IonFilter, kIonStr);
   result += addBoolToString(_.Light, kLightStr);
   result += addBoolToString(_.SwingH, kSwingHStr);
-  result += addIntToString(_.SwingV, kSwingVStr);
+  result += addSwingVToString(_.SwingV, kKelvinatorSwingVAuto,
+                              kKelvinatorSwingVHighest,
+                              kKelvinatorSwingVHighAuto,
+                              kKelvinatorSwingVUpperMiddle,
+                              kKelvinatorSwingVMiddle,
+                              kKelvinatorSwingVLowerMiddle,
+                              kKelvinatorSwingVLowAuto,
+                              kKelvinatorSwingVLowest,
+                              kKelvinatorSwingVOff,
+                              kKelvinatorSwingVAuto, kKelvinatorSwingVAuto,
+                              kKelvinatorSwingVAuto);
   return result;
 }
 
