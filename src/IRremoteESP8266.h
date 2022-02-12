@@ -497,6 +497,13 @@
 #define SEND_HITACHI_AC264     _IR_ENABLE_DEFAULT_
 #endif  // SEND_HITACHI_AC264
 
+#ifndef DECODE_HITACHI_AC296
+#define DECODE_HITACHI_AC296   _IR_ENABLE_DEFAULT_
+#endif  // DECODE_HITACHI_AC296
+#ifndef SEND_HITACHI_AC296
+#define SEND_HITACHI_AC296     _IR_ENABLE_DEFAULT_
+#endif  // SEND_HITACHI_AC296
+
 #ifndef DECODE_HITACHI_AC344
 #define DECODE_HITACHI_AC344   _IR_ENABLE_DEFAULT_
 #endif  // DECODE_HITACHI_AC344
@@ -1022,8 +1029,9 @@ enum decode_type_t {
   COOLIX48,  // 110
   HITACHI_AC264,
   KELON168,
+  HITACHI_AC296,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = KELON168,
+  kLastDecodeType = HITACHI_AC296,
 };
 
 // Message lengths & required repeat values
