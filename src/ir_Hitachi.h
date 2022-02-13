@@ -296,6 +296,84 @@ const uint8_t kHitachiAc264FanMedium = kHitachiAc424FanMedium;
 const uint8_t kHitachiAc264FanHigh = kHitachiAc424FanHigh;
 const uint8_t kHitachiAc264FanAuto = kHitachiAc424FanAuto;
 
+// HitachiAc296 
+union HitachiAC296Protocol{
+  uint8_t raw[kHitachiAc296StateLength];
+  struct {
+    // Byte 1~13
+    uint8_t pad0[13];
+    // Byte 14&15
+    uint8_t                    :2;
+    uint8_t Temp               :5; // storedf in LSB order.
+    uint8_t                    :1;
+    uint8_t                    :2;
+    uint8_t TempParity         :5; // stored in LSB order.
+    uint8_t                    :1;
+    // Byte 16~17
+    uint8_t                    :8;
+    uint8_t                    :8;
+    // Byte 18~21
+    uint8_t                    :4;
+    uint8_t OffTimerLow        :4; //  LSB
+    uint8_t OffTimerLowParity  :8;
+    uint8_t OffTimerHigh       :8;
+    uint8_t OffTimerHighParity :8;
+    // Byte 22~25
+    uint8_t OnTimerLow         :8; // LSB
+    uint8_t OnTimerLowParity   :8;
+    uint8_t OnTimerHigh        :4;
+    uint8_t OffTimerActive     :1;
+    uint8_t OnTimerActive      :1;
+    uint8_t                    :2;
+    uint8_t OnTimerHighParity  :6;
+    uint8_t                    :2;
+    // Byte 26~27                                
+    uint8_t Mode               :4;
+    uint8_t Fan                :3;
+    uint8_t                    :1;
+    uint8_t ModeParity         :4;
+    uint8_t FanParity          :3;
+    uint8_t                    :1;
+    // Byte 28~29
+    uint8_t                    :4;
+    uint8_t Power              :1;
+    uint8_t                    :2;
+    uint8_t TimerActive        :1;
+    uint8_t                    :4;
+    uint8_t PowerParity        :1;
+    uint8_t                    :2;
+    uint8_t TimerActiveParity  :1;
+    // Byte 30~35
+    uint8_t pad1[6];
+    // Byte 36~37
+    uint8_t                    :4;
+    uint8_t Humidity           :4;
+    uint8_t                    :4;
+    uint8_t HumidityParity     :4;
+  };
+};
+
+// Mode & Fan
+const uint8_t kHitachiAc296Cool = 0b1100; // 3
+const uint8_t kHitachiAc296Dry  = 0b0010; // 4
+const uint8_t kHitachiAc296Heat = 0b0110; // 6
+const uint8_t kHitachiAc296Auto = 0b1110; // 7
+const uint8_t kHitachiAc296CondensationControl = 0b1110; // 12
+
+const uint8_t kHitachiAc296FanSilent = 0b100; // 1
+const uint8_t kHitachiAc296FanLow    = 0b010; // 2
+const uint8_t kHitachiAc296FanMedium = 0b110; // 3
+const uint8_t kHitachiAc296FanHigh   = 0b001; // 4
+const uint8_t kHitachiAc296FanAuto   = 0b101; // 5
+
+const uint8_t kHitachiAc296TempSize = 5;
+const uint8_t kHitachiAc296MinTemp = 16;
+const uint8_t kHitachiAc296MaxTemp = 32;
+
+const uint8_t kHitachiAc296PowerOn = 1;
+const uint8_t kHitachiAc296PowerOff = 0;
+
+
 // Classes
 /// Class for handling detailed Hitachi 224-bit A/C messages.
 /// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/HitachiHeatpumpIR.cpp

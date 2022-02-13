@@ -1724,89 +1724,20 @@ void IRsend::sendHitachiAc296(const uint64_t data, const uint16_t nbits, const u
 #endif  // SEND_HITACHIAC296
 
 #if DECODE_HITACHIAC296
-// Function should be safe up to 64 bits.
-/// Decode the supplied HitachiAc296 message.
-/// Status: ALPHA / Untested.
-/// @param[in,out] results Ptr to the data to decode & where to store the decode
-/// @param[in] offset The starting index to use when attempting to decode the
-///   raw data. Typically/Defaults to kStartOffset.
-/// @param[in] nbits The number of data bits to expect.
-/// @param[in] strict Flag indicating if we should perform strict matching.
-/// @return A boolean. True if it can decode it, false if it can't.
-bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset, const uint16_t nbits, const bool strict) {
-  if (results->rawlen < 2 * nbits + kHitachiAc296Overhead - offset)
-    return false;  // Too short a message to match.
-  if (strict && nbits != kHitachiAc296Bits)
-    return false;
+bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset,
+                                const uint16_t nbits,
+                                const bool strict) {
 
-  uint64_t data = 0;
-  match_result_t data_result;
+  uint16_t used = matchGeneric(results->rawbuf + offset, results->state,
+                               results->rawlen - offset, nbits,
+                               kHitachiAc296HdrMark, kHitachiAc296HdrSpace,
+                               kHitachiAc296BitMark, kHitachiAc296OneSpace,
+                               kHitachiAc296BitMark, kHitachiAc296ZeroSpace,
+                               kHitachiAc296BitMark, kHitachiAcMinGap, true,
+                               kUseDefTol, 0, false);
+  if (used == 0) return false;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kHitachiAc296HdrMark))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], kHitachiAc296HdrSpace))
-    return false;
-
-  // Data Section #1
-  // e.g. data_result.data = 0x80080002FDFF0033CC49B622DD06F900FF00FF00FF00FF00FF6A958F7000FF00FF00FFC03F, nbits = 296
-  data_result = matchData(&(results->rawbuf[offset]), 296,
-                          kHitachiAc296BitMark, kHitachiAc296OneSpace,
-                          kHitachiAc296BitMark, kHitachiAc296ZeroSpace);
-  offset += data_result.used;
-  if (data_result.success == false) return false;  // Fail
-  data <<= 296;  // Make room for the new bits of data.
-  data |= data_result.data;
-
-  // Footer
-  if (!matchMark(results->rawbuf[offset++], kHitachiAc296BitMark))
-    return false;
-
-  // Success
-  results->decode_type = decode_type_t::HITACHIAC296;
-  results->bits = nbits;
-  results->value = data;
-  results->command = 0;
-  results->address = 0;
-  return true;
-}
-#endif  // DECODE_HITACHIAC296
-
-#if DECODE_HITACHIAC296
-// Function should be safe over 64 bits.
-/// Decode the supplied HitachiAc296 message.
-/// Status: ALPHA / Untested.
-/// @param[in,out] results Ptr to the data to decode & where to store the decode
-/// @param[in] offset The starting index to use when attempting to decode the
-///   raw data. Typically/Defaults to kStartOffset.
-/// @param[in] nbits The number of data bits to expect.
-/// @param[in] strict Flag indicating if we should perform strict matching.
-/// @return A boolean. True if it can decode it, false if it can't.
-bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset, const uint16_t nbits, const bool strict) {
-  if (results->rawlen < 2 * nbits + kHitachiAc296Overhead - offset)
-    return false;  // Too short a message to match.
-  if (strict && nbits != kHitachiAc296Bits)
-    return false;
-
-  uint16_t pos = 0;
-  uint16_t used = 0;
-
-  // Data Section #1
-  // e.g.
-  //   bits = 296; bytes = 37;
-  //   *(results->state + pos) = {0x80, 0x08, 0x00, 0x02, 0xFD, 0xFF, 0x00, 0x33, 0xCC, 0x49, 0xB6, 0x22, 0xDD, 0x06, 0xF9, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x6A, 0x95, 0x8F, 0x70, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0xC0, 0x3F};
-  used = matchGeneric(results->rawbuf + offset, results->state + pos,
-                      results->rawlen - offset, 296,
-                      kHitachiAc296HdrMark, kHitachiAc296HdrSpace,
-                      kHitachiAc296BitMark, kHitachiAc296OneSpace,
-                      kHitachiAc296BitMark, kHitachiAc296ZeroSpace,
-                      kHitachiAc296BitMark, kDefaultMessageGap, true);
-  if (used == 0) return false;  // We failed to find any data.
-  offset += used;  // Adjust for how much of the message we read.
-  pos += 37;  // Adjust by how many bytes of data we read
-
-  // Success
-  results->decode_type = decode_type_t::HITACHIAC296;
+  results->decode_type = decode_type_t::HITACHI_AC296;
   results->bits = nbits;
   return true;
 }
