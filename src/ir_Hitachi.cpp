@@ -1722,6 +1722,131 @@ void IRsend::sendHitachiAc296(const unsigned char data[], const uint16_t nbytes,
 }
 #endif  // SEND_HITACHIAC296
 
+IRHitachiAc296::IRHitachiAc296(const uint16_t pin, const bool inverted,
+                               const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+void IRHitachiAc296::stateReset(void) {
+  // Header
+  _.raw[0] = 0x01;
+  _.raw[1] = 0x10;
+  _.raw[2] = 0x00;
+
+  // Every next byte is a parity byte
+  _.raw[3] = 0x40;
+  _.raw[5] = 0xFF;
+  _.raw[7] = 0xCC;
+  _.raw[9] = 0x92;
+  _.raw[11] = 0x44;
+  // 13-14 is Temperature and parity
+  _.raw[15] = 0x00;
+  _.raw[17] = 0x00; // Off timer LSB
+  _.raw[19] = 0x00; // Off timer cont
+  _.raw[21] = 0x00; // On timer LSB
+  _.raw[23] = 0x00; // On timer cont
+  // 25-26 is Mode and fan
+  // 27-28 is Power
+  _.raw[29] = 0x00;
+  _.raw[31] = 0x00;
+  _.raw[33] = 0x00;
+  _.raw[35] = 0x03; // Humidity
+
+  setTemp(23);
+  setPower(true);
+  setMode(kHitachiAc296Cool);
+  setFan(kHitachiAc296FanAuto);
+
+  setInvertedStates();
+}
+
+/// Update the internal consistency check for the protocol.
+void IRHitachiAc296::setInvertedStates(void) {
+  invertBytePairs(_.raw + 3, kHitachiAc296StateLength - 3);
+}
+
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRHitachiAc296::getPower(void) const {
+  return _.Power;
+}
+
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRHitachiAc296::setPower(const bool on) {
+  _.Power = on;
+}
+
+/// Change the power setting to On.
+void IRHitachiAc296::on(void) { setPower(true); }
+
+/// Change the power setting to Off.
+void IRHitachiAc296::off(void) { setPower(false); }
+
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
+uint8_t IRHitachiAc296::getMode(void) const {
+  return _.Mode;
+}
+
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
+void IRHitachiAc296::setMode(const uint8_t mode) {
+  uint8_t newMode = mode;
+  switch (mode) {
+    case kHitachiAc296Heat:
+    case kHitachiAc296Cool:
+    case kHitachiAc296Auto: break;
+    default: newMode = kHitachiAc296Auto;
+  }
+
+  _.Mode = newMode;
+}
+
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRHitachiAc296::getTemp(void) const {
+  return reverseBits(_.Temp, kHitachiAc296TempSize) << 1;
+}
+
+/// Set the temperature.
+/// @param[in] celsius The temperature in degrees celsius.
+void IRHitachiAc296::setTemp(const uint8_t celsius) {
+  uint8_t temp;
+  temp = std::min(celsius, kHitachiAc296MaxTemp);
+  temp = std::max(temp, kHitachiAc296MinTemp);
+  _.Temp = reverseBits(temp << 1, kHitachiAc296TempSize);
+}
+
+/// Get the current fan speed setting.
+/// @return The current fan speed.
+uint8_t IRHitachiAc296::getFan(void) const {
+  return _.Fan;
+}
+
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
+void IRHitachiAc296::setFan(const uint8_t speed) {
+  uint8_t newSpeed = speed;
+  newSpeed = std::max(newSpeed, kHitachiAc296FanSilent);
+  newSpeed = std::min(newSpeed, kHitachiAc296FanAuto);
+
+  _.Fan = newSpeed;
+}
+
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
+uint8_t *IRHitachiAc296::getRaw(void) {
+  setInvertedStates();
+  return _.raw;
+}
+
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
+/// @param[in] length Size (in bytes) of the code for this protocol.
+void IRHitachiAc296::setRaw(const uint8_t new_code[], const uint16_t length) {
+  memcpy(_.raw, new_code, std::min(length, kHitachiAc264StateLength));
+}
+
 #if DECODE_HITACHI_AC296
 bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset,
                                 const uint16_t nbits,

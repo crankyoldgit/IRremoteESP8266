@@ -300,56 +300,44 @@ const uint8_t kHitachiAc264FanAuto = kHitachiAc424FanAuto;
 union HitachiAC296Protocol{
   uint8_t raw[kHitachiAc296StateLength];
   struct {
-    // Byte 1~13
+    // Byte 0~12
     uint8_t pad0[13];
-    // Byte 14&15
+    // Byte 13
     uint8_t                    :2;
-    uint8_t Temp               :5; // storedf in LSB order.
+    uint8_t Temp               :5; // stored in LSB order.
     uint8_t                    :1;
-    uint8_t                    :2;
-    uint8_t TempParity         :5; // stored in LSB order.
-    uint8_t                    :1;
-    // Byte 16~17
+    uint8_t                    :8;
+    // Byte 15~16
     uint8_t                    :8;
     uint8_t                    :8;
-    // Byte 18~21
-    uint8_t                    :4;
-    uint8_t OffTimerLow        :4; //  LSB
-    uint8_t OffTimerLowParity  :8;
+    // Byte 17~24
+    uint8_t OffTimerLow        :8; //  LSB
+    uint8_t /* Parity */       :8;
     uint8_t OffTimerHigh       :8;
-    uint8_t OffTimerHighParity :8;
-    // Byte 22~25
+    uint8_t /* Parity */       :8;
     uint8_t OnTimerLow         :8; // LSB
-    uint8_t OnTimerLowParity   :8;
+    uint8_t /* Parity */       :8;
     uint8_t OnTimerHigh        :4;
     uint8_t OffTimerActive     :1;
     uint8_t OnTimerActive      :1;
     uint8_t                    :2;
-    uint8_t OnTimerHighParity  :6;
-    uint8_t                    :2;
-    // Byte 26~27                                
+    uint8_t /* Parity */       :8;
+    // Byte 25~26                                
     uint8_t Mode               :4;
     uint8_t Fan                :3;
     uint8_t                    :1;
-    uint8_t ModeParity         :4;
-    uint8_t FanParity          :3;
-    uint8_t                    :1;
-    // Byte 28~29
+    uint8_t                    :8;
+    // Byte 27~28
     uint8_t                    :4;
     uint8_t Power              :1;
     uint8_t                    :2;
     uint8_t TimerActive        :1;
-    uint8_t                    :4;
-    uint8_t PowerParity        :1;
-    uint8_t                    :2;
-    uint8_t TimerActiveParity  :1;
-    // Byte 30~35
+    uint8_t                    :8;
+    // Byte 29~34
     uint8_t pad1[6];
-    // Byte 36~37
-    uint8_t                    :4;
-    uint8_t Humidity           :4;
-    uint8_t                    :4;
-    uint8_t HumidityParity     :4;
+    // Byte 35~36
+    uint8_t Humidity           :8; // LSB
+    uint8_t                    :8;
   };
 };
 
@@ -627,5 +615,47 @@ class IRHitachiAc264: public IRHitachiAc424 {
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat) override;
 #endif  // SEND_HITACHI_AC264
   String toString(void) const override;
+};
+
+class IRHitachiAc296 {
+ public:
+  explicit IRHitachiAc296(const uint16_t pin, const bool inverted = false,
+                          const bool use_modulation = true);
+  void stateReset(void);
+
+#if SEND_HITACHI_AC296
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+#endif
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void) const;
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp(void) const;
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void) const;
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void) const;
+  /* void setSwingVertical(const bool on); */
+  /* bool getSwingVertical(void) const; */
+  /* void setSwingHorizontal(const bool on); */
+  /* bool getSwingHorizontal(void) const; */
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kHitachiAc296StateLength);
+
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+
+  HitachiAC296Protocol _;
+  void setInvertedStates(void);
 };
 #endif  // IR_HITACHI_H_
