@@ -47,7 +47,6 @@ const uint16_t kHitachiAc3OneSpace = 1250;
 const uint16_t kHitachiAc3ZeroSpace = 410;
 
 // Support for HitachiAc296 protocol
-const uint16_t kHitachiAc296HdrSpace = 1714;
 
 using irutils::addBoolToString;
 using irutils::addIntToString;
@@ -61,7 +60,7 @@ using irutils::invertBytePairs;
 using irutils::minsToString;
 
 #if (SEND_HITACHI_AC || SEND_HITACHI_AC2 || SEND_HITACHI_AC264 || \
-     SEND_HITACHI_AC344 || SEND_HITACHI_AC296)
+     SEND_HITACHI_AC344)
 /// Send a Hitachi 28-byte/224-bit A/C formatted message. (HITACHI_AC)
 /// Status: STABLE / Working.
 /// @param[in] data The message to be sent.
@@ -1710,30 +1709,30 @@ String IRHitachiAc264::toString(void) const {
 #endif  // DECODE_HITACHI_AC264
 
 
-#if SEND_HITACHIAC296
+#if SEND_HITACHI_AC296
 /// Send a HitachiAc 37-byte/296-bit A/C message (HITACHI_AC296)
 /// Status: ALPHA / Untested.
 /// @param[in] data containing the IR command.
 /// @param[in] nbits Nr. of bits to send. usually kHitachiAc296Bits
 /// @param[in] repeat Nr. of times the message is to be repeated.
-void IRsend::sendHitachiAc296(const uint64_t data, const uint16_t nbits, const uint16_t repeat) {
+void IRsend::sendHitachiAc296(const unsigned char data[], const uint16_t nbytes, const uint16_t repeat) {
   if (nbytes < kHitachiAc264StateLength)
     return;  // Not enough bytes to send a proper message.
   sendHitachiAC(data, nbytes, repeat);
 }
 #endif  // SEND_HITACHIAC296
 
-#if DECODE_HITACHIAC296
+#if DECODE_HITACHI_AC296
 bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset,
                                 const uint16_t nbits,
                                 const bool strict) {
 
   uint16_t used = matchGeneric(results->rawbuf + offset, results->state,
                                results->rawlen - offset, nbits,
-                               kHitachiAc296HdrMark, kHitachiAc296HdrSpace,
-                               kHitachiAc296BitMark, kHitachiAc296OneSpace,
-                               kHitachiAc296BitMark, kHitachiAc296ZeroSpace,
-                               kHitachiAc296BitMark, kHitachiAcMinGap, true,
+                               kHitachiAcHdrMark, kHitachiAcHdrSpace,
+                               kHitachiAcBitMark, kHitachiAcOneSpace,
+                               kHitachiAcBitMark, kHitachiAcZeroSpace,
+                               kHitachiAcBitMark, kHitachiAcMinGap, true,
                                kUseDefTol, 0, false);
   if (used == 0) return false;
 
@@ -1741,4 +1740,4 @@ bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset,
   results->bits = nbits;
   return true;
 }
-#endif  // DECODE_HITACHIAC296
+#endif  // DECODE_HITACHI_AC296

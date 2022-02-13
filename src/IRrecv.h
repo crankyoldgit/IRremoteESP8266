@@ -591,7 +591,7 @@ class IRrecv {
                         const bool strict = true);
 #endif  // DECODE_HAIER_AC176
 #if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2 || DECODE_HITACHI_AC264 || \
-     DECODE_HITACHI_AC296 || DECODE_HITACHI_AC344)
+     DECODE_HITACHI_AC344)
   bool decodeHitachiAC(decode_results *results, uint16_t offset = kStartOffset,
                        const uint16_t nbits = kHitachiAcBits,
                        const bool strict = true, const bool MSBfirst = true);
@@ -608,6 +608,12 @@ class IRrecv {
                           const uint16_t nbits = kHitachiAc3Bits,
                           const bool strict = true);
 #endif  // DECODE_HITACHI_AC3
+#if DECODE_HITACHI_AC296
+  bool decodeHitachiAc296(decode_results *results,
+                          uint16_t offset = kStartOffset,
+                          const uint16_t nbits = kHitachiAc296Bits,
+                          const bool strict = true);
+#endif  // DECODE_HITACHI_AC296
 #if DECODE_HITACHI_AC424
   bool decodeHitachiAc424(decode_results *results,
                           uint16_t offset = kStartOffset,
