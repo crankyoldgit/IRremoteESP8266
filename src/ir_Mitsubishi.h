@@ -35,7 +35,6 @@
 //   Brand: Mitsubishi Electric,  Model: SG15D remote (MITSUBISHI_AC)
 //   Brand: Mitsubishi Electric,  Model: MSZ-ZW4017S A/C (MITSUBISHI_AC)
 //   Brand: Mitsubishi Electric,  Model: MSZ-FHnnVE A/C (MITSUBISHI_AC)
-//   Brand: Mitsubishi Electric,  Model: MLZ-RX5017AS A/C (MITSUBISHI_AC)
 //   Brand: Mitsubishi Electric,  Model: RH151 remote (MITSUBISHI_AC)
 
 #ifndef IR_MITSUBISHI_H_
