@@ -62,7 +62,7 @@ const uint16_t kMitsubishiAcBitMark = 450;
 const uint16_t kMitsubishiAcOneSpace = 1300;
 const uint16_t kMitsubishiAcZeroSpace = 420;
 const uint16_t kMitsubishiAcRptMark = 440;
-const uint16_t kMitsubishiAcRptSpace = 17100;
+const uint16_t kMitsubishiAcRptSpace = 15500;
 const uint8_t  kMitsubishiAcExtraTolerance = 5;
 
 // Mitsubishi 136 bit A/C
