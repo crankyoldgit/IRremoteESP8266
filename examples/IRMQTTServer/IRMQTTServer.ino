@@ -1249,8 +1249,8 @@ void handleInfo(void) {
     "Built: " __DATE__
       " " __TIME__ "<br>"
     "Period Offset: ") + String(offset) + F("us<br>"
-    "IR Lib Version: " _IRREMOTEESP8266_VERSION_STR "<br>"
 #if defined(ESP8266)
+    "IR Lib Version: " _IRREMOTEESP8266_VERSION_STR "<br>"
     "ESP8266 Core Version: ") + ESP.getCoreVersion() + F("<br>"
     "Free Sketch Space: ") + String(maxSketchSpace() >> 10) + F("k<br>"
 #endif  // ESP8266
