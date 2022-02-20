@@ -1314,6 +1314,8 @@ const uint16_t kRhossDefaultRepeat = 0;
 #define HITACHI_AC1_BITS              kHitachiAc1Bits
 #define HITACHI_AC2_STATE_LENGTH      kHitachiAc2StateLength
 #define HITACHI_AC2_BITS              kHitachiAc2Bits
+#define HITACHI_AC296_STATE_LENGTH    kHitachiAc296StateLength
+#define HITACHI_AC296_BITS            kHitachiAc296Bits
 #define JVC_BITS                      kJvcBits
 #define KELVINATOR_STATE_LENGTH       kKelvinatorStateLength
 #define LASERTAG_BITS                 kLasertagBits

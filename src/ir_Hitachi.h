@@ -304,14 +304,14 @@ union HitachiAC296Protocol{
     uint8_t pad0[13];
     // Byte 13
     uint8_t                    :2;
-    uint8_t Temp               :5; // stored in LSB order.
+    uint8_t Temp               :5; // LSB
     uint8_t                    :1;
     uint8_t                    :8;
     // Byte 15~16
     uint8_t                    :8;
     uint8_t                    :8;
     // Byte 17~24
-    uint8_t OffTimerLow        :8; //  LSB
+    uint8_t OffTimerLow        :8; // LSB
     uint8_t /* Parity */       :8;
     uint8_t OffTimerHigh       :8;
     uint8_t /* Parity */       :8;
@@ -336,29 +336,33 @@ union HitachiAC296Protocol{
     // Byte 29~34
     uint8_t pad1[6];
     // Byte 35~36
-    uint8_t Humidity           :8; // LSB
+    uint8_t                    :4;
+    uint8_t Humidity           :4; // LSB
     uint8_t                    :8;
   };
 };
 
 // Mode & Fan
-const uint8_t kHitachiAc296Cool = 0b1100; // 3
-const uint8_t kHitachiAc296Dry  = 0b0010; // 4
-const uint8_t kHitachiAc296Heat = 0b0110; // 6
-const uint8_t kHitachiAc296Auto = 0b1110; // 7
-const uint8_t kHitachiAc296CondensationControl = 0b1110; // 12
+const uint8_t kHitachiAc296Cool                = 0b0011; 
+const uint8_t kHitachiAc296DryCool             = 0b0100; 
+const uint8_t kHitachiAc296Dehumidify          = 0b0101; 
+const uint8_t kHitachiAc296Heat                = 0b0110;
+const uint8_t kHitachiAc296Auto                = 0b0111;
+const uint8_t kHitachiAc296AutoDehumidifying   = 0b1001;
+const uint8_t kHitachiAc296QuickLaundry        = 0b1010;
+const uint8_t kHitachiAc296CondensationControl = 0b1100;
 
-const uint8_t kHitachiAc296FanSilent = 0b100; // 1
-const uint8_t kHitachiAc296FanLow    = 0b010; // 2
-const uint8_t kHitachiAc296FanMedium = 0b110; // 3
-const uint8_t kHitachiAc296FanHigh   = 0b001; // 4
-const uint8_t kHitachiAc296FanAuto   = 0b101; // 5
+const uint8_t kHitachiAc296FanSilent = 0b001;
+const uint8_t kHitachiAc296FanLow    = 0b010;
+const uint8_t kHitachiAc296FanMedium = 0b011;
+const uint8_t kHitachiAc296FanHigh   = 0b100;
+const uint8_t kHitachiAc296FanAuto   = 0b101;
 
 const uint8_t kHitachiAc296TempSize = 5;
-const uint8_t kHitachiAc296MinTemp = 16;
-const uint8_t kHitachiAc296MaxTemp = 32;
+const uint8_t kHitachiAc296MinTemp  = 16;
+const uint8_t kHitachiAc296MaxTemp  = 32;
 
-const uint8_t kHitachiAc296PowerOn = 1;
+const uint8_t kHitachiAc296PowerOn  = 1;
 const uint8_t kHitachiAc296PowerOff = 0;
 
 
