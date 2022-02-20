@@ -46,8 +46,6 @@ const uint16_t kHitachiAc3BitMark = 460;
 const uint16_t kHitachiAc3OneSpace = 1250;
 const uint16_t kHitachiAc3ZeroSpace = 410;
 
-// Support for HitachiAc296 protocol
-
 using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
@@ -1715,7 +1713,9 @@ String IRHitachiAc264::toString(void) const {
 /// @param[in] data containing the IR command.
 /// @param[in] nbits Nr. of bits to send. usually kHitachiAc296Bits
 /// @param[in] repeat Nr. of times the message is to be repeated.
-void IRsend::sendHitachiAc296(const unsigned char data[], const uint16_t nbytes, const uint16_t repeat) {
+void IRsend::sendHitachiAc296(const unsigned char data[],
+                              const uint16_t nbytes,
+                              const uint16_t repeat) {
   if (nbytes < kHitachiAc296StateLength)
     return;  // Not enough bytes to send a proper message.
   sendHitachiAC(data, nbytes, repeat);
@@ -1740,16 +1740,16 @@ void IRHitachiAc296::stateReset(void) {
   _.raw[11] = 0x43;
   // 13-14 is Temperature and parity
   _.raw[15] = 0x00;
-  _.raw[17] = 0x00; // Off timer LSB
-  _.raw[19] = 0x00; // Off timer cont
-  _.raw[21] = 0x00; // On timer LSB
-  _.raw[23] = 0x00; // On timer cont
+  _.raw[17] = 0x00;  // Off timer LSB
+  _.raw[19] = 0x00;  // Off timer cont
+  _.raw[21] = 0x00;  // On timer LSB
+  _.raw[23] = 0x00;  // On timer cont
   // 25-26 is Mode and fan
-  _.raw[27] = 0xF1; // Power on
+  _.raw[27] = 0xF1;  // Power on
   _.raw[29] = 0x00;
   _.raw[31] = 0x00;
   _.raw[33] = 0x00;
-  _.raw[35] = 0x03; // Humidity
+  _.raw[35] = 0x03;  // Humidity
 
   setTemp(24);
   setMode(kHitachiAc296Heat);
@@ -1774,7 +1774,6 @@ void IRHitachiAc296::send(const uint16_t repeat) {
 }
 #endif  // SEND_HITACHI_AC296
 
-//begin
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
@@ -1864,7 +1863,6 @@ void IRHitachiAc296::setRaw(const uint8_t new_code[], const uint16_t length) {
 bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset,
                                 const uint16_t nbits,
                                 const bool strict) {
-
   uint16_t used = matchGeneric(results->rawbuf + offset, results->state,
                                results->rawlen - offset, nbits,
                                kHitachiAcHdrMark, kHitachiAcHdrSpace,

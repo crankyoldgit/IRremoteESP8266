@@ -296,7 +296,7 @@ const uint8_t kHitachiAc264FanMedium = kHitachiAc424FanMedium;
 const uint8_t kHitachiAc264FanHigh = kHitachiAc424FanHigh;
 const uint8_t kHitachiAc264FanAuto = kHitachiAc424FanAuto;
 
-// HitachiAc296 
+// HitachiAc296
 union HitachiAC296Protocol{
   uint8_t raw[kHitachiAc296StateLength];
   struct {
@@ -304,25 +304,25 @@ union HitachiAC296Protocol{
     uint8_t pad0[13];
     // Byte 13
     uint8_t                    :2;
-    uint8_t Temp               :5; // LSB
+    uint8_t Temp               :5;  // LSB
     uint8_t                    :1;
     uint8_t                    :8;
     // Byte 15~16
     uint8_t                    :8;
     uint8_t                    :8;
     // Byte 17~24
-    uint8_t OffTimerLow        :8; // LSB
+    uint8_t OffTimerLow        :8;  // LSB
     uint8_t /* Parity */       :8;
     uint8_t OffTimerHigh       :8;
     uint8_t /* Parity */       :8;
-    uint8_t OnTimerLow         :8; // LSB
+    uint8_t OnTimerLow         :8;  // LSB
     uint8_t /* Parity */       :8;
     uint8_t OnTimerHigh        :4;
     uint8_t OffTimerActive     :1;
     uint8_t OnTimerActive      :1;
     uint8_t                    :2;
     uint8_t /* Parity */       :8;
-    // Byte 25~26                                
+    // Byte 25~26
     uint8_t Mode               :4;
     uint8_t Fan                :3;
     uint8_t                    :1;
@@ -337,15 +337,15 @@ union HitachiAC296Protocol{
     uint8_t pad1[6];
     // Byte 35~36
     uint8_t                    :4;
-    uint8_t Humidity           :4; // LSB
+    uint8_t Humidity           :4;  // LSB
     uint8_t                    :8;
   };
 };
 
 // Mode & Fan
-const uint8_t kHitachiAc296Cool                = 0b0011; 
-const uint8_t kHitachiAc296DryCool             = 0b0100; 
-const uint8_t kHitachiAc296Dehumidify          = 0b0101; 
+const uint8_t kHitachiAc296Cool                = 0b0011;
+const uint8_t kHitachiAc296DryCool             = 0b0100;
+const uint8_t kHitachiAc296Dehumidify          = 0b0101;
 const uint8_t kHitachiAc296Heat                = 0b0110;
 const uint8_t kHitachiAc296Auto                = 0b0111;
 const uint8_t kHitachiAc296AutoDehumidifying   = 0b1001;
