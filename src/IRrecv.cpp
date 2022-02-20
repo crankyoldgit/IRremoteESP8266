@@ -1050,8 +1050,12 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Teknopoint decode");
     if (decodeTeknopoint(results, offset)) return true;
 #endif  // DECODE_TEKNOPOINT
+#if DECODE_KELON168
+    DPRINTLN("Attempting Kelon 168-bit decode");
+    if (decodeKelon168(results, offset)) return true;
+#endif  // DECODE_KELON168
 #if DECODE_KELON
-    DPRINTLN("Attempting Kelon decode");
+    DPRINTLN("Attempting Kelon 48-bit decode");
     if (decodeKelon(results, offset)) return true;
 #endif  // DECODE_KELON
 #if DECODE_SANYO_AC88

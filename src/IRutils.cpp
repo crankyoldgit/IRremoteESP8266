@@ -193,6 +193,7 @@ bool hasACState(const decode_type_t protocol) {
     case HITACHI_AC264:
     case HITACHI_AC344:
     case HITACHI_AC424:
+    case KELON168:
     case KELVINATOR:
     case MIRAGE:
     case MITSUBISHI136:
