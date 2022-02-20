@@ -1816,7 +1816,7 @@ void IRHitachiAc296::setMode(const uint8_t mode) {
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
 uint8_t IRHitachiAc296::getTemp(void) const {
-  return reverseBits(_.Temp, kHitachiAc296TempSize) >> 2;
+  return _.Temp;
 }
 
 /// Set the temperature.
@@ -1825,7 +1825,6 @@ void IRHitachiAc296::setTemp(const uint8_t celsius) {
   uint8_t temp;
   temp = std::min(celsius, kHitachiAc296MaxTemp);
   temp = std::max(temp, kHitachiAc296MinTemp);
-  temp = reverseBits(temp << 2, kHitachiAc296TempSize);
   _.Temp = temp;
 }
 
