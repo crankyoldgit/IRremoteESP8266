@@ -1764,6 +1764,16 @@ void IRHitachiAc296::setInvertedStates(void) {
   invertBytePairs(_.raw + 3, kHitachiAc296StateLength - 3);
 }
 
+/// Check if every second byte of the state, after the fixed header
+///   is inverted to the previous byte.
+/// @param[in] state The state array to be checked.
+/// @param[in] length The size of the state array.
+/// @note This is this protocols integrity check.
+bool IRHitachiAc296::hasInvertedStates(const uint8_t state[],
+                                       const uint16_t length) {
+  return (length <= 3 || checkInvertedBytePairs(state + 3, length - 3));
+}
+
 /// Set up hardware to be able to send a message.
 void IRHitachiAc296::begin(void) { _irsend.begin(); }
 
@@ -1869,6 +1879,11 @@ bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset,
                                kUseDefTol, 0, false);
   if (used == 0) return false;
 
+  // Compliance
+  if (strict && !IRHitachiAc296::hasInvertedStates(results->state, nbits / 8))
+    return false;
+
+  // Success
   results->decode_type = decode_type_t::HITACHI_AC296;
   results->bits = nbits;
   return true;

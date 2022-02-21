@@ -641,10 +641,7 @@ class IRHitachiAc296 {
   uint8_t getFan(void) const;
   void setMode(const uint8_t mode);
   uint8_t getMode(void) const;
-  /* void setSwingVertical(const bool on); */
-  /* bool getSwingVertical(void) const; */
-  /* void setSwingHorizontal(const bool on); */
-  /* bool getSwingHorizontal(void) const; */
+  static bool hasInvertedStates(const uint8_t state[], const uint16_t length);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kHitachiAc296StateLength);
