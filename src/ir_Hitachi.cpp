@@ -73,6 +73,7 @@ void IRsend::sendHitachiAC(const unsigned char data[], const uint16_t nbytes,
   bool MSBfirst = true;
   switch (nbytes) {
     case kHitachiAc264StateLength:
+    case kHitachiAc296StateLength:
     case kHitachiAc344StateLength:
       MSBfirst = false;
   }
