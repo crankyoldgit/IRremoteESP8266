@@ -1712,7 +1712,7 @@ String IRHitachiAc264::toString(void) const {
 /// Send a HitachiAc 37-byte/296-bit A/C message (HITACHI_AC296)
 /// Status: ALPHA / Untested.
 /// @param[in] data containing the IR command.
-/// @param[in] nbits Nr. of bits to send. usually kHitachiAc296Bits
+/// @param[in] nbytes Nr. of bytes to send. usually kHitachiAc296StateLength
 /// @param[in] repeat Nr. of times the message is to be repeated.
 void IRsend::sendHitachiAc296(const unsigned char data[],
                               const uint16_t nbytes,
@@ -1825,8 +1825,7 @@ uint8_t IRHitachiAc296::getTemp(void) const {
 void IRHitachiAc296::setTemp(const uint8_t celsius) {
   uint8_t temp;
   temp = std::min(celsius, kHitachiAc296MaxTemp);
-  temp = std::max(temp, kHitachiAc296MinTemp);
-  _.Temp = temp;
+  _.Temp = std::max(temp, kHitachiAc296MinTemp);
 }
 
 /// Get the current fan speed setting.
@@ -1840,9 +1839,7 @@ uint8_t IRHitachiAc296::getFan(void) const {
 void IRHitachiAc296::setFan(const uint8_t speed) {
   uint8_t newSpeed = speed;
   newSpeed = std::max(newSpeed, kHitachiAc296FanSilent);
-  newSpeed = std::min(newSpeed, kHitachiAc296FanAuto);
-
-  _.Fan = newSpeed;
+  _.Fan = std::min(newSpeed, kHitachiAc296FanAuto);
 }
 
 /// Get a PTR to the internal state/code for this protocol.
