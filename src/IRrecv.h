@@ -55,7 +55,11 @@ const uint32_t kFnvBasis32 = 2166136261UL;
 #ifdef ESP32
 // Which of the ESP32 timers to use by default.
 // (3 for most ESP32s, 1 for ESP32-C3s)
+#ifdef SOC_TIMER_GROUP_TOTAL_TIMERS
 const uint8_t kDefaultESP32Timer = SOC_TIMER_GROUP_TOTAL_TIMERS - 1;
+#else  // SOC_TIMER_GROUP_TOTAL_TIMERS
+const uint8_t kDefaultESP32Timer = 3;
+#endif  // SOC_TIMER_GROUP_TOTAL_TIMERS
 #endif  // ESP32
 
 #if DECODE_AC

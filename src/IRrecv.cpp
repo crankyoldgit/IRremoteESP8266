@@ -268,7 +268,14 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer,
                const uint8_t timer_num) {
   // Ensure we use a valid timer number.
-  _timer_num = std::min(timer_num, (uint8_t)(SOC_TIMER_GROUP_TOTAL_TIMERS - 1));
+  _timer_num = std::min(timer_num,
+                        (uint8_t)(
+#ifdef SOC_TIMER_GROUP_TOTAL_TIMERS
+                                  SOC_TIMER_GROUP_TOTAL_TIMERS - 1
+#else  // SOC_TIMER_GROUP_TOTAL_TIMERS
+                                  3
+#endif  // SOC_TIMER_GROUP_TOTAL_TIMERS
+                                 ));
 #else  // ESP32
 /// @cond IGNORE
 /// Class constructor
