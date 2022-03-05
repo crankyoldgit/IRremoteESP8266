@@ -52,8 +52,11 @@ const uint16_t kMaxTimeoutMs = kRawTick * (UINT16_MAX / MS_TO_USEC(1));
 const uint32_t kFnvPrime32 = 16777619UL;
 const uint32_t kFnvBasis32 = 2166136261UL;
 
-// Which of the ESP32 timers to use by default. (0-3)
-const uint8_t kDefaultESP32Timer = 3;
+#ifdef ESP32
+// Which of the ESP32 timers to use by default.
+// (3 for most ESP32s, 1 for ESP32-C3s)
+const uint8_t kDefaultESP32Timer = SOC_TIMER_GROUP_TOTAL_TIMERS - 1;
+#endif  // ESP32
 
 #if DECODE_AC
 // Hitachi AC is the current largest state size.

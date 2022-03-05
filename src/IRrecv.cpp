@@ -261,13 +261,14 @@ static void USE_IRAM_ATTR gpio_intr() {
 ///   capturing data. (Default: kTimeoutMs)
 /// @param[in] save_buffer Use a second (save) buffer to decode from.
 ///   (Default: false)
-/// @param[in] timer_num Nr. of the ESP32 timer to use (0 to 3) (ESP32 Only)
+/// @param[in] timer_num Nr. of the ESP32 timer to use. (0 to 3) (ESP32 Only)
+///   or (0 to 1) (ESP32-C3)
 #if defined(ESP32)
 IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer,
                const uint8_t timer_num) {
-  // There are only 4 timers. 0 to 3.
-  _timer_num = std::min(timer_num, (uint8_t)3);
+  // Ensure we use a valid timer number.
+  _timer_num = std::min(timer_num, (uint8_t)(SOC_TIMER_GROUP_TOTAL_TIMERS - 1));
 #else  // ESP32
 /// @cond IGNORE
 /// Class constructor
@@ -353,6 +354,13 @@ void IRrecv::enableIRIn(const bool pullup) {
   // Initialise the ESP32 timer.
   // 80MHz / 80 = 1 uSec granularity.
   timer = timerBegin(_timer_num, 80, true);
+#ifdef DEBUG
+  if (timer == NULL) {
+    DPRINT("FATAL: Unable enable system timer: ");
+    DPRINTLN((uint16_t)_timer_num);
+  }
+#endif  // DEBUG
+  assert(timer != NULL);  // Check we actually got the timer.
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
   timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
   // Note: Interrupt needs to be attached before it can be enabled or disabled.
