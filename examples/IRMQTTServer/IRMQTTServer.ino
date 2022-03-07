@@ -2345,8 +2345,8 @@ bool reconnect(void) {
   while (!mqtt_client.connected() && tries <= 3) {
     int connected = false;
 #if MQTT_SERVER_AUTODETECT_ENABLE
-  mqtt_detect_server();
-  mqtt_client.setServer(MqttServer, atoi(MqttPort));
+    mqtt_detect_server();
+    mqtt_client.setServer(MqttServer, atoi(MqttPort));
 #endif  // MQTT_SERVER_AUTODETECT_ENABLE
     // Attempt to connect
     debug(("Attempting MQTT connection to " + String(MqttServer) + ":" +
