@@ -6,7 +6,8 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1513
 
 // Supports:
-//   Brand: LG,  Model: 6711A20083V remote (LG)
+//   Brand: LG,  Model: 6711A20083V remote (LG - LG6711A20083V)
+//   Brand: LG,  Model: TS-H122ERM1 remote (LG - LG6711A20083V)
 //   Brand: LG,  Model: AKB74395308 remote (LG2)
 //   Brand: LG,  Model: S4-W12JA3AA A/C (LG2)
 //   Brand: LG,  Model: AKB75215403 remote (LG2)
@@ -17,8 +18,8 @@
 //   Brand: LG,  Model: AKB73757604 remote (LG2 - AKB73757604)
 //   Brand: LG,  Model: AKB73315611 remote (LG2 - AKB74955603)
 //   Brand: LG,  Model: MS05SQ NW0 A/C (LG2 - AKB74955603)
-//   Brand: General Electric,  Model: AG1BH09AW101 Split A/C (LG)
-//   Brand: General Electric,  Model: 6711AR2853M A/C Remote (LG)
+//   Brand: General Electric,  Model: AG1BH09AW101 A/C (LG - GE6711AR2853M)
+//   Brand: General Electric,  Model: 6711AR2853M Remote (LG - GE6711AR2853M)
 
 #ifndef IR_LG_H_
 #define IR_LG_H_
@@ -83,6 +84,7 @@ const uint32_t kLgAcSwingVHighest       = 0x881309D;
 const uint32_t kLgAcSwingVSwing         = 0x8813149;
 const uint32_t kLgAcSwingVAuto          = kLgAcSwingVSwing;
 const uint32_t kLgAcSwingVOff           = 0x881315A;
+const uint32_t kLgAcSwingVToggle        = 0x8810001;
 const uint8_t  kLgAcSwingVLowest_Short      = 0x04;
 const uint8_t  kLgAcSwingVLow_Short         = 0x05;
 const uint8_t  kLgAcSwingVMiddle_Short      = 0x06;
@@ -144,6 +146,7 @@ class IRLgAc {
   void setSwingH(const bool on);
   bool getSwingH(void) const;
   bool isSwingV(void) const;
+  bool isSwingVToggle(void) const;
   bool isVaneSwingV(void) const;
   void setSwingV(const uint32_t position);
   uint32_t getSwingV(void) const;
@@ -192,6 +195,7 @@ class IRLgAc {
   void _setTemp(const uint8_t value);
   bool _isAKB74955603(void) const;
   bool _isAKB73757604(void) const;
+  bool _isLG6711A20083V(void) const;
   bool _isNormal(void) const;
 };
 

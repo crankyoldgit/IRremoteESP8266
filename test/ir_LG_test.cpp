@@ -693,6 +693,10 @@ TEST(TestUtils, Housekeeping) {
             IRac::strToModel(irutils::modelToStr(
                 decode_type_t::LG2,
                 lg_ac_remote_model_t::AKB73757604).c_str()));
+  ASSERT_EQ(lg_ac_remote_model_t::LG6711A20083V,
+            IRac::strToModel(irutils::modelToStr(
+                decode_type_t::LG,
+                lg_ac_remote_model_t::LG6711A20083V).c_str()));
 }
 
 TEST(TestIRLgAcClass, KnownExamples) {
@@ -1162,4 +1166,21 @@ TEST(TestIRLgAcClass, Issue1737) {
   stdAc::state_t result;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
   EXPECT_TRUE(result.power);
+}
+
+TEST(TestIRLgAcClass, SwingVToggle) {
+  IRLgAc ac(kGpioUnused);
+  ac.begin();
+
+  ac.setModel(lg_ac_remote_model_t::GE6711AR2853M);
+  EXPECT_FALSE(ac.isSwingVToggle());
+  EXPECT_FALSE(ac._isLG6711A20083V());
+  EXPECT_EQ(lg_ac_remote_model_t::GE6711AR2853M, ac.getModel());
+
+  ac.setRaw(kLgAcSwingVToggle, decode_type_t::LG);
+  EXPECT_TRUE(ac.isSwingVToggle());
+  EXPECT_TRUE(ac._isLG6711A20083V());
+  EXPECT_EQ(lg_ac_remote_model_t::LG6711A20083V, ac.getModel());
+
+  EXPECT_EQ("Model: 5 (LG6711A20083V), Swing(V): Toggle", ac.toString());
 }
