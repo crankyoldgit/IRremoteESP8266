@@ -1183,4 +1183,10 @@ TEST(TestIRLgAcClass, SwingVToggle) {
   EXPECT_EQ(lg_ac_remote_model_t::LG6711A20083V, ac.getModel());
 
   EXPECT_EQ("Model: 5 (LG6711A20083V), Swing(V): Toggle", ac.toString());
+
+  ac.stateReset();
+  ac.setModel(lg_ac_remote_model_t::LG6711A20083V);
+  ac.setSwingV(kLgAcSwingVToggle);
+  EXPECT_EQ(ac._swingv, kLgAcSwingVToggle);
+  EXPECT_NE(ac._swingv_prev, kLgAcSwingVToggle);
 }
