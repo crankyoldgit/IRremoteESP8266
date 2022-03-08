@@ -1867,6 +1867,15 @@ void IRHitachiAc296::setRaw(const uint8_t new_code[], const uint16_t length) {
 }
 
 #if DECODE_HITACHI_AC296
+/// Decode the supplied Hitachi 37-byte A/C message.
+/// Status: STABLE / Working on a real device.
+/// @param[in,out] results Ptr to the data to decode & where to store the result
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1757
 bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset,
                                 const uint16_t nbits,
                                 const bool strict) {
