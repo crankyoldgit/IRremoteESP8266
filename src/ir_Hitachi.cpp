@@ -1710,7 +1710,7 @@ String IRHitachiAc264::toString(void) const {
 
 #if SEND_HITACHI_AC296
 /// Send a HitachiAc 37-byte/296-bit A/C message (HITACHI_AC296)
-/// Status: ALPHA / Untested.
+/// Status: STABLE / Working on a real device.
 /// @param[in] data containing the IR command.
 /// @param[in] nbytes Nr. of bytes to send. usually kHitachiAc296StateLength
 /// @param[in] repeat Nr. of times the message is to be repeated.
