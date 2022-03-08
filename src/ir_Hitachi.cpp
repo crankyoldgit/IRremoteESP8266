@@ -1771,7 +1771,7 @@ void IRHitachiAc296::setInvertedStates(void) {
 /// @note This is this protocols integrity check.
 bool IRHitachiAc296::hasInvertedStates(const uint8_t state[],
                                        const uint16_t length) {
-  return (length <= 3 || checkInvertedBytePairs(state + 3, length - 3));
+  return IRHitachiAc3::hasInvertedStates(state, length);
 }
 
 /// Set up hardware to be able to send a message.
