@@ -74,6 +74,7 @@ const uint8_t kLgAcSignature = 0x88;
 const uint32_t kLgAcOffCommand          = 0x88C0051;
 const uint32_t kLgAcLightToggle         = 0x88C00A6;
 
+const uint32_t kLgAcSwingVToggle        = 0x8810001;
 const uint32_t kLgAcSwingSignature      = 0x8813;
 const uint32_t kLgAcSwingVLowest        = 0x8813048;
 const uint32_t kLgAcSwingVLow           = 0x8813059;
@@ -84,7 +85,6 @@ const uint32_t kLgAcSwingVHighest       = 0x881309D;
 const uint32_t kLgAcSwingVSwing         = 0x8813149;
 const uint32_t kLgAcSwingVAuto          = kLgAcSwingVSwing;
 const uint32_t kLgAcSwingVOff           = 0x881315A;
-const uint32_t kLgAcSwingVToggle        = 0x8810001;
 const uint8_t  kLgAcSwingVLowest_Short      = 0x04;
 const uint8_t  kLgAcSwingVLow_Short         = 0x05;
 const uint8_t  kLgAcSwingVMiddle_Short      = 0x06;
