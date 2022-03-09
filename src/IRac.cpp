@@ -1509,6 +1509,12 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
   const uint8_t pos = ac->convertVaneSwingV(swingv);
   for (uint8_t vane = 0; vane < kLgAcSwingVMaxVanes; vane++)
     ac->setVaneSwingV(vane, pos);
+  // Toggle the swingv for LG6711A20083V models if we need to.
+  // i.e. Off to Not-Off, send a toggle. Not-Off to Off, send a toggle.
+  if ((model == lg_ac_remote_model_t::LG6711A20083V) &&
+      ((swingv == stdAc::swingv_t::kOff) !=
+       (swingv_prev == stdAc::swingv_t::kOff)))
+    ac->setSwingV(kLgAcSwingVToggle);
   ac->setSwingH(swingh != stdAc::swingh_t::kOff);
   // No Quiet setting available.
   // No Turbo setting available.
@@ -3458,6 +3464,8 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return lg_ac_remote_model_t::AKB74955603;
   } else if (!STRCASECMP(str, kAkb73757604Str)) {
     return lg_ac_remote_model_t::AKB73757604;
+  } else if (!STRCASECMP(str, kLg6711a20083vStr)) {
+    return lg_ac_remote_model_t::LG6711A20083V;
   // Panasonic A/C families
   } else if (!STRCASECMP(str, kLkeStr) ||
              !STRCASECMP(str, kPanasonicLkeStr)) {

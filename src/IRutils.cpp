@@ -636,6 +636,7 @@ namespace irutils {
           case lg_ac_remote_model_t::AKB75215403:   return kAkb75215403Str;
           case lg_ac_remote_model_t::AKB74955603:   return kAkb74955603Str;
           case lg_ac_remote_model_t::AKB73757604:   return kAkb73757604Str;
+          case lg_ac_remote_model_t::LG6711A20083V: return kLg6711a20083vStr;
           default:                                  return kUnknownStr;
         }
         break;
