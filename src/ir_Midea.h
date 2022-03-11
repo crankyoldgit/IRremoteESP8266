@@ -37,7 +37,6 @@
 //   Brand: Lennox,  Model: M22A indoor split A/C (MIDEA)
 //   Brand: Lennox,  Model: M33A indoor split A/C (MIDEA)
 //   Brand: Lennox,  Model: M33B indoor split A/C (MIDEA)
-//   Brand: Lennox,  Model: RG57A6/BGEFU1 remote (MIDEA)
 
 #ifndef IR_MIDEA_H_
 #define IR_MIDEA_H_
