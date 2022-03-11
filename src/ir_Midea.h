@@ -28,6 +28,15 @@
 //   Brand: Lennox,  Model: RG57A6/BGEFU1 remote (MIDEA)
 //   Brand: Lennox,  Model: MWMA009S4-3P A/C (MIDEA)
 //   Brand: Lennox,  Model: MWMA012S4-3P A/C (MIDEA)
+//   Brand: Lennox,  Model: MCFA indoor split A/C (MIDEA)
+//   Brand: Lennox,  Model: MCFB indoor split A/C (MIDEA)
+//   Brand: Lennox,  Model: MMDA indoor split A/C (MIDEA)
+//   Brand: Lennox,  Model: MMDB indoor split A/C (MIDEA)
+//   Brand: Lennox,  Model: MWMA indoor split A/C (MIDEA)
+//   Brand: Lennox,  Model: MWMB indoor split A/C (MIDEA)
+//   Brand: Lennox,  Model: M22A indoor split A/C (MIDEA)
+//   Brand: Lennox,  Model: M33A indoor split A/C (MIDEA)
+//   Brand: Lennox,  Model: M33B indoor split A/C (MIDEA)
 
 #ifndef IR_MIDEA_H_
 #define IR_MIDEA_H_
