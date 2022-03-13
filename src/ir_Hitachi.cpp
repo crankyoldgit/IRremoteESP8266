@@ -1723,10 +1723,15 @@ void IRsend::sendHitachiAc296(const unsigned char data[],
 }
 #endif  // SEND_HITACHIAC296
 
+// Class constructor for handling detailed Hitachi_AC296 37 byte A/C messages.
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
 IRHitachiAc296::IRHitachiAc296(const uint16_t pin, const bool inverted,
                                const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
+/// Reset the internal state to auto fan, heating, & 24° Celsius
 void IRHitachiAc296::stateReset(void) {
   // Header
   _.raw[0] = 0x01;
@@ -1785,18 +1790,13 @@ void IRHitachiAc296::send(const uint16_t repeat) {
 }
 #endif  // SEND_HITACHI_AC296
 
-
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHitachiAc296::getPower(void) const {
-  return _.Power;
-}
+bool IRHitachiAc296::getPower(void) const { return _.Power; }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRHitachiAc296::setPower(const bool on) {
-  _.Power = on;
-}
+void IRHitachiAc296::setPower(const bool on) { _.Power = on; }
 
 /// Change the power setting to On.
 void IRHitachiAc296::on(void) { setPower(true); }
@@ -1806,50 +1806,105 @@ void IRHitachiAc296::off(void) { setPower(false); }
 
 /// Get the operating mode setting of the A/C.
 /// @return The current operating mode setting.
-uint8_t IRHitachiAc296::getMode(void) const {
-  return _.Mode;
-}
+uint8_t IRHitachiAc296::getMode(void) const { return _.Mode; }
 
 /// Set the operating mode of the A/C.
 /// @param[in] mode The desired operating mode.
 void IRHitachiAc296::setMode(const uint8_t mode) {
-  uint8_t newMode = mode;
   switch (mode) {
     case kHitachiAc296Heat:
     case kHitachiAc296Cool:
-    case kHitachiAc296Auto: break;
-    default: newMode = kHitachiAc296Auto;
+    case kHitachiAc296Dehumidify:
+    case kHitachiAc296AutoDehumidifying:
+    case kHitachiAc296Auto:
+      _.Mode = mode;
+      setTemp(getTemp());  // Reset the temp to handle "Auto"'s special temp.
+      break;
+    default:
+      setMode(kHitachiAc296Auto);
   }
+}
 
-  _.Mode = newMode;
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRHitachiAc296::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool: return kHitachiAc296Cool;
+    case stdAc::opmode_t::kHeat: return kHitachiAc296Heat;
+    case stdAc::opmode_t::kDry:  return kHitachiAc296Dehumidify;
+    default:                     return kHitachiAc296Auto;
+  }
+}
+
+/// Convert a native mode into its stdAc equivalent.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::opmode_t IRHitachiAc296::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kHitachiAc296DryCool:
+    case kHitachiAc296Cool:              return stdAc::opmode_t::kCool;
+    case kHitachiAc296Heat:              return stdAc::opmode_t::kHeat;
+    case kHitachiAc296AutoDehumidifying:
+    case kHitachiAc296Dehumidify:        return stdAc::opmode_t::kDry;
+    default:                             return stdAc::opmode_t::kAuto;
+  }
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRHitachiAc296::getTemp(void) const {
-  return _.Temp;
-}
+uint8_t IRHitachiAc296::getTemp(void) const { return _.Temp; }
 
 /// Set the temperature.
 /// @param[in] celsius The temperature in degrees celsius.
 void IRHitachiAc296::setTemp(const uint8_t celsius) {
-  uint8_t temp;
-  temp = std::min(celsius, kHitachiAc296MaxTemp);
-  _.Temp = std::max(temp, kHitachiAc296MinTemp);
+  uint8_t temp = celsius;
+  if (getMode() == kHitachiAc296Auto) {  // Special temp for auto mode
+    temp = kHitachiAc296TempAuto;
+  } else {  // Normal temp setting.
+    temp = std::min(temp, kHitachiAc296MaxTemp);
+    temp = std::max(temp, kHitachiAc296MinTemp);
+  }
+  _.Temp = temp;
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRHitachiAc296::getFan(void) const {
-  return _.Fan;
-}
+uint8_t IRHitachiAc296::getFan(void) const { return _.Fan; }
 
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
 void IRHitachiAc296::setFan(const uint8_t speed) {
-  uint8_t newSpeed = speed;
-  newSpeed = std::max(newSpeed, kHitachiAc296FanSilent);
+  uint8_t newSpeed = std::max(speed, kHitachiAc296FanSilent);
   _.Fan = std::min(newSpeed, kHitachiAc296FanAuto);
+}
+
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRHitachiAc296::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:    return kHitachiAc296FanSilent;
+    case stdAc::fanspeed_t::kLow:    return kHitachiAc296FanLow;
+    case stdAc::fanspeed_t::kMedium: return kHitachiAc296FanMedium;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:    return kHitachiAc296FanHigh;
+    default:                         return kHitachiAc296FanAuto;
+  }
+}
+
+/// Convert a native fan speed into its stdAc equivalent.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::fanspeed_t IRHitachiAc296::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kHitachiAc424FanMax:    return stdAc::fanspeed_t::kMax;
+    case kHitachiAc424FanHigh:   return stdAc::fanspeed_t::kHigh;
+    case kHitachiAc424FanMedium: return stdAc::fanspeed_t::kMedium;
+    case kHitachiAc424FanLow:    return stdAc::fanspeed_t::kLow;
+    case kHitachiAc424FanMin:    return stdAc::fanspeed_t::kMin;
+    default:                     return stdAc::fanspeed_t::kAuto;
+  }
 }
 
 /// Get a PTR to the internal state/code for this protocol.
@@ -1866,6 +1921,49 @@ void IRHitachiAc296::setRaw(const uint8_t new_code[], const uint16_t length) {
   memcpy(_.raw, new_code, std::min(length, kHitachiAc296StateLength));
 }
 
+
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
+stdAc::state_t IRHitachiAc296::toCommon(void) const {
+  stdAc::state_t result{};
+  result.protocol = decode_type_t::HITACHI_AC296;
+  result.model = -1;  // No models used.
+  result.power = getPower();
+  result.mode = toCommonMode(_.Mode);
+  result.celsius = true;
+  result.degrees = _.Temp;
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.quiet = _.Fan == kHitachiAc296FanSilent;
+  // Not supported.
+  result.swingv = stdAc::swingv_t::kOff;
+  result.swingh = stdAc::swingh_t::kOff;
+  result.turbo = false;
+  result.clean = false;
+  result.econo = false;
+  result.filter = false;
+  result.light = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
+String IRHitachiAc296::toString(void) const {
+  String result = "";
+  result.reserve(70);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kHitachiAc296Auto, kHitachiAc296Cool,
+                            kHitachiAc296Heat, kHitachiAc1Dry,
+                            kHitachiAc296Auto);
+  result += addTempToString(getTemp());
+  result += addFanToString(_.Fan, kHitachiAc296FanHigh, kHitachiAc296FanLow,
+                           kHitachiAc296FanAuto, kHitachiAc296FanSilent,
+                           kHitachiAc296FanMedium);
+  return result;
+}
+
 #if DECODE_HITACHI_AC296
 /// Decode the supplied Hitachi 37-byte A/C message.
 /// Status: STABLE / Working on a real device.
@@ -1879,14 +1977,13 @@ void IRHitachiAc296::setRaw(const uint8_t new_code[], const uint16_t length) {
 bool IRrecv::decodeHitachiAc296(decode_results *results, uint16_t offset,
                                 const uint16_t nbits,
                                 const bool strict) {
-  uint16_t used = matchGeneric(results->rawbuf + offset, results->state,
-                               results->rawlen - offset, nbits,
-                               kHitachiAcHdrMark, kHitachiAcHdrSpace,
-                               kHitachiAcBitMark, kHitachiAcOneSpace,
-                               kHitachiAcBitMark, kHitachiAcZeroSpace,
-                               kHitachiAcBitMark, kHitachiAcMinGap, true,
-                               kUseDefTol, 0, false);
-  if (used == 0) return false;
+  if (!matchGeneric(results->rawbuf + offset, results->state,
+                    results->rawlen - offset, nbits,
+                    kHitachiAcHdrMark, kHitachiAcHdrSpace,
+                    kHitachiAcBitMark, kHitachiAcOneSpace,
+                    kHitachiAcBitMark, kHitachiAcZeroSpace,
+                    kHitachiAcBitMark, kHitachiAcMinGap, true,
+                    kUseDefTol, 0, false)) return false;
 
   // Compliance
   if (strict && !IRHitachiAc296::hasInvertedStates(results->state, nbits / 8))

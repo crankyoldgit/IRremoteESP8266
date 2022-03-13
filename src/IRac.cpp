@@ -230,6 +230,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_HITACHI_AC264
     case decode_type_t::HITACHI_AC264:
 #endif
+#if SEND_HITACHI_AC296
+    case decode_type_t::HITACHI_AC296:
+#endif
 #if SEND_HITACHI_AC344
     case decode_type_t::HITACHI_AC344:
 #endif
@@ -1340,6 +1343,35 @@ void IRac::hitachi264(IRHitachiAc264 *ac,
   ac->send();
 }
 #endif  // SEND_HITACHI_AC264
+
+#if SEND_HITACHI_AC296
+/// Send a Hitachi 296-bit A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRHitachiAc296 object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+void IRac::hitachi296(IRHitachiAc296 *ac,
+                      const bool on, const stdAc::opmode_t mode,
+                      const float degrees, const stdAc::fanspeed_t fan) {
+  ac->begin();
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setPower(on);
+  // No Swing(V) setting available.
+  // No Swing(H) setting available.
+  // No Quiet setting available.
+  // No Turbo setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_HITACHI_AC296
 
 #if SEND_HITACHI_AC344
 /// Send a Hitachi 344-bit A/C message with the supplied settings.
@@ -2946,6 +2978,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_HITACHI_AC264
+#if SEND_HITACHI_AC296
+    case HITACHI_AC296:
+    {
+      IRHitachiAc296 ac(_pin, _inverted, _modulation);
+      hitachi296(&ac, send.power, send.mode, degC, send.fanspeed);
+      break;
+    }
+#endif  // SEND_HITACHI_AC296
 #if SEND_HITACHI_AC344
     case HITACHI_AC344:
     {
@@ -3808,6 +3848,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_HITACHI_AC264
+#if DECODE_HITACHI_AC296
+      case decode_type_t::HITACHI_AC296: {
+        IRHitachiAc296 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_HITACHI_AC296
 #if DECODE_HITACHI_AC344
       case decode_type_t::HITACHI_AC344: {
         IRHitachiAc344 ac(kGpioUnused);
@@ -4273,6 +4320,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_HITACHI_AC264
+#if DECODE_HITACHI_AC296
+      case decode_type_t::HITACHI_AC296: {
+        IRHitachiAc296 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HITACHI_AC296
 #if DECODE_HITACHI_AC344
       case decode_type_t::HITACHI_AC344: {
         IRHitachiAc344 ac(kGpioUnused);
