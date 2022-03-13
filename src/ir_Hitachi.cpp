@@ -1898,11 +1898,10 @@ uint8_t IRHitachiAc296::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRHitachiAc296::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kHitachiAc424FanMax:    return stdAc::fanspeed_t::kMax;
-    case kHitachiAc424FanHigh:   return stdAc::fanspeed_t::kHigh;
-    case kHitachiAc424FanMedium: return stdAc::fanspeed_t::kMedium;
-    case kHitachiAc424FanLow:    return stdAc::fanspeed_t::kLow;
-    case kHitachiAc424FanMin:    return stdAc::fanspeed_t::kMin;
+    case kHitachiAc296FanHigh:   return stdAc::fanspeed_t::kHigh;
+    case kHitachiAc296FanMedium: return stdAc::fanspeed_t::kMedium;
+    case kHitachiAc296FanLow:    return stdAc::fanspeed_t::kLow;
+    case kHitachiAc296FanSilent: return stdAc::fanspeed_t::kMin;
     default:                     return stdAc::fanspeed_t::kAuto;
   }
 }
