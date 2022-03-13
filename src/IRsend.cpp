@@ -720,6 +720,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kHitachiAc3Bits;
     case HITACHI_AC264:
       return kHitachiAc264Bits;
+    case HITACHI_AC296:
+      return kHitachiAc296Bits;
     case HITACHI_AC344:
       return kHitachiAc344Bits;
     case HITACHI_AC424:
@@ -1219,6 +1221,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendHitachiAc264(state, nbytes);
       break;
 #endif  // SEND_HITACHI_AC264
+#if SEND_HITACHI_AC296
+    case HITACHI_AC296:
+      sendHitachiAc296(state, nbytes);
+      break;
+#endif  // SEND_HITACHI_AC296
 #if SEND_HITACHI_AC344
     case HITACHI_AC344:
       sendHitachiAc344(state, nbytes);

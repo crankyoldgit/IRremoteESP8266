@@ -8,6 +8,7 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1060
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1134
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1729
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1757
 
 // Supports:
 //   Brand: Hitachi,  Model: RAS-35THA6 remote
@@ -22,6 +23,8 @@
 //   Brand: Hitachi,  Model: RF11T1 remote (HITACHI_AC344)
 //   Brand: Hitachi,  Model: RAR-2P2 remote (HITACHI_AC264)
 //   Brand: Hitachi,  Model: RAK-25NH5 A/C (HITACHI_AC264)
+//   Brand: Hitachi,  Model: RAR-3U3 remote (HITACHI_AC296)
+//   Brand: Hitachi,  Model: RAS-70YHA3 A/C (HITACHI_AC296)
 
 #ifndef IR_HITACHI_H_
 #define IR_HITACHI_H_
@@ -293,6 +296,76 @@ const uint8_t kHitachiAc264FanMedium = kHitachiAc424FanMedium;
 const uint8_t kHitachiAc264FanHigh = kHitachiAc424FanHigh;
 const uint8_t kHitachiAc264FanAuto = kHitachiAc424FanAuto;
 
+// HitachiAc296
+union HitachiAC296Protocol{
+  uint8_t raw[kHitachiAc296StateLength];
+  struct {
+    // Byte 0~12
+    uint8_t pad0[13];
+    // Byte 13
+    uint8_t                    :2;
+    uint8_t Temp               :5;  // LSB
+    uint8_t                    :1;
+    uint8_t                    :8;
+    // Byte 15~16
+    uint8_t                    :8;
+    uint8_t                    :8;
+    // Byte 17~24
+    uint8_t OffTimerLow        :8;  // LSB
+    uint8_t /* Parity */       :8;
+    uint8_t OffTimerHigh       :8;
+    uint8_t /* Parity */       :8;
+    uint8_t OnTimerLow         :8;  // LSB
+    uint8_t /* Parity */       :8;
+    uint8_t OnTimerHigh        :4;
+    uint8_t OffTimerActive     :1;
+    uint8_t OnTimerActive      :1;
+    uint8_t                    :2;
+    uint8_t /* Parity */       :8;
+    // Byte 25~26
+    uint8_t Mode               :4;
+    uint8_t Fan                :3;
+    uint8_t                    :1;
+    uint8_t                    :8;
+    // Byte 27~28
+    uint8_t                    :4;
+    uint8_t Power              :1;
+    uint8_t                    :2;
+    uint8_t TimerActive        :1;
+    uint8_t                    :8;
+    // Byte 29~34
+    uint8_t pad1[6];
+    // Byte 35~36
+    uint8_t                    :4;
+    uint8_t Humidity           :4;  // LSB
+    uint8_t                    :8;
+  };
+};
+
+// Mode & Fan
+const uint8_t kHitachiAc296Cool                = 0b0011;
+const uint8_t kHitachiAc296DryCool             = 0b0100;
+const uint8_t kHitachiAc296Dehumidify          = 0b0101;
+const uint8_t kHitachiAc296Heat                = 0b0110;
+const uint8_t kHitachiAc296Auto                = 0b0111;
+const uint8_t kHitachiAc296AutoDehumidifying   = 0b1001;
+const uint8_t kHitachiAc296QuickLaundry        = 0b1010;
+const uint8_t kHitachiAc296CondensationControl = 0b1100;
+
+const uint8_t kHitachiAc296FanSilent = 0b001;
+const uint8_t kHitachiAc296FanLow    = 0b010;
+const uint8_t kHitachiAc296FanMedium = 0b011;
+const uint8_t kHitachiAc296FanHigh   = 0b100;
+const uint8_t kHitachiAc296FanAuto   = 0b101;
+
+const uint8_t kHitachiAc296TempSize = 5;
+const uint8_t kHitachiAc296MinTemp  = 16;
+const uint8_t kHitachiAc296MaxTemp  = 32;
+
+const uint8_t kHitachiAc296PowerOn  = 1;
+const uint8_t kHitachiAc296PowerOff = 0;
+
+
 // Classes
 /// Class for handling detailed Hitachi 224-bit A/C messages.
 /// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/HitachiHeatpumpIR.cpp
@@ -546,5 +619,44 @@ class IRHitachiAc264: public IRHitachiAc424 {
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat) override;
 #endif  // SEND_HITACHI_AC264
   String toString(void) const override;
+};
+
+class IRHitachiAc296 {
+ public:
+  explicit IRHitachiAc296(const uint16_t pin, const bool inverted = false,
+                          const bool use_modulation = true);
+  void stateReset(void);
+
+#if SEND_HITACHI_AC296
+  void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
+#endif
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void) const;
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp(void) const;
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void) const;
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void) const;
+  static bool hasInvertedStates(const uint8_t state[], const uint16_t length);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kHitachiAc296StateLength);
+
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;  ///< Instance of the IR send class
+#else  // UNIT_TEST
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif  // UNIT_TEST
+
+  HitachiAC296Protocol _;
+  void setInvertedStates(void);
 };
 #endif  // IR_HITACHI_H_

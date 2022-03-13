@@ -497,6 +497,13 @@
 #define SEND_HITACHI_AC264     _IR_ENABLE_DEFAULT_
 #endif  // SEND_HITACHI_AC264
 
+#ifndef DECODE_HITACHI_AC296
+#define DECODE_HITACHI_AC296   _IR_ENABLE_DEFAULT_
+#endif  // DECODE_HITACHI_AC296
+#ifndef SEND_HITACHI_AC296
+#define SEND_HITACHI_AC296     _IR_ENABLE_DEFAULT_
+#endif  // SEND_HITACHI_AC296
+
 #ifndef DECODE_HITACHI_AC344
 #define DECODE_HITACHI_AC344   _IR_ENABLE_DEFAULT_
 #endif  // DECODE_HITACHI_AC344
@@ -869,7 +876,7 @@
      DECODE_VOLTAS || DECODE_MIRAGE || DECODE_HAIER_AC176 || \
      DECODE_TEKNOPOINT || DECODE_KELON || DECODE_TROTEC_3550 || \
      DECODE_SANYO_AC88 || DECODE_RHOSS || DECODE_HITACHI_AC264 || \
-     DECODE_KELON168 || \
+     DECODE_KELON168 || DECODE_HITACHI_AC296 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1022,8 +1029,9 @@ enum decode_type_t {
   COOLIX48,  // 110
   HITACHI_AC264,
   KELON168,
+  HITACHI_AC296,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = KELON168,
+  kLastDecodeType = HITACHI_AC296,
 };
 
 // Message lengths & required repeat values
@@ -1135,6 +1143,8 @@ const uint16_t kHitachiAc3MinStateLength = 15;
 const uint16_t kHitachiAc3MinBits = kHitachiAc3MinStateLength * 8;
 const uint16_t kHitachiAc264StateLength = 33;
 const uint16_t kHitachiAc264Bits = kHitachiAc264StateLength * 8;
+const uint16_t kHitachiAc296StateLength = 37;
+const uint16_t kHitachiAc296Bits = kHitachiAc296StateLength * 8;
 const uint16_t kHitachiAc344StateLength = 43;
 const uint16_t kHitachiAc344Bits = kHitachiAc344StateLength * 8;
 const uint16_t kHitachiAc424StateLength = 53;
@@ -1304,6 +1314,8 @@ const uint16_t kRhossDefaultRepeat = 0;
 #define HITACHI_AC1_BITS              kHitachiAc1Bits
 #define HITACHI_AC2_STATE_LENGTH      kHitachiAc2StateLength
 #define HITACHI_AC2_BITS              kHitachiAc2Bits
+#define HITACHI_AC296_STATE_LENGTH    kHitachiAc296StateLength
+#define HITACHI_AC296_BITS            kHitachiAc296Bits
 #define JVC_BITS                      kJvcBits
 #define KELVINATOR_STATE_LENGTH       kKelvinatorStateLength
 #define LASERTAG_BITS                 kLasertagBits
