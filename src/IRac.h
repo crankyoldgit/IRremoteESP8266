@@ -305,6 +305,11 @@ void electra(IRElectraAc *ac,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan);
 #endif  // SEND_HITACHI_AC264
+#if SEND_HITACHI_AC296
+  void hitachi296(IRHitachiAc296 *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan);
+#endif  // SEND_HITACHI_AC296
 #if SEND_HITACHI_AC344
   void hitachi344(IRHitachiAc344 *ac,
                   const bool on, const stdAc::opmode_t mode,

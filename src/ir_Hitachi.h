@@ -358,9 +358,9 @@ const uint8_t kHitachiAc296FanMedium = 0b011;
 const uint8_t kHitachiAc296FanHigh   = 0b100;
 const uint8_t kHitachiAc296FanAuto   = 0b101;
 
-const uint8_t kHitachiAc296TempSize = 5;
+const uint8_t kHitachiAc296TempAuto = 1;  // Special value for "Auto" op mode.
 const uint8_t kHitachiAc296MinTemp  = 16;
-const uint8_t kHitachiAc296MaxTemp  = 32;
+const uint8_t kHitachiAc296MaxTemp  = 31;  // Max value you can store in 5 bits.
 
 const uint8_t kHitachiAc296PowerOn  = 1;
 const uint8_t kHitachiAc296PowerOff = 0;
@@ -629,7 +629,7 @@ class IRHitachiAc296 {
 
 #if SEND_HITACHI_AC296
   void send(const uint16_t repeat = kHitachiAcDefaultRepeat);
-#endif
+#endif  // SEND_HITACHI_AC296
   void begin(void);
   void on(void);
   void off(void);
@@ -645,7 +645,12 @@ class IRHitachiAc296 {
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[],
               const uint16_t length = kHitachiAc296StateLength);
-
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
 #ifndef UNIT_TEST
 
  private:
