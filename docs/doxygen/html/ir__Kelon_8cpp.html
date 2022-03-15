@@ -72,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Support for Kelan AC protocol. Both sending and decoding should be functional for models of series KELON ON/OFF 9000-12000. All features of the standard remote are implemented.  
+<p>Support for Kelon AC protocols. Both sending and decoding should be functional for models of series KELON ON/OFF 9000-12000. All features of the standard remote are implemented.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
@@ -91,9 +91,17 @@ Variables</h2></td></tr>
 <tr class="separator:aac9bfeaac4f477354641f7a6df2a1343"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3c42f0925abf8bb5cd0a9c0e331b86b"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Kelon_8cpp.html#aa3c42f0925abf8bb5cd0a9c0e331b86b">kKelonFreq</a> = 38000</td></tr>
 <tr class="separator:aa3c42f0925abf8bb5cd0a9c0e331b86b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a1df44b2f0a19535bcd274f43d4c11f"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Kelon_8cpp.html#a3a1df44b2f0a19535bcd274f43d4c11f">kKelon168FooterSpace</a> = 8000</td></tr>
+<tr class="separator:a3a1df44b2f0a19535bcd274f43d4c11f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acae16d9d485376ffc7ef81e60fbc7c4c"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Kelon_8cpp.html#acae16d9d485376ffc7ef81e60fbc7c4c">kKelon168Section1Size</a> = 6</td></tr>
+<tr class="separator:acae16d9d485376ffc7ef81e60fbc7c4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa14f847824fdc64a71f07e9e769f7a13"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Kelon_8cpp.html#aa14f847824fdc64a71f07e9e769f7a13">kKelon168Section2Size</a> = 8</td></tr>
+<tr class="separator:aa14f847824fdc64a71f07e9e769f7a13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25f3ad1077e84434ef2fc8fda5fac431"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Kelon_8cpp.html#a25f3ad1077e84434ef2fc8fda5fac431">kKelon168Section3Size</a> = 7</td></tr>
+<tr class="separator:a25f3ad1077e84434ef2fc8fda5fac431"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Support for Kelan AC protocol. Both sending and decoding should be functional for models of series KELON ON/OFF 9000-12000. All features of the standard remote are implemented. </p>
+<div class="textblock"><p>Support for Kelon AC protocols. Both sending and decoding should be functional for models of series KELON ON/OFF 9000-12000. All features of the standard remote are implemented. </p>
 <dl class="section note"><dt>Note</dt><dd>Unsupported:<ul>
 <li>Explicit on/off due to AC unit limitations</li>
 <li>Explicit swing position due to AC unit limitations</li>
@@ -101,6 +109,62 @@ Variables</h2></td></tr>
 </ul>
 </dd></dl>
 </div><h2 class="groupheader">Variable Documentation</h2>
+<a id="a3a1df44b2f0a19535bcd274f43d4c11f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a1df44b2f0a19535bcd274f43d4c11f">&#9670;&nbsp;</a></span>kKelon168FooterSpace</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint32_t kKelon168FooterSpace = 8000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acae16d9d485376ffc7ef81e60fbc7c4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acae16d9d485376ffc7ef81e60fbc7c4c">&#9670;&nbsp;</a></span>kKelon168Section1Size</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kKelon168Section1Size = 6</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa14f847824fdc64a71f07e9e769f7a13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa14f847824fdc64a71f07e9e769f7a13">&#9670;&nbsp;</a></span>kKelon168Section2Size</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kKelon168Section2Size = 8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a25f3ad1077e84434ef2fc8fda5fac431"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25f3ad1077e84434ef2fc8fda5fac431">&#9670;&nbsp;</a></span>kKelon168Section3Size</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kKelon168Section3Size = 7</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="af3f0f9a4c7492bd5279d113cc0e11270"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af3f0f9a4c7492bd5279d113cc0e11270">&#9670;&nbsp;</a></span>kKelonBitMark</h2>
 

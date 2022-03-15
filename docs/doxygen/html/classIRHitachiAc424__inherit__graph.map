@@ -1,4 +1,5 @@
 <map id="IRHitachiAc424" name="IRHitachiAc424">
-<area shape="rect" id="node1" title="Class for handling detailed Hitachi 53&#45;byte/424&#45;bit A/C messages." alt="" coords="5,5,127,32"/>
-<area shape="rect" id="node2" href="$classIRHitachiAc344.html" title="Class for handling detailed Hitachi 344&#45;bit A/C messages." alt="" coords="5,80,127,107"/>
+<area shape="rect" id="node1" title="Class for handling detailed Hitachi 53&#45;byte/424&#45;bit A/C messages." alt="" coords="77,5,199,32"/>
+<area shape="rect" id="node2" href="$classIRHitachiAc264.html" title="Class for handling detailed Hitachi 264&#45;bit A/C messages." alt="" coords="5,80,127,107"/>
+<area shape="rect" id="node3" href="$classIRHitachiAc344.html" title="Class for handling detailed Hitachi 344&#45;bit A/C messages." alt="" coords="151,80,272,107"/>
 </map>

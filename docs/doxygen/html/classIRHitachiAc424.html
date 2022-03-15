@@ -82,8 +82,9 @@ Inheritance diagram for IRHitachiAc424:</div>
 <div class="dyncontent">
 <div class="center"><img src="classIRHitachiAc424__inherit__graph.png" border="0" usemap="#IRHitachiAc424_inherit__map" alt="Inheritance graph"/></div>
 <map name="IRHitachiAc424_inherit__map" id="IRHitachiAc424_inherit__map">
-<area shape="rect" title="Class for handling detailed Hitachi 53&#45;byte/424&#45;bit A/C messages." alt="" coords="5,5,127,32"/>
-<area shape="rect" href="classIRHitachiAc344.html" title="Class for handling detailed Hitachi 344&#45;bit A/C messages." alt="" coords="5,80,127,107"/>
+<area shape="rect" title="Class for handling detailed Hitachi 53&#45;byte/424&#45;bit A/C messages." alt="" coords="77,5,199,32"/>
+<area shape="rect" href="classIRHitachiAc264.html" title="Class for handling detailed Hitachi 264&#45;bit A/C messages." alt="" coords="5,80,127,107"/>
+<area shape="rect" href="classIRHitachiAc344.html" title="Class for handling detailed Hitachi 344&#45;bit A/C messages." alt="" coords="151,80,272,107"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -132,7 +133,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a166d3d7cd9028d906a7a259902c8898c"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a166d3d7cd9028d906a7a259902c8898c">getTemp</a> (void) const</td></tr>
 <tr class="memdesc:a166d3d7cd9028d906a7a259902c8898c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current temperature setting.  <a href="classIRHitachiAc424.html#a166d3d7cd9028d906a7a259902c8898c">More...</a><br /></td></tr>
 <tr class="separator:a166d3d7cd9028d906a7a259902c8898c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd69bcff56224f39af92fc2d334b67bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#afd69bcff56224f39af92fc2d334b67bb">setFan</a> (const uint8_t speed)</td></tr>
+<tr class="memitem:afd69bcff56224f39af92fc2d334b67bb"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#afd69bcff56224f39af92fc2d334b67bb">setFan</a> (const uint8_t speed)</td></tr>
 <tr class="memdesc:afd69bcff56224f39af92fc2d334b67bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the speed of the fan.  <a href="classIRHitachiAc424.html#afd69bcff56224f39af92fc2d334b67bb">More...</a><br /></td></tr>
 <tr class="separator:afd69bcff56224f39af92fc2d334b67bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d105be99f05794ce845db06e17bffcd"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a2d105be99f05794ce845db06e17bffcd">getFan</a> (void) const</td></tr>
@@ -162,6 +163,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:adc24b8b984ff20cebdf81f65843bb283"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#adc24b8b984ff20cebdf81f65843bb283">setRaw</a> (const uint8_t new_code[], const uint16_t length=<a class="el" href="IRremoteESP8266_8h.html#aff17d9c0ccf683895d2c868094679f0a">kHitachiAc424StateLength</a>)</td></tr>
 <tr class="memdesc:adc24b8b984ff20cebdf81f65843bb283"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the internal state from a valid code for this protocol.  <a href="classIRHitachiAc424.html#adc24b8b984ff20cebdf81f65843bb283">More...</a><br /></td></tr>
 <tr class="separator:adc24b8b984ff20cebdf81f65843bb283"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a541067f8b2ecaba01ccc9b27120e0dba"><td class="memItemLeft" align="right" valign="top">virtual uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a541067f8b2ecaba01ccc9b27120e0dba">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed) const</td></tr>
+<tr class="memdesc:a541067f8b2ecaba01ccc9b27120e0dba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRHitachiAc424.html#a541067f8b2ecaba01ccc9b27120e0dba">More...</a><br /></td></tr>
+<tr class="separator:a541067f8b2ecaba01ccc9b27120e0dba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39048ed5108383c7d7e137d9f05aa537"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a39048ed5108383c7d7e137d9f05aa537">toCommonFanSpeed</a> (const uint8_t speed) const</td></tr>
+<tr class="memdesc:a39048ed5108383c7d7e137d9f05aa537"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRHitachiAc424.html#a39048ed5108383c7d7e137d9f05aa537">More...</a><br /></td></tr>
+<tr class="separator:a39048ed5108383c7d7e137d9f05aa537"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad33ed9dfd26bb513e113549b932f2f3f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#ad33ed9dfd26bb513e113549b932f2f3f">toCommon</a> (void) const</td></tr>
 <tr class="memdesc:ad33ed9dfd26bb513e113549b932f2f3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRHitachiAc424.html#ad33ed9dfd26bb513e113549b932f2f3f">More...</a><br /></td></tr>
 <tr class="separator:ad33ed9dfd26bb513e113549b932f2f3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,15 +181,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a974bf3ada7117e463b8c23e2158902be"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a974bf3ada7117e463b8c23e2158902be">convertMode</a> (const <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a> mode)</td></tr>
 <tr class="memdesc:a974bf3ada7117e463b8c23e2158902be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f" title="Common A/C settings for A/C operating modes.">stdAc::opmode_t</a> enum into its native mode.  <a href="classIRHitachiAc424.html#a974bf3ada7117e463b8c23e2158902be">More...</a><br /></td></tr>
 <tr class="separator:a974bf3ada7117e463b8c23e2158902be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f502b779f9fe4aca3a2f649c4cfbda3"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a4f502b779f9fe4aca3a2f649c4cfbda3">convertFan</a> (const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a> speed)</td></tr>
-<tr class="memdesc:a4f502b779f9fe4aca3a2f649c4cfbda3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383" title="Common A/C settings for Fan Speeds.">stdAc::fanspeed_t</a> enum into it's native speed.  <a href="classIRHitachiAc424.html#a4f502b779f9fe4aca3a2f649c4cfbda3">More...</a><br /></td></tr>
-<tr class="separator:a4f502b779f9fe4aca3a2f649c4cfbda3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a725d8dc2178975c977a7496792e667"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a99ad268c783486f9b3207cb78f48444f">stdAc::opmode_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a2a725d8dc2178975c977a7496792e667">toCommonMode</a> (const uint8_t mode)</td></tr>
 <tr class="memdesc:a2a725d8dc2178975c977a7496792e667"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native mode into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRHitachiAc424.html#a2a725d8dc2178975c977a7496792e667">More...</a><br /></td></tr>
 <tr class="separator:a2a725d8dc2178975c977a7496792e667"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16abdf55ea3ae4b06e2a23dad3496738"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a16abdf55ea3ae4b06e2a23dad3496738">toCommonFanSpeed</a> (const uint8_t speed)</td></tr>
-<tr class="memdesc:a16abdf55ea3ae4b06e2a23dad3496738"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a native fan speed into its <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent.  <a href="classIRHitachiAc424.html#a16abdf55ea3ae4b06e2a23dad3496738">More...</a><br /></td></tr>
-<tr class="separator:a16abdf55ea3ae4b06e2a23dad3496738"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -205,6 +206,8 @@ Private Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
+<tr class="memitem:a3340fb00bcc0f4848d6d0ec89d81650a"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a3340fb00bcc0f4848d6d0ec89d81650a">IRHitachiAc264</a></td></tr>
+<tr class="separator:a3340fb00bcc0f4848d6d0ec89d81650a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c885313a79bf8c02bc5eb9f7d80088b"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHitachiAc424.html#a3c885313a79bf8c02bc5eb9f7d80088b">IRHitachiAc344</a></td></tr>
 <tr class="separator:a3c885313a79bf8c02bc5eb9f7d80088b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -343,8 +346,8 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a id="a4f502b779f9fe4aca3a2f649c4cfbda3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4f502b779f9fe4aca3a2f649c4cfbda3">&#9670;&nbsp;</a></span>convertFan()</h2>
+<a id="a541067f8b2ecaba01ccc9b27120e0dba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a541067f8b2ecaba01ccc9b27120e0dba">&#9670;&nbsp;</a></span>convertFan()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -357,12 +360,12 @@ Friends</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">stdAc::fanspeed_t</a>&#160;</td>
           <td class="paramname"><em>speed</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -375,6 +378,8 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The native equivalent of the enum. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classIRHitachiAc264.html#a99124e203064cecb185ddb0cdb39be9b">IRHitachiAc264</a>.</p>
 
 </div>
 </div>
@@ -632,7 +637,7 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classIRHitachiAc344.html#ab11947f9c2a7272d35d75ce3ddbe6581">IRHitachiAc344</a>.</p>
+<p>Reimplemented in <a class="el" href="classIRHitachiAc264.html#a76a3785740f8fb65bca0ef74292ced51">IRHitachiAc264</a>, and <a class="el" href="classIRHitachiAc344.html#ab11947f9c2a7272d35d75ce3ddbe6581">IRHitachiAc344</a>.</p>
 
 </div>
 </div>
@@ -667,6 +672,9 @@ Friends</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void IRHitachiAc424::setFan </td>
@@ -676,6 +684,11 @@ Friends</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Set the speed of the fan. </p>
@@ -685,6 +698,8 @@ Friends</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+<p>Reimplemented in <a class="el" href="classIRHitachiAc264.html#a70ff409b8feec7d1d4db768a5b8c51f7">IRHitachiAc264</a>.</p>
 
 </div>
 </div>
@@ -811,7 +826,7 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classIRHitachiAc344.html#a8bf02e3923d881436a9578532ed3c024">IRHitachiAc344</a>.</p>
+<p>Reimplemented in <a class="el" href="classIRHitachiAc344.html#a8bf02e3923d881436a9578532ed3c024">IRHitachiAc344</a>, and <a class="el" href="classIRHitachiAc264.html#a0470b9b1396bdb643f2b08b03828784f">IRHitachiAc264</a>.</p>
 
 </div>
 </div>
@@ -906,7 +921,7 @@ Friends</h2></td></tr>
 <p>Reset the internal state to a fixed known good state. </p>
 <dl class="section note"><dt>Note</dt><dd>Reset to auto fan, cooling, 23° Celsius </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classIRHitachiAc344.html#a481cbfb0420ba884a7eb4c2ba82bd666">IRHitachiAc344</a>.</p>
+<p>Reimplemented in <a class="el" href="classIRHitachiAc264.html#a1e3bd5d35f3240c8f7cc44d56efefabb">IRHitachiAc264</a>, and <a class="el" href="classIRHitachiAc344.html#a481cbfb0420ba884a7eb4c2ba82bd666">IRHitachiAc344</a>.</p>
 
 </div>
 </div>
@@ -937,12 +952,12 @@ Friends</h2></td></tr>
 <p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent. </p>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native settings. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classIRHitachiAc344.html#a2bdc3e19a6125d107844f548e4321f6e">IRHitachiAc344</a>.</p>
+<p>Reimplemented in <a class="el" href="classIRHitachiAc264.html#a419473e8946763207dbf11ec162c2037">IRHitachiAc264</a>, and <a class="el" href="classIRHitachiAc344.html#a2bdc3e19a6125d107844f548e4321f6e">IRHitachiAc344</a>.</p>
 
 </div>
 </div>
-<a id="a16abdf55ea3ae4b06e2a23dad3496738"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a16abdf55ea3ae4b06e2a23dad3496738">&#9670;&nbsp;</a></span>toCommonFanSpeed()</h2>
+<a id="a39048ed5108383c7d7e137d9f05aa537"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39048ed5108383c7d7e137d9f05aa537">&#9670;&nbsp;</a></span>toCommonFanSpeed()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -955,12 +970,12 @@ Friends</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const uint8_t&#160;</td>
           <td class="paramname"><em>speed</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -973,6 +988,8 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native setting. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classIRHitachiAc264.html#a86d5ecadc7acd053429d12c15d7db66a">IRHitachiAc264</a>.</p>
 
 </div>
 </div>
@@ -1038,11 +1055,33 @@ Friends</h2></td></tr>
 <p>Convert the internal state into a human readable string. </p>
 <dl class="section return"><dt>Returns</dt><dd>A string containing the settings in human-readable form. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classIRHitachiAc344.html#a62c4b681346bb8def0dacda3c92af4b1">IRHitachiAc344</a>.</p>
+<p>Reimplemented in <a class="el" href="classIRHitachiAc264.html#a8dec11614780267089651cc55c1162c5">IRHitachiAc264</a>, and <a class="el" href="classIRHitachiAc344.html#a62c4b681346bb8def0dacda3c92af4b1">IRHitachiAc344</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Friends And Related Function Documentation</h2>
+<a id="a3340fb00bcc0f4848d6d0ec89d81650a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3340fb00bcc0f4848d6d0ec89d81650a">&#9670;&nbsp;</a></span>IRHitachiAc264</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="classIRHitachiAc264.html">IRHitachiAc264</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a3c885313a79bf8c02bc5eb9f7d80088b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3c885313a79bf8c02bc5eb9f7d80088b">&#9670;&nbsp;</a></span>IRHitachiAc344</h2>
 
