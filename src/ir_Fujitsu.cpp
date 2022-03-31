@@ -1,5 +1,5 @@
 // Copyright 2017 Jonny Graham
-// Copyright 2017-2021 David Conran
+// Copyright 2017-2022 David Conran
 // Copyright 2021 siriuslzx
 
 /// @file
@@ -164,7 +164,7 @@ bool IRFujitsuAC::updateUseLongOrShort(void) {
 
 /// Calculate and set the checksum values for the internal state.
 void IRFujitsuAC::checkSum(void) {
-  if (updateUseLongOrShort()) {  // Is it a long code?
+  if (updateUseLongOrShort()) {  // Is it going to be a long code?
     // Nr. of bytes in the message after this byte.
     _.RestLength = _state_length - 7;
     _.Protocol = (_model == fujitsu_ac_remote_model_t::ARREW4E) ? 0x31 : 0x30;
@@ -235,12 +235,17 @@ uint8_t IRFujitsuAC::getStateLength(void) {
   return updateUseLongOrShort() ? _state_length : _state_length_short;
 }
 
+/// Is the current binary state representation a long or a short code?
+/// @return true, if long; false, if short.
+bool IRFujitsuAC::isLongCode(void) const {
+  return _.Cmd == 0xFE || _.Cmd == 0xFC;
+}
+
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRFujitsuAC::getRaw(void) {
   checkSum();
-  if (_.Cmd == 0xFE || _.Cmd == 0xFC)
-    return _.longcode;
+  if (isLongCode()) return _.longcode;
   return _.shortcode;
 }
 
@@ -774,35 +779,41 @@ stdAc::fanspeed_t IRFujitsuAC::toCommonFanSpeed(const uint8_t speed) {
 }
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
+/// @param[in] prev Ptr to a previous state.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRFujitsuAC::toCommon(void) const {
+stdAc::state_t IRFujitsuAC::toCommon(const stdAc::state_t *prev) {
   stdAc::state_t result{};
+  if (prev != NULL) result = *prev;
   result.protocol = decode_type_t::FUJITSU_AC;
+  checkSum();
   result.model = _model;
   result.power = getPower();
-  result.mode = toCommonMode(_.Mode);
-  result.celsius = getCelsius();
-  result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed(_.Fan);
-  uint8_t swing = _.Swing;
-  switch (result.model) {
-    case fujitsu_ac_remote_model_t::ARREB1E:
-    case fujitsu_ac_remote_model_t::ARRAH2E:
-    case fujitsu_ac_remote_model_t::ARRY4:
-      result.clean = _.Clean;
-      result.filter = _.Filter;
-      result.swingv = (swing & kFujitsuAcSwingVert) ? stdAc::swingv_t::kAuto
-                                                    : stdAc::swingv_t::kOff;
-      result.swingh = (swing & kFujitsuAcSwingHoriz) ? stdAc::swingh_t::kAuto
-                                                     : stdAc::swingh_t::kOff;
-      break;
-    case fujitsu_ac_remote_model_t::ARDB1:
-    case fujitsu_ac_remote_model_t::ARJW2:
-    default:
-      result.swingv = stdAc::swingv_t::kOff;
-      result.swingh = stdAc::swingh_t::kOff;
+  // Only update these settings if it is a long message, or we have no previous
+  // state info for those settings.
+  if (isLongCode() || prev == NULL) {
+    result.mode = toCommonMode(_.Mode);
+    result.celsius = getCelsius();
+    result.degrees = getTemp();
+    result.fanspeed = toCommonFanSpeed(_.Fan);
+    uint8_t swing = _.Swing;
+    switch (result.model) {
+      case fujitsu_ac_remote_model_t::ARREB1E:
+      case fujitsu_ac_remote_model_t::ARRAH2E:
+      case fujitsu_ac_remote_model_t::ARRY4:
+        result.clean = _.Clean;
+        result.filter = _.Filter;
+        result.swingv = (swing & kFujitsuAcSwingVert) ? stdAc::swingv_t::kAuto
+                                                      : stdAc::swingv_t::kOff;
+        result.swingh = (swing & kFujitsuAcSwingHoriz) ? stdAc::swingh_t::kAuto
+                                                       : stdAc::swingh_t::kOff;
+        break;
+      case fujitsu_ac_remote_model_t::ARDB1:
+      case fujitsu_ac_remote_model_t::ARJW2:
+      default:
+        result.swingv = stdAc::swingv_t::kOff;
+        result.swingh = stdAc::swingh_t::kOff;
+    }
   }
-
   result.quiet = _.Fan == kFujitsuAcFanQuiet;
   result.turbo = _cmd == kFujitsuAcCmdPowerful;
   result.econo = _cmd == kFujitsuAcCmdEcono;

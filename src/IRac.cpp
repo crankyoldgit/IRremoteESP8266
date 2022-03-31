@@ -4252,7 +4252,7 @@ namespace IRAcUtils {
       case decode_type_t::FUJITSU_AC: {
         IRFujitsuAC ac(kGpioUnused);
         ac.setRaw(decode->state, decode->bits / 8);
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_FUJITSU_AC

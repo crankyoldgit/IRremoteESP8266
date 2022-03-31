@@ -1361,3 +1361,54 @@ TEST(TestIRFujitsuACClass, Discussion1701) {
   EXPECT_EQ(expected_raw_output, ac._irsend.outputStr());
   // Success.
 }
+
+TEST(TestIRFujitsuACClass, toCommon_Issue1780HandlePrev) {
+  IRFujitsuAC ac(kGpioUnused);
+  ac.setMode(kFujitsuAcModeCool);
+  ac.setTemp(20);
+  ac.setFanSpeed(kFujitsuAcFanQuiet);
+  ac.setSwing(kFujitsuAcSwingBoth);
+  ac.on();
+  ASSERT_TRUE(ac.toCommon().power);
+  stdAc::state_t prev = ac.toCommon();  // Copy in the state.
+  ac.off();
+  ASSERT_FALSE(ac.toCommon().power);
+  ac.send();  // This should send a short code.
+  prev.degrees = 27;
+  ac.stateReset();
+  IRrecv irrecv(kGpioUnused);
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
+  ASSERT_EQ(FUJITSU_AC, ac._irsend.capture.decode_type);
+  ac.setRaw(ac._irsend.capture.state, ac._irsend.capture.bits / 8);
+  ASSERT_EQ(decode_type_t::FUJITSU_AC, ac.toCommon().protocol);
+  ASSERT_EQ(fujitsu_ac_remote_model_t::ARRAH2E, ac.toCommon().model);
+  ASSERT_FALSE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(16, ac.toCommon().degrees);
+  ASSERT_EQ(27, ac.toCommon(&prev).degrees);
+  ASSERT_FALSE(ac.toCommon().quiet);
+
+  ASSERT_EQ(stdAc::opmode_t::kAuto, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon(&prev).mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kAuto, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon(&prev).fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  // Unsupported.
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().beep);
+  ASSERT_EQ(-1, ac.toCommon().sleep);
+  ASSERT_EQ(-1, ac.toCommon().clock);
+
+  stdAc::state_t result_inc_prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &result_inc_prev,
+                                       &prev));
+  ASSERT_EQ(27, result_inc_prev.degrees);
+  ASSERT_EQ(stdAc::opmode_t::kCool, result_inc_prev.mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMin, result_inc_prev.fanspeed);
+}
