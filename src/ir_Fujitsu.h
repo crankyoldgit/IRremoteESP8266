@@ -250,6 +250,7 @@ class IRFujitsuAC {
   fujitsu_ac_remote_model_t _model;
   uint8_t _state_length;
   uint8_t _state_length_short;
+  bool _rawstatemodified;
   void checkSum(void);
   bool updateUseLongOrShort(void);
   void buildFromState(const uint16_t length);

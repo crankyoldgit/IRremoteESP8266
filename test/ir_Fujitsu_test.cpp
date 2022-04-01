@@ -318,9 +318,7 @@ TEST(TestDecodeFujitsuAC, SyntheticShortMessages) {
   uint8_t expected_arrah2e[7] = {0x14, 0x63, 0x0, 0x10, 0x10, 0x02, 0xFD};
   EXPECT_STATE_EQ(expected_arrah2e, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Model: 1 (ARRAH2E), Id: 0, Power: Off, Mode: 0 (Auto), Temp: 16C, "
-      "Fan: 0 (Auto), Clean: Off, Filter: Off, Swing: 0 (Off), Command: N/A, "
-      "Timer: Off",
+      "Model: 1 (ARRAH2E), Id: 0, Power: Off, Command: N/A",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -617,9 +615,7 @@ TEST(TestIRFujitsuACClass, toCommon) {
 
   // Now test it.
   EXPECT_EQ(    // Off mode technically has no temp, mode, fan, etc.
-      "Model: 1 (ARRAH2E), Id: 0, Power: Off, Mode: 0 (Auto), Temp: 16C, "
-      "Fan: 0 (Auto), Clean: Off, Filter: Off, Swing: 0 (Off), Command: N/A, "
-      "Timer: Off",
+      "Model: 1 (ARRAH2E), Id: 0, Power: Off, Command: N/A",
       ac.toString());
   ASSERT_EQ(decode_type_t::FUJITSU_AC, ac.toCommon().protocol);
   ASSERT_EQ(fujitsu_ac_remote_model_t::ARRAH2E, ac.toCommon().model);
