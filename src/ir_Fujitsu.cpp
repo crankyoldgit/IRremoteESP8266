@@ -250,8 +250,7 @@ bool IRFujitsuAC::isLongCode(void) const {
 /// @return PTR to a code for this protocol based on the current internal state.
 uint8_t* IRFujitsuAC::getRaw(void) {
   checkSum();
-  if (isLongCode()) return _.longcode;
-  return _.shortcode;
+  return isLongCode() ? _.longcode : _.shortcode;
 }
 
 /// Build the internal state/config from the current (raw) A/C message.
