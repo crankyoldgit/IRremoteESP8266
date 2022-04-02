@@ -4168,7 +4168,7 @@ namespace IRAcUtils {
       case decode_type_t::DAIKIN128: {
         IRDaikin128 ac(kGpioUnused);
         ac.setRaw(decode->state);
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_DAIKIN128
@@ -4348,7 +4348,7 @@ namespace IRAcUtils {
       case decode_type_t::KELON: {
         IRKelonAc ac(kGpioUnused);
         ac.setRaw(decode->value);
-        *result = ac.toCommon();
+        *result = ac.toCommon(prev);
         break;
       }
 #endif  // DECODE_KELON
