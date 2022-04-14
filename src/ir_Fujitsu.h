@@ -1,5 +1,5 @@
 // Copyright 2017 Jonny Graham
-// Copyright 2018-2021 David Conran
+// Copyright 2018-2022 David Conran
 // Copyright 2021 siriuslzx
 
 /// @file
@@ -206,6 +206,7 @@ class IRFujitsuAC {
   bool setRaw(const uint8_t newState[], const uint16_t length);
   uint8_t getStateLength(void);
   static bool validChecksum(uint8_t* state, const uint16_t length);
+  bool isLongCode(void) const;
   void setPower(const bool on);
   void off(void);
   void on(void);
@@ -233,7 +234,7 @@ class IRFujitsuAC {
   static uint8_t convertFan(stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
-  stdAc::state_t toCommon(void) const;
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
   String toString(void) const;
 #ifndef UNIT_TEST
 
@@ -249,6 +250,7 @@ class IRFujitsuAC {
   fujitsu_ac_remote_model_t _model;
   uint8_t _state_length;
   uint8_t _state_length_short;
+  bool _rawstatemodified;
   void checkSum(void);
   bool updateUseLongOrShort(void);
   void buildFromState(const uint16_t length);
