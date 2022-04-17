@@ -296,11 +296,9 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
     setCmd(kFujitsuAcCmdStayOn);
   // Currently the only way we know how to tell ARRAH2E & ARRY4 apart is if
   // either the raw Filter or Clean setting is on.
-  if (_model == fujitsu_ac_remote_model_t::ARRAH2E && (_.Filter || _.Clean)) {
-    if (!get10CHeat()) {
-      setModel(fujitsu_ac_remote_model_t::ARRY4);
-    }
-  }
+  if (_model == fujitsu_ac_remote_model_t::ARRAH2E && (_.Filter || _.Clean) &&
+      !get10CHeat())
+    setModel(fujitsu_ac_remote_model_t::ARRY4);
   if (_state_length == kFujitsuAcStateLength && _.OutsideQuiet)
     setModel(fujitsu_ac_remote_model_t::ARREB1E);
   switch (_.Cmd) {
