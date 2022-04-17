@@ -623,9 +623,9 @@ TEST(TestIRac, Fujitsu) {
       "Model: 2 (ARDB1), Id: 0, Power: On, Mode: 1 (Cool), Temp: 19C, "
       "Fan: 2 (Medium), Command: N/A";
   std::string arrah2e_expected =
-      "Model: 1 (ARRAH2E), Id: 0, Power: On, Mode: 1 (Cool), Temp: 19C, "
-      "Fan: 2 (Medium), Clean: Off, Filter: Off, Swing: 0 (Off), Command: N/A, "
-      "Sleep Timer: 03:00";
+      "Model: 1 (ARRAH2E), Id: 0, Power: On, Mode: 3 (Fan), Temp: 10C, "
+      "Fan: 0 (Auto), Clean: Off, Filter: Off, 10C Heat: On, "
+      "Swing: 0 (Off), Command: N/A, Sleep Timer: 03:00";
   std::string arry4_expected =
       "Model: 5 (ARRY4), Id: 0, Power: On, Mode: 1 (Cool), Temp: 19C, "
       "Fan: 2 (Medium), Clean: On, Filter: On, Swing: 0 (Off), Command: N/A";
@@ -658,20 +658,21 @@ TEST(TestIRac, Fujitsu) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 
   ac._irsend.reset();
+  // Try to set the device to 10C Heat mode.
   irac.fujitsu(&ac,
                ARRAH2E,                     // Model
                true,                        // Power
-               stdAc::opmode_t::kCool,      // Mode
+               stdAc::opmode_t::kFan,       // Mode (Fan needed for 10C Heat)
                true,                        // Celsius
-               19,                          // Degrees
-               stdAc::fanspeed_t::kMedium,  // Fan speed
-               stdAc::swingv_t::kOff,       // Vertical swing
-               stdAc::swingh_t::kOff,       // Horizontal swing
+               19,                          // Degrees (Ignored in 10C Heat)
+               stdAc::fanspeed_t::kAuto,    // Fan speed (Auto needed for 10C)
+               stdAc::swingv_t::kOff,       // Vertical swing (Ditto)
+               stdAc::swingh_t::kOff,       // Horizontal swing (Ditto)
                false,                       // Quiet
                false,                       // Turbo (Powerful)
                false,                       // Econo
                true,                        // Filter
-               true,                        // Clean
+               true,                        // Clean  (Needed for 10C Heat)
                3 * 60);                     // Sleep
   ASSERT_EQ(arrah2e_expected, ac.toString());
   ac._irsend.makeDecodeResult();

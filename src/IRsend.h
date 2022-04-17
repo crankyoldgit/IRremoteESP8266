@@ -118,7 +118,8 @@ struct state_t {
 
 /// Fujitsu A/C model numbers
 enum fujitsu_ac_remote_model_t {
-  ARRAH2E = 1,  ///< (1) AR-RAH2E, AR-RAC1E, AR-RAE1E, AR-RCE1E (Default)
+  ARRAH2E = 1,  ///< (1) AR-RAH2E, AR-RAC1E, AR-RAE1E, AR-RCE1E, AR-RAH2U,
+                ///<     AR-REG1U (Default)
                 ///< Warning: Use on incorrect models can cause the A/C to lock
                 ///< up, requring the A/C to be physically powered off to fix.
                 ///< e.g. AR-RAH1U may lock up with a Swing command.

@@ -184,7 +184,13 @@ void IRFujitsuAC::checkSum(void) {
       }
     }
     if (_model != fujitsu_ac_remote_model_t::ARRY4) {
-      if (_model != fujitsu_ac_remote_model_t::ARREW4E) _.Clean = false;
+      switch (_model) {
+        case fujitsu_ac_remote_model_t::ARRAH2E:
+        case fujitsu_ac_remote_model_t::ARREW4E:
+          break;
+        default:
+          _.Clean = false;
+      }
       _.Filter = false;
     }
     // Set the On/Off/Sleep timer Nr of mins.
@@ -290,8 +296,11 @@ void IRFujitsuAC::buildFromState(const uint16_t length) {
     setCmd(kFujitsuAcCmdStayOn);
   // Currently the only way we know how to tell ARRAH2E & ARRY4 apart is if
   // either the raw Filter or Clean setting is on.
-  if (_model == fujitsu_ac_remote_model_t::ARRAH2E && (_.Filter || _.Clean))
-    setModel(fujitsu_ac_remote_model_t::ARRY4);
+  if (_model == fujitsu_ac_remote_model_t::ARRAH2E && (_.Filter || _.Clean)) {
+    if (!get10CHeat()) {
+      setModel(fujitsu_ac_remote_model_t::ARRY4);
+    }
+  }
   if (_state_length == kFujitsuAcStateLength && _.OutsideQuiet)
     setModel(fujitsu_ac_remote_model_t::ARREB1E);
   switch (_.Cmd) {
@@ -578,7 +587,7 @@ void IRFujitsuAC::setFilter(const bool on) {
 bool IRFujitsuAC::getFilter(void) const {
   switch (_model) {
     case fujitsu_ac_remote_model_t::ARRY4: return _.Filter;
-    default: return false;
+    default:                               return false;
   }
 }
 
@@ -587,6 +596,7 @@ bool IRFujitsuAC::getFilter(void) const {
 void IRFujitsuAC::set10CHeat(const bool on) {
   switch (_model) {
     // Only selected models support this.
+    case fujitsu_ac_remote_model_t::ARRAH2E:
     case fujitsu_ac_remote_model_t::ARREW4E:
       setClean(on);  // 10C Heat uses the same bit as Clean
       if (on) {
@@ -605,6 +615,7 @@ void IRFujitsuAC::set10CHeat(const bool on) {
 /// @return true, the setting is on. false, the setting is off.
 bool IRFujitsuAC::get10CHeat(void) const {
   switch (_model) {
+    case fujitsu_ac_remote_model_t::ARRAH2E:
     case fujitsu_ac_remote_model_t::ARREW4E:
       return (_.Clean && _.Power && _.Mode == kFujitsuAcModeFan &&
               _.Fan == kFujitsuAcFanAuto && _.Swing == kFujitsuAcSwingOff);
@@ -810,7 +821,11 @@ stdAc::state_t IRFujitsuAC::toCommon(const stdAc::state_t *prev) {
   if (isLongCode() || prev == NULL) {
     result.mode = toCommonMode(_.Mode);
     result.celsius = getCelsius();
-    result.degrees = getTemp();
+    {
+      const float minHeat = result.celsius ? kFujitsuAcMinHeat
+                                           : kFujitsuAcMinHeatF;
+      result.degrees = get10CHeat() ? minHeat : getTemp();
+    }
     result.fanspeed = toCommonFanSpeed(_.Fan);
     uint8_t swing = _.Swing;
     switch (result.model) {
@@ -848,7 +863,7 @@ stdAc::state_t IRFujitsuAC::toCommon(const stdAc::state_t *prev) {
 /// @return A human readable string.
 String IRFujitsuAC::toString(void) const {
   String result = "";
-  result.reserve(100);  // Reserve some heap for the string to reduce fragging.
+  result.reserve(180);  // Reserve some heap for the string to reduce fragging.
   fujitsu_ac_remote_model_t model = _model;
   result += addModelToString(decode_type_t::FUJITSU_AC, model, false);
   result += addIntToString(_.Id, kIdStr);
@@ -857,7 +872,12 @@ String IRFujitsuAC::toString(void) const {
     result += addModeToString(_.Mode, kFujitsuAcModeAuto, kFujitsuAcModeCool,
                               kFujitsuAcModeHeat, kFujitsuAcModeDry,
                               kFujitsuAcModeFan);
-    result += addTempFloatToString(getTemp(), getCelsius());
+    {
+      const bool isCelsius = getCelsius();
+      const float minHeat = isCelsius ? kFujitsuAcMinHeat : kFujitsuAcMinHeatF;
+      result += addTempFloatToString(get10CHeat() ? minHeat : getTemp(),
+                                     isCelsius);
+    }
     result += addFanToString(_.Fan, kFujitsuAcFanHigh, kFujitsuAcFanLow,
                              kFujitsuAcFanAuto, kFujitsuAcFanQuiet,
                              kFujitsuAcFanMed);
@@ -874,8 +894,14 @@ String IRFujitsuAC::toString(void) const {
         result += addBoolToString(getFilter(), kFilterStr);
         // FALL THRU
       default:   // e.g. ARREW4E
-        if (model == fujitsu_ac_remote_model_t::ARREW4E)
-          result += addBoolToString(get10CHeat(), k10CHeatStr);
+        switch (model) {
+          case fujitsu_ac_remote_model_t::ARRAH2E:
+          case fujitsu_ac_remote_model_t::ARREW4E:
+            result += addBoolToString(get10CHeat(), k10CHeatStr);
+            break;
+          default:
+            break;
+        }
         result += addIntToString(_.Swing, kSwingStr);
         result += kSpaceLBraceStr;
         switch (_.Swing) {
