@@ -30,6 +30,7 @@
 //   Brand: Fujitsu,  Model: AR-DL10 remote (ARDB1)
 //   Brand: Fujitsu,  Model: ASU30C1 A/C (ARDB1)
 //   Brand: Fujitsu,  Model: AR-RAH1U remote (ARREB1E)
+//   Brand: Fujitsu,  Model: AR-RAH2U remote (ARRAH2E)
 //   Brand: Fujitsu,  Model: ASU12RLF A/C (ARREB1E)
 //   Brand: Fujitsu,  Model: AR-REW4E remote (ARREW4E)
 //   Brand: Fujitsu,  Model: ASYG09KETA-B A/C (ARREW4E)
@@ -37,6 +38,7 @@
 //   Brand: Fujitsu,  Model: ASTG09K A/C (ARREW4E)
 //   Brand: Fujitsu,  Model: ASTG18K A/C (ARREW4E)
 //   Brand: Fujitsu,  Model: AR-REW1E remote (ARREW4E)
+//   Brand: Fujitsu,  Model: AR-REG1U remote (ARRAH2E)
 
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_
@@ -128,9 +130,11 @@ const uint8_t kFujitsuAcFanMed = 0x02;
 const uint8_t kFujitsuAcFanLow = 0x03;
 const uint8_t kFujitsuAcFanQuiet = 0x04;
 
+const float   kFujitsuAcMinHeat =     10;  // 10C
 const float   kFujitsuAcMinTemp =     16;  // 16C
 const float   kFujitsuAcMaxTemp =     30;  // 30C
 const uint8_t kFujitsuAcTempOffsetC = kFujitsuAcMinTemp;
+const float   kFujitsuAcMinHeatF =    50;  // 50F
 const float   kFujitsuAcMinTempF =    60;  // 60F
 const float   kFujitsuAcMaxTempF =    88;  // 88F
 const uint8_t kFujitsuAcTempOffsetF = 44;
