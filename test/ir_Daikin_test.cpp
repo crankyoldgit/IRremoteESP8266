@@ -3879,3 +3879,43 @@ TEST(TestDaikin176Class, UnitId) {
   ASSERT_EQ(0, ac.getId());
   EXPECT_STATE_EQ(unita, ac.getRaw(), kDaikin176Bits);
 }
+
+TEST(TestDaikin128Class, Issue1754_HeatMode) {
+  // Data from "MODE HEAT"
+  // Mesg Desc.: Power Toggle: Off, Mode: 8 (Heat), Temp: 19C, Fan: 4 (Medium),
+  // Powerful: Off, Quiet: Off, Swing(V): Off, Sleep: Off, Econo: Off,
+  // Clock: 20:22, On Timer: Off, On Timer: 10:00, Off Timer: Off,
+  // Off Timer: 16:30, Light Toggle: 0 (Off)
+  // Ref: https://docs.google.com/document/d/1bhPlwsUE4ppL1dlX6_aYmqCSxeE6HlOumYsR35S0CKA/edit#heading=h.luu34vdlzof1
+
+  const uint8_t heatmode[16] = {  // As recorded from a real remote.
+      0x16, 0x48, 0x22, 0x20, 0x10, 0x56, 0x19, 0x34,
+      0xA1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0B};
+
+  IRDaikin128 ac(kGpioUnused);
+  // Try to reproduce the exact same state.
+  ac.setClock(20 * 60 + 22);
+  ac.setOnTimer(10 * 60);
+  ac.setOnTimerEnabled(false);
+  ac.setOffTimer(16 * 60 + 30);
+  ac.setOffTimerEnabled(false);
+  ac.setPowerToggle(false);
+  ac.setTemp(19);
+  ac.setFan(kDaikin128FanMed);
+  ac.setPowerful(false);
+  ac.setQuiet(false);
+  ac.setSwingVertical(false);
+  ac.setSleep(false);
+  ac.setEcono(false);
+  ac.setLightToggle(0);
+  ac.setMode(kDaikin128Heat);
+
+  EXPECT_EQ(
+      "Power Toggle: Off, Mode: 8 (Heat), Temp: 19C, Fan: 4 (Medium), "
+      "Powerful: Off, Quiet: Off, Swing(V): Off, Sleep: Off, Econo: Off, "
+      "Clock: 20:22, On Timer: Off, On Timer: 10:00, Off Timer: Off, "
+      "Off Timer: 16:30, Light Toggle: 0 (Off)",
+      ac.toString());
+  // Compare the synthetic state to the captured one.
+  EXPECT_STATE_EQ(heatmode, ac.getRaw(), kDaikin128Bits);
+}
