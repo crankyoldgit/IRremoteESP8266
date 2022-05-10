@@ -36,7 +36,7 @@
 //   Brand: Daikin,  Model: BRC4C151 remote (DAIKIN176)
 //   Brand: Daikin,  Model: 17 Series FTXB09AXVJU A/C (DAIKIN128)
 //   Brand: Daikin,  Model: 17 Series FTXB12AXVJU A/C (DAIKIN128)
-//   Brand: Daikin,  Model: 17 Series FTXB24AXVJU A/C (NOT SUPPORTED)
+//   Brand: Daikin,  Model: 17 Series FTXB24AXVJU A/C (DAIKIN128)
 //   Brand: Daikin,  Model: BRC52B63 remote (DAIKIN128)
 //   Brand: Daikin,  Model: ARC480A5 remote (DAIKIN152)
 //   Brand: Daikin,  Model: FFN-C/FCN-F Series A/C (DAIKIN64)
