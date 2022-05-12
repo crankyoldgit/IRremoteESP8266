@@ -3737,7 +3737,7 @@ stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) const {
 
 #if SEND_DAIKIN200
 /// Send a Daikin200 (200-bit) A/C formatted message.
-/// Status: Alpha / Untested on a real device.
+/// Status: BETA / Untested on a real device.
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
@@ -3767,7 +3767,7 @@ void IRsend::sendDaikin200(const unsigned char data[], const uint16_t nbytes,
 
 #if DECODE_DAIKIN200
 /// Decode the supplied Daikin 200-bit message. (DAIKIN200)
-/// Status: BETA / Should be working.
+/// Status: STABLE / Known to be working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
@@ -3807,7 +3807,7 @@ bool IRrecv::decodeDaikin200(decode_results *results, uint16_t offset,
   if (strict) {
     if (pos * 8 != kDaikin200Bits) return false;
     // Validate the checksum.
-    // if (!IRDaikin200::validChecksum(results->state)) return false;
+    if (!IRDaikin176::validChecksum(results->state, pos)) return false;
   }
 
   // Success
