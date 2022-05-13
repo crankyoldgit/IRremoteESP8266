@@ -1102,6 +1102,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Coolix 48-bit decode");
     if (decodeCoolix48(results, offset)) return true;
 #endif  // DECODE_COOLIX48
+#if DECODE_DAIKIN200
+    DPRINTLN("Attempting Daikin 200-bit decode");
+    if (decodeDaikin200(results, offset)) return true;
+#endif  // DECODE_DAIKIN200
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

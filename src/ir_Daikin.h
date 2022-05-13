@@ -21,6 +21,7 @@
 /// @see Daikin216 https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 /// @see Daikin216 https://github.com/danny-source/Arduino_DY_IRDaikin
 /// @see Daikin64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
+/// @see Daikin200 https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
 
 // Supports:
 //   Brand: Daikin,  Model: ARC433** remote (DAIKIN)
@@ -47,6 +48,7 @@
 //   Brand: Daikin,  Model: FTWX35AXV1 A/C (DAIKIN64)
 //   Brand: Daikin,  Model: ARC484A4 remote (DAIKIN216)
 //   Brand: Daikin,  Model: FTQ60TV16U2 A/C (DAIKIN216)
+//   Brand: Daikin,  Model: BRC4M150W16 remote (DAIKIN200)
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
@@ -675,6 +677,18 @@ const uint8_t kDaikin64MinTemp = 16;  // Celsius
 const uint8_t kDaikin64MaxTemp = 30;  // Celsius
 const uint8_t kDaikin64ChecksumOffset = 60;
 const uint8_t kDaikin64ChecksumSize = 4;  // Mask 0b1111 << 59
+
+const uint16_t kDaikin200Freq = 38000;  // Modulation Frequency in Hz.
+const uint16_t kDaikin200HdrMark = 4920;
+const uint16_t kDaikin200HdrSpace = 2230;
+const uint16_t kDaikin200BitMark = 290;
+const uint16_t kDaikin200OneSpace = 1850;
+const uint16_t kDaikin200ZeroSpace = 780;
+const uint16_t kDaikin200Gap = 29400;
+const uint16_t kDaikin200Sections = 2;
+const uint16_t kDaikin200Section1Length = 7;
+const uint16_t kDaikin200Section2Length = kDaikin200StateLength -
+                                          kDaikin200Section1Length;
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool

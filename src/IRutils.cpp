@@ -179,6 +179,7 @@ bool hasACState(const decode_type_t protocol) {
     case DAIKIN160:
     case DAIKIN176:
     case DAIKIN2:
+    case DAIKIN200:
     case DAIKIN216:
     case ELECTRA_AC:
     case FUJITSU_AC:
