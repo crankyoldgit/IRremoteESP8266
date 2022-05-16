@@ -46,7 +46,8 @@ using irutils::minsToString;
   _.x##Mins = mins % 60;\
 } while (0)
 
-#if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02 || SEND_HAIER_AC176)
+#if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02 || SEND_HAIER_AC160 || \
+     SEND_HAIER_AC176)
 /// Send a Haier A/C formatted message. (HSU07-HEA03 remote)
 /// Status: STABLE / Known to be working.
 /// @param[in] data The message to be sent.
@@ -92,6 +93,18 @@ void IRsend::sendHaierAC176(const unsigned char data[], const uint16_t nbytes,
   if (nbytes >= kHaierAC176StateLength) sendHaierAC(data, nbytes, repeat);
 }
 #endif  // SEND_HAIER_AC176
+
+#if SEND_HAIER_AC160
+/// Send a Haier 160 bit remote A/C formatted message.
+/// Status: STABLE / Known to be working.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+void IRsend::sendHaierAC160(const unsigned char data[], const uint16_t nbytes,
+                            const uint16_t repeat) {
+  if (nbytes >= kHaierAC160StateLength) sendHaierAC(data, nbytes, repeat);
+}
+#endif  // SEND_HAIER_AC160
 
 /// Class constructor
 /// @param[in] pin GPIO to be used when sending.
@@ -568,7 +581,7 @@ void IRHaierAC176::checksum(void) {
 /// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRHaierAC176::validChecksum(const uint8_t state[], const uint16_t length) {
   if (length < 2) return false;  // 1 byte of data can't have a checksum.
-  if (length < kHaierAC176StateLength) {  // Is it too short?
+  if (length < kHaierAC160StateLength) {  // Is it too short?
     // Then it is just a checksum of the whole thing.
     return (state[length - 1] == sumBytes(state, length - 1));
   } else {  // It is long enough for two checksums.
@@ -1323,7 +1336,8 @@ bool IRHaierACYRW02::validChecksum(const uint8_t state[],
 }
 // End of IRHaierACYRW02 class.
 
-#if (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02)
+#if (DECODE_HAIER_AC || DECODE_HAIER_AC_YRW02 || DECODE_HAIER_AC160 || \
+     DECODE_HAIER_AC176)
 /// Decode the supplied Haier HSU07-HEA03 remote message.
 /// Status: STABLE / Known to be working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
@@ -1435,3 +1449,35 @@ bool IRrecv::decodeHaierAC176(decode_results* results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_HAIER_AC176
+
+#if DECODE_HAIER_AC160
+/// Decode the supplied Haier 160 bit remote A/C message.
+/// Status: STABLE / Known to be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+bool IRrecv::decodeHaierAC160(decode_results* results, uint16_t offset,
+                              const uint16_t nbits, const bool strict) {
+  if (strict) {
+    if (nbits != kHaierAC160Bits)
+      return false;  // Not strictly a HAIER_AC160 message.
+  }
+
+  // The protocol is almost exactly the same as HAIER_AC
+  if (!decodeHaierAC(results, offset, nbits, false)) return false;
+
+  // Compliance
+  if (strict) {
+    if (!IRHaierAC176::validChecksum(results->state, nbits / 8)) return false;
+  }
+
+  // Success
+  // It looks correct, but we haven't check the checksum etc.
+  results->decode_type = HAIER_AC160;
+  return true;
+}
+#endif  // DECODE_HAIER_AC160

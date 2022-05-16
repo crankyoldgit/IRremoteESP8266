@@ -573,6 +573,11 @@ class IRsend {
                         const uint16_t nbytes = kHaierACYRW02StateLength,
                         const uint16_t repeat = kHaierAcYrw02DefaultRepeat);
 #endif  // SEND_HAIER_AC_YRW02
+#if SEND_HAIER_AC160
+  void sendHaierAC160(const unsigned char data[],
+                      const uint16_t nbytes = kHaierAC160StateLength,
+                      const uint16_t repeat = kHaierAc160DefaultRepeat);
+#endif  // SEND_HAIER_AC160
 #if SEND_HAIER_AC176
   void sendHaierAC176(const unsigned char data[],
                       const uint16_t nbytes = kHaierAC176StateLength,

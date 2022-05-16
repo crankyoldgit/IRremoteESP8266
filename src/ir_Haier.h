@@ -8,6 +8,7 @@
 /// @see https://www.dropbox.com/s/mecyib3lhdxc8c6/IR%20data%20reverse%20engineering.xlsx?dl=0
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/485
 /// @see https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1804
 
 // Supports:
 //   Brand: Haier,  Model: HSU07-HEA03 remote (HAIER_AC)
@@ -17,6 +18,7 @@
 //   Brand: Mabe,   Model: MMI18HDBWCA6MI8 A/C (HAIER_AC176)
 //   Brand: Mabe,   Model: V12843 HJ200223 remote (HAIER_AC176)
 //   Brand: Daichi, Model: D-H A/C (HAIER_AC176)
+//   Brand: Haier,  Model: KFR-26GW/83@UI-Ge A/C (HAIER_AC160)
 
 #ifndef IR_HAIER_H_
 #define IR_HAIER_H_

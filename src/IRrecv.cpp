@@ -1106,6 +1106,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Daikin 200-bit decode");
     if (decodeDaikin200(results, offset)) return true;
 #endif  // DECODE_DAIKIN200
+#if DECODE_HAIER_AC160
+    DPRINTLN("Attempting Haier AC 160 bit decode");
+    if (decodeHaierAC160(results, offset)) return true;
+#endif  // DECODE_HAIER_AC160
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

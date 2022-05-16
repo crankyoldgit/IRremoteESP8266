@@ -1357,6 +1357,13 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::HAIER_AC176));
   ASSERT_EQ(kHaierAC176Bits, IRsend::defaultBits(decode_type_t::HAIER_AC176));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::HAIER_AC176));
+
+  ASSERT_EQ("HAIER_AC160", typeToString(decode_type_t::HAIER_AC160));
+  ASSERT_EQ(decode_type_t::HAIER_AC160, strToDecodeType("HAIER_AC160"));
+  ASSERT_TRUE(hasACState(decode_type_t::HAIER_AC160));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::HAIER_AC160));
+  ASSERT_EQ(kHaierAC160Bits, IRsend::defaultBits(decode_type_t::HAIER_AC160));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::HAIER_AC160));
 }
 
 TEST(TestHaierAC176Class, BuildKnownState) {
@@ -1534,4 +1541,80 @@ TEST(TestHaierAC176Class, Models) {
       "Swing(V): 2 (Middle), Swing(H): 0 (Middle), Sleep: Off, Health: Off, "
       "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off",
       ac.toString());
+}
+
+TEST(TestDecodeHaierAC160, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  irsend.reset();
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1804#issue-1236115063
+  const uint16_t rawData[325] = {
+      3078, 3002,
+      3058, 4338,
+      590, 1612, 588, 516, 584, 1588, 586, 542, 560, 540, 560, 1590, 584, 1618,
+      584, 542, 558, 1592, 584, 542, 582, 1594, 584, 542, 582, 1592, 560, 1642,
+      560, 516, 558, 544, 558, 542, 558, 542, 582, 518, 558, 542, 558, 516, 558,
+      542, 558, 542, 582, 520, 558, 542, 558, 542, 564, 510, 608, 492, 558, 542,
+      582, 520, 558, 542, 558, 544, 582, 492, 608, 1594, 558, 544, 558, 542,
+      582, 494, 608, 494, 558, 544, 558, 542, 558, 544, 558, 1616, 582, 1620,
+      560, 542, 558, 542, 582, 494, 558, 542, 558, 542, 558, 544, 556, 542, 582,
+      520, 580, 494, 582, 520, 582, 520, 558, 542, 558, 542, 582, 520, 582, 492,
+      608, 1592, 582, 520, 558, 544, 558, 516, 584, 518, 558, 542, 582, 520,
+      580, 520, 582, 520, 580, 492, 584, 516, 556, 544, 582, 518, 580, 520, 580,
+      520, 580, 494, 606, 494, 580, 520, 580, 520, 582, 520, 580, 520, 556, 518,
+      608, 492, 580, 520, 556, 544, 580, 520, 580, 520, 580, 494, 606, 494, 580,
+      520, 580, 520, 580, 520, 580, 520, 580, 494, 606, 496, 578, 522, 580, 520,
+      580, 520, 580, 520, 580, 494, 606, 494, 580, 520, 580, 520, 580, 1594,
+      608, 494, 580, 1620, 580, 522, 580, 520, 580, 494, 578, 1620, 582, 520,
+      580, 1596, 582, 1620, 582, 1594, 608, 1594, 582, 522, 580, 1594, 582,
+      1620, 582, 520, 580, 1596, 582, 520, 580, 1620, 582, 494, 606, 496, 580,
+      522, 580, 522, 580, 520, 580, 520, 580, 496, 604, 496, 580, 520, 580,
+      1620, 582, 1594, 582, 522, 578, 522, 580, 522, 578, 522, 580, 496, 580,
+      522, 578, 522, 578, 522, 578, 524, 578, 522, 578, 496, 578, 522, 578, 522,
+      578, 546, 554, 522, 578, 522, 578, 520, 556, 546, 554, 546, 554, 546, 556,
+      544, 556, 546, 554, 520, 554, 544, 556, 1620, 582, 544, 556, 1594, 580,
+      546, 556, 1594, 580};  // UNKNOWN B6B57D85
+  const uint8_t expectedState[kHaierAC160StateLength] = {
+      0xA6, 0xAC, 0x00, 0x00, 0x40, 0x60, 0x00, 0x20, 0x00, 0x00,
+      0x00, 0x00, 0x05, 0x17, 0xB5, 0x00, 0x60, 0x00, 0x00, 0x15};
+
+  irsend.sendRaw(rawData, 325, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HAIER_AC160, irsend.capture.decode_type);
+  ASSERT_EQ(kHaierAC160Bits, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+}
+
+// Decoding a message we entirely constructed based solely on a given state.
+TEST(TestDecodeHaierAC160, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expectedState[kHaierAC160StateLength] = {
+        0xA6, 0xAC, 0x00, 0x00, 0x40, 0x60, 0x00, 0x20, 0x00, 0x00,
+        0x00, 0x00, 0x05, 0x17, 0xB5, 0x00, 0x60, 0x00, 0x00, 0x15};
+
+  irsend.reset();
+  irsend.sendHaierAC160(expectedState);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(HAIER_AC160, irsend.capture.decode_type);
+  ASSERT_EQ(kHaierAC160Bits, irsend.capture.bits);
+  EXPECT_FALSE(irsend.capture.repeat);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
