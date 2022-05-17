@@ -1132,7 +1132,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   if (!resumed)  // Check if we have already resumed.
     resume();
   return false;
-}
+}  // NOLINT(readability/fn_size)
 
 /// Convert the tolerance percentage into something valid.
 /// @param[in] percentage An integer percentage.
