@@ -397,6 +397,7 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     D_STR_KELON168 "\x0"
     D_STR_HITACHI_AC296 "\x0"
     D_STR_DAIKIN200 "\x0"
+    D_STR_HAIER_AC160 "\x0"
     ///< New protocol strings should be added just above this line.
     "\x0"  ///< This string requires double null termination.
 };
