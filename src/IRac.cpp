@@ -219,6 +219,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_HAIER_AC
     case decode_type_t::HAIER_AC:
 #endif
+#if SEND_HAIER_AC160
+    case decode_type_t::HAIER_AC160:
+#endif  // SEND_HAIER_AC160
 #if SEND_HAIER_AC176
     case decode_type_t::HAIER_AC176:
 #endif  // SEND_HAIER_AC176
@@ -1199,6 +1202,46 @@ void IRac::haier(IRHaierAC *ac,
   ac->send();
 }
 #endif  // SEND_HAIER_AC
+
+#if SEND_HAIER_AC160
+/// Send a Haier 160 bit A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRHaierAC160 object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] quiet Run the device in quiet mode.
+/// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
+void IRac::haier160(IRHaierAC160 *ac,
+                    const bool on, const stdAc::opmode_t mode,
+                    const bool celsius, const float degrees,
+                    const stdAc::fanspeed_t fan,
+                    const stdAc::swingv_t swingv,
+                    const bool turbo, const bool quiet, const bool filter,
+                    const int16_t sleep) {
+  ac->begin();
+  // No Model setting available.
+  ac->setMode(ac->convertMode(mode));
+  ac->setUseFahrenheit(!celsius);
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(ac->convertSwingV(swingv));
+  // No Horizontal Swing setting available.
+  ac->setQuiet(quiet);
+  ac->setTurbo(turbo);
+  // No Light setting available.
+  ac->setHealth(filter);
+  // No Clean setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  ac->setPower(on);
+  ac->send();
+}
+#endif  // SEND_HAIER_AC160
 
 #if SEND_HAIER_AC176
 /// Send a Haier 176 bit A/C message with the supplied settings.
@@ -2978,6 +3021,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_HAIER_AC
+#if SEND_HAIER_AC160
+    case HAIER_AC160:
+    {
+      IRHaierAC160 ac(_pin, _inverted, _modulation);
+      haier160(&ac, send.power, send.mode, send.celsius, send.degrees,
+               send.fanspeed, send.swingv, send.turbo, send.filter, send.sleep);
+      break;
+    }
+#endif  // SEND_HAIER_AC160
 #if SEND_HAIER_AC176
     case HAIER_AC176:
     {
@@ -3876,6 +3928,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_HAIER_AC
+#if DECODE_HAIER_AC160
+      case decode_type_t::HAIER_AC160: {
+        IRHaierAC160 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_HAIER_AC160
 #if DECODE_HAIER_AC176
       case decode_type_t::HAIER_AC176: {
         IRHaierAC176 ac(kGpioUnused);
@@ -4351,6 +4410,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_HAIER_AC
+#if DECODE_HAIER_AC160
+      case decode_type_t::HAIER_AC160: {
+        IRHaierAC160 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HAIER_AC160
 #if DECODE_HAIER_AC176
       case decode_type_t::HAIER_AC176: {
         IRHaierAC176 ac(kGpioUnused);

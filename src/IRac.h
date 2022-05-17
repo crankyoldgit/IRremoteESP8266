@@ -275,6 +275,14 @@ void electra(IRElectraAc *ac,
              const bool filter, const int16_t sleep = -1,
              const int16_t clock = -1);
 #endif  // SEND_HAIER_AC
+#if SEND_HAIER_AC160
+  void haier160(IRHaierAC160 *ac,
+                const bool on, const stdAc::opmode_t mode, const bool celsius,
+                const float degrees, const stdAc::fanspeed_t fan,
+                const stdAc::swingv_t swingv,
+                const bool turbo, const bool quiet, const bool filter,
+                const int16_t sleep = -1);
+#endif  // SEND_HAIER_AC160
 #if SEND_HAIER_AC176
   void haier176(IRHaierAC176 *ac,
                 const haier_ac176_remote_model_t model, const bool on,
