@@ -684,6 +684,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kArgoBits;
     case CORONA_AC:
       return kCoronaAcBits;
+    case CARRIER_AC128:
+      return kCarrierAc128Bits;
     case DAIKIN:
       return kDaikinBits;
     case DAIKIN128:
@@ -1130,6 +1132,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendArgo(state, nbytes);
       break;
 #endif  // SEND_ARGO
+#if SEND_CARRIER_AC128
+    case CARRIER_AC128:
+      sendCarrierAC128(state, nbytes);
+      break;
+#endif  // SEND_CARRIER_AC128
 #if SEND_CORONA_AC
     case CORONA_AC:
       sendCoronaAc(state, nbytes);

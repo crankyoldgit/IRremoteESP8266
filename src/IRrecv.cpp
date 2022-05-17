@@ -1110,6 +1110,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Haier AC 160 bit decode");
     if (decodeHaierAC160(results, offset)) return true;
 #endif  // DECODE_HAIER_AC160
+#if DECODE_CARRIER_AC128
+    DPRINTLN("Attempting Carrier AC 128-bit decode");
+    if (decodeCarrierAC128(results, offset)) return true;
+#endif  // DECODE_CARRIER_AC128
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

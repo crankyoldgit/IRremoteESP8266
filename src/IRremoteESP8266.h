@@ -455,6 +455,13 @@
 #define SEND_CARRIER_AC64      _IR_ENABLE_DEFAULT_
 #endif  // SEND_CARRIER_AC64
 
+#ifndef DECODE_CARRIER_AC128
+#define DECODE_CARRIER_AC128   _IR_ENABLE_DEFAULT_
+#endif  // DECODE_CARRIER_AC128
+#ifndef SEND_CARRIER_AC128
+#define SEND_CARRIER_AC128     _IR_ENABLE_DEFAULT_
+#endif  // SEND_CARRIER_AC128
+
 #ifndef DECODE_HAIER_AC
 #define DECODE_HAIER_AC        _IR_ENABLE_DEFAULT_
 #endif  // DECODE_HAIER_AC
@@ -890,7 +897,7 @@
      DECODE_VOLTAS || DECODE_MIRAGE || DECODE_HAIER_AC176 || \
      DECODE_TEKNOPOINT || DECODE_KELON || DECODE_TROTEC_3550 || \
      DECODE_SANYO_AC88 || DECODE_RHOSS || DECODE_HITACHI_AC264 || \
-     DECODE_KELON168 || DECODE_HITACHI_AC296 || \
+     DECODE_KELON168 || DECODE_HITACHI_AC296 || DECODE_CARRIER_AC128 || \
      DECODE_DAIKIN200 || SEND_HAIER_AC160 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
@@ -1047,8 +1054,9 @@ enum decode_type_t {
   HITACHI_AC296,
   DAIKIN200,
   HAIER_AC160,  // 115
+  CARRIER_AC128,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = HAIER_AC160,
+  kLastDecodeType = CARRIER_AC128,
 };
 
 // Message lengths & required repeat values
@@ -1078,6 +1086,9 @@ const uint16_t kCarrierAc40Bits = 40;
 const uint16_t kCarrierAc40MinRepeat = 2;
 const uint16_t kCarrierAc64Bits = 64;
 const uint16_t kCarrierAc64MinRepeat = kNoRepeat;
+const uint16_t kCarrierAc128StateLength = 16;
+const uint16_t kCarrierAc128Bits = kCarrierAc128StateLength * 8;
+const uint16_t kCarrierAc128MinRepeat = kNoRepeat;
 const uint16_t kCoronaAcStateLengthShort = 7;
 const uint16_t kCoronaAcStateLength = kCoronaAcStateLengthShort * 3;
 const uint16_t kCoronaAcBitsShort = kCoronaAcStateLengthShort * 8;
