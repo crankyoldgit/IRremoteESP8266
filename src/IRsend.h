@@ -670,11 +670,16 @@ class IRsend {
   void sendVestelAc(const uint64_t data, const uint16_t nbits = kVestelAcBits,
                     const uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_TCL96AC
+  void sendTcl96Ac(const unsigned char data[],
+                    const uint16_t nbytes = kTcl96AcStateLength,
+                    const uint16_t repeat = kTcl96AcDefaultRepeat);
+#endif  // SEND_TCL96AC
 #if SEND_TCL112AC
   void sendTcl112Ac(const unsigned char data[],
                     const uint16_t nbytes = kTcl112AcStateLength,
                     const uint16_t repeat = kTcl112AcDefaultRepeat);
-#endif
+#endif  // SEND_TCL112AC
 #if SEND_TECO
   void sendTeco(const uint64_t data, const uint16_t nbits = kTecoBits,
                 const uint16_t repeat = kNoRepeat);

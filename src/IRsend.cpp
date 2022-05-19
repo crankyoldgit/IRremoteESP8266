@@ -768,6 +768,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kSanyoAc88Bits;
     case SHARP_AC:
       return kSharpAcBits;
+    case TCL96AC:
+      return kTcl96AcBits;
     case TCL112AC:
       return kTcl112AcBits;
     case TEKNOPOINT:
@@ -1349,6 +1351,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendSharpAc(state, nbytes);
       break;
 #endif  // SEND_SHARP_AC
+#if SEND_TCL96AC
+    case TCL96AC:
+      sendTcl96Ac(state, nbytes);
+      break;
+#endif  // SEND_TCL96AC
 #if SEND_TCL112AC
     case TCL112AC:
       sendTcl112Ac(state, nbytes);
