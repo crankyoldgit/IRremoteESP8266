@@ -20,21 +20,30 @@ const uint16_t kTotoOneSpace = 1634;
 const uint16_t kTotoZeroSpace = 516;
 const uint16_t kTotoGap = 38000;
 const uint16_t kTotoSpecialGap = 42482;
+const uint64_t kTotoPrefix = 0x2008;
+const uint16_t kTotoPrefixBits = 15;
 
 #if SEND_TOTO
 /// Send a Toto Toilet formatted message.
-/// Status: ALPHA / Untested.
+/// Status: BETA / Seems to work.
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1806
 void IRsend::sendToto(const uint64_t data, const uint16_t nbits,
                       const uint16_t repeat) {
-  sendGeneric(kTotoHdrMark, kTotoHdrSpace,
-              kTotoBitMark, kTotoOneSpace,
-              kTotoBitMark, kTotoZeroSpace,
-              kTotoBitMark, kTotoGap,
-              data, nbits, 38, true, repeat, kDutyDefault);
+  if (nbits <= kTotoShortBits) {  // Short code message.
+    sendGeneric(kTotoHdrMark, kTotoHdrSpace,
+                kTotoBitMark, kTotoOneSpace,
+                kTotoBitMark, kTotoZeroSpace,
+                kTotoBitMark, kTotoGap,
+                (kTotoPrefix << nbits) | data, nbits + kTotoPrefixBits,
+                38, true, repeat, kDutyDefault);
+  } else {  // Long code message
+    // This is really two messages sent at least one extra time each.
+    sendToto(GETBITS64(data, 0, kTotoShortBits), kTotoShortBits, repeat + 1);
+    sendToto(data >> kTotoShortBits, nbits - kTotoShortBits, repeat + 1);
+  }
 }
 #endif  // SEND_TOTO
 
@@ -50,35 +59,56 @@ void IRsend::sendToto(const uint64_t data, const uint16_t nbits,
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1806
 bool IRrecv::decodeToto(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
-  if (strict && nbits != kTotoBits)
-    return false;  // We expect Toto to be a certain sized message.
+  if (strict && nbits != kTotoShortBits && nbits != kTotoLongBits)
+    return false;  // We expect Toto to be a certain sized messages.
 
-  if (results->rawlen < (2 * nbits + kHeader + kFooter) *
-                        (kTotoDefaultRepeat + 1) - 1 + offset)
+  const uint16_t repeats = (nbits > kTotoShortBits) ? kTotoDefaultRepeat + 1
+                                                    : kTotoDefaultRepeat;
+  const uint16_t ksections = (nbits > kTotoShortBits) ? 2 : 1;
+
+  if (results->rawlen < (2 * (nbits + kTotoPrefixBits) + kHeader + kFooter) *
+                        (repeats + 1) - 1 + offset)
     return false;  // We don't have enough entries to possibly match.
 
-
-  uint64_t data = 0;
   uint16_t used = 0;
 
-  for (uint16_t r = 0; r <= kTotoDefaultRepeat; r++) {  // We expect a repeat.
-    // Match Header + Data + Footer + Gap
-    used = matchGeneric(results->rawbuf + offset, &data,
-                        results->rawlen - offset, nbits,
-                        kTotoHdrMark, kTotoHdrSpace,
-                        kTotoBitMark, kTotoOneSpace,
-                        kTotoBitMark, kTotoZeroSpace,
-                        kTotoBitMark, kTotoGap, true);
-    if (!used) return false;  // Didn't match, so fail.
-    offset += used;
-    if (r && data != results->value) return false;  // The repeat didn't match.
-    results->value = data;
+  // Long messages have two sections, short have only one.
+  for (uint16_t section = 1; section <= ksections; section++) {
+    results->value <<= (nbits / ksections);
+    uint64_t data = 0;
+    uint64_t repeat_data = 0;
+    for (uint16_t r = 0; r <= repeats; r++) {  // We expect a repeat.
+      uint64_t prefix = 0;
+      // Header + Prefix
+      used = matchGeneric(results->rawbuf + offset, &prefix,
+                          results->rawlen - offset, kTotoPrefixBits,
+                          kTotoHdrMark, kTotoHdrSpace,
+                          kTotoBitMark, kTotoOneSpace,
+                          kTotoBitMark, kTotoZeroSpace,
+                          0, 0, false);  // No Footer
+      if (!used) return false;  // Didn't match, so fail.
+      offset += used;
+      if (strict && (prefix != kTotoPrefix)) return false;
+      // Data + Footer + Gap
+      used = matchGeneric(results->rawbuf + offset, &data,
+                          results->rawlen - offset, nbits / ksections,
+                          0, 0,  // No Header
+                          kTotoBitMark, kTotoOneSpace,
+                          kTotoBitMark, kTotoZeroSpace,
+                          kTotoBitMark, kTotoGap, true);
+      if (!used) return false;  // Didn't match, so fail.
+      offset += used;
+
+      if (r && data != repeat_data) return false;  // Repeat didn't match.
+      repeat_data |= data;
+    }
+    results->value |= data;
   }
   // Success
   results->bits = nbits;
   results->decode_type = decode_type_t::TOTO;
-  results->command = 0;
-  results->address = 0;
+  results->command = GETBITS64(results->value, 0, kTotoBits);
+  results->address = results->value >> kTotoBits;
   return true;
 }
 #endif  // DECODE_TOTO

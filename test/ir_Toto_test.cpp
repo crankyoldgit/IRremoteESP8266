@@ -15,39 +15,6 @@ TEST(TestToto, Housekeeping) {
   ASSERT_EQ(kSingleRepeat, IRsend::minRepeats(decode_type_t::TOTO));
 }
 
-/*
-// Tests for sendToto().
-// Test sending typical data only.
-TEST(TestSendToto, SendDataOnly) {
-  IRsendTest irsend(kGpioUnused);
-  irsend.begin();
-
-  irsend.reset();
-  irsend.sendToto(0x5C32CD);  // Small flush.
-  EXPECT_EQ(
-    "",
-      irsend.outputStr());
-
-  irsend.reset();
-}
-
-// Test sending with different repeats.
-TEST(TestSendToto, SendWithRepeats) {
-  IRsendTest irsend(kGpioUnused);
-  irsend.begin();
-
-  irsend.reset();
-  irsend.sendToto(0x5C32CD, kTotoBits, 0);  // 0 repeats.
-  EXPECT_EQ(
-      "",
-      irsend.outputStr());
-  irsend.sendToto(0x5C32CD, kTotoBits, 2);  // 2 repeats.
-  EXPECT_EQ(
-      "",
-      irsend.outputStr());
-}
-
-*/
 // Tests for decodeToto().
 
 // Decode normal Toto messages.
@@ -63,9 +30,9 @@ TEST(TestDecodeToto, SyntheticDecode) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(TOTO, irsend.capture.decode_type);
   EXPECT_EQ(kTotoBits, irsend.capture.bits);
-  EXPECT_EQ(0x200800B0B0, irsend.capture.value);
+  EXPECT_EQ(0xB0B0, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
-  EXPECT_EQ(0, irsend.capture.command);
+  EXPECT_EQ(0xB0B0, irsend.capture.command);
 }
 
 // Decode real example via Issue #1806
@@ -100,7 +67,7 @@ TEST(TestDecodeToto, RealDecode) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(TOTO, irsend.capture.decode_type);
   EXPECT_EQ(kTotoBits, irsend.capture.bits);
-  EXPECT_EQ(0x200800B0B0, irsend.capture.value);
+  EXPECT_EQ(0xB0B0, irsend.capture.value);
   EXPECT_EQ(0, irsend.capture.address);
-  EXPECT_EQ(0, irsend.capture.command);
+  EXPECT_EQ(0xB0B0, irsend.capture.command);
 }

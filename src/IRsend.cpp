@@ -634,6 +634,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case MIDEA24:
     case NIKAI:
     case RCMM:
+    case TOTO:
     case TRANSCOLD:
       return 24;
     case LG:
@@ -657,8 +658,6 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return 35;
     case SAMSUNG36:
       return 36;
-    case TOTO:
-      return 39;
     case CARRIER_AC40:
       return kCarrierAc40Bits;  // 40
     case DOSHISHA:
