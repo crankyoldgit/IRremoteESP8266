@@ -1578,7 +1578,7 @@ void IRHaierAC160::setMode(uint8_t mode) {
     default:
       setMode(kHaierAcYrw02Auto);  // Unexpected, default to auto mode.
   }
-  _.AuxHeat = (_.Mode == kHaierAcYrw02Heat);  // Set this bit only if heat mode.
+  _.AuxHeating = (_.Mode == kHaierAcYrw02Heat);  // Set only if heat mode.
 }
 
 /// Get the operating mode setting of the A/C.
@@ -1749,6 +1749,17 @@ void IRHaierAC160::setQuiet(const bool on) {
       _.Button = kHaierAcYrw02ButtonTurbo;
       if (on) _.Turbo = false;
   }
+}
+
+/// Get the value of the Aux Heating setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRHaierAC160::getAuxHeating(void) const { return _.AuxHeating; }
+
+/// Change the Aux Heating setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRHaierAC160::setAuxHeating(const bool on) {
+  _.Button = kHaierAc160ButtonAuxHeating;
+  _.AuxHeating = on;
 }
 
 /// Get the value of the current Light toggle setting.
@@ -2071,6 +2082,9 @@ String IRHaierAC160::toString(void) const {
     case kHaierAc160ButtonLight:
       result += kLightStr;
       break;
+    case kHaierAc160ButtonAuxHeating:
+      result += kHeatingStr;
+      break;
     case kHaierAcYrw02ButtonCFAB:
       result += kCelsiusFahrenheitStr;
       break;
@@ -2137,6 +2151,7 @@ String IRHaierAC160::toString(void) const {
                               tmode != kHaierAcYrw02OnTimer) ?
       minsToString(getOffTimer()) : kOffStr, kOffTimerStr);
   result += addBoolToString(_.Lock, kLockStr);
+  result += addBoolToString(_.AuxHeating, kHeatingStr);
   return result;
 }
 // End of IRHaierAC160 class.

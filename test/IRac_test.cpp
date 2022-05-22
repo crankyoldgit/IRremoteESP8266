@@ -828,7 +828,7 @@ TEST(TestIRac, Haier160) {
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
       "Fan: 2 (Medium), Turbo: On, Quiet: Off, Swing(V): 4 (High), Sleep: On, "
       "Clean: On, Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, "
-      "Lock: Off";
+      "Lock: Off, Heating: Off";
   ac.begin();
   irac.haier160(&ac,
                 true,                                    // Power

@@ -195,6 +195,7 @@ const uint8_t kHaierAcYrw02ButtonSleep =    0b01011;
 const uint8_t kHaierAcYrw02ButtonTimer =    0b10000;
 const uint8_t kHaierAcYrw02ButtonLock =     0b10100;
 const uint8_t kHaierAc160ButtonLight =      0b10101;
+const uint8_t kHaierAc160ButtonAuxHeating = 0b10110;
 const uint8_t kHaierAc160ButtonClean =      0b11001;
 const uint8_t kHaierAcYrw02ButtonCFAB =     0b11010;
 
@@ -294,7 +295,7 @@ union HaierAc160Protocol{
     // Byte 4
     uint8_t             :6;
     uint8_t Power       :1;
-    uint8_t AuxHeat     :1;
+    uint8_t AuxHeating  :1;
     // Byte 5
     uint8_t OffTimerHrs :5;
     uint8_t Fan         :3;
@@ -604,6 +605,8 @@ class IRHaierAC160 {
   void setTurbo(const bool on);
   bool getQuiet(void) const;
   void setQuiet(const bool on);
+  bool getAuxHeating(void) const;
+  void setAuxHeating(const bool on);
 
   uint8_t getSwingV(void) const;
   void setSwingV(const uint8_t pos);

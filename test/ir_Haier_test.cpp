@@ -1590,7 +1590,8 @@ TEST(TestDecodeHaierAC160, RealExample) {
   EXPECT_EQ(
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 26C, Fan: 3 (Low), "
       "Turbo: Off, Quiet: Off, Swing(V): 12 (Auto), Sleep: Off, Clean: Off, "
-      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off",
+      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off, "
+      "Heating: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
@@ -1617,7 +1618,8 @@ TEST(TestDecodeHaierAC160, SyntheticExample) {
   EXPECT_EQ(
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 26C, Fan: 3 (Low), "
       "Turbo: Off, Quiet: Off, Swing(V): 12 (Auto), Sleep: Off, Clean: Off, "
-      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off",
+      "Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, Lock: Off, "
+      "Heating: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
@@ -1655,15 +1657,15 @@ TEST(TestHaierAC160Class, OperatingMode) {
 
   ac.setMode(kHaierAcYrw02Cool);
   EXPECT_EQ(kHaierAcYrw02Cool, ac.getMode());
-  EXPECT_FALSE(ac._.AuxHeat);
+  EXPECT_FALSE(ac.getAuxHeating());
 
   ac.setMode(kHaierAcYrw02Heat);
   EXPECT_EQ(kHaierAcYrw02Heat, ac.getMode());
-  EXPECT_TRUE(ac._.AuxHeat);
+  EXPECT_TRUE(ac.getAuxHeating());
 
   ac.setMode(kHaierAcYrw02Fan);
   EXPECT_EQ(kHaierAcYrw02Fan, ac.getMode());
-  EXPECT_FALSE(ac._.AuxHeat);
+  EXPECT_FALSE(ac.getAuxHeating());
 
   ac.setMode(kHaierAcYrw02Dry);
   EXPECT_EQ(kHaierAcYrw02Dry, ac.getMode());
@@ -1791,7 +1793,7 @@ TEST(TestHaierAC160Class, CleanMode) {
       "Power: On, Button: 25 (Clean), Mode: 1 (Cool), Temp: 26C, "
       "Fan: 3 (Low), Turbo: Off, Quiet: Off, Swing(V): 12 (Auto), "
       "Sleep: Off, Clean: On, Timer Mode: 0 (N/A), "
-      "On Timer: Off, Off Timer: Off, Lock: Off",
+      "On Timer: Off, Off Timer: Off, Lock: Off, Heating: Off",
       ac.toString());
   // No clean set.
   // https://docs.google.com/spreadsheets/d/1RNJ7esbArS5fy1lmiM-i1PekXSNojCMad4WuuyunsC8/edit#gid=2048081808&range=FR4
@@ -1804,7 +1806,7 @@ TEST(TestHaierAC160Class, CleanMode) {
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 26C, "
       "Fan: 3 (Low), Turbo: Off, Quiet: Off, Swing(V): 12 (Auto), "
       "Sleep: Off, Clean: Off, Timer Mode: 0 (N/A), "
-      "On Timer: Off, Off Timer: Off, Lock: Off",
+      "On Timer: Off, Off Timer: Off, Lock: Off, Heating: Off",
       ac.toString());
 }
 
@@ -1974,6 +1976,38 @@ TEST(TestHaierAC160Class, Light) {
       "Power: On, Button: 21 (Light), Mode: 1 (Cool), Temp: 26C, "
       "Fan: 3 (Low), Turbo: Off, Quiet: Off, Swing(V): 12 (Auto), "
       "Sleep: Off, Clean: Off, Timer Mode: 0 (N/A), "
-      "On Timer: Off, Off Timer: Off, Lock: Off",
+      "On Timer: Off, Off Timer: Off, Lock: Off, Heating: Off",
+      ac.toString());
+}
+
+TEST(TestHaierAC160Class, AuxHeating) {
+  IRHaierAC160 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setAuxHeating(true);
+  EXPECT_TRUE(ac.getAuxHeating());
+  EXPECT_EQ(kHaierAc160ButtonAuxHeating, ac.getButton());
+
+  ac.setButton(kHaierAcYrw02ButtonTempUp);
+  ac.setAuxHeating(false);
+  EXPECT_FALSE(ac.getAuxHeating());
+  EXPECT_EQ(kHaierAc160ButtonAuxHeating, ac.getButton());
+
+  ac.setAuxHeating(true);
+  EXPECT_TRUE(ac.getAuxHeating());
+  EXPECT_EQ(kHaierAc160ButtonAuxHeating, ac.getButton());
+
+  // https://docs.google.com/spreadsheets/d/1RNJ7esbArS5fy1lmiM-i1PekXSNojCMad4WuuyunsC8/edit#gid=2048081808&range=A124:W143
+  const uint8_t aux_button_off[kHaierAC160StateLength] = {
+      0xA6, 0xAC, 0x00, 0x00, 0x40, 0x60, 0x00, 0x80, 0x00, 0x00,
+      0x00, 0x00, 0x16, 0x88, 0xB5, 0x00, 0x60, 0x00, 0x00, 0x15};
+  ac.setRaw(aux_button_off);
+  EXPECT_FALSE(ac.getAuxHeating());
+  EXPECT_EQ(kHaierAc160ButtonAuxHeating, ac.getButton());
+  EXPECT_EQ(
+      "Power: On, Button: 22 (Heating), Mode: 4 (Heat), Temp: 26C, "
+      "Fan: 3 (Low), Turbo: Off, Quiet: Off, Swing(V): 12 (Auto), "
+      "Sleep: Off, Clean: Off, Timer Mode: 0 (N/A), "
+      "On Timer: Off, Off Timer: Off, Lock: Off, Heating: Off",
       ac.toString());
 }
