@@ -1115,8 +1115,9 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     if (decodeCarrierAC128(results, offset)) return true;
 #endif  // DECODE_CARRIER_AC128
 #if DECODE_TOTO
-    DPRINTLN("Attempting Toto 39-bit decode");
-    if (decodeToto(results, offset)) return true;
+    DPRINTLN("Attempting Toto 48/24-bit decode");
+    if (decodeToto(results, offset, kTotoLongBits) ||  // Long needs to be first
+        decodeToto(results, offset, kTotoShortBits)) return true;
 #endif  // DECODE_TOTO
   // Typically new protocols are added above this line.
   }
