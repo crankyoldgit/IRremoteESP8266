@@ -1751,6 +1751,20 @@ void IRHaierAC160::setQuiet(const bool on) {
   }
 }
 
+/// Get the value of the current Light toggle setting.
+/// @return true, the setting is on. false, the setting is off.
+/// @note This setting seems to be controlled just by the button setting.
+bool IRHaierAC160::getLightToggle(void) const {
+  return _.Button == kHaierAc160ButtonLight;
+}
+
+/// Set the Light Toggle setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+/// @note This setting seems to be controlled just by the button setting.
+void IRHaierAC160::setLightToggle(const bool on) {
+  _.Button = on ? kHaierAc160ButtonLight : kHaierAcYrw02ButtonPower;
+}
+
 /// Get the current fan speed setting.
 /// @return The current fan speed.
 uint8_t IRHaierAC160::getFan(void) const { return _.Fan; }
@@ -1970,9 +1984,19 @@ stdAc::swingv_t IRHaierAC160::toCommonSwingV(const uint8_t pos) {
 }
 
 /// Convert the current internal state into its stdAc::state_t equivalent.
+/// @param[in] prev Ptr to the previous state if required.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRHaierAC160::toCommon(void) const {
+stdAc::state_t IRHaierAC160::toCommon(const stdAc::state_t *prev) const {
   stdAc::state_t result{};
+  // Start with the previous state if given it.
+  if (prev != NULL) {
+    result = *prev;
+  } else {
+    // Set defaults for non-zero values that are not implicitly set for when
+    // there is no previous state.
+    // e.g. Any setting that toggles should probably go here.
+    result.light = false;
+  }
   result.protocol = decode_type_t::HAIER_AC160;
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
@@ -1985,11 +2009,11 @@ stdAc::state_t IRHaierAC160::toCommon(void) const {
   result.turbo = _.Turbo;
   result.quiet = _.Quiet;
   result.clean = _.Clean && _.Clean2;
+  result.light ^= getLightToggle();
   // Not supported.
   result.filter = false;
   result.model = -1;
   result.econo = false;
-  result.light = false;
   result.beep = true;
   result.clock = -1;
   return result;
@@ -2043,6 +2067,9 @@ String IRHaierAC160::toString(void) const {
       break;
     case kHaierAc160ButtonClean:
       result += kCleanStr;
+      break;
+    case kHaierAc160ButtonLight:
+      result += kLightStr;
       break;
     case kHaierAcYrw02ButtonCFAB:
       result += kCelsiusFahrenheitStr;

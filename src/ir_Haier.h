@@ -194,6 +194,7 @@ const uint8_t kHaierAcYrw02ButtonTurbo =    0b01000;
 const uint8_t kHaierAcYrw02ButtonSleep =    0b01011;
 const uint8_t kHaierAcYrw02ButtonTimer =    0b10000;
 const uint8_t kHaierAcYrw02ButtonLock =     0b10100;
+const uint8_t kHaierAc160ButtonLight =      0b10101;
 const uint8_t kHaierAc160ButtonClean =      0b11001;
 const uint8_t kHaierAcYrw02ButtonCFAB =     0b11010;
 
@@ -596,6 +597,8 @@ class IRHaierAC160 {
   void setSleep(const bool on);
   bool getClean(void) const;
   void setClean(const bool on);
+  bool getLightToggle(void) const;
+  void setLightToggle(const bool on);
 
   bool getTurbo(void) const;
   void setTurbo(const bool on);
@@ -627,7 +630,7 @@ class IRHaierAC160 {
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   static bool toCommonTurbo(const uint8_t speed);
   static bool toCommonQuiet(const uint8_t speed);
-  stdAc::state_t toCommon(void) const;
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL) const;
   String toString(void) const;
 #ifndef UNIT_TEST
 

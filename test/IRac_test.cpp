@@ -840,6 +840,8 @@ TEST(TestIRac, Haier160) {
                 true,                                    // Turbo
                 false,                                   // Quiet
                 true,                                    // Clean
+                true,                                    // Light
+                true,                                    // Light (prev)
                 8 * 60 + 0);                             // Sleep time
   ASSERT_EQ(expected, ac.toString());
   ac._irsend.makeDecodeResult();

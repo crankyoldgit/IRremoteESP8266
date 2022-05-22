@@ -1946,3 +1946,34 @@ TEST(TestHaierAC160Class, SwingV) {
   EXPECT_EQ(kHaierAc160SwingVLow, ac.getSwingV());
   EXPECT_EQ(kHaierAcYrw02ButtonTempUp, ac.getButton());
 }
+
+TEST(TestHaierAC160Class, Light) {
+  IRHaierAC160 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setLightToggle(true);
+  EXPECT_TRUE(ac.getLightToggle());
+  EXPECT_EQ(kHaierAc160ButtonLight, ac.getButton());
+
+  ac.setButton(kHaierAcYrw02ButtonTempUp);
+  ac.setLightToggle(false);
+  EXPECT_FALSE(ac.getLightToggle());
+  EXPECT_NE(kHaierAc160ButtonLight, ac.getButton());
+
+  ac.setLightToggle(true);
+  EXPECT_TRUE(ac.getLightToggle());
+  EXPECT_EQ(kHaierAc160ButtonLight, ac.getButton());
+
+  const uint8_t light_press[kHaierAC160StateLength] = {
+      0xA6, 0xAC, 0x00, 0x00, 0x40, 0x60, 0x00, 0x20, 0x00, 0x00,
+      0x00, 0x00, 0x15, 0x27, 0xB5, 0x00, 0x60, 0x00, 0x00, 0x15};
+  ac.setRaw(light_press);
+  EXPECT_TRUE(ac.getLightToggle());
+  EXPECT_EQ(kHaierAc160ButtonLight, ac.getButton());
+  EXPECT_EQ(
+      "Power: On, Button: 21 (Light), Mode: 1 (Cool), Temp: 26C, "
+      "Fan: 3 (Low), Turbo: Off, Quiet: Off, Swing(V): 12 (Auto), "
+      "Sleep: Off, Clean: Off, Timer Mode: 0 (N/A), "
+      "On Timer: Off, Off Timer: Off, Lock: Off",
+      ac.toString());
+}
