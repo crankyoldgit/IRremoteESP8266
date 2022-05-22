@@ -1515,7 +1515,7 @@ void IRHaierAC160::stateReset(void) {
   _.Model = kHaierAcYrw02ModelA;
   _.Prefix = kHaierAc160Prefix;
   _.Temp = kHaierAcYrw02DefTempC - kHaierAcYrw02MinTempC;
-  _.Health = true;
+  setClean(false);
   setFan(kHaierAcYrw02FanAuto);
   _.Power = true;
   _.Button = kHaierAcYrw02ButtonPower;
@@ -1549,6 +1549,7 @@ void IRHaierAC160::setButton(uint8_t button) {
     case kHaierAcYrw02ButtonTurbo:
     case kHaierAcYrw02ButtonSleep:
     case kHaierAcYrw02ButtonLock:
+    case kHaierAc160ButtonClean:
     case kHaierAcYrw02ButtonCFAB:
       _.Button = button;
   }
@@ -1676,17 +1677,17 @@ uint8_t IRHaierAC160::getTemp(void) const {
   return degree;
 }
 
-/// Set the Health (filter) setting of the A/C.
+/// Set the Clean setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRHaierAC160::setHealth(const bool on) {
-  _.Button = kHaierAcYrw02ButtonHealth;
-  _.Health = on;
-  _.Health2 = on;
+void IRHaierAC160::setClean(const bool on) {
+  _.Button = kHaierAc160ButtonClean;
+  _.Clean = on;
+  _.Clean2 = on;
 }
 
-/// Get the Health (filter) setting of the A/C.
+/// Get the Clean setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRHaierAC160::getHealth(void) const { return _.Health && _.Health2; }
+bool IRHaierAC160::getClean(void) const { return _.Clean && _.Clean2; }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
@@ -1980,15 +1981,15 @@ stdAc::state_t IRHaierAC160::toCommon(void) const {
   result.fanspeed = toCommonFanSpeed(_.Fan);
   result.swingv = toCommonSwingV(_.SwingV);
   result.swingh = stdAc::swingh_t::kOff;
-  result.filter = _.Health && _.Health2;
   result.sleep = _.Sleep ? 0 : -1;
   result.turbo = _.Turbo;
   result.quiet = _.Quiet;
+  result.clean = _.Clean && _.Clean2;
   // Not supported.
+  result.filter = false;
   result.model = -1;
   result.econo = false;
   result.light = false;
-  result.clean = false;
   result.beep = true;
   result.clock = -1;
   return result;
@@ -2040,6 +2041,9 @@ String IRHaierAC160::toString(void) const {
     case kHaierAcYrw02ButtonLock:
       result += kLockStr;
       break;
+    case kHaierAc160ButtonClean:
+      result += kCleanStr;
+      break;
     case kHaierAcYrw02ButtonCFAB:
       result += kCelsiusFahrenheitStr;
       break;
@@ -2071,7 +2075,7 @@ String IRHaierAC160::toString(void) const {
   }
   result += ')';
   result += addBoolToString(_.Sleep, kSleepStr);
-  result += addBoolToString(_.Health, kHealthStr);
+  result += addBoolToString(getClean(), kCleanStr);
   const uint8_t tmode = getTimerMode();
   result += addIntToString(tmode, kTimerModeStr);
   result += kSpaceLBraceStr;
