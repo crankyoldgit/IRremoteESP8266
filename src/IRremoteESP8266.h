@@ -1055,8 +1055,9 @@ enum decode_type_t {
   DAIKIN200,
   HAIER_AC160,  // 115
   CARRIER_AC128,
+  TESTEXAMPLE
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = CARRIER_AC128,
+  kLastDecodeType = TESTEXAMPLE,
 };
 
 // Message lengths & required repeat values
@@ -1321,6 +1322,8 @@ const uint16_t kBoseBits = 16;
 const uint16_t kRhossStateLength = 12;
 const uint16_t kRhossBits = kRhossStateLength * 8;
 const uint16_t kRhossDefaultRepeat = 0;
+
+const uint16_t kTestExampleBits = 52;
 
 
 // Legacy defines. (Deprecated)

@@ -822,6 +822,12 @@ class IRrecv {
                     const uint16_t nbits = kAirtonBits,
                     const bool strict = true);
 #endif  // DECODE_AIRTON
+#if DECODE_TESTEXAMPLE
+  bool decodeTestExample(decode_results *results,
+                         uint16_t offset = kStartOffset,
+                         const uint16_t nbits = kTestExampleBits,
+                         const bool strict = true);
+#endif  // DECODE_TESTEXAMPLE
 };
 
 #endif  // IRRECV_H_

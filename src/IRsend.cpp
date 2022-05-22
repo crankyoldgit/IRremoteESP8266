@@ -1072,6 +1072,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendTeco(data, nbits, min_repeat);
       break;
 #endif  // SEND_TECO
+#if SEND_TESTEXAMPLE
+    case TESTEXAMPLE:
+      sendTestExample(data, nbits, min_repeat);
+      break;
+#endif  // SEND_TESTEXAMPLE
 #if SEND_TRANSCOLD
     case TRANSCOLD:
       sendTranscold(data, nbits, min_repeat);

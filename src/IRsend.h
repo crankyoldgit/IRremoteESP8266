@@ -806,6 +806,10 @@ class IRsend {
   void sendAirton(const uint64_t data, const uint16_t nbits = kAirtonBits,
                   const uint16_t repeat = kAirtonDefaultRepeat);
 #endif  // SEND_AIRTON
+#if SEND_TESTEXAMPLE
+  void sendTestExample(const uint64_t data, const uint16_t nbits = kTestExampleBits,
+                       const uint16_t repeat = kNoRepeat);
+#endif  // SEND_TESTEXAMPLE
 
  protected:
 #ifdef UNIT_TEST
