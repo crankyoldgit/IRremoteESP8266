@@ -822,12 +822,12 @@ class IRrecv {
                     const uint16_t nbits = kAirtonBits,
                     const bool strict = true);
 #endif  // DECODE_AIRTON
-#if DECODE_TESTEXAMPLE
-  bool decodeTestExample(decode_results *results,
+#if DECODE_CLIMATEBUTLER
+  bool decodeClimateButler(decode_results *results,
                          uint16_t offset = kStartOffset,
-                         const uint16_t nbits = kTestExampleBits,
+                         const uint16_t nbits = kClimateButlerBits,
                          const bool strict = true);
-#endif  // DECODE_TESTEXAMPLE
+#endif  // DECODE_CLIMATEBUTLER
 };
 
 #endif  // IRRECV_H_

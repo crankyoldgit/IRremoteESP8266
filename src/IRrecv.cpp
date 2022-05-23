@@ -1114,10 +1114,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Carrier AC 128-bit decode");
     if (decodeCarrierAC128(results, offset)) return true;
 #endif  // DECODE_CARRIER_AC128
-#if DECODE_TESTEXAMPLE
-    DPRINTLN("Attempting TestExample decode");
-    if (decodeTestExample(results)) return true;
-#endif  // DECODE_TESTEXAMPLE
+#if DECODE_CLIMATEBUTLER
+    DPRINTLN("Attempting ClimateButler decode");
+    if (decodeClimateButler(results)) return true;
+#endif  // DECODE_CLIMATEBUTLER
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
