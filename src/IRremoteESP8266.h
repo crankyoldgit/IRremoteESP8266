@@ -882,12 +882,21 @@
 #define SEND_HAIER_AC160    _IR_ENABLE_DEFAULT_
 #endif  // SEND_HAIER_AC160
 
+<<<<<<< HEAD
 #ifndef DECODE_CLIMATEBUTLER
 #define DECODE_CLIMATEBUTLER  _IR_ENABLE_DEFAULT_
 #endif  // DECODE_CLIMATEBUTLER
 #ifndef SEND_CLIMATEBUTLER
 #define SEND_CLIMATEBUTLER    _IR_ENABLE_DEFAULT_
 #endif  // SEND_CLIMATEBUTLER
+=======
+#ifndef DECODE_TOTO
+#define DECODE_TOTO         _IR_ENABLE_DEFAULT_
+#endif  // DECODE_TOTO
+#ifndef SEND_TOTO
+#define SEND_TOTO           _IR_ENABLE_DEFAULT_
+#endif  // SEND_TOTO
+>>>>>>> 0f9485700f1847bdc536fe032000388fc7f2c950
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
@@ -1062,9 +1071,15 @@ enum decode_type_t {
   DAIKIN200,
   HAIER_AC160,  // 115
   CARRIER_AC128,
+<<<<<<< HEAD
   CLIMATEBUTLER,
   // Add new entries before this one, and update it to point to the last entry.
   kLastDecodeType = CLIMATEBUTLER,
+=======
+  TOTO,
+  // Add new entries before this one, and update it to point to the last entry.
+  kLastDecodeType = TOTO,
+>>>>>>> 0f9485700f1847bdc536fe032000388fc7f2c950
 };
 
 // Message lengths & required repeat values
@@ -1306,6 +1321,10 @@ const uint16_t kToshibaACStateLengthShort = kToshibaACStateLength - 2;
 const uint16_t kToshibaACBitsShort = kToshibaACStateLengthShort * 8;
 const uint16_t kToshibaACStateLengthLong = kToshibaACStateLength + 1;
 const uint16_t kToshibaACBitsLong = kToshibaACStateLengthLong * 8;
+const uint16_t kTotoBits = 24;
+const uint16_t kTotoShortBits = kTotoBits;
+const uint16_t kTotoLongBits = kTotoShortBits * 2;
+const uint16_t kTotoDefaultRepeat = kSingleRepeat;
 const uint16_t kTranscoldBits = 24;
 const uint16_t kTranscoldDefaultRepeat = kNoRepeat;
 const uint16_t kTrotecStateLength = 9;

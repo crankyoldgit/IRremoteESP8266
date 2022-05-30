@@ -571,6 +571,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case MULTIBRACKETS:
     case SHERWOOD:
     case TOSHIBA_AC:
+    case TOTO:
       return kSingleRepeat;
     // Special
     case AIRWELL:
@@ -633,6 +634,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case MIDEA24:
     case NIKAI:
     case RCMM:
+    case TOTO:
     case TRANSCOLD:
       return 24;
     case LG:
@@ -1077,6 +1079,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendTeco(data, nbits, min_repeat);
       break;
 #endif  // SEND_TECO
+#if SEND_TOTO
+    case TOTO:
+      sendToto(data, nbits, min_repeat);
+      break;
+#endif  // SEND_TOTO
 #if SEND_TRANSCOLD
     case TRANSCOLD:
       sendTranscold(data, nbits, min_repeat);
