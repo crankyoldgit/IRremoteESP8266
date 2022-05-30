@@ -806,10 +806,10 @@ class IRsend {
   void sendAirton(const uint64_t data, const uint16_t nbits = kAirtonBits,
                   const uint16_t repeat = kAirtonDefaultRepeat);
 #endif  // SEND_AIRTON
-#if SEND_CLIMATEBUTLER
-  void sendClimateButler(const uint64_t data, const uint16_t nbits = kClimateButlerBits,
+#if SEND_CLIMABUTLER
+  void sendClimaButler(const uint64_t data, const uint16_t nbits = kClimaButlerBits,
                        const uint16_t repeat = kNoRepeat);
-#endif  // SEND_CLIMATEBUTLER
+#endif  // SEND_CLIMABUTLER
 
  protected:
 #ifdef UNIT_TEST
