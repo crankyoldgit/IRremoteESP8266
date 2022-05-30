@@ -882,21 +882,19 @@
 #define SEND_HAIER_AC160    _IR_ENABLE_DEFAULT_
 #endif  // SEND_HAIER_AC160
 
-<<<<<<< HEAD
-#ifndef DECODE_CLIMATEBUTLER
-#define DECODE_CLIMATEBUTLER  _IR_ENABLE_DEFAULT_
-#endif  // DECODE_CLIMATEBUTLER
-#ifndef SEND_CLIMATEBUTLER
-#define SEND_CLIMATEBUTLER    _IR_ENABLE_DEFAULT_
-#endif  // SEND_CLIMATEBUTLER
-=======
 #ifndef DECODE_TOTO
 #define DECODE_TOTO         _IR_ENABLE_DEFAULT_
 #endif  // DECODE_TOTO
 #ifndef SEND_TOTO
 #define SEND_TOTO           _IR_ENABLE_DEFAULT_
 #endif  // SEND_TOTO
->>>>>>> 0f9485700f1847bdc536fe032000388fc7f2c950
+
+#ifndef DECODE_CLIMATEBUTLER
+#define DECODE_CLIMATEBUTLER  _IR_ENABLE_DEFAULT_
+#endif  // DECODE_CLIMATEBUTLER
+#ifndef SEND_CLIMATEBUTLER
+#define SEND_CLIMATEBUTLER    _IR_ENABLE_DEFAULT_
+#endif  // SEND_CLIMATEBUTLER
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
@@ -1071,15 +1069,10 @@ enum decode_type_t {
   DAIKIN200,
   HAIER_AC160,  // 115
   CARRIER_AC128,
-<<<<<<< HEAD
+  TOTO,
   CLIMATEBUTLER,
   // Add new entries before this one, and update it to point to the last entry.
   kLastDecodeType = CLIMATEBUTLER,
-=======
-  TOTO,
-  // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = TOTO,
->>>>>>> 0f9485700f1847bdc536fe032000388fc7f2c950
 };
 
 // Message lengths & required repeat values
