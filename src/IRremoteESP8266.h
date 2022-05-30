@@ -889,6 +889,13 @@
 #define SEND_TOTO           _IR_ENABLE_DEFAULT_
 #endif  // SEND_TOTO
 
+#ifndef DECODE_CLIMATEBUTLER
+#define DECODE_CLIMATEBUTLER  _IR_ENABLE_DEFAULT_
+#endif  // DECODE_CLIMATEBUTLER
+#ifndef SEND_CLIMATEBUTLER
+#define SEND_CLIMATEBUTLER    _IR_ENABLE_DEFAULT_
+#endif  // SEND_CLIMATEBUTLER
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -1063,8 +1070,9 @@ enum decode_type_t {
   HAIER_AC160,  // 115
   CARRIER_AC128,
   TOTO,
+  CLIMATEBUTLER,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = TOTO,
+  kLastDecodeType = CLIMATEBUTLER,
 };
 
 // Message lengths & required repeat values
@@ -1333,6 +1341,7 @@ const uint16_t kBoseBits = 16;
 const uint16_t kRhossStateLength = 12;
 const uint16_t kRhossBits = kRhossStateLength * 8;
 const uint16_t kRhossDefaultRepeat = 0;
+const uint16_t kClimateButlerBits = 52;
 
 
 // Legacy defines. (Deprecated)

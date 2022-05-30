@@ -841,6 +841,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendCarrierAC64(data, nbits, min_repeat);
       break;
 #endif  // SEND_CARRIER_AC64
+#if SEND_CLIMABUTLER
+    case CLIMABUTLER:
+      sendClimaButler(data, nbits, min_repeat);
+      break;
+#endif  // SEND_CLIMABUTLER
 #if SEND_COOLIX
     case COOLIX:
       sendCOOLIX(data, nbits, min_repeat);

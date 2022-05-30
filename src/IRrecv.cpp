@@ -1119,6 +1119,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     if (decodeToto(results, offset, kTotoLongBits) ||  // Long needs to be first
         decodeToto(results, offset, kTotoShortBits)) return true;
 #endif  // DECODE_TOTO
+#if DECODE_CLIMABUTLER
+    DPRINTLN("Attempting ClimaButler decode");
+    if (decodeClimaButler(results)) return true;
+#endif  // DECODE_CLIMABUTLER
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
