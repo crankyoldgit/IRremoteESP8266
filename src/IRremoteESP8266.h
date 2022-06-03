@@ -1401,7 +1401,7 @@ const uint16_t kClimaButlerBits = 52;
 #define WHYNTER_BITS                  kWhynterBits
 
 // Turn on Debugging information by uncommenting the following line.
-//#define DEBUG 1
+// #define DEBUG 1
 
 #ifdef DEBUG
 #ifdef UNIT_TEST

@@ -670,6 +670,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case MIDEA:
     case PANASONIC:
       return 48;
+    case CLIMABUTLER:
+      return kClimaButlerBits;  // 52
     case AIRTON:
     case ECOCLIM:
     case MAGIQUEST:
