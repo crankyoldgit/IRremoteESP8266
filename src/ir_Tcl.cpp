@@ -1,4 +1,4 @@
-// Copyright 2019, 2021 David Conran
+// Copyright 2019, 2021, 2022 David Conran
 
 /// @file
 /// @brief Support for TCL protocols.
@@ -24,8 +24,8 @@ const uint32_t kTcl96AcGap = kDefaultMessageGap;  // Just a guess.
 const uint8_t  kTcl96AcSpaceCount = 4;
 const uint16_t kTcl96AcBitSpaces[kTcl96AcSpaceCount] = {360,    // 0b00
                                                         838,    // 0b01
-                                                        1444,   // 0b10
-                                                        2182};  // 0b11
+                                                        2182,   // 0b10
+                                                        1444};  // 0b11
 
 using irutils::addBoolToString;
 using irutils::addFanToString;
