@@ -810,6 +810,11 @@ class IRsend {
   void sendToto(const uint64_t data, const uint16_t nbits = kTotoBits,
                 const uint16_t repeat = kTotoDefaultRepeat);
 #endif  // SEND_TOTO
+#if SEND_CLIMABUTLER
+  void sendClimaButler(const uint64_t data,
+                       const uint16_t nbits = kClimaButlerBits,
+                       const uint16_t repeat = kNoRepeat);
+#endif  // SEND_CLIMABUTLER
 
  protected:
 #ifdef UNIT_TEST
