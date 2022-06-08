@@ -609,6 +609,13 @@
 #define SEND_TECO              _IR_ENABLE_DEFAULT_
 #endif  // SEND_TECO
 
+#ifndef DECODE_TCL96AC
+#define DECODE_TCL96AC        _IR_ENABLE_DEFAULT_
+#endif  // DECODE_TCL96AC
+#ifndef SEND_TCL96AC
+#define SEND_TCL96AC          _IR_ENABLE_DEFAULT_
+#endif  // SEND_TCL96AC
+
 #ifndef DECODE_TCL112AC
 #define DECODE_TCL112AC        _IR_ENABLE_DEFAULT_
 #endif  // DECODE_TCL112AC
@@ -912,7 +919,7 @@
      DECODE_TEKNOPOINT || DECODE_KELON || DECODE_TROTEC_3550 || \
      DECODE_SANYO_AC88 || DECODE_RHOSS || DECODE_HITACHI_AC264 || \
      DECODE_KELON168 || DECODE_HITACHI_AC296 || DECODE_CARRIER_AC128 || \
-     DECODE_DAIKIN200 || SEND_HAIER_AC160 || \
+     DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1071,8 +1078,9 @@ enum decode_type_t {
   CARRIER_AC128,
   TOTO,
   CLIMABUTLER,
+  TCL96AC,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = CLIMABUTLER,
+  kLastDecodeType = TCL96AC,
 };
 
 // Message lengths & required repeat values
@@ -1300,6 +1308,9 @@ const uint16_t kSonyMinBits = 12;
 const uint16_t kSonyMinRepeat = 2;
 const uint16_t kSymphonyBits = 12;
 const uint16_t kSymphonyDefaultRepeat = 3;
+const uint16_t kTcl96AcStateLength = 12;
+const uint16_t kTcl96AcBits = kTcl96AcStateLength * 8;
+const uint16_t kTcl96AcDefaultRepeat = kNoRepeat;
 const uint16_t kTcl112AcStateLength = 14;
 const uint16_t kTcl112AcBits = kTcl112AcStateLength * 8;
 const uint16_t kTcl112AcDefaultRepeat = kNoRepeat;

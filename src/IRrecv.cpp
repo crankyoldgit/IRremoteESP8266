@@ -1123,6 +1123,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting ClimaButler decode");
     if (decodeClimaButler(results)) return true;
 #endif  // DECODE_CLIMABUTLER
+#if DECODE_TCL96AC
+    DPRINTLN("Attempting TCL AC 96-bit decode");
+    if (decodeTcl96Ac(results, offset)) return true;
+#endif  // DECODE_TCL96AC
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

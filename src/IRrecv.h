@@ -833,6 +833,12 @@ class IRrecv {
                          const uint16_t nbits = kClimaButlerBits,
                          const bool strict = true);
 #endif  // DECODE_CLIMABUTLER
+#if DECODE_TCL96AC
+  bool decodeTcl96Ac(decode_results *results,
+                     uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kTcl96AcBits,
+                     const bool strict = true);
+#endif  // DECODE_TCL96AC
 };
 
 #endif  // IRRECV_H_
