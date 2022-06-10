@@ -839,6 +839,12 @@ class IRrecv {
                      const uint16_t nbits = kTcl96AcBits,
                      const bool strict = true);
 #endif  // DECODE_TCL96AC
+#if DECODE_BOSCH144
+  bool decodeBosch144(decode_results *results,
+                      uint16_t offset = kStartOffset,
+                      const uint16_t nbits = kBosch144Bits,
+                      const bool strict = true);
+#endif  // DECODE_BOSCH144
 };
 
 #endif  // IRRECV_H_

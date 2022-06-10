@@ -820,6 +820,11 @@ class IRsend {
                        const uint16_t nbits = kClimaButlerBits,
                        const uint16_t repeat = kNoRepeat);
 #endif  // SEND_CLIMABUTLER
+#if SEND_BOSCH144
+  void sendBosch144(const unsigned char data[],
+                    const uint16_t nbytes = kBosch144StateLength,
+                    const uint16_t repeat = kNoRepeat);
+#endif  // SEND_BOSCH144
 
  protected:
 #ifdef UNIT_TEST

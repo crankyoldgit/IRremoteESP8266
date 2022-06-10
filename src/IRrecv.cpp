@@ -729,6 +729,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Sharp decode");
     if (decodeSharp(results, offset)) return true;
 #endif
+#if DECODE_BOSCH144
+    DPRINTLN("Attempting Bosch 144-bit decode");
+    // Bosch is similar to Coolix, so it must be attempted before decodeCOOLIX.
+    if (decodeBosch144(results, offset)) return true;
+#endif  // DECODE_BOSCH144
 #if DECODE_COOLIX
     DPRINTLN("Attempting Coolix 24-bit decode");
     if (decodeCOOLIX(results, offset)) return true;
