@@ -28,7 +28,7 @@ const uint16_t kBosch144NrOfSections = 3;
 
 #if SEND_BOSCH144
 /// Send a Bosch 144-bit / 18-byte message
-/// Status: ALPHA / Untested.
+/// Status: STABLE / Confirmed Working.
 /// @param[in] data The message to be sent.
 /// @param[in] nbytes The number of bytes of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
@@ -58,7 +58,7 @@ void IRsend::sendBosch144(const unsigned char data[], const uint16_t nbytes,
 
 #if DECODE_BOSCH144
 /// Decode the supplied Bosch 144-bit / 18-byte A/C message.
-/// Status: BETA / Probably Working.
+/// Status: STABLE / Confirmed Working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
