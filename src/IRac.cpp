@@ -3472,6 +3472,8 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return gree_ac_remote_model_t::YAW1F;
   } else if (!STRCASECMP(str, kYbofbStr)) {
     return gree_ac_remote_model_t::YBOFB;
+  } else if (!STRCASECMP(str, kYx1fsfStr)) {
+    return gree_ac_remote_model_t::YX1FSF;
   // Haier models
   } else if (!STRCASECMP(str, kV9014557AStr)) {
     return haier_ac176_remote_model_t::V9014557_A;

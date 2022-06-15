@@ -609,9 +609,10 @@ namespace irutils {
         break;
       case decode_type_t::GREE:
         switch (model) {
-          case gree_ac_remote_model_t::YAW1F: return kYaw1fStr;
-          case gree_ac_remote_model_t::YBOFB: return kYbofbStr;
-          default:                            return kUnknownStr;
+          case gree_ac_remote_model_t::YAW1F:  return kYaw1fStr;
+          case gree_ac_remote_model_t::YBOFB:  return kYbofbStr;
+          case gree_ac_remote_model_t::YX1FSF: return kYx1fsfStr;
+          default:                             return kUnknownStr;
         }
         break;
       case decode_type_t::HAIER_AC176:
