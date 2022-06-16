@@ -903,6 +903,13 @@
 #define SEND_CLIMABUTLER    _IR_ENABLE_DEFAULT_
 #endif  // SEND_CLIMABUTLER
 
+#ifndef DECODE_BOSCH144
+#define DECODE_BOSCH144     _IR_ENABLE_DEFAULT_
+#endif  // DECODE_BOSCH144
+#ifndef SEND_BOSCH144
+#define SEND_BOSCH144       _IR_ENABLE_DEFAULT_
+#endif  // SEND_BOSCH144
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -920,6 +927,7 @@
      DECODE_SANYO_AC88 || DECODE_RHOSS || DECODE_HITACHI_AC264 || \
      DECODE_KELON168 || DECODE_HITACHI_AC296 || DECODE_CARRIER_AC128 || \
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
+     DECODE_BOSCH144 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1079,8 +1087,9 @@ enum decode_type_t {
   TOTO,
   CLIMABUTLER,
   TCL96AC,
+  BOSCH144,  // 120
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = TCL96AC,
+  kLastDecodeType = BOSCH144,
 };
 
 // Message lengths & required repeat values
@@ -1101,6 +1110,8 @@ const uint16_t kArgoStateLength = 12;
 const uint16_t kArgoBits = kArgoStateLength * 8;
 const uint16_t kArgoDefaultRepeat = kNoRepeat;
 const uint16_t kArrisBits = 32;
+const uint16_t kBosch144StateLength = 18;
+const uint16_t kBosch144Bits = kBosch144StateLength * 8;
 const uint16_t kCoolixBits = 24;
 const uint16_t kCoolix48Bits = kCoolixBits * 2;
 const uint16_t kCoolixDefaultRepeat = kSingleRepeat;

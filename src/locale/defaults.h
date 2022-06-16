@@ -706,6 +706,12 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_ARRIS
 #define D_STR_ARRIS "ARRIS"
 #endif  // D_STR_ARRIS
+#ifndef D_STR_BOSCH
+#define D_STR_BOSCH "BOSCH"
+#endif  // D_STR_BOSCH
+#ifndef D_STR_BOSCH144
+#define D_STR_BOSCH144 D_STR_BOSCH "144"
+#endif  // D_STR_BOSCH144
 #ifndef D_STR_BOSE
 #define D_STR_BOSE "BOSE"
 #endif  // D_STR_BOSE
