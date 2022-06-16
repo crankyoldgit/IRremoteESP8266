@@ -235,6 +235,7 @@ extern IRTEXT_CONST_PTR(kXFanStr);
 extern IRTEXT_CONST_PTR(kYaw1fStr);
 extern IRTEXT_CONST_PTR(kYbofbStr);
 extern IRTEXT_CONST_PTR(kYesStr);
+extern IRTEXT_CONST_PTR(kYx1fsfStr);
 extern IRTEXT_CONST_PTR(kZoneFollowStr);
 extern IRTEXT_CONST_PTR(kAllProtocolNamesStr);
 

@@ -566,6 +566,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_YBOFB
 #define D_STR_YBOFB "YBOFB"
 #endif  // D_STR_YBOFB
+#ifndef D_STR_YX1FSF
+#define D_STR_YX1FSF "YX1FSF"
+#endif  // D_STR_YX1FSF
 #ifndef D_STR_V9014557_A
 #define D_STR_V9014557_A "V9014557-A"
 #endif  // D_STR_V9014557_A
