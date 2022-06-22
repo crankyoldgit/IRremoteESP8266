@@ -1132,6 +1132,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting TCL AC 96-bit decode");
     if (decodeTcl96Ac(results, offset)) return true;
 #endif  // DECODE_TCL96AC
+#if DECODE_SANYO_AC152
+    DPRINTLN("Attempting Sanyo AC 152-bit decode");
+    if (decodeSanyoAc152(results, offset)) return true;
+#endif  // DECODE_SANYO_AC152
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

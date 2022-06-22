@@ -238,6 +238,13 @@
 #define SEND_SANYO_AC88        _IR_ENABLE_DEFAULT_
 #endif  // SEND_SANYO_AC88
 
+#ifndef DECODE_SANYO_AC152
+#define DECODE_SANYO_AC152     _IR_ENABLE_DEFAULT_
+#endif  // DECODE_SANYO_AC152
+#ifndef SEND_SANYO_AC152
+#define SEND_SANYO_AC152       _IR_ENABLE_DEFAULT_
+#endif  // SEND_SANYO_AC152
+
 #ifndef DECODE_MITSUBISHI
 #define DECODE_MITSUBISHI      _IR_ENABLE_DEFAULT_
 #endif  // DECODE_MITSUBISHI
@@ -927,7 +934,7 @@
      DECODE_SANYO_AC88 || DECODE_RHOSS || DECODE_HITACHI_AC264 || \
      DECODE_KELON168 || DECODE_HITACHI_AC296 || DECODE_CARRIER_AC128 || \
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
-     DECODE_BOSCH144 || \
+     DECODE_BOSCH144 || DECODE_SANYO_AC152 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1088,8 +1095,9 @@ enum decode_type_t {
   CLIMABUTLER,
   TCL96AC,
   BOSCH144,  // 120
+  SANYO_AC152,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = BOSCH144,
+  kLastDecodeType = SANYO_AC152,
 };
 
 // Message lengths & required repeat values
@@ -1299,6 +1307,9 @@ const uint16_t kSanyoAcBits = kSanyoAcStateLength * 8;
 const uint16_t kSanyoAc88StateLength = 11;
 const uint16_t kSanyoAc88Bits = kSanyoAc88StateLength * 8;
 const uint16_t kSanyoAc88MinRepeat = 2;
+const uint16_t kSanyoAc152StateLength = 19;
+const uint16_t kSanyoAc152Bits = kSanyoAc152StateLength * 8;
+const uint16_t kSanyoAc152MinRepeat = kNoRepeat;
 const uint16_t kSanyoSA8650BBits = 12;
 const uint16_t kSanyoLC7461AddressBits = 13;
 const uint16_t kSanyoLC7461CommandBits = 8;

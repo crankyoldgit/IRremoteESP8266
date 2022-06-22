@@ -404,6 +404,7 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     D_STR_CLIMABUTLER "\x0"
     D_STR_TCL96AC "\x0"
     D_STR_BOSCH144 "\x0"
+    D_STR_SANYO_AC152 "\x0"
     ///< New protocol strings should be added just above this line.
     "\x0"  ///< This string requires double null termination.
 };
