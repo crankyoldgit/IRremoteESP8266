@@ -23,6 +23,7 @@
 //   Brand: Sanyo,  Model: SAP-K242AH A/C (SANYO_AC)
 //   Brand: Sanyo,  Model: RCS-2S4E remote (SANYO_AC)
 //   Brand: Sanyo,  Model: RCS-4MHVPIS4EE remote (SANYO_AC152)
+//   Brand: Sanyo,  Model: SAP-KMRV124EHE A/C (SANYO_AC152)
 
 #ifndef IR_SANYO_H_
 #define IR_SANYO_H_
