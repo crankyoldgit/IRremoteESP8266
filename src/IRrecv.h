@@ -325,6 +325,12 @@ class IRrecv {
                        const uint16_t nbits = kSanyoAc88Bits,
                        const bool strict = true);
 #endif  // DECODE_SANYO_AC88
+#if DECODE_SANYO_AC152
+  bool decodeSanyoAc152(decode_results *results,
+                        uint16_t offset = kStartOffset,
+                        const uint16_t nbits = kSanyoAc152Bits,
+                        const bool strict = true);
+#endif  // DECODE_SANYO_AC152
 #if DECODE_MITSUBISHI
   bool decodeMitsubishi(decode_results *results, uint16_t offset = kStartOffset,
                         const uint16_t nbits = kMitsubishiBits,
