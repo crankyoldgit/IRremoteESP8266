@@ -522,7 +522,12 @@ class IRrecv {
   bool decodeDaikin216(decode_results *results, uint16_t offset = kStartOffset,
                        const uint16_t nbits = kDaikin216Bits,
                        const bool strict = true);
-#endif
+#endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN312
+  bool decodeDaikin312(decode_results *results, uint16_t offset = kStartOffset,
+                       const uint16_t nbits = kDaikin312Bits,
+                       const bool strict = true);
+#endif  // DECODE_DAIKIN312
 #if DECODE_TOSHIBA_AC
   bool decodeToshibaAC(decode_results *results, uint16_t offset = kStartOffset,
                        const uint16_t nbits = kToshibaACBits,

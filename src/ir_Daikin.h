@@ -691,6 +691,18 @@ const uint16_t kDaikin200Section1Length = 7;
 const uint16_t kDaikin200Section2Length = kDaikin200StateLength -
                                           kDaikin200Section1Length;
 
+const uint16_t kDaikin312HdrMark = 3518;
+const uint16_t kDaikin312HdrSpace = 1688;
+const uint16_t kDaikin312BitMark = 453;
+const uint16_t kDaikin312ZeroSpace = 414;
+const uint16_t kDaikin312OneSpace = 1275;
+const uint16_t kDaikin312HdrGap = 25100;
+const uint16_t kDaikin312SectionGap = 35512;
+const uint16_t kDaikin312Sections = 2;
+const uint16_t kDaikin312Section1Length = 20;
+const uint16_t kDaikin312Section2Length = kDaikin312StateLength -
+                                          kDaikin312Section1Length;
+
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
 #define DAIKIN_HEAT kDaikinHeat
