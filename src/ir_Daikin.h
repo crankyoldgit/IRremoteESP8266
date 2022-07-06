@@ -1,6 +1,6 @@
 // Copyright 2016 sillyfrog
 // Copyright 2017 sillyfrog, crankyoldgit
-// Copyright 2018-2021 crankyoldgit
+// Copyright 2018-2022 crankyoldgit
 // Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 
 /// @file
@@ -22,6 +22,7 @@
 /// @see Daikin216 https://github.com/danny-source/Arduino_DY_IRDaikin
 /// @see Daikin64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
 /// @see Daikin200 https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
+/// @see Daikin312 https://github.com/crankyoldgit/IRremoteESP8266/issues/1829
 
 // Supports:
 //   Brand: Daikin,  Model: ARC433** remote (DAIKIN)
@@ -50,6 +51,8 @@
 //   Brand: Daikin,  Model: ARC484A4 remote (DAIKIN216)
 //   Brand: Daikin,  Model: FTQ60TV16U2 A/C (DAIKIN216)
 //   Brand: Daikin,  Model: BRC4M150W16 remote (DAIKIN200)
+//   Brand: Daikin,  Model: FTXM20R5V1B A/C (DAIKIN312)
+//   Brand: Daikin,  Model: ARC466A67 remote (DAIKIN312)
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
