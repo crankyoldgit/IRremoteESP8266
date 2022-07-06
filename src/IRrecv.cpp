@@ -1136,6 +1136,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Sanyo AC 152-bit decode");
     if (decodeSanyoAc152(results, offset)) return true;
 #endif  // DECODE_SANYO_AC152
+#if DECODE_DAIKIN312
+    DPRINTLN("Attempting Daikin 312-bit decode");
+    if (decodeDaikin312(results, offset)) return true;
+#endif  // DECODE_DAIKIN312
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

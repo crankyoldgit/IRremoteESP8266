@@ -917,6 +917,13 @@
 #define SEND_BOSCH144       _IR_ENABLE_DEFAULT_
 #endif  // SEND_BOSCH144
 
+#ifndef DECODE_DAIKIN312
+#define DECODE_DAIKIN312    _IR_ENABLE_DEFAULT_
+#endif  // DECODE_DAIKIN312
+#ifndef SEND_DAIKIN312
+#define SEND_DAIKIN312      _IR_ENABLE_DEFAULT_
+#endif  // SEND_DAIKIN312
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -934,7 +941,7 @@
      DECODE_SANYO_AC88 || DECODE_RHOSS || DECODE_HITACHI_AC264 || \
      DECODE_KELON168 || DECODE_HITACHI_AC296 || DECODE_CARRIER_AC128 || \
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
-     DECODE_BOSCH144 || DECODE_SANYO_AC152 || \
+     DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1096,8 +1103,9 @@ enum decode_type_t {
   TCL96AC,
   BOSCH144,  // 120
   SANYO_AC152,
+  DAIKIN312,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = SANYO_AC152,
+  kLastDecodeType = DAIKIN312,
 };
 
 // Message lengths & required repeat values
@@ -1164,6 +1172,9 @@ const uint16_t kDaikin200DefaultRepeat = kNoRepeat;
 const uint16_t kDaikin216StateLength = 27;
 const uint16_t kDaikin216Bits = kDaikin216StateLength * 8;
 const uint16_t kDaikin216DefaultRepeat = kNoRepeat;
+const uint16_t kDaikin312StateLength = 39;
+const uint16_t kDaikin312Bits = kDaikin312StateLength * 8;
+const uint16_t kDaikin312DefaultRepeat = kNoRepeat;
 const uint16_t kDelonghiAcBits = 64;
 const uint16_t kDelonghiAcDefaultRepeat = kNoRepeat;
 const uint16_t kTechnibelAcBits = 56;
