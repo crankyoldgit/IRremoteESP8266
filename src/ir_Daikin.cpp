@@ -3859,7 +3859,7 @@ void IRsend::sendDaikin312(const unsigned char data[], const uint16_t nbytes,
 
 #if DECODE_DAIKIN312
 /// Decode the supplied Daikin 312-bit / 39-byte message. (DAIKIN312)
-/// Status: BETA / Probably working.
+/// Status: STABLE / Confirmed working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
