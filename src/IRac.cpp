@@ -1642,6 +1642,7 @@ void IRac::mitsubishi(IRMitsubishiAC *ac,
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   ac->setVane(ac->convertSwingV(swingv));
+  ac->setVaneLeft(ac->convertSwingV(swingv));
   ac->setWideVane(ac->convertSwingH(swingh));
   if (quiet) ac->setFan(kMitsubishiAcFanSilent);
   ac->setISave10C(false);
