@@ -20,6 +20,7 @@
 #include "ir_Airwell.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
+#include "ir_Bosch.h"
 #include "ir_Carrier.h"
 #include "ir_Coolix.h"
 #include "ir_Corona.h"
@@ -160,6 +161,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_ARGO
     case decode_type_t::ARGO:
+#endif
+#if SEND_BOSCH144
+    case decode_type_t::BOSCH144:
 #endif
 #if SEND_CARRIER_AC64
     case decode_type_t::CARRIER_AC64:
@@ -458,6 +462,52 @@ void IRac::argo(IRArgoAC *ac,
   ac->send();
 }
 #endif  // SEND_ARGO
+
+#if SEND_BOSCH144
+/// Send a Bosch144 A/C message with the supplied settings.
+/// @note May result in multiple messages being sent.
+/// @param[in, out] ac A Ptr to an IRBosch144AC object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.                                  *** todo
+/// @param[in] quiet Run the device in quiet/silent mode.
+/// @param[in] turbo Run the device in turbo/powerful mode.                        *** todo
+/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc   *** todo
+/// @note -1 is Off, >= 0 is on.
+void IRac::bosch144( IRBosch144AC *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const float degrees, const stdAc::fanspeed_t fan,
+                  const bool quiet ) {
+  ac->begin();
+  ac->setPower( on );
+  if (!on) {
+      // after turn off AC no more commands should
+      // be accepted
+      ac->send();
+      return;
+  }
+  ac->setTemp( degrees );
+  ac->setFan( ac->convertFan( fan ) );
+  ac->setMode( ac->convertMode( mode ) );
+  ac->setQuiet( quiet );
+  ac->setInvertBytes();
+  ac->setCheckSumS3();
+  ac->send();  // Send the state, which will also power on the unit.
+  // The following are all options/settings that create their own special
+  // messages. Often they only make sense to be sent after the unit is turned
+  // on. For instance, assuming a person wants to have the a/c on and in turbo
+  // mode. If we send the turbo message, it is ignored if the unit is off.
+  // Hence we send the special mode/setting messages after a normal message
+  // which will turn on the device.
+  // No Filter setting available.
+  // No Beep setting available.
+  // No Clock setting available.
+  // No Econo setting available.
+  // No Sleep setting available.
+}
+#endif  // SEND_BOSCH144
 
 #if SEND_CARRIER_AC64
 /// Send a Carrier 64-bit A/C message with the supplied settings.
@@ -2759,6 +2809,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_ARGO
+#if SEND_BOSCH144
+    case BOSCH144:
+    {
+      IRBosch144AC ac(_pin, _inverted, _modulation);
+      bosch144(&ac, send.power, send.mode, degC, send.fanspeed, send.quiet);
+      break;
+    }
+#endif  // SEND_AMCOR
 #if SEND_CARRIER_AC64
     case CARRIER_AC64:
     {
@@ -3686,6 +3744,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_ARGO
+#if DECODE_BOSCH144
+      case decode_type_t::BOSCH144: {
+        IRBosch144AC ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_BOSCH144
 #if DECODE_CARRIER_AC64
       case decode_type_t::CARRIER_AC64: {
         IRCarrierAc64 ac(kGpioUnused);
@@ -4135,6 +4200,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_ARGO
+#if DECODE_BOSCH144
+      case decode_type_t::BOSCH144: {
+        IRBosch144AC ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_BOSCH144
 #if DECODE_CARRIER_AC64
       case decode_type_t::CARRIER_AC64: {
         IRCarrierAc64 ac(kGpioUnused);
