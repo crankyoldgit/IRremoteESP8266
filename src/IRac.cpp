@@ -2816,7 +2816,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       bosch144(&ac, send.power, send.mode, degC, send.fanspeed, send.quiet);
       break;
     }
-#endif  // SEND_AMCOR
+#endif  // SEND_BOSCH144
 #if SEND_CARRIER_AC64
     case CARRIER_AC64:
     {
