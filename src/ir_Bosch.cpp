@@ -83,15 +83,16 @@ void IRBosch144AC::send(const uint16_t repeat) {
   if (!powerFlag) {
     _irsend.sendBosch144(kBosch144Off, sizeof(kBosch144Off), repeat);
   }   // "Off" is a 96bit message
-  else _irsend.sendBosch144(getRaw(), kBosch144StateLength, repeat);
-  // other 96bit messages are not yet supported
+  else {
+    _irsend.sendBosch144(getRaw(), kBosch144StateLength, repeat);
+  }   // other 96bit messages are not yet supported
 }
 #endif  // SEND_BOSCH144
 
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
-uint8_t* IRBosch144AC::getRaw(void) { 
-  return _.raw; 
+uint8_t* IRBosch144AC::getRaw(void) {
+  return _.raw;
 }
 
 /// Set the internal state from a valid code for this protocol.
@@ -109,8 +110,8 @@ bool IRBosch144AC::getPower(void) const {
 }
 
 void IRBosch144AC::setTempRaw(const uint8_t code) {
-  _.TempS1 = _.TempS2 = code >> 1; // save 4 bits in S1 and S2
-  _.TempS3 = code & 1;             // save 1 bit in Section3
+  _.TempS1 = _.TempS2 = code >> 1;  // save 4 bits in S1 and S2
+  _.TempS3 = code & 1;              // save 1 bit in Section3
 }
 
 /// Set the temperature.
@@ -131,18 +132,18 @@ uint8_t IRBosch144AC::getTemp(void) const {
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
 void IRBosch144AC::setFan(const uint16_t speed) {
-  _.FanS1 = _.FanS2 = speed >> 6; // save 3 bits in S1 and S2
-  _.FanS3 = speed & 0b111111;     // save 6 bits in Section3
+  _.FanS1 = _.FanS2 = speed >> 6;  // save 3 bits in S1 and S2
+  _.FanS3 = speed & 0b111111;      // save 6 bits in Section3
 }
 
 /// Set the desired operation mode.
 /// @param[in] mode The desired operation mode.
 void IRBosch144AC::setMode(const uint8_t mode) {
-  _.ModeS1 = _.ModeS2 = mode >> 1; // save 2 bits in S1 and S2
-  _.ModeS3 = mode & 0b1;           // save 1 bit in Section3
+  _.ModeS1 = _.ModeS2 = mode >> 1;  // save 2 bits in S1 and S2
+  _.ModeS3 = mode & 0b1;            // save 1 bit in Section3
   if (mode == kBosch144Auto || mode == kBosch144Dry) {
-    _.FanS1 = _.FanS2 = 0b000;     // save 3 bits in S1 and S2
-    _.FanS3 = kBosch144FanAuto0;   // save 6 bits in Section3
+    _.FanS1 = _.FanS2 = 0b000;      // save 3 bits in S1 and S2
+    _.FanS3 = kBosch144FanAuto0;    // save 6 bits in Section3
   }
 }
 
