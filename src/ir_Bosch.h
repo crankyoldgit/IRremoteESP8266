@@ -70,20 +70,20 @@ const uint8_t kBosch144Off[] = {0xB2, 0x4D, 0x7B, 0x84, 0xE0, 0x1F,
 
 // On, 25C, Mode: Auto
 const uint8_t kBosch144DefaultState[kBosch144StateLength] = {
- 0xB2, 0x4D, 0x1F, 0xE0, 0xC8, 0x37,
- 0xB2, 0x4D, 0x1F, 0xE0, 0xC8, 0x37,
- 0xD5, 0x65, 0x00, 0x00, 0x00, 0x3A};
+  0xB2, 0x4D, 0x1F, 0xE0, 0xC8, 0x37,
+  0xB2, 0x4D, 0x1F, 0xE0, 0xC8, 0x37,
+  0xD5, 0x65, 0x00, 0x00, 0x00, 0x3A};
 /*const uint8_t kBosch144DefaultState[kBosch144StateLength] = {
- 0xB2, 0x00, 0x00, 0x00, 0x00, 0x00,
- 0xB2, 0x00, 0x00, 0x00, 0x00, 0x00,
- 0xD5, 0x00, 0x00, 0x00, 0x00, 0x00};*/
+  0xB2, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0xB2, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0xD5, 0x00, 0x00, 0x00, 0x00, 0x00};*/
 
 union Bosch144Protocol {
   uint8_t raw[kBosch144StateLength];  ///< The state in IR code form.
   struct {
     uint8_t            :8;   // Fixed value 0b10110010 / 0xB2.   ############
     uint8_t InnvertS1_1:8;   // Invert byte  0b01001101 / 0x4D   #
-    uint8_t            :5;   // not used (without timer use)     #     
+    uint8_t            :5;   // not used (without timer use)     #
     uint8_t FanS1      :3;   // Fan speed bits in Section 1      #
     uint8_t InnvertS1_2:8;   // Invert byte                      #  Section 1 =
     uint8_t            :2;   // not used (without timer use)     #   Sektion 2
@@ -93,8 +93,8 @@ union Bosch144Protocol {
 
     uint8_t            :8;   // Fixed value 0b10110010 / 0xB2.   ############
     uint8_t InnvertS2_1:8;   // Invert byte  0b01001101 / 0x4D   #
-    uint8_t            :5;   // not used (without timer use)     # 
-    uint8_t FanS2      :3;   // Fan speed bits in Section 2      #  
+    uint8_t            :5;   // not used (without timer use)     #
+    uint8_t FanS2      :3;   // Fan speed bits in Section 2      #
     uint8_t InnvertS2_2:8;   // Invert byte                      #  Section 2 =
     uint8_t            :2;   // not used (without timer use)     #   Sektion 1
     uint8_t ModeS2     :2;   // Operation mode bits S2           #
