@@ -279,7 +279,7 @@ String IRBosch144AC::toString(void) const {
 
 void IRBosch144AC::setInvertBytes() {
   for (uint8_t i = 0; i <= 10; i += 2) {
-    _raw[i + 1] = ~_.raw[i];
+    _.raw[i + 1] = ~_.raw[i];
   }
 }
 
