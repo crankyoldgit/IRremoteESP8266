@@ -105,7 +105,7 @@ void IRBosch144AC::setPower(const bool on) {
 }
 
 bool IRBosch144AC::getPower(void) const {
-  return true;
+  return powerFlag;
 }
 
 void IRBosch144AC::setTempRaw(const uint8_t code) {
@@ -137,6 +137,11 @@ void IRBosch144AC::setFan(const uint16_t speed) {
   _.FanS3 = speed & 0b111111;      // save 6 bits in Section3
 }
 
+uint16_t IRBosch144AC::getFan(void) const {
+  uint16_t speed = (_.FanS1 << 6) + _.FanS3;
+  return speed;
+}
+
 /// Set the desired operation mode.
 /// @param[in] mode The desired operation mode.
 void IRBosch144AC::setMode(const uint8_t mode) {
@@ -146,6 +151,11 @@ void IRBosch144AC::setMode(const uint8_t mode) {
     _.FanS1 = _.FanS2 = 0b000;      // save 3 bits in S1 and S2
     _.FanS3 = kBosch144FanAuto0;    // save 6 bits in Section3
   }
+}
+
+uint8_t IRBosch144AC::getMode(void) const {
+  uint8_t mode = (_.ModeS1 << 1) + _.ModeS3;
+  return mode;
 }
 
 /// Set the Quiet mode of the A/C.
@@ -268,12 +278,9 @@ String IRBosch144AC::toString(void) const {
 }
 
 void IRBosch144AC::setInvertBytes() {
-  _.InnvertS1_1 = ~_.raw[0];
-  _.InnvertS1_2 = ~_.raw[2];
-  _.InnvertS1_3 = ~_.raw[4];
-  _.InnvertS2_1 = ~_.raw[6];
-  _.InnvertS2_2 = ~_.raw[8];
-  _.InnvertS2_3 = ~_.raw[10];
+  for (uint8_t i = 0; i <= 10; i += 2) {
+    _raw[i + 1] = ~_.raw[i];
+  }
 }
 
 void IRBosch144AC::setCheckSumS3() {
