@@ -48,7 +48,7 @@ void IRsend::sendBosch144(const unsigned char data[], const uint16_t nbytes,
   enableIROut(kBoschFreq);
 
   for (uint16_t r = 0; r <= repeat; r++) {
-    for (uint16_t offset = 0; offset < nbytes; offset += kBosch144BytesPerSection)
+    for (uint16_t offset=0; offset < nbytes; offset += kBosch144BytesPerSection)
       // Section Header + Data + Footer
       sendGeneric(kBoschHdrMark, kBoschHdrSpace,
                   kBoschBitMark, kBoschOneSpace,
@@ -66,27 +66,24 @@ void IRsend::sendBosch144(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-IRBosch144AC::IRBosch144AC(const uint16_t pin, const bool inverted, const bool use_modulation)
-    : _irsend(pin, inverted, use_modulation) {
-      stateReset();
-    }
+IRBosch144AC::IRBosch144AC(const uint16_t pin, const bool inverted,
+                           const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the internal state to a fixed known good state.
-void IRBosch144AC::stateReset(void) {
-  setRaw(kBosch144DefaultState);
-}
+void IRBosch144AC::stateReset(void) { setRaw(kBosch144DefaultState); }
 
 /// Set up hardware to be able to send a message.
-void IRBosch144AC::begin(void) {
-  _irsend.begin();
-}
+void IRBosch144AC::begin(void) { _irsend.begin(); }
 
 #if SEND_BOSCH144
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRBosch144AC::send(const uint16_t repeat) {
-  if (!powerFlag) _irsend.sendBosch144( kBosch144Off, sizeof(kBosch144Off), repeat); // "Off" is a 96bit message
-  else _irsend.sendBosch144( getRaw(), kBosch144StateLength, repeat );
+  if (!powerFlag) {
+    _irsend.sendBosch144(kBosch144Off, sizeof(kBosch144Off), repeat);
+  }   // "Off" is a 96bit message
+  else _irsend.sendBosch144(getRaw(), kBosch144StateLength, repeat);
   // other 96bit messages are not yet supported
 }
 #endif  // SEND_BOSCH144
@@ -134,15 +131,15 @@ uint8_t IRBosch144AC::getTemp(void) const {
 /// Set the speed of the fan.
 /// @param[in] speed The desired setting.
 void IRBosch144AC::setFan(const uint16_t speed) {
-  _.FanS1 = _.FanS2 = speed >> 6; //save 3 bits in S1 and S2
-  _.FanS3 = speed & 0b111111;     //save 6 bits in Section3
+  _.FanS1 = _.FanS2 = speed >> 6; // save 3 bits in S1 and S2
+  _.FanS3 = speed & 0b111111;     // save 6 bits in Section3
 }
 
 /// Set the desired operation mode.
 /// @param[in] mode The desired operation mode.
 void IRBosch144AC::setMode(const uint8_t mode) {
-  _.ModeS1 = _.ModeS2 = mode >> 1; //save 2 bits in S1 and S2
-  _.ModeS3 = mode & 0b1;           //save 1 bit in Section3
+  _.ModeS1 = _.ModeS2 = mode >> 1; // save 2 bits in S1 and S2
+  _.ModeS3 = mode & 0b1;           // save 1 bit in Section3
   if (mode == kBosch144Auto || mode == kBosch144Dry) {
     _.FanS1 = _.FanS2 = 0b000;     // save 3 bits in S1 and S2
     _.FanS3 = kBosch144FanAuto0;   // save 6 bits in Section3
@@ -164,7 +161,7 @@ bool IRBosch144AC::getQuiet(void) const { return _.Quiet; }
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
 uint8_t IRBosch144AC::convertMode(const stdAc::opmode_t mode) {
-  switch(mode) {
+  switch (mode) {
     case stdAc::opmode_t::kCool:
       return kBosch144Cool;
     case stdAc::opmode_t::kHeat:
@@ -182,7 +179,7 @@ uint8_t IRBosch144AC::convertMode(const stdAc::opmode_t mode) {
 /// @param[in] speed The enum to be converted.
 /// @return The native equivalent of the enum.
 uint16_t IRBosch144AC::convertFan(const stdAc::fanspeed_t speed) {
-  switch(speed) {
+  switch (speed) {
     case stdAc::fanspeed_t::kMin:
       return kBosch144Fan20;
     case stdAc::fanspeed_t::kLow:
@@ -202,7 +199,7 @@ uint16_t IRBosch144AC::convertFan(const stdAc::fanspeed_t speed) {
 /// @param[in] mode The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRBosch144AC::toCommonMode(const uint8_t mode) {
-  switch(mode) {
+  switch (mode) {
     case kBosch144Cool: return stdAc::opmode_t::kCool;
     case kBosch144Heat: return stdAc::opmode_t::kHeat;
     case kBosch144Dry: return stdAc::opmode_t::kDry;
@@ -215,7 +212,7 @@ stdAc::opmode_t IRBosch144AC::toCommonMode(const uint8_t mode) {
 /// @param[in] speed The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRBosch144AC::toCommonFanSpeed(const uint16_t speed) {
-  switch(speed) {
+  switch (speed) {
     case kBosch144Fan100: return stdAc::fanspeed_t::kMax;
     case kBosch144Fan80: return stdAc::fanspeed_t::kHigh;
     case kBosch144Fan60: return stdAc::fanspeed_t::kMedium;
