@@ -471,27 +471,24 @@ void IRac::argo(IRArgoAC *ac,
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
-/// @param[in] swingv The vertical swing setting.                                  *** todo
 /// @param[in] quiet Run the device in quiet/silent mode.
-/// @param[in] turbo Run the device in turbo/powerful mode.                        *** todo
-/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc   *** todo
 /// @note -1 is Off, >= 0 is on.
-void IRac::bosch144( IRBosch144AC *ac,
+void IRac::bosch144(IRBosch144AC *ac,
                   const bool on, const stdAc::opmode_t mode,
                   const float degrees, const stdAc::fanspeed_t fan,
-                  const bool quiet ) {
+                  const bool quiet) {
   ac->begin();
-  ac->setPower( on );
+  ac->setPower(on);
   if (!on) {
       // after turn off AC no more commands should
       // be accepted
       ac->send();
       return;
   }
-  ac->setTemp( degrees );
-  ac->setFan( ac->convertFan( fan ) );
-  ac->setMode( ac->convertMode( mode ) );
-  ac->setQuiet( quiet );
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setMode(ac->convertMode(mode));
+  ac->setQuiet(quiet);
   ac->setInvertBytes();
   ac->setCheckSumS3();
   ac->send();  // Send the state, which will also power on the unit.
