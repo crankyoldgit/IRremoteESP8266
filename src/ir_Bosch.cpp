@@ -80,10 +80,9 @@ void IRBosch144AC::begin(void) { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRBosch144AC::send(const uint16_t repeat) {
-  if (!powerFlag) {
+  if (!powerFlag) {  // "Off" is a 96bit message
     _irsend.sendBosch144(kBosch144Off, sizeof(kBosch144Off), repeat);
-  }   // "Off" is a 96bit message
-  else {
+  } else {
     _irsend.sendBosch144(getRaw(), kBosch144StateLength, repeat);
   }   // other 96bit messages are not yet supported
 }
