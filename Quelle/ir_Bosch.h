@@ -170,4 +170,4 @@ class IRBosch144AC {
   uint8_t getTempRaw(void) const;
 };
 
-#endif  // IR_BOSCH144_H_
+#endif  // IR_BOSCH_H_
