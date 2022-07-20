@@ -96,5 +96,5 @@ TEST(TestDecodeBosch144, SyntheticSelfDecode) {
       "",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
