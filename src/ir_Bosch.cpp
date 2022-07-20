@@ -71,7 +71,10 @@ IRBosch144AC::IRBosch144AC(const uint16_t pin, const bool inverted,
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the internal state to a fixed known good state.
-void IRBosch144AC::stateReset(void) { setRaw(kBosch144DefaultState); }
+void IRBosch144AC::stateReset(void) {
+  setRaw(kBosch144DefaultState);
+  setPower(true);
+}
 
 /// Set up hardware to be able to send a message.
 void IRBosch144AC::begin(void) { _irsend.begin(); }
