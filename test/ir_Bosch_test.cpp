@@ -13,7 +13,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("BOSCH144", typeToString(decode_type_t::BOSCH144));
   ASSERT_EQ(decode_type_t::BOSCH144, strToDecodeType("BOSCH144"));
   ASSERT_TRUE(hasACState(decode_type_t::BOSCH144));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::BOSCH144));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::BOSCH144));
   ASSERT_EQ(kBosch144Bits, IRsend::defaultBits(decode_type_t::BOSCH144));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::BOSCH144));
 }
