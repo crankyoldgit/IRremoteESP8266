@@ -129,8 +129,10 @@ void IRBosch144AC::setTemp(const uint8_t degrees) {
 uint8_t IRBosch144AC::getTemp(void) const {
   uint8_t temp = (_.TempS1 << 1) + _.TempS3;
   uint8_t retemp = 0;
-  for (uint8_t i = 0; i < 16; i++) {
-    if (temp == kBosch144TempMap[i]) retemp = kBosch144TempMin + i;
+  for (uint8_t i = 0; i < kBosch144TempRange; i++) {
+    if (temp == kBosch144TempMap[i]) {
+      retemp = kBosch144TempMin + i;
+    }
   }
   return retemp;
 }
