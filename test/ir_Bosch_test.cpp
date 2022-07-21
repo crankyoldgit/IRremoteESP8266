@@ -69,8 +69,7 @@ TEST(TestDecodeBosch144, RealExample) {
   EXPECT_EQ(kBosch144Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "Power: On, Mode: 0 (Cool), Fan: 5 (Max), Temp: 16C, "
-      "Quiet: Off",
+      "Power: On, Mode: 0 (Cool), Fan: 5 (High), Temp: 16C, Quiet: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
@@ -94,7 +93,7 @@ TEST(TestDecodeBosch144, SyntheticSelfDecode) {
   EXPECT_EQ(kBosch144Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 0 (Cool), Fan: 5 (High), Temp: 16C, Quiet: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
