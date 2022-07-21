@@ -94,6 +94,8 @@ void IRBosch144AC::send(const uint16_t repeat) {
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
 uint8_t* IRBosch144AC::getRaw(void) {
+  setInvertBytes();
+  setCheckSumS3();
   return _.raw;
 }
 
@@ -243,10 +245,10 @@ stdAc::state_t IRBosch144AC::toCommon(void) const {
   stdAc::state_t result{};
   result.protocol = decode_type_t::BOSCH144;
   result.power = getPower();
-  result.mode = toCommonMode((_.ModeS1 << 1) + _.ModeS3);
+  result.mode = toCommonMode(getMode());
   result.celsius = true;
   result.degrees = getTemp();
-  result.fanspeed = toCommonFanSpeed((_.FanS1 << 6) + _.FanS3);
+  result.fanspeed = toCommonFanSpeed(getFan());
   result.quiet = getQuiet();
   // Not supported.
   result.model = -1;
@@ -266,17 +268,20 @@ stdAc::state_t IRBosch144AC::toCommon(void) const {
 /// Convert the current internal state into a human readable string.
 /// @return A human readable string.
 String IRBosch144AC::toString(void) const {
-  uint8_t mode = (_.ModeS1 << 1)+_.ModeS3;
-  uint16_t fan = (_.FanS1 << 6) + _.FanS3;
+  uint8_t mode = getMode();
+  uint8_t fan = static_cast<int>(toCommonFanSpeed(getFan()));
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(mode, kBosch144Auto, kBosch144Cool,
                             kBosch144Heat, kBosch144Dry, kBosch144Fan);
-  result += addFanToString(fan>>1, kBosch144Fan100>>1, kBosch144Fan20>>1,
-                           kBosch144FanAuto>>1, kBosch144FanAuto>>1,
-                           kBosch144Fan60>>1);
+  result += addFanToString(fan, static_cast<int>(stdAc::fanspeed_t::kMax),
+                           static_cast<int>(stdAc::fanspeed_t::kMin),
+                           static_cast<int>(stdAc::fanspeed_t::kAuto),
+                           static_cast<int>(stdAc::fanspeed_t::kAuto),
+                           static_cast<int>(stdAc::fanspeed_t::kMedium));
   result += addTempToString(getTemp());
+  result += addBoolToString(_.Quiet, kQuietStr);
   return result;
 }
 

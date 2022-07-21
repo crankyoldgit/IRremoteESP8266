@@ -489,8 +489,6 @@ void IRac::bosch144(IRBosch144AC *ac,
   ac->setFan(ac->convertFan(fan));
   ac->setMode(ac->convertMode(mode));
   ac->setQuiet(quiet);
-  ac->setInvertBytes();
-  ac->setCheckSumS3();
   ac->send();  // Send the state, which will also power on the unit.
   // The following are all options/settings that create their own special
   // messages. Often they only make sense to be sent after the unit is turned
