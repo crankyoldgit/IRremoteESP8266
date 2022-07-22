@@ -4,10 +4,6 @@
 /// @brief Support for the Bosch A/C / heatpump protocol
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1787
 
-// Supports:
-//   Brand: Bosch,  Model: CL3000i-Set 26 E A/C
-//   Brand: Bosch,  Model: RG10A(G2S)BGEF remote
-
 #include <algorithm>
 #ifndef ARDUINO
 #include <string>
