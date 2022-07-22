@@ -73,10 +73,6 @@ const uint8_t kBosch144DefaultState[kBosch144StateLength] = {
   0xB2, 0x4D, 0x1F, 0xE0, 0xC8, 0x37,
   0xB2, 0x4D, 0x1F, 0xE0, 0xC8, 0x37,
   0xD5, 0x65, 0x00, 0x00, 0x00, 0x3A};
-/*const uint8_t kBosch144DefaultState[kBosch144StateLength] = {
-  0xB2, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0xB2, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0xD5, 0x00, 0x00, 0x00, 0x00, 0x00};*/
 
 union Bosch144Protocol {
   uint8_t raw[kBosch144StateLength];  ///< The state in IR code form.
@@ -150,8 +146,6 @@ class IRBosch144AC {
   static stdAc::fanspeed_t toCommonFanSpeed(const uint16_t speed);
   stdAc::state_t toCommon(void) const;
   String toString(void) const;
-  void setInvertBytes();
-  void setCheckSumS3();
 #ifndef UNIT_TEST
 
  private:
@@ -166,6 +160,8 @@ class IRBosch144AC {
   // Internal State settings
   bool powerFlag;
 
+  void setInvertBytes();
+  void setCheckSumS3();
   void setTempRaw(const uint8_t code);
   uint8_t getTempRaw(void) const;
 };
