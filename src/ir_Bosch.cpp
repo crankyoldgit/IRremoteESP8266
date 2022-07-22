@@ -1,4 +1,5 @@
 // Copyright 2022 David Conran
+// Copyright 2022 Nico Thien
 /// @file
 /// @brief Support for the Bosch A/C / heatpump protocol
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1787
@@ -8,9 +9,9 @@
 //   Brand: Bosch,  Model: RG10A(G2S)BGEF remote
 
 #include <algorithm>
-/*#ifndef ARDUINO
+#ifndef ARDUINO
 #include <string>
-#endif*/
+#endif
 #include <cstring>
 #include "ir_Bosch.h"
 #include "IRrecv.h"
@@ -43,7 +44,7 @@ using irutils::addTempToString;
 void IRsend::sendBosch144(const unsigned char data[], const uint16_t nbytes,
                           const uint16_t repeat) {
   // nbytes is required to be a multiple of kBosch144BytesPerSection.
-  if (nbytes % kBosch144BytesPerSection != 0)return;
+  if (nbytes % kBosch144BytesPerSection != 0) return;
   // Set IR carrier frequency
   enableIROut(kBoschFreq);
 
@@ -128,7 +129,7 @@ void IRBosch144AC::setTemp(const uint8_t degrees) {
 
 uint8_t IRBosch144AC::getTemp(void) const {
   uint8_t temp = (_.TempS1 << 1) + _.TempS3;
-  uint8_t retemp = 0;
+  uint8_t retemp = 25;
   for (uint8_t i = 0; i < kBosch144TempRange; i++) {
     if (temp == kBosch144TempMap[i]) {
       retemp = kBosch144TempMin + i;
@@ -145,8 +146,7 @@ void IRBosch144AC::setFan(const uint16_t speed) {
 }
 
 uint16_t IRBosch144AC::getFan(void) const {
-  uint16_t speed = (_.FanS1 << 6) + _.FanS3;
-  return speed;
+  return (_.FanS1 << 6) + _.FanS3;
 }
 
 /// Set the desired operation mode.
@@ -161,8 +161,7 @@ void IRBosch144AC::setMode(const uint8_t mode) {
 }
 
 uint8_t IRBosch144AC::getMode(void) const {
-  uint8_t mode = (_.ModeS1 << 1) + _.ModeS3;
-  return mode;
+  return (_.ModeS1 << 1) + _.ModeS3;
 }
 
 /// Set the Quiet mode of the A/C.
