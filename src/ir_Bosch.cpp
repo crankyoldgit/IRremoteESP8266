@@ -99,7 +99,12 @@ uint8_t* IRBosch144AC::getRaw(void) {
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IRBosch144AC::setRaw(const uint8_t new_code[]) {
-  std::memcpy(_.raw, new_code, kBosch144StateLength);
+  if (sizeof(new_code) == kBosch144StateLength) {
+    setPower(true);
+    std::memcpy(_.raw, new_code, kBosch144StateLength);
+  } else {
+    if (new_code == kBosch144Off) setPower(false);
+  }
 }
 
 void IRBosch144AC::setPower(const bool on) {
