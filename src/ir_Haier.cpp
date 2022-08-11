@@ -1794,6 +1794,17 @@ void IRHaierAC160::setFan(uint8_t speed) {
   }
 }
 
+/// Set the Health (filter) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRHaierAC160::setHealth(const bool on) {
+  _.Button = kHaierAcYrw02ButtonHealth;
+  _.Health = on;
+}
+
+/// Get the Health (filter) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRHaierAC160::getHealth(void) const { return _.Health; }
+
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
 uint8_t IRHaierAC160::getSwingV(void) const { return _.SwingV; }
@@ -2021,8 +2032,8 @@ stdAc::state_t IRHaierAC160::toCommon(const stdAc::state_t *prev) const {
   result.quiet = _.Quiet;
   result.clean = _.Clean && _.Clean2;
   result.light ^= getLightToggle();
+  result.filter = _.Health;
   // Not supported.
-  result.filter = false;
   result.model = -1;
   result.econo = false;
   result.beep = true;
@@ -2101,6 +2112,7 @@ String IRHaierAC160::toString(void) const {
                            kHaierAcYrw02FanMed);
   result += addBoolToString(_.Turbo, kTurboStr);
   result += addBoolToString(_.Quiet, kQuietStr);
+  result += addBoolToString(_.Health, kHealthStr);
   result += addIntToString(_.SwingV, kSwingVStr);
   result += kSpaceLBraceStr;
   switch (_.SwingV) {

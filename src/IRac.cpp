@@ -1214,6 +1214,7 @@ void IRac::haier(IRHaierAC *ac,
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] quiet Run the device in quiet mode.
+/// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
 /// @param[in] clean Turn on the clean mode.
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] prevlight Previous LED/Display mode.
@@ -1223,8 +1224,8 @@ void IRac::haier160(IRHaierAC160 *ac,
                     const bool celsius, const float degrees,
                     const stdAc::fanspeed_t fan,
                     const stdAc::swingv_t swingv,
-                    const bool turbo, const bool quiet, const bool clean,
-                    const bool light, const bool prevlight,
+                    const bool turbo, const bool quiet, const bool filter,
+                    const bool clean, const bool light, const bool prevlight,
                     const int16_t sleep) {
   ac->begin();
   // No Model setting available.
@@ -1236,7 +1237,7 @@ void IRac::haier160(IRHaierAC160 *ac,
   // No Horizontal Swing setting available.
   ac->setQuiet(quiet);
   ac->setTurbo(turbo);
-  // No Filter setting available.
+  ac->setHealth(filter);
   ac->setClean(clean);
   // No Clean setting available.
   // No Beep setting available.
@@ -3034,7 +3035,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRHaierAC160 ac(_pin, _inverted, _modulation);
       haier160(&ac, send.power, send.mode, send.celsius, send.degrees,
-               send.fanspeed, send.swingv, send.turbo, send.clean,
+               send.fanspeed, send.swingv, send.turbo, send.filter, send.clean,
                send.light, prev_light, send.sleep);
       break;
     }

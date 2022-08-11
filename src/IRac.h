@@ -280,8 +280,8 @@ void electra(IRElectraAc *ac,
                 const bool on, const stdAc::opmode_t mode, const bool celsius,
                 const float degrees, const stdAc::fanspeed_t fan,
                 const stdAc::swingv_t swingv,
-                const bool turbo, const bool quiet, const bool clean,
-                const bool light, const bool prevlight,
+                const bool turbo, const bool quiet, const bool filter,
+                const bool clean, const bool light, const bool prevlight,
                 const int16_t sleep = -1);
 #endif  // SEND_HAIER_AC160
 #if SEND_HAIER_AC176

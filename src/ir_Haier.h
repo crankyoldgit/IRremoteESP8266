@@ -289,7 +289,7 @@ union HaierAc160Protocol{
     uint8_t SwingH      :3;
     // Byte 3
     uint8_t             :1;
-    uint8_t Econo       :1;
+    uint8_t Health      :1;
     uint8_t             :3;
     uint8_t TimerMode   :3;
     // Byte 4
@@ -620,6 +620,9 @@ class IRHaierAC160 {
 
   bool getLock(void) const;
   void setLock(const bool on);
+
+  bool getHealth(void) const;
+  void setHealth(const bool on);
 
   uint8_t* getRaw(void);
   virtual void setRaw(const uint8_t new_code[]);

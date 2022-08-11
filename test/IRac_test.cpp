@@ -826,7 +826,8 @@ TEST(TestIRac, Haier160) {
   IRrecv capture(kGpioUnused);
   const char expected[] =
       "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
-      "Fan: 2 (Medium), Turbo: On, Quiet: Off, Swing(V): 4 (High), Sleep: On, "
+      "Fan: 2 (Medium), Turbo: On, Quiet: Off, Health: On, "
+      "Swing(V): 4 (High), Sleep: On, "
       "Clean: On, Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, "
       "Lock: Off, Heating: Off";
   ac.begin();
@@ -839,6 +840,7 @@ TEST(TestIRac, Haier160) {
                 stdAc::swingv_t::kHigh,                  // Vertical swing
                 true,                                    // Turbo
                 false,                                   // Quiet
+                true,                                    // Filter/Health
                 true,                                    // Clean
                 true,                                    // Light
                 true,                                    // Light (prev)
