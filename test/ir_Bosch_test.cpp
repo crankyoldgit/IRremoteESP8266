@@ -13,7 +13,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("BOSCH144", typeToString(decode_type_t::BOSCH144));
   ASSERT_EQ(decode_type_t::BOSCH144, strToDecodeType("BOSCH144"));
   ASSERT_TRUE(hasACState(decode_type_t::BOSCH144));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::BOSCH144));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::BOSCH144));
   ASSERT_EQ(kBosch144Bits, IRsend::defaultBits(decode_type_t::BOSCH144));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::BOSCH144));
 }
@@ -69,10 +69,10 @@ TEST(TestDecodeBosch144, RealExample) {
   EXPECT_EQ(kBosch144Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 0 (Cool), Fan: 5 (High), Temp: 16C, Quiet: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
 TEST(TestDecodeBosch144, SyntheticSelfDecode) {
@@ -93,8 +93,8 @@ TEST(TestDecodeBosch144, SyntheticSelfDecode) {
   EXPECT_EQ(kBosch144Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 0 (Cool), Fan: 5 (High), Temp: 16C, Quiet: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }

@@ -11,6 +11,7 @@
 #include "ir_Airwell.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
+#include "ir_Bosch.h"
 #include "ir_Carrier.h"
 #include "ir_Coolix.h"
 #include "ir_Corona.h"
@@ -134,6 +135,12 @@ class IRac {
             const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
             const bool turbo, const int16_t sleep = -1);
 #endif  // SEND_ARGO
+#if SEND_BOSCH144
+  void bosch144(IRBosch144AC *ac,
+              const bool on, const stdAc::opmode_t mode, const float degrees,
+              const stdAc::fanspeed_t fan,
+              const bool quiet);
+#endif  // SEND_COOLIX
 #if SEND_CARRIER_AC64
 void carrier64(IRCarrierAc64 *ac,
                const bool on, const stdAc::opmode_t mode,
