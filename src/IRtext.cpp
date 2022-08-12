@@ -392,12 +392,12 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if DECODE_SANYO_LC7461 || SEND_SANYO_LC7461
+    #if DECODE_SANYO || SEND_SANYO
     D_STR_SANYO_LC7461 "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if DECODE_RC5X || SEND_RC5X
+    #if DECODE_RC5 || SEND_RC5
     D_STR_RC5X "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
@@ -412,7 +412,7 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if DECODE_NEC_LIKE || SEND_NEC_LIKE
+    #if DECODE_NEC || SEND_NEC
     D_STR_NEC_LIKE "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
@@ -537,7 +537,7 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if DECODE_LG2 || SEND_LG2
+    #if DECODE_LG || SEND_LG
     D_STR_LG2 "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
@@ -577,12 +577,12 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if DECODE_MITSUBISHI_HEAVY || SEND_MITSUBISHI_HEAVY  // Exception
+    #if DECODE_MITSUBISHIHEAVY || SEND_MITSUBISHIHEAVY  // Exception
     D_STR_MITSUBISHI_HEAVY_88 "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if DECODE_MITSUBISHI_HEAVY || SEND_MITSUBISHI_HEAVY  // Exception
+    #if DECODE_MITSUBISHIHEAVY || SEND_MITSUBISHIHEAVY  // Exception
     D_STR_MITSUBISHI_HEAVY_152 "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
