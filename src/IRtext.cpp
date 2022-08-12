@@ -280,7 +280,9 @@ IRTEXT_CONST_STRING(kDg11j13aStr, D_STR_DG11J13A);  ///< "DG11J13A"
 IRTEXT_CONST_STRING(kDg11j104Str, D_STR_DG11J104);  ///< "DG11J104"
 IRTEXT_CONST_STRING(kDg11j191Str, D_STR_DG11J191);  ///< "DG11J191"
 
-#define D_STR_UNSUPPORTED "?" // Unsupported protocols will be showing as a question mark, check for length > 1 to show only currently included protocols
+#define D_STR_UNSUPPORTED "?"  // Unsupported protocols will be showing as
+                               // a question mark, check for length > 1
+                               // to show only currently included protocols
 // Protocol Names
 // Needs to be in decode_type_t order.
 IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
@@ -375,7 +377,7 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if SEND_SHERWOOD // SEND-ONLY
+    #if SEND_SHERWOOD  // SEND-ONLY
     D_STR_SHERWOOD "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
@@ -405,7 +407,7 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if SEND_PRONTO // SEND-ONLY
+    #if SEND_PRONTO  // SEND-ONLY
     D_STR_PRONTO "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
@@ -430,12 +432,12 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if SEND_RAW // SEND-ONLY
+    #if SEND_RAW  // SEND-ONLY
     D_STR_RAW "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if SEND_GLOBALCACHE // SEND-ONLY
+    #if SEND_GLOBALCACHE  // SEND-ONLY
     D_STR_GLOBALCACHE "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
@@ -575,12 +577,12 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if DECODE_MITSUBISHI_HEAVY || SEND_MITSUBISHI_HEAVY // Exception
+    #if DECODE_MITSUBISHI_HEAVY || SEND_MITSUBISHI_HEAVY  // Exception
     D_STR_MITSUBISHI_HEAVY_88 "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if DECODE_MITSUBISHI_HEAVY || SEND_MITSUBISHI_HEAVY // Exception
+    #if DECODE_MITSUBISHI_HEAVY || SEND_MITSUBISHI_HEAVY  // Exception
     D_STR_MITSUBISHI_HEAVY_152 "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
@@ -650,7 +652,7 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
     #else
     D_STR_UNSUPPORTED "\x0"
     #endif
-    #if SEND_SONY // Exception
+    #if SEND_SONY  // Exception
     D_STR_SONY_38K "\x0"
     #else
     D_STR_UNSUPPORTED "\x0"
