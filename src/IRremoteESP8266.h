@@ -52,8 +52,6 @@
 #include <string>
 #endif  // UNIT_TEST
 
-#include "IRmacros.h"
-
 // Library Version Information
 // Major version number (X.x.x)
 #define _IRREMOTEESP8266_VERSION_MAJOR 2
