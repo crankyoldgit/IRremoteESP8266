@@ -64,7 +64,8 @@ void IRArgoAC::send(const uint16_t repeat) {
   _irsend.sendArgo(getRaw(), kArgoStateLength, repeat);
 }
 
-/// Send current room temperature for the iFeel feature as a silent IR message (no acknowledgement from the device).
+/// Send current room temperature for the iFeel feature as a silent IR
+/// message (no acknowledgement from the device).
 /// @param[in] temp The temperature in degrees celsius.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRArgoAC::sendTemperature(const uint8_t temp, const uint16_t repeat) {
