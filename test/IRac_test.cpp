@@ -820,6 +820,41 @@ TEST(TestIRac, Haier) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
 }
 
+TEST(TestIRac, Haier160) {
+  IRHaierAC160 ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  const char expected[] =
+      "Power: On, Button: 5 (Power), Mode: 1 (Cool), Temp: 23C, "
+      "Fan: 2 (Medium), Turbo: On, Quiet: Off, Health: On, "
+      "Swing(V): 4 (High), Sleep: On, "
+      "Clean: On, Timer Mode: 0 (N/A), On Timer: Off, Off Timer: Off, "
+      "Lock: Off, Heating: Off";
+  ac.begin();
+  irac.haier160(&ac,
+                true,                                    // Power
+                stdAc::opmode_t::kCool,                  // Mode
+                true,                                    // Celsius
+                23,                                      // Degrees
+                stdAc::fanspeed_t::kMedium,              // Fan speed
+                stdAc::swingv_t::kHigh,                  // Vertical swing
+                true,                                    // Turbo
+                false,                                   // Quiet
+                true,                                    // Filter/Health
+                true,                                    // Clean
+                true,                                    // Light
+                true,                                    // Light (prev)
+                8 * 60 + 0);                             // Sleep time
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(HAIER_AC160, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kHaierAC160Bits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+}
+
 TEST(TestIRac, Haier176) {
   IRHaierAC176 ac(kGpioUnused);
   IRac irac(kGpioUnused);
