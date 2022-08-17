@@ -11,6 +11,8 @@
 #include "IRremoteESP8266.h"
 #include "i18n.h"
 
+#include "IRmacros.h"
+
 #ifndef PROGMEM
 #define PROGMEM  // Pretend we have the PROGMEM macro even if we really don't.
 #endif
