@@ -68,10 +68,10 @@ void IRArgoAC::send(const uint16_t repeat) {
 /// message (no acknowledgement from the device).
 /// @param[in] temp The temperature in degrees celsius.
 /// @param[in] repeat Nr. of times the message will be repeated.
-void IRArgoAC::sendTemperature(const uint8_t temp, const uint16_t repeat) {
-    unsigned char tempc = temp - kArgoTempDelta;
-    unsigned char check = 52 + tempc;
-    unsigned char end = 0b011;
+void IRArgoAC::sendSensorTemp(const uint8_t temp, const uint16_t repeat) {
+    uint8_t tempc = temp - kArgoTempDelta;
+    uint8_t check = 52 + tempc;
+    uint8_t end = 0b011;
 
     ArgoProtocol data;
     data.raw[0] = 0b10101100;
