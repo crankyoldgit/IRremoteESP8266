@@ -932,7 +932,8 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
 #endif
 #if DECODE_ARGO
     DPRINTLN("Attempting Argo decode");
-    if (decodeArgo(results, offset)) return true;
+    if (decodeArgo(results, offset) ||
+        decodeArgo(results, offset, kArgoShortBits, false)) return true;
 #endif  // DECODE_ARGO
 #if DECODE_SHARP_AC
     DPRINTLN("Attempting SHARP_AC decode");

@@ -3797,7 +3797,7 @@ namespace IRAcUtils {
 #if DECODE_ARGO
       case decode_type_t::ARGO: {
         IRArgoAC ac(kGpioUnused);
-        ac.setRaw(result->state);
+        ac.setRaw(result->state, result->bits / 8);
         return ac.toString();
       }
 #endif  // DECODE_ARGO
@@ -4259,8 +4259,15 @@ namespace IRAcUtils {
 #if DECODE_ARGO
       case decode_type_t::ARGO: {
         IRArgoAC ac(kGpioUnused);
-        ac.setRaw(decode->state);
-        *result = ac.toCommon();
+        const uint16_t length = decode->bits / 8;
+        switch (length) {
+          case kArgoStateLength:
+            ac.setRaw(decode->state, length);
+            *result = ac.toCommon();
+            break;
+          default:
+            return false;
+        }
         break;
       }
 #endif  // DECODE_ARGO

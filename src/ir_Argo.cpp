@@ -37,8 +37,6 @@ using irutils::addTempToString;
 /// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendArgo(const unsigned char data[], const uint16_t nbytes,
                       const uint16_t repeat) {
-  // Check if we have enough bytes to send a proper message.
-  if (nbytes < kArgoStateLength) return;
   // TODO(kaschmo): validate
   sendGeneric(kArgoHdrMark, kArgoHdrSpace, kArgoBitMark, kArgoOneSpace,
               kArgoBitMark, kArgoZeroSpace, 0, 0,  // No Footer.
@@ -69,20 +67,19 @@ void IRArgoAC::send(const uint16_t repeat) {
 /// @param[in] temp The temperature in degrees celsius.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRArgoAC::sendSensorTemp(const uint8_t temp, const uint16_t repeat) {
-    uint8_t tempc = temp - kArgoTempDelta;
-    uint8_t check = 52 + tempc;
-    uint8_t end = 0b011;
+    const uint8_t tempc = temp - kArgoTempDelta;
+    const uint8_t check = 52 + tempc;
+    const uint8_t end = 0b011;
 
     ArgoProtocol data;
-    data.raw[0] = 0b10101100;
-    data.raw[1] = 0b11110101;
-    data.raw[2] = (tempc << 3) | (check >> 5);
-    data.raw[3] = (check << 3) | end;
-    for (uint8_t i = 4; i < kArgoStateLength; i++) data.raw[i] = 0x0;
-    uint8_t sum = IRArgoAC::calcChecksum(data.raw, kArgoStateLength);
-    data.raw[10] = 0b00000010;
-    data.Sum = sum;
-
+    _stateReset(&data);
+    // data.raw[2] = (tempc << 3) | (check >> 5);
+    data.SensorT = tempc;
+    data.CheckHi = check >> 5;
+    // data.raw[3] = (check << 3) | end;
+    data.CheckLo = check;
+    data.Fixed = end;
+    _checksum(&data);
     _irsend.sendArgo(data.raw, kArgoStateLength, repeat);
 }
 #endif  // SEND_ARGO
@@ -107,32 +104,37 @@ bool IRArgoAC::validChecksum(const uint8_t state[], const uint16_t length) {
       IRArgoAC::calcChecksum(state, length);
 }
 
-/// Update the checksum for the internal state.
-void IRArgoAC::checksum(void) {
-  uint8_t sum = IRArgoAC::calcChecksum(_.raw, kArgoStateLength);
+/// Update the checksum for a given state.
+/// @param[in,out] state Pointer to a binary representation of the A/C state.
+void IRArgoAC::_checksum(ArgoProtocol *state) {
+  uint8_t sum = IRArgoAC::calcChecksum(state->raw, kArgoStateLength);
   // Append sum to end of array
   // Set const part of checksum bit 10
-  _.raw[10] = 0b00000010;
-  _.Sum = sum;
+  state->Post = kArgoPost;
+  state->Sum = sum;
+}
+
+/// Update the checksum for the internal state.
+void IRArgoAC::checksum(void) { _checksum(&_); }
+
+/// Reset the given state to a known good state.
+/// @param[in,out] state Pointer to a binary representation of the A/C state.
+void IRArgoAC::_stateReset(ArgoProtocol *state) {
+  for (uint8_t i = 2; i < kArgoStateLength; i++) state->raw[i] = 0x0;
+  state->Pre1 = kArgoPreamble1;  // LSB first (as sent) 0b00110101;
+  state->Pre2 = kArgoPreamble2;  // LSB first: 0b10101111; //const preamble
+  state->Post = kArgoPost;
 }
 
 /// Reset the internals of the object to a known good state.
 void IRArgoAC::stateReset(void) {
-  for (uint8_t i = 0; i < kArgoStateLength; i++) _.raw[i] = 0x0;
-
-  // Argo Message. Store MSB left.
-  // Default message:
-  _.raw[0] = 0b10101100;  // LSB first (as sent) 0b00110101; //const preamble
-  _.raw[1] = 0b11110101;  // LSB first: 0b10101111; //const preamble
-  // Keep payload 2-9 at zero
-  _.raw[10] = 0b00000010;  // Const 01
-  _.Sum = 0;
-
+  _stateReset(&_);
   off();
   setTemp(20);
   setRoomTemp(25);
   setMode(kArgoAuto);
   setFan(kArgoFanAuto);
+  _length = kArgoStateLength;
 }
 
 /// Get the raw state of the object, suitable to be sent with the appropriate
@@ -145,8 +147,10 @@ uint8_t* IRArgoAC::getRaw(void) {
 
 /// Set the raw state of the object.
 /// @param[in] state The raw state from the native IR message.
-void IRArgoAC::setRaw(const uint8_t state[]) {
-  std::memcpy(_.raw, state, kArgoStateLength);
+/// @param[in] length The length of raw state in bytes.
+void IRArgoAC::setRaw(const uint8_t state[], const uint16_t length) {
+  std::memcpy(_.raw, state, length);
+  _length = length;
 }
 
 /// Set the internal state to have the power on.
@@ -191,6 +195,12 @@ void IRArgoAC::setTemp(const uint8_t degrees) {
 /// @return The current setting for temp. in degrees celsius.
 uint8_t IRArgoAC::getTemp(void) const {
   return _.Temp + kArgoTempDelta;
+}
+
+/// Get the current sensor temperature setting.
+/// @return The current setting for the sensor. in degrees celsius.
+uint8_t IRArgoAC::getSensorTemp(void) const {
+  return (_length == kArgoShortStateLength) ? _.SensorT + kArgoTempDelta : 0;
 }
 
 /// Set the speed of the fan.
@@ -394,61 +404,66 @@ stdAc::state_t IRArgoAC::toCommon(void) const {
 String IRArgoAC::toString(void) const {
   String result = "";
   result.reserve(100);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(_.Power, kPowerStr, false);
-  result += addIntToString(_.Mode, kModeStr);
-  result += kSpaceLBraceStr;
-  switch (_.Mode) {
-    case kArgoAuto:
-      result += kAutoStr;
-      break;
-    case kArgoCool:
-      result += kCoolStr;
-      break;
-    case kArgoHeat:
-      result += kHeatStr;
-      break;
-    case kArgoDry:
-      result += kDryStr;
-      break;
-    case kArgoHeatAuto:
-      result += kHeatStr;
-      result += ' ';
-      result += kAutoStr;
-      break;
-    case kArgoOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
+  if (_length == kArgoShortStateLength) {
+    result += addIntToString(getSensorTemp(), kSensorTempStr, false);
+    result += 'C';
+  } else {
+    result += addBoolToString(_.Power, kPowerStr, false);
+    result += addIntToString(_.Mode, kModeStr);
+    result += kSpaceLBraceStr;
+    switch (_.Mode) {
+      case kArgoAuto:
+        result += kAutoStr;
+        break;
+      case kArgoCool:
+        result += kCoolStr;
+        break;
+      case kArgoHeat:
+        result += kHeatStr;
+        break;
+      case kArgoDry:
+        result += kDryStr;
+        break;
+      case kArgoHeatAuto:
+        result += kHeatStr;
+        result += ' ';
+        result += kAutoStr;
+        break;
+      case kArgoOff:
+        result += kOffStr;
+        break;
+      default:
+        result += kUnknownStr;
+    }
+    result += ')';
+    result += addIntToString(_.Fan, kFanStr);
+    result += kSpaceLBraceStr;
+    switch (_.Fan) {
+      case kArgoFanAuto:
+        result += kAutoStr;
+        break;
+      case kArgoFan3:
+        result += kMaxStr;
+        break;
+      case kArgoFan1:
+        result += kMinStr;
+        break;
+      case kArgoFan2:
+        result += kMedStr;
+        break;
+      default:
+        result += kUnknownStr;
+    }
+    result += ')';
+    result += addTempToString(getTemp());
+    result += kCommaSpaceStr;
+    result += kRoomStr;
+    result += ' ';
+    result += addTempToString(getRoomTemp(), true, false);
+    result += addBoolToString(_.Max, kMaxStr);
+    result += addBoolToString(_.iFeel, kIFeelStr);
+    result += addBoolToString(_.Night, kNightStr);
   }
-  result += ')';
-  result += addIntToString(_.Fan, kFanStr);
-  result += kSpaceLBraceStr;
-  switch (_.Fan) {
-    case kArgoFanAuto:
-      result += kAutoStr;
-      break;
-    case kArgoFan3:
-      result += kMaxStr;
-      break;
-    case kArgoFan1:
-      result += kMinStr;
-      break;
-    case kArgoFan2:
-      result += kMedStr;
-      break;
-    default:
-      result += kUnknownStr;
-  }
-  result += ')';
-  result += addTempToString(getTemp());
-  result += kCommaSpaceStr;
-  result += kRoomStr;
-  result += ' ';
-  result += addTempToString(getRoomTemp(), true, false);
-  result += addBoolToString(_.Max, kMaxStr);
-  result += addBoolToString(_.iFeel, kIFeelStr);
-  result += addBoolToString(_.Night, kNightStr);
   return result;
 }
 
