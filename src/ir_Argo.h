@@ -1,4 +1,5 @@
 // Copyright 2017 Schmolders
+// Copyright 2022 crankyoldgit
 /// @file
 /// @brief Support for Argo Ulisse 13 DCI Mobile Split ACs.
 
@@ -145,7 +146,7 @@ class IRArgoAC {
 
 #if SEND_ARGO
   void send(const uint16_t repeat = kArgoDefaultRepeat);
-  void sendSensorTemp(const uint8_t temp,
+  void sendSensorTemp(const uint8_t degrees,
                       const uint16_t repeat = kArgoDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
   /// @return The uSec timing offset needed per modulation of the IR Led.

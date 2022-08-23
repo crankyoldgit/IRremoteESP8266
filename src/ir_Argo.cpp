@@ -23,6 +23,9 @@ const uint16_t kArgoOneSpace = 2200;
 const uint16_t kArgoZeroSpace = 900;
 const uint32_t kArgoGap = kDefaultMessageGap;  // Made up value. Complete guess.
 
+const uint8_t  kArgoSensorCheck = 52;  // Part of the sensor message check calc.
+const uint8_t  kArgoSensorFixed = 0b011;
+
 using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
@@ -64,23 +67,21 @@ void IRArgoAC::send(const uint16_t repeat) {
 
 /// Send current room temperature for the iFeel feature as a silent IR
 /// message (no acknowledgement from the device).
-/// @param[in] temp The temperature in degrees celsius.
+/// @param[in] degrees The temperature in degrees celsius.
 /// @param[in] repeat Nr. of times the message will be repeated.
-void IRArgoAC::sendSensorTemp(const uint8_t temp, const uint16_t repeat) {
-    const uint8_t tempc = temp - kArgoTempDelta;
-    const uint8_t check = 52 + tempc;
-    const uint8_t end = 0b011;
+void IRArgoAC::sendSensorTemp(const uint8_t degrees, const uint16_t repeat) {
+  const uint8_t temp = std::max(std::min(degrees, kArgoMaxRoomTemp),
+                                kArgoTempDelta) - kArgoTempDelta;
+  const uint8_t check = kArgoSensorCheck + temp;
 
-    ArgoProtocol data;
-    _stateReset(&data);
-    // data.raw[2] = (tempc << 3) | (check >> 5);
-    data.SensorT = tempc;
-    data.CheckHi = check >> 5;
-    // data.raw[3] = (check << 3) | end;
-    data.CheckLo = check;
-    data.Fixed = end;
-    _checksum(&data);
-    _irsend.sendArgo(data.raw, kArgoStateLength, repeat);
+  ArgoProtocol data;
+  _stateReset(&data);
+  data.SensorT = temp;
+  data.CheckHi = check >> 5;
+  data.CheckLo = check;
+  data.Fixed = kArgoSensorFixed;
+  _checksum(&data);
+  _irsend.sendArgo(data.raw, kArgoStateLength, repeat);
 }
 #endif  // SEND_ARGO
 
