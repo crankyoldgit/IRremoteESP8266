@@ -61,7 +61,7 @@
 #define _IRREMOTEESP8266_VERSION_PATCH 2
 // Macro to convert version info into an integer
 #define _IRREMOTEESP8266_VERSION_VAL(major, minor, patch) \
-                                    ((major << 16) | (minor << 8) | (patch))
+                                    (((major) << 16) | ((minor) << 8) | (patch))
 // Macro to convert literal into a string
 #define MKSTR_HELPER(x) #x
 #define MKSTR(x) MKSTR_HELPER(x)
