@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['string_7922',['String',['../IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff',1,'IRremoteESP8266.h']]]
+  ['string_8295',['String',['../IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff',1,'IRremoteESP8266.h']]]
 ];

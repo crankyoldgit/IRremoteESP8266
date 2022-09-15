@@ -86,6 +86,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionHaierAc176Protocol.html">HaierAc176Protocol</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Haier 176 bit A/C message.  <a href="unionHaierAc176Protocol.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionHaierAc160Protocol.html">HaierAc160Protocol</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Haier 160 bit A/C message.  <a href="unionHaierAc160Protocol.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC.html">IRHaierAC</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Haier A/C messages.  <a href="classIRHaierAC.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -94,6 +97,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierACYRW02.html">IRHaierACYRW02</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Haier ACYRW02 A/C messages.  <a href="classIRHaierACYRW02.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRHaierAC160.html">IRHaierAC160</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Haier 160 bit A/C messages.  <a href="classIRHaierAC160.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
@@ -174,6 +180,8 @@ Variables</h2></td></tr>
 <tr class="separator:ae514e61ee32c322d0069d5226e5cada1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12cae5decc9032d65bca18d84d817fc2"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a12cae5decc9032d65bca18d84d817fc2">kHaierAc176Prefix</a> = 0xB7</td></tr>
 <tr class="separator:a12cae5decc9032d65bca18d84d817fc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee53abc217ebadccdf353c570846a603"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#aee53abc217ebadccdf353c570846a603">kHaierAc160Prefix</a> = 0xB5</td></tr>
+<tr class="separator:aee53abc217ebadccdf353c570846a603"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af91b01320a7a7acaf29269e0366565b4"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#af91b01320a7a7acaf29269e0366565b4">kHaierAcYrw02SwingVOff</a> = 0x0</td></tr>
 <tr class="separator:af91b01320a7a7acaf29269e0366565b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af04e8cba561b9d03969ce95fd3013b59"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#af04e8cba561b9d03969ce95fd3013b59">kHaierAcYrw02SwingVTop</a> = 0x1</td></tr>
@@ -186,6 +194,22 @@ Variables</h2></td></tr>
 <tr class="separator:aa52f6fc78d550d27024b07a9f7966544"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20480c65ea6e806cab6663ff0ccf6860"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a20480c65ea6e806cab6663ff0ccf6860">kHaierAcYrw02SwingVAuto</a> = 0xC</td></tr>
 <tr class="separator:a20480c65ea6e806cab6663ff0ccf6860"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe139740ea22c7abf294933e5b958c69"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#abe139740ea22c7abf294933e5b958c69">kHaierAc160SwingVOff</a> = 0b0000</td></tr>
+<tr class="separator:abe139740ea22c7abf294933e5b958c69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27c3c3fa51224900a5cf7bfbe6935f0d"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a27c3c3fa51224900a5cf7bfbe6935f0d">kHaierAc160SwingVTop</a> = 0b0001</td></tr>
+<tr class="separator:a27c3c3fa51224900a5cf7bfbe6935f0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87fd6a1834c5a78a36658722f62a9a88"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a87fd6a1834c5a78a36658722f62a9a88">kHaierAc160SwingVHighest</a> = 0b0010</td></tr>
+<tr class="separator:a87fd6a1834c5a78a36658722f62a9a88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24fe81c1274c7a1380e41a768b3e33c2"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a24fe81c1274c7a1380e41a768b3e33c2">kHaierAc160SwingVHigh</a> = 0b0100</td></tr>
+<tr class="separator:a24fe81c1274c7a1380e41a768b3e33c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72465e195bf8042a74d9b2ccb5e0b18c"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a72465e195bf8042a74d9b2ccb5e0b18c">kHaierAc160SwingVMiddle</a> = 0b0110</td></tr>
+<tr class="separator:a72465e195bf8042a74d9b2ccb5e0b18c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a167705c579d16ca7f497b625949fbe9f"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a167705c579d16ca7f497b625949fbe9f">kHaierAc160SwingVLow</a> = 0b1000</td></tr>
+<tr class="separator:a167705c579d16ca7f497b625949fbe9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dc6299c16ea746376d337f4631dc517"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a3dc6299c16ea746376d337f4631dc517">kHaierAc160SwingVLowest</a> = 0b0011</td></tr>
+<tr class="separator:a3dc6299c16ea746376d337f4631dc517"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a396462490721b4673df47cf20f3710f4"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a396462490721b4673df47cf20f3710f4">kHaierAc160SwingVAuto</a> = 0b1100</td></tr>
+<tr class="separator:a396462490721b4673df47cf20f3710f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a653c6b51a20515cb6e9ce2b4e0fc71df"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a653c6b51a20515cb6e9ce2b4e0fc71df">kHaierAcYrw02SwingHMiddle</a> = 0x0</td></tr>
 <tr class="separator:a653c6b51a20515cb6e9ce2b4e0fc71df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7451fe524b1424e841ff1089e4dda8d"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#aa7451fe524b1424e841ff1089e4dda8d">kHaierAcYrw02SwingHLeftMax</a> = 0x3</td></tr>
@@ -240,6 +264,12 @@ Variables</h2></td></tr>
 <tr class="separator:a7296e228ad486af8e31062bfb1b149ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09180578731549106d8803b614d0949f"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a09180578731549106d8803b614d0949f">kHaierAcYrw02ButtonLock</a> = 0b10100</td></tr>
 <tr class="separator:a09180578731549106d8803b614d0949f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07f68dc62e1315ea7dcdcc33f15d813b"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a07f68dc62e1315ea7dcdcc33f15d813b">kHaierAc160ButtonLight</a> = 0b10101</td></tr>
+<tr class="separator:a07f68dc62e1315ea7dcdcc33f15d813b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ddcc202ded32bb7eb23b8b2b0e85a4c"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a0ddcc202ded32bb7eb23b8b2b0e85a4c">kHaierAc160ButtonAuxHeating</a> = 0b10110</td></tr>
+<tr class="separator:a0ddcc202ded32bb7eb23b8b2b0e85a4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb6ef94635539f1b66decd07079bb2a2"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#afb6ef94635539f1b66decd07079bb2a2">kHaierAc160ButtonClean</a> = 0b11001</td></tr>
+<tr class="separator:afb6ef94635539f1b66decd07079bb2a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac08a11d13a4054a86b7eeef6ae9a372b"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#ac08a11d13a4054a86b7eeef6ae9a372b">kHaierAcYrw02ButtonCFAB</a> = 0b11010</td></tr>
 <tr class="separator:ac08a11d13a4054a86b7eeef6ae9a372b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38f92622851e2dd5cb33e65b4ffc6fc3"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Haier_8h.html#a38f92622851e2dd5cb33e65b4ffc6fc3">kHaierAcYrw02NoTimers</a> = 0b000</td></tr>
@@ -263,10 +293,180 @@ Variables</h2></td></tr>
 <dd>
 <a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/485">https://github.com/crankyoldgit/IRremoteESP8266/issues/485</a> </dd>
 <dd>
-<a href="https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods">https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&amp;preview=haer2.ods</a> </dd></dl>
+<a href="https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&preview=haer2.ods">https://www.dropbox.com/sh/w0bt7egp0fjger5/AADRFV6Wg4wZskJVdFvzb8Z0a?dl=0&amp;preview=haer2.ods</a> </dd>
+<dd>
+<a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1804">https://github.com/crankyoldgit/IRremoteESP8266/issues/1804</a> </dd></dl>
 </li>
 </ul>
 </div><h2 class="groupheader">Variable Documentation</h2>
+<a id="a0ddcc202ded32bb7eb23b8b2b0e85a4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ddcc202ded32bb7eb23b8b2b0e85a4c">&#9670;&nbsp;</a></span>kHaierAc160ButtonAuxHeating</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160ButtonAuxHeating = 0b10110</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afb6ef94635539f1b66decd07079bb2a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb6ef94635539f1b66decd07079bb2a2">&#9670;&nbsp;</a></span>kHaierAc160ButtonClean</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160ButtonClean = 0b11001</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a07f68dc62e1315ea7dcdcc33f15d813b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07f68dc62e1315ea7dcdcc33f15d813b">&#9670;&nbsp;</a></span>kHaierAc160ButtonLight</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160ButtonLight = 0b10101</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aee53abc217ebadccdf353c570846a603"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee53abc217ebadccdf353c570846a603">&#9670;&nbsp;</a></span>kHaierAc160Prefix</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160Prefix = 0xB5</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a396462490721b4673df47cf20f3710f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a396462490721b4673df47cf20f3710f4">&#9670;&nbsp;</a></span>kHaierAc160SwingVAuto</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160SwingVAuto = 0b1100</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a24fe81c1274c7a1380e41a768b3e33c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24fe81c1274c7a1380e41a768b3e33c2">&#9670;&nbsp;</a></span>kHaierAc160SwingVHigh</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160SwingVHigh = 0b0100</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a87fd6a1834c5a78a36658722f62a9a88"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87fd6a1834c5a78a36658722f62a9a88">&#9670;&nbsp;</a></span>kHaierAc160SwingVHighest</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160SwingVHighest = 0b0010</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a167705c579d16ca7f497b625949fbe9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a167705c579d16ca7f497b625949fbe9f">&#9670;&nbsp;</a></span>kHaierAc160SwingVLow</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160SwingVLow = 0b1000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3dc6299c16ea746376d337f4631dc517"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dc6299c16ea746376d337f4631dc517">&#9670;&nbsp;</a></span>kHaierAc160SwingVLowest</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160SwingVLowest = 0b0011</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a72465e195bf8042a74d9b2ccb5e0b18c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72465e195bf8042a74d9b2ccb5e0b18c">&#9670;&nbsp;</a></span>kHaierAc160SwingVMiddle</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160SwingVMiddle = 0b0110</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abe139740ea22c7abf294933e5b958c69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe139740ea22c7abf294933e5b958c69">&#9670;&nbsp;</a></span>kHaierAc160SwingVOff</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160SwingVOff = 0b0000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a27c3c3fa51224900a5cf7bfbe6935f0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27c3c3fa51224900a5cf7bfbe6935f0d">&#9670;&nbsp;</a></span>kHaierAc160SwingVTop</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kHaierAc160SwingVTop = 0b0001</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a12cae5decc9032d65bca18d84d817fc2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a12cae5decc9032d65bca18d84d817fc2">&#9670;&nbsp;</a></span>kHaierAc176Prefix</h2>
 
