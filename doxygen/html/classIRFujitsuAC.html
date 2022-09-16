@@ -161,6 +161,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a02636372996211d464c7394329921ea0"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a02636372996211d464c7394329921ea0">getStateLength</a> (void)</td></tr>
 <tr class="memdesc:a02636372996211d464c7394329921ea0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length (size) of the state code for the current configuration.  <a href="classIRFujitsuAC.html#a02636372996211d464c7394329921ea0">More...</a><br /></td></tr>
 <tr class="separator:a02636372996211d464c7394329921ea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84475b5254527b264d28b11cb09aae5f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a84475b5254527b264d28b11cb09aae5f">isLongCode</a> (void) const</td></tr>
+<tr class="memdesc:a84475b5254527b264d28b11cb09aae5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the current binary state representation a long or a short code?  <a href="classIRFujitsuAC.html#a84475b5254527b264d28b11cb09aae5f">More...</a><br /></td></tr>
+<tr class="separator:a84475b5254527b264d28b11cb09aae5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d8211f20c8ec299e1fcb588a0846ac2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a8d8211f20c8ec299e1fcb588a0846ac2">setPower</a> (const bool <a class="el" href="classIRFujitsuAC.html#adcb24818d088c879beb7d76ada332f43">on</a>)</td></tr>
 <tr class="memdesc:a8d8211f20c8ec299e1fcb588a0846ac2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the power setting.  <a href="classIRFujitsuAC.html#a8d8211f20c8ec299e1fcb588a0846ac2">More...</a><br /></td></tr>
 <tr class="separator:a8d8211f20c8ec299e1fcb588a0846ac2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -230,9 +233,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af91371d9fc03c014dad0a6f2abb56df1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#af91371d9fc03c014dad0a6f2abb56df1">getCelsius</a> (void) const</td></tr>
 <tr class="memdesc:af91371d9fc03c014dad0a6f2abb56df1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Clean mode status of the A/C.  <a href="classIRFujitsuAC.html#af91371d9fc03c014dad0a6f2abb56df1">More...</a><br /></td></tr>
 <tr class="separator:af91371d9fc03c014dad0a6f2abb56df1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae878d663cdcd9f40cb3ae348b03a4cb2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#ae878d663cdcd9f40cb3ae348b03a4cb2">toCommon</a> (void) const</td></tr>
-<tr class="memdesc:ae878d663cdcd9f40cb3ae348b03a4cb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRFujitsuAC.html#ae878d663cdcd9f40cb3ae348b03a4cb2">More...</a><br /></td></tr>
-<tr class="separator:ae878d663cdcd9f40cb3ae348b03a4cb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb737650df38f58ff216b341def3657a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#abb737650df38f58ff216b341def3657a">toCommon</a> (const <a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> *prev=NULL)</td></tr>
+<tr class="memdesc:abb737650df38f58ff216b341def3657a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent.  <a href="classIRFujitsuAC.html#abb737650df38f58ff216b341def3657a">More...</a><br /></td></tr>
+<tr class="separator:abb737650df38f58ff216b341def3657a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a418e1c0ded978d80f85ec0fda813c8f3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a418e1c0ded978d80f85ec0fda813c8f3">toString</a> (void) const</td></tr>
 <tr class="memdesc:a418e1c0ded978d80f85ec0fda813c8f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the current internal state into a human readable string.  <a href="classIRFujitsuAC.html#a418e1c0ded978d80f85ec0fda813c8f3">More...</a><br /></td></tr>
 <tr class="separator:a418e1c0ded978d80f85ec0fda813c8f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -285,6 +288,8 @@ Private Attributes</h2></td></tr>
 <tr class="separator:aea1819d0041f305e2c990f6f3eced865"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7093cf32cd2e856ff692aebc732c1d50"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a7093cf32cd2e856ff692aebc732c1d50">_state_length_short</a></td></tr>
 <tr class="separator:a7093cf32cd2e856ff692aebc732c1d50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74f6027b45179b94e729d70a02c83abf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRFujitsuAC.html#a74f6027b45179b94e729d70a02c83abf">_rawstatemodified</a></td></tr>
+<tr class="separator:a74f6027b45179b94e729d70a02c83abf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for handling detailed Fujitsu A/C messages. </p>
@@ -906,6 +911,27 @@ Private Attributes</h2></td></tr>
 
 <p>Get the Timer type of the A/C message. </p>
 <dl class="section return"><dt>Returns</dt><dd>The current timer type in numeric form. </dd></dl>
+
+</div>
+</div>
+<a id="a84475b5254527b264d28b11cb09aae5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84475b5254527b264d28b11cb09aae5f">&#9670;&nbsp;</a></span>isLongCode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRFujitsuAC::isLongCode </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Is the current binary state representation a long or a short code? </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if long; false, if short. </dd></dl>
 
 </div>
 </div>
@@ -1561,8 +1587,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ae878d663cdcd9f40cb3ae348b03a4cb2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae878d663cdcd9f40cb3ae348b03a4cb2">&#9670;&nbsp;</a></span>toCommon()</h2>
+<a id="abb737650df38f58ff216b341def3657a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb737650df38f58ff216b341def3657a">&#9670;&nbsp;</a></span>toCommon()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1570,14 +1596,20 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> IRFujitsuAC::toCommon </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td class="paramtype">const <a class="el" href="structstdAc_1_1state__t.html">stdAc::state_t</a> *&#160;</td>
+          <td class="paramname"><em>prev</em> = <code>NULL</code></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Convert the current internal state into its <a class="el" href="structstdAc_1_1state__t.html" title="Structure to hold a common A/C state.">stdAc::state_t</a> equivalent. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">prev</td><td>Ptr to a previous state. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespacestdAc.html" title="Enumerators and Structures for the Common A/C API.">stdAc</a> equivalent of the native settings. </dd></dl>
 
 </div>
@@ -1880,6 +1912,28 @@ Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="IRsend_8h.html#a7204e78a1fe37a819c0b66f87a685dc0">fujitsu_ac_remote_model_t</a> IRFujitsuAC::_model</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a74f6027b45179b94e729d70a02c83abf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74f6027b45179b94e729d70a02c83abf">&#9670;&nbsp;</a></span>_rawstatemodified</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRFujitsuAC::_rawstatemodified</td>
         </tr>
       </table>
   </td>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rhossprotocol_4115',['RhossProtocol',['../unionRhossProtocol.html',1,'']]]
+  ['panasonicac32protocol_4308',['PanasonicAc32Protocol',['../unionPanasonicAc32Protocol.html',1,'']]]
 ];

@@ -95,6 +95,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0e4793a4f6fc537ec1450f5a42206dae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRArgoAC.html#a0e4793a4f6fc537ec1450f5a42206dae">send</a> (const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a9a2190c526885753c676db666e48b764">kArgoDefaultRepeat</a>)</td></tr>
 <tr class="memdesc:a0e4793a4f6fc537ec1450f5a42206dae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send the current internal state as an IR message.  <a href="classIRArgoAC.html#a0e4793a4f6fc537ec1450f5a42206dae">More...</a><br /></td></tr>
 <tr class="separator:a0e4793a4f6fc537ec1450f5a42206dae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae186ec3470fededebfb4c116ac7be720"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRArgoAC.html#ae186ec3470fededebfb4c116ac7be720">sendSensorTemp</a> (const uint8_t temp, const uint16_t repeat=<a class="el" href="IRremoteESP8266_8h.html#a9a2190c526885753c676db666e48b764">kArgoDefaultRepeat</a>)</td></tr>
+<tr class="memdesc:ae186ec3470fededebfb4c116ac7be720"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send current room temperature for the iFeel feature as a silent IR message (no acknowledgement from the device).  <a href="classIRArgoAC.html#ae186ec3470fededebfb4c116ac7be720">More...</a><br /></td></tr>
+<tr class="separator:ae186ec3470fededebfb4c116ac7be720"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63cd2f350a7f249c020439543ef3c6d5"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRArgoAC.html#a63cd2f350a7f249c020439543ef3c6d5">calibrate</a> (void)</td></tr>
 <tr class="memdesc:a63cd2f350a7f249c020439543ef3c6d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the calibration to calculate uSec timing offsets for this platform.  <a href="classIRArgoAC.html#a63cd2f350a7f249c020439543ef3c6d5">More...</a><br /></td></tr>
 <tr class="separator:a63cd2f350a7f249c020439543ef3c6d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -779,6 +782,43 @@ Private Attributes</h2></td></tr>
 <p>Send the current internal state as an IR message. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>Nr. of times the message will be repeated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae186ec3470fededebfb4c116ac7be720"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae186ec3470fededebfb4c116ac7be720">&#9670;&nbsp;</a></span>sendSensorTemp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void IRArgoAC::sendSensorTemp </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>temp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>repeat</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a9a2190c526885753c676db666e48b764">kArgoDefaultRepeat</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send current room temperature for the iFeel feature as a silent IR message (no acknowledgement from the device). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">temp</td><td>The temperature in degrees celsius. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">repeat</td><td>Nr. of times the message will be repeated. </td></tr>
   </table>
   </dd>
