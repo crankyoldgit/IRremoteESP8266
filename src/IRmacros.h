@@ -12,6 +12,9 @@
  * ('base' version)
  */
 /// @cond TEST
+#ifndef __VA_OPT__
+#define __VA_OPT__(...)
+#endif
 #define PP_NARG(...) \
     PP_NARG_(__VA_ARGS__, PP_RSEQ_N())
 
@@ -22,7 +25,7 @@
     _1, _2, _3, _4, _5, _6, N, ...)   (N)
 
 #define PP_RSEQ_N() \
-    6,5,4,3,2,1,0
+    6, 5, 4, 3, 2, 1, 0
 /// @endcond
 /**
  * PP_NARG() end
@@ -40,7 +43,7 @@
  * NB: If __VA_OPT__ macro not supported, the <true_result> will be expanded!
  */
 /// @cond TEST
-#if PP_NARG(__VA_OPT__(,)) != 2
+#if PP_NARG(__VA_OPT__(, )) != 2
 #define COND(cond, a, b) a
 #else
 #define NOTHING
