@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['fujitsuprotocol_4026',['FujitsuProtocol',['../unionFujitsuProtocol.html',1,'']]]
+  ['ecoclimprotocol_4215',['EcoclimProtocol',['../unionEcoclimProtocol.html',1,'']]],
+  ['electraprotocol_4216',['ElectraProtocol',['../unionElectraProtocol.html',1,'']]]
 ];

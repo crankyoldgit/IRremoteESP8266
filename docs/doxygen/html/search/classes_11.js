@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['whirlpoolprotocol_4132',['WhirlpoolProtocol',['../unionWhirlpoolProtocol.html',1,'']]]
+  ['vestelprotocol_4324',['VestelProtocol',['../unionVestelProtocol.html',1,'']]],
+  ['voltasprotocol_4325',['VoltasProtocol',['../unionVoltasProtocol.html',1,'']]]
 ];

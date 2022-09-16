@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['panasonicac32protocol_4114',['PanasonicAc32Protocol',['../unionPanasonicAc32Protocol.html',1,'']]]
+  ['neoclimaprotocol_4307',['NeoclimaProtocol',['../unionNeoclimaProtocol.html',1,'']]]
 ];
