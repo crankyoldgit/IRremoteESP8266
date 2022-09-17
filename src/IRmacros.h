@@ -6,29 +6,16 @@
 /// @file IRmacros.h
 
 /**
- * PP_NARG() macro get number of arguments provided
- * Source:
- * http://jonjagger.blogspot.com/2010/11/c-macro-magic-ppnarg.html
- * ('base' version)
+ * VA_OPT_SUPPORTED macro to check if __VA_OPT__ is supported
+ * Source: https://stackoverflow.com/questions/48045470/
+ * portably-detect-va-opt-support
+ * (answer by cpplearner)
  */
-/// @cond TEST
-#ifndef __VA_OPT__
-#define __VA_OPT__(...)
-#endif
-#define PP_NARG(...) \
-    PP_NARG_(__VA_ARGS__, PP_RSEQ_N())
-
-#define PP_NARG_(...) \
-    PP_ARG_N(__VA_ARGS__)
-
-#define PP_ARG_N( \
-    _1, _2, _3, _4, _5, _6, N, ...)   (N)
-
-#define PP_RSEQ_N() \
-    6, 5, 4, 3, 2, 1, 0
-/// @endcond
+#define PP_THIRD_ARG(a, b, c, ...) c
+#define VA_OPT_SUPPORTED_I(...) PP_THIRD_ARG(__VA_OPT__(, ), true, false, )
+#define VA_OPT_SUPPORTED VA_OPT_SUPPORTED_I(?)
 /**
- * PP_NARG() end
+ * VA_OPT_SUPPORTED end
  */
 
 /**
@@ -43,7 +30,8 @@
  * NB: If __VA_OPT__ macro not supported, the <true_result> will be expanded!
  */
 /// @cond TEST
-#if PP_NARG(__VA_OPT__(, )) != 2
+#if !VA_OPT_SUPPORTED
+// #pragma message("Compiler without __VA_OPT__ support")
 #define COND(cond, a, b) a
 #else
 #define NOTHING
