@@ -7,9 +7,7 @@
 
 /**
  * VA_OPT_SUPPORTED macro to check if __VA_OPT__ is supported
- * Source: https://stackoverflow.com/questions/48045470/
- * portably-detect-va-opt-support
- * (answer by cpplearner)
+ * Source: https://stackoverflow.com/a/48045656
  */
 /// @cond TEST
 #define PP_THIRD_ARG(a, b, c, ...) c
