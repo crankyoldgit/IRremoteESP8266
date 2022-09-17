@@ -14,7 +14,7 @@
 /// @cond TEST
 #define PP_THIRD_ARG(a, b, c, ...) c
 #define VA_OPT_SUPPORTED_I(...) \
-            PP_THIRD_ARG(__VA_OPT__(, ), true, false, false)
+            PP_THIRD_ARG(__VA_OPT__(, false), true, false, false)
 #define VA_OPT_SUPPORTED VA_OPT_SUPPORTED_I(?)
 /// @endcond
 /**
