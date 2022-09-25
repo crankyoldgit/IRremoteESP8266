@@ -533,6 +533,8 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
             D_STR_SANYO_AC152, D_STR_UNSUPPORTED) "\x0"
     COND(DECODE_DAIKIN312 || SEND_DAIKIN312,
             D_STR_DAIKIN312, D_STR_UNSUPPORTED) "\x0"
+    COND(DECODE_GORENJE || SEND_GORENJE,
+            D_STR_GORENJE, D_STR_UNSUPPORTED) "\x0"
     ///< New protocol (macro) strings should be added just above this line.
     "\x0"  ///< This string requires double null termination.
 };

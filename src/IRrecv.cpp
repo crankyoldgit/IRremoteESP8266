@@ -1152,6 +1152,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Daikin 312-bit decode");
     if (decodeDaikin312(results, offset)) return true;
 #endif  // DECODE_DAIKIN312
+#if DECODE_GORENJE
+    DPRINTLN("Attempting GORENJE decode");
+    if (decodeGorenje(results, offset)) return true;
+#endif  // DECODE_GORENJE
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

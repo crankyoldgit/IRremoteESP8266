@@ -598,6 +598,11 @@ class IRrecv {
                          const uint16_t nbits = kGoodweatherBits,
                          const bool strict = true);
 #endif  // DECODE_GOODWEATHER
+#if DECODE_GORENJE
+  bool decodeGorenje(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kGorenjeBits,
+                     const bool strict = true);
+#endif  // DECODE_GORENJE
 #if DECODE_GREE
   bool decodeGree(decode_results *results, uint16_t offset = kStartOffset,
                   const uint16_t nbits = kGreeBits,
