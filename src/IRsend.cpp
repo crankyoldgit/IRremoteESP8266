@@ -796,6 +796,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kWhirlpoolAcBits;
     case XMP:
       return kXmpBits;
+    case YORK:
+      return kYorkBits;
     // No default amount of bits.
     case FUJITSU_AC:
     case MWM:
@@ -1427,6 +1429,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendWhirlpoolAC(state, nbytes);
       break;
 #endif  // SEND_WHIRLPOOL_AC
+#if SEND_YORK
+    case YORK:
+      sendYork(state, nbytes);
+      break;
+#endif  // SEND_YORK
     default:
       return false;
   }

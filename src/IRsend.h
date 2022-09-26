@@ -879,6 +879,11 @@ class IRsend {
   void sendWowwee(const uint64_t data, const uint16_t nbits = kWowweeBits,
                   const uint16_t repeat = kWowweeDefaultRepeat);
 #endif  // SEND_WOWWEE
+#if SEND_YORK
+  void sendYork(const unsigned char data[],
+                    const uint16_t nbytes = kYorkStateLength,
+                    const uint16_t repeat = kNoRepeat);
+#endif  // SEND_YORK
 
  protected:
 #ifdef UNIT_TEST

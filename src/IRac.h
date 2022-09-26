@@ -49,6 +49,7 @@
 #include "ir_Vestel.h"
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
+#include "ir_York.h"
 
 // Constants
 const int8_t kGpioUnused = -1;  ///< A placeholder for not using an actual GPIO.

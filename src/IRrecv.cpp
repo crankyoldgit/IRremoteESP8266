@@ -1177,6 +1177,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Carrier A/C 84-bit decode");
     if (decodeCarrierAC84(results, offset)) return true;
 #endif  // DECODE_CARRIER_AC84
+#if DECODE_YORK
+    DPRINTLN("Attempting York decode");
+    if (decodeYork(results, offset, kYorkBits)) return true;
+#endif  // DECODE_YORK
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

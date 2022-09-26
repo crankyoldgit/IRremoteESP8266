@@ -363,6 +363,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_VOLTAS
     case decode_type_t::VOLTAS:
 #endif
+#if SEND_YORK
+    case decode_type_t::YORK:
+#endif
     case decode_type_t::WHIRLPOOL_AC:
       return true;
     default:
@@ -4493,6 +4496,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_WHIRLPOOL_AC
+#if DECODE_YORK
+      case decode_type_t::YORK: {
+        IRYorkAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_YORK
       default:
         return "";
     }
@@ -5029,6 +5039,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_WHIRLPOOL_AC
+#if DECODE_YORK
+      case decode_type_t::YORK: {
+        IRYorkAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_YORK
       default:
         return false;
     }
