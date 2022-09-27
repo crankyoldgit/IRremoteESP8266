@@ -924,6 +924,13 @@
 #define SEND_DAIKIN312      _IR_ENABLE_DEFAULT_
 #endif  // SEND_DAIKIN312
 
+#ifndef DECODE_GORENJE
+#define DECODE_GORENJE      _IR_ENABLE_DEFAULT_
+#endif  // DECODE_GORENJE
+#ifndef SEND_GORENJE
+#define SEND_GORENJE        _IR_ENABLE_DEFAULT_
+#endif  // SEND_GORENJE
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -1104,8 +1111,9 @@ enum decode_type_t {
   BOSCH144,  // 120
   SANYO_AC152,
   DAIKIN312,
+  GORENJE,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = DAIKIN312,
+  kLastDecodeType = GORENJE,
 };
 
 // Message lengths & required repeat values
@@ -1203,6 +1211,7 @@ const uint16_t kGicableBits = 16;
 const uint16_t kGicableMinRepeat = kSingleRepeat;
 const uint16_t kGoodweatherBits = 48;
 const uint16_t kGoodweatherMinRepeat = kNoRepeat;
+const uint16_t kGorenjeBits = 8;
 const uint16_t kGreeStateLength = 8;
 const uint16_t kGreeBits = kGreeStateLength * 8;
 const uint16_t kGreeDefaultRepeat = kNoRepeat;

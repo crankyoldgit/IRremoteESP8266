@@ -519,6 +519,10 @@ class IRsend {
                        const uint16_t nbits = kGoodweatherBits,
                        const uint16_t repeat = kGoodweatherMinRepeat);
 #endif  // SEND_GOODWEATHER
+#if SEND_GORENJE
+  void sendGorenje(const uint64_t data, const uint16_t nbits = kGorenjeBits,
+                   const uint16_t repeat = kNoRepeat);
+#endif  // SEND_GORENJE
 #if SEND_PRONTO
   void sendPronto(uint16_t data[], uint16_t len, uint16_t repeat = kNoRepeat);
 #endif
