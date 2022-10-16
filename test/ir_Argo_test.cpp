@@ -1,11 +1,12 @@
 // Copyright 2019 David Conran
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "ir_Argo.h"
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
 #include "IRsend_test.h"
-#include "gtest/gtest.h"
 
 
 TEST(TestArgoACClass, toCommon) {
@@ -50,9 +51,11 @@ TEST(TestArgoACClass, MessageConstructon) {
   ac.setNight(true);
 
   // Don't implicitly trust this. It's just a guess.
-  uint8_t expected[kArgoStateLength] = {
-      0xAC, 0xF5, 0x00, 0x24, 0x02, 0x00, 0x00, 0x00, 0x00, 0xAC, 0xD6, 0x01};
-  EXPECT_STATE_EQ(expected, ac.getRaw(), kArgoBits);
+  auto expected = std::vector<uint8_t>({
+      0xAC, 0xF5, 0x00, 0x24, 0x02, 0x00, 0x00, 0x00, 0x00, 0xAC, 0xD6, 0x01});
+  auto actual = ac.getRaw();
+  EXPECT_THAT(std::vector<uint8_t>(actual, actual + kArgoBits / 8),
+              ::testing::ElementsAreArray(expected));
   EXPECT_EQ(
       "Power: On, Mode: 0 (Cool), Fan: 0 (Auto), Temp: 20C, Room Temp: 21C, "
       "Max: On, IFeel: On, Night: On",
