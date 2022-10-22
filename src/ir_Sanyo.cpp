@@ -762,13 +762,13 @@ void IRSanyoAc88::stateReset(void) {
 /// Set up hardware to be able to send a message.
 void IRSanyoAc88::begin(void) { _irsend.begin(); }
 
-#if SEND_SANYO_AC
+#if SEND_SANYO_AC88
 /// Send the current internal state as IR messages.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRSanyoAc88::send(const uint16_t repeat) {
   _irsend.sendSanyoAc88(getRaw(), kSanyoAc88StateLength, repeat);
 }
-#endif  // SEND_SANYO_AC
+#endif  // SEND_SANYO_AC88
 
 /// Get a PTR to the internal state/code for this protocol with all integrity
 ///   checks passing.
