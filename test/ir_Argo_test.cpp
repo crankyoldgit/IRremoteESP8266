@@ -10,7 +10,7 @@
 
 
 TEST(TestArgoACClass, toCommon) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
   ac.setPower(true);
   ac.setMode(kArgoCool);
   ac.setTemp(20);
@@ -40,7 +40,7 @@ TEST(TestArgoACClass, toCommon) {
 }
 
 TEST(TestArgoACClass, MessageConstructon) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
   ac.setPower(true);
   ac.setTemp(20);
   ac.setMode(kArgoCool);
@@ -95,8 +95,8 @@ TEST(TestSendArgo, SendDataOnly) {
 // Decode normal Argo messages.
 
 TEST(TestDecodeArgo, SyntheticDecode) {
-  IRsendTest irsend(0);
-  IRrecv irrecv(0);
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
   irsend.begin();
 
   // Synthesised Normal Argo message.
@@ -117,9 +117,8 @@ TEST(TestDecodeArgo, SyntheticDecode) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
-
 TEST(TestArgoACClass, SetAndGetTemp) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
 
   ac.setTemp(25);
   EXPECT_EQ(25, ac.getTemp());
@@ -134,7 +133,7 @@ TEST(TestArgoACClass, SetAndGetTemp) {
 }
 
 TEST(TestArgoACClass, SetAndGetRoomTemp) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
 
   ac.setRoomTemp(25);
   EXPECT_EQ(25, ac.getRoomTemp());
@@ -149,7 +148,7 @@ TEST(TestArgoACClass, SetAndGetRoomTemp) {
 }
 
 TEST(TestArgoACClass, SetAndGetMode) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
 
   ac.setMode(kArgoHeat);
   EXPECT_EQ(kArgoHeat, ac.getMode());
@@ -168,7 +167,7 @@ TEST(TestArgoACClass, SetAndGetMode) {
 }
 
 TEST(TestArgoACClass, SetAndGetFan) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
 
   ac.setFan(kArgoFan3);
   EXPECT_EQ(kArgoFan3, ac.getFan());
@@ -185,7 +184,7 @@ TEST(TestArgoACClass, SetAndGetFan) {
 }
 
 TEST(TestArgoACClass, Night) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
   ac.setNight(false);
   ASSERT_FALSE(ac.getNight());
   ac.setNight(true);
@@ -195,7 +194,7 @@ TEST(TestArgoACClass, Night) {
 }
 
 TEST(TestArgoACClass, iFeel) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
   ac.setiFeel(false);
   ASSERT_FALSE(ac.getiFeel());
   ac.setiFeel(true);
@@ -205,7 +204,7 @@ TEST(TestArgoACClass, iFeel) {
 }
 
 TEST(TestArgoACClass, Power) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
   ac.setPower(false);
   ASSERT_FALSE(ac.getPower());
   ac.setPower(true);
@@ -215,7 +214,7 @@ TEST(TestArgoACClass, Power) {
 }
 
 TEST(TestArgoACClass, Max) {
-  IRArgoAC ac(0);
+  IRArgoAC ac(kGpioUnused);
   ac.setMax(false);
   ASSERT_FALSE(ac.getMax());
   ac.setMax(true);
@@ -228,4 +227,34 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("ARGO", typeToString(decode_type_t::ARGO));
   ASSERT_EQ(decode_type_t::ARGO, strToDecodeType("ARGO"));
   ASSERT_TRUE(hasACState(decode_type_t::ARGO));
+}
+
+TEST(TestDecodeArgo, RealShortDecode) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  // Real short Argo message. (i.e. 32 bits)
+  const uint16_t sensor_28C[67] = {
+      6418, 3168, 444, 834, 444, 834, 442, 2112, 444, 2112, 444, 834, 442, 2114,
+      442, 834, 442, 2112, 444, 2112, 444, 832, 442, 2114, 442, 834, 442, 2112,
+      442, 2114, 442, 2112, 444, 2112, 442, 834, 442, 2112, 444, 834, 442, 834,
+      442, 834, 442, 834, 442, 2114, 442, 2114, 442, 2112, 442, 2112, 442, 834,
+      444, 834, 442, 834, 442, 2112, 442, 2112, 442, 836,
+      442};  // UNKNOWN 6149090
+  irsend.reset();
+  uint8_t expectedState[kArgoShortStateLength] = {
+      0xAC, 0xF5, 0xC2, 0x63};
+  irsend.sendRaw(sensor_28C, 67, 38);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::ARGO, irsend.capture.decode_type);
+  EXPECT_EQ(kArgoShortBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Sensor Temp: 28C",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  // These short messages don't result in a valid state.
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }

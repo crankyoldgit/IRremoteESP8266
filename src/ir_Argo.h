@@ -1,4 +1,5 @@
 // Copyright 2017 Schmolders
+// Copyright 2022 crankyoldgit
 /// @file
 /// @brief Support for Argo Ulisse 13 DCI Mobile Split ACs.
 
@@ -25,9 +26,9 @@ union ArgoProtocol {
   uint8_t raw[kArgoStateLength];  ///< The state in native IR code form
   struct {
     // Byte 0
-    uint64_t          :8;  // Typically 0b00110101
+    uint64_t Pre1     :8;  // Typically 0b00110101
     // Byte 1
-    uint64_t          :8;  // Typically 0b10101111
+    uint64_t Pre2     :8;  // Typically 0b10101111
     // Byte 2~4
     uint64_t          :3;
     uint64_t Mode     :3;
@@ -57,15 +58,29 @@ union ArgoProtocol {
     uint32_t          :1;  // const 0
     uint32_t iFeel    :1;
     // Byte 10~11
-    uint32_t          :2;  // const 01
+    uint32_t Post     :2;
     uint32_t Sum      :8;  // straddle byte 10 and 11
     uint32_t          :6;
+  };
+  struct {
+    // Byte 0-1
+    uint8_t           :8;
+    uint8_t           :8;
+    // Byte 2-3
+    uint8_t CheckHi   :3;
+    uint8_t SensorT   :5;
+    uint8_t Fixed     :3;  // Typically 0b011
+    uint8_t CheckLo   :5;
   };
 };
 
 // Constants. Store MSB left.
 
 const uint8_t kArgoHeatBit =      0b00100000;
+
+const uint8_t kArgoPreamble1 = 0b10101100;
+const uint8_t kArgoPreamble2 = 0b11110101;
+const uint8_t kArgoPost      = 0b00000010;
 
 // Mode                           0b00111000
 const uint8_t kArgoCool =           0b000;
@@ -131,7 +146,7 @@ class IRArgoAC {
 
 #if SEND_ARGO
   void send(const uint16_t repeat = kArgoDefaultRepeat);
-  void sendSensorTemp(const uint8_t temp,
+  void sendSensorTemp(const uint8_t degrees,
                       const uint16_t repeat = kArgoDefaultRepeat);
   /// Run the calibration to calculate uSec timing offsets for this platform.
   /// @return The uSec timing offset needed per modulation of the IR Led.
@@ -148,6 +163,8 @@ class IRArgoAC {
 
   void setTemp(const uint8_t degrees);
   uint8_t getTemp(void) const;
+
+  uint8_t getSensorTemp(void) const;
 
   void setFan(const uint8_t fan);
   uint8_t getFan(void) const;
@@ -172,7 +189,7 @@ class IRArgoAC {
   uint8_t getRoomTemp(void) const;
 
   uint8_t* getRaw(void);
-  void setRaw(const uint8_t state[]);
+  void setRaw(const uint8_t state[], const uint16_t length = kArgoStateLength);
   static uint8_t calcChecksum(const uint8_t state[],
                               const uint16_t length = kArgoStateLength);
   static bool validChecksum(const uint8_t state[],
@@ -195,13 +212,16 @@ class IRArgoAC {
 #endif
   // # of bytes per command
   ArgoProtocol _;
+  void _stateReset(ArgoProtocol *state);
   void stateReset(void);
+  void _checksum(ArgoProtocol *state);
   void checksum(void);
 
   // Attributes
   uint8_t flap_mode;
   uint8_t heat_mode;
   uint8_t cool_mode;
+  uint16_t _length = kArgoStateLength;
 };
 
 #endif  // IR_ARGO_H_
