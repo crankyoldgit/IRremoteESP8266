@@ -73,7 +73,7 @@ cd ~/Arduino/libraries/IRremoteESP8266 && git pull
 ## Bijdragen
 Als je wilt [bijdragen](.github/CONTRIBUTING.md#how-can-i-contribute) aan dit project, hulp is altijd welkom bij:
 - Het [melden](.github/CONTRIBUTING.md#reporting-bugs) van problemen en foutmeldingen
-- ideeën voor verbeteringen
+- Ideeën voor verbeteringen
 - Verbeteringen van de documentatie
 - [Het aanmaken van issues](.github/CONTRIBUTING.md#reporting-bugs) en [pull requests](.github/CONTRIBUTING.md#pull-requests)
 - Het delen van deze bibliotheek
