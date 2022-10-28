@@ -258,8 +258,7 @@
  *         - "Middle"
  *         - "Low"
  *         - "Lowest"
- *       # `power_command_topic` is probably not needed for most HA configurations
- *       # power_command_topic: "ir_server/ac/cmnd/power"
+ *       power_command_topic: "ir_server/ac/cmnd/power"
  *       mode_command_topic: "ir_server/ac/cmnd/mode"
  *       mode_state_topic: "ir_server/ac/stat/mode"
  *       temperature_command_topic: "ir_server/ac/cmnd/temp"
@@ -300,8 +299,7 @@
  *       - "Middle"
  *       - "Low"
  *       - "Lowest"
- *     # `power_command_topic` is probably not needed for most HA configurations
- *     # power_command_topic: "ir_server/ac/cmnd/power"
+ *     power_command_topic: "ir_server/ac/cmnd/power"
  *     mode_command_topic: "ir_server/ac/cmnd/mode"
  *     mode_state_topic: "ir_server/ac/stat/mode"
  *     temperature_command_topic: "ir_server/ac/cmnd/temp"
@@ -3135,9 +3133,6 @@ bool sendClimate(const String topic_prefix, const bool retain,
 #else  // MQTT_CLIMATE_HA_MODE
   String mode_str = IRac::opmodeToString(next.mode);
 #endif  // MQTT_CLIMATE_HA_MODE
-  // I don't know why, but the modes need to be lower case to work with
-  // Home Assistant & Google Home.
-  mode_str.toLowerCase();
 #if MQTT_CLIMATE_HA_MODE
   // Home Assistant want's these two bound together.
   if (prev.power != next.power || prev.mode != next.mode || forceMQTT) {
@@ -3151,6 +3146,10 @@ bool sendClimate(const String topic_prefix, const bool retain,
   }
   if (prev.mode != next.mode || forceMQTT) {
 #endif  // MQTT_CLIMATE_HA_MODE
+    // I don't know why, but the modes need to be lower case to work with
+    // Home Assistant & Google Home.
+    mode_str.toLowerCase();
+
     success &= sendString(topic_prefix + KEY_MODE, mode_str, retain);
     diff = true;
   }
