@@ -37,10 +37,10 @@ uint32_t IRtimer::elapsed() {
     return UINT32_MAX - start + now;  // Has wrapped.
 }
 
+#ifdef UNIT_TEST
 /// Add time to the timer to simulate elapsed time.
 /// @param[in] usecs Nr. of uSeconds to be added.
 /// @note Only used in unit testing.
-#ifdef UNIT_TEST
 void IRtimer::add(uint32_t usecs) { _IRtimer_unittest_now += usecs; }
 #endif  // UNIT_TEST
 
@@ -70,9 +70,9 @@ uint32_t TimerMs::elapsed() {
     return UINT32_MAX - start + now;  // Has wrapped.
 }
 
+#ifdef UNIT_TEST
 /// Add time to the timer to simulate elapsed time.
 /// @param[in] msecs Nr. of mSeconds to be added.
 /// @note Only used in unit testing.
-#ifdef UNIT_TEST
 void TimerMs::add(uint32_t msecs) { _IRtimer_unittest_now += msecs; }
 #endif  // UNIT_TEST

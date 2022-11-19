@@ -168,9 +168,9 @@ static void USE_IRAM_ATTR read_timeout(void *arg __attribute__((unused))) {
 /// It signals to the library that capturing of IR data has stopped.
 /// @note ESP32 version
 static void USE_IRAM_ATTR read_timeout(void) {
-/// @endcond
   portENTER_CRITICAL(&mux);
 #endif  // ESP32
+/// @endcond
   if (params.rawlen) params.rcvstate = kStopState;
 #if defined(ESP8266)
   os_intr_unlock();
@@ -250,7 +250,7 @@ static void USE_IRAM_ATTR gpio_intr() {
 #endif  // UNIT_TEST
 
 // Start of IRrecv class -------------------
-
+#if defined(ESP32)
 /// Class constructor
 /// Args:
 /// @param[in] recvpin The GPIO pin the IR receiver module's data pin is
@@ -263,7 +263,6 @@ static void USE_IRAM_ATTR gpio_intr() {
 ///   (Default: false)
 /// @param[in] timer_num Nr. of the ESP32 timer to use. (0 to 3) (ESP32 Only)
 ///   or (0 to 1) (ESP32-C3)
-#if defined(ESP32)
 IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer,
                const uint8_t timer_num) {
@@ -276,7 +275,7 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                                   3));
 #endif  // SOC_TIMER_GROUP_TOTAL_TIMERS
 #else  // ESP32
-/// @cond IGNORE
+/// @cond !ESP32
 /// Class constructor
 /// Args:
 /// @param[in] recvpin The GPIO pin the IR receiver module's data pin is
@@ -289,7 +288,6 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 ///   (Default: false)
 IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
                const uint8_t timeout, const bool save_buffer) {
-/// @endcond
 #endif  // ESP32
   params.recvpin = recvpin;
   params.bufsize = bufsize;
@@ -326,6 +324,7 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 #endif  // DECODE_HASH
   _tolerance = kTolerance;
 }
+/// @endcond
 
 /// Class destructor
 /// Cleans up after the object is no longer needed.
