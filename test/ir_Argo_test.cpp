@@ -25,6 +25,7 @@ TEST(TestArgoACClass, toCommon) {
   ac.setNight(true);
   // Now test it.
   ASSERT_EQ(decode_type_t::ARGO, ac.toCommon().protocol);
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, ac.toCommon().command);
   ASSERT_TRUE(ac.toCommon().power);
   ASSERT_TRUE(ac.toCommon().celsius);
   ASSERT_EQ(20, ac.toCommon().degrees);
@@ -61,6 +62,7 @@ TEST(TestArgoAC_WREM3Class, toCommon) {
   // Now test it.
   ASSERT_EQ(decode_type_t::ARGO, ac.toCommon().protocol);
   ASSERT_EQ(argo_ac_remote_model_t::SAC_WREM3, ac.toCommon().model);
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, ac.toCommon().command);
   ASSERT_TRUE(ac.toCommon().celsius);
   ASSERT_TRUE(ac.toCommon().beep);  // Always on (except for iFeel)
   ASSERT_FALSE(ac.toCommon().clean);
@@ -397,6 +399,161 @@ TEST(TestIrAc, ArgoWrem3_SyntheticSendAndDecode_ACCommand) {
   EXPECT_EQ(state.model, r.model);
   EXPECT_EQ(state.power, r.power);
 }
+
+TEST(TestIrAc, ArgoWrem3_SyntheticSendAndDecode_iFeelReport) {
+  IRac irac(kGpioUnused);
+  auto capture = std::make_shared<IRrecv>(kGpioUnused);
+  irac._utReceiver = capture;
+
+  stdAc::state_t state = {};
+  state.protocol = ARGO;
+  state.model = argo_ac_remote_model_t::SAC_WREM3;
+  state.command = stdAc::ac_command_t::kSensorTempReport;
+  state.degrees = 19;
+
+  irac.sendAc(state, nullptr);
+
+  ASSERT_NE(nullptr, irac._lastDecodeResults);
+  EXPECT_EQ(ARGO, irac._lastDecodeResults->decode_type);
+  EXPECT_EQ("IFeel Report[CH#0]: Model: 2 (WREM3), Sensor Temp: 19C",
+            IRAcUtils::resultAcToString(irac._lastDecodeResults.get()));
+
+  stdAc::state_t r = {};
+  ASSERT_TRUE(IRAcUtils::decodeToState(irac._lastDecodeResults.get(), &r,
+                                       nullptr));
+  EXPECT_EQ(ARGO, r.protocol);
+  EXPECT_EQ(state.model, r.model);
+  EXPECT_EQ(state.command, r.command);
+  EXPECT_EQ(state.degrees, r.degrees);
+}
+
+TEST(TestIrAc, ArgoWrem3_SyntheticSendAndDecode_Timer) {
+  IRac irac(kGpioUnused);
+  auto capture = std::make_shared<IRrecv>(kGpioUnused);
+  irac._utReceiver = capture;
+
+  stdAc::state_t state = {};
+  state.protocol = ARGO;
+  state.model = argo_ac_remote_model_t::SAC_WREM3;
+  state.command = stdAc::ac_command_t::kTimerCommand;
+  state.power = true;
+  state.mode = stdAc::opmode_t::kAuto;  // Needs to be set for `state.power`
+                                        // not to be ignored!
+  state.clock = 13*60+21;
+  state.sleep = 2*60+10;
+
+  irac.sendAc(state, nullptr);
+
+  ASSERT_NE(nullptr, irac._lastDecodeResults);
+  EXPECT_EQ(ARGO, irac._lastDecodeResults->decode_type);
+  EXPECT_EQ("Timer[CH#0]: Model: 2 (WREM3), Power: On, Timer Mode: 1 "
+            "(Sleep Timer), Clock: 13:21, Day: 0 (Sun), Timer: 02:10",
+    IRAcUtils::resultAcToString(irac._lastDecodeResults.get()));
+
+  stdAc::state_t r = {};
+  ASSERT_TRUE(IRAcUtils::decodeToState(irac._lastDecodeResults.get(), &r,
+                                       nullptr));
+  EXPECT_EQ(ARGO, r.protocol);
+  EXPECT_EQ(state.model, r.model);
+  EXPECT_EQ(state.command, r.command);
+  EXPECT_EQ(state.power, r.power);
+  EXPECT_EQ(state.clock, r.clock);
+  EXPECT_EQ(state.sleep, r.sleep);
+}
+
+///
+/// @brief Test fixture for Config messages sent via @c IRAc generic i-face
+/// @note The commands are abusing generic intafrace and instead are
+///       using: @c clock -> for settingID
+///              @c sleep -> for setting Value
+///
+class TestArgoConfigViaIRAc :
+    public ::testing::TestWithParam<std::tuple<uint16_t, uint16_t>> {
+};
+
+class TestArgoConfigViaIRAc_Positive : public TestArgoConfigViaIRAc {};
+TEST_P(TestArgoConfigViaIRAc_Positive,
+    ArgoWrem3_SyntheticSendAndDecode_Config_Positive) {
+  int16_t settingId = std::get<0>(GetParam());
+  int16_t settingValue = std::get<1>(GetParam());
+  IRac irac(kGpioUnused);
+  auto capture = std::make_shared<IRrecv>(kGpioUnused);
+  irac._utReceiver = capture;
+
+  stdAc::state_t state = {};
+  state.protocol = ARGO;
+  state.model = argo_ac_remote_model_t::SAC_WREM3;
+  state.command = stdAc::ac_command_t::kConfigCommand;
+  state.clock = settingId;
+  state.sleep = settingValue;
+
+  irac.sendAc(state, nullptr);
+
+  ASSERT_NE(nullptr, irac._lastDecodeResults);
+  EXPECT_EQ(ARGO, irac._lastDecodeResults->decode_type);
+  std::ostringstream ossExpectedStr;
+  ossExpectedStr << "Config[CH#0]: Model: 2 (WREM3), Key: " << settingId
+                 << ", Value: " << settingValue;
+  EXPECT_EQ(ossExpectedStr.str(),
+    IRAcUtils::resultAcToString(irac._lastDecodeResults.get()));
+
+  stdAc::state_t r = {};
+  ASSERT_TRUE(IRAcUtils::decodeToState(irac._lastDecodeResults.get(), &r,
+                                       nullptr));
+  EXPECT_EQ(ARGO, r.protocol);
+  EXPECT_EQ(state.model, r.model);
+  EXPECT_EQ(state.command, r.command);
+}
+
+INSTANTIATE_TEST_CASE_P(
+  TestIrAc,
+  TestArgoConfigViaIRAc_Positive,
+  ::testing::Values(
+    std::make_tuple(5, 0),
+    std::make_tuple(5, 1),
+    std::make_tuple(6, 0),
+    std::make_tuple(6, 1),
+    std::make_tuple(6, 2),
+    std::make_tuple(6, 3),
+    std::make_tuple(12, 30),
+    std::make_tuple(12, 75),
+    std::make_tuple(12, 99)
+));
+
+class TestArgoConfigViaIRAc_Negative : public TestArgoConfigViaIRAc {};
+TEST_P(TestArgoConfigViaIRAc_Negative,
+    ArgoWrem3_SyntheticSendAndDecode_Config_Negative) {
+  int16_t settingId = std::get<0>(GetParam());
+  int16_t settingValue = std::get<1>(GetParam());
+  IRac irac(kGpioUnused);
+  auto capture = std::make_shared<IRrecv>(kGpioUnused);
+  irac._utReceiver = capture;
+
+  stdAc::state_t state = {};
+  state.protocol = ARGO;
+  state.model = argo_ac_remote_model_t::SAC_WREM3;
+  state.command = stdAc::ac_command_t::kConfigCommand;
+  state.clock = settingId;
+  state.sleep = settingValue;
+
+  irac.sendAc(state, nullptr);
+
+  // The "safe" mode should have prevented the message from sending out
+  ASSERT_EQ(nullptr, irac._lastDecodeResults);  // nothing got sent
+}
+
+INSTANTIATE_TEST_CASE_P(
+  TestIrAc,
+  TestArgoConfigViaIRAc_Negative,
+  ::testing::Values(
+    std::make_tuple(5, 2),
+    std::make_tuple(6, 4),
+    std::make_tuple(12, 29),
+    std::make_tuple(12, 100),
+    std::make_tuple(0, 0),
+    std::make_tuple(80, 86)
+));
+
 
 /******************************************************************************/
 /* Tests for IRArgoACBase (comon functionality across WREM2 and WREM3)        */
@@ -1296,6 +1453,7 @@ TEST(TestDecodeArgo, RealShortDecode) {
   stdAc::state_t r, p;
   // These short messages do result in a valid state (w/ room temperature only)
   EXPECT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  EXPECT_EQ(stdAc::ac_command_t::kSensorTempReport, r.command);
 }
 
 ///

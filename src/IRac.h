@@ -86,6 +86,8 @@ class IRac {
   static bool cmpStates(const stdAc::state_t a, const stdAc::state_t b);
   static bool strToBool(const char *str, const bool def = false);
   static int16_t strToModel(const char *str, const int16_t def = -1);
+  static stdAc::ac_command_t strToCommandType(const char *str,
+      const stdAc::ac_command_t def = stdAc::ac_command_t::kControlCommand);
   static stdAc::opmode_t strToOpmode(
       const char *str, const stdAc::opmode_t def = stdAc::opmode_t::kAuto);
   static stdAc::fanspeed_t strToFanspeed(
@@ -96,6 +98,7 @@ class IRac {
   static stdAc::swingh_t strToSwingH(
       const char *str, const stdAc::swingh_t def = stdAc::swingh_t::kOff);
   static String boolToString(const bool value);
+  static String commandTypeToString(const stdAc::ac_command_t cmdType);
   static String opmodeToString(const stdAc::opmode_t mode,
                                const bool ha = false);
   static String fanspeedToString(const stdAc::fanspeed_t speed);
@@ -148,6 +151,11 @@ class IRac {
       const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
       const bool night, const bool econo, const bool turbo, const bool filter,
       const bool light);
+  void argoWrem3_iFeelReport(IRArgoAC_WREM3 *ac, const float sensorTemp);
+  void argoWrem3_ConfigSet(IRArgoAC_WREM3 *ac, const uint8_t param,
+      const uint8_t value, bool safe = true);
+  void argoWrem3_SetTimer(IRArgoAC_WREM3 *ac, bool on,
+      const uint16_t currentTime, const uint16_t delayMinutes);
 #endif  // SEND_ARGO
 #if SEND_BOSCH144
   void bosch144(IRBosch144AC *ac,
