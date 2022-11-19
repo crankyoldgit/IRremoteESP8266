@@ -342,9 +342,61 @@ TEST(TestDecodeArgo, SyntheticDecode) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
 }
 
+// Synthetic send and decode ***via common*** interface
+TEST(TestIrAc, ArgoWrem2_SyntheticSendAndDecode_ACCommand) {
+  IRac irac(kGpioUnused);
+  auto capture = std::make_shared<IRrecv>(kGpioUnused);
+  irac._utReceiver = capture;
 
+  stdAc::state_t state = {};
+  state.protocol = ARGO;
+  state.model = 1;
+  state.power = true;
+  state.mode = stdAc::opmode_t::kCool;
 
+  irac.sendAc(state, nullptr);
+  ASSERT_NE(nullptr, irac._lastDecodeResults);
+  EXPECT_EQ(ARGO, irac._lastDecodeResults->decode_type);
+  EXPECT_EQ("Model: 1 (WREM2), Power: On, Mode: 0 (Cool), Fan: 0 (Auto), "
+            "Temp: 25C, Room Temp: 25C, Max: Off, IFeel: Off, Night: Off",
+    IRAcUtils::resultAcToString(irac._lastDecodeResults.get()));
 
+  stdAc::state_t r = {};
+  ASSERT_TRUE(IRAcUtils::decodeToState(irac._lastDecodeResults.get(), &r,
+                                      nullptr));
+  EXPECT_EQ(ARGO, r.protocol);
+  EXPECT_EQ(1, r.model);
+  EXPECT_TRUE(r.power);
+  EXPECT_EQ(state.mode, r.mode);
+}
+
+TEST(TestIrAc, ArgoWrem3_SyntheticSendAndDecode_ACCommand) {
+  IRac irac(kGpioUnused);
+  auto capture = std::make_shared<IRrecv>(kGpioUnused);
+  irac._utReceiver = capture;
+
+  stdAc::state_t state = {};
+  state.protocol = ARGO;
+  state.model = argo_ac_remote_model_t::SAC_WREM3;
+  state.power = true;
+  state.mode = stdAc::opmode_t::kCool;
+
+  irac.sendAc(state, nullptr);
+  ASSERT_NE(nullptr, irac._lastDecodeResults);
+  EXPECT_EQ(ARGO, irac._lastDecodeResults->decode_type);
+  EXPECT_EQ("Command[CH#0]: Model: 2 (WREM3), Power: On, Mode: 1 (Cool),"
+            " Temp: 25C, Room: 25C, Fan: 0 (Auto), Swing(V): 7 (Breeze), "
+            "IFeel: Off, Night: Off, Econo: Off, Max: Off, Filter: Off, "
+            "Light: Off",
+    IRAcUtils::resultAcToString(irac._lastDecodeResults.get()));
+
+  stdAc::state_t r = {};
+  ASSERT_TRUE(IRAcUtils::decodeToState(irac._lastDecodeResults.get(), &r,
+                                       nullptr));
+  EXPECT_EQ(ARGO, r.protocol);
+  EXPECT_EQ(state.model, r.model);
+  EXPECT_EQ(state.power, r.power);
+}
 
 /******************************************************************************/
 /* Tests for IRArgoACBase (comon functionality across WREM2 and WREM3)        */
