@@ -148,9 +148,9 @@ class IRac {
             const bool turbo, const int16_t sleep = -1);
   void argoWrem3_ACCommand(IRArgoAC_WREM3 *ac,
       const bool on, const stdAc::opmode_t mode, const float degrees,
-      const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
-      const bool night, const bool econo, const bool turbo, const bool filter,
-      const bool light);
+      const float roomTemp, const stdAc::fanspeed_t fan,
+      const stdAc::swingv_t swingv, const bool iFeel, const bool night,
+      const bool econo, const bool turbo, const bool filter, const bool light);
   void argoWrem3_iFeelReport(IRArgoAC_WREM3 *ac, const float roomTemp);
   void argoWrem3_ConfigSet(IRArgoAC_WREM3 *ac, const uint8_t param,
       const uint8_t value, bool safe = true);

@@ -2743,8 +2743,8 @@ TEST(TestIRac, strToCommandType) {
   EXPECT_EQ(stdAc::ac_command_t::kControlCommand,
             IRac::strToCommandType("FOOBAR"));
   EXPECT_EQ(stdAc::ac_command_t::kTimerCommand,
-            IRac::strToCommandType("FOOBAR", 
-            stdAc::ac_command_t::kTimerCommand));  
+            IRac::strToCommandType("FOOBAR",
+            stdAc::ac_command_t::kTimerCommand));
 }
 
 TEST(TestIRac, boolToString) {
@@ -3243,4 +3243,29 @@ TEST(TestIRac, initState) {
   EXPECT_EQ(stdAc::swingv_t::kOff, builtin_init.swingv);
   EXPECT_EQ(decode_type_t::UNKNOWN, no_init.protocol);
   EXPECT_EQ(stdAc::ac_command_t::kControlCommand, no_init.command);
+  EXPECT_FALSE(no_init.iFeel);
+  EXPECT_EQ(-1, no_init.roomTemperature);
+}
+
+TEST(TestIRac, cleanState) {
+  IRac irac(kGpioUnused);
+  stdAc::state_t s = {};
+  s.mode = stdAc::opmode_t::kFan;
+  s.power = true;
+  s.roomTemperature = 20.5;
+  s.degrees = 22.3;
+
+  auto clean = irac.cleanState(s);
+  EXPECT_TRUE(clean.power);
+  EXPECT_EQ(s.mode, clean.mode);
+  EXPECT_EQ(s.roomTemperature, clean.roomTemperature);
+  EXPECT_EQ(s.degrees, clean.degrees);
+
+  s.mode = stdAc::opmode_t::kOff;
+  clean = irac.cleanState(s);
+  EXPECT_FALSE(clean.power);
+
+  s.roomTemperature = -1;
+  clean = irac.cleanState(s);
+  EXPECT_EQ(s.degrees, clean.roomTemperature);
 }

@@ -126,6 +126,8 @@ struct state_t {
   int16_t sleep = -1;  // `-1` means off.
   int16_t clock = -1;  // `-1` means not set.
   stdAc::ac_command_t command = stdAc::ac_command_t::kControlCommand;
+  bool iFeel = false;
+  float roomTemperature = -1;  // `-1` means not set.
 };
 };  // namespace stdAc
 

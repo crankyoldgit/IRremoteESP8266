@@ -1256,11 +1256,12 @@ stdAc::state_t IRArgoAC::toCommon(void) const {
   result.power = _.Power;
   result.mode = toCommonMode(getModeEx());
   result.celsius = true;
-  result.degrees = (_messageType != argoIrMessageType_t::IFEEL_TEMP_REPORT)?
-                   getTemp() : getRoomTemp();
+  result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFanEx());
   result.turbo = _.Max;
   result.sleep = _.Night ? 0 : -1;
+  result.iFeel = getiFeel();
+  result.roomTemperature = getRoomTemp();
   // Not supported.
   result.swingv = stdAc::swingv_t::kOff;
   result.swingh = stdAc::swingh_t::kOff;
@@ -1271,7 +1272,6 @@ stdAc::state_t IRArgoAC::toCommon(void) const {
   result.clean = false;
   result.beep = false;
   result.clock = -1;
-  // Common does not (yet?) support commandType / iFeel / roomTemp
   return result;
 }
 
@@ -1285,8 +1285,7 @@ stdAc::state_t IRArgoAC_WREM3::toCommon(void) const {
   result.power = getPower();
   result.mode = toCommonMode(getModeEx());
   result.celsius = true;
-  result.degrees = (_messageType != argoIrMessageType_t::IFEEL_TEMP_REPORT)?
-                   getTemp() : getRoomTemp();
+  result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFanEx());
   result.turbo = _.Max;
   result.swingv = toCommonSwingV(_.Flap);
@@ -1302,12 +1301,13 @@ stdAc::state_t IRArgoAC_WREM3::toCommon(void) const {
     result.clock = getCurrentTimeMinutes();
     result.sleep = getDelayTimerMinutes();
   }
+  result.iFeel = getiFeel();
+  result.roomTemperature = getRoomTemp();
 
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.clean = false;
 
-  // Common does not (yet?) support commandType / iFeel / roomTemp
 
   return result;
 }

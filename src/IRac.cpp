@@ -498,16 +498,18 @@ void IRac::argo(IRArgoAC *ac,
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The set temperature setting in degrees Celsius.
+/// @param[in] roomTemp The room (iFeel) temperature setting in degrees Celsius.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] iFeel Whether to enable iFeel mode on the A/C unit.
 /// @param[in] night Enable night mode (raises temp by +1*C after 1h).
 /// @param[in] econo Enable eco mode (limits power consumed).
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] filter Enable filter mode
 /// @param[in] light Enable device display/LEDs
 void IRac::argoWrem3_ACCommand(IRArgoAC_WREM3 *ac, const bool on,
-    const stdAc::opmode_t mode, const float degrees,
-    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+    const stdAc::opmode_t mode, const float degrees, const float roomTemp,
+    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv, const bool iFeel,
     const bool night, const bool econo, const bool turbo, const bool filter,
     const bool light) {
   ac->begin();
@@ -515,14 +517,15 @@ void IRac::argoWrem3_ACCommand(IRArgoAC_WREM3 *ac, const bool on,
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
+  ac->setRoomTemp(roomTemp);
   ac->setFan(ac->convertFan(fan));
   ac->setFlap(ac->convertSwingV(swingv));
+  ac->setiFeel(iFeel);
   ac->setNight(night);
   ac->setEco(econo);
   ac->setMax(turbo);
   ac->setFilter(filter);
   ac->setLight(light);
-  // No "sensorTemp" mode/value support in common (yet)
   // No Clean setting available.
   // No Beep setting available - always beeps in this mode :)
   ac->send();
@@ -2782,6 +2785,7 @@ stdAc::state_t IRac::cleanState(const stdAc::state_t state) {
   // A hack for Home Assistant, it appears to need/want an Off opmode.
   // So enforce the power is off if the mode is also off.
   if (state.mode == stdAc::opmode_t::kOff) result.power = false;
+  if (state.roomTemperature == -1.0) result.roomTemperature = state.degrees;
   return result;
 }
 
@@ -2982,8 +2986,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
         IRArgoAC_WREM3 ac(_pin, _inverted, _modulation);
         switch (send.command) {
           case stdAc::ac_command_t::kTemperatureReport:
-            argoWrem3_iFeelReport(&ac, send.degrees);  // Uses "degrees"
-                                                       // as roomTemp
+            argoWrem3_iFeelReport(&ac, send.roomTemperature);
             break;
           case stdAc::ac_command_t::kConfigCommand:
             /// @warning: this is ABUSING current **common** parameters:
@@ -2998,8 +3001,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
           case stdAc::ac_command_t::kControlCommand:
           default:
             argoWrem3_ACCommand(&ac, send.power, send.mode, send.degrees,
-              send.fanspeed, send.swingv, send.quiet, send.econo, send.turbo,
-              send.filter, send.light);
+              send.roomTemperature, send.fanspeed, send.swingv, send.iFeel,
+              send.quiet, send.econo, send.turbo, send.filter, send.light);
             break;
         }
         OUTPUT_DECODE_RESULTS_FOR_UT(ac);
@@ -3578,7 +3581,8 @@ bool IRac::cmpStates(const stdAc::state_t a, const stdAc::state_t b) {
       a.swingh != b.swingh || a.quiet != b.quiet || a.turbo != b.turbo ||
       a.econo != b.econo || a.light != b.light || a.filter != b.filter ||
       a.clean != b.clean || a.beep != b.beep || a.sleep != b.sleep ||
-      a.mode != b.mode;
+      a.mode != b.mode || a.roomTemperature != b.roomTemperature ||
+      a.iFeel != b.iFeel;
 }
 
 /// Check if the internal state has changed from what was previously sent.
