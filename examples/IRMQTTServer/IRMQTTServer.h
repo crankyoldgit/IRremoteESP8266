@@ -253,6 +253,9 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define KEY_JSON "json"
 #define KEY_RESEND "resend"
 #define KEY_VCC "vcc"
+#define KEY_COMMAND "command"
+#define KEY_ROOMTEMP "roomtemp"
+#define KEY_IFEEL "ifeel"
 
 // HTML arguments we will parse for IR code information.
 #define KEY_TYPE "type"  // KEY_PROTOCOL is also checked too.
@@ -358,7 +361,8 @@ static const char kClimateTopics[] PROGMEM =
     "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
     KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
     KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
-    KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS "|" KEY_RESEND
+    KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS "|" KEY_RESEND "|" KEY_COMMAND "|"
+    "|" KEY_ROOMTEMP "|" KEY_IFEEL
 #if MQTT_CLIMATE_JSON
     "|" KEY_JSON
 #endif  // MQTT_CLIMATE_JSON
@@ -367,6 +371,7 @@ static const char* const kMqttTopics[] = {
     KEY_PROTOCOL, KEY_MODEL, KEY_POWER, KEY_MODE, KEY_TEMP, KEY_FANSPEED,
     KEY_SWINGV, KEY_SWINGH, KEY_QUIET, KEY_TURBO, KEY_LIGHT, KEY_BEEP,
     KEY_ECONO, KEY_SLEEP, KEY_FILTER, KEY_CLEAN, KEY_CELSIUS, KEY_RESEND,
+    KEY_COMMAND, KEY_ROOMTEMP, KEY_IFEEL
     KEY_JSON};  // KEY_JSON needs to be the last one.
 
 

@@ -984,6 +984,18 @@ String htmlSelectModel(const String name, const int16_t def) {
   return html;
 }
 
+String htmlSelectCommandType(const String name, const stdAc::ac_command_t def) {
+  String html = F("<select name='") + name + F("'>");
+  for (uint8_t i = 0;
+       i <= (int8_t)stdAc::ac_command_t::kLastAcCommandEnum;
+       i++) {
+    String mode = IRac::commandTypeToString((stdAc::ac_command_t)i);
+    html += htmlOptionItem(mode, mode, (stdAc::ac_command_t)i == def);
+  }
+  html += F("</select>");
+  return html;
+}
+
 String htmlSelectUint(const String name, const uint16_t max,
                       const uint16_t def) {
   String html = F("<select name='") + name + F("'>");
@@ -1108,6 +1120,9 @@ void handleAirCon(void) {
         "<tr><td>" D_STR_MODEL "</td><td>") +
             htmlSelectModel(KEY_MODEL, climate[chan]->next.model) +
             F("</td></tr>"
+        "<tr><td>" D_STR_COMMAND_TYPE "</td><td>") +
+            htmlSelectCommandType(KEY_COMMAND, climate[chan]->next.command) +
+            F("</td></tr>"
         "<tr><td>" D_STR_POWER "</td><td>") +
             htmlSelectBool(KEY_POWER, climate[chan]->next.power) +
             F("</td></tr>"
@@ -1126,6 +1141,11 @@ void handleAirCon(void) {
                 (!climate[chan]->next.celsius ? " selected='selected'" : "") +
                 F(">F</option>"
             "</select></td></tr>"
+        "<tr><td>" D_STR_SENSORTEMP "</td><td>"
+            "<input type='number' name='" KEY_ROOMTEMP "' min='-1' max='90' "
+            "step='0.5' value='") +
+            String(climate[chan]->next.roomTemperature, 1) +
+            F("'></td></tr>"
         "<tr><td>" D_STR_FAN "</td><td>") +
             htmlSelectFanspeed(KEY_FANSPEED, climate[chan]->next.fanspeed) +
             F("</td></tr>"
@@ -1137,6 +1157,9 @@ void handleAirCon(void) {
             F("</td></tr>"
         "<tr><td>" D_STR_QUIET "</td><td>") +
             htmlSelectBool(KEY_QUIET, climate[chan]->next.quiet) +
+            F("</td></tr>"
+        "<tr><td>" D_STR_IFEEL "</td><td>") +
+            htmlSelectBool(KEY_IFEEL, climate[chan]->next.iFeel) +
             F("</td></tr>"
         "<tr><td>" D_STR_TURBO "</td><td>") +
             htmlSelectBool(KEY_TURBO, climate[chan]->next.turbo) +
@@ -2976,6 +2999,7 @@ void sendJsonState(const stdAc::state_t state, const String topic,
   DynamicJsonDocument json(kJsonAcStateMaxSize);
   json[KEY_PROTOCOL] = typeToString(state.protocol);
   json[KEY_MODEL] = state.model;
+  json[KEY_COMMAND] = IRac::commandToString(state.command);
   json[KEY_POWER] = IRac::boolToString(state.power);
   json[KEY_MODE] = IRac::opmodeToString(state.mode, ha_mode);
   // Home Assistant wants mode to be off if power is also off & vice-versa.
@@ -2985,10 +3009,12 @@ void sendJsonState(const stdAc::state_t state, const String topic,
   }
   json[KEY_CELSIUS] = IRac::boolToString(state.celsius);
   json[KEY_TEMP] = state.degrees;
+  json[KEY_ROOMTEMP] = state.roomTemp;
   json[KEY_FANSPEED] = IRac::fanspeedToString(state.fanspeed);
   json[KEY_SWINGV] = IRac::swingvToString(state.swingv);
   json[KEY_SWINGH] = IRac::swinghToString(state.swingh);
   json[KEY_QUIET] = IRac::boolToString(state.quiet);
+  json[KEY_IFEEL] = IRac::boolToString(state.iFeel);
   json[KEY_TURBO] = IRac::boolToString(state.turbo);
   json[KEY_ECONO] = IRac::boolToString(state.econo);
   json[KEY_LIGHT] = IRac::boolToString(state.light);
@@ -3026,6 +3052,10 @@ stdAc::state_t jsonToState(const stdAc::state_t current, const char *str) {
     result.model = IRac::strToModel(json[KEY_MODEL].as<char*>());
   else if (validJsonInt(json, KEY_MODEL))
     result.model = json[KEY_MODEL];
+  if (validJsonStr(json, KEY_COMMAND))
+    result.command = IRac::strToCommand(json[KEY_COMMAND].as<char*>());
+  else if (validJsonInt(json, KEY_COMMAND))
+    result.command = json[KEY_COMMAND];
   if (validJsonStr(json, KEY_MODE))
     result.mode = IRac::strToOpmode(json[KEY_MODE]);
   if (validJsonStr(json, KEY_FANSPEED))
@@ -3036,10 +3066,14 @@ stdAc::state_t jsonToState(const stdAc::state_t current, const char *str) {
     result.swingh = IRac::strToSwingH(json[KEY_SWINGH]);
   if (json.containsKey(KEY_TEMP))
     result.degrees = json[KEY_TEMP];
+  if (json.containsKey(KEY_ROOMTEMP))
+    result.roomTemp = json[KEY_ROOMTEMP];
   if (validJsonInt(json, KEY_SLEEP))
     result.sleep = json[KEY_SLEEP];
   if (validJsonStr(json, KEY_POWER))
     result.power = IRac::strToBool(json[KEY_POWER]);
+  if (validJsonStr(json, KEY_IFEEL))
+    result.iFeel = IRac::strToBool(json[KEY_IFEEL]);
   if (validJsonStr(json, KEY_QUIET))
     result.quiet = IRac::strToBool(json[KEY_QUIET]);
   if (validJsonStr(json, KEY_TURBO))
@@ -3071,6 +3105,8 @@ void updateClimate(stdAc::state_t *state, const String str,
     state->protocol = strToDecodeType(payload.c_str());
   } else if (str.equals(prefix + F(KEY_MODEL))) {
     state->model = IRac::strToModel(payload.c_str());
+  } else if (str.equals(prefix + F(KEY_COMMAND))) {
+    state->command = IRac::strToCommandType(payload.c_str());
   } else if (str.equals(prefix + F(KEY_POWER))) {
     state->power = IRac::strToBool(payload.c_str());
 #if MQTT_CLIMATE_HA_MODE
@@ -3085,12 +3121,16 @@ void updateClimate(stdAc::state_t *state, const String str,
 #endif  // MQTT_CLIMATE_HA_MODE
   } else if (str.equals(prefix + F(KEY_TEMP))) {
     state->degrees = payload.toFloat();
+  } else if (str.equals(prefix + F(KEY_ROOMTEMP))) {
+    state->roomTemperature = payload.toFloat();
   } else if (str.equals(prefix + F(KEY_FANSPEED))) {
     state->fanspeed = IRac::strToFanspeed(payload.c_str());
   } else if (str.equals(prefix + F(KEY_SWINGV))) {
     state->swingv = IRac::strToSwingV(payload.c_str());
   } else if (str.equals(prefix + F(KEY_SWINGH))) {
     state->swingh = IRac::strToSwingH(payload.c_str());
+  } else if (str.equals(prefix + F(KEY_IFEEL))) {
+    state->iFeel = IRac::strToBool(payload.c_str());
   } else if (str.equals(prefix + F(KEY_QUIET))) {
     state->quiet = IRac::strToBool(payload.c_str());
   } else if (str.equals(prefix + F(KEY_TURBO))) {
@@ -3128,6 +3168,11 @@ bool sendClimate(const String topic_prefix, const bool retain,
     diff = true;
     success &= sendInt(topic_prefix + KEY_MODEL, next.model, retain);
   }
+  if (prev.command != next.command || forceMQTT) {
+    String command_str = IRac::commandTypeToString(next.command);
+    diff = true;
+    success &= sendString(topic_prefix + KEY_COMMAND, command_str, retain);
+  }
 #ifdef MQTT_CLIMATE_HA_MODE
   String mode_str = IRac::opmodeToString(next.mode, MQTT_CLIMATE_HA_MODE);
 #else  // MQTT_CLIMATE_HA_MODE
@@ -3161,6 +3206,11 @@ bool sendClimate(const String topic_prefix, const bool retain,
     diff = true;
     success &= sendBool(topic_prefix + KEY_CELSIUS, next.celsius, retain);
   }
+  if (prev.roomTemperature != next.roomTemperature || forceMQTT) {
+    diff = true;
+    success &= sendFloat(topic_prefix + KEY_ROOMTEMP, next.roomTemperature,
+                         retain);
+  }
   if (prev.fanspeed != next.fanspeed || forceMQTT) {
     diff = true;
     success &= sendString(topic_prefix + KEY_FANSPEED,
@@ -3175,6 +3225,10 @@ bool sendClimate(const String topic_prefix, const bool retain,
     diff = true;
     success &= sendString(topic_prefix + KEY_SWINGH,
                           IRac::swinghToString(next.swingh), retain);
+  }
+  if (prev.iFeel != next.iFeel || forceMQTT) {
+    diff = true;
+    success &= sendBool(topic_prefix + KEY_IFEEL, next.iFeel, retain);
   }
   if (prev.quiet != next.quiet || forceMQTT) {
     diff = true;
