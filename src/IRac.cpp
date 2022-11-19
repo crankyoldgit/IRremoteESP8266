@@ -64,6 +64,34 @@
 #endif  // ESP8266
 #endif  // STRCASECMP
 
+#ifndef UNIT_TEST
+#define OUTPUT_DECODE_RESULTS_FOR_UT(ac)
+#else
+/// If compiling for UT *and* a test receiver @c IRrecv is provided via the
+/// @c _utReceived param, this injects an "output" gadget @c _lastDecodeResults
+/// into the @c IRAc::sendAc method, so that the UT code may parse the "sent"
+/// value and drive further assertions
+///
+/// @note The @c decode_results "returned" is a shallow copy (empty rawbuf),
+///       mostly b/c the class does not have a custom/deep copy c-tor
+///       and defining it would be an overkill for this purpose
+/// @note For future maintainers: If @c IRAc class is ever refactored to use
+///       polymorphism (static or dynamic)... this macro should be removed
+///       and replaced with proper GMock injection.
+#define OUTPUT_DECODE_RESULTS_FOR_UT(ac)                        \
+  {                                                             \
+    if (_utReceiver) {                                          \
+      _lastDecodeResults = nullptr;                             \
+      (ac)._irsend.makeDecodeResult();                          \
+      if (_utReceiver->decode(&(ac)._irsend.capture)) {         \
+        _lastDecodeResults = std::unique_ptr<decode_results>(   \
+          new decode_results((ac)._irsend.capture));            \
+        _lastDecodeResults->rawbuf = nullptr;                   \
+      }                                                         \
+    }                                                           \
+  }
+#endif  // UNIT_TEST
+
 /// Class constructor
 /// @param[in] pin Gpio pin to use when transmitting IR messages.
 /// @param[in] inverted true, gpio output defaults to high. false, to low.
@@ -2890,10 +2918,12 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
         argoWrem3_ACCommand(&ac, send.power, send.mode, send.degrees,
           send.fanspeed, send.swingv, send.quiet, send.econo, send.turbo,
           send.filter, send.light);
+        OUTPUT_DECODE_RESULTS_FOR_UT(ac);
       } else {
         IRArgoAC ac(_pin, _inverted, _modulation);
         argo(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
             send.turbo, send.sleep);
+        OUTPUT_DECODE_RESULTS_FOR_UT(ac);
       }
       break;
     }
