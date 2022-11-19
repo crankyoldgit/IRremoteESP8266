@@ -79,6 +79,18 @@ enum class swingv_t {
   kLastSwingvEnum = kLowest,
 };
 
+/// @brief Tyoe of A/C command (if the remote uses different codes for each)
+/// @note Most remotes support only a single command or aggregate multiple
+///       into one (e.g. control+timer). Use @c kControlCommand in such case
+enum class ac_command_t {
+  kControlCommand = 0,
+  kTemperatureReport = 1,
+  kTimerCommand = 2,
+  kConfigCommand = 3,
+  // Add new entries before this one, and update it to point to the last entry
+  kLastAcCommandEnum = kConfigCommand,
+};
+
 /// Common A/C settings for Horizontal Swing.
 enum class swingh_t {
   kOff =     -1,
@@ -113,6 +125,7 @@ struct state_t {
   bool beep = false;
   int16_t sleep = -1;  // `-1` means off.
   int16_t clock = -1;  // `-1` means not set.
+  stdAc::ac_command_t command = stdAc::ac_command_t::kControlCommand;
 };
 };  // namespace stdAc
 

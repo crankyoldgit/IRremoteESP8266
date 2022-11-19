@@ -527,6 +527,71 @@ void IRac::argoWrem3_ACCommand(IRArgoAC_WREM3 *ac, const bool on,
   // No Beep setting available - always beeps in this mode :)
   ac->send();
 }
+
+/// Send an Argo A/C WREM-3 iFeel (room temp) silent (no beep) report.
+/// @param[in, out] ac A Ptr to an IRArgoAC_WREM3 object to use.
+/// @param[in] roomTemp The room (iFeel) temperature setting in degrees Celsius.
+void IRac::argoWrem3_iFeelReport(IRArgoAC_WREM3 *ac, const float roomTemp) {
+  ac->begin();
+  ac->setMessageType(argoIrMessageType_t::IFEEL_TEMP_REPORT);
+  ac->setRoomTemp(roomTemp);
+  ac->send();
+}
+
+/// Send an Argo A/C WREM-3 Config command.
+/// @param[in, out] ac A Ptr to an IRArgoAC_WREM3 object to use.
+/// @param[in] param The parameter ID.
+/// @param[in] value The parameter value.
+/// @param[in] safe If true, will only allow setting the below parameters
+///                 in order to avoid accidentally setting a restricted
+///                 vendor-specific param and breaking the A/C device
+/// @note Known parameters (P<xx>, where xx is the @c param)
+///       P05 - Temperature Scale (0-Celsius, 1-Fahrenheit)
+///       P06 - Transmission channel (0..3)
+///       P12 - ECO mode power input limit (30..99, default: 75)
+void IRac::argoWrem3_ConfigSet(IRArgoAC_WREM3 *ac, const uint8_t param,
+    const uint8_t value, bool safe /*= true*/) {
+  if (safe) {
+    switch (param) {
+      case 5:  // temp. scale (note this is likely excess as not transmitted)
+        if (value > 1) { return;  /* invalid */ }
+        break;
+      case 6:  // channel (note this is likely excess as not transmitted)
+        if (value > 3) { return;  /* invalid */ }
+        break;
+      case 12:  // eco power limit
+        if (value < 30 || value > 99) { return;  /* invalid */ }
+        break;
+      default:
+        return;  /* invalid */
+    }
+  }
+  ac->begin();
+  ac->setMessageType(argoIrMessageType_t::CONFIG_PARAM_SET);
+  ac->setConfigEntry(param, value);
+  ac->send();
+}
+
+/// Send an Argo A/C WREM-3 Delay timer command.
+/// @param[in, out] ac A Ptr to an IRArgoAC_WREM3 object to use.
+/// @param[in] on Whether the unit is currently on. The timer, upon elapse
+///               will toggle this state
+/// @param[in] currentTime currentTime in minutes, starting from 00:00
+/// @note For timer mode, this value is not really used much so can be zero.
+/// @param[in] delayMinutes Number of minutes after which the @c on state should
+///                         be toggled
+/// @note Schedule timers are not exposed via this interface
+void IRac::argoWrem3_SetTimer(IRArgoAC_WREM3 *ac, bool on,
+    const uint16_t currentTime, const uint16_t delayMinutes) {
+  ac->begin();
+  ac->setMessageType(argoIrMessageType_t::TIMER_COMMAND);
+  ac->setPower(on);
+  ac->setTimerType(argoTimerType_t::DELAY_TIMER);
+  ac->setCurrentTimeMinutes(currentTime);
+  // Note: Day of week is not set (no need)
+  ac->setDelayTimerMinutes(delayMinutes);
+  ac->send();
+}
 #endif  // SEND_ARGO
 
 #if SEND_BOSCH144
@@ -2915,9 +2980,28 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       if (send.model == argo_ac_remote_model_t::SAC_WREM3) {
         IRArgoAC_WREM3 ac(_pin, _inverted, _modulation);
-        argoWrem3_ACCommand(&ac, send.power, send.mode, send.degrees,
-          send.fanspeed, send.swingv, send.quiet, send.econo, send.turbo,
-          send.filter, send.light);
+        switch (send.command) {
+          case stdAc::ac_command_t::kTemperatureReport:
+            argoWrem3_iFeelReport(&ac, send.degrees);  // Uses "degrees"
+                                                       // as roomTemp
+            break;
+          case stdAc::ac_command_t::kConfigCommand:
+            /// @warning: this is ABUSING current **common** parameters:
+            ///           @c clock and @c sleep as config key and value
+            ///           Hence, value pre-validation is performed (safe-mode)
+            ///           to avoid accidental device misconfiguration
+            argoWrem3_ConfigSet(&ac, send.clock, send.sleep, true);
+            break;
+          case stdAc::ac_command_t::kTimerCommand:
+            argoWrem3_SetTimer(&ac, send.power, send.clock, send.sleep);
+            break;
+          case stdAc::ac_command_t::kControlCommand:
+          default:
+            argoWrem3_ACCommand(&ac, send.power, send.mode, send.degrees,
+              send.fanspeed, send.swingv, send.quiet, send.econo, send.turbo,
+              send.filter, send.light);
+            break;
+        }
         OUTPUT_DECODE_RESULTS_FOR_UT(ac);
       } else {
         IRArgoAC ac(_pin, _inverted, _modulation);
@@ -3493,13 +3577,34 @@ bool IRac::cmpStates(const stdAc::state_t a, const stdAc::state_t b) {
       a.fanspeed != b.fanspeed || a.swingv != b.swingv ||
       a.swingh != b.swingh || a.quiet != b.quiet || a.turbo != b.turbo ||
       a.econo != b.econo || a.light != b.light || a.filter != b.filter ||
-      a.clean != b.clean || a.beep != b.beep || a.sleep != b.sleep;
+      a.clean != b.clean || a.beep != b.beep || a.sleep != b.sleep ||
+      a.mode != b.mode;
 }
 
 /// Check if the internal state has changed from what was previously sent.
 /// @note The comparison excludes the clock.
 /// @return True if it has changed, False if not.
 bool IRac::hasStateChanged(void) { return cmpStates(next, _prev); }
+
+/// Convert the supplied str into the appropriate enum.
+/// @param[in] str A Ptr to a C-style string to be converted.
+/// @param[in] def The enum to return if no conversion was possible.
+/// @return The equivalent enum.
+stdAc::ac_command_t IRac::strToCommandType(const char *str,
+                                           const stdAc::ac_command_t def) {
+  if (!STRCASECMP(str, kControlCommandStr))
+    return stdAc::ac_command_t::kControlCommand;
+  else if (!STRCASECMP(str, kTemperatureReportStr) ||
+           !STRCASECMP(str, kIFeelStr))
+    return stdAc::ac_command_t::kTemperatureReport;
+  else if (!STRCASECMP(str, kTimerCommandStr) ||
+           !STRCASECMP(str, kTimerStr))
+    return stdAc::ac_command_t::kTimerCommand;
+  else if (!STRCASECMP(str, kConfigCommandStr))
+    return stdAc::ac_command_t::kConfigCommand;
+  else
+    return def;
+}
 
 /// Convert the supplied str into the appropriate enum.
 /// @param[in] str A Ptr to a C-style string to be converted.
@@ -3776,6 +3881,19 @@ bool IRac::strToBool(const char *str, const bool def) {
 /// @return The equivalent String for the locale.
 String IRac::boolToString(const bool value) {
   return value ? kOnStr : kOffStr;
+}
+
+/// Convert the supplied operation mode into the appropriate String.
+/// @param[in] cmdType The enum to be converted.
+/// @return The equivalent String for the locale.
+String IRac::commandTypeToString(const stdAc::ac_command_t cmdType) {
+  switch (cmdType) {
+    case stdAc::ac_command_t::kControlCommand:    return kControlCommandStr;
+    case stdAc::ac_command_t::kTemperatureReport: return kTemperatureReportStr;
+    case stdAc::ac_command_t::kTimerCommand:      return kTimerCommandStr;
+    case stdAc::ac_command_t::kConfigCommand:     return kConfigCommandStr;
+    default:                                      return kUnknownStr;
+  }
 }
 
 /// Convert the supplied operation mode into the appropriate String.

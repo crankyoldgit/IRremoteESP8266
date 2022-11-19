@@ -382,6 +382,7 @@ class IRArgoACBase {
   static argoMode_t convertMode(const stdAc::opmode_t mode);
   static argoFan_t convertFan(const stdAc::fanspeed_t speed);
   static argoFlap_t convertSwingV(const stdAc::swingv_t position);
+  static argoIrMessageType_t convertCommand(const stdAc::ac_command_t command);
 
  protected:
   void _stateReset(ARGO_PROTOCOL_T *state, argoIrMessageType_t messageType
@@ -398,6 +399,7 @@ class IRArgoACBase {
   static stdAc::opmode_t toCommonMode(const argoMode_t mode);
   static stdAc::fanspeed_t toCommonFanSpeed(const argoFan_t speed);
   static stdAc::swingv_t toCommonSwingV(const uint8_t position);
+  static stdAc::ac_command_t toCommonCommand(const argoIrMessageType_t command);
 
   // Attributes
   ARGO_PROTOCOL_T _;  ///< The raw protocol data

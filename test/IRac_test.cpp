@@ -73,6 +73,7 @@ TEST(TestIRac, Airton) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Airwell) {
@@ -96,6 +97,7 @@ TEST(TestIRac, Airwell) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Amcor) {
@@ -119,6 +121,7 @@ TEST(TestIRac, Amcor) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Argo) {
@@ -140,6 +143,7 @@ TEST(TestIRac, Argo) {
   EXPECT_EQ(kArgoFlapFull, ac.getFlap());
   EXPECT_FALSE(ac.getMax());  // Turbo
   EXPECT_FALSE(ac.getNight());  // Sleep
+  EXPECT_EQ(argoIrMessageType_t::AC_CONTROL, ac.getMessageType());
 }
 
 TEST(TestIRac, Carrier64) {
@@ -174,6 +178,7 @@ TEST(TestIRac, Carrier64) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Coolix) {
@@ -235,6 +240,7 @@ TEST(TestIRac, Coolix) {
       // End of message #2 (i.e. Repeat '1')
       // Note: the two messages (#1 & #2) are identical.
       ac._irsend.outputStr());
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Corona) {
@@ -277,6 +283,7 @@ TEST(TestIRac, Corona) {
   ASSERT_EQ(expectedCapture, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Daikin) {
@@ -310,6 +317,7 @@ TEST(TestIRac, Daikin) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Daikin128) {
@@ -343,6 +351,7 @@ TEST(TestIRac, Daikin128) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Daikin152) {
@@ -371,6 +380,7 @@ TEST(TestIRac, Daikin152) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Daikin160) {
@@ -396,6 +406,7 @@ TEST(TestIRac, Daikin160) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Daikin176) {
@@ -421,6 +432,7 @@ TEST(TestIRac, Daikin176) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Daikin2) {
@@ -460,6 +472,7 @@ TEST(TestIRac, Daikin2) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Daikin216) {
@@ -488,6 +501,7 @@ TEST(TestIRac, Daikin216) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Daikin64) {
@@ -656,6 +670,7 @@ TEST(TestIRac, Fujitsu) {
   ASSERT_EQ(ardb1_expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   ac._irsend.reset();
   // Try to set the device to 10C Heat mode.
@@ -681,6 +696,7 @@ TEST(TestIRac, Fujitsu) {
   ASSERT_EQ(kFujitsuAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(arrah2e_expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
   ac._irsend.reset();
   irac.fujitsu(&ac,
                fujitsu_ac_remote_model_t::ARRY4,  // Model
@@ -703,6 +719,7 @@ TEST(TestIRac, Fujitsu) {
   ASSERT_EQ(kFujitsuAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(arry4_expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   ac._irsend.reset();
   irac.fujitsu(&ac,
@@ -753,6 +770,7 @@ TEST(TestIRac, Goodweather) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Gree) {
@@ -789,6 +807,7 @@ TEST(TestIRac, Gree) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Haier) {
@@ -818,6 +837,7 @@ TEST(TestIRac, Haier) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Haier160) {
@@ -853,6 +873,7 @@ TEST(TestIRac, Haier160) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Haier176) {
@@ -886,6 +907,7 @@ TEST(TestIRac, Haier176) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, HaierYrwo2) {
@@ -919,6 +941,7 @@ TEST(TestIRac, HaierYrwo2) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Hitachi) {
@@ -946,6 +969,7 @@ TEST(TestIRac, Hitachi) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Hitachi1) {
@@ -978,6 +1002,7 @@ TEST(TestIRac, Hitachi1) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Hitachi264) {
@@ -1003,6 +1028,7 @@ TEST(TestIRac, Hitachi264) {
   ASSERT_EQ(expected_swingon, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
   EXPECT_EQ(decode_type_t::HITACHI_AC264, r.protocol);
   EXPECT_TRUE(r.power);
   EXPECT_EQ(stdAc::opmode_t::kHeat, r.mode);
@@ -1031,6 +1057,7 @@ TEST(TestIRac, Hitachi296) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
   EXPECT_EQ(decode_type_t::HITACHI_AC296, r.protocol);
   EXPECT_TRUE(r.power);
   EXPECT_EQ(stdAc::opmode_t::kHeat, r.mode);
@@ -1062,6 +1089,7 @@ TEST(TestIRac, Hitachi344) {
   ASSERT_EQ(expected_swingon, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
   EXPECT_EQ(decode_type_t::HITACHI_AC344, r.protocol);
   EXPECT_TRUE(r.power);
   EXPECT_EQ(stdAc::opmode_t::kHeat, r.mode);
@@ -1082,6 +1110,7 @@ TEST(TestIRac, Hitachi344) {
   ASSERT_EQ(expected_swingoff, ac.toString());
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
   ASSERT_EQ(HITACHI_AC344, ac._irsend.capture.decode_type);
   ASSERT_EQ(kHitachiAc344Bits, ac._irsend.capture.bits);
   ASSERT_EQ(expected_swingoff,
@@ -1115,6 +1144,7 @@ TEST(TestIRac, Hitachi424) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   ac._irsend.reset();
   irac.hitachi424(&ac,
@@ -1131,6 +1161,7 @@ TEST(TestIRac, Hitachi424) {
   ASSERT_EQ(kHitachiAc424Bits, ac._irsend.capture.bits);
   ASSERT_EQ(expected_swingv, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Kelvinator) {
@@ -1164,6 +1195,7 @@ TEST(TestIRac, Kelvinator) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, LG) {
@@ -1196,6 +1228,7 @@ TEST(TestIRac, LG) {
   ASSERT_EQ(61, ac._irsend.capture.rawlen);
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, LG2) {
@@ -1228,6 +1261,7 @@ TEST(TestIRac, LG2) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
   // Message #2 - SwingV Low
   EXPECT_TRUE(capture.decodeLG(&ac._irsend.capture, 61));
   ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
@@ -1443,6 +1477,7 @@ TEST(TestIRac, LG2_AKB73757604) {
   ASSERT_EQ(LG2, ac._irsend.capture.decode_type);
   ASSERT_EQ(kLgBits, ac._irsend.capture.bits);
   ASSERT_EQ(kLgAcSwingHAuto, ac._irsend.capture.value);
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Midea) {
@@ -1479,6 +1514,7 @@ TEST(TestIRac, Midea) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Mirage) {
@@ -1518,6 +1554,7 @@ TEST(TestIRac, Mirage) {
   ASSERT_EQ(kMirageBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected_KKG9AC1, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   const char expected_KKG29AC1[] =
       "Model: 2 (KKG29AC1), Power: On, Mode: 3 (Dry), Temp: 27C, "
@@ -1535,6 +1572,7 @@ TEST(TestIRac, Mirage) {
   ASSERT_EQ(expected_KKG29AC1,
             IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Mitsubishi) {
@@ -1567,6 +1605,7 @@ TEST(TestIRac, Mitsubishi) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Mitsubishi136) {
@@ -1593,6 +1632,7 @@ TEST(TestIRac, Mitsubishi136) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, MitsubishiHeavy88) {
@@ -1623,6 +1663,7 @@ TEST(TestIRac, MitsubishiHeavy88) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, MitsubishiHeavy152) {
@@ -1656,6 +1697,7 @@ TEST(TestIRac, MitsubishiHeavy152) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Neoclima) {
@@ -1690,6 +1732,7 @@ TEST(TestIRac, Neoclima) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Panasonic) {
@@ -1722,6 +1765,7 @@ TEST(TestIRac, Panasonic) {
   ASSERT_EQ(expected_nke, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   char expected_dke[] =
       "Model: 3 (DKE), Power: On, Mode: 3 (Cool), Temp: 18C, Fan: 4 (Maximum), "
@@ -1748,6 +1792,7 @@ TEST(TestIRac, Panasonic) {
   ASSERT_EQ(kPanasonicAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected_dke, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Panasonic32) {
@@ -1774,6 +1819,7 @@ TEST(TestIRac, Panasonic32) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Samsung) {
@@ -1813,6 +1859,7 @@ TEST(TestIRac, Samsung) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   ac._irsend.reset();
   irac.samsung(&ac,
@@ -1841,6 +1888,7 @@ TEST(TestIRac, Samsung) {
   ASSERT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   ac._irsend.reset();
   const char sleep[] =
@@ -1874,6 +1922,7 @@ TEST(TestIRac, Samsung) {
   ASSERT_EQ(kSamsungAcExtendedBits, ac._irsend.capture.bits);
   ASSERT_EQ(sleep, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Sanyo) {
@@ -1902,6 +1951,7 @@ TEST(TestIRac, Sanyo) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Sanyo88) {
@@ -1931,6 +1981,7 @@ TEST(TestIRac, Sanyo88) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Sharp) {
@@ -1963,6 +2014,7 @@ TEST(TestIRac, Sharp) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Tcl112) {
@@ -1997,6 +2049,7 @@ TEST(TestIRac, Tcl112) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
   // Test the quiet mode, which should generate two messages.
   ac._irsend.reset();
   irac.tcl112(&ac,
@@ -2052,6 +2105,7 @@ TEST(TestIRac, Technibel) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Teco) {
@@ -2079,6 +2133,7 @@ TEST(TestIRac, Teco) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Toshiba) {
@@ -2108,6 +2163,7 @@ TEST(TestIRac, Toshiba) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
   EXPECT_EQ(
       "f38000d50"
       "m4400s4300"
@@ -2183,6 +2239,7 @@ TEST(TestIRac, Transcold) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Trotec) {
@@ -2212,6 +2269,7 @@ TEST(TestIRac, Trotec) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Trotec3550) {
@@ -2242,6 +2300,7 @@ TEST(TestIRac, Trotec3550) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Truma) {
@@ -2271,6 +2330,7 @@ TEST(TestIRac, Truma) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, Vestel) {
@@ -2300,6 +2360,7 @@ TEST(TestIRac, Vestel) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   ac._irsend.reset();
   char expected_clocks[] =
@@ -2325,6 +2386,7 @@ TEST(TestIRac, Vestel) {
   ASSERT_EQ(kVestelAcBits, ac._irsend.capture.bits);
   ASSERT_EQ(expected_clocks, IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   // Now check it sends both messages during normal operation when the
   // clock is set.
@@ -2404,6 +2466,7 @@ TEST(TestIRac, Voltas) {
   ASSERT_EQ(expected_unknown, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   ac._irsend.reset();
   // Test the UNKNOWN model type
@@ -2470,6 +2533,7 @@ TEST(TestIRac, Whirlpool) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 TEST(TestIRac, cmpStates) {
@@ -2663,6 +2727,26 @@ TEST(TestIRac, strToModel) {
   EXPECT_EQ(0, IRac::strToModel("FOOBAR", 0));
 }
 
+TEST(TestIRac, strToCommandType) {
+  EXPECT_EQ(stdAc::ac_command_t::kControlCommand,
+            IRac::strToCommandType("A/C Control"));
+  EXPECT_EQ(stdAc::ac_command_t::kTemperatureReport,
+            IRac::strToCommandType("A/C Temp Report"));
+  EXPECT_EQ(stdAc::ac_command_t::kTemperatureReport,
+            IRac::strToCommandType("IFeel"));
+  EXPECT_EQ(stdAc::ac_command_t::kTimerCommand,
+            IRac::strToCommandType("A/C Set Timer"));
+  EXPECT_EQ(stdAc::ac_command_t::kTimerCommand,
+            IRac::strToCommandType("Timer"));
+  EXPECT_EQ(stdAc::ac_command_t::kConfigCommand,
+            IRac::strToCommandType("A/C Config"));
+  EXPECT_EQ(stdAc::ac_command_t::kControlCommand,
+            IRac::strToCommandType("FOOBAR"));
+  EXPECT_EQ(stdAc::ac_command_t::kTimerCommand,
+            IRac::strToCommandType("FOOBAR", 
+            stdAc::ac_command_t::kTimerCommand));  
+}
+
 TEST(TestIRac, boolToString) {
   EXPECT_EQ("On", IRac::boolToString(true));
   EXPECT_EQ("Off", IRac::boolToString(false));
@@ -2700,6 +2784,17 @@ TEST(TestIRac, swinghToString) {
   EXPECT_EQ("UNKNOWN", IRac::swinghToString((stdAc::swingh_t)500));
 }
 
+TEST(TestIRac, commandTypeToString) {
+  EXPECT_EQ("A/C Control",
+            IRac::commandTypeToString(stdAc::ac_command_t::kControlCommand));
+  EXPECT_EQ("A/C Temp Report",
+            IRac::commandTypeToString(stdAc::ac_command_t::kTemperatureReport));
+  EXPECT_EQ("A/C Set Timer",
+            IRac::commandTypeToString(stdAc::ac_command_t::kTimerCommand));
+  EXPECT_EQ("A/C Config",
+            IRac::commandTypeToString(stdAc::ac_command_t::kConfigCommand));
+}
+
 // Check that we keep the previous state info if the message is a special
 // state-less command.
 TEST(TestIRac, CoolixDecodeToState) {
@@ -2718,6 +2813,7 @@ TEST(TestIRac, CoolixDecodeToState) {
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   stdAc::state_t result;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, result.command);
   ASSERT_EQ(decode_type_t::COOLIX, result.protocol);
   ASSERT_FALSE(result.power);
   ASSERT_EQ(stdAc::opmode_t::kHeat, result.mode);
@@ -2881,6 +2977,7 @@ TEST(TestIRac, Issue1001) {
             IRAcUtils::resultAcToString(&ac._irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
   // Now check if the mode is set to "Off" instead of just change to power off.
   // i.e. How Home Assistant expects things to work.
@@ -2911,6 +3008,7 @@ TEST(TestIRac, Issue1001) {
             "Command: 1 (Power)",
             IRAcUtils::resultAcToString(&ac._irsend.capture));
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &r, &p));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
 // Check power switching in Daikin2 common a/c handling when from an IR message.
@@ -2960,6 +3058,7 @@ TEST(TestIRac, Issue1035) {
   ASSERT_FALSE(prev.power);
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &result, &prev));
   ASSERT_TRUE(result.power);
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, result.command);
 
   prev = result;
 
@@ -2971,6 +3070,7 @@ TEST(TestIRac, Issue1035) {
   ASSERT_EQ(DAIKIN2, ac._irsend.capture.decode_type);
   ASSERT_TRUE(prev.power);
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &result, &prev));
+  ASSERT_EQ(stdAc::ac_command_t::kControlCommand, result.command);
   ASSERT_FALSE(result.power);
 }
 
@@ -3142,4 +3242,5 @@ TEST(TestIRac, initState) {
   EXPECT_EQ(-1, builtin_init.model);
   EXPECT_EQ(stdAc::swingv_t::kOff, builtin_init.swingv);
   EXPECT_EQ(decode_type_t::UNKNOWN, no_init.protocol);
+  EXPECT_EQ(stdAc::ac_command_t::kControlCommand, no_init.command);
 }

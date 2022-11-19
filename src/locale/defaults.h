@@ -451,6 +451,15 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_AC_COMMAND
 #define D_STR_AC_COMMAND "A/C Config"
 #endif  // D_STR_AC_COMMAND
+#ifndef D_STR_AC_CONTROL
+#define D_STR_AC_CONTROL "A/C Control"
+#endif  // D_STR_AC_CONTROL
+#ifndef D_STR_AC_TEMP_REPORT
+#define D_STR_AC_TEMP_REPORT "A/C Temp Report"
+#endif  // D_STR_AC_TEMP_REPORT
+#ifndef D_STR_AC_TIMER
+#define D_STR_AC_TIMER "A/C Set Timer"
+#endif  // D_STR_AC_TIMER
 #ifndef D_STR_COMMAND_TYPE
 #define D_STR_COMMAND_TYPE "A/C Command"
 #endif  // D_STR_COMMAND_TYPE
