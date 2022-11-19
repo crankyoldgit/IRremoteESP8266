@@ -106,7 +106,7 @@ class IRac {
 #ifndef UNIT_TEST
 
  private:
-#endif
+#endif  // UNIT_TEST
   uint16_t _pin;  ///< The GPIO to use to transmit messages from.
   bool _inverted;  ///< IR LED is lit when GPIO is LOW (true) or HIGH (false)?
   bool _modulation;  ///< Is frequency modulation to be used?
@@ -134,6 +134,11 @@ class IRac {
             const bool on, const stdAc::opmode_t mode, const float degrees,
             const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
             const bool turbo, const int16_t sleep = -1);
+  void argoWrem3_ACCommand(IRArgoAC_WREM3 *ac,
+      const bool on, const stdAc::opmode_t mode, const float degrees,
+      const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+      const bool night, const bool econo, const bool turbo, const bool filter,
+      const bool light);
 #endif  // SEND_ARGO
 #if SEND_BOSCH144
   void bosch144(IRBosch144AC *ac,

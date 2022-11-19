@@ -294,6 +294,9 @@ class IRrecv {
 #if DECODE_ARGO
   bool decodeArgo(decode_results *results, uint16_t offset = kStartOffset,
                   const uint16_t nbits = kArgoBits, const bool strict = true);
+  bool decodeArgoWREM3(decode_results *results, uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kArgo3AcControlStateLength * 8,
+                  const bool strict = true);
 #endif  // DECODE_ARGO
 #if DECODE_ARRIS
   bool decodeArris(decode_results *results, uint16_t offset = kStartOffset,
