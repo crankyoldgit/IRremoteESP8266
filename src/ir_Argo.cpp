@@ -1100,7 +1100,8 @@ argoFan_t IRArgoACBase<T>::convertFan(const stdAc::fanspeed_t speed) {
       return argoFan_t::FAN_LOWER;
     case stdAc::fanspeed_t::kMedium:
       return argoFan_t::FAN_LOW;
-    // No 'MEDIUM-HIGH' in common, hence skipping the "actual" medium
+    case stdAc::fanspeed_t::kMediumHigh:
+      return argoFan_t::FAN_MEDIUM;
     case stdAc::fanspeed_t::kHigh:
       return argoFan_t::FAN_HIGH;
     case stdAc::fanspeed_t::kMax:
@@ -1120,7 +1121,8 @@ argoFlap_t IRArgoACBase<T>::convertSwingV(const stdAc::swingv_t position) {
       return argoFlap_t::FLAP_1;
     case stdAc::swingv_t::kHigh:
       return argoFlap_t::FLAP_2;
-    // Skipping "flap3" -> no UPPER-MIDDLE in common
+    case stdAc::swingv_t::kUpperMiddle:
+      return argoFlap_t::FLAP_3;
     case stdAc::swingv_t::kMiddle:
       return argoFlap_t::FLAP_4;
     case stdAc::swingv_t::kLow:
@@ -1180,7 +1182,8 @@ stdAc::swingv_t IRArgoACBase<ArgoProtocolWREM3>::toCommonSwingV(
       return stdAc::swingv_t::kHighest;
     case argoFlap_t::FLAP_5:
       return stdAc::swingv_t::kHigh;
-    case argoFlap_t::FLAP_4:  // Upper-middle collapsed to "middle"
+    case argoFlap_t::FLAP_4:
+      return stdAc::swingv_t::kUpperMiddle;
     case argoFlap_t::FLAP_3:
       return stdAc::swingv_t::kMiddle;
     case argoFlap_t::FLAP_2:
@@ -1237,9 +1240,8 @@ stdAc::fanspeed_t IRArgoACBase<T>::toCommonFanSpeed(const argoFan_t speed) {
     case argoFan_t::FAN_AUTO: return stdAc::fanspeed_t::kAuto;
     case argoFan_t::FAN_HIGHEST: return stdAc::fanspeed_t::kMax;
     case argoFan_t::FAN_HIGH: return stdAc::fanspeed_t::kHigh;
-    case argoFan_t::FAN_MEDIUM:  // No "Medium-High" support in common
-    case argoFan_t::FAN_LOW:
-      return stdAc::fanspeed_t::kMedium;
+    case argoFan_t::FAN_MEDIUM: return stdAc::fanspeed_t::kMediumHigh;
+    case argoFan_t::FAN_LOW: return stdAc::fanspeed_t::kMedium;
     case argoFan_t::FAN_LOWER: return stdAc::fanspeed_t::kLow;
     case argoFan_t::FAN_LOWEST: return stdAc::fanspeed_t::kMin;
     default: return stdAc::fanspeed_t::kAuto;

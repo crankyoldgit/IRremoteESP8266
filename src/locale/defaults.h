@@ -448,6 +448,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_BOTTOM
 #define D_STR_BOTTOM "Bottom"
 #endif  // D_STR_BOTTOM
+#ifndef D_STR_UPPER_MIDDLE
+#define D_STR_UPPER_MIDDLE "UpperMiddle"
+#endif  // D_STR_UPPER_MIDDLE
 #ifndef D_STR_AC_COMMAND
 #define D_STR_AC_COMMAND "A/C Config"
 #endif  // D_STR_AC_COMMAND

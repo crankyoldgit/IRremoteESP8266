@@ -3673,6 +3673,8 @@ stdAc::fanspeed_t IRac::strToFanspeed(const char *str,
            !STRCASECMP(str, kMaximumStr) ||
            !STRCASECMP(str, kHighestStr))
     return stdAc::fanspeed_t::kMax;
+  else if (!STRCASECMP(str, kMedHighStr))
+    return stdAc::fanspeed_t::kMediumHigh;
   else
     return def;
 }
@@ -3705,6 +3707,8 @@ stdAc::swingv_t IRac::strToSwingV(const char *str,
            !STRCASECMP(str, kMediumStr) ||
            !STRCASECMP(str, kCentreStr))
     return stdAc::swingv_t::kMiddle;
+  else if (!STRCASECMP(str, kUpperMiddleStr))
+    return stdAc::swingv_t::kUpperMiddle;
   else if (!STRCASECMP(str, kHighStr) ||
            !STRCASECMP(str, kHiStr))
     return stdAc::swingv_t::kHigh;
@@ -3921,13 +3925,14 @@ String IRac::opmodeToString(const stdAc::opmode_t mode, const bool ha) {
 /// @return The equivalent String for the locale.
 String IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kAuto:   return kAutoStr;
-    case stdAc::fanspeed_t::kMax:    return kMaxStr;
-    case stdAc::fanspeed_t::kHigh:   return kHighStr;
-    case stdAc::fanspeed_t::kMedium: return kMediumStr;
-    case stdAc::fanspeed_t::kLow:    return kLowStr;
-    case stdAc::fanspeed_t::kMin:    return kMinStr;
-    default:                         return kUnknownStr;
+    case stdAc::fanspeed_t::kAuto:       return kAutoStr;
+    case stdAc::fanspeed_t::kMax:        return kMaxStr;
+    case stdAc::fanspeed_t::kHigh:       return kHighStr;
+    case stdAc::fanspeed_t::kMedium:     return kMediumStr;
+    case stdAc::fanspeed_t::kMediumHigh: return kMedHighStr;
+    case stdAc::fanspeed_t::kLow:        return kLowStr;
+    case stdAc::fanspeed_t::kMin:        return kMinStr;
+    default:                             return kUnknownStr;
   }
 }
 
@@ -3936,14 +3941,15 @@ String IRac::fanspeedToString(const stdAc::fanspeed_t speed) {
 /// @return The equivalent String for the locale.
 String IRac::swingvToString(const stdAc::swingv_t swingv) {
   switch (swingv) {
-    case stdAc::swingv_t::kOff:     return kOffStr;
-    case stdAc::swingv_t::kAuto:    return kAutoStr;
-    case stdAc::swingv_t::kHighest: return kHighestStr;
-    case stdAc::swingv_t::kHigh:    return kHighStr;
-    case stdAc::swingv_t::kMiddle:  return kMiddleStr;
-    case stdAc::swingv_t::kLow:     return kLowStr;
-    case stdAc::swingv_t::kLowest:  return kLowestStr;
-    default:                        return kUnknownStr;
+    case stdAc::swingv_t::kOff:          return kOffStr;
+    case stdAc::swingv_t::kAuto:         return kAutoStr;
+    case stdAc::swingv_t::kHighest:      return kHighestStr;
+    case stdAc::swingv_t::kHigh:         return kHighStr;
+    case stdAc::swingv_t::kMiddle:       return kMiddleStr;
+    case stdAc::swingv_t::kUpperMiddle:  return kUpperMiddleStr;
+    case stdAc::swingv_t::kLow:          return kLowStr;
+    case stdAc::swingv_t::kLowest:       return kLowestStr;
+    default:                             return kUnknownStr;
   }
 }
 
