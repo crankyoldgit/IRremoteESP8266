@@ -378,6 +378,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_MEDIUM
 #define D_STR_MEDIUM "Medium"
 #endif  // D_STR_MEDIUM
+#ifndef D_STR_MED_HIGH
+#define D_STR_MED_HIGH "Med-high"
+#endif  // D_STR_MEDIUM
 
 #ifndef D_STR_HIGHEST
 #define D_STR_HIGHEST "Highest"
@@ -445,6 +448,27 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_BOTTOM
 #define D_STR_BOTTOM "Bottom"
 #endif  // D_STR_BOTTOM
+#ifndef D_STR_AC_COMMAND
+#define D_STR_AC_COMMAND "A/C Config"
+#endif  // D_STR_AC_COMMAND
+#ifndef D_STR_COMMAND_TYPE
+#define D_STR_COMMAND_TYPE "A/C Command"
+#endif  // D_STR_COMMAND_TYPE
+#ifndef D_STR_SCHEDULE
+#define D_STR_SCHEDULE "Schedule"
+#endif  // D_STR_SCHEDULE
+#ifndef D_STR_CH
+#define D_STR_CH "CH#"
+#endif  // D_STR_CH
+#ifndef D_STR_TIMER_ACTIVE_DAYS
+#define D_STR_TIMER_ACTIVE_DAYS "TimerActiveDays"
+#endif  // D_STR_TIMER_ACTIVE_DAYS
+#ifndef D_STR_KEY
+#define D_STR_KEY "Key"
+#endif  // D_STR_KEY
+#ifndef D_STR_VALUE
+#define D_STR_VALUE "Value"
+#endif  // D_STR_VALUE
 
 // Compound words/phrases/descriptions from pre-defined words.
 // Note: Obviously these need to be defined *after* their component words.
@@ -689,6 +713,12 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_DG11J191
 #define D_STR_DG11J191 "DG11J191"
 #endif  // D_STR_DG11J191
+#ifndef D_STR_ARGO_WREM2
+#define D_STR_ARGO_WREM2 "WREM2"
+#endif  // D_STR_ARGO_WREM2
+#ifndef D_STR_ARGO_WREM3
+#define D_STR_ARGO_WREM3 "WREM3"
+#endif  // D_STR_ARGO_WREM3
 
 // Protocols Names
 #ifndef D_STR_AIRTON

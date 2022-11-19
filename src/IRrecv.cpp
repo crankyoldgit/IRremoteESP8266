@@ -942,8 +942,20 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
       return true;
 #endif
 #if DECODE_ARGO
-    DPRINTLN("Attempting Argo decode");
-    if (decodeArgo(results, offset) ||
+  DPRINTLN("Attempting Argo WREM3 decode (AC Control)");
+  if (decodeArgoWREM3(results, offset, kArgo3AcControlStateLength * 8, true))
+    return true;
+  DPRINTLN("Attempting Argo WREM3 decode (iFeel report)");
+  if (decodeArgoWREM3(results, offset, kArgo3iFeelReportStateLength * 8, true))
+    return true;
+  DPRINTLN("Attempting Argo WREM3 decode (Config)");
+  if (decodeArgoWREM3(results, offset, kArgo3ConfigStateLength * 8, true))
+    return true;
+  DPRINTLN("Attempting Argo WREM3 decode (Timer)");
+  if (decodeArgoWREM3(results, offset, kArgo3TimerStateLength * 8, true))
+    return true;
+  DPRINTLN("Attempting Argo WREM2 decode");
+    if (decodeArgo(results, offset, kArgoBits) ||
         decodeArgo(results, offset, kArgoShortBits, false)) return true;
 #endif  // DECODE_ARGO
 #if DECODE_SHARP_AC

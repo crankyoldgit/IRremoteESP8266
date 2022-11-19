@@ -695,6 +695,13 @@ namespace irutils {
           default:                                    return kUnknownStr;
         }
         break;
+      case decode_type_t::ARGO:
+        switch (model) {
+          case argo_ac_remote_model_t::SAC_WREM2: return kArgoWrem2Str;
+          case argo_ac_remote_model_t::SAC_WREM3: return kArgoWrem3Str;
+          default:                                return kUnknownStr;
+        }
+        break;
       default: return kUnknownStr;
     }
   }
@@ -722,10 +729,12 @@ namespace irutils {
   /// @param[in] celsius Is the temp Celsius or Fahrenheit.
   ///  true is C, false is F
   /// @param[in] precomma Should the output string start with ", " or not?
+  /// @param[in] isRoomTemp Is the value a room (ambient) temperature or target?
   /// @return The resulting String.
   String addTempToString(const uint16_t degrees, const bool celsius,
-                         const bool precomma) {
-    String result = addIntToString(degrees, kTempStr, precomma);
+                         const bool precomma, const bool isRoomTemp) {
+    String result = addIntToString(degrees, (isRoomTemp)? kRoomStr : kTempStr,
+                                   precomma);
     result += celsius ? 'C' : 'F';
     return result;
   }
@@ -736,12 +745,14 @@ namespace irutils {
   /// @param[in] celsius Is the temp Celsius or Fahrenheit.
   ///  true is C, false is F
   /// @param[in] precomma Should the output string start with ", " or not?
+  /// @param[in] isRoomTemp Is the value a room (ambient) temperature or target?
   /// @return The resulting String.
   String addTempFloatToString(const float degrees, const bool celsius,
-                              const bool precomma) {
+                              const bool precomma, const bool isRoomTemp) {
     String result = "";
     result.reserve(14);  // Assuming ", Temp: XXX.5F" is the largest.
-    result += addIntToString(degrees, kTempStr, precomma);
+    result += addIntToString(degrees, isRoomTemp? kRoomStr : kTempStr,
+                             precomma);
     // Is it a half degree?
     if (((uint16_t)(2 * degrees)) & 1) result += F(".5");
     result += celsius ? 'C' : 'F';
@@ -788,43 +799,57 @@ namespace irutils {
     result.reserve(19);  // ", Day: N (UNKNOWN)"
     result += addIntToString(day_of_week, kDayStr, precomma);
     result += kSpaceLBraceStr;
+    result += dayToString(day_of_week, offset);
+    return result + ')';
+  }
+
+  /// Create a String of the 3-letter day of the week from a numerical day of
+  /// the week. e.g. "Mon"
+  /// @param[in] day_of_week A numerical version of the sequential day of the
+  ///  week. e.g. Sunday = 1, Monday = 2, ..., Saturday = 7
+  /// @param[in] offset Days to offset by.
+  ///  e.g. For different day starting the week.
+  /// @return The resulting String.
+  String dayToString(const uint8_t day_of_week, const int8_t offset) {
     if ((uint8_t)(day_of_week + offset) < 7)
 #if UNIT_TEST
-      result += String(kThreeLetterDayOfWeekStr).substr(
-          (day_of_week + offset) * 3, 3);
+      return String(kThreeLetterDayOfWeekStr).substr(
+        (day_of_week + offset) * 3, 3);
 #else  // UNIT_TEST
-      result += String(kThreeLetterDayOfWeekStr).substring(
-          (day_of_week + offset) * 3, (day_of_week + offset) * 3 + 3);
+      return String(kThreeLetterDayOfWeekStr).substring(
+        (day_of_week + offset) * 3, (day_of_week + offset) * 3 + 3);
 #endif  // UNIT_TEST
     else
-      result += kUnknownStr;
-    return result + ')';
+      return kUnknownStr;
   }
 
   /// Create a String of human output for the given fan speed.
   /// e.g. "Fan: 0 (Auto)"
   /// @param[in] speed The numeric speed of the fan to display.
-  /// @param[in] high The numeric value for High speed.
+  /// @param[in] high The numeric value for High speed. (second highest)
   /// @param[in] low The numeric value for Low speed.
   /// @param[in] automatic The numeric value for Auto speed.
   /// @param[in] quiet The numeric value for Quiet speed.
   /// @param[in] medium The numeric value for Medium speed.
   /// @param[in] maximum The numeric value for Highest speed. (if > high)
+  /// @param[in] medium_high The numeric value for third-highest speed.
+  ///                        (if > medium)
   /// @return The resulting String.
   String addFanToString(const uint8_t speed, const uint8_t high,
                         const uint8_t low, const uint8_t automatic,
                         const uint8_t quiet, const uint8_t medium,
-                        const uint8_t maximum) {
+                        const uint8_t maximum, const uint8_t medium_high) {
     String result = "";
     result.reserve(21);  // ", Fan: NNN (UNKNOWN)"
     result += addIntToString(speed, kFanStr);
     result += kSpaceLBraceStr;
-    if (speed == high)           result += kHighStr;
-    else if (speed == low)       result += kLowStr;
-    else if (speed == automatic) result += kAutoStr;
-    else if (speed == quiet)     result += kQuietStr;
-    else if (speed == medium)    result += kMediumStr;
-    else if (speed == maximum)   result += kMaximumStr;
+    if (speed == high)              result += kHighStr;
+    else if (speed == low)          result += kLowStr;
+    else if (speed == automatic)    result += kAutoStr;
+    else if (speed == quiet)        result += kQuietStr;
+    else if (speed == medium)       result += kMediumStr;
+    else if (speed == maximum)      result += kMaximumStr;
+    else if (speed == medium_high)  result += kMedHighStr;
     else
       result += kUnknownStr;
     return result + ')';
