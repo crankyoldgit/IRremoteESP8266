@@ -102,7 +102,7 @@ COMMON_DEPS = $(USER_DIR)/IRrecv.h $(USER_DIR)/IRsend.h $(USER_DIR)/IRtimer.h \
 							$(PROTOCOLS_H)
 
 # Common test dependencies
-COMMON_TEST_DEPS = $(COMMON_DEPS) IRrecv_test.h IRsend_test.h
+COMMON_TEST_DEPS = $(COMMON_DEPS) IRrecv_test.h IRsend_test.h ut_utils.h
 
 # For simplicity and to avoid depending on implementation details of
 # Google Mock and Google Test, the dependencies specified below are

@@ -43,6 +43,8 @@ using irutils::addSwingVToString;
 using irutils::minsToString;
 using irutils::addDayToString;
 using irutils::addModelToString;
+using irutils::daysBitmaskToString;
+using irutils::addTimerModeToString;
 
 #if SEND_ARGO
 /// Send a Argo A/C formatted message.
@@ -295,9 +297,9 @@ uint8_t IRArgoACBase<ArgoProtocolWREM3>::calcChecksum(const uint8_t state[],
     return -1;  // Nothing to compute on
   }
 
-  auto payloadSizeBits = (length - 1) * 8;  // Last byte carries checksum
+  uint16_t payloadSizeBits = (length - 1) * 8;  // Last byte carries checksum
 
-  auto msgType = getMessageType(state, length);
+  argoIrMessageType_t msgType = getMessageType(state, length);
   if (msgType == argoIrMessageType_t::IFEEL_TEMP_REPORT) {
     payloadSizeBits += 5;  // For WREM3::iFeel the checksum is 3-bit
   } else if (msgType == argoIrMessageType_t::TIMER_COMMAND) {
@@ -340,7 +342,7 @@ void IRArgoACBase<ArgoProtocol>::_checksum(ArgoProtocol *state) {
 /// @relates IRArgoACBase\<ARGO_PROTOCOL_T\>
 template<>
 void IRArgoACBase<ArgoProtocolWREM3>::_checksum(ArgoProtocolWREM3 *state) {
-  auto msgType = IRArgoAC_WREM3::getMessageType(*state);
+  argoIrMessageType_t msgType = IRArgoAC_WREM3::getMessageType(*state);
 
   uint8_t sum = calcChecksum(state->raw, getRawByteLength(*state));
   switch (msgType) {
@@ -416,7 +418,7 @@ void IRArgoACBase<T>::stateReset(argoIrMessageType_t messageType) {
   if (messageType == argoIrMessageType_t::AC_CONTROL) {
     off();
     setTemp(20);
-    setRoomTemp(25);
+    setSensorTemp(25);
     setMode(argoMode_t::AUTO);
     setFan(argoFan_t::FAN_AUTO);
   }
@@ -456,7 +458,7 @@ uint8_t IRArgoACBase<ArgoProtocolWREM3>::getChecksum(const uint8_t state[],
   if (length < 1) {
     return -1;
   }
-  auto msgType = getMessageType(state, length);
+  argoIrMessageType_t msgType = getMessageType(state, length);
   if (msgType == argoIrMessageType_t::IFEEL_TEMP_REPORT) {
     return (state[length - 1] & 0b11100000) >> 5;
   }
@@ -487,6 +489,7 @@ void IRArgoACBase<T>::send(const uint16_t repeat) {
   _irsend.sendArgo(getRaw(), getRawByteLength(), repeat);
 }
 
+/// @cond
 /// Send the current internal state as an IR message.
 /// @note This is a full specialization for @c ArgoProtocolWREM3 type and while
 ///       it semantically belongs to @c IrArgoAC_WREM3 class impl., it has *not*
@@ -497,6 +500,7 @@ template<>
 void IRArgoACBase<ArgoProtocolWREM3>::send(const uint16_t repeat) {
   _irsend.sendArgoWREM3(getRaw(), getRawByteLength(), repeat);
 }
+/// @endcond
 
 
 /// Send current room temperature for the iFeel feature as a silent IR
@@ -515,7 +519,8 @@ void IRArgoAC::sendSensorTemp(const uint8_t degrees, const uint16_t repeat) {
   data.CheckLo = check;
   data.Fixed = kArgoSensorFixed;
   _checksum(&data);
-  auto msgLen = getRawByteLength(data, argoIrMessageType_t::IFEEL_TEMP_REPORT);
+  uint16_t msgLen = getRawByteLength(data,
+                                     argoIrMessageType_t::IFEEL_TEMP_REPORT);
 
   _irsend.sendArgo(data.raw, msgLen, repeat);
 }
@@ -532,7 +537,8 @@ void IRArgoAC_WREM3::sendSensorTemp(const uint8_t degrees,
   _stateReset(&data, argoIrMessageType_t::IFEEL_TEMP_REPORT);
   data.SensorT = temp;
   _checksum(&data);
-  auto msgLen = getRawByteLength(data, argoIrMessageType_t::IFEEL_TEMP_REPORT);
+  uint16_t msgLen = getRawByteLength(data,
+                                     argoIrMessageType_t::IFEEL_TEMP_REPORT);
   _irsend.sendArgoWREM3(data.raw, msgLen, repeat);
 }
 #endif
@@ -648,17 +654,6 @@ uint8_t IRArgoACBase<T>::getTemp(void) const {
   return _.Temp + kArgoTempDelta;
 }
 
-/// Get the current sensor temperature setting (iFeel report).
-/// @note This is different from @c getRoomTemp() as it retrieves iFeel report
-///       explicitly (won't take AC command reported temperature)
-///       ? Does it have any use ?
-/// @return The current setting for the sensor. in degrees celsius.
-template<typename T>
-uint8_t IRArgoACBase<T>::getSensorTemp(void) const {
-  return (_messageType == argoIrMessageType_t::IFEEL_TEMP_REPORT) ?
-          _.SensorT + kArgoTempDelta : 0;
-}
-
 
 /// @brief Get the current fan mode setting as a strongly typed value (WREM2).
 /// @note This is a full specialization for @c ArgoProtocol type and while
@@ -720,7 +715,7 @@ void IRArgoACBase<ArgoProtocol>::setFan(argoFan_t fan) {
       _.Fan = kArgoFan1;
       break;
     default:
-      auto raw_value = static_cast<uint8_t>(fan);  // 2-bit value, per def.
+      uint8_t raw_value = static_cast<uint8_t>(fan);  // 2-bit value, per def.
       if ((raw_value & 0b11) == raw_value) {
         // Outside of known value range, but matches field length
         // Let's assume the caller knows what they're doing and pass it through
@@ -784,7 +779,7 @@ argoFlap_t IRArgoACBase<T>::getFlapEx(void) const {
 /// @param[in] flap The desired flap mode.
 template<typename T>
 void IRArgoACBase<T>::setFlap(argoFlap_t flap) {
-  auto raw_value = static_cast<uint8_t>(flap);
+  uint8_t raw_value = static_cast<uint8_t>(flap);
   if ((raw_value & 0b111) == raw_value) {
     // Outside of known value range, but matches field length
     // Let's assume the caller knows what they're doing and pass it through
@@ -877,13 +872,13 @@ void IRArgoACBase<ArgoProtocol>::setMode(argoMode_t mode) {
       _.Mode = static_cast<uint8_t>(kArgoAuto);
       break;
     default:
-      auto raw_value = static_cast<uint8_t>(mode);
+      uint8_t raw_value = static_cast<uint8_t>(mode);
       if ((raw_value & 0b111) == raw_value) {
         // Outside of known value range, but matches field length
         // Let's assume the caller knows what they're doing and pass it through
         _.Mode = raw_value;
       } else {
-        _.Mode = static_cast<uint8_t>(kArgoAuto);;
+        _.Mode = static_cast<uint8_t>(kArgoAuto);
       }
       break;
   }
@@ -1028,7 +1023,7 @@ argoIrMessageType_t IRArgoACBase<T>::getMessageType(void) const {
 /// @note Depending on message type - this will set `sensor` or `roomTemp` value
 /// @param[in] degrees The temperature in degrees celsius.
 template<typename T>
-void IRArgoACBase<T>::setRoomTemp(const uint8_t degrees) {
+void IRArgoACBase<T>::setSensorTemp(const uint8_t degrees) {
   uint8_t temp = std::min(degrees, kArgoMaxRoomTemp);
   temp = std::max(temp, kArgoTempDelta) - kArgoTempDelta;
   if (getMessageType() == argoIrMessageType_t::IFEEL_TEMP_REPORT) {
@@ -1042,7 +1037,7 @@ void IRArgoACBase<T>::setRoomTemp(const uint8_t degrees) {
 /// @note Depending on message type - this will get `sensor` or `roomTemp` value
 /// @return The current setting for the room temp. in degrees celsius.
 template<typename T>
-uint8_t IRArgoACBase<T>::getRoomTemp(void) const {
+uint8_t IRArgoACBase<T>::getSensorTemp(void) const {
   if (getMessageType() == argoIrMessageType_t::IFEEL_TEMP_REPORT) {
     return _.SensorT + kArgoTempDelta;
   }
@@ -1342,10 +1337,7 @@ String IRArgoAC::toString(void) const {
     }
     result += ')';
     result += addTempToString(getTemp());
-    result += kCommaSpaceStr;
-    result += kRoomStr;
-    result += ' ';
-    result += addTempToString(getRoomTemp(), true, false);
+    result += addTempToString(getSensorTemp(), true, true, true);
     result += addBoolToString(_.Max, kMaxStr);
     result += addBoolToString(_.iFeel, kIFeelStr);
     result += addBoolToString(_.Night, kNightStr);
@@ -1371,8 +1363,8 @@ uint16_t IRArgoAC_WREM3::getCurrentTimeMinutes(void) const {
 /// @brief Set current day of week
 /// @param dayOfWeek Current day of week
 void IRArgoAC_WREM3::setCurrentDayOfWeek(argoWeekday dayOfWeek) {
-  auto day = std::min(to_underlying(dayOfWeek),
-                      to_underlying(argoWeekday::SATURDAY));
+  uint8_t day = std::min(to_underlying(dayOfWeek),
+                         to_underlying(argoWeekday::SATURDAY));
   _.timer.CurrentWeekdayHi = (day >> 1);
   _.timer.CurrentWeekdayLo = (day & 0b1);
 }
@@ -1490,7 +1482,7 @@ uint8_t IRArgoAC_WREM3::getTimerActiveDaysBitmap(void) const {
 void IRArgoAC_WREM3::setScheduleTimerActiveDays(
     const std::set<argoWeekday>& days) {
   uint8_t daysBitmap = 0;
-  for (const auto& day : days) {
+  for (const argoWeekday& day : days) {
     daysBitmap |= (0b1 << to_underlying(day));
   }
   _.timer.TimerActiveDaysHi = (daysBitmap >> 5);
@@ -1519,87 +1511,13 @@ argo_ac_remote_model_t IRArgoAC_WREM3::getModel() const {
 }
 
 namespace {
-  /// @brief Helper function to convert timer active days to a string
-  /// @param days The active days bitmap
-  /// @return `|`-delimited representation of active days (3-letter day repr.)
-  String dayBitmaskToString(std::set<argoWeekday> days) {
-    String result = "";
-    result.reserve(29);  // [Sun|Mon|Tue|Wed|Thu|Fri|Sat]
-
-    for (const auto& day : days) {
-        if (result.length() > 0) {
-          result += "|";
-        }
-        result += irutils::dayToString(to_underlying(day));
-    }
-    return result;
-  }
-
-  /// @brief Get string representation of a timer type
-  /// @param timerType Timer type to represent
-  /// @return String representation
-  String timerTypeToString(argoTimerType_t timerType) {
-    String result = "";
-    result.reserve(13);  // "2 (Schedule1)"
-    result += uint64ToString(to_underlying(timerType));
-    result += kSpaceLBraceStr;
-
-    switch (timerType) {
-      case argoTimerType_t::NO_TIMER:
-        result += kOffStr;
-        break;
-      case argoTimerType_t::DELAY_TIMER:
-        result += kSleepTimerStr;
-        break;
-      case argoTimerType_t::SCHEDULE_TIMER_1:
-        result += kScheduleStr;
-        result += '1';
-        break;
-      case argoTimerType_t::SCHEDULE_TIMER_2:
-        result += kScheduleStr;
-        result += '2';
-        break;
-      case argoTimerType_t::SCHEDULE_TIMER_3:
-        result += kScheduleStr;
-        result += '3';
-        break;
-      default:
-        result += kUnknownStr;
-        break;
-    }
-    return result + ')';
-  }
-
-  String channelToString(uint8_t channel) {
-    String result = "";
-    result.reserve(6);  // "[CH#4]"
-    result += "[";
-    result += kChStr;
-    result += uint64ToString(channel);
-    result += "]";
-    return result;
-  }
-
   String commandTypeToString(argoIrMessageType_t type, uint8_t channel) {
-    String result = "";
-    result.reserve(19);  // "Sensor Temp[CH#0]: "
-    switch (type) {
-      case argoIrMessageType_t::AC_CONTROL:
-        result += kCommandStr;
-        break;
-      case argoIrMessageType_t::IFEEL_TEMP_REPORT:
-        result += kSensorTempStr;
-        break;
-      case argoIrMessageType_t::TIMER_COMMAND:
-        result += kTimerStr;
-        break;
-      case argoIrMessageType_t::CONFIG_PARAM_SET:
-        result += kConfigCommandStr;
-        break;
-      default:
-        result += kUnknownStr;
-    }
-    result += channelToString(channel);
+    String result = irutils::irCommandTypeToString(to_underlying(type),
+        to_underlying(argoIrMessageType_t::AC_CONTROL),
+        to_underlying(argoIrMessageType_t::IFEEL_TEMP_REPORT),
+        to_underlying(argoIrMessageType_t::TIMER_COMMAND),
+        to_underlying(argoIrMessageType_t::CONFIG_PARAM_SET));
+    result += irutils::channelToString(channel);
     result += kColonSpaceStr;
     return result;
   }
@@ -1615,7 +1533,7 @@ String IRArgoAC_WREM3::toString(void) const {
   //        IFeel: Off, Night: Off, Econo: Off, Max: Off, Filter: Off, Light: On
   //        Temp: 20C, Room Temp: 21C, Max: On, IFeel: On, Night: On
 
-  auto commandType = this->getMessageType();
+  argoIrMessageType_t commandType = this->getMessageType();
   argo_ac_remote_model_t model = getModel();
 
   result += commandTypeToString(commandType, getChannel());
@@ -1635,7 +1553,7 @@ String IRArgoAC_WREM3::toString(void) const {
                                 to_underlying(argoMode_t::DRY),
                                 to_underlying(argoMode_t::FAN));
       result += addTempToString(getTemp());
-      result += addTempToString(getRoomTemp(), true, true, true);
+      result += addTempToString(getSensorTemp(), true, true, true);
       result += addFanToString(to_underlying(getFanEx()),
                               to_underlying(argoFan_t::FAN_HIGH),
                               to_underlying(argoFan_t::FAN_LOWER),
@@ -1663,8 +1581,12 @@ String IRArgoAC_WREM3::toString(void) const {
 
   case argoIrMessageType_t::TIMER_COMMAND:
     result += addBoolToString(_.timer.IsOn, kPowerStr);
-    result += addLabeledString(timerTypeToString(getTimerType()),
-                               kTimerModeStr);
+    result += addTimerModeToString(to_underlying(getTimerType()),
+        to_underlying(argoTimerType_t::NO_TIMER),
+        to_underlying(argoTimerType_t::DELAY_TIMER),
+        to_underlying(argoTimerType_t::SCHEDULE_TIMER_1),
+        to_underlying(argoTimerType_t::SCHEDULE_TIMER_2),
+        to_underlying(argoTimerType_t::SCHEDULE_TIMER_3));
     result += addLabeledString(minsToString(getCurrentTimeMinutes()),
                                kClockStr);
     result += addDayToString(to_underlying(getCurrentDayOfWeek()));
@@ -1681,8 +1603,9 @@ String IRArgoAC_WREM3::toString(void) const {
                                    kOnTimerStr);
         result += addLabeledString(minsToString(getScheduleTimerStopMinutes()),
                                    kOffTimerStr);
-        result += addLabeledString(dayBitmaskToString(
-          getScheduleTimerActiveDays()), kTimerActiveDaysStr);
+
+        result += addLabeledString(daysBitmaskToString(
+          getTimerActiveDaysBitmap()), kTimerActiveDaysStr);
         break;
     }
     break;
@@ -1705,7 +1628,7 @@ bool IRArgoAC_WREM3::hasValidPreamble(const uint8_t state[],
   if (length < 1) {
     return false;
   }
-  auto preamble = state[0] & 0x0F;
+  uint8_t preamble = state[0] & 0x0F;
   return preamble == kArgoWrem3Preamble;
 }
 
@@ -1771,17 +1694,22 @@ bool IRrecv::decodeArgoWREM3(decode_results *results, uint16_t offset,
     return false;
   }
 
-  const uint16_t kArgoOverhead = 3;
   uint16_t bytesRead = matchGeneric(results->rawbuf + offset, results->state,
                   results->rawlen - offset, nbits,
                   kArgoHdrMark, kArgoHdrSpace,
                   kArgoBitMark, kArgoOneSpace,
                   kArgoBitMark, kArgoZeroSpace,
                   kArgoBitMark, kArgoGap,  // difference vs decodeArgo
-                  true, _tolerance, kArgoOverhead,
+                  true, _tolerance, 0,
                   false);
-  if (!bytesRead ||
-      !IRArgoAC_WREM3::isValidWrem3Message(results->state, nbits, strict)) {
+  if (!bytesRead) {
+    return false;
+  }
+
+  // If 'strict', assert it is a valid WREM-3 'model' protocolar message
+  // vs. just 'any ARGO'
+  if (strict &&
+      !IRArgoAC_WREM3::isValidWrem3Message(results->state, nbits, true)) {
     return false;
   }
 
@@ -1799,39 +1727,43 @@ bool IRrecv::decodeArgoWREM3(decode_results *results, uint16_t offset,
 /// @brief Detects if an ARGO protocol message is a WREM-3 sub-type (model)
 /// @param state The raw IR decore state
 /// @param nbits The length of @c state **IN BITS**
-/// @param strict Whether to perform strict matching (incl. checksum)
+/// @param verifyChecksum Whether to perform checksum verification
 /// @return True if the message is a WREM-3 one
 bool IRArgoAC_WREM3::isValidWrem3Message(const uint8_t state[],
-                                         const uint16_t nbits, bool strict) {
-  auto stateLength = std::min(static_cast<uint16_t>(std::ceil(nbits / 8.0)),
-                              kStateSizeMax);
-
-  if (strict && !IRArgoAC_WREM3::hasValidPreamble(state, stateLength)) {
+                                         const uint16_t nbits,
+                                         bool verifyChecksum) {
+  if ((nbits % 8) != 0) {
+    return false;  // WREM-3 protocol always has a full byte length commands
+  }
+  uint16_t stateLengthBytes = std::min(static_cast<uint16_t>(nbits / 8),
+                                       kStateSizeMax);
+  if (!IRArgoAC_WREM3::hasValidPreamble(state, stateLengthBytes)) {
     return false;
   }
 
-  auto messageType = IRArgoACBase<ArgoProtocolWREM3>::getMessageType(state,
-    stateLength);
+  argoIrMessageType_t messageType = IRArgoACBase<ArgoProtocolWREM3>
+      ::getMessageType(state, stateLengthBytes);
 
   switch (messageType) {
     case argoIrMessageType_t::AC_CONTROL :
-      if (nbits != kArgo3AcControlStateLength * 8) { return false; }
+      if (stateLengthBytes != kArgo3AcControlStateLength) { return false; }
       break;
   case argoIrMessageType_t::CONFIG_PARAM_SET:
-      if (nbits != kArgo3ConfigStateLength * 8) { return false; }
+      if (stateLengthBytes != kArgo3ConfigStateLength) { return false; }
       break;
   case argoIrMessageType_t::TIMER_COMMAND:
-      if (nbits != kArgo3TimerStateLength * 8) { return false; }
+      if (stateLengthBytes != kArgo3TimerStateLength) { return false; }
       break;
     case argoIrMessageType_t::IFEEL_TEMP_REPORT:
-      if (nbits != kArgo3iFeelReportStateLength * 8) { return false; }
+      if (stateLengthBytes != kArgo3iFeelReportStateLength) { return false; }
       break;
     default:
       return false;
   }
 
   // Compliance: Verify we got a valid checksum.
-  if (strict && !IRArgoAC_WREM3::validChecksum(state, stateLength)) {
+  if (verifyChecksum &&
+      !IRArgoAC_WREM3::validChecksum(state, stateLengthBytes)) {
     return false;
   }
   return true;

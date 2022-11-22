@@ -342,8 +342,7 @@ class IRArgoACBase {
   void setTemp(const uint8_t degrees);
   uint8_t getTemp(void) const;
 
-  void setRoomTemp(const uint8_t degrees);
-  uint8_t getRoomTemp(void) const;
+  void setSensorTemp(const uint8_t degrees);
   uint8_t getSensorTemp(void) const;
 
   void setFan(const argoFan_t fan);
@@ -513,7 +512,7 @@ class IRArgoAC_WREM3 : public IRArgoACBase<ArgoProtocolWREM3> {
  public:
 #if DECODE_ARGO
   static bool isValidWrem3Message(const uint8_t state[], const uint16_t nbits,
-      bool strict);
+      bool verifyChecksum = true);
 #endif
 };
 

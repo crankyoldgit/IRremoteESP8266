@@ -67,6 +67,7 @@
 #ifndef UNIT_TEST
 #define OUTPUT_DECODE_RESULTS_FOR_UT(ac)
 #else
+/* NOTE: THIS IS NOT A DOXYGEN COMMENT (would require ENABLE_PREPROCESSING-YES)
 /// If compiling for UT *and* a test receiver @c IRrecv is provided via the
 /// @c _utReceived param, this injects an "output" gadget @c _lastDecodeResults
 /// into the @c IRAc::sendAc method, so that the UT code may parse the "sent"
@@ -78,6 +79,7 @@
 /// @note For future maintainers: If @c IRAc class is ever refactored to use
 ///       polymorphism (static or dynamic)... this macro should be removed
 ///       and replaced with proper GMock injection.
+*/
 #define OUTPUT_DECODE_RESULTS_FOR_UT(ac)                        \
   {                                                             \
     if (_utReceiver) {                                          \

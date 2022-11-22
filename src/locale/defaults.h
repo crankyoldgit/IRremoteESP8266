@@ -310,6 +310,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_LOCK
 #define D_STR_LOCK "Lock"
 #endif  // D_STR_LOCK
+#ifndef D_STR_REPORT
+#define D_STR_REPORT "Report"
+#endif  // D_STR_REPORT
 
 #ifndef D_STR_AUTO
 #define D_STR_AUTO "Auto"
@@ -379,8 +382,8 @@ D_STR_INDIRECT " " D_STR_MODE
 #define D_STR_MEDIUM "Medium"
 #endif  // D_STR_MEDIUM
 #ifndef D_STR_MED_HIGH
-#define D_STR_MED_HIGH "Med-high"
-#endif  // D_STR_MEDIUM
+#define D_STR_MED_HIGH D_STR_MED "-" D_STR_HIGH
+#endif  // D_STR_MED_HIGH
 
 #ifndef D_STR_HIGHEST
 #define D_STR_HIGHEST "Highest"
@@ -448,12 +451,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_BOTTOM
 #define D_STR_BOTTOM "Bottom"
 #endif  // D_STR_BOTTOM
-#ifndef D_STR_AC_COMMAND
-#define D_STR_AC_COMMAND "A/C Config"
-#endif  // D_STR_AC_COMMAND
-#ifndef D_STR_COMMAND_TYPE
-#define D_STR_COMMAND_TYPE "A/C Command"
-#endif  // D_STR_COMMAND_TYPE
+#ifndef D_STR_CONFIG
+#define D_STR_CONFIG "Config"
+#endif  // D_STR_CONFIG
 #ifndef D_STR_SCHEDULE
 #define D_STR_SCHEDULE "Schedule"
 #endif  // D_STR_SCHEDULE
@@ -496,6 +496,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_DISPLAYTEMP
 #define D_STR_DISPLAYTEMP D_STR_DISPLAY " " D_STR_TEMP
 #endif  // D_STR_DISPLAYTEMP
+#ifndef D_STR_IFEELREPORT
+#define D_STR_IFEELREPORT D_STR_IFEEL " " D_STR_REPORT
+#endif  // D_STR_IFEELREPORT
 #ifndef D_STR_SENSORTEMP
 #define D_STR_SENSORTEMP D_STR_SENSOR " " D_STR_TEMP
 #endif  // D_STR_SENSORTEMP

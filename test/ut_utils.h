@@ -11,13 +11,13 @@
 
 
 std::string bytesToHexString(const std::vector<uint8_t>& value) {
-    std::ostringstream os;
-    os << std::hex << std::setfill('0');  // set the stream to hex with 0 fill
+    std::ostringstream oss;
+    oss << std::hex << std::setfill('0');
 
-    std::for_each(std::begin(value), std::end(value), [&os] (int i) {
-        os << std::setw(2) << std::uppercase << static_cast<int>(i);
+    std::for_each(std::begin(value), std::end(value), [&oss] (uint8_t i) {
+        oss << std::setw(2) << std::uppercase << static_cast<uint16_t>(i);
     });
-    return os.str();
+    return oss.str();
 }
 
 std::vector<uint8_t> hexStringToBytes(const std::string& hex) {

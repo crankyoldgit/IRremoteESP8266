@@ -89,7 +89,7 @@ TEST(TestArgoACClass, MessageConstructon) {
   ac.setTemp(20);
   ac.setMode(kArgoCool);
   ac.setFan(kArgoFanAuto);
-  ac.setRoomTemp(21);
+  ac.setSensorTemp(21);
   ac.setiFeel(true);
   ac.setMax(true);
   ac.setNight(true);
@@ -102,7 +102,7 @@ TEST(TestArgoACClass, MessageConstructon) {
               ::testing::ElementsAreArray(expected));
   EXPECT_EQ(
       "Model: 1 (WREM2), Power: On, Mode: 0 (Cool), Fan: 0 (Auto), Temp: 20C, "
-      "Room Temp: 21C, Max: On, IFeel: On, Night: On",
+      "Sensor Temp: 21C, Max: On, IFeel: On, Night: On",
       ac.toString());
 }
 
@@ -112,7 +112,7 @@ TEST(TestArgoAC_WREM3Class, MessageConstructon_ACControl) {
   ac.setPower(true);
   ac.setMode(argoMode_t::COOL);
   ac.setTemp(22);
-  ac.setRoomTemp(26);
+  ac.setSensorTemp(26);
   ac.setFan(argoFan_t::FAN_AUTO);
   ac.setFlap(argoFlap_t::FLAP_FULL);
   ac.setiFeel(false);
@@ -129,8 +129,8 @@ TEST(TestArgoAC_WREM3Class, MessageConstructon_ACControl) {
               ::testing::ElementsAreArray(expected));
   EXPECT_EQ(
       "Command[CH#0]: Model: 2 (WREM3), Power: On, Mode: 1 (Cool), Temp: 22C, "
-      "Room: 26C, Fan: 0 (Auto), Swing(V): 7 (Breeze), IFeel: Off, Night: Off, "
-      "Econo: Off, Max: Off, Filter: Off, Light: On",
+      "Sensor Temp: 26C, Fan: 0 (Auto), Swing(V): 7 (Breeze), IFeel: Off, "
+      "Night: Off, Econo: Off, Max: Off, Filter: Off, Light: On",
       ac.toString());
 }
 
@@ -140,8 +140,8 @@ TEST(TestArgoAC_WREM3Class, MessageConstructon_ACControl_2) {
   ac.setPower(true);
   ac.setMode(argoMode_t::AUTO);
   ac.setTemp(23);
-  ac.setRoomTemp(28);
-  ac.setFan(argoFan_t::FAN_LOWER);
+  ac.setSensorTemp(28);
+  ac.setFan(argoFan_t::FAN_MEDIUM);
   ac.setMax(true);
   ac.setNight(true);
   ac.setFlap(argoFlap_t::FLAP_4);
@@ -150,22 +150,22 @@ TEST(TestArgoAC_WREM3Class, MessageConstructon_ACControl_2) {
   ac.setLight(true);
   ac.setiFeel(true);
   auto expected = std::vector<uint8_t>({
-      0x2B, 0xB8, 0x53, 0xFC, 0xC3, 0xF5});
+      0x2B, 0xB8, 0x93, 0xFC, 0xC3, 0x35});
   auto actual = ac.getRaw();
   ASSERT_EQ(ac.getRawByteLength(), kArgo3AcControlStateLength);
   EXPECT_THAT(std::vector<uint8_t>(actual, actual + ac.getRawByteLength()),
               ::testing::ElementsAreArray(expected));
   EXPECT_EQ(
       "Command[CH#2]: Model: 2 (WREM3), Power: On, Mode: 5 (Auto), Temp: 23C, "
-      "Room: 28C, Fan: 2 (Low), Swing(V): 4 (Middle), IFeel: On, Night: On,"
-      " Econo: On, Max: On, Filter: On, Light: On",
+      "Sensor Temp: 28C, Fan: 4 (Med-High), Swing(V): 4 (Middle), IFeel: On, "
+      "Night: On, Econo: On, Max: On, Filter: On, Light: On",
       ac.toString());
 }
 
 TEST(TestArgoAC_WREM3Class, MessageConstructon_iFeelReport) {
   IRArgoAC_WREM3 ac(kGpioUnused);
   ac.setMessageType(argoIrMessageType_t::IFEEL_TEMP_REPORT);
-  ac.setRoomTemp(31);
+  ac.setSensorTemp(31);
 
   auto expected = std::vector<uint8_t>({0x4B, 0xDB});
   auto actual = ac.getRaw();
@@ -173,7 +173,7 @@ TEST(TestArgoAC_WREM3Class, MessageConstructon_iFeelReport) {
   EXPECT_THAT(std::vector<uint8_t>(actual, actual + ac.getRawByteLength()),
               ::testing::ElementsAreArray(expected));
   EXPECT_EQ(
-      "Sensor Temp[CH#0]: Model: 2 (WREM3), Room: 31C",
+      "IFeel Report[CH#0]: Model: 2 (WREM3), Sensor Temp: 31C",
       ac.toString());
 }
 
@@ -188,7 +188,7 @@ TEST(TestArgoAC_WREM3Class, MessageConstructon_Config) {
   EXPECT_THAT(std::vector<uint8_t>(actual, actual + ac.getRawByteLength()),
               ::testing::ElementsAreArray(expected));
   EXPECT_EQ(
-      "A/C Config[CH#0]: Model: 2 (WREM3), Key: 6, Value: 30",
+      "Config[CH#0]: Model: 2 (WREM3), Key: 6, Value: 30",
       ac.toString());
 }
 
@@ -336,7 +336,7 @@ TEST(TestDecodeArgo, SyntheticDecode) {
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "Model: 1 (WREM2), Power: On, Mode: 0 (Cool), Fan: 0 (Auto), Temp: 20C, "
-      "Room Temp: 21C, Max: On, IFeel: On, Night: On",
+      "Sensor Temp: 21C, Max: On, IFeel: On, Night: On",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
@@ -358,7 +358,7 @@ TEST(TestIrAc, ArgoWrem2_SyntheticSendAndDecode_ACCommand) {
   ASSERT_NE(nullptr, irac._lastDecodeResults);
   EXPECT_EQ(ARGO, irac._lastDecodeResults->decode_type);
   EXPECT_EQ("Model: 1 (WREM2), Power: On, Mode: 0 (Cool), Fan: 0 (Auto), "
-            "Temp: 25C, Room Temp: 25C, Max: Off, IFeel: Off, Night: Off",
+            "Temp: 25C, Sensor Temp: 25C, Max: Off, IFeel: Off, Night: Off",
     IRAcUtils::resultAcToString(irac._lastDecodeResults.get()));
 
   stdAc::state_t r = {};
@@ -385,8 +385,8 @@ TEST(TestIrAc, ArgoWrem3_SyntheticSendAndDecode_ACCommand) {
   ASSERT_NE(nullptr, irac._lastDecodeResults);
   EXPECT_EQ(ARGO, irac._lastDecodeResults->decode_type);
   EXPECT_EQ("Command[CH#0]: Model: 2 (WREM3), Power: On, Mode: 1 (Cool),"
-            " Temp: 25C, Room: 25C, Fan: 0 (Auto), Swing(V): 7 (Breeze), "
-            "IFeel: Off, Night: Off, Econo: Off, Max: Off, Filter: Off, "
+            " Temp: 25C, Sensor Temp: 25C, Fan: 0 (Auto), Swing(V): 7 (Breeze),"
+            " IFeel: Off, Night: Off, Econo: Off, Max: Off, Filter: Off, "
             "Light: Off",
     IRAcUtils::resultAcToString(irac._lastDecodeResults.get()));
 
@@ -422,43 +422,33 @@ TYPED_TEST(TestArgoACBaseClass, SetAndGetTemp) {
   EXPECT_EQ(kArgoMaxTemp, ac.getTemp());
 }
 
-TYPED_TEST(TestArgoACBaseClass, SetAndGetRoomTemp) {
+TYPED_TEST(TestArgoACBaseClass, SetAndGetSensorTemp) {
   IRArgoACBase<TypeParam> ac(kGpioUnused);
 
   // Room Temp from AC command
-  ac.setRoomTemp(25);
-  EXPECT_EQ(25, ac.getRoomTemp());
-  EXPECT_EQ(0, ac.getSensorTemp());
-  ac.setRoomTemp(kArgoTempDelta);
-  EXPECT_EQ(kArgoTempDelta, ac.getRoomTemp());
-  EXPECT_EQ(0, ac.getSensorTemp());
-  ac.setRoomTemp(kArgoMaxRoomTemp);
-  EXPECT_EQ(kArgoMaxRoomTemp, ac.getRoomTemp());
-  EXPECT_EQ(0, ac.getSensorTemp());
-  ac.setRoomTemp(kArgoTempDelta - 1);
-  EXPECT_EQ(kArgoTempDelta, ac.getRoomTemp());
-  EXPECT_EQ(0, ac.getSensorTemp());
-  ac.setRoomTemp(kArgoMaxRoomTemp + 1);
-  EXPECT_EQ(kArgoMaxRoomTemp, ac.getRoomTemp());
-  EXPECT_EQ(0, ac.getSensorTemp());
+  ac.setSensorTemp(25);
+  EXPECT_EQ(25, ac.getSensorTemp());
+  ac.setSensorTemp(kArgoTempDelta);
+  EXPECT_EQ(kArgoTempDelta, ac.getSensorTemp());
+  ac.setSensorTemp(kArgoMaxRoomTemp);
+  EXPECT_EQ(kArgoMaxRoomTemp, ac.getSensorTemp());
+  ac.setSensorTemp(kArgoTempDelta - 1);
+  EXPECT_EQ(kArgoTempDelta, ac.getSensorTemp());
+  ac.setSensorTemp(kArgoMaxRoomTemp + 1);
+  EXPECT_EQ(kArgoMaxRoomTemp, ac.getSensorTemp());
 
   // Room temp from iFeel coommand
   ac.setMessageType(argoIrMessageType_t::IFEEL_TEMP_REPORT);  // reset
-  EXPECT_EQ(kArgoTempDelta, ac.getRoomTemp());
-  ac.setRoomTemp(19);
-  EXPECT_EQ(19, ac.getRoomTemp());
+  EXPECT_EQ(kArgoTempDelta, ac.getSensorTemp());
+  ac.setSensorTemp(19);
   EXPECT_EQ(19, ac.getSensorTemp());
-  ac.setRoomTemp(kArgoTempDelta);
-  EXPECT_EQ(kArgoTempDelta, ac.getRoomTemp());
+  ac.setSensorTemp(kArgoTempDelta);
   EXPECT_EQ(kArgoTempDelta, ac.getSensorTemp());
-  ac.setRoomTemp(kArgoMaxRoomTemp);
-  EXPECT_EQ(kArgoMaxRoomTemp, ac.getRoomTemp());
+  ac.setSensorTemp(kArgoMaxRoomTemp);
   EXPECT_EQ(kArgoMaxRoomTemp, ac.getSensorTemp());
-  ac.setRoomTemp(kArgoTempDelta - 1);
-  EXPECT_EQ(kArgoTempDelta, ac.getRoomTemp());
+  ac.setSensorTemp(kArgoTempDelta - 1);
   EXPECT_EQ(kArgoTempDelta, ac.getSensorTemp());
-  ac.setRoomTemp(kArgoMaxRoomTemp + 1);
-  EXPECT_EQ(kArgoMaxRoomTemp, ac.getRoomTemp());
+  ac.setSensorTemp(kArgoMaxRoomTemp + 1);
   EXPECT_EQ(kArgoMaxRoomTemp, ac.getSensorTemp());
 }
 
@@ -601,7 +591,7 @@ TYPED_TEST(TestArgoACBaseClass, SetMessageTypeResetsState) {
 
   ac.on();
   ac.setTemp(30);
-  ac.setRoomTemp(33);
+  ac.setSensorTemp(33);
   ac.setMode(argoMode_t::COOL);
   ac.setFan(argoFan_t::FAN_HIGHEST);
 
@@ -609,13 +599,13 @@ TYPED_TEST(TestArgoACBaseClass, SetMessageTypeResetsState) {
   EXPECT_EQ(argoIrMessageType_t::AC_CONTROL, ac.getMessageType());
   EXPECT_FALSE(ac.getPower());
   EXPECT_EQ(20, ac.getTemp());
-  EXPECT_EQ(25, ac.getRoomTemp());
+  EXPECT_EQ(25, ac.getSensorTemp());
   EXPECT_EQ(argoMode_t::AUTO, ac.getModeEx());
   EXPECT_EQ(argoFan_t::FAN_AUTO, ac.getFanEx());
 
   ac.setMessageType(argoIrMessageType_t::IFEEL_TEMP_REPORT);
   EXPECT_EQ(argoIrMessageType_t::IFEEL_TEMP_REPORT, ac.getMessageType());
-  EXPECT_EQ(kArgoTempDelta, ac.getRoomTemp());
+  EXPECT_EQ(kArgoTempDelta, ac.getSensorTemp());
 }
 
 TYPED_TEST(TestArgoACBaseClass, staticGetMessageType) {
@@ -687,24 +677,24 @@ TYPED_TEST(TestArgoACBaseClass, setRaw) {
   if (std::is_same<TypeParam, ArgoProtocol>()) {
     ac.setRaw(reinterpret_cast<uint8_t*>(&rawStateAC), std::min(
       static_cast<size_t>(kArgoStateLength), sizeof(TypeParam)));
-    EXPECT_EQ(30 + kArgoTempDelta, ac.getRoomTemp());
+    EXPECT_EQ(30 + kArgoTempDelta, ac.getSensorTemp());
     EXPECT_EQ(argoIrMessageType_t::AC_CONTROL, ac.getMessageType());
 
     ac.setRaw(reinterpret_cast<uint8_t*>(&rawStateIFeel), std::min(
       static_cast<size_t>(kArgoShortStateLength), sizeof(TypeParam)));
-    EXPECT_EQ(25 + kArgoTempDelta, ac.getRoomTemp());
+    EXPECT_EQ(25 + kArgoTempDelta, ac.getSensorTemp());
     EXPECT_EQ(argoIrMessageType_t::IFEEL_TEMP_REPORT, ac.getMessageType());
   } else {
     ac.setRaw(reinterpret_cast<uint8_t*>(&rawStateAC), std::min(
       static_cast<size_t>(kArgo3AcControlStateLength), sizeof(TypeParam)));
-    EXPECT_EQ(30 + kArgoTempDelta, ac.getRoomTemp());
+    EXPECT_EQ(30 + kArgoTempDelta, ac.getSensorTemp());
     EXPECT_EQ(argoIrMessageType_t::AC_CONTROL, ac.getMessageType());
 
     auto raw = reinterpret_cast<uint8_t*>(&rawStateIFeel);
     raw[0] = 0x4B;  // sets Byte0::IrCommandType to IFeel (0b01)
     ac.setRaw(raw, std::min(static_cast<size_t>(kArgo3iFeelReportStateLength),
                             sizeof(TypeParam)));
-    EXPECT_EQ(25 + kArgoTempDelta, ac.getRoomTemp());
+    EXPECT_EQ(25 + kArgoTempDelta, ac.getSensorTemp());
     EXPECT_EQ(argoIrMessageType_t::IFEEL_TEMP_REPORT, ac.getMessageType());
   }
 }
@@ -856,7 +846,7 @@ TEST(TestArgoACClass, SendSensorTemp) {
   // Method 2 (via send())
   IRArgoAC ac2(kGpioUnused);
   ac2.setMessageType(argoIrMessageType_t::IFEEL_TEMP_REPORT);
-  ac2.setRoomTemp(19);
+  ac2.setSensorTemp(19);
   ac2.send();
   ac2._irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&ac2._irsend.capture));
@@ -1214,7 +1204,7 @@ TEST(TestArgoAC_WREM3Class, IsValidWrem3Message) {
   wrem3IFeel[0] += 1;
   ASSERT_FALSE(IRArgoAC_WREM3::isValidWrem3Message(wrem3IFeel,
                sizeof(wrem3IFeel) / sizeof(wrem3IFeel[0]) * 8, true));
-  ASSERT_TRUE(IRArgoAC_WREM3::isValidWrem3Message(wrem3IFeel,
+  ASSERT_FALSE(IRArgoAC_WREM3::isValidWrem3Message(wrem3IFeel,
                sizeof(wrem3IFeel) / sizeof(wrem3IFeel[0]) * 8, false));
   wrem3IFeel[0] -= 1;  // restore
 }
@@ -1228,18 +1218,18 @@ TEST(TestArgoAC_WREM3Class, SendSensorTemp) {
   ac._irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&ac._irsend.capture));
   EXPECT_EQ(decode_type_t::ARGO, ac._irsend.capture.decode_type);
-  EXPECT_EQ("Sensor Temp[CH#0]: Model: 2 (WREM3), Room: 10C",
+  EXPECT_EQ("IFeel Report[CH#0]: Model: 2 (WREM3), Sensor Temp: 10C",
       IRAcUtils::resultAcToString(&ac._irsend.capture));
 
   // Method 2 (via send())
   IRArgoAC_WREM3 ac2(kGpioUnused);
   ac2.setMessageType(argoIrMessageType_t::IFEEL_TEMP_REPORT);
-  ac2.setRoomTemp(19);
+  ac2.setSensorTemp(19);
   ac2.send();
   ac2._irsend.makeDecodeResult();
   EXPECT_TRUE(irrecv.decode(&ac2._irsend.capture));
   EXPECT_EQ(decode_type_t::ARGO, ac2._irsend.capture.decode_type);
-  EXPECT_EQ("Sensor Temp[CH#0]: Model: 2 (WREM3), Room: 19C",
+  EXPECT_EQ("IFeel Report[CH#0]: Model: 2 (WREM3), Sensor Temp: 19C",
       IRAcUtils::resultAcToString(&ac2._irsend.capture));
 }
 
@@ -1386,8 +1376,8 @@ INSTANTIATE_TEST_CASE_P(
       kArgo3AcControlStateLength,
       std::vector<uint8_t> { 0x0B, 0x36, 0x12, 0x0F, 0xC2, 0x24 },
       "Command[CH#0]: Model: 2 (WREM3), Power: On, Mode: 1 (Cool), Temp: 22C, "
-      "Room: 26C, Fan: 0 (Auto), Swing(V): 7 (Breeze), IFeel: Off, Night: Off, "
-      "Econo: Off, Max: Off, Filter: Off, Light: On"),
+      "Sensor Temp: 26C, Fan: 0 (Auto), Swing(V): 7 (Breeze), IFeel: Off, "
+      "Night: Off, Econo: Off, Max: Off, Filter: Off, Light: On"),
 
 
     ArgoE2ETestParam(
@@ -1398,7 +1388,7 @@ INSTANTIATE_TEST_CASE_P(
       },
       kArgo3iFeelReportStateLength,
       std::vector<uint8_t> { 0x4B, 0x15 },
-      "Sensor Temp[CH#0]: Model: 2 (WREM3), Room: 25C"),
+      "IFeel Report[CH#0]: Model: 2 (WREM3), Sensor Temp: 25C"),
 
 
     ArgoE2ETestParam(
@@ -1409,7 +1399,7 @@ INSTANTIATE_TEST_CASE_P(
       },
       kArgo3iFeelReportStateLength,
       std::vector<uint8_t> {0x4B, 0x57},
-      "Sensor Temp[CH#0]: Model: 2 (WREM3), Room: 27C"),
+      "IFeel Report[CH#0]: Model: 2 (WREM3), Sensor Temp: 27C"),
 
 
     ArgoE2ETestParam(
@@ -1448,7 +1438,7 @@ INSTANTIATE_TEST_CASE_P(
       },
       kArgo3ConfigStateLength,
       std::vector<uint8_t> { 0xCB, 0x0C, 0x4A, 0x21 },
-      "A/C Config[CH#0]: Model: 2 (WREM3), Key: 12, Value: 74")),
+      "Config[CH#0]: Model: 2 (WREM3), Key: 12, Value: 74")),
   [](const testing::TestParamInfo<ArgoE2ETestParam>& info) {
       return bytesToHexString(info.param.expectedEncodedValue);
   }
