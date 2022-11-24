@@ -137,7 +137,7 @@ TEST(TestIRac, Argo) {
   EXPECT_TRUE(ac.getPower());
   EXPECT_EQ(kArgoHeat, ac.getMode());
   EXPECT_EQ(21, ac.getTemp());
-  EXPECT_EQ(kArgoFlapAuto, ac.getFlap());
+  EXPECT_EQ(kArgoFlapFull, ac.getFlap());
   EXPECT_FALSE(ac.getMax());  // Turbo
   EXPECT_FALSE(ac.getNight());  // Sleep
 }
@@ -2652,6 +2652,10 @@ TEST(TestIRac, strToModel) {
             IRac::strToModel("ARRAH2E"));
   EXPECT_EQ(whirlpool_ac_remote_model_t::DG11J13A,
             IRac::strToModel("DG11J13A"));
+  EXPECT_EQ(argo_ac_remote_model_t::SAC_WREM2,
+            IRac::strToModel("WREM2"));
+  EXPECT_EQ(argo_ac_remote_model_t::SAC_WREM3,
+            IRac::strToModel("WREM3"));
   EXPECT_EQ(1, IRac::strToModel("1"));
   EXPECT_EQ(10, IRac::strToModel("10"));
   EXPECT_EQ(-1, IRac::strToModel("0"));

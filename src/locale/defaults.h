@@ -310,6 +310,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_LOCK
 #define D_STR_LOCK "Lock"
 #endif  // D_STR_LOCK
+#ifndef D_STR_REPORT
+#define D_STR_REPORT "Report"
+#endif  // D_STR_REPORT
 
 #ifndef D_STR_AUTO
 #define D_STR_AUTO "Auto"
@@ -378,6 +381,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_MEDIUM
 #define D_STR_MEDIUM "Medium"
 #endif  // D_STR_MEDIUM
+#ifndef D_STR_MED_HIGH
+#define D_STR_MED_HIGH D_STR_MED "-" D_STR_HIGH
+#endif  // D_STR_MED_HIGH
 
 #ifndef D_STR_HIGHEST
 #define D_STR_HIGHEST "Highest"
@@ -445,6 +451,24 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_BOTTOM
 #define D_STR_BOTTOM "Bottom"
 #endif  // D_STR_BOTTOM
+#ifndef D_STR_CONFIG
+#define D_STR_CONFIG "Config"
+#endif  // D_STR_CONFIG
+#ifndef D_STR_SCHEDULE
+#define D_STR_SCHEDULE "Schedule"
+#endif  // D_STR_SCHEDULE
+#ifndef D_STR_CH
+#define D_STR_CH "CH#"
+#endif  // D_STR_CH
+#ifndef D_STR_TIMER_ACTIVE_DAYS
+#define D_STR_TIMER_ACTIVE_DAYS "TimerActiveDays"
+#endif  // D_STR_TIMER_ACTIVE_DAYS
+#ifndef D_STR_KEY
+#define D_STR_KEY "Key"
+#endif  // D_STR_KEY
+#ifndef D_STR_VALUE
+#define D_STR_VALUE "Value"
+#endif  // D_STR_VALUE
 
 // Compound words/phrases/descriptions from pre-defined words.
 // Note: Obviously these need to be defined *after* their component words.
@@ -472,6 +496,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_DISPLAYTEMP
 #define D_STR_DISPLAYTEMP D_STR_DISPLAY " " D_STR_TEMP
 #endif  // D_STR_DISPLAYTEMP
+#ifndef D_STR_IFEELREPORT
+#define D_STR_IFEELREPORT D_STR_IFEEL " " D_STR_REPORT
+#endif  // D_STR_IFEELREPORT
 #ifndef D_STR_SENSORTEMP
 #define D_STR_SENSORTEMP D_STR_SENSOR " " D_STR_TEMP
 #endif  // D_STR_SENSORTEMP
@@ -689,6 +716,12 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_DG11J191
 #define D_STR_DG11J191 "DG11J191"
 #endif  // D_STR_DG11J191
+#ifndef D_STR_ARGO_WREM2
+#define D_STR_ARGO_WREM2 "WREM2"
+#endif  // D_STR_ARGO_WREM2
+#ifndef D_STR_ARGO_WREM3
+#define D_STR_ARGO_WREM3 "WREM3"
+#endif  // D_STR_ARGO_WREM3
 
 // Protocols Names
 #ifndef D_STR_AIRTON

@@ -202,6 +202,11 @@ enum lg_ac_remote_model_t {
   LG6711A20083V,      // (5) Same as GE6711AR2853M, but only SwingV toggle.
 };
 
+/// Argo A/C model numbers
+enum argo_ac_remote_model_t {
+  SAC_WREM2 = 1,   // (1) ARGO WREM2 remote (default)
+  SAC_WREM3        // (2) ARGO WREM3 remote (touch buttons), bit-len vary by cmd
+};
 
 // Classes
 
@@ -529,8 +534,12 @@ class IRsend {
 #if SEND_ARGO
   void sendArgo(const unsigned char data[],
                 const uint16_t nbytes = kArgoStateLength,
+                const uint16_t repeat = kArgoDefaultRepeat,
+                bool sendFooter = false);
+  void sendArgoWREM3(const unsigned char data[],
+                const uint16_t nbytes = kArgoStateLength,
                 const uint16_t repeat = kArgoDefaultRepeat);
-#endif
+#endif  // SEND_ARGO
 #if SEND_TROTEC
   void sendTrotec(const unsigned char data[],
                   const uint16_t nbytes = kTrotecStateLength,

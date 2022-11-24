@@ -64,6 +64,36 @@
 #endif  // ESP8266
 #endif  // STRCASECMP
 
+#ifndef UNIT_TEST
+#define OUTPUT_DECODE_RESULTS_FOR_UT(ac)
+#else
+/* NOTE: THIS IS NOT A DOXYGEN COMMENT (would require ENABLE_PREPROCESSING-YES)
+/// If compiling for UT *and* a test receiver @c IRrecv is provided via the
+/// @c _utReceived param, this injects an "output" gadget @c _lastDecodeResults
+/// into the @c IRAc::sendAc method, so that the UT code may parse the "sent"
+/// value and drive further assertions
+///
+/// @note The @c decode_results "returned" is a shallow copy (empty rawbuf),
+///       mostly b/c the class does not have a custom/deep copy c-tor
+///       and defining it would be an overkill for this purpose
+/// @note For future maintainers: If @c IRAc class is ever refactored to use
+///       polymorphism (static or dynamic)... this macro should be removed
+///       and replaced with proper GMock injection.
+*/
+#define OUTPUT_DECODE_RESULTS_FOR_UT(ac)                        \
+  {                                                             \
+    if (_utReceiver) {                                          \
+      _lastDecodeResults = nullptr;                             \
+      (ac)._irsend.makeDecodeResult();                          \
+      if (_utReceiver->decode(&(ac)._irsend.capture)) {         \
+        _lastDecodeResults = std::unique_ptr<decode_results>(   \
+          new decode_results((ac)._irsend.capture));            \
+        _lastDecodeResults->rawbuf = nullptr;                   \
+      }                                                         \
+    }                                                           \
+  }
+#endif  // UNIT_TEST
+
 /// Class constructor
 /// @param[in] pin Gpio pin to use when transmitting IR messages.
 /// @param[in] inverted true, gpio output defaults to high. false, to low.
@@ -462,6 +492,41 @@ void IRac::argo(IRArgoAC *ac,
   // No Clean setting available.
   // No Beep setting available.
   ac->setNight(sleep >= 0);  // Convert to a boolean.
+  ac->send();
+}
+
+/// Send an Argo A/C WREM-3 AC **control** message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRArgoAC_WREM3 object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The set temperature setting in degrees Celsius.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] night Enable night mode (raises temp by +1*C after 1h).
+/// @param[in] econo Enable eco mode (limits power consumed).
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] filter Enable filter mode
+/// @param[in] light Enable device display/LEDs
+void IRac::argoWrem3_ACCommand(IRArgoAC_WREM3 *ac, const bool on,
+    const stdAc::opmode_t mode, const float degrees,
+    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+    const bool night, const bool econo, const bool turbo, const bool filter,
+    const bool light) {
+  ac->begin();
+  ac->setMessageType(argoIrMessageType_t::AC_CONTROL);
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setFlap(ac->convertSwingV(swingv));
+  ac->setNight(night);
+  ac->setEco(econo);
+  ac->setMax(turbo);
+  ac->setFilter(filter);
+  ac->setLight(light);
+  // No "sensorTemp" mode/value support in common (yet)
+  // No Clean setting available.
+  // No Beep setting available - always beeps in this mode :)
   ac->send();
 }
 #endif  // SEND_ARGO
@@ -2850,9 +2915,18 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
 #if SEND_ARGO
     case ARGO:
     {
-      IRArgoAC ac(_pin, _inverted, _modulation);
-      argo(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-           send.turbo, send.sleep);
+      if (send.model == argo_ac_remote_model_t::SAC_WREM3) {
+        IRArgoAC_WREM3 ac(_pin, _inverted, _modulation);
+        argoWrem3_ACCommand(&ac, send.power, send.mode, send.degrees,
+          send.fanspeed, send.swingv, send.quiet, send.econo, send.turbo,
+          send.filter, send.light);
+        OUTPUT_DECODE_RESULTS_FOR_UT(ac);
+      } else {
+        IRArgoAC ac(_pin, _inverted, _modulation);
+        argo(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+            send.turbo, send.sleep);
+        OUTPUT_DECODE_RESULTS_FOR_UT(ac);
+      }
       break;
     }
 #endif  // SEND_ARGO
@@ -3666,6 +3740,11 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return whirlpool_ac_remote_model_t::DG11J13A;
   } else if (!STRCASECMP(str, kDg11j191Str)) {
     return whirlpool_ac_remote_model_t::DG11J191;
+  // Argo A/C models
+  } else if (!STRCASECMP(str, kArgoWrem2Str)) {
+    return argo_ac_remote_model_t::SAC_WREM2;
+  } else if (!STRCASECMP(str, kArgoWrem3Str)) {
+    return argo_ac_remote_model_t::SAC_WREM3;
   } else {
     int16_t number = atoi(str);
     if (number > 0)
@@ -3796,6 +3875,12 @@ namespace IRAcUtils {
 #endif  // DECODE_AMCOR
 #if DECODE_ARGO
       case decode_type_t::ARGO: {
+        if (IRArgoAC_WREM3::isValidWrem3Message(result->state, result->bits,
+                                                true)) {
+          IRArgoAC_WREM3 ac(kGpioUnused);
+          ac.setRaw(result->state, result->bits / 8);
+          return ac.toString();
+        }
         IRArgoAC ac(kGpioUnused);
         ac.setRaw(result->state, result->bits / 8);
         return ac.toString();
@@ -4258,15 +4343,23 @@ namespace IRAcUtils {
 #endif  // DECODE_AMCOR
 #if DECODE_ARGO
       case decode_type_t::ARGO: {
-        IRArgoAC ac(kGpioUnused);
         const uint16_t length = decode->bits / 8;
-        switch (length) {
-          case kArgoStateLength:
-            ac.setRaw(decode->state, length);
-            *result = ac.toCommon();
-            break;
-          default:
-            return false;
+        if (IRArgoAC_WREM3::isValidWrem3Message(decode->state,
+                                                decode->bits, true)) {
+          IRArgoAC_WREM3 ac(kGpioUnused);
+          ac.setRaw(decode->state, length);
+          *result = ac.toCommon();
+        } else {
+          IRArgoAC ac(kGpioUnused);
+          switch (length) {
+            case kArgoStateLength:
+            case kArgoShortStateLength:
+              ac.setRaw(decode->state, length);
+              *result = ac.toCommon();
+              break;
+            default:
+              return false;
+          }
         }
         break;
       }

@@ -5,6 +5,8 @@
 
 #ifndef UNIT_TEST
 #include <Arduino.h>
+#else
+#include <memory>
 #endif
 #include "IRremoteESP8266.h"
 #include "ir_Airton.h"
@@ -103,10 +105,17 @@ class IRac {
   stdAc::state_t getStatePrev(void);
   bool hasStateChanged(void);
   stdAc::state_t next;  ///< The state we want the device to be in after we send
-#ifndef UNIT_TEST
+#ifdef UNIT_TEST
+  /// @cond IGNORE
+  /// UT-specific
+  /// See @c OUTPUT_DECODE_RESULTS_FOR_UT macro description in IRac.cpp
+  std::shared_ptr<IRrecv> _utReceiver = nullptr;
+  std::unique_ptr<decode_results> _lastDecodeResults = nullptr;
+  /// @endcond
+#else
 
  private:
-#endif
+#endif  // UNIT_TEST
   uint16_t _pin;  ///< The GPIO to use to transmit messages from.
   bool _inverted;  ///< IR LED is lit when GPIO is LOW (true) or HIGH (false)?
   bool _modulation;  ///< Is frequency modulation to be used?
@@ -134,6 +143,11 @@ class IRac {
             const bool on, const stdAc::opmode_t mode, const float degrees,
             const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
             const bool turbo, const int16_t sleep = -1);
+  void argoWrem3_ACCommand(IRArgoAC_WREM3 *ac,
+      const bool on, const stdAc::opmode_t mode, const float degrees,
+      const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+      const bool night, const bool econo, const bool turbo, const bool filter,
+      const bool light);
 #endif  // SEND_ARGO
 #if SEND_BOSCH144
   void bosch144(IRBosch144AC *ac,
