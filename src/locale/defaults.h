@@ -454,6 +454,12 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_CONFIG
 #define D_STR_CONFIG "Config"
 #endif  // D_STR_CONFIG
+#ifndef D_STR_CONTROL
+#define D_STR_CONTROL "Control"
+#endif  // D_STR_CONTROL
+#ifndef D_STR_SET_TIMER
+#define D_STR_SET_TIMER D_STR_SET " " D_STR_TIMER
+#endif  // D_STR_AC_TIMER
 #ifndef D_STR_SCHEDULE
 #define D_STR_SCHEDULE "Schedule"
 #endif  // D_STR_SCHEDULE
