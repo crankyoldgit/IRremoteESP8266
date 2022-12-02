@@ -1044,6 +1044,25 @@ uint8_t IRArgoACBase<T>::getSensorTemp(void) const {
   return _.RoomTemp + kArgoTempDelta;
 }
 
+/// @brief Convert a stdAc::ac_command_t enum into its native message type.
+/// @param command The enum to be converted.
+/// @return The native equivalent of the enum.
+template<typename T>
+argoIrMessageType_t IRArgoACBase<T>::convertCommand(
+      const stdAc::ac_command_t command) {
+  switch (command) {
+    case stdAc::ac_command_t::kSensorTempReport:
+      return argoIrMessageType_t::IFEEL_TEMP_REPORT;
+    case stdAc::ac_command_t::kTimerCommand:
+      return argoIrMessageType_t::TIMER_COMMAND;
+    case stdAc::ac_command_t::kConfigCommand:
+      return argoIrMessageType_t::CONFIG_PARAM_SET;
+    case stdAc::ac_command_t::kControlCommand:
+    default:
+      return argoIrMessageType_t::AC_CONTROL;
+  }
+}
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -1169,6 +1188,26 @@ stdAc::swingv_t IRArgoACBase<ArgoProtocolWREM3>::toCommonSwingV(
   }
 }
 
+/// Convert a native message type into its stdAc equivalent.
+/// @param[in] command The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+template<typename T>
+stdAc::ac_command_t IRArgoACBase<T>::toCommonCommand(
+      const argoIrMessageType_t command) {
+  switch (command) {
+    case argoIrMessageType_t::AC_CONTROL:
+        return stdAc::ac_command_t::kControlCommand;
+    case argoIrMessageType_t::IFEEL_TEMP_REPORT:
+        return stdAc::ac_command_t::kSensorTempReport;
+    case argoIrMessageType_t::TIMER_COMMAND:
+        return stdAc::ac_command_t::kTimerCommand;
+    case argoIrMessageType_t::CONFIG_PARAM_SET:
+        return stdAc::ac_command_t::kConfigCommand;
+    default:
+        return stdAc::ac_command_t::kControlCommand;
+  }
+}
+
 /// Convert a native mode into its stdAc equivalent.
 /// @param[in] mode The native setting to be converted.
 /// @return The stdAc equivalent of the native setting.
@@ -1208,10 +1247,12 @@ stdAc::state_t IRArgoAC::toCommon(void) const {
   stdAc::state_t result{};
   result.protocol = decode_type_t::ARGO;
   result.model = argo_ac_remote_model_t::SAC_WREM2;
+  result.command = toCommonCommand(_messageType);
   result.power = _.Power;
   result.mode = toCommonMode(getModeEx());
   result.celsius = true;
-  result.degrees = getTemp();
+  result.degrees = (_messageType != argoIrMessageType_t::IFEEL_TEMP_REPORT)?
+                   getTemp() : getSensorTemp();
   result.fanspeed = toCommonFanSpeed(getFanEx());
   result.turbo = _.Max;
   result.sleep = _.Night ? 0 : -1;
@@ -1235,10 +1276,12 @@ stdAc::state_t IRArgoAC_WREM3::toCommon(void) const {
   stdAc::state_t result{};
   result.protocol = decode_type_t::ARGO;
   result.model = argo_ac_remote_model_t::SAC_WREM3;
+  result.command = toCommonCommand(_messageType);
   result.power = getPower();
   result.mode = toCommonMode(getModeEx());
   result.celsius = true;
-  result.degrees = getTemp();
+  result.degrees = (_messageType != argoIrMessageType_t::IFEEL_TEMP_REPORT)?
+                   getTemp() : getSensorTemp();
   result.fanspeed = toCommonFanSpeed(getFanEx());
   result.turbo = _.Max;
   result.swingv = toCommonSwingV(_.Flap);
