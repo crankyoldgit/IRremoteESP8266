@@ -236,6 +236,7 @@ extern IRTEXT_CONST_PTR(kTypeStr);
 extern IRTEXT_CONST_PTR(kUnknownStr);
 extern IRTEXT_CONST_PTR(kUpStr);
 extern IRTEXT_CONST_PTR(kUpperStr);
+extern IRTEXT_CONST_PTR(kUpperMiddleStr);
 extern IRTEXT_CONST_PTR(kValueStr);
 extern IRTEXT_CONST_PTR(kV9014557AStr);
 extern IRTEXT_CONST_PTR(kV9014557BStr);

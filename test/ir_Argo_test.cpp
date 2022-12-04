@@ -75,7 +75,7 @@ TEST(TestArgoAC_WREM3Class, toCommon) {
   ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
   ASSERT_TRUE(ac.toCommon().turbo);
   ASSERT_TRUE(ac.toCommon().quiet);  // Night
-  ASSERT_EQ(stdAc::swingv_t::kMiddle, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingv_t::kUpperMiddle, ac.toCommon().swingv);
   ASSERT_TRUE(ac.toCommon().econo);
   ASSERT_TRUE(ac.toCommon().light);
   ASSERT_TRUE(ac.toCommon().filter);
