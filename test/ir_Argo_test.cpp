@@ -44,6 +44,8 @@ TEST(TestArgoACClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_FALSE(ac.toCommon().quiet);
   ASSERT_EQ(-1, ac.toCommon().clock);
+  ASSERT_FALSE(ac.toCommon().iFeel);
+  ASSERT_EQ(25, ac.toCommon().sensorTemperature);
 }
 
 TEST(TestArgoAC_WREM3Class, toCommon) {
@@ -79,6 +81,8 @@ TEST(TestArgoAC_WREM3Class, toCommon) {
   ASSERT_TRUE(ac.toCommon().econo);
   ASSERT_TRUE(ac.toCommon().light);
   ASSERT_TRUE(ac.toCommon().filter);
+  ASSERT_TRUE(ac.toCommon().iFeel);
+  ASSERT_EQ(25, ac.toCommon().sensorTemperature);
 }
 
 /******************************************************************************/
@@ -409,7 +413,7 @@ TEST(TestIrAc, ArgoWrem3_SyntheticSendAndDecode_iFeelReport) {
   state.protocol = ARGO;
   state.model = argo_ac_remote_model_t::SAC_WREM3;
   state.command = stdAc::ac_command_t::kSensorTempReport;
-  state.degrees = 19;
+  state.sensorTemperature = 18.9;  // expected to be rounded up
 
   irac.sendAc(state, nullptr);
 
@@ -424,7 +428,7 @@ TEST(TestIrAc, ArgoWrem3_SyntheticSendAndDecode_iFeelReport) {
   EXPECT_EQ(ARGO, r.protocol);
   EXPECT_EQ(state.model, r.model);
   EXPECT_EQ(state.command, r.command);
-  EXPECT_EQ(state.degrees, r.degrees);
+  EXPECT_EQ(19, r.sensorTemperature);
 }
 
 TEST(TestIrAc, ArgoWrem3_SyntheticSendAndDecode_Timer) {
@@ -1454,6 +1458,7 @@ TEST(TestDecodeArgo, RealShortDecode) {
   // These short messages do result in a valid state (w/ room temperature only)
   EXPECT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
   EXPECT_EQ(stdAc::ac_command_t::kSensorTempReport, r.command);
+  EXPECT_EQ(28, r.sensorTemperature);
 }
 
 ///

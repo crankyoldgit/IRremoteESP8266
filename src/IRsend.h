@@ -39,6 +39,9 @@ const uint8_t kDutyMax = 100;     // Percentage
 const uint16_t kMaxAccurateUsecDelay = 16383;
 //  Usecs to wait between messages we don't know the proper gap time.
 const uint32_t kDefaultMessageGap = 100000;
+/// Placeholder for missing sensor temp value
+/// @note Not using "-1" as it may be a valid external temp
+const float kNoTempValue = -100.0;
 
 /// Enumerators and Structures for the Common A/C API.
 namespace stdAc {
@@ -126,6 +129,8 @@ struct state_t {
   int16_t sleep = -1;  // `-1` means off.
   int16_t clock = -1;  // `-1` means not set.
   stdAc::ac_command_t command = stdAc::ac_command_t::kControlCommand;
+  bool iFeel = false;
+  float sensorTemperature = kNoTempValue;  // `kNoTempValue` means not set.
 };
 };  // namespace stdAc
 
