@@ -622,10 +622,12 @@ stdAc::state_t IRSanyoAc::toCommon(void) const {
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
   result.degrees = getTemp();
+  result.sensorTemperature = getSensorTemp();
   result.fanspeed = toCommonFanSpeed(_.Fan);
   result.sleep = _.Sleep ? 0 : -1;
   result.swingv = toCommonSwingV(_.SwingV);
   result.beep = _.Beep;
+  result.iFeel = !getSensor();
   // Not supported.
   result.swingh = stdAc::swingh_t::kOff;
   result.turbo = false;

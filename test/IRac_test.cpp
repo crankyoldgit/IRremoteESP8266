@@ -133,8 +133,10 @@ TEST(TestIRac, Argo) {
             true,                        // Power
             stdAc::opmode_t::kHeat,      // Mode
             21,                          // Celsius
+            22,                          // Sensor Temp.
             stdAc::fanspeed_t::kHigh,    // Fan speed
             stdAc::swingv_t::kOff,       // Vertical swing
+            false,                       // iFeel
             false,                       // Turbo
             -1);                         // Sleep
   EXPECT_TRUE(ac.getPower());
@@ -194,9 +196,11 @@ TEST(TestIRac, Coolix) {
               true,                        // Power
               stdAc::opmode_t::kHeat,      // Mode
               21,                          // Celsius
+              kNoTempValue,                // Sensor Temp
               stdAc::fanspeed_t::kHigh,    // Fan speed
               stdAc::swingv_t::kOff,       // Vertical swing
               stdAc::swingh_t::kOff,       // Horizontal swing
+              false,                       // iFeel
               false,                       // Turbo
               false,                       // Light
               false,                       // Clean
@@ -562,7 +566,7 @@ TEST(TestIRac, Ecoclim) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Power: On, Mode: 1 (Cool), Temp: 26C, SensorTemp: 26C, Fan: 2 (High), "
+      "Power: On, Mode: 1 (Cool), Temp: 26C, SensorTemp: 27C, Fan: 2 (High), "
       "Clock: 12:34, On Timer: Off, Off Timer: Off, Type: 0";
 
   ac.begin();
@@ -570,6 +574,7 @@ TEST(TestIRac, Ecoclim) {
                true,                        // Power
                stdAc::opmode_t::kCool,      // Mode
                26,                          // Celsius
+               27,                          // Sensor Temp.
                stdAc::fanspeed_t::kHigh,    // Fan speed
                -1,                          // Sleep
                12 * 60 + 34);               // Clock
@@ -581,7 +586,7 @@ TEST(TestIRac, Ecoclim) {
   ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
 
   char expected_sleep[] =
-      "Power: On, Mode: 7 (Sleep), Temp: 21C, SensorTemp: 21C, Fan: 0 (Low), "
+      "Power: On, Mode: 7 (Sleep), Temp: 21C, SensorTemp: 22C, Fan: 0 (Low), "
       "Clock: 17:17, On Timer: Off, Off Timer: Off, Type: 0";
 
   ac._irsend.reset();
@@ -589,6 +594,7 @@ TEST(TestIRac, Ecoclim) {
                true,                        // Power
                stdAc::opmode_t::kCool,      // Mode
                21,                          // Celsius
+               22,                          // Sensor Temp.
                stdAc::fanspeed_t::kLow,     // Fan speed
                8 * 60,                      // Sleep
                17 * 60 + 17);               // Clock
@@ -614,9 +620,11 @@ TEST(TestIRac, Electra) {
                true,                        // Power
                stdAc::opmode_t::kFan,       // Mode
                26,                          // Celsius
+               27,                          // Sensor Temp.
                stdAc::fanspeed_t::kHigh,    // Fan speed
                stdAc::swingv_t::kAuto,      // Vertical swing
                stdAc::swingh_t::kLeft,      // Horizontal swing
+               false,                       // iFeel
                true,                        // Turbo
                true,                        // Light (toggle)
                true);                       // Clean
@@ -779,7 +787,7 @@ TEST(TestIRac, Gree) {
   IRrecv capture(kGpioUnused);
   char expected[] =
       "Model: 1 (YAW1F), Power: On, Mode: 1 (Cool), Temp: 71F, "
-      "Fan: 2 (Medium), Turbo: Off, Econo: Off, IFeel: Off, WiFi: Off, "
+      "Fan: 2 (Medium), Turbo: Off, Econo: Off, IFeel: On, WiFi: Off, "
       "XFan: On, Light: On, Sleep: On, Swing(V) Mode: Manual, "
       "Swing(V): 3 (UNKNOWN), Swing(H): 5 (Right), Timer: Off, "
       "Display Temp: 0 (Off)";
@@ -794,6 +802,7 @@ TEST(TestIRac, Gree) {
             stdAc::fanspeed_t::kMedium,     // Fan speed
             stdAc::swingv_t::kHigh,         // Vertical swing
             stdAc::swingh_t::kRight,        // Horizontal swing
+            true,                           // iFeel
             false,                          // Turbo
             false,                          // Econo
             true,                           // Light
@@ -1496,8 +1505,10 @@ TEST(TestIRac, Midea) {
              stdAc::opmode_t::kDry,       // Mode
              true,                        // Celsius
              27,                          // Degrees
+             28,                          // Sensor Temp.
              stdAc::fanspeed_t::kMedium,  // Fan speed
              stdAc::swingv_t::kOff,       // Swing(V)
+             false,                       // iFeel
              false,                       // Silent/Quiet
              false,                       // Previous Silent/Quiet setting
              false,                       // Turbo
@@ -1939,8 +1950,10 @@ TEST(TestIRac, Sanyo) {
              true,                         // Power
              stdAc::opmode_t::kCool,       // Mode
              28,                           // Celsius
+             kNoTempValue,                 // SensorTemp
              stdAc::fanspeed_t::kMedium,   // Fan speed
              stdAc::swingv_t::kHighest,    // Vertical Swing
+             false,                        // iFeel
              true,                         // Beep
              17);                          // Sleep
   ASSERT_EQ(expected, ac.toString());
@@ -2877,9 +2890,11 @@ TEST(TestIRac, Issue821) {
               result.power,     // Power
               result.mode,      // Mode
               result.degrees,   // Celsius
+              kNoTempValue,     // Sensor Temp
               result.fanspeed,  // Fan speed
               result.swingv,    // Vertical swing
               result.swingh,    // Horizontal swing
+              result.iFeel,     // iFeel
               result.turbo,     // Turbo
               result.light,     // Light
               result.clean,     // Clean

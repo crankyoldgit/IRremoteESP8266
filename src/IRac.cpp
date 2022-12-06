@@ -470,19 +470,27 @@ void IRac::amcor(IRAmcorAc *ac,
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
+/// @param[in] sensorTemp The room (iFeel) temperature sensor reading in degrees
+///                       Celsius.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] iFeel Whether to enable iFeel (remote temp) mode on the A/C unit.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] sleep Nr. of minutes for sleep mode.
 /// @note -1 is Off, >= 0 is on.
 void IRac::argo(IRArgoAC *ac,
                 const bool on, const stdAc::opmode_t mode, const float degrees,
-                const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                const float sensorTemp, const stdAc::fanspeed_t fan,
+                const stdAc::swingv_t swingv, const bool iFeel,
                 const bool turbo, const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
-  ac->setTemp(degrees);
+  ac->setTemp(static_cast<uint8_t>(std::round(degrees)));
+  if (sensorTemp != kNoTempValue) {
+    ac->setSensorTemp(static_cast<uint8_t>(std::round(sensorTemp)));
+  }
+  ac->setiFeel(iFeel);
   ac->setFan(ac->convertFan(fan));
   ac->setFlap(ac->convertSwingV(swingv));
   // No Quiet setting available.
@@ -528,9 +536,9 @@ void IRac::argoWrem3_ACCommand(IRArgoAC_WREM3 *ac, const bool on,
   if (sensorTemp != kNoTempValue) {
     ac->setSensorTemp(static_cast<uint8_t>(std::round(sensorTemp)));
   }
+  ac->setiFeel(iFeel);
   ac->setFan(ac->convertFan(fan));
   ac->setFlap(ac->convertSwingV(swingv));
-  ac->setiFeel(iFeel);
   ac->setNight(night);
   ac->setEco(econo);
   ac->setMax(turbo);
@@ -692,9 +700,12 @@ void IRac::carrier64(IRCarrierAc64 *ac,
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
+/// @param[in] sensorTemp The room (iFeel) temperature sensor reading in degrees
+///                       Celsius.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] swingh The horizontal swing setting.
+/// @param[in] iFeel Whether to enable iFeel (remote temp) mode on the A/C unit.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
@@ -702,10 +713,11 @@ void IRac::carrier64(IRCarrierAc64 *ac,
 /// @note -1 is Off, >= 0 is on.
 void IRac::coolix(IRCoolixAC *ac,
                   const bool on, const stdAc::opmode_t mode,
-                  const float degrees, const stdAc::fanspeed_t fan,
+                  const float degrees, const float sensorTemp,
+                  const stdAc::fanspeed_t fan,
                   const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                  const bool turbo, const bool light, const bool clean,
-                  const int16_t sleep) {
+                  const bool iFeel, const bool turbo, const bool light,
+                  const bool clean, const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   if (!on) {
@@ -722,6 +734,12 @@ void IRac::coolix(IRCoolixAC *ac,
   // No Clock setting available.
   // No Econo setting available.
   // No Quiet setting available.
+  if (sensorTemp != kNoTempValue) {
+    ac->setSensorTemp(static_cast<uint8_t>(std::round(sensorTemp)));
+  } else {
+    ac->clearSensorTemp();
+  }
+  ac->setZoneFollow(iFeel);
   ac->send();  // Send the state, which will also power on the unit.
   // The following are all options/settings that create their own special
   // messages. Often they only make sense to be sent after the unit is turned
@@ -1086,13 +1104,16 @@ void IRac::delonghiac(IRDelonghiAc *ac,
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
+/// @param[in] sensorTemp The room (iFeel) temperature sensor reading in degrees
+///                       Celsius.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 /// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
 void IRac::ecoclim(IREcoclimAc *ac,
                    const bool on, const stdAc::opmode_t mode,
-                   const float degrees, const stdAc::fanspeed_t fan,
-                   const int16_t sleep, const int16_t clock) {
+                   const float degrees, const float sensorTemp,
+                   const stdAc::fanspeed_t fan, const int16_t sleep,
+                   const int16_t clock) {
   ac->begin();
   ac->setPower(on);
   uint8_t new_mode;
@@ -1102,8 +1123,13 @@ void IRac::ecoclim(IREcoclimAc *ac,
     new_mode = ac->convertMode(mode);  // Not Sleep, so use the supplied mode.
   ac->setMode(new_mode);
   ac->setTemp(degrees);
-  ac->setSensorTemp(degrees);  //< Set to the desired temp until we cab disable.
   ac->setFan(ac->convertFan(fan));
+  if (sensorTemp != kNoTempValue) {
+    ac->setSensorTemp(static_cast<uint8_t>(std::round(sensorTemp)));
+  } else {
+    ac->setSensorTemp(degrees);  //< Set to the desired temp
+                                 //  until we can disable.
+  }
   // No SwingV setting available
   // No SwingH setting available
   // No Quiet setting available.
@@ -1125,22 +1151,28 @@ void IRac::ecoclim(IREcoclimAc *ac,
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
+/// @param[in] sensorTemp The room (iFeel) temperature sensor reading in degrees
+///                       Celsius.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] swingh The horizontal swing setting.
+/// @param[in] iFeel Whether to enable iFeel (remote temp) mode on the A/C unit.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] lighttoggle Should we toggle the LED/Display?
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
 void IRac::electra(IRElectraAc *ac,
                    const bool on, const stdAc::opmode_t mode,
-                   const float degrees, const stdAc::fanspeed_t fan,
-                   const stdAc::swingv_t swingv,
-                   const stdAc::swingh_t swingh, const bool turbo,
-                   const bool lighttoggle, const bool clean) {
+                   const float degrees, const float sensorTemp,
+                   const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                   const stdAc::swingh_t swingh, const bool iFeel,
+                   const bool turbo, const bool lighttoggle, const bool clean) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
+  if (sensorTemp != kNoTempValue) {
+    ac->setSensorTemp(static_cast<uint8_t>(std::round(sensorTemp)));
+  }
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(swingv != stdAc::swingv_t::kOff);
   ac->setSwingH(swingh != stdAc::swingh_t::kOff);
@@ -1153,6 +1185,7 @@ void IRac::electra(IRElectraAc *ac,
   // No Beep setting available.
   // No Sleep setting available.
   // No Clock setting available.
+  ac->setIFeel(iFeel);
   ac->send();
 }
 #endif  // SEND_ELECTRA_AC
@@ -1278,6 +1311,7 @@ void IRac::goodweather(IRGoodweatherAc *ac,
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] swingh The horizontal swing setting.
+/// @param[in] iFeel Whether to enable iFeel (remote temp) mode on the A/C unit.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] econo Toggle the device's economical mode.
 /// @param[in] light Turn on the LED/Display mode.
@@ -1287,8 +1321,8 @@ void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
                 const bool on, const stdAc::opmode_t mode, const bool celsius,
                 const float degrees, const stdAc::fanspeed_t fan,
                 const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
-                const bool turbo, const bool econo, const bool light,
-                const bool clean, const int16_t sleep) {
+                const bool iFeel, const bool turbo, const bool econo,
+                const bool light, const bool clean, const int16_t sleep) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
@@ -1298,6 +1332,7 @@ void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
   ac->setSwingVertical(swingv == stdAc::swingv_t::kAuto,  // Set auto flag.
                        ac->convertSwingV(swingv));
   ac->setSwingHorizontal(ac->convertSwingH(swingh));
+  ac->setIFeel(iFeel);
   ac->setLight(light);
   ac->setTurbo(turbo);
   ac->setEcono(econo);
@@ -1807,8 +1842,11 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
 /// @param[in] mode The operation mode setting.
 /// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
 /// @param[in] degrees The temperature setting in degrees.
+/// @param[in] sensorTemp The room (iFeel) temperature sensor reading
+///                       in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] iFeel Whether to enable iFeel (remote temp) mode on the A/C unit.
 /// @param[in] quiet Run the device in quiet/silent mode.
 /// @param[in] quiet_prev The device's previous quiet/silent mode.
 /// @param[in] turbo Toggle the device's turbo/powerful mode.
@@ -1819,9 +1857,9 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
 /// @note On Danby A/C units, swingv controls the Ion Filter instead.
 void IRac::midea(IRMideaAC *ac,
                  const bool on, const stdAc::opmode_t mode, const bool celsius,
-                 const float degrees, const stdAc::fanspeed_t fan,
-                 const stdAc::swingv_t swingv,
-                 const bool quiet, const bool quiet_prev,
+                 const float degrees, const float sensorTemp,
+                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                 const bool iFeel, const bool quiet, const bool quiet_prev,
                  const bool turbo, const bool econo, const bool light,
                  const bool clean, const int16_t sleep) {
   ac->begin();
@@ -1829,6 +1867,10 @@ void IRac::midea(IRMideaAC *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setUseCelsius(celsius);
   ac->setTemp(degrees, celsius);
+  if (sensorTemp != kNoTempValue) {
+    ac->setSensorTemp(sensorTemp, celsius);
+  }
+  ac->setEnableSensorTemp(iFeel);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingVToggle(swingv != stdAc::swingv_t::kOff);
   // No Horizontal swing setting available.
@@ -2226,19 +2268,29 @@ void IRac::samsung(IRSamsungAc *ac,
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
+/// @param[in] sensorTemp The room (iFeel) temperature sensor reading in degrees
+///                       Celsius.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
+/// @param[in] iFeel Whether to enable iFeel (remote temp) mode on the A/C unit.
 /// @param[in] beep Enable/Disable beeps when receiving IR messages.
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 void IRac::sanyo(IRSanyoAc *ac,
                  const bool on, const stdAc::opmode_t mode,
-                 const float degrees, const stdAc::fanspeed_t fan,
-                 const stdAc::swingv_t swingv, const bool beep,
-                 const int16_t sleep) {
+                 const float degrees, const float sensorTemp,
+                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                 const bool iFeel, const bool beep, const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
+  if (sensorTemp != kNoTempValue) {
+    ac->setSensorTemp(static_cast<uint8_t>(std::round(sensorTemp)));
+  } else {
+    ac->setSensorTemp(degrees);  // Set the sensor temp to the desired
+                                 // (normal) temp.
+  }
+  ac->setSensor(!iFeel);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(ac->convertSwingV(swingv));
   // No Horizontal swing setting available.
@@ -2251,10 +2303,6 @@ void IRac::sanyo(IRSanyoAc *ac,
   ac->setBeep(beep);
   ac->setSleep(sleep >= 0);  // Sleep is either on/off, so convert to boolean.
   // No Clock setting available.
-
-  // Extra
-  ac->setSensor(true);  // Set the A/C to use the temp sensor in the Unit/Wall.
-  ac->setSensorTemp(degrees);  // Set the sensor temp to the desired temp.
   ac->send();
 }
 #endif  // SEND_SANYO_AC
@@ -3027,8 +3075,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
         OUTPUT_DECODE_RESULTS_FOR_UT(ac);
       } else {
         IRArgoAC ac(_pin, _inverted, _modulation);
-        argo(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-            send.turbo, send.sleep);
+        argo(&ac, send.power, send.mode, degC, sensorTempC, send.fanspeed,
+          send.swingv, send.iFeel, send.turbo, send.sleep);
         OUTPUT_DECODE_RESULTS_FOR_UT(ac);
       }
       break;
@@ -3055,8 +3103,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case COOLIX:
     {
       IRCoolixAC ac(_pin, _inverted, _modulation);
-      coolix(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-             send.swingh, send.turbo, send.light, send.clean, send.sleep);
+      coolix(&ac, send.power, send.mode, degC, sensorTempC, send.fanspeed,
+             send.swingv, send.swingh, send.iFeel, send.turbo, send.light,
+             send.clean, send.sleep);
       break;
     }
 #endif  // SEND_COOLIX
@@ -3154,7 +3203,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case ECOCLIM:
     {
       IREcoclimAc ac(_pin, _inverted, _modulation);
-      ecoclim(&ac, send.power, send.mode, degC, send.fanspeed, send.clock);
+      ecoclim(&ac, send.power, send.mode, degC, sensorTempC, send.fanspeed,
+              send.iFeel, send.clock);
       break;
     }
 #endif  // SEND_ECOCLIM
@@ -3162,8 +3212,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case ELECTRA_AC:
     {
       IRElectraAc ac(_pin, _inverted, _modulation);
-      electra(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-              send.swingh, send.turbo, send.light, send.clean);
+      electra(&ac, send.power, send.mode, degC, sensorTempC, send.fanspeed,
+              send.swingv, send.swingh, send.iFeel, send.turbo, send.light,
+              send.clean);
       break;
     }
 #endif  // SEND_ELECTRA_AC
@@ -3331,8 +3382,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRMideaAC ac(_pin, _inverted, _modulation);
       midea(&ac, send.power, send.mode, send.celsius, send.degrees,
-            send.fanspeed, send.swingv, send.quiet, prev_quiet, send.turbo,
-            send.econo, send.light, send.sleep);
+            send.sensorTemperature, send.fanspeed, send.swingv, send.iFeel,
+            send.quiet, prev_quiet, send.turbo, send.econo, send.light,
+            send.sleep);
       break;
     }
 #endif  // SEND_MIDEA
@@ -3441,8 +3493,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case SANYO_AC:
     {
       IRSanyoAc ac(_pin, _inverted, _modulation);
-      sanyo(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
-            send.beep, send.sleep);
+      sanyo(&ac, send.power, send.mode, degC, sensorTempC, send.fanspeed,
+            send.swingv, send.iFeel, send.beep, send.sleep);
       break;
     }
 #endif  // SEND_SANYO_AC
