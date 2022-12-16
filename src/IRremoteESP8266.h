@@ -931,6 +931,13 @@
 #define SEND_GORENJE        _IR_ENABLE_DEFAULT_
 #endif  // SEND_GORENJE
 
+#ifndef DECODE_IKEDA
+#define DECODE_IKEDA    _IR_ENABLE_DEFAULT_
+#endif  // DECODE_IKEDA
+#ifndef SEND_IKEDA
+#define SEND_IKEDA      _IR_ENABLE_DEFAULT_
+#endif  // SEND_IKEDA
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -1112,8 +1119,9 @@ enum decode_type_t {
   SANYO_AC152,
   DAIKIN312,
   GORENJE,
+  IKEDA,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = GORENJE,
+  kLastDecodeType = IKEDA,
 };
 
 // Message lengths & required repeat values
@@ -1401,6 +1409,9 @@ const uint16_t kRhossStateLength = 12;
 const uint16_t kRhossBits = kRhossStateLength * 8;
 const uint16_t kRhossDefaultRepeat = 0;
 const uint16_t kClimaButlerBits = 52;
+const uint16_t kIkedaStateLength = 5; // 5 states * 8 bits
+const uint16_t kIKEDABits = kIkedaStateLength * 8;
+const uint16_t kIkedaMinRepeat = 2; // Sanyo88 (for now)
 
 
 // Legacy defines. (Deprecated)
@@ -1458,6 +1469,7 @@ const uint16_t kClimaButlerBits = 52;
 #define TOSHIBA_AC_STATE_LENGTH       kToshibaACStateLength
 #define TROTEC_COMMAND_LENGTH         kTrotecStateLength
 #define WHYNTER_BITS                  kWhynterBits
+#define IKEDA_BITS                    kIKEDABits
 
 // Turn on Debugging information by uncommenting the following line.
 // #define DEBUG 1

@@ -863,6 +863,11 @@ class IRsend {
                     const uint16_t nbytes = kBosch144StateLength,
                     const uint16_t repeat = kNoRepeat);
 #endif  // SEND_BOSCH144
+#if SEND_IKEDA
+  void sendIKEDA(const uint64_t data,
+                     const uint16_t nbits = kIKEDABits,
+                     const uint16_t repeat = kNoRepeat);
+#endif  // SEND_IKEDA
 
  protected:
 #ifdef UNIT_TEST

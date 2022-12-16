@@ -29,6 +29,7 @@
 #include "ir_Kelon.h"
 #include "ir_Kelvinator.h"
 #include "ir_LG.h"
+#include "ir_Ikeda.h"
 #include "ir_Midea.h"
 #include "ir_Mirage.h"
 #include "ir_Mitsubishi.h"
@@ -382,6 +383,16 @@ void electra(IRElectraAc *ac,
           const stdAc::swingv_t swingv, const stdAc::swingv_t swingv_prev,
           const stdAc::swingh_t swingh, const bool light);
 #endif  // SEND_LG
+
+#if SEND_IKEDA
+  void ikeda(IRIkedaAc *ac,
+             const bool on, const stdAc::opmode_t mode,
+             const float degrees, const stdAc::fanspeed_t fan,
+             const stdAc::swingv_t swingv,
+             const bool quiet, const bool turbo,
+             const int16_t sleep = -1);
+#endif  // SEND_IKEDA
+
 #if SEND_MIDEA
   void midea(IRMideaAC *ac,
              const bool on, const stdAc::opmode_t mode, const bool celsius,
