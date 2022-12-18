@@ -616,7 +616,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
 #endif
 #if DECODE_IKEDA
 	DPRINTLN("Attempting Ikeda decode");
-	//if (decodeIKEDA(results)) return true;
 	if (decodeIKEDA(results, offset)) return true;
     // Try decodeIKEDA() before decodeNEC() / decodeSanyoLC7461() because the protocols are
     // similar in timings & structure

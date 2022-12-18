@@ -1409,9 +1409,8 @@ const uint16_t kRhossStateLength = 12;
 const uint16_t kRhossBits = kRhossStateLength * 8;
 const uint16_t kRhossDefaultRepeat = 0;
 const uint16_t kClimaButlerBits = 52;
-const uint16_t kIkedaStateLength = 5; // 5 states * 8 bits
-const uint16_t kIKEDABits = kIkedaStateLength * 8;
-const uint16_t kIkedaMinRepeat = 2; // Sanyo88 (for now)
+const uint16_t kIKEDABits = 40;
+const uint16_t kIkedaMinRepeat = 2;
 
 
 // Legacy defines. (Deprecated)

@@ -18,7 +18,7 @@ using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::bcdToUint8;
 using irutils::uint8ToBcd;
-using irutils::sumNibbles;
+using irutils::sumBytes;
 
 /**
  * Decode pulse distance width protocols.
@@ -173,7 +173,13 @@ ON+OFF timers at the same time - not possible.
 0x100 = 256
 
 
-                  CSUM      TEMP      Emp   Fan    Flap   FP     FanOnly  MODE  Slp   OnTmr   OffTmr    Pow  Timer Padding
+                  CSUM      TEMP     |Emp   Fan    Flap   FP     FanOnly  MODE |Slp   OnTmr   OffTmr    Pow  Timer| Padding
+
+    0x222311AA              00100010  0     01     0      0      0        11    0     0       0         1    0001  10101010
+
+Power: Off, Mode: 0 (Auto), Temp: 20C, Fan: 0 (Auto), Swing(V): On, Turbo: Off, Sleep: Off  ---> Checksum generation test #1
+                    219        32                         16                                1                        170+1+16+32 -> 219 Correct CS
+    0xDB201001AA  11011011  00100000  0     00     1      0      0        00    0     0       0         0    0001  10101010
 
 // 19C 
     0xF7192311AA  11110111  00011001  0     01     0      0      0        11    0     0       0         1    0001  10101010
@@ -301,10 +307,9 @@ IRIkedaAc::IRIkedaAc(const uint16_t pin, const bool inverted,
 /// Reset the state of the remote to a known good state/sequence.
 /// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?ts=5f0190a5#gid=1050142776&range=A2:B2
 void IRIkedaAc::stateReset(void) {
-  // 0xEF241011AA == ON,  Mode: Auto; Fan: Auto, Temp: 24 C, Flap: ON <-
-  // 0xDF241001AA == OFF, Mode: Auto; Fan: Auto, Temp: 24 C, Flap: ON
-  //_.remote_state = 0xEF101011AA; // @ 16C
-  _.remote_state = 0xAA111010EF;
+  // 0xEF161011AA == ON,  Mode: Auto; Fan: Auto, Temp: 16 C, Flap: ON
+  // 0xDF161001AA == OFF, Mode: Auto; Fan: Auto, Temp: 16 C, Flap: ON <-
+  _.remote_state = 0x00161001AA; // checksum 0x00   
 }
 
 /// Set up hardware to be able to send a message.
@@ -314,14 +319,38 @@ void IRIkedaAc::begin(void) { _irsend.begin(); }
 /// Send the current internal state as IR messages.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRIkedaAc::send(const uint16_t repeat) {
-  _irsend.sendIKEDA(getRaw(), kSanyoAc88StateLength, repeat);
+  _irsend.sendIKEDA(getRaw(), kIKEDABits, repeat);
 }
 #endif  // SEND_IKEDA
+
+/// Calculate and set the checksum values for the internal state.
+void IRIkedaAc::checksum(void) {
+  uint8_t cs = sumBytes(_.remote_state, 4, 0, true);
+  _.Checksum = cs;
+  //DPRINTLN((String)"checksum(): " + _.Checksum);
+}
+
+
+uint8_t IRIkedaAc::calcChecksum(const uint64_t data) {
+  uint8_t sum = sumBytes(data, 4, 0, true);
+  //DPRINTLN((String)"calcChecksum(): " + sum);
+  return sum;
+}
+
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @return true, if the state has a valid checksum. Otherwise, false.
+bool IRIkedaAc::validChecksum(const uint64_t state) {
+  // Validate the checksum of the given state.
+  uint8_t bits = GETBITS64(state, 32, 8);
+  //DPRINTLN((String)"validChecksum(): " + bits);
+  return (bits == calcChecksum(state));
+}
 
 /// Get a copy of the internal state/code for this protocol.
 /// @return The code for this protocol based on the current internal state.
 uint64_t IRIkedaAc::getRaw(void) {
-  //checksum();  // Ensure correct checksum before sending.
+  checksum();  // Ensure correct checksum before sending.
   return _.remote_state;
 }
 
@@ -452,6 +481,34 @@ void IRIkedaAc::setSwingV(const bool on) { _.Flap = on; }
 /// @return true, the setting is on. false, the setting is off.
 bool IRIkedaAc::getSwingV(void) const { return _.Flap; }
 
+// Ikeda only has on/off for swing
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRIkedaAc::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+    case stdAc::swingv_t::kMiddle:
+    case stdAc::swingv_t::kLow:
+    case stdAc::swingv_t::kLowest:
+    case stdAc::swingv_t::kAuto:    return 1;
+    // Native "Auto" doesn't have a good match for this in stdAc. (Case 2)
+    // So we repurpose stdAc's "Off" (and anything else) to be Native Auto.
+    default:                        return 0;
+  }
+}
+
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] pos A native position to convert.
+/// @return The common vertical swing position.
+stdAc::swingv_t IRIkedaAc::toCommonSwingV(const uint8_t pos) {
+  switch (pos) {
+    case 1:                         return stdAc::swingv_t::kAuto;
+    default:                        return stdAc::swingv_t::kOff;
+  }
+}
+
 /// Change the Turbo setting. (Force run)
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRIkedaAc::setTurbo(const bool on) { _.Fp = on; }
@@ -492,11 +549,11 @@ stdAc::state_t IRIkedaAc::toCommon(const stdAc::state_t *prev) {
     result.degrees = getTemp();
     result.fanspeed = toCommonFanSpeed(_.Fan);
     result.swingv = _.Flap ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
-    result.filter = false;
     result.turbo = _.Fp;
     result.sleep = _.Sleep ? 0 : -1;
     result.clock = false;
     // Not supported.
+    result.filter = false;
     result.swingh = stdAc::swingh_t::kOff;
     result.econo = false;
     result.light = false;
@@ -572,6 +629,9 @@ bool IRrecv::decodeIKEDA(decode_results *results, uint16_t offset,
   // Footer
   if (!matchMark(results->rawbuf[offset++], kIKEDABitMark))
     return false;
+
+  // Compliance
+  if (strict && !IRIkedaAc::validChecksum(data)) return false;
 
   // Success
   results->decode_type = decode_type_t::IKEDA;

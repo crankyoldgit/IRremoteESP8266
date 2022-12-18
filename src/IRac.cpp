@@ -1790,17 +1790,16 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
 #endif  // SEND_LG
 
 #if SEND_IKEDA
-/// Send a Midea A/C message with the supplied settings.
-/// @param[in, out] ac A Ptr to an IRMideaAC object to use.
+/// Send a Ikeda A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRIkedaAc object to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
-/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingv Toggle The vertical swing setting.
 /// @param[in] quiet Run the device in quiet/silent mode.
 /// @param[in] turbo Toggle the device's turbo/powerful mode.
-/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
-/// @note On Danby A/C units, swingv controls the Ion Filter instead.
+/// @param[in] sleep Toggle 0 is Off, 1 is on. Only available on mode Heat / Cold
 void IRac::ikeda(IRIkedaAc *ac,
                  const bool on, const stdAc::opmode_t mode, 
                  const float degrees, const stdAc::fanspeed_t fan,
@@ -1812,6 +1811,7 @@ void IRac::ikeda(IRIkedaAc *ac,
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(ac->convertSwingV(swingv)); // only on(auto swing)/off
   // No Horizontal swing setting available.
   // No Filter setting available.
   // No Beep setting available.
@@ -3473,7 +3473,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     }
 #endif  // SEND_SANYO_AC88
 #if SEND_IKEDA
-    case SEND_IKEDA:
+    case IKEDA:
     {
       IRIkedaAc ac(_pin, _inverted, _modulation);
       ikeda(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,

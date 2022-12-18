@@ -163,6 +163,8 @@ class IRIkedaAc {
   void setFan(const uint8_t speed);
   uint8_t getFan(void) const;
 
+  uint8_t convertSwingV(const stdAc::swingv_t position);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   void setSwingV(const bool on);
   bool getSwingV(void) const;
 
@@ -188,6 +190,8 @@ class IRIkedaAc {
   static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
   stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
   String toString(void) const;
+  static uint8_t calcChecksum(const uint64_t state);
+  static bool validChecksum(const uint64_t state);
   
 #ifndef UNIT_TEST
 
@@ -203,6 +207,6 @@ class IRIkedaAc {
   uint8_t _lastfan;  // Last user chosen/valid fan speed.
   uint8_t _lastmode;  // Last user chosen operation mode.
   // static uint8_t calcChecksum(const uint64_t state);
-  // void checksum(void);
+  void checksum(void);
 };
 #endif  // IR_TRUMA_H_

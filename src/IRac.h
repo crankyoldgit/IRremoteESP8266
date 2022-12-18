@@ -383,7 +383,6 @@ void electra(IRElectraAc *ac,
           const stdAc::swingv_t swingv, const stdAc::swingv_t swingv_prev,
           const stdAc::swingh_t swingh, const bool light);
 #endif  // SEND_LG
-
 #if SEND_IKEDA
   void ikeda(IRIkedaAc *ac,
              const bool on, const stdAc::opmode_t mode,
@@ -392,7 +391,6 @@ void electra(IRElectraAc *ac,
              const bool quiet, const bool turbo,
              const int16_t sleep = -1);
 #endif  // SEND_IKEDA
-
 #if SEND_MIDEA
   void midea(IRMideaAC *ac,
              const bool on, const stdAc::opmode_t mode, const bool celsius,
