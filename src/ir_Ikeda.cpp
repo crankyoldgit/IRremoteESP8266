@@ -1,4 +1,6 @@
 // Author: Dobri Dobrev (Onepamopa)
+// Copyright 2022 Onepamopa
+
 /// @file
 /// @brief Support for IKEDA protocol
 // Supports:
@@ -47,13 +49,13 @@ using irutils::sumBytes;
 
 // See https://github.com/crankyoldgit/IRremoteESP8266/wiki/Adding-support-for-a-new-IR-protocol
 // for details of how to include this in the library.
-const uint16_t kIKEDAHdrMark 	    = 8912; ///< uSeconds.
-const uint16_t kIKEDABitMark 	    = 619;  ///< uSeconds.
-const uint16_t kIKEDAHdrSpace 	  = 2042; ///< uSeconds.
-const uint16_t kIKEDAOneSpace 	  = 1212; ///< uSeconds.
-const uint16_t kIKEDAZeroSpace 	  = 477;  ///< uSeconds.
+const uint16_t kIKEDAHdrMark      = 8912; ///< uSeconds.
+const uint16_t kIKEDABitMark      = 619;  ///< uSeconds.
+const uint16_t kIKEDAHdrSpace     = 2042; ///< uSeconds.
+const uint16_t kIKEDAOneSpace     = 1212; ///< uSeconds.
+const uint16_t kIKEDAZeroSpace    = 477;  ///< uSeconds.
 const uint32_t kTESTSanyoAc88Gap  = 3675;       ///< uSeconds
-const uint16_t kIKEDAFreq 		    = 38000;  // Hz. (Guessing the most common frequency.)
+const uint16_t kIKEDAFreq         = 38000;  // Hz. (Guessing the most common frequency.)
 const uint16_t kIKEDAOverhead     = 3; // 3 -> 1
 
 #if SEND_IKEDA
@@ -163,7 +165,7 @@ IRIkedaAc::IRIkedaAc(const uint16_t pin, const bool inverted,
 void IRIkedaAc::stateReset(void) {
   // 0xEF161011AA == ON,  Mode: Auto; Fan: Auto, Temp: 16 C, Flap: ON
   // 0xDF161001AA == OFF, Mode: Auto; Fan: Auto, Temp: 16 C, Flap: ON <-
-  _.remote_state = 0x00161001AA; // checksum 0x00   
+  _.remote_state = 0x00161001AA;  // checksum 0x00
 }
 
 /// Set up hardware to be able to send a message.
@@ -181,13 +183,13 @@ void IRIkedaAc::send(const uint16_t repeat) {
 void IRIkedaAc::checksum(void) {
   uint8_t cs = sumBytes(_.remote_state, 4, 0, true);
   _.Checksum = cs;
-  //DPRINTLN((String)"checksum(): " + _.Checksum);
+  // DPRINTLN((String)"checksum(): " + _.Checksum);
 }
 
 
 uint8_t IRIkedaAc::calcChecksum(const uint64_t data) {
   uint8_t sum = sumBytes(data, 4, 0, true);
-  //DPRINTLN((String)"calcChecksum(): " + sum);
+  // DPRINTLN((String)"calcChecksum(): " + sum);
   return sum;
 }
 
@@ -197,7 +199,7 @@ uint8_t IRIkedaAc::calcChecksum(const uint64_t data) {
 bool IRIkedaAc::validChecksum(const uint64_t state) {
   // Validate the checksum of the given state.
   uint8_t bits = GETBITS64(state, 32, 8);
-  //DPRINTLN((String)"validChecksum(): " + bits);
+  // DPRINTLN((String)"validChecksum(): " + bits);
   return (bits == calcChecksum(state));
 }
 
@@ -273,7 +275,7 @@ stdAc::opmode_t IRIkedaAc::toCommonMode(const uint8_t mode) {
     case ikedaDry:
       return stdAc::opmode_t::kDry;
     default:
-      return stdAc::opmode_t::kAuto; // Fan (Quiet)
+      return stdAc::opmode_t::kAuto;  // Fan (Quiet)
   }
 }
 
@@ -284,13 +286,13 @@ const uint8_t kIkedaAcTempDelta = 6;   ///< Celsius to Native Temp difference.
 void IRIkedaAc::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max((uint8_t)ikedaMinTemp, degrees);
   temp = std::min((uint8_t)ikedaMaxTemp, temp);
-  _.Temperature = uint8ToBcd(temp); // Binary coded decimal
+  _.Temperature = uint8ToBcd(temp);  // Binary coded decimal
 }
 
 /// Get the current desired temperature setting.
 /// @return The current setting for temp. in degrees celsius.
 uint8_t IRIkedaAc::getTemp(void) const {
-  return bcdToUint8(_.Temperature); // Binary coded decimal
+  return bcdToUint8(_.Temperature);  // Binary coded decimal
 }
 
 /// Set the speed of the fan.
@@ -448,8 +450,6 @@ String IRIkedaAc::toString(void) const {
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
-
-// Returns 40 bits, MSB first, Arduino-IRremote (original library) returns LSB first
 bool IRrecv::decodeIKEDA(decode_results *results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * nbits + kIKEDAOverhead - offset)
@@ -472,7 +472,7 @@ bool IRrecv::decodeIKEDA(decode_results *results, uint16_t offset,
               // zeromark       zerisoace
               kIKEDABitMark, kIKEDAZeroSpace,
               // tolerance, excess, msbfirst, expectlastspace
-              kUseDefTol, kMarkExcess, false, true); // MSB disabled
+              kUseDefTol, kMarkExcess, false, true);  // MSB disabled
   
   offset += data_result.used;
 
