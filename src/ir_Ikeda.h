@@ -17,71 +17,6 @@
 #include "IRsend_test.h"
 #endif
 
-// /// Native representation of a Ikeda A/C message.
-// union IkedaProtocol{
-//   uint64_t remote_state;  ///< The state in native IR code form
-//   struct {
-//     // Byte 0
-//     uint8_t Checksum      :8;
-
-//     // Byte 1
-//     uint8_t Temperature   :8;		// DEC 16-30 C -> @ HEX
-
-//     // Byte 2
-//     uint8_t               :1; // Empty 0x0
-//     uint8_t Fan           :2; // 3=Low, 2=Medium, 1=High, 0=Auto
-//     uint8_t Flap          :1; // 0=Off, 1=On
-//     uint8_t Fp            :1; // 0=Off, 1=On // FORCE RUN (Turbo?)
-//     uint8_t FanOnly       :1; // 0=Off, 1=On (with mode Auto)
-//     uint8_t Mode          :2; // 0b10001 (17) 0x11=Heat, 0b00 (0) 0x00=Auto(& Fan), 0b0001 (1) 0x01=Cool, 0b00010000 (16) 0x10=Dry
-
-//     // Byte 3
-//     uint8_t Sleep         :1; // 0=Off, 1=On
-//     uint8_t OnT_Enable    :1; // 0=Off, 1=On
-//     uint8_t OffT_Enable   :1; // 0=Off, 1=On
-//     uint8_t Power         :1; // 0=Off, 1=On
-//     uint8_t Timer         :4; // 1-12h
-// 		// timer hours 1-9, 0xA=10, 0xB=11 0xC=12
-
-//     // Byte 4
-//     uint8_t               :8;  // Always 0xAA
-//   };
-// };
-
-
-// /// Native representation of a Ikeda A/C message.
-// union IkedaProtocol{
-//   uint64_t remote_state;  ///< The state in native IR code form
-//   struct {
-//       // Byte 4
-//     uint8_t               :8;  // Always 0xAA
-
-//     // Byte 3
-//     uint8_t Sleep         :1; // 0=Off, 1=On
-//     uint8_t OnT_Enable    :1; // 0=Off, 1=On
-//     uint8_t OffT_Enable   :1; // 0=Off, 1=On
-//     uint8_t Power         :1; // 0=Off, 1=On
-//     uint8_t Timer         :4; // 1-12h
-// 		// timer hours 1-9, 0xA=10, 0xB=11 0xC=12
-
-//     // Byte 2
-//     uint8_t               :1; // Empty 0x0
-//     uint8_t Fan           :2; // 3=Low, 2=Medium, 1=High, 0=Auto
-//     uint8_t Flap          :1; // 0=Off, 1=On
-//     uint8_t Fp            :1; // 0=Off, 1=On // FORCE RUN (Turbo?)
-//     uint8_t FanOnly       :1; // 0=Off, 1=On (with mode Auto)
-//     uint8_t Mode          :2; // 0b10001 (17) 0x11=Heat, 0b00 (0) 0x00=Auto(& Fan), 0b0001 (1) 0x01=Cool, 0b00010000 (16) 0x10=Dry
-
-//     // Byte 1
-//     uint8_t Temperature   :8;		// DEC 16-30 C -> @ HEX
-
-//     // Byte 0
-//     uint8_t Checksum      :8;
-//   };
-// };
-
-
-
 // Works OK but the degrees are not correct
 union IkedaProtocol{
   uint64_t remote_state;  ///< The state in native IR code form
@@ -206,7 +141,6 @@ class IRIkedaAc {
  
   uint8_t _lastfan;  // Last user chosen/valid fan speed.
   uint8_t _lastmode;  // Last user chosen operation mode.
-  // static uint8_t calcChecksum(const uint64_t state);
   void checksum(void);
 };
 #endif  // IR_TRUMA_H_

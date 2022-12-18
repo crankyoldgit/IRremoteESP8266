@@ -76,97 +76,6 @@ void IRsend::sendIKEDA(uint64_t data, uint16_t nbits,
 
 /*
 
-ON:
-21:21:56.033 -> Protocol  : IKEDA (Repeat)
-21:21:56.033 -> Code      : 0x2242311AA (40 Bits)
-21:21:56.033 -> No description
-21:21:56.033 -> uint16_t rawData[83] = {8960, 2016,  620, 474,  618, 1206,  644, 478,  618, 1204,  644, 478,  618, 1204,  644, 474,  618, 1208,  644, 1178,  618, 474,  622, 474,  644, 474,  618, 1208,  644, 474,  618, 448,  648, 476,  618, 1204,  650, 1204,  618, 474,  618, 452,  644, 474,  618, 1210,  644, 474,  618, 474,  622, 474,  618, 474,  644, 1178,  648, 448,  618, 500,  622, 1204,  618, 474,  618, 452,  644, 474,  618, 1208,  644, 474,  618, 478,  618, 476,  618, 474,  648, 448,  644, 448,  618};  // IKEDA (Repeat) 2242311AA
-21:21:56.080 -> uint64_t data = 0x2242311AA; 242311AA [0x2]
-
-OFF:
-21:21:59.337 -> Protocol  : IKEDA (Repeat)
-21:21:59.337 -> Code      : 0xF2242301AA (40 Bits)
-21:21:59.337 -> No description
-21:21:59.337 -> uint16_t rawData[83] = {8964, 2012,  618, 474,  618, 1210,  644, 476,  618, 1204,  648, 474,  618, 1204,  644, 478,  618, 1204,  644, 1178,  622, 474,  618, 474,  644, 478,  618, 474,  618, 474,  622, 474,  644, 448,  618, 1234,  618, 1204,  618, 474,  622, 474,  644, 448,  644, 1210,  644, 448,  618, 474,  622, 500,  618, 474,  624, 1204,  618, 474,  618, 474,  622, 1204,  618, 474,  618, 474,  648, 448,  618, 1230,  618, 478,  618, 500,  618, 1204,  622, 1204,  644, 1178,  618, 1206,  622};  // IKEDA (Repeat) F2242301AA
-21:21:59.383 -> uint64_t data = 0xF2242301AA; 242301AA [0xF2]
-
-ON:
-21:23:44.531 -> Protocol characteristics for a 50 us tick: 40, 179, 41, 12, 0, 10, 24
-21:23:44.531 -> 
-21:23:44.531 -> Protocol=PulseDistance Raw-Data=0x2 40 bits LSB first
-21:23:44.531 -> Send with:
-21:23:44.531 ->     uint32_t tRawData[]={0x242311AA, 0x2};
-21:23:44.531 ->     IrSender.sendPulseDistanceWidthFromArray(38, 8950, 2050, 600, 1200, 600, 500, &tRawData[0], 40, PROTOCOL_IS_LSB_FIRST, <millisofRepeatPeriod>, <numberOfRepeats>);
-
-OFF:
-21:24:59.085 -> Protocol characteristics for a 50 us tick: 40, 179, 40, 13, 0, 10, 24
-21:24:59.131 -> 
-21:24:59.131 -> Protocol=PulseDistance Raw-Data=0xF2 40 bits LSB first
-21:24:59.131 -> Send with:
-21:24:59.131 ->     uint32_t tRawData[]={0x242301AA, 0xF2};
-21:24:59.131 ->     IrSender.sendPulseDistanceWidthFromArray(38, 8950, 2000, 650, 1200, 650, 500, &tRawData[0], 40, PROTOCOL_IS_LSB_FIRST, <millisofRepeatPeriod>, <numberOfRepeats>);
-
-// in MSB:
-0x5588C4E8AF
-0x55 = 85  // 55 = 85
-0x88 = 136 // 88 = 136
-0xC4 = 196 // 4C = 76
-0xE8 = 232 // 8E = 142
-0xAF = 175 // FA = 250
-
-// in LSB:
-0xF2 17 20 11 AA // AUTO, 17C, Fan HIGH
-0xF3 17 21 11 AA // COOL, 17C, Fan HIGH
-0xF4 17 22 11 AA // DRY,  17C, Fan HIGH
-0xF6 17 24 11 AA // FAN,  17C, Fan HIGH
-0xD5 17 03 11 AA // HEAT, 17C, Fan AUTO
-0x35 17 63 11 AA // HEAT, 17C, Fan LOW
-0x15 17 43 11 AA // HEAT, 17C, Fan MEDIUM
-
-0x5  17 33 11 AA // HEAT, 17C, Fan HIGH, Flap->ON: First part: 3=FlapON_FanHIGH
-0x25 17 53 11 AA // HEAT, 17C, Fan MEDIUM, Flap->ON: 5=FlapON_FanMEDIUM
-0x45 17 73 11 AA // HEAT, 17C, Fan LOW, Flap->ON: 7=FlapON_FanLOW
-0xE5 17 13 11 AA // HEAT, 17C, Fan AUTO, Flap->ON: 1=FlapON_FanAUTO
-
-0x75 17 23 91 AA // HEAT, 17C, Fan HIGH, SleepMode->ON 	state[2][1]: 3 (heatSleep) + state[3][0]: 11->91 9=SleepMode
-0x73 17 21 91 AA // COOL, 17C, Fan HIGH, SleepMode->ON 	state[2][1]: 1 (coolSleep) + state[3][0]: 11->91 9=SleepMode
-
-0xFD 17 2B 11 AA // HEAT, 17C, Fan HIGH, FP->ON 		state[2][1] B(heatFP)
-0xFB 17 29 11 AA // COOL, 17C, Fan HIGH, FP->ON 		state[2][1] 9(coolFP)
-
-0x73 17 21 91 AA // COOL, 17C, Fan HIGH, SleepMode->ON 				state[2][1]: 1 + state[3][0]: 11->91 9=SleepMode
-0x7B 17 29 91 AA // COOL, 17C, Fan HIGH, SleepMode->ON + FP->ON 	state[2][1]: 9(coolFP) + state[3][0]: 11->91 9=SleepMode
-0x7D 17 2B 91 AA // HEAT, 17C, Fan HIGH, SleepMode->ON + FP->ON		state[2][1]: B(heatFP) + state[3][0]: 11->91 9=SleepMode
-
-
-
-0xF5 17 23 11 AA // HEAT, 17C, Fan HIGH (for checksum check only)
-0x25 17 23 41 AA // HEAT, 17C, Fan HIGH, On-Timer->1h	state[3][0] 4=On-Timer; state[3][1] 1-9, 0xA=10, 0xB=11 0xC=12
-0x26 17 23 42 AA // HEAT, 17C, Fan HIGH, On-Timer->2h
-0x27 17 23 43 AA // HEAT, 17C, Fan HIGH, On-Timer->3h
-0x28 17 23 44 AA // HEAT, 17C, Fan HIGH, On-Timer->4h
-0x29 17 23 45 AA // HEAT, 17C, Fan HIGH, On-Timer->5h
-0x2A 17 23 46 AA // HEAT, 17C, Fan HIGH, On-Timer->6h
-0x2B 17 23 47 AA // HEAT, 17C, Fan HIGH, On-Timer->7h
-0x2C 17 23 48 AA // HEAT, 17C, Fan HIGH, On-Timer->8h
-0x2D 17 23 49 AA // HEAT, 17C, Fan HIGH, On-Timer->9h
-0x2E 17 23 4A AA // HEAT, 17C, Fan HIGH, On-Timer->10h
-0x2F 17 23 4B AA // HEAT, 17C, Fan HIGH, On-Timer->11h
-0x30 17 23 4C AA // HEAT, 17C, Fan HIGH, On-Timer->12h
-
-0x15 17 23 31 AA // HEAT, 17C, Fan HIGH, Off-Timer->1h	state[3][0] 3=Off-Timer; state[3][1] 1-9, 0xA=10, 0xB=11 0xC=12
-0x16 17 23 32 AA // HEAT, 17C, Fan HIGH, Off-Timer->2h
-0x17 17 23 33 AA // HEAT, 17C, Fan HIGH, Off-Timer->3h
-0x18 17 23 34 AA // HEAT, 17C, Fan HIGH, Off-Timer->4h
-0x19 17 23 35 AA // HEAT, 17C, Fan HIGH, Off-Timer->5h
-0x1A 17 23 36 AA // HEAT, 17C, Fan HIGH, Off-Timer->6h
-0x1B 17 23 37 AA // HEAT, 17C, Fan HIGH, Off-Timer->7h
-0x1C 17 23 38 AA // HEAT, 17C, Fan HIGH, Off-Timer->8h
-0x1D 17 23 39 AA // HEAT, 17C, Fan HIGH, Off-Timer->9h
-0x1E 17 23 3A AA // HEAT, 17C, Fan HIGH, Off-Timer->10h
-0x1F 17 23 3B AA // HEAT, 17C, Fan HIGH, Off-Timer->11h
-0x20 17 23 3C AA // HEAT, 17C, Fan HIGH, Off-Timer->12h
-
 ON+OFF timers at the same time - not possible.
 
 0x010 = 16
@@ -239,61 +148,6 @@ ON;  Mode: Heat; Fan: High; Temp: 16, FP: ON, SLEEP: OFF, FLAP: OFF
 ON;  Mode: Heat; Fan: High; Temp: 16, FP: ON, SLEEP: ON, FLAP: OFF
     0x7C162B91AA  01111100  00010110  0     01     0      1      0        11    1     0       0         1    0001  10101010
 
-
-
-0xF5172311AA
-11110101 00010111 00100011 00010001 10101010 // 40
-0xF5 = 245  -> checksum state[0]: 0xF5 = 0x17 + 0x23 + 0x11 + 0xAA
-	// checksum with first byte only 1 digit
-	0x5 17 33 11 AA
-	0101 00010111 00110011 00010001 10101010 // 36
-	// if checksum is 1 digit (for example 0x2, 0x3, 0x4, 0x5, 0xD, etc =>> hex(100+hex2dec(DIGIT))
-	-------
-
-0x17 = 23	-> temperature: state[1] (in this case 17C)
-
-0x23 =  	-> mode: state[2]
-	First bit state[2][0]:
-		- Fan speed (auto=0, high=2, medium=4, low=6) OR
-		- Fan speed flap (1=Flap_Fan_Auto, 3=Flap_Fan_High, 5=Flap_Fan_Medium, 7=Flap_Fan_Low)
-	Second bit state[2][1]:
-		- Operating mode "normal" (0=auto, 1=cool, 2=dry, 3=heat, 4=fan)
-		- Operating mode "fp" (B=heatFP, 9=coolFP) (Dry, Fan & Auto -> no FP & SLEEP modes)
-		- Operating mode "sleep" (3=Heat_Sleep, 1=Cool_Sleep) + state[3][0] to 9
-		- Combined "sleep" + "fp" (HEAT and COLD only): (B=heatFP_SLEEP, 9=coolFP_SLEEP) + state[3][0] to 9
-		
-0x11 = 17	-> state[3]
-	First bit state[3][0]: 0=AC off; ON: 1=Normal, 9=Sleep mode(with or without FP), 3=Off-Timer, 4=On-Timer
-	Second bit state[3][1]: on/off timer hours 1-9, 0xA=10, 0xB=11 0xC=12
-	// ON+OFF timers at the same time - not possible.
-
-0xAA = 170	-> state[4] always 0xAA (probably to ensure enough amount for checksum creation)
-	--------
-		245 = value of state[0] = state[1]+[2]+[3]+[4]
-
-// checksum with first byte only 1 digit
-0x5 17 33 11 AA
-0101 00010111 00110011 00010001 10101010 // 36 digits
-		// if 1 digit = hex(100+DIGIT)
-0x5		= 5 	| 0x105 = 261
-		-------
-0x17	= 23
-0x33	= 51
-0x11	= 17
-0xAA	= 170
-		-------
-			261
-
-ON @ 27C, Auto, fan high: 0x2 27 20 11 AA
-0x2 	= 2		| 0x102 = 258
-0x27 	= 39
-0x20	= 32
-0x11	= 17
-0xAA	= 170
-		---------
-			258
-
-
 */
 
 /// Class constructor
@@ -305,7 +159,7 @@ IRIkedaAc::IRIkedaAc(const uint16_t pin, const bool inverted,
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Reset the state of the remote to a known good state/sequence.
-/// @see https://docs.google.com/spreadsheets/d/1dYfLsnYvpjV-SgO8pdinpfuBIpSzm8Q1R5SabrLeskw/edit?ts=5f0190a5#gid=1050142776&range=A2:B2
+/// @see https://docs.google.com/spreadsheets/d/1IOxfKN2PPuIayC1UFZqkHrk7LAqH0AwUjgUn6dIrnzg
 void IRIkedaAc::stateReset(void) {
   // 0xEF161011AA == ON,  Mode: Auto; Fan: Auto, Temp: 16 C, Flap: ON
   // 0xDF161001AA == OFF, Mode: Auto; Fan: Auto, Temp: 16 C, Flap: ON <-
