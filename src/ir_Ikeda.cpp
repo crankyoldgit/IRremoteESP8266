@@ -334,11 +334,11 @@ stdAc::swingv_t IRIkedaAc::toCommonSwingV(const uint8_t pos) {
 }
 
 /// Change the Turbo setting. (Force run)
-/// @param[in] mode true, the setting is on. false, the setting is off.
-void IRIkedaAc::setTurbo(bool mode) {
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRIkedaAc::setTurbo(bool on) {
   if (_.Mode == ikedaHeat || _.Mode == ikedaCool) {
     // Available on Heat/Cold only
-    _.Fp = mode;
+    _.Fp = on;
   } else {
     _.Fp = false;
   }
@@ -350,11 +350,11 @@ void IRIkedaAc::setTurbo(bool mode) {
 bool IRIkedaAc::getTurbo(void) const { return _.Fp; }
 
 /// Change the Sleep setting.
-/// @param[in] mode true, the setting is on. false, the setting is off.
-void IRIkedaAc::setSleep(bool mode) {
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRIkedaAc::setSleep(bool on) {
   if (_.Mode == ikedaHeat || _.Mode == ikedaCool) {
     // Available on Heat/Cold only
-     _.Sleep = mode;
+     _.Sleep = on;
   } else {
     _.Sleep = false;
   }
@@ -365,10 +365,10 @@ void IRIkedaAc::setSleep(bool mode) {
 bool IRIkedaAc::getSleep(void) const { return _.Sleep; }
 
 /// Change the Quiet mode -- Mode: Auto, FanOnly: true
-/// @param[in] mode true, the setting is on. false, the setting is off.
-void IRIkedaAc::setQuiet(bool mode) {
-  _.FanOnly = mode;
-  if (mode) {
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRIkedaAc::setQuiet(bool on) {
+  _.FanOnly = on;
+  if (on) {
     setMode(ikedaAuto);
   }
 }
