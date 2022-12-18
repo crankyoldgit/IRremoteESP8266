@@ -33,6 +33,7 @@
 #include "ir_Kelon.h"
 #include "ir_Kelvinator.h"
 #include "ir_LG.h"
+#include "ir_Ikeda.h"
 #include "ir_Midea.h"
 #include "ir_Mitsubishi.h"
 #include "ir_MitsubishiHeavy.h"
@@ -289,6 +290,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_MIDEA
     case decode_type_t::MIDEA:
 #endif  // SEND_MIDEA
+#if SEND_IKEDA
+    case decode_type_t::IKEDA:
+#endif  // SEND_IKEDA
 #if SEND_MIRAGE
     case decode_type_t::MIRAGE:
 #endif  // SEND_MIRAGE
@@ -1784,6 +1788,40 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
   ac->send();
 }
 #endif  // SEND_LG
+
+#if SEND_IKEDA
+/// Send a Ikeda A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRIkedaAc object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv Toggle The vertical swing setting.
+/// @param[in] quiet Run the device in quiet/silent mode.
+/// @param[in] turbo Toggle the device's turbo/powerful mode.
+/// @param[in] sleep Toggle 0=Off, 1=on. Available on Heat/Cold
+void IRac::ikeda(IRIkedaAc *ac,
+                 const bool on, const stdAc::opmode_t mode,
+                 const float degrees, const stdAc::fanspeed_t fan,
+                 const stdAc::swingv_t swingv,
+                 bool quiet, bool turbo,
+                 const int16_t sleep) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setQuiet(quiet);  // Mode "Fan" (FanOnly)
+  ac->setTurbo(turbo);  // FP
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(ac->convertSwingV(swingv));  // only on(auto swing)/off
+  // No Horizontal swing setting available.
+  // No Filter setting available.
+  // No Beep setting available.
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_IKEDA
 
 #if SEND_MIDEA
 /// Send a Midea A/C message with the supplied settings.
@@ -3436,6 +3474,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_SANYO_AC88
+#if SEND_IKEDA
+    case IKEDA:
+    {
+      IRIkedaAc ac(_pin, _inverted, _modulation);
+      ikeda(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+              send.quiet, send.turbo, send.sleep);
+      break;
+    }
+#endif  // SEND_IKEDA
 #if SEND_SHARP_AC
     case SHARP_AC:
     {
@@ -4227,6 +4274,13 @@ namespace IRAcUtils {
         return ac.isValidLgAc() ? ac.toString() : "";
       }
 #endif  // DECODE_LG
+#if DECODE_IKEDA
+      case decode_type_t::IKEDA: {
+        IRIkedaAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // Ikeda uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_IKEDA
 #if DECODE_MIDEA
       case decode_type_t::MIDEA: {
         IRMideaAC ac(kGpioUnused);
@@ -4737,6 +4791,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_LG
+#if DECODE_IKEDA
+      case decode_type_t::IKEDA: {
+        IRIkedaAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_IKEDA
 #if DECODE_MIDEA
       case decode_type_t::MIDEA: {
         IRMideaAC ac(kGpioUnused);

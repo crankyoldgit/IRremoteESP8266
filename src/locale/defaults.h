@@ -892,6 +892,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_INAX
 #define D_STR_INAX "INAX"
 #endif  // D_STR_INAX
+#ifndef D_STR_IKEDA
+#define D_STR_IKEDA "IKEDA"
+#endif  // D_STR_IKEDA
 #ifndef D_STR_JVC
 #define D_STR_JVC "JVC"
 #endif  // D_STR_JVC
