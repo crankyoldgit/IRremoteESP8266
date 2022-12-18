@@ -106,10 +106,10 @@ union IkedaProtocol{
     uint8_t               :1; // Empty 0x0
 
     // Byte 1
-    //uint8_t               :3;
-    uint8_t Temperature   :5;		// DEC 16-30 C -> @ HEX
-    uint8_t               :3;
-    //uint8_t Temperature   :8;
+    //uint8_t               :3; // :2
+    //uint8_t Temperature   :6;		// :5  DEC 16-30 C -> @ HEX
+    //uint8_t               :2; // :3
+    uint8_t Temperature   :8;
 
     // Byte 0
     uint8_t Checksum      :8;

@@ -1794,16 +1794,11 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
 /// @param[in, out] ac A Ptr to an IRMideaAC object to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
-/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
 /// @param[in] degrees The temperature setting in degrees.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] quiet Run the device in quiet/silent mode.
-/// @param[in] quiet_prev The device's previous quiet/silent mode.
 /// @param[in] turbo Toggle the device's turbo/powerful mode.
-/// @param[in] econo Toggle the device's economical mode.
-/// @param[in] light Toggle the LED/Display mode.
-/// @param[in] clean Turn on the self-cleaning mode. e.g. XFan, dry filters etc
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
 /// @note On Danby A/C units, swingv controls the Ion Filter instead.
 void IRac::ikeda(IRIkedaAc *ac,
@@ -3477,6 +3472,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_SANYO_AC88
+#if SEND_IKEDA
+    case SEND_IKEDA:
+    {
+      IRIkedaAc ac(_pin, _inverted, _modulation);
+      ikeda(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+              send.quiet, send.turbo, send.sleep);
+      break;
+    }
+#endif  // SEND_IKEDA
 #if SEND_SHARP_AC
     case SHARP_AC:
     {

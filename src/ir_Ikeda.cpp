@@ -16,6 +16,9 @@ using irutils::addBoolToString;
 using irutils::addFanToString;
 using irutils::addModeToString;
 using irutils::addTempToString;
+using irutils::bcdToUint8;
+using irutils::uint8ToBcd;
+using irutils::sumNibbles;
 
 /**
  * Decode pulse distance width protocols.
@@ -393,29 +396,18 @@ stdAc::opmode_t IRIkedaAc::toCommonMode(const uint8_t mode) {
 
 const uint8_t kIkedaAcTempDelta = 6;   ///< Celsius to Native Temp difference.
 
-// /// Set the desired temperature.
-// /// @param[in] degrees The temperature in degrees celsius.
-// void IRIkedaAc::setTemp(const uint8_t degrees) {
-//   uint8_t temp = std::max((uint8_t)ikedaMinTemp, degrees);
-//   _.Temperature = std::min((uint8_t)ikedaMaxTemp, temp);
-// }
-
 /// Set the desired temperature.
 /// @param[in] degrees The temperature in degrees celsius.
 void IRIkedaAc::setTemp(const uint8_t degrees) {
   uint8_t temp = std::max((uint8_t)ikedaMinTemp, degrees);
   temp = std::min((uint8_t)ikedaMaxTemp, temp);
-  _.Temperature = temp;
+  _.Temperature = uint8ToBcd(temp); // Binary coded decimal
 }
-
-// /// Get the current desired temperature setting.
-// /// @return The current setting for temp. in degrees celsius.
-// uint8_t IRIkedaAc::getTemp(void) const { return _.Temperature; }
 
 /// Get the current desired temperature setting.
 /// @return The current setting for temp. in degrees celsius.
 uint8_t IRIkedaAc::getTemp(void) const {
-  return _.Temperature; // - kIkedaAcTempDelta;
+  return bcdToUint8(_.Temperature); // Binary coded decimal
 }
 
 /// Set the speed of the fan.
@@ -547,7 +539,8 @@ String IRIkedaAc::toString(void) const {
 /// @return A boolean. True if it can decode it, false if it can't.
 
 // Returns 40 bits, MSB first, Arduino-IRremote (original library) returns LSB first
-bool IRrecv::decodeIKEDA(decode_results *results, uint16_t offset, const uint16_t nbits, const bool strict) {
+bool IRrecv::decodeIKEDA(decode_results *results, uint16_t offset,
+                          const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * nbits + kIKEDAOverhead - offset)
     return false;  // Too short a message to match.
   if (strict && nbits != kIKEDABits)
@@ -563,12 +556,12 @@ bool IRrecv::decodeIKEDA(decode_results *results, uint16_t offset, const uint16_
     return false;
 
   data_result = matchData(&(results->rawbuf[offset]), kIKEDABits,
-							// onemark		onespace
+              // onemark		onespace
               kIKEDABitMark, kIKEDAOneSpace,
-							// zeromark       zerisoace
-						  kIKEDABitMark, kIKEDAZeroSpace,
-						  // tolerance, excess, msbfirst, expectlastspace
-						  kUseDefTol, kMarkExcess, false, true); // MSB disabled
+              // zeromark       zerisoace
+              kIKEDABitMark, kIKEDAZeroSpace,
+              // tolerance, excess, msbfirst, expectlastspace
+              kUseDefTol, kMarkExcess, false, true); // MSB disabled
   
   offset += data_result.used;
 
