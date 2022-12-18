@@ -615,11 +615,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     if (decodeAiwaRCT501(results, offset)) return true;
 #endif
 #if DECODE_IKEDA
-	DPRINTLN("Attempting Ikeda decode");
-	if (decodeIKEDA(results, offset)) return true;
-    // Try decodeIKEDA() before decodeNEC() / decodeSanyoLC7461() because the protocols are
-    // similar in timings & structure
-#endif // DECODE_IKEDA
+  DPRINTLN("Attempting Ikeda decode");
+  if (decodeIKEDA(results, offset)) return true;
+    // Try decodeIKEDA() before decodeNEC() / decodeSanyoLC7461() because the
+    // protocols are similar in timings & structure
+#endif  // DECODE_IKEDA
 #if DECODE_SANYO
     DPRINTLN("Attempting Sanyo LC7461 decode");
     // Try decodeSanyoLC7461() before decodeNEC() because the protocols are

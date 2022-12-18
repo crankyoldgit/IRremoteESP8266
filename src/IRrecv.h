@@ -867,10 +867,10 @@ class IRrecv {
 #endif  // DECODE_BOSCH144
 #if DECODE_IKEDA
   bool decodeIKEDA(decode_results *results,
-					uint16_t offset = kStartOffset,
-					const uint16_t nbits = kIKEDABits,
-					const bool strict = true);
-#endif // DECODE_IKEDA
+                      uint16_t offset = kStartOffset,
+                      const uint16_t nbits = kIKEDABits,
+                      const bool strict = true);
+#endif  // DECODE_IKEDA
 };
 
 #endif  // IRRECV_H_

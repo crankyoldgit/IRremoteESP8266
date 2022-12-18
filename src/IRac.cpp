@@ -292,7 +292,7 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif  // SEND_MIDEA
 #if SEND_IKEDA
     case decode_type_t::IKEDA:
-#endif // SEND_IKEDA
+#endif  // SEND_IKEDA
 #if SEND_MIRAGE
     case decode_type_t::MIRAGE:
 #endif  // SEND_MIRAGE
@@ -1799,19 +1799,19 @@ void IRac::lg(IRLgAc *ac, const lg_ac_remote_model_t model,
 /// @param[in] swingv Toggle The vertical swing setting.
 /// @param[in] quiet Run the device in quiet/silent mode.
 /// @param[in] turbo Toggle the device's turbo/powerful mode.
-/// @param[in] sleep Toggle 0 is Off, 1 is on. Only available on mode Heat / Cold
+/// @param[in] sleep Toggle 0=Off, 1=on. Available on Heat/Cold
 void IRac::ikeda(IRIkedaAc *ac,
-                 const bool on, const stdAc::opmode_t mode, 
+                 const bool on, const stdAc::opmode_t mode,
                  const float degrees, const stdAc::fanspeed_t fan,
                  const stdAc::swingv_t swingv,
-                 const bool quiet, const bool turbo, 
+                 const bool quiet, const bool turbo,
                  const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
-  ac->setSwingV(ac->convertSwingV(swingv)); // only on(auto swing)/off
+  ac->setSwingV(ac->convertSwingV(swingv));  // only on(auto swing)/off
   // No Horizontal swing setting available.
   // No Filter setting available.
   // No Beep setting available.

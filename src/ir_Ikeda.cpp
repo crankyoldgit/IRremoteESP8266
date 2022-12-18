@@ -22,41 +22,14 @@ using irutils::bcdToUint8;
 using irutils::uint8ToBcd;
 using irutils::sumBytes;
 
-/**
- * Decode pulse distance width protocols.
- *
- * We can have the following protocol timings
- * Pulse distance:          Pulses/marks are constant, pause/spaces have different length, like NEC.
- * Pulse width:             Pulses/marks have different length, pause/spaces are constant, like Sony.
- * Pulse distance width:    Pulses/marks and pause/spaces have different length, often the bit length is constant, like MagiQuest.
- * Pulse distance width can be decoded like pulse width decoder, if this decoder does not check the length of pause/spaces.
- *
- * Input is     IrReceiver.decodedIRData.rawDataPtr->rawbuf[]
- * Output is    IrReceiver.decodedIRData.decodedRawData
- *
- * Assume pulse distance if aOneMarkMicros == aZeroMarkMicros
- *
- * @param   aStartOffset        Must point to a mark
- * @param   aOneMarkMicros      Taken as constant BitMarkMicros for pulse distance.
- * @param   aZeroMarkMicros     Not required if DECODE_STRICT_CHECKS is not defined.
- * @param   aOneSpaceMicros     Taken as (constant) BitSpaceMicros for pulse width.
- * @param   aZeroSpaceMicros    Not required if DECODE_STRICT_CHECKS is not defined.
- * @return  true                If decoding was successful
- */
-
-
-// Original library detects "Pulse distance" and LSB
-
-// See https://github.com/crankyoldgit/IRremoteESP8266/wiki/Adding-support-for-a-new-IR-protocol
-// for details of how to include this in the library.
-const uint16_t kIKEDAHdrMark      = 8912; ///< uSeconds.
-const uint16_t kIKEDABitMark      = 619;  ///< uSeconds.
-const uint16_t kIKEDAHdrSpace     = 2042; ///< uSeconds.
-const uint16_t kIKEDAOneSpace     = 1212; ///< uSeconds.
-const uint16_t kIKEDAZeroSpace    = 477;  ///< uSeconds.
+const uint16_t kIKEDAHdrMark      = 8912;  ///< uSeconds.
+const uint16_t kIKEDABitMark      = 619;   ///< uSeconds.
+const uint16_t kIKEDAHdrSpace     = 2042;  ///< uSeconds.
+const uint16_t kIKEDAOneSpace     = 1212;  ///< uSeconds.
+const uint16_t kIKEDAZeroSpace    = 477;   ///< uSeconds.
 const uint32_t kTESTSanyoAc88Gap  = 3675;       ///< uSeconds
 const uint16_t kIKEDAFreq         = 38000;  // Hz. (Guessing the most common frequency.)
-const uint16_t kIKEDAOverhead     = 3; // 3 -> 1
+const uint16_t kIKEDAOverhead     = 3;
 
 #if SEND_IKEDA
 // Function should be safe up to 64 bits.
@@ -65,7 +38,7 @@ const uint16_t kIKEDAOverhead     = 3; // 3 -> 1
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
-void IRsend::sendIKEDA(uint64_t data, uint16_t nbits, 
+void IRsend::sendIKEDA(uint64_t data, uint16_t nbits,
                         const uint16_t repeat) {
         sendGeneric(kIKEDAHdrMark, kIKEDAHdrSpace,
                     kIKEDABitMark, kIKEDAOneSpace,
@@ -79,10 +52,6 @@ void IRsend::sendIKEDA(uint64_t data, uint16_t nbits,
 /*
 
 ON+OFF timers at the same time - not possible.
-
-0x010 = 16
-0x100 = 256
-
 
                   CSUM      TEMP     |Emp   Fan    Flap   FP     FanOnly  MODE |Slp   OnTmr   OffTmr    Pow  Timer| Padding
 
@@ -467,13 +436,13 @@ bool IRrecv::decodeIKEDA(decode_results *results, uint16_t offset,
     return false;
 
   data_result = matchData(&(results->rawbuf[offset]), kIKEDABits,
-              // onemark		onespace
+              // onemark       onespace
               kIKEDABitMark, kIKEDAOneSpace,
               // zeromark       zerisoace
               kIKEDABitMark, kIKEDAZeroSpace,
               // tolerance, excess, msbfirst, expectlastspace
               kUseDefTol, kMarkExcess, false, true);  // MSB disabled
-  
+
   offset += data_result.used;
 
   if (data_result.success == false) return false;  // Fail

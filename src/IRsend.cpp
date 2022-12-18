@@ -938,7 +938,7 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     case IKEDA:
       sendIKEDA(data, nbits, min_repeat);
       break;
-#endif // SEND_IKEDA
+#endif  // SEND_IKEDA
 #if SEND_JVC
     case JVC:
       sendJVC(data, nbits, min_repeat);

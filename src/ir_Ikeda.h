@@ -31,7 +31,7 @@ union IkedaProtocol{
     uint8_t Sleep         :1;  // 0=Off, 1=On
 
     // Byte 2
-    uint8_t Mode          :2;  // 0b10001 (17) 0x11=Heat, 0b00 (0) 0x00=Auto(& Fan), 0b0001 (1) 0x01=Cool, 0b00010000 (16) 0x10=Dry
+    uint8_t Mode          :2;  // 17 0x11=Heat, 0 0x00=Auto(& Fan), 1 0x01=Cool, 16 0x10=Dry
     uint8_t FanOnly       :1;  // 0=Off, 1=On (with mode Auto)
     uint8_t Fp            :1;  // 0=Off, 1=On // FORCE RUN (Turbo?)
     uint8_t Flap          :1;  // 0=Off, 1=On
@@ -133,7 +133,7 @@ class IRIkedaAc {
   /// @endcond
 #endif  // UNIT_TEST
   IkedaProtocol _;
- 
+
   uint8_t _lastfan;  // Last user chosen/valid fan speed.
   uint8_t _lastmode;  // Last user chosen operation mode.
   void checksum(void);
