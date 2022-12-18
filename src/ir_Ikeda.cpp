@@ -207,7 +207,6 @@ uint8_t IRIkedaAc::getMode(void) const { return _.Mode; }
 /// @note If we get an unexpected mode, default to AUTO.
 void IRIkedaAc::setMode(const uint8_t mode) {
   switch (mode) {
-    case ikedaAuto:
     case ikedaCool:
     case ikedaDry:
     case ikedaHeat:
@@ -215,8 +214,8 @@ void IRIkedaAc::setMode(const uint8_t mode) {
       _.Mode = mode;
       break;
     default:
+      // Auto w/wo FanOnly
       _.Mode = ikedaAuto;
-      // Turn on FanOnty here?
   }
 }
 
@@ -335,24 +334,44 @@ stdAc::swingv_t IRIkedaAc::toCommonSwingV(const uint8_t pos) {
 }
 
 /// Change the Turbo setting. (Force run)
-/// @param[in] on true, the setting is on. false, the setting is off.
-void IRIkedaAc::setTurbo(const bool on) { _.Fp = on; }
+/// @param[in] mode true, the setting is on. false, the setting is off.
+void IRIkedaAc::setTurbo(bool mode) {
+  if (_.Mode == ikedaHeat || _.Mode == ikedaCool) {
+    // Available on Heat/Cold only
+    _.Fp = mode;
+  } else {
+    _.Fp = false;
+  }
+}
+
 
 /// Get the value of the current Turbo setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRIkedaAc::getTurbo(void) const { return _.Fp; }
 
 /// Change the Sleep setting.
-/// @param[in] on true, the setting is on. false, the setting is off.
-void IRIkedaAc::setSleep(const bool on) { _.Sleep = on; }
+/// @param[in] mode true, the setting is on. false, the setting is off.
+void IRIkedaAc::setSleep(bool mode) {
+  if (_.Mode == ikedaHeat || _.Mode == ikedaCool) {
+    // Available on Heat/Cold only
+     _.Sleep = mode;
+  } else {
+    _.Sleep = false;
+  }
+}
 
 /// Get the value of the current Sleep setting.
 /// @return true, the setting is on. false, the setting is off.
 bool IRIkedaAc::getSleep(void) const { return _.Sleep; }
 
-/// Change the Quiet mode (Mode: FAN ???).
-/// @param[in] on true, the setting is on. false, the setting is off.
-void IRIkedaAc::setQuiet(const bool on) { _.FanOnly = on; setMode(ikedaAuto); }
+/// Change the Quiet mode -- Mode: Auto, FanOnly: true
+/// @param[in] mode true, the setting is on. false, the setting is off.
+void IRIkedaAc::setQuiet(bool mode) {
+  _.FanOnly = mode;
+  if (mode) {
+    setMode(ikedaAuto);
+  }
+}
 
 /// Get the value of the current Sleep setting.
 /// @return true, the setting is on. false, the setting is off.
@@ -376,13 +395,13 @@ stdAc::state_t IRIkedaAc::toCommon(const stdAc::state_t *prev) {
     result.swingv = _.Flap ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
     result.turbo = _.Fp;
     result.sleep = _.Sleep ? 0 : -1;
-    result.clock = false;
+    result.quiet = _.FanOnly ? 0 : 1;
+    result.clock = false;  // Timer 1-12h; On/Off - not at the same time
     // Not supported.
     result.filter = false;
     result.swingh = stdAc::swingh_t::kOff;
     result.econo = false;
     result.light = false;
-    result.quiet = false;
     result.beep = false;
     result.clean = false;
   }
@@ -396,11 +415,12 @@ String IRIkedaAc::toString(void) const {
   result.reserve(115);
   result += addBoolToString(getPower(), kPowerStr, false);
   result += addModeToString(_.Mode, ikedaAuto, ikedaCool,
-                            ikedaHeat, ikedaDry, ikedaFan);
+                            ikedaHeat, ikedaDry, ikedaAuto);
   result += addTempToString(getTemp());
   result += addFanToString(_.Fan, ikedaFanHigh, ikedaFanLow,
                            ikedaFanAuto, ikedaFanAuto,
                            ikedaFanMed);
+  result += addBoolToString(_.FanOnly, kFanOnlyStr);
   result += addBoolToString(_.Flap, kSwingVStr);
   result += addBoolToString(_.Fp, kTurboStr);
   result += addBoolToString(_.Sleep, kSleepStr);

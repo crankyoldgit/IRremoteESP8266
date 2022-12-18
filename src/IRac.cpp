@@ -1804,14 +1804,14 @@ void IRac::ikeda(IRIkedaAc *ac,
                  const bool on, const stdAc::opmode_t mode,
                  const float degrees, const stdAc::fanspeed_t fan,
                  const stdAc::swingv_t swingv,
-                 const bool quiet, const bool turbo,
+                 bool quiet, bool turbo,
                  const int16_t sleep) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
-  ac->setQuiet(quiet);  // Mode "Fan"
-  ac->setTurbo(turbo);
+  ac->setQuiet(quiet);  // Mode "Fan" (FanOnly)
+  ac->setTurbo(turbo);  // FP
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(ac->convertSwingV(swingv));  // only on(auto swing)/off
   // No Horizontal swing setting available.

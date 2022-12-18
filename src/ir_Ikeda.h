@@ -107,8 +107,8 @@ class IRIkedaAc {
   void setSleep(const bool on);
   bool getSleep(void) const;
 
-  void setQuiet(const bool on);  // Mode: FAN?
-  bool getQuiet(void) const;  // Mode: FAN?
+  void setQuiet(const bool on);  // Mode: Fan Only
+  bool getQuiet(void) const;     // Mode: Fan Only
 
   void setRaw(const uint64_t newState);
   uint64_t getRaw(void);
