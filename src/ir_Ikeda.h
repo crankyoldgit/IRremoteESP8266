@@ -31,7 +31,7 @@ union IkedaProtocol{
     uint8_t Sleep         :1;  // 0=Off, 1=On
 
     // Byte 2
-    uint8_t Mode          :2;  // 17 0x11=Heat, 0 0x00=Auto(& Fan), 1 0x01=Cool, 16 0x10=Dry
+    uint8_t Mode          :2;  // 17=Heat,0=Auto(& Fan),1=Cool,16=Dry
     uint8_t FanOnly       :1;  // 0=Off, 1=On (with mode Auto)
     uint8_t Fp            :1;  // 0=Off, 1=On // FORCE RUN (Turbo?)
     uint8_t Flap          :1;  // 0=Off, 1=On
@@ -122,7 +122,7 @@ class IRIkedaAc {
   String toString(void) const;
   static uint8_t calcChecksum(const uint64_t state);
   static bool validChecksum(const uint64_t state);
-  
+
 #ifndef UNIT_TEST
 
  private:

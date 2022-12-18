@@ -1810,6 +1810,8 @@ void IRac::ikeda(IRIkedaAc *ac,
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees);
+  ac->setQuiet(quiet);  // Mode "Fan"
+  ac->setTurbo(turbo);
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(ac->convertSwingV(swingv));  // only on(auto swing)/off
   // No Horizontal swing setting available.

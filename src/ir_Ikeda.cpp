@@ -28,7 +28,7 @@ const uint16_t kIKEDAHdrSpace     = 2042;  ///< uSeconds.
 const uint16_t kIKEDAOneSpace     = 1212;  ///< uSeconds.
 const uint16_t kIKEDAZeroSpace    = 477;   ///< uSeconds.
 const uint32_t kTESTSanyoAc88Gap  = 3675;       ///< uSeconds
-const uint16_t kIKEDAFreq         = 38000;  // Hz. (Guessing the most common frequency.)
+const uint16_t kIKEDAFreq         = 38000;  // Hz.
 const uint16_t kIKEDAOverhead     = 3;
 
 #if SEND_IKEDA
