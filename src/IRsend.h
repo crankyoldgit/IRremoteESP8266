@@ -56,14 +56,15 @@ enum class opmode_t {
 
 /// Common A/C settings for Fan Speeds.
 enum class fanspeed_t {
-  kAuto =   0,
-  kMin =    1,
-  kLow =    2,
-  kMedium = 3,
-  kHigh =   4,
-  kMax =    5,
+  kAuto =       0,
+  kMin =        1,
+  kLow =        2,
+  kMedium =     3,
+  kHigh =       4,
+  kMax =        5,
+  kMediumHigh = 6,
   // Add new entries before this one, and update it to point to the last entry
-  kLastFanspeedEnum = kMax,
+  kLastFanspeedEnum = kMediumHigh,
 };
 
 /// Common A/C settings for Vertical Swing.
@@ -75,8 +76,9 @@ enum class swingv_t {
   kMiddle =  3,
   kLow =     4,
   kLowest =  5,
+  kUpperMiddle = 6,
   // Add new entries before this one, and update it to point to the last entry
-  kLastSwingvEnum = kLowest,
+  kLastSwingvEnum = kUpperMiddle,
 };
 
 /// @brief Tyoe of A/C command (if the remote uses different codes for each)

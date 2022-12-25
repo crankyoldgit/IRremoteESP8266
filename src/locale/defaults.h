@@ -451,6 +451,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_BOTTOM
 #define D_STR_BOTTOM "Bottom"
 #endif  // D_STR_BOTTOM
+#ifndef D_STR_UPPER_MIDDLE
+#define D_STR_UPPER_MIDDLE D_STR_UPPER "-" D_STR_MIDDLE
+#endif  // D_STR_UPPER_MIDDLE
 #ifndef D_STR_CONFIG
 #define D_STR_CONFIG "Config"
 #endif  // D_STR_CONFIG

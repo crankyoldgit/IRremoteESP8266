@@ -2679,6 +2679,7 @@ TEST(TestIRac, strToFanspeed) {
   EXPECT_EQ(stdAc::fanspeed_t::kMin, IRac::strToFanspeed("MIN"));
   EXPECT_EQ(stdAc::fanspeed_t::kLow, IRac::strToFanspeed("LOW"));
   EXPECT_EQ(stdAc::fanspeed_t::kMedium, IRac::strToFanspeed("MEDIUM"));
+  EXPECT_EQ(stdAc::fanspeed_t::kMediumHigh, IRac::strToFanspeed("MED-HIGH"));
   EXPECT_EQ(stdAc::fanspeed_t::kHigh, IRac::strToFanspeed("HIGH"));
   EXPECT_EQ(stdAc::fanspeed_t::kMax, IRac::strToFanspeed("MAX"));
   EXPECT_EQ(stdAc::fanspeed_t::kAuto, IRac::strToFanspeed("FOOBAR"));
@@ -2691,6 +2692,7 @@ TEST(TestIRac, strToSwingV) {
   EXPECT_EQ(stdAc::swingv_t::kLowest, IRac::strToSwingV("LOWEST"));
   EXPECT_EQ(stdAc::swingv_t::kLow, IRac::strToSwingV("LOW"));
   EXPECT_EQ(stdAc::swingv_t::kMiddle, IRac::strToSwingV("MIDDLE"));
+  EXPECT_EQ(stdAc::swingv_t::kUpperMiddle, IRac::strToSwingV("UPPER-MIDDLE"));
   EXPECT_EQ(stdAc::swingv_t::kHigh, IRac::strToSwingV("HIGH"));
   EXPECT_EQ(stdAc::swingv_t::kHighest, IRac::strToSwingV("HIGHEST"));
   EXPECT_EQ(stdAc::swingv_t::kOff, IRac::strToSwingV("OFF"));
@@ -2771,6 +2773,7 @@ TEST(TestIRac, opmodeToString) {
 TEST(TestIRac, fanspeedToString) {
   EXPECT_EQ("Low", IRac::fanspeedToString(stdAc::fanspeed_t::kLow));
   EXPECT_EQ("Auto", IRac::fanspeedToString(stdAc::fanspeed_t::kAuto));
+  EXPECT_EQ("Med-High", IRac::fanspeedToString(stdAc::fanspeed_t::kMediumHigh));
   EXPECT_EQ("UNKNOWN", IRac::fanspeedToString((stdAc::fanspeed_t)500));
 }
 
@@ -2778,6 +2781,8 @@ TEST(TestIRac, swingvToString) {
   EXPECT_EQ("Off", IRac::swingvToString(stdAc::swingv_t::kOff));
   EXPECT_EQ("Low", IRac::swingvToString(stdAc::swingv_t::kLow));
   EXPECT_EQ("Auto", IRac::swingvToString(stdAc::swingv_t::kAuto));
+  EXPECT_EQ("Upper-Middle", IRac::swingvToString(
+      stdAc::swingv_t::kUpperMiddle));
   EXPECT_EQ("UNKNOWN", IRac::swingvToString((stdAc::swingv_t)500));
 }
 
