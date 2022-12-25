@@ -76,7 +76,7 @@ run-% : %_test
 
 install-googletest :
 	rm -rf ../lib/googletest
-	git clone -b v1.8.x https://github.com/google/googletest.git ../lib/googletest
+	git clone -b v1.10.x https://github.com/google/googletest.git ../lib/googletest
 
 # Builds gtest.a, gtest_main.a, gmock.a, gmock_main.a.
 
