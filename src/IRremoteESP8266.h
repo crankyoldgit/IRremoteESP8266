@@ -931,6 +931,13 @@
 #define SEND_GORENJE        _IR_ENABLE_DEFAULT_
 #endif  // SEND_GORENJE
 
+#ifndef DECODE_WOWWEE
+#define DECODE_WOWWEE      _IR_ENABLE_DEFAULT_
+#endif  // DECODE_WOWWEE
+#ifndef SEND_WOWWEE
+#define SEND_WOWWEE        _IR_ENABLE_DEFAULT_
+#endif  // SEND_WOWWEE
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -1112,8 +1119,9 @@ enum decode_type_t {
   SANYO_AC152,
   DAIKIN312,
   GORENJE,
+  WOWWEE,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = GORENJE,
+  kLastDecodeType = WOWWEE,
 };
 
 // Message lengths & required repeat values
@@ -1387,6 +1395,8 @@ const uint16_t kWhirlpoolAcStateLength = 21;
 const uint16_t kWhirlpoolAcBits = kWhirlpoolAcStateLength * 8;
 const uint16_t kWhirlpoolAcDefaultRepeat = kNoRepeat;
 const uint16_t kWhynterBits = 32;
+const uint16_t kWowweeBits = 11;
+const uint16_t kWowweeDefaultRepeat = kNoRepeat;
 const uint8_t  kVestelAcBits = 56;
 const uint16_t kXmpBits = 64;
 const uint16_t kZepealBits = 16;
