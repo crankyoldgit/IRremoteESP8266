@@ -7,6 +7,28 @@
 // Supports:
 //   Brand: WowWee,  Model: RoboRapter-X
 
+// WowWee RoboRapter-X messages
+// Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1938#issuecomment-1367968228
+//
+// Button                 Code
+// ======                 =====
+// Left                   0x180
+// Forward                0x186
+// Backward               0x187
+// Right                  0x188
+// Stop                   0x18E
+// Head Counterclockwise  0x191
+// Tail Left              0x192
+// Tail Right             0x193
+// Head Clockwise         0x194
+// Guard Mode             0x1B0
+// Roam                   0x1B1
+// Cautious Mood          0x1B2
+// Playful Mood           0x1B3
+// Hunting Mood           0x1B4
+// Demo                   0x1D0
+// Bite                   0x1D1
+
 #include <algorithm>
 #include "IRrecv.h"
 #include "IRsend.h"
