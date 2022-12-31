@@ -45,7 +45,7 @@ const uint16_t kWowweeFreq = 38000;  // Hz. (Just a guess)
 
 #if SEND_WOWWEE
 /// Send a WowWee formatted message.
-/// Status: BETA / Untested on a real device.
+/// Status: STABLE / Confirmed working with real device.
 /// @param[in] data The message to be sent.
 /// @param[in] nbits The number of bits of message to be sent.
 /// @param[in] repeat The number of times the command is to be repeated.
@@ -60,7 +60,7 @@ void IRsend::sendWowwee(uint64_t data, uint16_t nbits, uint16_t repeat) {
 
 #if DECODE_WOWWEE
 /// Decode the supplied WowWee message.
-/// Status: BETA / Untested on a real device.
+/// Status: STABLE / Confirmed working with real device.
 /// @param[in,out] results Ptr to the data to decode & where to store the result
 /// @param[in] offset The starting index to use when attempting to decode the
 ///   raw data. Typically/Defaults to kStartOffset.
