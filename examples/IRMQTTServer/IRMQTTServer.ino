@@ -947,7 +947,7 @@ void handleExamples(void) {
 #endif  // EXAMPLES_ENABLE
 
 String htmlSelectBool(const String name, const bool def) {
-  String html = F("<select name='") + name + F("'>");
+  String html = String(F("<select name='")) + name + F("'>");
   for (uint16_t i = 0; i < 2; i++)
     html += htmlOptionItem(IRac::boolToString(i), IRac::boolToString(i),
                            i == def);
@@ -957,18 +957,18 @@ String htmlSelectBool(const String name, const bool def) {
 
 String htmlDisableCheckbox(const String name, const String targetControlId,
                            const bool checked, const String toggleJsFnName) {
-  String html = F("<input type='checkbox' name='") + name + F("' id='") +
-    name + F("' onclick=\"") + toggleJsFnName + F("(this, '") +
+  String html = String(F("<input type='checkbox' name='")) + name + F("' id='")
+    + name + F("' onclick=\"") + toggleJsFnName + F("(this, '") +
     targetControlId + F("')\"");
   if (checked) {
     html += F(" checked");
   }
-  html += F("/><label for='") + name + F("'>Disabled</label>");
+  html += "/><label for='" + name + F("'>Disabled</label>");
   return html;
 }
 
 String htmlSelectClimateProtocol(const String name, const decode_type_t def) {
-  String html = F("<select name='") + name + F("'>");
+  String html = String(F("<select name='")) + name + F("'>");
   for (uint8_t i = 1; i <= decode_type_t::kLastDecodeType; i++) {
     if (IRac::isProtocolSupported((decode_type_t)i)) {
       html += htmlOptionItem(String(i), typeToString((decode_type_t)i),
@@ -980,7 +980,7 @@ String htmlSelectClimateProtocol(const String name, const decode_type_t def) {
 }
 
 String htmlSelectModel(const String name, const int16_t def) {
-  String html = F("<select name='") + name + F("'>");
+  String html = String(F("<select name='")) + name + F("'>");
   for (int16_t i = -1; i <= 6; i++) {
     String num = String(i);
     String text;
@@ -997,7 +997,7 @@ String htmlSelectModel(const String name, const int16_t def) {
 }
 
 String htmlSelectCommandType(const String name, const stdAc::ac_command_t def) {
-  String html = F("<select name='") + name + F("'>");
+  String html = String(F("<select name='")) + name + F("'>");
   for (uint8_t i = 0;
        i <= (int8_t)stdAc::ac_command_t::kLastAcCommandEnum;
        i++) {
@@ -1010,7 +1010,7 @@ String htmlSelectCommandType(const String name, const stdAc::ac_command_t def) {
 
 String htmlSelectUint(const String name, const uint16_t max,
                       const uint16_t def) {
-  String html = F("<select name='") + name + F("'>");
+  String html = String(F("<select name='")) + name + F("'>");
   for (uint16_t i = 0; i < max; i++) {
     String num = String(i);
     html += htmlOptionItem(num, num, i == def);
@@ -1021,7 +1021,7 @@ String htmlSelectUint(const String name, const uint16_t max,
 
 String htmlSelectGpio(const String name, const int16_t def,
                       const int8_t list[], const int16_t length) {
-  String html = F(": <select name='") + name + F("'>");
+  String html = String(F(": <select name='")) + name + F("'>");
   for (int16_t i = 0; i < length; i++) {
     String num = String(list[i]);
     html += htmlOptionItem(num, list[i] == kGpioUnused ? F("Unused") : num,
@@ -1033,7 +1033,7 @@ String htmlSelectGpio(const String name, const int16_t def,
 }
 
 String htmlSelectMode(const String name, const stdAc::opmode_t def) {
-  String html = F("<select name='") + name + F("'>");
+  String html = String(F("<select name='")) + name + F("'>");
   for (int8_t i = -1; i <= (int8_t)stdAc::opmode_t::kLastOpmodeEnum; i++) {
     String mode = IRac::opmodeToString((stdAc::opmode_t)i);
     html += htmlOptionItem(mode, mode, (stdAc::opmode_t)i == def);
@@ -1043,7 +1043,7 @@ String htmlSelectMode(const String name, const stdAc::opmode_t def) {
 }
 
 String htmlSelectFanspeed(const String name, const stdAc::fanspeed_t def) {
-  String html = F("<select name='") + name + F("'>");
+  String html = String(F("<select name='")) + name + F("'>");
   for (int8_t i = 0; i <= (int8_t)stdAc::fanspeed_t::kLastFanspeedEnum; i++) {
     String speed = IRac::fanspeedToString((stdAc::fanspeed_t)i);
     html += htmlOptionItem(speed, speed, (stdAc::fanspeed_t)i == def);
@@ -1053,7 +1053,7 @@ String htmlSelectFanspeed(const String name, const stdAc::fanspeed_t def) {
 }
 
 String htmlSelectSwingv(const String name, const stdAc::swingv_t def) {
-  String html = F("<select name='") + name + F("'>");
+  String html = String(F("<select name='")) + name + F("'>");
   for (int8_t i = -1; i <= (int8_t)stdAc::swingv_t::kLastSwingvEnum; i++) {
     String swing = IRac::swingvToString((stdAc::swingv_t)i);
     html += htmlOptionItem(swing, swing, (stdAc::swingv_t)i == def);
@@ -1063,7 +1063,7 @@ String htmlSelectSwingv(const String name, const stdAc::swingv_t def) {
 }
 
 String htmlSelectSwingh(const String name, const stdAc::swingh_t def) {
-  String html = F("<select name='") + name + F("'>");
+  String html = String(F("<select name='")) + name + F("'>");
   for (int8_t i = -1; i <= (int8_t)stdAc::swingh_t::kLastSwinghEnum; i++) {
     String swing = IRac::swinghToString((stdAc::swingh_t)i);
     html += htmlOptionItem(swing, swing, (stdAc::swingh_t)i == def);
@@ -1110,7 +1110,7 @@ String htmlButton(const String url, const String button, const String text) {
 
 String getJsToggleCheckbox(const String functionName) {
   const String javascript =
-    F("  function ") + functionName + F("(checkbox, targetInputId) {\n"
+    String(F("  function ")) + functionName + F("(checkbox, targetInputId) {\n"
       "     var targetControl = document.getElementById(targetInputId);\n"
       "     targetControl.disabled = checkbox.checked;\n"
       "     if (!targetControl.disabled) { targetControl.focus(); }\n"
@@ -1124,10 +1124,10 @@ void handleAirCon(void) {
                            getJsToggleCheckbox());
   html += htmlMenu();
   if (kNrOfIrTxGpios > 1) {
-    html += F("<form method='POST' action='/aircon/set'"
+    html += String(F("<form method='POST' action='/aircon/set'"
         " enctype='multipart/form-data'>"
         "<table>"
-        "<tr><td><b>Climate #</b></td><td>") +
+        "<tr><td><b>Climate #</b></td><td>")) +
         htmlSelectUint(KEY_CHANNEL, kNrOfIrTxGpios, chan) +
         F("<input type='submit' value='Change'>"
         "</td></tr>"
@@ -1137,11 +1137,11 @@ void handleAirCon(void) {
   }
   if (climate[chan] != NULL) {
     bool noSensorTemp = (climate[chan]->next.sensorTemperature == kNoTempValue);
-    html += F("<h3>Current Settings</h3>"
+    html += String(F("<h3>Current Settings</h3>"
         "<form method='POST' action='/aircon/set'"
         " enctype='multipart/form-data'>"
-        "<input type='hidden' name='" KEY_CHANNEL "' value='") + String(chan) +
-            F("'>") +
+        "<input type='hidden' name='" KEY_CHANNEL "' value='")) + String(chan)
+            + F("'>") +
         F("<table style='width:33%'>"
         "<tr><td>" D_STR_PROTOCOL "</td><td>") +
             htmlSelectClimateProtocol(KEY_PROTOCOL,
@@ -1344,8 +1344,8 @@ void handleInfo(void) {
   String html = htmlHeader(F("IR MQTT server info"));
   html += htmlMenu();
   html +=
-    F("<h3>General</h3>"
-    "<p>Hostname: ") + String(Hostname) + F("<br>"
+    String(F("<h3>General</h3>"
+    "<p>Hostname: ")) + String(Hostname) + F("<br>"
     "IP address: ") + WiFi.localIP().toString() + F("<br>"
     "MAC address: ") + WiFi.macAddress() + F("<br>"
     "Booted: ") + timeSince(1) + F("<br>") +
@@ -2701,8 +2701,8 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 void sendMQTTDiscovery(const char *topic) {
   if (mqtt_client.publish(
       topic, String(
-      F("{"
-      "\"~\":\"") + MqttClimate + F("\","
+      String(F("{"
+      "\"~\":\"")) + MqttClimate + F("\","
       "\"name\":\"") + MqttHAName + F("\","
 #if (!MQTT_CLIMATE_HA_MODE)
       // Typically we don't need or use the power command topic if we are using
@@ -2778,8 +2778,8 @@ void loop(void) {
           boot = false;
         } else {
           mqttLog(String(
-              F("IRMQTTServer just (re)connected to MQTT. "
-                "Lost connection about ")
+              String(F("IRMQTTServer just (re)connected to MQTT. "
+                "Lost connection about "))
               + timeSince(lastConnectedTime)).c_str());
         }
         lastConnectedTime = now;
