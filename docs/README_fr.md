@@ -46,15 +46,15 @@ cd ~/Arduino/libraries/IRremoteESP8266 && git pull
 ```
 
 ## Contribution
-Si vous voulez  [contribuer](.github/CONTRIBUTING.md#how-can-i-contribute) au projet, pour les erreurs:
-- [Reporting](.github/CONTRIBUTING.md#reporting-bugs) bug et erreurs
+Si vous voulez  [contribuer](../.github/CONTRIBUTING.md#how-can-i-contribute) au projet, pour les erreurs:
+- [Reporting](../.github/CONTRIBUTING.md#reporting-bugs) bug et erreurs
 - Demander des améliorations
 - Améliorer notre documentation
-- [Création d'issues](.github/CONTRIBUTING.md#reporting-bugs) et [pull requests](.github/CONTRIBUTING.md#pull-requests)
+- [Création d'issues](../.github/CONTRIBUTING.md#reporting-bugs) et [pull requests](../.github/CONTRIBUTING.md#pull-requests)
 - Parlez de cettre librairie à d'autres personnes
 
 ## Contributeurs
-disponible [ici](.github/Contributors.md)
+disponible [ici](../.github/Contributors.md)
 
 ## Historique de la bibliothèque
 Elle est basée sur le travail de Shirriff (https://github.com/shirriff/Arduino-IRremote/)
