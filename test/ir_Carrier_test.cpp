@@ -264,6 +264,16 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(kCarrierAc64MinRepeat,
             IRsend::minRepeats(decode_type_t::CARRIER_AC64));
 
+  // CARRIER_AC84
+  ASSERT_EQ("CARRIER_AC84", typeToString(decode_type_t::CARRIER_AC84));
+  ASSERT_EQ(decode_type_t::CARRIER_AC84, strToDecodeType("CARRIER_AC84"));
+  ASSERT_TRUE(hasACState(decode_type_t::CARRIER_AC84));
+  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::CARRIER_AC84));
+  ASSERT_EQ(kCarrierAc84Bits,
+            IRsend::defaultBits(decode_type_t::CARRIER_AC84));
+  ASSERT_EQ(kNoRepeat,
+            IRsend::minRepeats(decode_type_t::CARRIER_AC84));
+
   // CARRIER_AC128
   ASSERT_EQ("CARRIER_AC128", typeToString(decode_type_t::CARRIER_AC128));
   ASSERT_EQ(decode_type_t::CARRIER_AC128, strToDecodeType("CARRIER_AC128"));
@@ -686,6 +696,74 @@ TEST(TestDecodeCarrierAC128, SyntheticExample) {
   EXPECT_TRUE(irrecv.decode(&irsend.capture));
   ASSERT_EQ(CARRIER_AC128, irsend.capture.decode_type);
   ASSERT_EQ(kCarrierAc128Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected_state, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+// Decode a "real" Carrier 80bit example message.
+TEST(TestDecodeCarrierAC84, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  const uint8_t expected_state[kCarrierAc84StateLength] = {
+      0x0C, 0x00, 0xC9, 0x8C, 0x00, 0x48, 0x00, 0x48, 0x2A, 0x84, 0x17};
+  irsend.begin();
+
+  irsend.reset();
+  // Data from:
+  //  https://github.com/crankyoldgit/IRremoteESP8266/issues/1943#issue-1519570772
+  const uint16_t rawData[171] = {
+      5844, 1152,
+      1154, 462, 1152, 462, 418, 1194, 418, 1194, 420, 1194, 416, 1198,
+      418, 1196, 416, 1196, 418, 1194, 420, 1192, 420, 1194, 420, 1194,
+      1152, 460, 1152, 460, 420, 1192, 418, 1194, 1154, 458, 418, 1194,
+      420, 1192, 1154, 460, 1152, 458, 420, 1194, 418, 1194, 418, 1194,
+      1152, 460, 1154, 458, 418, 1196, 416, 1194, 418, 1194, 418, 1196,
+      420, 1194, 418, 1192, 420, 1194, 420, 1192, 418, 1196, 416, 1194,
+      416, 1196, 1152, 462, 416, 1194, 422, 1192, 1154, 458, 420, 1192,
+      418, 1194, 418, 1194, 418, 1196, 420, 1194, 418, 1192, 420, 1194,
+      418, 1192, 420, 1194, 418, 1194, 420, 1194, 418, 1194, 1154, 458,
+      418, 1194, 418, 1192, 1154, 458, 418, 1196, 416, 1194, 420, 1194,
+      416, 1192, 418, 1194, 1152, 462, 416, 1196, 1152, 458, 418, 1196,
+      1152, 458, 418, 1194, 1154, 460, 418, 1194, 418, 1196, 418, 1196,
+      418, 1194, 1154, 460, 420, 1192, 418, 1194, 420, 1194, 418, 1194,
+      418, 1196, 1152, 460, 418, 1194, 1154, 458, 1154, 460, 1152, 458,
+      1152};  // UNKNOWN E366A1BC
+
+
+  irsend.sendRaw(rawData, 171, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(CARRIER_AC84, irsend.capture.decode_type);
+  EXPECT_EQ(kCarrierAc84Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected_state, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  EXPECT_EQ(
+      "Protocol  : CARRIER_AC84\n"
+      "Code      : 0x0C00C98C004800482A8417 (84 Bits)\n",
+      resultToHumanReadableBasic(&irsend.capture));
+}
+
+// Decode a synthetic Carrier AC 80-bit message.
+TEST(TestDecodeCarrierAC84, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  irsend.reset();
+
+  const uint8_t expected_state[kCarrierAc84StateLength] = {
+      0x0C, 0x00, 0xC9, 0x8C, 0x00, 0x48, 0x00, 0x48, 0x2A, 0x84, 0x17};
+  irsend.sendCarrierAC84(expected_state);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(CARRIER_AC84, irsend.capture.decode_type);
+  ASSERT_EQ(kCarrierAc84Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expected_state, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
       "",
