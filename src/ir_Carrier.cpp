@@ -48,8 +48,8 @@ const uint32_t kCarrierAc64Gap = kDefaultMessageGap;  // A guess.
 
 //< @see: https://github.com/crankyoldgit/IRremoteESP8266/issues/1943#issue-1519570772
 const uint16_t kCarrierAc84HdrMark = 5850;
-const uint16_t kCarrierAc84Zero = 1152;
-const uint16_t kCarrierAc84One = 466;
+const uint16_t kCarrierAc84Zero = 1175;
+const uint16_t kCarrierAc84One = 430;
 const uint16_t kCarrierAc84HdrSpace = kCarrierAc84Zero;
 const uint32_t kCarrierAc84Gap = kDefaultMessageGap;  // A guess.
 const uint8_t  kCarrierAc84ExtraBits = 4;
@@ -672,13 +672,13 @@ void IRsend::sendCarrierAC84(const uint8_t data[], const uint16_t nbytes,
                   0, 0,  // No footer
                   GETBITS64(data[0], 0, kCarrierAc84ExtraBits),
                   kCarrierAc84ExtraBits,
-                  38000, true, 0, 33);
+                  38000, false, 0, 33);
       // The rest of the data.
       sendGeneric(0, 0,  // No Header
                   kCarrierAc84Zero, kCarrierAc84One,  // Data
                   kCarrierAc84One, kCarrierAc84Zero,
                   kCarrierAc84Zero, kDefaultMessageGap,  // Footer
-                  data + 1, nbytes - 1, 38000, true, 0, 33);
+                  data + 1, nbytes - 1, 38000, false, 0, 33);
     }
   }
 }
@@ -718,7 +718,7 @@ bool IRrecv::decodeCarrierAC84(decode_results *results, uint16_t offset,
                                   // Data
                                   kCarrierAc84Zero, kCarrierAc84One,
                                   // No Footer
-                                  0, 0, true);
+                                  0, 0, false, kUseDefTol, kMarkExcess, false);
   if (!used) return false;
   // Stuff the captured data so far into the first byte of the state.
   *results->state = data;
@@ -730,7 +730,8 @@ bool IRrecv::decodeCarrierAC84(decode_results *results, uint16_t offset,
                     0, 0,  // No Header expected.
                     kCarrierAc84Zero, kCarrierAc84One,  // Data
                     kCarrierAc84One, kCarrierAc84Zero,
-                    kCarrierAc84Zero, kDefaultMessageGap, true)) return false;
+                    kCarrierAc84Zero, kDefaultMessageGap, true,
+                    kUseDefTol, kMarkExcess, false)) return false;
 
   // Success
   results->decode_type = decode_type_t::CARRIER_AC84;

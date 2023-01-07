@@ -709,7 +709,7 @@ TEST(TestDecodeCarrierAC84, RealExample) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
   const uint8_t expected_state[kCarrierAc84StateLength] = {
-      0x0C, 0x00, 0xC9, 0x8C, 0x00, 0x48, 0x00, 0x48, 0x2A, 0x84, 0x17};
+      0x03, 0x00, 0x93, 0x31, 0x00, 0x12, 0x00, 0x12, 0x54, 0x21, 0xE8};
   irsend.begin();
 
   irsend.reset();
@@ -745,7 +745,7 @@ TEST(TestDecodeCarrierAC84, RealExample) {
       IRAcUtils::resultAcToString(&irsend.capture));
   EXPECT_EQ(
       "Protocol  : CARRIER_AC84\n"
-      "Code      : 0x0C00C98C004800482A8417 (84 Bits)\n",
+      "Code      : 0x03009331001200125421E8 (84 Bits)\n",
       resultToHumanReadableBasic(&irsend.capture));
 }
 
