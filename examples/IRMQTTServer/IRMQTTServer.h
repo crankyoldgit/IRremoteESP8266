@@ -271,7 +271,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define KEY_TX_GPIO "tx"
 #define KEY_RX_GPIO "rx"
 
-// Miscelaneous constants
+// Miscellaneous constants
 #define TOGGLE_JS_FN_NAME "ToggleInputBasedOnCheckbox"
 
 // Text for Last Will & Testament status messages.
@@ -299,7 +299,7 @@ const uint16_t kJsonAcStateMaxSize = 1024;  // Bytes
 // ----------------- End of User Configuration Section -------------------------
 
 // Constants
-#define _MY_VERSION_ "v1.7.1"
+#define _MY_VERSION_ "v1.8.0"
 
 const uint8_t kRebootTime = 15;  // Seconds
 const uint8_t kQuickDisplayTime = 2;  // Seconds
