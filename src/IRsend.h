@@ -870,6 +870,10 @@ class IRsend {
                     const uint16_t nbytes = kBosch144StateLength,
                     const uint16_t repeat = kNoRepeat);
 #endif  // SEND_BOSCH144
+#if SEND_WOWWEE
+  void sendWowwee(const uint64_t data, const uint16_t nbits = kWowweeBits,
+                  const uint16_t repeat = kWowweeDefaultRepeat);
+#endif  // SEND_WOWWEE
 
  protected:
 #ifdef UNIT_TEST

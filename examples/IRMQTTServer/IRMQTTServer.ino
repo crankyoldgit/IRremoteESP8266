@@ -3152,7 +3152,11 @@ void updateClimate(stdAc::state_t *state, const String str,
     state->mode = IRac::strToOpmode(payload.c_str());
 #if MQTT_CLIMATE_HA_MODE
     // When in Home Assistant mode, a Mode of Off, means turn the Power off too.
-    if (state->mode == stdAc::opmode_t::kOff) state->power = false;
+    if (state->mode == stdAc::opmode_t::kOff) {
+      state->power = false;
+    } else {
+      state->power = true;
+    }
 #endif  // MQTT_CLIMATE_HA_MODE
   } else if (str.equals(prefix + F(KEY_TEMP))) {
     state->degrees = payload.toFloat();

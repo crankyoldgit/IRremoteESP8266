@@ -1169,6 +1169,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting GORENJE decode");
     if (decodeGorenje(results, offset)) return true;
 #endif  // DECODE_GORENJE
+#if DECODE_WOWWEE
+    DPRINTLN("Attempting WOWWEE decode");
+    if (decodeWowwee(results, offset)) return true;
+#endif  // DECODE_WOWWEE
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

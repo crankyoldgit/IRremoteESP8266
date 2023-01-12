@@ -1105,6 +1105,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_WHYNTER
 #define D_STR_WHYNTER "WHYNTER"
 #endif  // D_STR_WHYNTER
+#ifndef D_STR_WOWWEE
+#define D_STR_WOWWEE "WOWWEE"
+#endif  // D_STR_WOWWEE
 #ifndef D_STR_XMP
 #define D_STR_XMP "XMP"
 #endif  // D_STR_XMP
