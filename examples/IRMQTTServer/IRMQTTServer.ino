@@ -2702,7 +2702,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 }
 
 #if MQTT_DISCOVERY_ENABLE
-void sendMQTTDiscovery(const char *topic, String &channel_id) {
+void sendMQTTDiscovery(const char *topic, String channel_id) {
   String pub_topic = String(topic) + channel_id + F("/config");
   if (mqtt_client.publish(
       pub_topic.c_str(), String(
