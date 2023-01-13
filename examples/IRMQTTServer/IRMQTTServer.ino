@@ -2206,7 +2206,7 @@ void init_vars(void) {
   MqttClimateCmnd = MqttClimate + '/' + MQTT_CLIMATE_CMND + '/';
   // Sub-topic for the climate stat topics.
 #if MQTT_DISCOVERY_ENABLE
-  MqttDiscovery = "homeassistant/climate/" + String(Hostname) + "/config";
+  MqttDiscovery = "homeassistant/climate/" + String(Hostname);
   MqttUniqueId = WiFi.macAddress();
   MqttUniqueId.replace(":", "");
 #endif  // MQTT_DISCOVERY_ENABLE
@@ -2525,7 +2525,11 @@ void handleSendMqttDiscovery(void) {
       " is sent.</p>") +
       addJsReloadUrl(kUrlRoot, kRebootTime, true) +
       htmlEnd());
-  sendMQTTDiscovery(MqttDiscovery.c_str());
+  for (uint16_t i = 0; i < kNrOfIrTxGpios; i++) {
+    String channel_id = "";
+    if (i > 0) channel_id = "_" + String(i);
+    sendMQTTDiscovery(MqttDiscovery.c_str(), channel_id);
+  }
 }
 #endif  // MQTT_DISCOVERY_ENABLE
 
@@ -2698,12 +2702,13 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 }
 
 #if MQTT_DISCOVERY_ENABLE
-void sendMQTTDiscovery(const char *topic) {
+void sendMQTTDiscovery(const char *topic, String channel_id) {
+  String pub_topic = String(topic) + channel_id + F("/config");
   if (mqtt_client.publish(
-      topic, String(
-      String(F("{"
-      "\"~\":\"")) + MqttClimate + F("\","
-      "\"name\":\"") + MqttHAName + F("\","
+      pub_topic.c_str(), String(
+      F("{"
+      "\"~\":\"") + MqttClimate + channel_id + F("\","
+      "\"name\":\"") + MqttHAName + channel_id + F("\","
 #if (!MQTT_CLIMATE_HA_MODE)
       // Typically we don't need or use the power command topic if we are using
       // our Home Assistant Climate compatiblity mode. It causes odd behaviour
@@ -2729,9 +2734,9 @@ void sendMQTTDiscovery(const char *topic) {
       "\"swing_modes\":[\"" D_STR_OFF "\",\"" D_STR_AUTO "\",\"" D_STR_HIGHEST
                         "\",\"" D_STR_HIGH "\",\"" D_STR_MIDDLE "\",\""
                         D_STR_LOW "\",\"" D_STR_LOWEST "\"],"
-      "\"uniq_id\":\"") + MqttUniqueId + F("\","
+      "\"uniq_id\":\"") + MqttUniqueId + channel_id + F("\","
       "\"device\":{"
-        "\"identifiers\":[\"") + MqttUniqueId + F("\"],"
+        "\"identifiers\":[\"") + MqttUniqueId + channel_id + F("\"],"
         "\"connections\":[[\"mac\",\"") + WiFi.macAddress() + F("\"]],"
         "\"manufacturer\":\"IRremoteESP8266\","
         "\"model\":\"IRMQTTServer\","
