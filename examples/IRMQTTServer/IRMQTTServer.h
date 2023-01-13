@@ -253,6 +253,9 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define KEY_JSON "json"
 #define KEY_RESEND "resend"
 #define KEY_VCC "vcc"
+#define KEY_COMMAND "command"
+#define KEY_SENSORTEMP "sensortemp"
+#define KEY_IFEEL "ifeel"
 
 // HTML arguments we will parse for IR code information.
 #define KEY_TYPE "type"  // KEY_PROTOCOL is also checked too.
@@ -260,10 +263,16 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define KEY_BITS "bits"
 #define KEY_REPEAT "repeats"
 #define KEY_CHANNEL "channel"  // Which IR TX channel to send on.
+#define KEY_SENSORTEMP_DISABLED "sensortemp_disabled"  // For HTML form only,
+                                                       // not sent via MQTT
+                                                       // nor JSON
 
 // GPIO html/config keys
 #define KEY_TX_GPIO "tx"
 #define KEY_RX_GPIO "rx"
+
+// Miscellaneous constants
+#define TOGGLE_JS_FN_NAME "ToggleInputBasedOnCheckbox"
 
 // Text for Last Will & Testament status messages.
 const char* const kLwtOnline = "Online";
@@ -358,7 +367,8 @@ static const char kClimateTopics[] PROGMEM =
     "(" KEY_PROTOCOL "|" KEY_MODEL "|" KEY_POWER "|" KEY_MODE "|" KEY_TEMP "|"
     KEY_FANSPEED "|" KEY_SWINGV "|" KEY_SWINGH "|" KEY_QUIET "|"
     KEY_TURBO "|" KEY_LIGHT "|" KEY_BEEP "|" KEY_ECONO "|" KEY_SLEEP "|"
-    KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS "|" KEY_RESEND
+    KEY_FILTER "|" KEY_CLEAN "|" KEY_CELSIUS "|" KEY_RESEND "|" KEY_COMMAND "|"
+    "|" KEY_SENSORTEMP "|" KEY_IFEEL
 #if MQTT_CLIMATE_JSON
     "|" KEY_JSON
 #endif  // MQTT_CLIMATE_JSON
@@ -367,6 +377,7 @@ static const char* const kMqttTopics[] = {
     KEY_PROTOCOL, KEY_MODEL, KEY_POWER, KEY_MODE, KEY_TEMP, KEY_FANSPEED,
     KEY_SWINGV, KEY_SWINGH, KEY_QUIET, KEY_TURBO, KEY_LIGHT, KEY_BEEP,
     KEY_ECONO, KEY_SLEEP, KEY_FILTER, KEY_CLEAN, KEY_CELSIUS, KEY_RESEND,
+    KEY_COMMAND, KEY_SENSORTEMP, KEY_IFEEL
     KEY_JSON};  // KEY_JSON needs to be the last one.
 
 
@@ -410,7 +421,8 @@ int8_t getDefaultTxGpio(void);
 String genStatTopic(const uint16_t channel = 0);
 String listOfTxGpios(void);
 bool hasUnsafeHTMLChars(String input);
-String htmlHeader(const String title, const String h1_text = "");
+String htmlHeader(const String title, const String h1_text = "",
+                  const String headScriptsJS = "");
 String htmlEnd(void);
 String htmlButton(const String url, const String button,
                   const String text = "");
@@ -418,9 +430,13 @@ String htmlMenu(void);
 void handleRoot(void);
 String addJsReloadUrl(const String url, const uint16_t timeout_s,
                       const bool notify);
+String getJsToggleCheckbox(const String functionName = TOGGLE_JS_FN_NAME);
 void handleExamples(void);
 String htmlOptionItem(const String value, const String text, bool selected);
 String htmlSelectBool(const String name, const bool def);
+String htmlDisableCheckbox(const String name, const String targetControlId,
+                           const bool checked,
+                           const String toggleJsFnName = TOGGLE_JS_FN_NAME);
 String htmlSelectClimateProtocol(const String name, const decode_type_t def);
 String htmlSelectAcStateProtocol(const String name, const decode_type_t def,
                                  const bool simple);
