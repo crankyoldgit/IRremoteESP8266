@@ -6,6 +6,7 @@
 #endif
 
 #define __STDC_LIMIT_MACROS
+#include <math.h>
 #include <stdint.h>
 #include <string.h>
 #include <algorithm>
@@ -173,6 +174,7 @@ bool hasACState(const decode_type_t protocol) {
     case AMCOR:
     case ARGO:
     case BOSCH144:
+    case CARRIER_AC84:
     case CARRIER_AC128:
     case CORONA_AC:
     case DAIKIN:
@@ -304,7 +306,7 @@ String resultToSourceCode(const decode_results * const results) {
   if (results->decode_type != UNKNOWN) {
     if (hasState) {
 #if DECODE_AC
-      uint16_t nbytes = results->bits / 8;
+      uint16_t nbytes = ceil(static_cast<float>(results->bits) / 8.0);
       output += F("uint8_t state[");
       output += uint64ToString(nbytes);
       output += F("] = {");
