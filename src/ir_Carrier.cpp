@@ -53,6 +53,7 @@ const uint16_t kCarrierAc84One = 430;
 const uint16_t kCarrierAc84HdrSpace = kCarrierAc84Zero;
 const uint32_t kCarrierAc84Gap = kDefaultMessageGap;  // A guess.
 const uint8_t  kCarrierAc84ExtraBits = 4;
+const uint8_t  kCarrierAc84ExtraTolerance = 5;
 
 const uint16_t kCarrierAc128HdrMark = 4600;
 const uint16_t kCarrierAc128HdrSpace = 2600;
@@ -686,7 +687,7 @@ void IRsend::sendCarrierAC84(const uint8_t data[], const uint16_t nbytes,
 
 #if DECODE_CARRIER_AC84
 /// Decode the supplied Carroer A/C 84 Bit formatted message.
-/// Status: BETA / Untested but probably works.
+/// Status: STABLE / Confirmed Working.
 /// @param[in,out] results Ptr to the data to decode & where to store the decode
 ///   result.
 /// @param[in] offset The starting index to use when attempting to decode the
@@ -718,7 +719,10 @@ bool IRrecv::decodeCarrierAC84(decode_results *results, uint16_t offset,
                                   // Data
                                   kCarrierAc84Zero, kCarrierAc84One,
                                   // No Footer
-                                  0, 0, false, kUseDefTol, kMarkExcess, false);
+                                  0, 0,
+                                  false,
+                                  _tolerance + kCarrierAc84ExtraTolerance,
+                                  kMarkExcess, false);
   if (!used) return false;
   // Stuff the captured data so far into the first byte of the state.
   *results->state = data;
@@ -731,7 +735,8 @@ bool IRrecv::decodeCarrierAC84(decode_results *results, uint16_t offset,
                     kCarrierAc84Zero, kCarrierAc84One,  // Data
                     kCarrierAc84One, kCarrierAc84Zero,
                     kCarrierAc84Zero, kDefaultMessageGap, true,
-                    kUseDefTol, kMarkExcess, false)) return false;
+                    _tolerance + kCarrierAc84ExtraTolerance,
+                    kMarkExcess, false)) return false;
 
   // Success
   results->decode_type = decode_type_t::CARRIER_AC84;
