@@ -213,6 +213,11 @@ enum whirlpool_ac_remote_model_t {
   DG11J191,
 };
 
+// Kelon/Hisense (Kelon168) A/C remote model numbers
+enum kelon168_ac_remote_model_t {
+  DG11R201 = 1,  // RCH-R0Y3 too?
+};
+
 /// LG A/C model numbers
 enum lg_ac_remote_model_t {
   GE6711AR2853M = 1,  // (1) LG 28-bit Protocol (default)
@@ -840,7 +845,7 @@ class IRsend {
 #if SEND_KELON168
   void sendKelon168(const unsigned char data[],
                     const uint16_t nbytes = kKelon168StateLength,
-                    const uint16_t repeat = kNoRepeat);
+                    const uint16_t repeat = kKelon168DefaultRepeat);
 #endif  // SEND_KELON168
 #if SEND_BOSE
   void sendBose(const uint64_t data, const uint16_t nbits = kBoseBits,
