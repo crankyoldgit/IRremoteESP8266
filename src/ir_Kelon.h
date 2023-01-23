@@ -17,7 +17,7 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1903
 /// The specifics of reverse engineering the protocols details:
 /// * DG11R2-01 by mp3-10
-/// * RCH-R0Y3 by countrysideboy 
+/// * RCH-R0Y3 by countrysideboy
 
 // Supports:
 //   Brand: Kelon,  Model: ON/OFF 9000-12000 (KELON)
@@ -160,12 +160,12 @@ union Kelon168Protocol {
   uint8_t raw[kKelon168StateLength];  ///< The state in native form
   struct {
     // Byte 0~1
-    uint8_t preamble[2]; // Fixed to 0x83, 0x06
+    uint8_t preamble[2];  // Fixed to 0x83, 0x06
     // Byte 2
     uint8_t Fan     :2;
     uint8_t Power   :1;
     uint8_t Sleep   :1;
-    uint8_t         :3; // TODO Not encoded / used, should be dry?
+    uint8_t         :3;   // Not encoded / used, should be dry?
     uint8_t Swing1  :1;
     // Byte 3
     uint8_t Mode  :3;
@@ -215,7 +215,8 @@ union Kelon168Protocol {
     uint8_t       :6;
     // Byte 17
     uint8_t pad1;
-    // Byte 18 (Model1 & Model2 are some fixed bits. On Whirlpool remotes they indicate the remote model)
+    // Byte 18 (Model1 & Model2 are some fixed bits.
+    // On Whirlpool remotes they indicate the remote model)
     uint8_t Model1 :4;
     uint8_t On     :1;
     uint8_t Model2 :3;
@@ -240,11 +241,11 @@ const uint8_t kKelon168Cool = 2;
 const uint8_t kKelon168Dry = 3;
 const uint8_t kKelon168Fan = 4;
 const uint8_t kKelon168FanAuto = 0;
-const uint8_t kKelon168FanMin = 1;  // 0b001
-const uint8_t kKelon168FanLow = 2;      // 0b010 
+const uint8_t kKelon168FanMin = 1;      // 0b001
+const uint8_t kKelon168FanLow = 2;      // 0b010
 const uint8_t kKelon168FanMedium = 3;   // 0b011
 const uint8_t kKelon168FanHigh = 4;     // 0b100
-const uint8_t kKelon168FanMax = 5; // 0b101
+const uint8_t kKelon168FanMax = 5;      // 0b101
 const uint8_t kKelon168MinTemp = 16;     // 16C (DG11R2-01)
 const uint8_t kKelon168MaxTemp = 32;     // 30C (DG11R2-01)
 const uint8_t kKelon168AutoTemp = 23;    // 23C
@@ -265,16 +266,15 @@ class IRKelon168Ac {
  public:
   explicit IRKelon168Ac(uint16_t pin, bool inverted = false,
                      bool use_modulation = true);
-  
+
   #if SEND_KELON168
-  void send(const uint16_t repeat = kKelon168DefaultRepeat, const bool calcChecksum = true);
+  void send(const uint16_t repeat = kKelon168DefaultRepeat,
+            const bool calcChecksum = true);
   /// Run the calibration to calculate uSec timing offsets for this platform.
   /// @return The uSec timing offset needed per modulation of the IR Led.
   /// @note This will produce a 65ms IR signal pulse at 38kHz.
   ///   Only ever needs to be run once per object instantiation, if at all.
   int8_t calibrate(void) { return _irsend.calibrate(); }
-
-  // TODO ensurePower?
   #endif  // SEND_KELON168
 
   void begin(void);
@@ -338,6 +338,5 @@ class IRKelon168Ac {
   void _setMode(const uint8_t mode);
   int8_t getTempOffset(void) const;
 };
-
 
 #endif  // IR_KELON_H_

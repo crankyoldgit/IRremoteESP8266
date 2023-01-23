@@ -448,9 +448,7 @@ String IRKelonAc::toString() const {
   return result;
 }
 
-/// KELON168
-/// --------
-
+// KELON168
 
 #if SEND_KELON168
 /// Send a Kelon 168 bit / 21 byte message.
@@ -587,7 +585,7 @@ void IRKelon168Ac::stateReset(void) {
   _.raw[0]  = 0x83;
   _.raw[1]  = 0x06;
   _.raw[6]  = 0x80;
-  _.raw[18] = 0x28; // Remote model, device off
+  _.raw[18] = 0x28;             // Remote model, device off
   _setTemp(kKelon168AutoTemp);  // Default to a sane value, 23C
 }
 
@@ -661,7 +659,12 @@ kelon168_ac_remote_model_t IRKelon168Ac::getModel(void) const {
 /// Set the model of the A/C to emulate.
 /// @param[in] model The enum of the appropriate model.
 void IRKelon168Ac::setModel(const kelon168_ac_remote_model_t model) {
-  // Not implemented.
+  switch (model) {
+    case kelon168_ac_remote_model_t::DG11R201:
+    default:
+      _.Model1 = 0b1000;
+      _.Model2 = 0b001;
+  }
 }
 
 /// Calculate the temp. offset in deg C for the current model.
@@ -768,8 +771,8 @@ void IRKelon168Ac::setFan(const uint8_t speed) {
 
 /// Get the current fan speed setting.
 /// The encoding is distributed across two bits, middle values (2 Low & 4 High)
-/// are encoded on the Fan2 bit. Normal values (1 Minimum, 3 Medium, 5 High) are written
-/// as 3,2,1 (inverted scale)
+/// are encoded on the Fan2 bit. Normal values (1 Minimum, 3 Medium,
+/// 5 High) are written as 3,2,1 (inverted scale)
 /// @return The current fan speed/mode.
 uint8_t IRKelon168Ac::getFan(void) const {
   switch (_.Fan) {
@@ -1025,7 +1028,7 @@ stdAc::state_t IRKelon168Ac::toCommon(const stdAc::state_t *prev) const {
   result.turbo = getSuper();
   result.light = getLight();
   result.sleep = _.Sleep ? 0 : -1;
-  // TODO add encoding
+  // TODO(leonardfactory) add encoding
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.filter = false;
