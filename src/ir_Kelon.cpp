@@ -520,6 +520,7 @@ bool IRrecv::decodeKelon168(decode_results *results, uint16_t offset,
                       kKelonBitMark, kKelon168FooterSpace,
                       false, _tolerance, 0, false);
   if (!used) return false;  // Failed to match.
+  offset += used;
 
   used = matchGeneric(results->rawbuf + offset,
                       results->state + kKelon168Section1Size,
