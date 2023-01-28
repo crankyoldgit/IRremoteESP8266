@@ -132,7 +132,8 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTT_CLIMATE "ac"  // Sub-topic for the climate topics.
 #define MQTT_CLIMATE_CMND "cmnd"  // Sub-topic for the climate command topics.
 #define MQTT_CLIMATE_STAT "stat"  // Sub-topic for the climate stat topics.
-#define MQTT_SENSOR_STAT "sensor"  // Sub-topic for the temperature/humidity sensor stat topics.
+// Sub-topic for the temperature/humidity sensor stat topics.
+#define MQTT_SENSOR_STAT "sensor"
 // Enable sending/receiving climate via JSON. `true` cost ~5k of program space.
 #define MQTT_CLIMATE_JSON false
 
@@ -223,8 +224,8 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define REPLAY_DECODED_AC_MESSAGE false
 
 // ------------------------ SHT-3x Support -------------------------------------
-// Set the following to true enable SHT-3x sensor support (such as the Lolin SHT30 
-// Shield), connected to GPIOs 4 and 5 (D2 and D1).
+// Set the following to true enable SHT-3x sensor support (such as the Lolin
+// SHT30 Shield), connected to GPIOs 4 and 5 (D2 and D1).
 // *** IMPORTANT ***
 // You must also uncomment the line in the platformio.ini file to enable the
 // SHT-3x library.
@@ -488,7 +489,7 @@ bool parseStringAndSendRaw(IRsend *irsend, const String str);
 #endif  // SEND_RAW
 #if SHT3X_ENABLE
 void sendMQTTDiscoverySensor(const char *topic, String type);
-#endif // SHT3X_ENABLE
+#endif  // SHT3X_ENABLE
 void handleIr(void);
 void handleNotFound(void);
 void setup_wifi(void);

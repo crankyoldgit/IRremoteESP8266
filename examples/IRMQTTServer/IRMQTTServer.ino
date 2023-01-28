@@ -501,7 +501,7 @@ String MqttDiscovery;
 String MqttUniqueId;
 #if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
 String MqttDiscoverySensor;
-#endif // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
 #endif  // MQTT_DISCOVERY_ENABLE
 String MqttHAName;
 String MqttClientId;
@@ -549,8 +549,8 @@ bool isSerialGpioUsedByIr(void) {
 
 #if SHT3X_SUPPORT
 SHT3X TemperatureSensor(SHT3X_I2C_ADDRESS);
-TimerMs statSensorReadTime = TimerMs(); 
-#endif // SHT3X_SUPPORT
+TimerMs statSensorReadTime = TimerMs();
+#endif  // SHT3X_SUPPORT
 
 // Debug messages get sent to the serial port.
 #pragma GCC diagnostic push
@@ -1306,11 +1306,11 @@ void handleAdmin(void) {
   html += htmlButton(
       kUrlSendDiscovery, F("Send MQTT Discovery"),
 #if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
-      F("Send a Climate and Sensor MQTT discovery message to Home Assistant.<br><br>")
+      F("Send a Climate and Sensor MQTT"
 #else
-      F("Send a Climate MQTT discovery message to Home Assistant.<br><br>")
-#endif // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
-      );
+      F("Send a Climate MQTT"
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+      " discovery message to Home Assistant.<br><br>"));
 
 #endif  // MQTT_DISCOVERY_ENABLE
 #if MQTT_CLEAR_ENABLE
@@ -1516,7 +1516,7 @@ bool clearMqttSavedStates(const String topic_base) {
 #if SHT3X_SUPPORT && MQTT_DISCOVERY_ENABLE
   // Clear the HA sensor discovery message.
   success &= mqtt_client.publish(MqttDiscoverySensor.c_str(), "", true);
-#endif // SHT3X_SUPPORT && MQTT_DISCOVERY_ENABLE
+#endif  // SHT3X_SUPPORT && MQTT_DISCOVERY_ENABLE
 #endif  // MQTT_DISCOVERY_ENABLE
   for (size_t channel = 0;
        channel <= kNrOfIrTxGpios;
@@ -2234,7 +2234,7 @@ void init_vars(void) {
   MqttDiscovery = "homeassistant/climate/" + String(Hostname);
 #if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
   MqttDiscoverySensor = "homeassistant/sensor/" + String(Hostname);
-#endif // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
   MqttUniqueId = WiFi.macAddress();
   MqttUniqueId.replace(":", "");
 #endif  // MQTT_DISCOVERY_ENABLE
@@ -2568,7 +2568,7 @@ void handleSendMqttDiscovery(void) {
 #if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
   sendMQTTDiscoverySensor(MqttDiscoverySensor.c_str(), KEY_TEMP);
   sendMQTTDiscoverySensor(MqttDiscoverySensor.c_str(), KEY_HUMIDITY);
-#endif // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
 }
 #endif  // MQTT_DISCOVERY_ENABLE
 
@@ -2774,8 +2774,8 @@ void sendMQTTDiscovery(const char *topic, String channel_id) {
                         "\",\"" D_STR_HIGH "\",\"" D_STR_MIDDLE "\",\""
                         D_STR_LOW "\",\"" D_STR_LOWEST "\"],"
 #if SHT3X_SUPPORT
-      "\"curr_temp_t\":\"") + MqttSensorStat + F( KEY_TEMP "\"," 
-#endif // SHT3X_SUPPORT
+      "\"curr_temp_t\":\"") + MqttSensorStat + F(KEY_TEMP "\","
+#endif  // SHT3X_SUPPORT
       "\"uniq_id\":\"") + MqttUniqueId + channel_id + F("\","
       "\"device\":{"
         "\"identifiers\":[\"") + MqttUniqueId + channel_id + F("\"],"
@@ -2907,8 +2907,7 @@ void loop(void) {
     // Check if it's time to read the SHT3x sensor.
     if (statSensorReadTime.elapsed() > SHT3X_CHECK_FREQ * 1000) {
       byte result = TemperatureSensor.get();
-      if (result == 0)
-      {
+      if (result == 0) {
         // Success
         float temp = TemperatureSensor.cTemp;
         // XXX Convert units
@@ -2917,16 +2916,16 @@ void loop(void) {
         String mqttTempTopic = MqttSensorStat + KEY_TEMP;
         String mqttHumidityTopic = MqttSensorStat + KEY_HUMIDITY;
         mqtt_client.publish(mqttTempTopic.c_str(), String(temp).c_str());
-        mqtt_client.publish(mqttHumidityTopic.c_str(), String(humidity).c_str());
-      }
-      else
-      {
+        mqtt_client.publish(mqttHumidityTopic.c_str(),
+                            String(humidity).c_str());
+      } else {
         // Error
-        mqttLog((String(F("SHT3x sensor read error: ")) + String(result)).c_str());
+        mqttLog((String(F("SHT3x sensor read error: ")) + 
+                 String(result)).c_str());
       }
       statSensorReadTime.reset();
     }
-#endif // SHT3X_SUPPORT
+#endif  // SHT3X_SUPPORT
   }
 #endif  // MQTT_ENABLE
 #if IR_RX
