@@ -2920,7 +2920,7 @@ void loop(void) {
                             String(humidity).c_str());
       } else {
         // Error
-        mqttLog((String(F("SHT3x sensor read error: ")) + 
+        mqttLog((String(F("SHT3x sensor read error: ")) +
                  String(result)).c_str());
       }
       statSensorReadTime.reset();
