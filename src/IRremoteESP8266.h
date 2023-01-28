@@ -938,6 +938,13 @@
 #define SEND_WOWWEE        _IR_ENABLE_DEFAULT_
 #endif  // SEND_WOWWEE
 
+#ifndef DECODE_CARRIER_AC84
+#define DECODE_CARRIER_AC84 _IR_ENABLE_DEFAULT_
+#endif  // DECODE_CARRIER_AC84
+#ifndef SEND_CARRIER_AC84
+#define SEND_CARRIER_AC84   _IR_ENABLE_DEFAULT_
+#endif  // SEND_CARRIER_AC84
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -956,6 +963,7 @@
      DECODE_KELON168 || DECODE_HITACHI_AC296 || DECODE_CARRIER_AC128 || \
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
+     DECODE_CARRIER_AC84 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1120,8 +1128,9 @@ enum decode_type_t {
   DAIKIN312,
   GORENJE,
   WOWWEE,
+  CARRIER_AC84,  // 125
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = WOWWEE,
+  kLastDecodeType = CARRIER_AC84,
 };
 
 // Message lengths & required repeat values
@@ -1159,6 +1168,9 @@ const uint16_t kCarrierAc40Bits = 40;
 const uint16_t kCarrierAc40MinRepeat = 2;
 const uint16_t kCarrierAc64Bits = 64;
 const uint16_t kCarrierAc64MinRepeat = kNoRepeat;
+const uint16_t kCarrierAc84StateLength = 11;
+const uint16_t kCarrierAc84Bits = kCarrierAc84StateLength * 8 - 4;
+const uint16_t kCarrierAc84MinRepeat = kNoRepeat;
 const uint16_t kCarrierAc128StateLength = 16;
 const uint16_t kCarrierAc128Bits = kCarrierAc128StateLength * 8;
 const uint16_t kCarrierAc128MinRepeat = kNoRepeat;

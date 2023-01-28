@@ -1173,6 +1173,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting WOWWEE decode");
     if (decodeWowwee(results, offset)) return true;
 #endif  // DECODE_WOWWEE
+#if DECODE_CARRIER_AC84
+    DPRINTLN("Attempting Carrier A/C 84-bit decode");
+    if (decodeCarrierAC84(results, offset)) return true;
+#endif  // DECODE_CARRIER_AC84
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
