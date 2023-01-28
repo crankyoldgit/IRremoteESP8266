@@ -224,12 +224,12 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define REPLAY_DECODED_AC_MESSAGE false
 
 // ------------------------ SHT-3x Support -------------------------------------
-// Set the following to true enable SHT-3x sensor support (such as the Lolin
-// SHT30 Shield), connected to GPIOs 4 and 5 (D2 and D1).
-// *** IMPORTANT ***
-// You must also uncomment the line in the platformio.ini file to enable the
-// SHT-3x library.
+// To enable SHT-3x sensor support (such as the Lolin SHT30 Shield), connected
+// to GPIOs 4 and 5 (D2 and D1), do the following:
+//  - uncomment the line in platformio.ini to enable the SHT-3x library.
+//  - uncomment the following #define line
 // #define SHT3X_SUPPORT true
+
 // Default address for SHT-3x sensor.
 #define SHT3X_I2C_ADDRESS 0x44
 // Requires MQTT_DISCOVERY_ENABLE to be true as well.
@@ -487,9 +487,9 @@ bool parseStringAndSendPronto(IRsend *irsend, const String str,
 #if SEND_RAW
 bool parseStringAndSendRaw(IRsend *irsend, const String str);
 #endif  // SEND_RAW
-#if SHT3X_ENABLE
+#if SHT3X_SUPPORT
 void sendMQTTDiscoverySensor(const char *topic, String type);
-#endif  // SHT3X_ENABLE
+#endif  // SH3X_SUPPORT
 void handleIr(void);
 void handleNotFound(void);
 void setup_wifi(void);
