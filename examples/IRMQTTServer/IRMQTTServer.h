@@ -226,7 +226,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 // ------------------------ SHT-3x Support -------------------------------------
 // To enable SHT-3x sensor support (such as the Lolin SHT30 Shield), connected
 // to GPIOs 4 and 5 (D2 and D1), do the following:
-//  - uncomment the line in platformio.ini to enable the SHT-3x library.
+//  - uncomment the line in platformio.ini to enable the SHT-3x library
 //  - uncomment the following #define line
 // #define SHT3X_SUPPORT true
 
