@@ -132,6 +132,7 @@ const uint32_t kMqttReconnectTime = 5000;  // Delay(ms) between reconnect tries.
 #define MQTT_CLIMATE "ac"  // Sub-topic for the climate topics.
 #define MQTT_CLIMATE_CMND "cmnd"  // Sub-topic for the climate command topics.
 #define MQTT_CLIMATE_STAT "stat"  // Sub-topic for the climate stat topics.
+#define MQTT_SENSOR_STAT "sensor"  // Sub-topic for the temperature/humidity sensor stat topics.
 // Enable sending/receiving climate via JSON. `true` cost ~5k of program space.
 #define MQTT_CLIMATE_JSON false
 
@@ -221,6 +222,25 @@ const uint16_t kMinUnknownSize = 2 * 10;
 //      actual a/c unit.
 #define REPLAY_DECODED_AC_MESSAGE false
 
+// ------------------------ SHT-3x Support -------------------------------------
+// Set the following to true enable SHT-3x sensor support (such as the Lolin SHT30 
+// Shield), connected to GPIOs 4 and 5 (D2 and D1).
+// *** IMPORTANT ***
+// You must also uncomment the line in the platformio.ini file to enable the
+// SHT-3x library.
+// #define SHT3X_SUPPORT true
+// Default address for SHT-3x sensor.
+#define SHT3X_I2C_ADDRESS 0x44
+// Requires MQTT_DISCOVERY_ENABLE to be true as well.
+// If set, will send HA MQTT Discovery messages for the SHT-3x sensor.
+#define SHT3X_MQTT_DISCOVERY_ENABLE true
+// I2C SDA pin for SHT-3x sensor (D2).
+#define SHT3X_I2C_SDA 4
+// I2C SCL pin for SHT-3x sensor (D1).
+#define SHT3X_I2C_SCL 5
+// Check frequency for SHT-3x sensor (in seconds).
+#define SHT3X_CHECK_FREQ 60
+
 // ------------------------ Advanced Usage Only --------------------------------
 
 // Reports the input voltage to the ESP chip. **NOT** the input voltage
@@ -238,6 +258,7 @@ const uint16_t kMinUnknownSize = 2 * 10;
 #define KEY_POWER "power"
 #define KEY_MODE "mode"
 #define KEY_TEMP "temp"
+#define KEY_HUMIDITY "humidity"
 #define KEY_FANSPEED "fanspeed"
 #define KEY_SWINGV "swingv"
 #define KEY_SWINGH "swingh"
@@ -465,6 +486,9 @@ bool parseStringAndSendPronto(IRsend *irsend, const String str,
 #if SEND_RAW
 bool parseStringAndSendRaw(IRsend *irsend, const String str);
 #endif  // SEND_RAW
+#if SHT3X_ENABLE
+void sendMQTTDiscoverySensor(const char *topic, String type);
+#endif // SHT3X_ENABLE
 void handleIr(void);
 void handleNotFound(void);
 void setup_wifi(void);
