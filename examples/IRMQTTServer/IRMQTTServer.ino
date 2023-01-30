@@ -419,6 +419,10 @@ using irutils::msToString;
   ADC_MODE(ADC_VCC);
 #endif  // REPORT_VCC
 
+#ifdef SHT3X_SUPPORT
+#include <WEMOS_SHT3X.h>
+#endif
+
 // Globals
 uint8_t _sanity = 0;
 #if defined(ESP8266)
@@ -495,9 +499,15 @@ String MqttClimateCmnd;  // Sub-topic for the climate command topics.
 #if MQTT_DISCOVERY_ENABLE
 String MqttDiscovery;
 String MqttUniqueId;
+#if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+String MqttDiscoverySensor;
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
 #endif  // MQTT_DISCOVERY_ENABLE
 String MqttHAName;
 String MqttClientId;
+#if SHT3X_SUPPORT
+String MqttSensorStat;
+#endif  // SHT3X_SUPPORT
 
 // Primative lock file for gating MQTT state broadcasts.
 bool lockMqttBroadcast = true;
@@ -536,6 +546,11 @@ bool isSerialGpioUsedByIr(void) {
     }
   return false;  // Not in use as far as we can tell.
 }
+
+#if SHT3X_SUPPORT
+SHT3X TemperatureSensor(SHT3X_I2C_ADDRESS);
+TimerMs statSensorReadTime = TimerMs();
+#endif  // SHT3X_SUPPORT
 
 // Debug messages get sent to the serial port.
 #pragma GCC diagnostic push
@@ -1290,7 +1305,13 @@ void handleAdmin(void) {
 #if MQTT_DISCOVERY_ENABLE
   html += htmlButton(
       kUrlSendDiscovery, F("Send MQTT Discovery"),
-      F("Send a Climate MQTT discovery message to Home Assistant.<br><br>"));
+#if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+      F("Send a Climate and Sensor MQTT"
+#else
+      F("Send a Climate MQTT"
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+      " discovery message to Home Assistant.<br><br>"));
+
 #endif  // MQTT_DISCOVERY_ENABLE
 #if MQTT_CLEAR_ENABLE
   html += htmlButton(
@@ -1492,6 +1513,10 @@ bool clearMqttSavedStates(const String topic_base) {
 #if MQTT_DISCOVERY_ENABLE
   // Clear the HA climate discovery message.
   success &= mqtt_client.publish(MqttDiscovery.c_str(), "", true);
+#if SHT3X_SUPPORT && MQTT_DISCOVERY_ENABLE
+  // Clear the HA sensor discovery message.
+  success &= mqtt_client.publish(MqttDiscoverySensor.c_str(), "", true);
+#endif  // SHT3X_SUPPORT && MQTT_DISCOVERY_ENABLE
 #endif  // MQTT_DISCOVERY_ENABLE
   for (size_t channel = 0;
        channel <= kNrOfIrTxGpios;
@@ -2207,12 +2232,19 @@ void init_vars(void) {
   // Sub-topic for the climate stat topics.
 #if MQTT_DISCOVERY_ENABLE
   MqttDiscovery = "homeassistant/climate/" + String(Hostname);
+#if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+  MqttDiscoverySensor = "homeassistant/sensor/" + String(Hostname);
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
   MqttUniqueId = WiFi.macAddress();
   MqttUniqueId.replace(":", "");
 #endif  // MQTT_DISCOVERY_ENABLE
   MqttHAName = String(Hostname) + "_aircon";
   // Create a unique MQTT client id.
   MqttClientId = String(Hostname) + String(kChipId, HEX);
+#if SHT3X_SUPPORT
+  // Sub-topic for the climate stat topics.
+  MqttSensorStat = String(MqttPrefix) + '/' + MQTT_SENSOR_STAT + '/';
+#endif  // SHT3X_SUPPORT
 #endif  // MQTT_ENABLE
 }
 
@@ -2518,6 +2550,9 @@ void handleSendMqttDiscovery(void) {
       htmlMenu() +
       F("<p>The Home Assistant MQTT Discovery message is being sent to topic: ")
       + MqttDiscovery +
+#if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+      F(" and ") + MqttDiscoverySensor +
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
       F(". It will show up in Home Assistant in a few seconds."
       "</p>"
       "<h3>Warning!</h3>"
@@ -2530,6 +2565,10 @@ void handleSendMqttDiscovery(void) {
     if (i > 0) channel_id = "_" + String(i);
     sendMQTTDiscovery(MqttDiscovery.c_str(), channel_id);
   }
+#if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+  sendMQTTDiscoverySensor(MqttDiscoverySensor.c_str(), KEY_TEMP);
+  sendMQTTDiscoverySensor(MqttDiscoverySensor.c_str(), KEY_HUMIDITY);
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
 }
 #endif  // MQTT_DISCOVERY_ENABLE
 
@@ -2734,6 +2773,9 @@ void sendMQTTDiscovery(const char *topic, String channel_id) {
       "\"swing_modes\":[\"" D_STR_OFF "\",\"" D_STR_AUTO "\",\"" D_STR_HIGHEST
                         "\",\"" D_STR_HIGH "\",\"" D_STR_MIDDLE "\",\""
                         D_STR_LOW "\",\"" D_STR_LOWEST "\"],"
+#if SHT3X_SUPPORT
+      "\"curr_temp_t\":\"") + MqttSensorStat + F(KEY_TEMP "\","
+#endif  // SHT3X_SUPPORT
       "\"uniq_id\":\"") + MqttUniqueId + channel_id + F("\","
       "\"device\":{"
         "\"identifiers\":[\"") + MqttUniqueId + channel_id + F("\"],"
@@ -2752,6 +2794,47 @@ void sendMQTTDiscovery(const char *topic, String channel_id) {
     mqttLog(PSTR("MQTT climate discovery FAILED to send."));
   }
 }
+
+#if SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
+// Send the MQTT Discovery data for the SHT3X sensor.
+// type must be a String of either KEY_TEMP or KEY_HUMIDITY.
+void sendMQTTDiscoverySensor(const char *topic, String type) {
+  String pub_topic = String(topic) + F("_") + type + F("/config");
+  String uom = "%";
+  String ha_class = type;
+  // XXX Update units of measure for temperature.
+  if (type == KEY_TEMP) {
+      uom = "°C";
+      ha_class = "temperature";
+  }
+  if (mqtt_client.publish(
+      pub_topic.c_str(), String(
+      F("{"
+      "\"name\":\"") + MqttHAName + "_" + type + F("\","
+
+      "\"stat_t\":\"") + MqttSensorStat + type + F("\","
+      "\"dev_cla\":\"") + ha_class + F("\","
+      "\"unit_of_meas\":\"") + uom + F("\","
+
+      "\"uniq_id\":\"") + MqttUniqueId + type + F("\","
+      "\"device\":{"
+        "\"identifiers\":[\"") + MqttUniqueId + type + F("\"],"
+        "\"connections\":[[\"mac\",\"") + WiFi.macAddress() + F("\"]],"
+        "\"manufacturer\":\"IRremoteESP8266\","
+        "\"model\":\"IRMQTTServer\","
+        "\"name\":\"") + Hostname + F("\","
+        "\"sw_version\":\"" _MY_VERSION_ "\""
+        "}"
+      "}")).c_str(), true)) {
+    mqttLog(PSTR("MQTT sensor discovery successful sent."));
+    hasDiscoveryBeenSent = true;
+    lastDiscovery.reset();
+    mqttSentCounter++;
+  } else {
+    mqttLog(PSTR("MQTT sensor discovery FAILED to send."));
+  }
+}
+#endif  // SHT3X_SUPPORT && SHT3X_MQTT_DISCOVERY_ENABLE
 #endif  // MQTT_DISCOVERY_ENABLE
 #endif  // MQTT_ENABLE
 
@@ -2820,6 +2903,29 @@ void loop(void) {
     }
     // Periodically send all of the climate state via MQTT.
     doBroadcast(&lastBroadcast, kBroadcastPeriodMs, climate, false, false);
+#if SHT3X_SUPPORT
+    // Check if it's time to read the SHT3x sensor.
+    if (statSensorReadTime.elapsed() > SHT3X_CHECK_FREQ * 1000) {
+      byte result = TemperatureSensor.get();
+      if (result == 0) {
+        // Success
+        float temp = TemperatureSensor.cTemp;
+        // XXX Convert units
+        float humidity = TemperatureSensor.humidity;
+        // Publish the temp and humidity to MQTT.
+        String mqttTempTopic = MqttSensorStat + KEY_TEMP;
+        String mqttHumidityTopic = MqttSensorStat + KEY_HUMIDITY;
+        mqtt_client.publish(mqttTempTopic.c_str(), String(temp).c_str());
+        mqtt_client.publish(mqttHumidityTopic.c_str(),
+                            String(humidity).c_str());
+      } else {
+        // Error
+        mqttLog((String(F("SHT3x sensor read error: ")) +
+                 String(result)).c_str());
+      }
+      statSensorReadTime.reset();
+    }
+#endif  // SHT3X_SUPPORT
   }
 #endif  // MQTT_ENABLE
 #if IR_RX
