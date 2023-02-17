@@ -3384,7 +3384,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       midea(&ac, send.power, send.mode, send.celsius, send.degrees,
             send.sensorTemperature, send.fanspeed, send.swingv, send.iFeel,
             send.quiet, prev_quiet, send.turbo, send.econo, send.light,
-            send.sleep);
+            send.clean, send.sleep);
       break;
     }
 #endif  // SEND_MIDEA
