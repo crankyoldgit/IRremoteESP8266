@@ -943,21 +943,8 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
       return true;
 #endif
 #if DECODE_ARGO
-  DPRINTLN("Attempting Argo WREM3 decode (AC Control)");
-  if (decodeArgoWREM3(results, offset, kArgo3AcControlStateLength * 8, true))
-    return true;
-  DPRINTLN("Attempting Argo WREM3 decode (iFeel report)");
-  if (decodeArgoWREM3(results, offset, kArgo3iFeelReportStateLength * 8, true))
-    return true;
-  DPRINTLN("Attempting Argo WREM3 decode (Config)");
-  if (decodeArgoWREM3(results, offset, kArgo3ConfigStateLength * 8, true))
-    return true;
-  DPRINTLN("Attempting Argo WREM3 decode (Timer)");
-  if (decodeArgoWREM3(results, offset, kArgo3TimerStateLength * 8, true))
-    return true;
-  DPRINTLN("Attempting Argo WREM2 decode");
-    if (decodeArgo(results, offset, kArgoBits) ||
-        decodeArgo(results, offset, kArgoShortBits, false)) return true;
+    DPRINTLN("Attempting Argo decode");
+    if (decodeArgo(results, offset)) return true;
 #endif  // DECODE_ARGO
 #if DECODE_SHARP_AC
     DPRINTLN("Attempting SHARP_AC decode");
@@ -1019,6 +1006,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Delonghi AC decode");
     if (decodeDelonghiAc(results, offset)) return true;
 #endif  // DECODE_DELONGHI_AC
+#if DECODE_DELONGHI_RADIATOR
+    DPRINTLN("Attempting Delonghi Heater decode");
+    if (decodeDelonghiRadiator(results, offset)) return true;
+#endif  // DECODE_DELONGHI_RADIATOR
 #if DECODE_DOSHISHA
     DPRINTLN("Attempting Doshisha decode");
     if (decodeDoshisha(results, offset)) return true;
@@ -1165,18 +1156,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Daikin 312-bit decode");
     if (decodeDaikin312(results, offset)) return true;
 #endif  // DECODE_DAIKIN312
-#if DECODE_GORENJE
-    DPRINTLN("Attempting GORENJE decode");
-    if (decodeGorenje(results, offset)) return true;
-#endif  // DECODE_GORENJE
-#if DECODE_WOWWEE
-    DPRINTLN("Attempting WOWWEE decode");
-    if (decodeWowwee(results, offset)) return true;
-#endif  // DECODE_WOWWEE
-#if DECODE_CARRIER_AC84
-    DPRINTLN("Attempting Carrier A/C 84-bit decode");
-    if (decodeCarrierAC84(results, offset)) return true;
-#endif  // DECODE_CARRIER_AC84
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
@@ -1448,18 +1427,27 @@ match_result_t IRrecv::matchData(
   match_result_t result;
   result.success = false;  // Fail by default.
   result.data = 0;
+  int ShouldPrint = (onespace == 1559 && zerospace == 531);
+  //if( ShouldPrint ) Serial.printf("Enter matchData, onemark=%d, onespace=%d, zeromark=%d, zerospace=%d\n", onemark, onespace, zeromark, zerospace);
+
   if (expectlastspace) {  // We are expecting data with a final space.
-    for (result.used = 0; result.used < nbits * 2;
-         result.used += 2, data_ptr += 2) {
+    for (result.used = 0; result.used < nbits * 2; result.used += 2, data_ptr += 2) {
+      int isMatchOneMark = matchMark(*data_ptr, onemark, tolerance, excess);
+      int isMatchOneSpace = matchMark(*(data_ptr+1), onespace, tolerance, excess);
+      int isMatchZeroMark = matchMark(*data_ptr, zeromark, tolerance, excess);
+      int isMatchZeroSpace = matchMark(*(data_ptr+1), zerospace, tolerance, excess);
       // Is the bit a '1'?
-      if (matchMark(*data_ptr, onemark, tolerance, excess) &&
-          matchSpace(*(data_ptr + 1), onespace, tolerance, excess)) {
+      if (isMatchOneMark && isMatchOneSpace ) {
         result.data = (result.data << 1) | 1;
-      } else if (matchMark(*data_ptr, zeromark, tolerance, excess) &&
-                 matchSpace(*(data_ptr + 1), zerospace, tolerance, excess)) {
+      } else if (isMatchZeroMark && isMatchZeroSpace) {
         result.data <<= 1;  // The bit is a '0'.
       } else {
         if (!MSBfirst) result.data = reverseBits(result.data, result.used / 2);
+        if ( ShouldPrint )
+        {
+          //Serial.printf("matchData with expectlastspace fails at used = %d valueMark=%d, valueSpace=%d, isMatchOneMark=%d, isMatchOneSpace=%d, isMatchZeroMark=%d, isMatchZeroSpace=%d\n"
+          //  , result.used, *data_ptr*kRawTick, *(data_ptr+1)*kRawTick, isMatchOneMark, isMatchOneSpace, isMatchZeroMark, isMatchZeroSpace);
+        }
         return result;  // It's neither, so fail.
       }
     }
@@ -1571,8 +1559,14 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                               const uint8_t tolerance,
                               const int16_t excess,
                               const bool MSBfirst) {
+
+  int ShouldPrint = (onespace == 1559 && zerospace == 531);
   // If we are expecting byte sizes, check it's a factor of 8 or fail.
-  if (!use_bits && nbits % 8 != 0)  return 0;
+  if (!use_bits && nbits % 8 != 0)  
+  {
+    //if (ShouldPrint) Serial.printf("nbits =%d, not multiple of 8\n", nbits);
+    return 0;
+  }
   // Calculate if we expect a trailing space in the data section.
   const bool kexpectspace = footermark || (onespace != zerospace);
   // Calculate how much remaining buffer is required.
@@ -1584,15 +1578,26 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
   // Don't need to extend for footerspace because it could be the end of message
 
   // Check if there is enough capture buffer to possibly have the message.
-  if (remaining < min_remaining) return 0;  // Nope, so abort.
-  uint16_t offset = 0;
-
-  // Header
-  if (hdrmark && !matchMark(*(data_ptr + offset++), hdrmark, tolerance, excess))
+  if (remaining < min_remaining)
+  {
+    //if (ShouldPrint) Serial.printf("remaining =%d < min_remaining %d\n", remaining, min_remaining);
     return 0;
+  }
+  uint16_t offset = 0;
+  uint16_t value = 0;
+  // Header
+  if ( hdrmark) value = *(data_ptr + offset++);
+  if (hdrmark && !matchMark(value, hdrmark, tolerance, excess))
+  {
+    //if (ShouldPrint) Serial.printf("matchMark Header fails : offset = %d, Mark=%d, hdrMark=%d, tolerance=%d, excess=%d\n", offset-1, value*kRawTick, hdrmark, tolerance, excess);
+    return 0;
+  }
   if (hdrspace && !matchSpace(*(data_ptr + offset++), hdrspace, tolerance,
                               excess))
+  {
+    //if (ShouldPrint) Serial.println("matchMark Space fails");
     return 0;
+  }
 
   // Data
   if (use_bits) {  // Bits.
@@ -1600,7 +1605,11 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                                               onemark, onespace,
                                               zeromark, zerospace, tolerance,
                                               excess, MSBfirst, kexpectspace);
-    if (!result.success) return 0;
+    if (!result.success) 
+    {
+      //if (ShouldPrint) Serial.println("matchData fails");
+      return 0;
+    }
     *result_bits_ptr = result.data;
     offset += result.used;
   } else {  // bytes
@@ -1609,21 +1618,35 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                                             onemark, onespace,
                                             zeromark, zerospace, tolerance,
                                             excess, MSBfirst, kexpectspace);
-    if (!data_used) return 0;
+    if (!data_used) 
+    {
+      //if (ShouldPrint) Serial.println("matchBytes fails");
+      return 0;
+    }
     offset += data_used;
   }
   // Footer
   if (footermark && !matchMark(*(data_ptr + offset++), footermark, tolerance,
                                excess))
+  {
+    //if (ShouldPrint) Serial.println("matchMark Footer fails");
     return 0;
+  }
+
   // If we have something still to match & haven't reached the end of the buffer
   if (footerspace && offset < remaining) {
       if (atleast) {
         if (!matchAtLeast(*(data_ptr + offset), footerspace, tolerance, excess))
+        {
+          //if (ShouldPrint) Serial.printf("matchAtLeast fails at offset %d\n", offset);
           return 0;
+        }
       } else {
         if (!matchSpace(*(data_ptr + offset), footerspace, tolerance, excess))
+        {
+          //if (ShouldPrint) Serial.printf("matchSpace after footer fails at offset %d\n", offset);
           return 0;
+        }
       }
       offset++;
   }
