@@ -294,9 +294,6 @@ class IRrecv {
 #if DECODE_ARGO
   bool decodeArgo(decode_results *results, uint16_t offset = kStartOffset,
                   const uint16_t nbits = kArgoBits, const bool strict = true);
-  bool decodeArgoWREM3(decode_results *results, uint16_t offset = kStartOffset,
-                  const uint16_t nbits = kArgo3AcControlStateLength * 8,
-                  const bool strict = true);
 #endif  // DECODE_ARGO
 #if DECODE_ARRIS
   bool decodeArris(decode_results *results, uint16_t offset = kStartOffset,
@@ -583,12 +580,6 @@ class IRrecv {
                          const uint16_t nbits = kCarrierAc40Bits,
                          const bool strict = true);
 #endif  // DECODE_CARRIER_AC40
-#if DECODE_CARRIER_AC84
-  bool decodeCarrierAC84(decode_results *results,
-                         uint16_t offset = kStartOffset,
-                         const uint16_t nbits = kCarrierAc84Bits,
-                         const bool strict = true);
-#endif  // DECODE_CARRIER_AC84
 #if DECODE_CARRIER_AC64
   bool decodeCarrierAC64(decode_results *results,
                          uint16_t offset = kStartOffset,
@@ -607,11 +598,6 @@ class IRrecv {
                          const uint16_t nbits = kGoodweatherBits,
                          const bool strict = true);
 #endif  // DECODE_GOODWEATHER
-#if DECODE_GORENJE
-  bool decodeGorenje(decode_results *results, uint16_t offset = kStartOffset,
-                     const uint16_t nbits = kGorenjeBits,
-                     const bool strict = true);
-#endif  // DECODE_GORENJE
 #if DECODE_GREE
   bool decodeGree(decode_results *results, uint16_t offset = kStartOffset,
                   const uint16_t nbits = kGreeBits,
@@ -759,6 +745,11 @@ class IRrecv {
                      const uint16_t nbits = kDelonghiAcBits,
                      const bool strict = true);
 #endif  // DECODE_DELONGHI_AC
+#if DECODE_DELONGHI_RADIATOR
+  bool decodeDelonghiRadiator(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kDelonghiRadiatorBits,
+                     const bool strict = true);
+#endif  // DECODE_DELONGHI_RADIATOR
 #if DECODE_DOSHISHA
   bool decodeDoshisha(decode_results *results, uint16_t offset = kStartOffset,
                       const uint16_t nbits = kDoshishaBits,
@@ -871,12 +862,6 @@ class IRrecv {
                       const uint16_t nbits = kBosch144Bits,
                       const bool strict = true);
 #endif  // DECODE_BOSCH144
-#if DECODE_WOWWEE
-  bool decodeWowwee(decode_results *results,
-                    uint16_t offset = kStartOffset,
-                    const uint16_t nbits = kWowweeBits,
-                    const bool strict = true);
-#endif  // DECODE_WOWWEE
 };
 
 #endif  // IRRECV_H_

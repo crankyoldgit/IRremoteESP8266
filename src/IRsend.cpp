@@ -603,10 +603,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
 uint16_t IRsend::defaultBits(const decode_type_t protocol) {
   switch (protocol) {
     case MULTIBRACKETS:
-    case GORENJE:
       return 8;
-    case WOWWEE:
-      return 11;
     case RC5:
     case SYMPHONY:
       return 12;
@@ -665,6 +662,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kCarrierAc40Bits;  // 40
     case DOSHISHA:
       return kDoshishaBits;  // 40
+    case DELONGHI_RADIATOR:
+      return(40);
     case SANYO_LC7461:
       return kSanyoLC7461Bits;  // 42
     case COOLIX48:
@@ -693,8 +692,6 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kBosch144Bits;
     case CORONA_AC:
       return kCoronaAcBits;
-    case CARRIER_AC84:
-      return kCarrierAc84Bits;
     case CARRIER_AC128:
       return kCarrierAc128Bits;
     case DAIKIN:
@@ -881,6 +878,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendDelonghiAc(data, nbits, min_repeat);
       break;
 #endif
+#if SEND_DELONGHI_RADIATOR
+    case DELONGHI_RADIATOR:
+      sendDelonghiRadiator(data, nbits, min_repeat);
+      break;
+#endif
 #if SEND_DENON
     case DENON:
       sendDenon(data, nbits, min_repeat);
@@ -919,11 +921,6 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #if SEND_GOODWEATHER
     case GOODWEATHER:
       sendGoodweather(data, nbits, min_repeat);
-      break;
-#endif
-#if SEND_GORENJE
-    case GORENJE:
-      sendGorenje(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_GREE
@@ -1124,11 +1121,6 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendWhynter(data, nbits, min_repeat);
       break;
 #endif
-#if SEND_WOWWEE
-    case WOWWEE:
-      sendWowwee(data, nbits, min_repeat);
-      break;
-#endif  // SEND_WOWWEE
 #if SEND_XMP
     case XMP:
       sendXmp(data, nbits, min_repeat);
@@ -1174,11 +1166,6 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendBosch144(state, nbytes);
       break;
 #endif  // SEND_BOSCH144
-#if SEND_CARRIER_AC84
-    case CARRIER_AC84:
-      sendCarrierAC84(state, nbytes);
-      break;
-#endif  // SEND_CARRIER_AC84
 #if SEND_CARRIER_AC128
     case CARRIER_AC128:
       sendCarrierAC128(state, nbytes);
