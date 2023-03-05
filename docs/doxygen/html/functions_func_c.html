@@ -70,7 +70,7 @@ $(function() {
 <li>calcChecksum()
 : <a class="el" href="classIRAirtonAc.html#af9707f71b93e2d4b21aaba2f88307bef">IRAirtonAc</a>
 , <a class="el" href="classIRAmcorAc.html#aec764cf4d88bb3fcbe3f36d24780f6a9">IRAmcorAc</a>
-, <a class="el" href="classIRArgoAC.html#acab2fe3b9f77f57f0e99da0bec0d7392">IRArgoAC</a>
+, <a class="el" href="classIRArgoACBase.html#a254d361c7f7db2b7a3e4414f40b4cdef">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 , <a class="el" href="classIRCarrierAc64.html#a20676dcf4b0a6510cc3bce282fbf8504">IRCarrierAc64</a>
 , <a class="el" href="classIRDaikin64.html#ac29c18fde1b0cd98991e68c0f672d0e9">IRDaikin64</a>
 , <a class="el" href="classIRDelonghiAc.html#a14d7629bb888deb02e83886191f44c2d">IRDelonghiAc</a>
@@ -93,6 +93,7 @@ $(function() {
 , <a class="el" href="classIRTrumaAc.html#a88f8ba515492d3d217f6476e0f386f1e">IRTrumaAc</a>
 , <a class="el" href="classIRVestelAc.html#ac0ba3de4de70350c5325b3d5e0b39e58">IRVestelAc</a>
 , <a class="el" href="classIRVoltas.html#a0069131bedc4b97a61547abe9640fd09">IRVoltas</a>
+, <a class="el" href="classIRYorkAc.html#a7a6e2f89742321d88d2e1cc1dc88aba4">IRYorkAc</a>
 </li>
 <li>calcFirstChecksum()
 : <a class="el" href="classIRDaikin128.html#a25b25f6b73bb5f1fd17a16080179d4bc">IRDaikin128</a>
@@ -117,7 +118,7 @@ $(function() {
 : <a class="el" href="classIRAirtonAc.html#ad66e28b40332cca757aecd471202c5fd">IRAirtonAc</a>
 , <a class="el" href="classIRAirwellAc.html#ae7a80cbb217d35835961477caaea3218">IRAirwellAc</a>
 , <a class="el" href="classIRAmcorAc.html#a6206e866e859bc4690cb014c49c1ff80">IRAmcorAc</a>
-, <a class="el" href="classIRArgoAC.html#a63cd2f350a7f249c020439543ef3c6d5">IRArgoAC</a>
+, <a class="el" href="classIRArgoACBase.html#ad2d075d5088985078433dbbef25c996c">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 , <a class="el" href="classIRBosch144AC.html#ac5b82e8ff735d1f89d3382bc03b688b0">IRBosch144AC</a>
 , <a class="el" href="classIRCarrierAc64.html#a0718376156750e66f98ea0549c75b21b">IRCarrierAc64</a>
 , <a class="el" href="classIRCoolixAC.html#a9e39ce5050888210d6ba9b79ae3763e3">IRCoolixAC</a>
@@ -174,6 +175,7 @@ $(function() {
 , <a class="el" href="classIRVestelAc.html#aae91667d96d86de824a20c256c311f15">IRVestelAc</a>
 , <a class="el" href="classIRVoltas.html#ac264033a983290d9c194fde822ed63a4">IRVoltas</a>
 , <a class="el" href="classIRWhirlpoolAc.html#a006c59c1c84c62fccd3730bec30ef5e8">IRWhirlpoolAc</a>
+, <a class="el" href="classIRYorkAc.html#aae383edf3b0d9a52d12c53261b5c4c16">IRYorkAc</a>
 </li>
 <li>cancelOffTimer()
 : <a class="el" href="classIRPanasonicAc.html#a6d202284320c59205cb0d02cb613cada">IRPanasonicAc</a>
@@ -190,7 +192,7 @@ $(function() {
 <li>checksum()
 : <a class="el" href="classIRAirtonAc.html#a9ccb41a2d483c7b31e53c321cee4343f">IRAirtonAc</a>
 , <a class="el" href="classIRAmcorAc.html#a67244a75731be6a3bd96ecc0384d0113">IRAmcorAc</a>
-, <a class="el" href="classIRArgoAC.html#ab0fe4e42d1c1201a92f5c4738b869763">IRArgoAC</a>
+, <a class="el" href="classIRArgoACBase.html#a4445c510ff1ac4960d5d2a94c53cd913">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 , <a class="el" href="classIRCarrierAc64.html#a005fab56acf94fe97db7fa92651b2882">IRCarrierAc64</a>
 , <a class="el" href="classIRCoronaAc.html#ae0257fdafacf7fd2e7ac6ca3f8ae3168">IRCoronaAc</a>
 , <a class="el" href="classIRDaikin128.html#a747c906808c269581de6cf9b02e5c0a7">IRDaikin128</a>
@@ -263,14 +265,20 @@ $(function() {
 <li>cmpStates()
 : <a class="el" href="classIRac.html#a3ba4eee08650dfcdd6d492a67c86f016">IRac</a>
 </li>
+<li>commandTypeToString()
+: <a class="el" href="classIRac.html#a46eadbb1fdf6d812e2e1de4c990b2ac9">IRac</a>
+</li>
 <li>compare()
 : <a class="el" href="classIRrecv.html#ad7347c72b14d9f2f20f65bcf235ab3dc">IRrecv</a>
+</li>
+<li>convertCommand()
+: <a class="el" href="classIRArgoACBase.html#a6e97d6060b0f70a9152478510806c111">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 </li>
 <li>convertFan()
 : <a class="el" href="classIRAirtonAc.html#a21bacf36521565ae9e139421235d4a30">IRAirtonAc</a>
 , <a class="el" href="classIRAirwellAc.html#a44091f4d58b8078df1a93170cb9900d8">IRAirwellAc</a>
 , <a class="el" href="classIRAmcorAc.html#ad0f8b7cdf5942c3680639d410f53d18c">IRAmcorAc</a>
-, <a class="el" href="classIRArgoAC.html#acd147993fb998a0e7015173b9514d4a2">IRArgoAC</a>
+, <a class="el" href="classIRArgoACBase.html#a9c7b38883cd1ab3d0905be103e8dd57e">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 , <a class="el" href="classIRBosch144AC.html#ab71895d6c6a3bc93425180ef063e0be2">IRBosch144AC</a>
 , <a class="el" href="classIRCarrierAc64.html#a255e6679397434877f1c6c9ac70fff50">IRCarrierAc64</a>
 , <a class="el" href="classIRCoolixAC.html#a7ffa1cfcf82bd905b0f607401200c895">IRCoolixAC</a>
@@ -325,12 +333,13 @@ $(function() {
 , <a class="el" href="classIRVestelAc.html#aa7702b0e50b6c8073cd7740a630b19dd">IRVestelAc</a>
 , <a class="el" href="classIRVoltas.html#a83022d8acc690f1a9672566ae4845e9e">IRVoltas</a>
 , <a class="el" href="classIRWhirlpoolAc.html#a3004feef0ec5fe327d6a43d68d029377">IRWhirlpoolAc</a>
+, <a class="el" href="classIRYorkAc.html#a4dc5170e87d5d4cfefe7fc9fec2bfea2">IRYorkAc</a>
 </li>
 <li>convertMode()
 : <a class="el" href="classIRAirtonAc.html#a9feab248ecbfb9064963f3a70a9f336a">IRAirtonAc</a>
 , <a class="el" href="classIRAirwellAc.html#a20f9a804b2f8774165befc43d434ad84">IRAirwellAc</a>
 , <a class="el" href="classIRAmcorAc.html#ab57117e1072b5265ac9ab5be6d58bccc">IRAmcorAc</a>
-, <a class="el" href="classIRArgoAC.html#ad242e7b18dea9768b9fad6b1e0e12f65">IRArgoAC</a>
+, <a class="el" href="classIRArgoACBase.html#a7a00b8a47758ab89a5d540e7ee089bef">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 , <a class="el" href="classIRBosch144AC.html#af1e045d15cf1a48ec533ec8b812d7369">IRBosch144AC</a>
 , <a class="el" href="classIRCarrierAc64.html#a8e94b1526b26cec55f1e700c86aaf74e">IRCarrierAc64</a>
 , <a class="el" href="classIRCoolixAC.html#acfb0d2c20322cb4d3cd681a3a54b30fe">IRCoolixAC</a>
@@ -385,6 +394,7 @@ $(function() {
 , <a class="el" href="classIRVestelAc.html#a5bb967d4972374254dad2c0a6fac7ed2">IRVestelAc</a>
 , <a class="el" href="classIRVoltas.html#a3086d4e457769916808b3aef151c9b6b">IRVoltas</a>
 , <a class="el" href="classIRWhirlpoolAc.html#afbf2f473c98f480d68c8bb28e1202d56">IRWhirlpoolAc</a>
+, <a class="el" href="classIRYorkAc.html#a1a9252c344d135b5306e25115ee0f5e5">IRYorkAc</a>
 </li>
 <li>convertSwing()
 : <a class="el" href="classIRTechnibelAc.html#a9368635dd24b042066094bfca13e8a17">IRTechnibelAc</a>
@@ -403,7 +413,7 @@ $(function() {
 </li>
 <li>convertSwingV()
 : <a class="el" href="classIRAirtonAc.html#aae02d61138494b72c3d539e973d3c34e">IRAirtonAc</a>
-, <a class="el" href="classIRArgoAC.html#ac23ff32b45c3fc5402e7e303ad9b5d54">IRArgoAC</a>
+, <a class="el" href="classIRArgoACBase.html#ac533804d57a36243c1eb129bc335daa5">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 , <a class="el" href="classIRDaikin160.html#a615f599f3bc3e8dec5e5ef92512a2301">IRDaikin160</a>
 , <a class="el" href="classIRDaikin2.html#aa3de8468b869989ec52a5f9f57ff4a77">IRDaikin2</a>
 , <a class="el" href="classIRGoodweatherAc.html#a3b37c04fd9b60b63052d93374fc15d4f">IRGoodweatherAc</a>
@@ -429,7 +439,7 @@ $(function() {
 : <a class="el" href="classIRLgAc.html#af478d89d3109f189fc2f07e41b22bfc2">IRLgAc</a>
 </li>
 <li>coolix()
-: <a class="el" href="classIRac.html#a4750db3b06db51f5a23c22538c41b7b3">IRac</a>
+: <a class="el" href="classIRac.html#a28b11ee1affe3c33c065702ee0a247c0">IRac</a>
 </li>
 <li>copyIrParams()
 : <a class="el" href="classIRrecv.html#ab017a0f9256954bb7d943e3c6b7e31bf">IRrecv</a>

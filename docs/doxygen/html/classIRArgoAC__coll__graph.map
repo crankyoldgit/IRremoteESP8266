@@ -1,5 +1,6 @@
 <map id="IRArgoAC" name="IRArgoAC">
-<area shape="rect" id="node1" title="Class for handling detailed Argo A/C messages." alt="" coords="52,95,135,121"/>
-<area shape="rect" id="node2" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
-<area shape="rect" id="node3" href="$unionArgoProtocol.html" title="Native representation of a Argo A/C message." alt="" coords="97,5,202,32"/>
+<area shape="rect" id="node1" title="Supports Argo A/C SAC&#45;WREM2 IR remote protocol." alt="" coords="78,171,161,197"/>
+<area shape="rect" id="node2" href="$classIRArgoACBase.html" title=" " alt="" coords="5,95,233,121"/>
+<area shape="rect" id="node3" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="31,5,98,32"/>
+<area shape="rect" id="node4" href="$unionArgoProtocol.html" title="Native representation of a Argo A/C message for WREM&#45;2 remote." alt="" coords="123,5,228,32"/>
 </map>

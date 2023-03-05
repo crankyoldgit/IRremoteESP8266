@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classIRMirageAc.html" title="Class for handling detailed Mirage 120&#45;bit A/C messages." alt="" coords="5,5,101,32"/>
+<area shape="rect" id="node1" href="$classIRHitachiAc424.html" title="Class for handling detailed Hitachi 53&#45;byte/424&#45;bit A/C messages." alt="" coords="5,31,127,57"/>
+<area shape="rect" id="node2" href="$classIRHitachiAc264.html" title="Class for handling detailed Hitachi 264&#45;bit A/C messages." alt="" coords="175,5,296,32"/>
+<area shape="rect" id="node3" href="$classIRHitachiAc344.html" title="Class for handling detailed Hitachi 344&#45;bit A/C messages." alt="" coords="175,56,296,83"/>
 </map>

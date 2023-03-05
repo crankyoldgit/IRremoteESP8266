@@ -101,7 +101,8 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383aa022f15e910eb36278094efb6e808a07">fanspeed_t::kHigh</a> = 4, 
 <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383aa0b1ac8aae6b1cfbbe89085c642b3b4b">fanspeed_t::kMax</a> = 5, 
-<a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383ab2d2a6993491fd666f1fa0afff5913ad">fanspeed_t::kLastFanspeedEnum</a> = kMax
+<a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383a6facfd5c89ee45abf6c01322d79d0433">fanspeed_t::kMediumHigh</a> = 6, 
+<a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383ab2d2a6993491fd666f1fa0afff5913ad">fanspeed_t::kLastFanspeedEnum</a> = kMediumHigh
 <br />
  }</td></tr>
 <tr class="memdesc:a8bb0dbf18fe69f639f4ac0b3ff133383"><td class="mdescLeft">&#160;</td><td class="mdescRight">Common A/C settings for Fan Speeds.  <a href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">More...</a><br /></td></tr>
@@ -115,11 +116,24 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43ab3199775e825c139b44e3e9ccf3cbc7e">swingv_t::kMiddle</a> = 3, 
 <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43acd8fe42741a3bbc973bbf1d404afeff4">swingv_t::kLow</a> = 4, 
 <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43a334c684494b7f19d765cf062ae94a314">swingv_t::kLowest</a> = 5, 
-<a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43a4127912afc084d51c71c4ea0c7dd7b30">swingv_t::kLastSwingvEnum</a> = kLowest
+<a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43a7a498a7e1eea5e760c10942c6a011889">swingv_t::kUpperMiddle</a> = 6, 
+<br />
+&#160;&#160;<a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43a4127912afc084d51c71c4ea0c7dd7b30">swingv_t::kLastSwingvEnum</a> = kUpperMiddle
 <br />
  }</td></tr>
 <tr class="memdesc:ac07f224c7bb47cac55dd01f24770ef43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Common A/C settings for Vertical Swing.  <a href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">More...</a><br /></td></tr>
 <tr class="separator:ac07f224c7bb47cac55dd01f24770ef43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9273f2effbd3b783862b82ae509fb832"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832">ac_command_t</a> { <br />
+&#160;&#160;<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832ac90f66495b3fcb0e578b7d1bd9e2473c">ac_command_t::kControlCommand</a> = 0, 
+<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832aa267dfd5c81a23748781129839e960eb">ac_command_t::kSensorTempReport</a> = 1, 
+<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832afae9973f9c6642bc139f69ff488e4027">ac_command_t::kTimerCommand</a> = 2, 
+<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832a7907956232af8076e97276fba05dce0d">ac_command_t::kConfigCommand</a> = 3, 
+<br />
+&#160;&#160;<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832ae16de72b183953ca7bb11e233ef79fa5">ac_command_t::kLastAcCommandEnum</a> = kConfigCommand
+<br />
+ }</td></tr>
+<tr class="memdesc:a9273f2effbd3b783862b82ae509fb832"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tyoe of A/C command (if the remote uses different codes for each)  <a href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832">More...</a><br /></td></tr>
+<tr class="separator:a9273f2effbd3b783862b82ae509fb832"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae50ee315fa9c9ec1a4078da40d6b147"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestdAc.html#aae50ee315fa9c9ec1a4078da40d6b147">swingh_t</a> { <br />
 &#160;&#160;<a class="el" href="namespacestdAc.html#aae50ee315fa9c9ec1a4078da40d6b147acc9ab5e60ac2a9a675ba64bf4bb49dc8">swingh_t::kOff</a> = -1, 
 <a class="el" href="namespacestdAc.html#aae50ee315fa9c9ec1a4078da40d6b147aa8c857c2f1b000c92f9794ebf53888d7">swingh_t::kAuto</a> = 0, 
@@ -140,6 +154,38 @@ Enumerations</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Enumerators and Structures for the Common A/C API. </p>
 </div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a9273f2effbd3b783862b82ae509fb832"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9273f2effbd3b783862b82ae509fb832">&#9670;&nbsp;</a></span>ac_command_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832">stdAc::ac_command_t</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Tyoe of A/C command (if the remote uses different codes for each) </p>
+<dl class="section note"><dt>Note</dt><dd>Most remotes support only a single command or aggregate multiple into one (e.g. control+timer). Use <code>kControlCommand</code> in such case </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a9273f2effbd3b783862b82ae509fb832ac90f66495b3fcb0e578b7d1bd9e2473c"></a>kControlCommand&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a9273f2effbd3b783862b82ae509fb832aa267dfd5c81a23748781129839e960eb"></a>kSensorTempReport&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a9273f2effbd3b783862b82ae509fb832afae9973f9c6642bc139f69ff488e4027"></a>kTimerCommand&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a9273f2effbd3b783862b82ae509fb832a7907956232af8076e97276fba05dce0d"></a>kConfigCommand&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a9273f2effbd3b783862b82ae509fb832ae16de72b183953ca7bb11e233ef79fa5"></a>kLastAcCommandEnum&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
 <a id="a8bb0dbf18fe69f639f4ac0b3ff133383"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8bb0dbf18fe69f639f4ac0b3ff133383">&#9670;&nbsp;</a></span>fanspeed_t</h2>
 
@@ -168,6 +214,7 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="a8bb0dbf18fe69f639f4ac0b3ff133383a3ce9d817402b59f65fb01ea044bb1ee9"></a>kMedium&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a8bb0dbf18fe69f639f4ac0b3ff133383aa022f15e910eb36278094efb6e808a07"></a>kHigh&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a8bb0dbf18fe69f639f4ac0b3ff133383aa0b1ac8aae6b1cfbbe89085c642b3b4b"></a>kMax&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a8bb0dbf18fe69f639f4ac0b3ff133383a6facfd5c89ee45abf6c01322d79d0433"></a>kMediumHigh&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a8bb0dbf18fe69f639f4ac0b3ff133383ab2d2a6993491fd666f1fa0afff5913ad"></a>kLastFanspeedEnum&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
@@ -270,6 +317,7 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="ac07f224c7bb47cac55dd01f24770ef43ab3199775e825c139b44e3e9ccf3cbc7e"></a>kMiddle&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ac07f224c7bb47cac55dd01f24770ef43acd8fe42741a3bbc973bbf1d404afeff4"></a>kLow&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ac07f224c7bb47cac55dd01f24770ef43a334c684494b7f19d765cf062ae94a314"></a>kLowest&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ac07f224c7bb47cac55dd01f24770ef43a7a498a7e1eea5e760c10942c6a011889"></a>kUpperMiddle&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ac07f224c7bb47cac55dd01f24770ef43a4127912afc084d51c71c4ea0c7dd7b30"></a>kLastSwingvEnum&#160;</td><td class="fielddoc"></td></tr>
 </table>
 

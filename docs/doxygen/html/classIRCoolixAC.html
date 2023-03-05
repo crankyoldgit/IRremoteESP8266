@@ -194,6 +194,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af4e833be17070157662c6fe01545b5f4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="IRremoteESP8266_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#af4e833be17070157662c6fe01545b5f4">toString</a> (void) const</td></tr>
 <tr class="memdesc:af4e833be17070157662c6fe01545b5f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the internal state into a human readable string.  <a href="classIRCoolixAC.html#af4e833be17070157662c6fe01545b5f4">More...</a><br /></td></tr>
 <tr class="separator:af4e833be17070157662c6fe01545b5f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c0f39d8e2e79d8259000695263ec3fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a0c0f39d8e2e79d8259000695263ec3fa">setZoneFollow</a> (const bool <a class="el" href="classIRCoolixAC.html#a13f0346bf6450f3853c6dba6be8cb63a">on</a>)</td></tr>
+<tr class="memdesc:a0c0f39d8e2e79d8259000695263ec3fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the Zone Follow setting.  <a href="classIRCoolixAC.html#a0c0f39d8e2e79d8259000695263ec3fa">More...</a><br /></td></tr>
+<tr class="separator:a0c0f39d8e2e79d8259000695263ec3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -221,9 +224,6 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a425c3f5fb26330266156c133fb9104eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a425c3f5fb26330266156c133fb9104eb">setSensorTempRaw</a> (const uint8_t code)</td></tr>
 <tr class="memdesc:a425c3f5fb26330266156c133fb9104eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the raw (native) sensor temperature value.  <a href="classIRCoolixAC.html#a425c3f5fb26330266156c133fb9104eb">More...</a><br /></td></tr>
 <tr class="separator:a425c3f5fb26330266156c133fb9104eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c0f39d8e2e79d8259000695263ec3fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#a0c0f39d8e2e79d8259000695263ec3fa">setZoneFollow</a> (const bool <a class="el" href="classIRCoolixAC.html#a13f0346bf6450f3853c6dba6be8cb63a">on</a>)</td></tr>
-<tr class="memdesc:a0c0f39d8e2e79d8259000695263ec3fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the Zone Follow setting.  <a href="classIRCoolixAC.html#a0c0f39d8e2e79d8259000695263ec3fa">More...</a><br /></td></tr>
-<tr class="separator:a0c0f39d8e2e79d8259000695263ec3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9bfc6c78fca87962c9335d60f625322"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRCoolixAC.html#aa9bfc6c78fca87962c9335d60f625322">isSpecialState</a> (void) const</td></tr>
 <tr class="memdesc:aa9bfc6c78fca87962c9335d60f625322"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the current state is a special state?  <a href="classIRCoolixAC.html#aa9bfc6c78fca87962c9335d60f625322">More...</a><br /></td></tr>
 <tr class="separator:aa9bfc6c78fca87962c9335d60f625322"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1313,9 +1313,6 @@ Private Attributes</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void IRCoolixAC::setZoneFollow </td>
@@ -1325,11 +1322,6 @@ Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Change the Zone Follow setting. </p>
