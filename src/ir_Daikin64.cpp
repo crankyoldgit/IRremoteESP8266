@@ -371,6 +371,15 @@ void IRDaikin64::setOnTimeEnabled(const bool on) { _.OnTimer = on; }
 /// @return true, the setting is on. false, the setting is off.
 bool IRDaikin64::getOnTimeEnabled(void) const { return _.OnTimer; }
 
+#define SETTIME(x, n) do { \
+  uint16_t mins = n;\
+  if (n >= 24 * 60) mins = 0;\
+  _.x##HalfHour = (mins % 60) >= 30;\
+  _.x##Hours = uint8ToBcd(mins / 60);\
+} while (0)
+
+#define GETTIME(x) bcdToUint8(_.x##Hours) * 60 + (_.x##HalfHour ? 30 : 0)
+
 /// Get the On Timer time to be sent to the A/C unit.
 /// @return The number of minutes past midnight.
 uint16_t IRDaikin64::getOnTime(void) const { return GETTIME(On); }
