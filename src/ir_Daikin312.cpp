@@ -4,7 +4,7 @@
 // Copyright 2019 pasna (IRDaikin160 class / Daikin176 class)
 
 /// @file
-/// @brief Support for Daikin A/C protocols.
+/// @brief Support for 312-bit Daikin A/C protocols.
 /// @see Daikin http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
 /// @see Daikin https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
 /// @see Daikin http://rdlab.cdmt.vn/project-2013/daikin-ir-protocol
@@ -22,6 +22,10 @@
 /// @see Daikin216 https://github.com/danny-source/Arduino_DY_IRDaikin
 /// @see Daikin64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
 /// @see Daikin200 https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
+
+// Supports:
+//   Brand: Daikin,  Model: FTXM20R5V1B A/C (DAIKIN312)
+//   Brand: Daikin,  Model: ARC466A67 remote (DAIKIN312)
 
 #include "ir_Daikin.h"
 #include <algorithm>

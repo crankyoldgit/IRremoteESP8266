@@ -5,23 +5,12 @@
 
 /// @file
 /// @brief Support for Daikin A/C protocols.
-/// @see Daikin http://harizanov.com/2012/02/control-daikin-air-conditioner-over-the-internet/
-/// @see Daikin https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
-/// @see Daikin http://rdlab.cdmt.vn/project-2013/daikin-ir-protocol
-/// @see Daikin https://github.com/blafois/Daikin-IR-Reverse
-/// @see Daikin128 https://github.com/crankyoldgit/IRremoteESP8266/issues/827
-/// @see Daikin152 https://github.com/crankyoldgit/IRremoteESP8266/issues/873
-/// @see Daikin152 https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.cpp
-/// @see Daikin152 https://github.com/ToniA/arduino-heatpumpir/blob/master/DaikinHeatpumpARC480A14IR.h
-/// @see Daikin160 https://github.com/crankyoldgit/IRremoteESP8266/issues/731
-/// @see Daikin2 https://docs.google.com/spreadsheets/d/1f8EGfIbBUo2B-CzUFdrgKQprWakoYNKM80IKZN4KXQE/edit#gid=236366525&range=B25:D32
-/// @see Daikin2 https://github.com/crankyoldgit/IRremoteESP8266/issues/582
-/// @see Daikin2 https://github.com/crankyoldgit/IRremoteESP8266/issues/1535
-/// @see Daikin2 https://www.daikin.co.nz/sites/default/files/daikin-split-system-US7-FTXZ25-50NV1B.pdf
-/// @see Daikin216 https://github.com/crankyoldgit/IRremoteESP8266/issues/689
-/// @see Daikin216 https://github.com/danny-source/Arduino_DY_IRDaikin
-/// @see Daikin64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
-/// @see Daikin200 https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
+/// @see Daikin176 https://github.com/crankyoldgit/IRremoteESP8266/issues/816
+
+// Supports:
+//   Brand: Daikin,  Model: BRC4C153 remote (DAIKIN176)
+//   Brand: Daikin,  Model: FFQ35B8V1B A/C (DAIKIN176)
+//   Brand: Daikin,  Model: BRC4C151 remote (DAIKIN176)
 
 #include "ir_Daikin.h"
 #include <algorithm>
