@@ -284,19 +284,19 @@ uint16_t IRYorkAc::getOffTimer(void) const {
 
 /// CRC16-16 (a.k.a. CRC-16-IBM)
 void IRYorkAc::calcChecksum() {
-uint8_t length = 14;
-uint16_t reg_crc = 0x0000;
-uint8_t* data = _.raw;
-while(length--) {
-  reg_crc ^= *data++;
-    for (u_int16_t index = 0; index < 8; index++) {
+  uint8_t length = 14;
+  uint16_t reg_crc = 0x0000;
+  uint8_t* data = _.raw;
+  while(length--) {
+    reg_crc ^= *data++;
+    for (uint16_t index = 0; index < 8; index++) {
       if (reg_crc & 0x01) {
         reg_crc = (reg_crc>>1) ^ 0xA001;
       } else {
         reg_crc = reg_crc >>1;
       }
     }
-}
+  }
   _.Chk1 = (reg_crc & 0xff);
   _.Chk2 = ((reg_crc >> 8) & 0x00ff);
 }
