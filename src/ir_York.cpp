@@ -287,7 +287,7 @@ void IRYorkAc::calcChecksum() {
   uint8_t length = 14;
   uint16_t reg_crc = 0x0000;
   uint8_t* data = _.raw;
-  while(length--) {
+  while (length--) {
     reg_crc ^= *data++;
     for (uint16_t index = 0; index < 8; index++) {
       if (reg_crc & 0x01) {
