@@ -877,6 +877,12 @@ class IRrecv {
                     const uint16_t nbits = kWowweeBits,
                     const bool strict = true);
 #endif  // DECODE_WOWWEE
+#if DECODE_YORK
+  bool decodeYork(decode_results *results,
+                  uint16_t kStartOffset,
+                  const uint16_t kYorkBits,
+                  const bool strict = true);
+#endif  // DECODE_YORK
 };
 
 #endif  // IRRECV_H_

@@ -945,6 +945,13 @@
 #define SEND_CARRIER_AC84   _IR_ENABLE_DEFAULT_
 #endif  // SEND_CARRIER_AC84
 
+#ifndef DECODE_YORK
+#define DECODE_YORK         _IR_ENABLE_DEFAULT_
+#endif  // DECODE_YORK
+#ifndef SEND_YORK
+#define SEND_YORK           _IR_ENABLE_DEFAULT_
+#endif  // SEND_YORK
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -963,7 +970,7 @@
      DECODE_KELON168 || DECODE_HITACHI_AC296 || DECODE_CARRIER_AC128 || \
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
-     DECODE_CARRIER_AC84 || \
+     DECODE_CARRIER_AC84 || DECODE_YORK || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1129,8 +1136,9 @@ enum decode_type_t {
   GORENJE,
   WOWWEE,
   CARRIER_AC84,  // 125
+  YORK,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = CARRIER_AC84,
+  kLastDecodeType = YORK,
 };
 
 // Message lengths & required repeat values
@@ -1423,6 +1431,8 @@ const uint16_t kRhossStateLength = 12;
 const uint16_t kRhossBits = kRhossStateLength * 8;
 const uint16_t kRhossDefaultRepeat = 0;
 const uint16_t kClimaButlerBits = 52;
+const uint16_t kYorkBits = 136;
+const uint16_t kYorkStateLength = 17;
 
 
 // Legacy defines. (Deprecated)

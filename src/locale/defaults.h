@@ -1114,6 +1114,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_XMP
 #define D_STR_XMP "XMP"
 #endif  // D_STR_XMP
+#ifndef D_STR_YORK
+#define D_STR_YORK "YORK"
+#endif  // D_STR_YORK
 #ifndef D_STR_ZEPEAL
 #define D_STR_ZEPEAL "ZEPEAL"
 #endif  // D_STR_ZEPEAL
