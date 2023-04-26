@@ -12,6 +12,7 @@
 // General housekeeping
 TEST(TestYork, Housekeeping) {
   ASSERT_EQ("YORK", typeToString(decode_type_t::YORK));
+  ASSERT_EQ(typeToString(decode_type_t::YORK), "YORK");
   ASSERT_TRUE(hasACState(YORK));
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::YORK));
   ASSERT_EQ(kYorkBits, IRsend::defaultBits(decode_type_t::YORK));
@@ -72,7 +73,7 @@ TEST(TestDecodeYork, SyntheticDecode) {
   EXPECT_STATE_EQ(kYorkKnownGoodState, irsend.capture.state,
                   irsend.capture.bits);
   EXPECT_EQ(
-      ", Power: On, Mode: 1 (Heat), Fan: 8 (Auto), Temp: 24C, Swing(V): Off"
+      "Power: On, Mode: 1 (Heat), Fan: 8 (Auto), Temp: 24C, Swing(V): Off"
       ", On Timer: 00:00, Off Timer: 00:00",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
@@ -82,7 +83,7 @@ TEST(TestDecodeYork, SyntheticDecode) {
 // test checksum calculation
 TEST(TestYorkClass, SetAndGetTemp) {
   IRYorkAc ac(kGpioUnused);
-  ac.stateReset();
+  EXPECT_NE(23, ac.getTemp());  // default state is 24 deegrees Celsius
   ac.setTemp(23);
   EXPECT_EQ(23, ac.getTemp());
 

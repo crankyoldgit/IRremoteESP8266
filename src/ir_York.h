@@ -4,7 +4,8 @@
 /// @brief Support for the York AC protocol (remote GRYLH2A)
 
 // Supports:
-//   Brand: York,  Model: MHH07P17
+//   Brand: York,  Model: MHH07P17 A/C
+//   Brand: York,  Model: GRYLH2A remote
 
 #ifndef IR_YORK_H_
 #define IR_YORK_H_

@@ -69,8 +69,6 @@ void IRsend::sendYork(const uint8_t data[], const uint16_t nbytes,
 /// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeYork(decode_results *results, uint16_t offset,
                         const uint16_t nbits, const bool strict) {
-  if (results->rawlen < 2 * nbits + (kHeader + kFooter - 1) - offset)
-    return false;  // Too short a message to match.
   if (strict && nbits != kYorkBits)
     return false;
 
@@ -102,7 +100,9 @@ bool IRrecv::decodeYork(decode_results *results, uint16_t offset,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRYorkAc::IRYorkAc(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
-      : _irsend(pin, inverted, use_modulation) { }
+      : _irsend(pin, inverted, use_modulation) {
+        stateReset();
+      }
 
 // Reset the internal state to a fixed known good state.
 void IRYorkAc::stateReset() {
@@ -199,8 +199,6 @@ void IRYorkAc::setFan(const uint8_t speed) {
     case kYorkAuto:
       _.Fan = kYorkFanAuto;
       break;
-    case kYorkCool:
-    case kYorkHeat:
     default:
       _.Fan = std::min(speed, kYorkFanAuto);
   }
@@ -245,9 +243,7 @@ stdAc::fanspeed_t IRYorkAc::toCommonFanSpeed(const uint8_t speed) {
 /// Set the temperature.
 /// @param[in] degrees The temperature in degrees celsius.
 void IRYorkAc::setTemp(const uint8_t degrees) {
-  uint8_t temp = std::max(kYorkMinTemp, degrees);
-  temp = std::min(kYorkMaxTemp, temp);
-  _.Temp = temp;
+  _.Temp = std::min(kYorkMaxTemp, std::max(kYorkMinTemp, degrees));
 }
 
 /// Get the current temperature setting.
@@ -288,13 +284,12 @@ uint16_t IRYorkAc::getOffTimer(void) const {
 
 /// CRC16-16 (a.k.a. CRC-16-IBM)
 void IRYorkAc::calcChecksum() {
-int j;
-unsigned char length = 14;
+uint8_t length = 14;
 uint16_t reg_crc = 0x0000;
-unsigned char* data = _.raw;
+uint8_t* data = _.raw;
 while(length--) {
   reg_crc ^= *data++;
-    for (j = 0; j < 8; j++) {
+    for (u_int16_t index = 0; index < 8; index++) {
       if (reg_crc & 0x01) {
         reg_crc = (reg_crc>>1) ^ 0xA001;
       } else {
@@ -346,7 +341,7 @@ stdAc::state_t IRYorkAc::toCommon(const stdAc::state_t *prev) const {
 String IRYorkAc::toString(void) const {
   String result = "";
   result.reserve(70);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(_.Power, kPowerStr);
+  result += addBoolToString(_.Power, kPowerStr, false);
 
   result += addModeToString(_.Mode, kYorkAuto, kYorkCool,
                             kYorkHeat, kYorkDry, kYorkFan);
