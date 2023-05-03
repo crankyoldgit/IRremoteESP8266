@@ -701,9 +701,12 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
       return true;
 #endif
 #if DECODE_PANASONIC
-    DPRINTLN("Attempting Panasonic decode");
+    DPRINTLN("Attempting Panasonic (48-bit) decode");
     if (decodePanasonic(results, offset)) return true;
-#endif
+    DPRINTLN("Attempting Panasonic (40-bit) decode");
+    if (decodePanasonic(results, offset, kPanasonic40Bits, true,
+                        kPanasonic40Manufacturer)) return true;
+#endif  // DECODE_PANASONIC
 #if DECODE_LG
     DPRINTLN("Attempting LG (28-bit) decode");
     if (decodeLG(results, offset, kLgBits, true)) return true;
