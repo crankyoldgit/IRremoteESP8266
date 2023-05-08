@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['fanspeed_5ft_8297',['fanspeed_t',['../namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383',1,'stdAc']]],
-  ['fujitsu_5fac_5fremote_5fmodel_5ft_8298',['fujitsu_ac_remote_model_t',['../IRsend_8h.html#a7204e78a1fe37a819c0b66f87a685dc0',1,'IRsend.h']]]
+  ['decode_5ftype_5ft_8691',['decode_type_t',['../IRremoteESP8266_8h.html#ad5b287a488a8c1b7b8661f029ab56fad',1,'IRremoteESP8266.h']]]
 ];

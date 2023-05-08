@@ -67,6 +67,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">ir_Argo.h File Reference</div>  </div>
@@ -81,16 +82,119 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionArgoProtocol.html">ArgoProtocol</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Argo A/C message.  <a href="unionArgoProtocol.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of a Argo A/C message for WREM-2 remote.  <a href="unionArgoProtocol.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionArgoProtocolWREM3.html">ArgoProtocolWREM3</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Native representation of A/C IR message for WREM-3 remote.  <a href="unionArgoProtocolWREM3.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structArgoProtocolWREM3_1_1Timer.html">ArgoProtocolWREM3::Timer</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structArgoProtocolWREM3_1_1Config.html">ArgoProtocolWREM3::Config</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRArgoACBase.html">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for handling <em>common</em> support for Argo remote protocols (functionality is shared across WREM-2 and WREM-3 IR protocols)  <a href="classIRArgoACBase.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRArgoAC.html">IRArgoAC</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class for handling detailed Argo A/C messages.  <a href="classIRArgoAC.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Supports Argo A/C SAC-WREM2 IR remote protocol.  <a href="classIRArgoAC.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRArgoAC__WREM3.html">IRArgoAC_WREM3</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Supports Argo A/C SAC-WREM3 IR remote protocol.  <a href="classIRArgoAC__WREM3.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:af6d63b1d2f511ebd1a1358e497ed1fca"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fca">argoIrMessageType_t</a> : uint8_t { <a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fcaa9915c819a5e8b3546f86085cc0fe7590">argoIrMessageType_t::AC_CONTROL</a> = 0b00, 
+<a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fcaa47e6c5e48dcb7cb8a5a7bd5a84acc645">argoIrMessageType_t::IFEEL_TEMP_REPORT</a> = 0b01, 
+<a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fcaaa448a8175147fc1ffd14ecb94c923b25">argoIrMessageType_t::TIMER_COMMAND</a> = 0b10, 
+<a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fcaa369ff3023dfee076a5f4a828cb9e401e">argoIrMessageType_t::CONFIG_PARAM_SET</a> = 0b11
+ }</td></tr>
+<tr class="memdesc:af6d63b1d2f511ebd1a1358e497ed1fca"><td class="mdescLeft">&#160;</td><td class="mdescRight">IR message type (determines the payload part of IR command)  <a href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fca">More...</a><br /></td></tr>
+<tr class="separator:af6d63b1d2f511ebd1a1358e497ed1fca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5ec3c5effcb350b776669400d29809c"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#ac5ec3c5effcb350b776669400d29809c">argoMode_t</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#ac5ec3c5effcb350b776669400d29809ca79ce8508b165746597039bd1dbeb6957">argoMode_t::COOL</a> = 0b001, 
+<a class="el" href="ir__Argo_8h.html#ac5ec3c5effcb350b776669400d29809ca76cca64663bcf77e11df2d5a88fc7d4b">argoMode_t::DRY</a> = 0b010, 
+<a class="el" href="ir__Argo_8h.html#ac5ec3c5effcb350b776669400d29809ca0e188df2c3af993beffab7abdcf4163e">argoMode_t::HEAT</a> = 0b011, 
+<a class="el" href="ir__Argo_8h.html#ac5ec3c5effcb350b776669400d29809ca1da87abe947673580190ba507384ad37">argoMode_t::FAN</a> = 0b100, 
+<br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#ac5ec3c5effcb350b776669400d29809cae1f2d5134ed2543d38a0de9751cf75d9">argoMode_t::AUTO</a> = 0b101
+<br />
+ }</td></tr>
+<tr class="memdesc:ac5ec3c5effcb350b776669400d29809c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A/C operation mode.  <a href="ir__Argo_8h.html#ac5ec3c5effcb350b776669400d29809c">More...</a><br /></td></tr>
+<tr class="separator:ac5ec3c5effcb350b776669400d29809c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa06fa023aaa4ffd1cce16ddc08ee1b58"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58">argoFan_t</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58aa207fbde795a97f0278390199f36a509">argoFan_t::FAN_AUTO</a> = 0b000, 
+<a class="el" href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58a07d9593f6b8d126037f96806994772ea">argoFan_t::FAN_LOWEST</a> = 0b001, 
+<a class="el" href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58a2e42233603acdda97b3dd89307edcee8">argoFan_t::FAN_LOWER</a> = 0b010, 
+<a class="el" href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58a7318fac250df8bc0efe7c616185578fb">argoFan_t::FAN_LOW</a> = 0b011, 
+<br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58a9865ba61a2c93e510d1deade184ddc32">argoFan_t::FAN_MEDIUM</a> = 0b100, 
+<a class="el" href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58aebc86c97e5d763c7f22ac0e1b28b73d0">argoFan_t::FAN_HIGH</a> = 0b101, 
+<a class="el" href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58af0246d50d62c176b86b1f3a5909c8ab8">argoFan_t::FAN_HIGHEST</a> = 0b110
+<br />
+ }</td></tr>
+<tr class="memdesc:aa06fa023aaa4ffd1cce16ddc08ee1b58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fan speed.  <a href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58">More...</a><br /></td></tr>
+<tr class="separator:aa06fa023aaa4ffd1cce16ddc08ee1b58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65130e0edbf25ecde961ccc38fe67719"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719">argoFlap_t</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719a56775047b9124f1580878402c0c55be7">argoFlap_t::FLAP_AUTO</a> = 0, 
+<a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719af18495cec4cef149d25ee6551ecd1faa">argoFlap_t::FLAP_1</a> = 1, 
+<a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719a24f043ecb6cd07609b615d46e71bb402">argoFlap_t::FLAP_2</a> = 2, 
+<a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719ac0331d96cdc3ed5527b53d0bde9a603b">argoFlap_t::FLAP_3</a> = 3, 
+<br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719abe0a7a47746f22762d4f9c3667d51787">argoFlap_t::FLAP_4</a> = 4, 
+<a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719affaa6ad135bd9da0b8f2be04a8b5ddb0">argoFlap_t::FLAP_5</a> = 5, 
+<a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719a2c78726b4e4346a56cfd8431ffe04476">argoFlap_t::FLAP_6</a> = 6, 
+<a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719aae522716b308d241caea47bb2ae5f021">argoFlap_t::FLAP_FULL</a> = 7
+<br />
+ }</td></tr>
+<tr class="memdesc:a65130e0edbf25ecde961ccc38fe67719"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flap position (swing-V)  <a href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719">More...</a><br /></td></tr>
+<tr class="separator:a65130e0edbf25ecde961ccc38fe67719"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9443ca88850f6c6b35cf8eab9346cdb3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a9443ca88850f6c6b35cf8eab9346cdb3">argoTimerType_t</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#a9443ca88850f6c6b35cf8eab9346cdb3a55b73b4d95d8dd0410bb927f45c939ff">argoTimerType_t::NO_TIMER</a> = 0b000, 
+<a class="el" href="ir__Argo_8h.html#a9443ca88850f6c6b35cf8eab9346cdb3ac65a4aeef1cd04e287e7a1d5888fb184">argoTimerType_t::DELAY_TIMER</a> = 0b001, 
+<a class="el" href="ir__Argo_8h.html#a9443ca88850f6c6b35cf8eab9346cdb3a0628dae4e492858b2cedf53b1e3766bc">argoTimerType_t::SCHEDULE_TIMER_1</a> = 0b010, 
+<a class="el" href="ir__Argo_8h.html#a9443ca88850f6c6b35cf8eab9346cdb3a66b7991dae6e27468e2d020b4ee4db9c">argoTimerType_t::SCHEDULE_TIMER_2</a> = 0b011, 
+<br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#a9443ca88850f6c6b35cf8eab9346cdb3ab434f89db500505de02d82de9cab47c5">argoTimerType_t::SCHEDULE_TIMER_3</a> = 0b100
+<br />
+ }</td></tr>
+<tr class="memdesc:a9443ca88850f6c6b35cf8eab9346cdb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timer type to set (for <code><a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fcaaa448a8175147fc1ffd14ecb94c923b25">argoIrMessageType_t::TIMER_COMMAND</a></code>)  <a href="ir__Argo_8h.html#a9443ca88850f6c6b35cf8eab9346cdb3">More...</a><br /></td></tr>
+<tr class="separator:a9443ca88850f6c6b35cf8eab9346cdb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a501b500862a42a52a8c0711c51df05bd"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bd">argoWeekday</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bda95fa12cb2100ce7081b71f7c44bc12a5">argoWeekday::SUNDAY</a> = 0b000, 
+<a class="el" href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bda98617021b249af0ace0f84ee92ccc7cd">argoWeekday::MONDAY</a> = 0b001, 
+<a class="el" href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bda5f5140afce13197a89e848004f292f14">argoWeekday::TUESDAY</a> = 0b010, 
+<a class="el" href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bdaaaebdc947e9f7d4ea362e5dc4fe7f825">argoWeekday::WEDNESDAY</a> = 0b011, 
+<br />
+&#160;&#160;<a class="el" href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bda7a61b324afb4dd8b2fb4a38afc34f755">argoWeekday::THURSDAY</a> = 0b100, 
+<a class="el" href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bda86fb6d343289267f3e9edb9b7403d936">argoWeekday::FRIDAY</a> = 0b101, 
+<a class="el" href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bdafd5ae113ac00b67f69541bc8c7f21ef7">argoWeekday::SATURDAY</a> = 0b110
+<br />
+ }</td></tr>
+<tr class="memdesc:a501b500862a42a52a8c0711c51df05bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Day type to set (for <code><a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fcaaa448a8175147fc1ffd14ecb94c923b25">argoIrMessageType_t::TIMER_COMMAND</a></code>)  <a href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bd">More...</a><br /></td></tr>
+<tr class="separator:a501b500862a42a52a8c0711c51df05bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:ada4b42336f3d423e3ef1060605c7f7f1"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#ada4b42336f3d423e3ef1060605c7f7f1">kArgoHeatBit</a> = 0b00100000</td></tr>
 <tr class="separator:ada4b42336f3d423e3ef1060605c7f7f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acca77ab2a43b45900c0dc36ac850085b"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#acca77ab2a43b45900c0dc36ac850085b">kArgoPreamble1</a> = 0b10101100</td></tr>
+<tr class="separator:acca77ab2a43b45900c0dc36ac850085b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc3bddd499528a3967a34304e960cb38"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#acc3bddd499528a3967a34304e960cb38">kArgoPreamble2</a> = 0b11110101</td></tr>
+<tr class="separator:acc3bddd499528a3967a34304e960cb38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b75baa7fdd9021826d04fb74818a36e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a9b75baa7fdd9021826d04fb74818a36e">kArgoPost</a> = 0b00000010</td></tr>
+<tr class="separator:a9b75baa7fdd9021826d04fb74818a36e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27708d14f3987e3c4513d59bbf4aa4b9"><td class="memItemLeft" align="right" valign="top">const uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a27708d14f3987e3c4513d59bbf4aa4b9">kArgoFrequency</a> = 38000</td></tr>
+<tr class="separator:a27708d14f3987e3c4513d59bbf4aa4b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7256560730a73dcaaa60cdfc8140fc0b"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a7256560730a73dcaaa60cdfc8140fc0b">kArgoTempDelta</a> = 4</td></tr>
+<tr class="separator:a7256560730a73dcaaa60cdfc8140fc0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27427d4479dc126e8782985008d4dd7d"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a27427d4479dc126e8782985008d4dd7d">kArgoMaxRoomTemp</a> = 35</td></tr>
+<tr class="separator:a27427d4479dc126e8782985008d4dd7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bc4e4cfe12af43730cb128f4043ad11"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a4bc4e4cfe12af43730cb128f4043ad11">kArgoMinTemp</a> = 10</td></tr>
+<tr class="separator:a4bc4e4cfe12af43730cb128f4043ad11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2409d2f472fb950c070fa5c0a07f69ce"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a2409d2f472fb950c070fa5c0a07f69ce">kArgoMaxTemp</a> = 32</td></tr>
+<tr class="separator:a2409d2f472fb950c070fa5c0a07f69ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fae966a8c3e2387190da7034f61b59e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a1fae966a8c3e2387190da7034f61b59e">kArgoMaxChannel</a> = 3</td></tr>
+<tr class="separator:a1fae966a8c3e2387190da7034f61b59e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab331356887b5f8f04f5ffdf9031fde71"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#ab331356887b5f8f04f5ffdf9031fde71">kArgoCool</a> = 0b000</td></tr>
 <tr class="separator:ab331356887b5f8f04f5ffdf9031fde71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae119706139f65f730db477d060a7bc5d"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#ae119706139f65f730db477d060a7bc5d">kArgoDry</a> = 0b001</td></tr>
@@ -113,14 +217,6 @@ Variables</h2></td></tr>
 <tr class="separator:a7b544220198b6aa311da78bc02b0e211"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa34af62e7134bbca2028d74ba7dfed4e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#aa34af62e7134bbca2028d74ba7dfed4e">kArgoFan3</a> = 3</td></tr>
 <tr class="separator:aa34af62e7134bbca2028d74ba7dfed4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7256560730a73dcaaa60cdfc8140fc0b"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a7256560730a73dcaaa60cdfc8140fc0b">kArgoTempDelta</a> = 4</td></tr>
-<tr class="separator:a7256560730a73dcaaa60cdfc8140fc0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27427d4479dc126e8782985008d4dd7d"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a27427d4479dc126e8782985008d4dd7d">kArgoMaxRoomTemp</a> = 35</td></tr>
-<tr class="separator:a27427d4479dc126e8782985008d4dd7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bc4e4cfe12af43730cb128f4043ad11"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a4bc4e4cfe12af43730cb128f4043ad11">kArgoMinTemp</a> = 10</td></tr>
-<tr class="separator:a4bc4e4cfe12af43730cb128f4043ad11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2409d2f472fb950c070fa5c0a07f69ce"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a2409d2f472fb950c070fa5c0a07f69ce">kArgoMaxTemp</a> = 32</td></tr>
-<tr class="separator:a2409d2f472fb950c070fa5c0a07f69ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7f4a97011f94e4bf453e7cfd01fd780"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#af7f4a97011f94e4bf453e7cfd01fd780">kArgoFlapAuto</a> = 0</td></tr>
 <tr class="separator:af7f4a97011f94e4bf453e7cfd01fd780"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a477dac25a687b9d875cf9e94623d5e84"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8h.html#a477dac25a687b9d875cf9e94623d5e84">kArgoFlap1</a> = 1</td></tr>
@@ -140,7 +236,208 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support for Argo Ulisse 13 DCI Mobile Split ACs. </p>
-</div><h2 class="groupheader">Variable Documentation</h2>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="aa06fa023aaa4ffd1cce16ddc08ee1b58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa06fa023aaa4ffd1cce16ddc08ee1b58">&#9670;&nbsp;</a></span>argoFan_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="ir__Argo_8h.html#aa06fa023aaa4ffd1cce16ddc08ee1b58">argoFan_t</a> : uint8_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fan speed. </p>
+<dl class="section note"><dt>Note</dt><dd>Raw values match WREM-3 protocol, but the enum is used in generic context </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aa06fa023aaa4ffd1cce16ddc08ee1b58aa207fbde795a97f0278390199f36a509"></a>FAN_AUTO&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aa06fa023aaa4ffd1cce16ddc08ee1b58a07d9593f6b8d126037f96806994772ea"></a>FAN_LOWEST&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aa06fa023aaa4ffd1cce16ddc08ee1b58a2e42233603acdda97b3dd89307edcee8"></a>FAN_LOWER&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aa06fa023aaa4ffd1cce16ddc08ee1b58a7318fac250df8bc0efe7c616185578fb"></a>FAN_LOW&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aa06fa023aaa4ffd1cce16ddc08ee1b58a9865ba61a2c93e510d1deade184ddc32"></a>FAN_MEDIUM&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aa06fa023aaa4ffd1cce16ddc08ee1b58aebc86c97e5d763c7f22ac0e1b28b73d0"></a>FAN_HIGH&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aa06fa023aaa4ffd1cce16ddc08ee1b58af0246d50d62c176b86b1f3a5909c8ab8"></a>FAN_HIGHEST&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="a65130e0edbf25ecde961ccc38fe67719"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65130e0edbf25ecde961ccc38fe67719">&#9670;&nbsp;</a></span>argoFlap_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="ir__Argo_8h.html#a65130e0edbf25ecde961ccc38fe67719">argoFlap_t</a> : uint8_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Flap position (swing-V) </p>
+<dl class="section note"><dt>Note</dt><dd>Raw values match WREM-3 protocol, but the enum is used in generic context </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a65130e0edbf25ecde961ccc38fe67719a56775047b9124f1580878402c0c55be7"></a>FLAP_AUTO&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a65130e0edbf25ecde961ccc38fe67719af18495cec4cef149d25ee6551ecd1faa"></a>FLAP_1&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a65130e0edbf25ecde961ccc38fe67719a24f043ecb6cd07609b615d46e71bb402"></a>FLAP_2&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a65130e0edbf25ecde961ccc38fe67719ac0331d96cdc3ed5527b53d0bde9a603b"></a>FLAP_3&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a65130e0edbf25ecde961ccc38fe67719abe0a7a47746f22762d4f9c3667d51787"></a>FLAP_4&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a65130e0edbf25ecde961ccc38fe67719affaa6ad135bd9da0b8f2be04a8b5ddb0"></a>FLAP_5&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a65130e0edbf25ecde961ccc38fe67719a2c78726b4e4346a56cfd8431ffe04476"></a>FLAP_6&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a65130e0edbf25ecde961ccc38fe67719aae522716b308d241caea47bb2ae5f021"></a>FLAP_FULL&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="af6d63b1d2f511ebd1a1358e497ed1fca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6d63b1d2f511ebd1a1358e497ed1fca">&#9670;&nbsp;</a></span>argoIrMessageType_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fca">argoIrMessageType_t</a> : uint8_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>IR message type (determines the payload part of IR command) </p>
+<dl class="section note"><dt>Note</dt><dd>Raw values match WREM-3 protocol, but the enum is used in generic context </dd>
+<dd>
+WREM-3 remote supports all commands separately, whereas WREM-2 (allegedly) only has the <code>AC_CONTROL</code> and <code>IFEEL_TEMP_REPORT</code> (timers are part of <code>AC_CONTROL</code> command), and there's no config. </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af6d63b1d2f511ebd1a1358e497ed1fcaa9915c819a5e8b3546f86085cc0fe7590"></a>AC_CONTROL&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="af6d63b1d2f511ebd1a1358e497ed1fcaa47e6c5e48dcb7cb8a5a7bd5a84acc645"></a>IFEEL_TEMP_REPORT&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="af6d63b1d2f511ebd1a1358e497ed1fcaaa448a8175147fc1ffd14ecb94c923b25"></a>TIMER_COMMAND&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="af6d63b1d2f511ebd1a1358e497ed1fcaa369ff3023dfee076a5f4a828cb9e401e"></a>CONFIG_PARAM_SET&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="ac5ec3c5effcb350b776669400d29809c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5ec3c5effcb350b776669400d29809c">&#9670;&nbsp;</a></span>argoMode_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="ir__Argo_8h.html#ac5ec3c5effcb350b776669400d29809c">argoMode_t</a> : uint8_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A/C operation mode. </p>
+<dl class="section note"><dt>Note</dt><dd>Raw values match WREM-3 protocol, but the enum is used in generic context </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ac5ec3c5effcb350b776669400d29809ca79ce8508b165746597039bd1dbeb6957"></a>COOL&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ac5ec3c5effcb350b776669400d29809ca76cca64663bcf77e11df2d5a88fc7d4b"></a>DRY&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ac5ec3c5effcb350b776669400d29809ca0e188df2c3af993beffab7abdcf4163e"></a>HEAT&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ac5ec3c5effcb350b776669400d29809ca1da87abe947673580190ba507384ad37"></a>FAN&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ac5ec3c5effcb350b776669400d29809cae1f2d5134ed2543d38a0de9751cf75d9"></a>AUTO&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="a9443ca88850f6c6b35cf8eab9346cdb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9443ca88850f6c6b35cf8eab9346cdb3">&#9670;&nbsp;</a></span>argoTimerType_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="ir__Argo_8h.html#a9443ca88850f6c6b35cf8eab9346cdb3">argoTimerType_t</a> : uint8_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Timer type to set (for <code><a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fcaaa448a8175147fc1ffd14ecb94c923b25">argoIrMessageType_t::TIMER_COMMAND</a></code>) </p>
+<dl class="section note"><dt>Note</dt><dd>Raw values match WREM-3 protocol </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a9443ca88850f6c6b35cf8eab9346cdb3a55b73b4d95d8dd0410bb927f45c939ff"></a>NO_TIMER&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a9443ca88850f6c6b35cf8eab9346cdb3ac65a4aeef1cd04e287e7a1d5888fb184"></a>DELAY_TIMER&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a9443ca88850f6c6b35cf8eab9346cdb3a0628dae4e492858b2cedf53b1e3766bc"></a>SCHEDULE_TIMER_1&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a9443ca88850f6c6b35cf8eab9346cdb3a66b7991dae6e27468e2d020b4ee4db9c"></a>SCHEDULE_TIMER_2&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a9443ca88850f6c6b35cf8eab9346cdb3ab434f89db500505de02d82de9cab47c5"></a>SCHEDULE_TIMER_3&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="a501b500862a42a52a8c0711c51df05bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a501b500862a42a52a8c0711c51df05bd">&#9670;&nbsp;</a></span>argoWeekday</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="ir__Argo_8h.html#a501b500862a42a52a8c0711c51df05bd">argoWeekday</a> : uint8_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Day type to set (for <code><a class="el" href="ir__Argo_8h.html#af6d63b1d2f511ebd1a1358e497ed1fcaaa448a8175147fc1ffd14ecb94c923b25">argoIrMessageType_t::TIMER_COMMAND</a></code>) </p>
+<dl class="section note"><dt>Note</dt><dd>Raw values match WREM-3 protocol </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a501b500862a42a52a8c0711c51df05bda95fa12cb2100ce7081b71f7c44bc12a5"></a>SUNDAY&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a501b500862a42a52a8c0711c51df05bda98617021b249af0ace0f84ee92ccc7cd"></a>MONDAY&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a501b500862a42a52a8c0711c51df05bda5f5140afce13197a89e848004f292f14"></a>TUESDAY&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a501b500862a42a52a8c0711c51df05bdaaaebdc947e9f7d4ea362e5dc4fe7f825"></a>WEDNESDAY&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a501b500862a42a52a8c0711c51df05bda7a61b324afb4dd8b2fb4a38afc34f755"></a>THURSDAY&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a501b500862a42a52a8c0711c51df05bda86fb6d343289267f3e9edb9b7403d936"></a>FRIDAY&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a501b500862a42a52a8c0711c51df05bdafd5ae113ac00b67f69541bc8c7f21ef7"></a>SATURDAY&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
 <a id="a527fa5776cb58f88013de5062c620b12"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a527fa5776cb58f88013de5062c620b12">&#9670;&nbsp;</a></span>kArgoAuto</h2>
 
@@ -351,6 +648,20 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a27708d14f3987e3c4513d59bbf4aa4b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27708d14f3987e3c4513d59bbf4aa4b9">&#9670;&nbsp;</a></span>kArgoFrequency</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint16_t kArgoFrequency = 38000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a431536a03ef985b53a4147df5a043b21"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a431536a03ef985b53a4147df5a043b21">&#9670;&nbsp;</a></span>kArgoHeat</h2>
 
@@ -407,6 +718,20 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a1fae966a8c3e2387190da7034f61b59e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fae966a8c3e2387190da7034f61b59e">&#9670;&nbsp;</a></span>kArgoMaxChannel</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kArgoMaxChannel = 3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a27427d4479dc126e8782985008d4dd7d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a27427d4479dc126e8782985008d4dd7d">&#9670;&nbsp;</a></span>kArgoMaxRoomTemp</h2>
 
@@ -457,6 +782,48 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint8_t kArgoOff = 0b011</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9b75baa7fdd9021826d04fb74818a36e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b75baa7fdd9021826d04fb74818a36e">&#9670;&nbsp;</a></span>kArgoPost</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kArgoPost = 0b00000010</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acca77ab2a43b45900c0dc36ac850085b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acca77ab2a43b45900c0dc36ac850085b">&#9670;&nbsp;</a></span>kArgoPreamble1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kArgoPreamble1 = 0b10101100</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acc3bddd499528a3967a34304e960cb38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc3bddd499528a3967a34304e960cb38">&#9670;&nbsp;</a></span>kArgoPreamble2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kArgoPreamble2 = 0b11110101</td>
         </tr>
       </table>
 </div><div class="memdoc">

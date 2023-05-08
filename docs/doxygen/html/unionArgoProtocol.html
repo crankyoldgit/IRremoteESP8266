@@ -69,7 +69,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Native representation of a Argo A/C message.  
+<p>Native representation of a Argo A/C message for WREM-2 remote.  
  <a href="unionArgoProtocol.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ir__Argo_8h_source.html">ir_Argo.h</a>&gt;</code></p>
@@ -80,12 +80,12 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a845151d1f5062ab0116f3a413e23da8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state in native IR code form.  <a href="unionArgoProtocol.html#a845151d1f5062ab0116f3a413e23da8f">More...</a><br /></td></tr>
 <tr class="separator:a845151d1f5062ab0116f3a413e23da8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a4ee69f4b6b36f3215f2b9b1758939d"><td class="memItemLeft" >struct {</td></tr>
-<tr class="memitem:a6dfe577365aff7a2d0a7d2e953322c37"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a2b15de65bd2368c53c07850b32c240f1">__pad0__</a>:8</td></tr>
+<tr class="memitem:a139cb288793909942c08dc1c3c57fba2"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a812f3e3bdeca0f584075df054836e393">Pre1</a>:8</td></tr>
+<tr class="separator:a139cb288793909942c08dc1c3c57fba2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6ec0301a6fa6719b1670e8c1c8f7615"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#abb78dbee396963cd7acccaa2a4c63aed">Pre2</a>:8</td></tr>
+<tr class="separator:aa6ec0301a6fa6719b1670e8c1c8f7615"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dfe577365aff7a2d0a7d2e953322c37"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a2b15de65bd2368c53c07850b32c240f1">__pad0__</a>:3</td></tr>
 <tr class="separator:a6dfe577365aff7a2d0a7d2e953322c37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d521aae1c00b263be37ed362f4ba21c"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a87ef29a274368f72fe0e8aee0d09c241">__pad1__</a>:8</td></tr>
-<tr class="separator:a6d521aae1c00b263be37ed362f4ba21c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6779f907b46ffe8ef105c4b8d1057918"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a44dff1537c390a45ee43c57f2b80050d">__pad2__</a>:3</td></tr>
-<tr class="separator:a6779f907b46ffe8ef105c4b8d1057918"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed5c8d5181fdf26e6c6251c1306f7e1c"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#afac4337c33e8a2b8e12b84890121e00c">Mode</a>:3</td></tr>
 <tr class="separator:aed5c8d5181fdf26e6c6251c1306f7e1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0347929079764dc274ff6c1baa237ec"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a928a356c79acc2b56ffeea8e536d9e98">Temp</a>:5</td></tr>
@@ -96,49 +96,64 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a2df38e51fd06d5c96d972cffe2dfe30a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba48de5f65dc7b999e70aae1c6caeb2d"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#ab7d5a6a5d6849160b5980de7615dd5d1">Flap</a>:3</td></tr>
 <tr class="separator:aba48de5f65dc7b999e70aae1c6caeb2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7ec86448f9f9071b21d5cd1805f6561"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a6b383394993c83f6ed098826e5c02a4a">__pad3__</a>:3</td></tr>
+<tr class="memitem:a6d521aae1c00b263be37ed362f4ba21c"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a87ef29a274368f72fe0e8aee0d09c241">__pad1__</a>:3</td></tr>
+<tr class="separator:a6d521aae1c00b263be37ed362f4ba21c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6779f907b46ffe8ef105c4b8d1057918"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a44dff1537c390a45ee43c57f2b80050d">__pad2__</a>:8</td></tr>
+<tr class="separator:a6779f907b46ffe8ef105c4b8d1057918"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7ec86448f9f9071b21d5cd1805f6561"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a6b383394993c83f6ed098826e5c02a4a">__pad3__</a>:8</td></tr>
 <tr class="separator:ac7ec86448f9f9071b21d5cd1805f6561"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add66203abd4d7f6d1ed2c77bf5abb4cf"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a2c425c7f223a53cdb33a783d133f5a77">__pad4__</a>:8</td></tr>
+<tr class="memitem:add66203abd4d7f6d1ed2c77bf5abb4cf"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a2c425c7f223a53cdb33a783d133f5a77">__pad4__</a>:3</td></tr>
 <tr class="separator:add66203abd4d7f6d1ed2c77bf5abb4cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fcb9e9d61fbb65639ce62a98aa0cb1a"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#aa3990245fbd608c4a4e7fef690532656">__pad5__</a>:8</td></tr>
+<tr class="memitem:a3fcb9e9d61fbb65639ce62a98aa0cb1a"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#aa3990245fbd608c4a4e7fef690532656">__pad5__</a>:5</td></tr>
 <tr class="separator:a3fcb9e9d61fbb65639ce62a98aa0cb1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9328cea2711ce426da983f71ebe6a9b1"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a644f13f404fc89ac769437a1cf6ef5cc">__pad6__</a>:3</td></tr>
-<tr class="separator:a9328cea2711ce426da983f71ebe6a9b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae45a2ffbd294baeecab39935c4b3561a"><td class="memItemLeft" >&#160;&#160;&#160;uint64_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a981cc0905966560692835630b870bc96">__pad7__</a>:5</td></tr>
-<tr class="separator:ae45a2ffbd294baeecab39935c4b3561a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a110e43c8a10f36379233589577190965"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#aada1e2f63bf852c820d3313d6bf55e2e">__pad8__</a>:6</td></tr>
+<tr class="memitem:a2b33b182592b494045cf79b5e2371df9"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a4e7e70246828f7378c565eed079cc3bb">__pad6__</a>:6</td></tr>
+<tr class="separator:a2b33b182592b494045cf79b5e2371df9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3802f14d6d87962803855091bbd5af49"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a2ebaec59a258ffd88106b9208a1904ff">__pad7__</a>:1</td></tr>
+<tr class="separator:a3802f14d6d87962803855091bbd5af49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a110e43c8a10f36379233589577190965"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#aada1e2f63bf852c820d3313d6bf55e2e">__pad8__</a>:1</td></tr>
 <tr class="separator:a110e43c8a10f36379233589577190965"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa1566f480c1c57db0cd4388b59a79de"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a38bc056c18e086e4ff91d86e33b0bc08">__pad9__</a>:1</td></tr>
 <tr class="separator:aaa1566f480c1c57db0cd4388b59a79de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a161d876166d1eb9f8b50a5940afcce05"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#aa2c0eb524c5870ea14aac018834c203f">__pad10__</a>:1</td></tr>
 <tr class="separator:a161d876166d1eb9f8b50a5940afcce05"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6bce3b94df219427bbfe82deafc5df8"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a6ccde46c9c033ca08161da12a2657187">__pad11__</a>:1</td></tr>
-<tr class="separator:ac6bce3b94df219427bbfe82deafc5df8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64c8830026a4f26fb08a854d96030dfc"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a338bbbc882a3409af4ff510a9b7c001b">__pad12__</a>:1</td></tr>
-<tr class="separator:a64c8830026a4f26fb08a854d96030dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf59e20b00c58aaaadd140a91653b90c"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a6dbfb2137f0e64a65e3aa45a50485fbe">Night</a>:1</td></tr>
 <tr class="separator:abf59e20b00c58aaaadd140a91653b90c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed390e5f3690fcba6911441bb545c318"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#ac3edf881406da0b9a253a7536ba3e810">Max</a>:1</td></tr>
 <tr class="separator:aed390e5f3690fcba6911441bb545c318"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a356d036dfc3c8d2d1ff26d91994f2da4"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a093e716979933669e589fb5ead32a3a5">__pad13__</a>:1</td></tr>
-<tr class="separator:a356d036dfc3c8d2d1ff26d91994f2da4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6bce3b94df219427bbfe82deafc5df8"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a6ccde46c9c033ca08161da12a2657187">__pad11__</a>:1</td></tr>
+<tr class="separator:ac6bce3b94df219427bbfe82deafc5df8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36db8306d1957c059c26489ffa48cb18"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a72c5dbd39ccbac31d5cfc39beaa87d92">Power</a>:1</td></tr>
 <tr class="separator:a36db8306d1957c059c26489ffa48cb18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1074f9f1e7d808bf3caea00beb9948eb"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#ab35dfc5963cfdcf5a776c78d3ea5f423">__pad14__</a>:1</td></tr>
-<tr class="separator:a1074f9f1e7d808bf3caea00beb9948eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64c8830026a4f26fb08a854d96030dfc"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a338bbbc882a3409af4ff510a9b7c001b">__pad12__</a>:1</td></tr>
+<tr class="separator:a64c8830026a4f26fb08a854d96030dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57d46753968c8ffd110036537b6a7cc6"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a9d51b32b8e2b2ff08339be238a775097">iFeel</a>:1</td></tr>
 <tr class="separator:a57d46753968c8ffd110036537b6a7cc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a734aff6185511536c4e91be37afb4a99"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a1a3263d128339d19b1dfa2857da3475b">__pad15__</a>:2</td></tr>
-<tr class="separator:a734aff6185511536c4e91be37afb4a99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f5cad9c3f404b8377a5bf8771c96bde"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#ac686fd78cc03240805841ff00cbc9f60">Post</a>:2</td></tr>
+<tr class="separator:a7f5cad9c3f404b8377a5bf8771c96bde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade12ecb124eda7a4e122326f6dc6e3df"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#ab0ec3039d81a3a2a6c8b44f5c64d2fae">Sum</a>:8</td></tr>
 <tr class="separator:ade12ecb124eda7a4e122326f6dc6e3df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef65eb26ce536767e96cef5c661ca580"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a0e901bceaaa0cc966eabb937ad4b549a">__pad16__</a>:6</td></tr>
-<tr class="separator:aef65eb26ce536767e96cef5c661ca580"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a356d036dfc3c8d2d1ff26d91994f2da4"><td class="memItemLeft" >&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a093e716979933669e589fb5ead32a3a5">__pad13__</a>:6</td></tr>
+<tr class="separator:a356d036dfc3c8d2d1ff26d91994f2da4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a4ee69f4b6b36f3215f2b9b1758939d"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 <tr class="separator:a5a4ee69f4b6b36f3215f2b9b1758939d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0b57798ca7e4dd15a893917896e8299"><td class="memItemLeft" >struct {</td></tr>
+<tr class="memitem:a81ecd846520b8d84165dfdd13f64a15e"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a4f8d0aecc565f48599323ac9f185648d">__pad0__</a>:8</td></tr>
+<tr class="separator:a81ecd846520b8d84165dfdd13f64a15e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4687132ad9f6ce454401cc1f6b577f47"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#abce5696ec51bc4c7e7399f659758ab1d">__pad1__</a>:8</td></tr>
+<tr class="separator:a4687132ad9f6ce454401cc1f6b577f47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4edf1e59ab8ded9593a54e7e5c59a95"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#ae2a1946fe7c29b4b21bfa883ff4953d0">CheckHi</a>:3</td></tr>
+<tr class="separator:ac4edf1e59ab8ded9593a54e7e5c59a95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46af5b668f0f17086080a40ff77ea876"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a827df01ab95494241f781e04924a8245">SensorT</a>:5</td></tr>
+<tr class="separator:a46af5b668f0f17086080a40ff77ea876"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac484df8cc74fc637fd5905ca7f4b6507"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#a07a3aaf660b37cdd980869e8b8773ae0">Fixed</a>:3</td></tr>
+<tr class="separator:ac484df8cc74fc637fd5905ca7f4b6507"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72502d903cfab63b3b7733f33fbef7ef"><td class="memItemLeft" >&#160;&#160;&#160;uint8_t&#160;&#160;&#160;<a class="el" href="unionArgoProtocol.html#ad2c899922bded40e8380cf07848c6627">CheckLo</a>:5</td></tr>
+<tr class="separator:a72502d903cfab63b3b7733f33fbef7ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0b57798ca7e4dd15a893917896e8299"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:af0b57798ca7e4dd15a893917896e8299"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Native representation of a Argo A/C message. </p>
+<div class="textblock"><p>Native representation of a Argo A/C message for WREM-2 remote. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a5a4ee69f4b6b36f3215f2b9b1758939d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5a4ee69f4b6b36f3215f2b9b1758939d">&#9670;&nbsp;</a></span>@7</h2>
@@ -154,14 +169,42 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="af0b57798ca7e4dd15a893917896e8299"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0b57798ca7e4dd15a893917896e8299">&#9670;&nbsp;</a></span>@9</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct { ... } </td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a2b15de65bd2368c53c07850b32c240f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b15de65bd2368c53c07850b32c240f1">&#9670;&nbsp;</a></span>__pad0__</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b15de65bd2368c53c07850b32c240f1">&#9670;&nbsp;</a></span>__pad0__ <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">uint64_t ArgoProtocol::__pad0__</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4f8d0aecc565f48599323ac9f185648d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f8d0aecc565f48599323ac9f185648d">&#9670;&nbsp;</a></span>__pad0__ <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t ArgoProtocol::__pad0__</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -224,56 +267,28 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ab35dfc5963cfdcf5a776c78d3ea5f423"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab35dfc5963cfdcf5a776c78d3ea5f423">&#9670;&nbsp;</a></span>__pad14__</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t ArgoProtocol::__pad14__</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a1a3263d128339d19b1dfa2857da3475b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a3263d128339d19b1dfa2857da3475b">&#9670;&nbsp;</a></span>__pad15__</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t ArgoProtocol::__pad15__</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a0e901bceaaa0cc966eabb937ad4b549a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e901bceaaa0cc966eabb937ad4b549a">&#9670;&nbsp;</a></span>__pad16__</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t ArgoProtocol::__pad16__</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a87ef29a274368f72fe0e8aee0d09c241"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a87ef29a274368f72fe0e8aee0d09c241">&#9670;&nbsp;</a></span>__pad1__</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a87ef29a274368f72fe0e8aee0d09c241">&#9670;&nbsp;</a></span>__pad1__ <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">uint64_t ArgoProtocol::__pad1__</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abce5696ec51bc4c7e7399f659758ab1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abce5696ec51bc4c7e7399f659758ab1d">&#9670;&nbsp;</a></span>__pad1__ <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t ArgoProtocol::__pad1__</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -336,28 +351,28 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a644f13f404fc89ac769437a1cf6ef5cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a644f13f404fc89ac769437a1cf6ef5cc">&#9670;&nbsp;</a></span>__pad6__</h2>
+<a id="a4e7e70246828f7378c565eed079cc3bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e7e70246828f7378c565eed079cc3bb">&#9670;&nbsp;</a></span>__pad6__</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint64_t ArgoProtocol::__pad6__</td>
+          <td class="memname">uint32_t ArgoProtocol::__pad6__</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a981cc0905966560692835630b870bc96"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a981cc0905966560692835630b870bc96">&#9670;&nbsp;</a></span>__pad7__</h2>
+<a id="a2ebaec59a258ffd88106b9208a1904ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ebaec59a258ffd88106b9208a1904ff">&#9670;&nbsp;</a></span>__pad7__</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint64_t ArgoProtocol::__pad7__</td>
+          <td class="memname">uint32_t ArgoProtocol::__pad7__</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -392,6 +407,34 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ae2a1946fe7c29b4b21bfa883ff4953d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2a1946fe7c29b4b21bfa883ff4953d0">&#9670;&nbsp;</a></span>CheckHi</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t ArgoProtocol::CheckHi</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad2c899922bded40e8380cf07848c6627"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2c899922bded40e8380cf07848c6627">&#9670;&nbsp;</a></span>CheckLo</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t ArgoProtocol::CheckLo</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a9247f87997f4fda42940ca204b8363d6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9247f87997f4fda42940ca204b8363d6">&#9670;&nbsp;</a></span>Fan</h2>
 
@@ -400,6 +443,20 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">uint64_t ArgoProtocol::Fan</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a07a3aaf660b37cdd980869e8b8773ae0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07a3aaf660b37cdd980869e8b8773ae0">&#9670;&nbsp;</a></span>Fixed</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t ArgoProtocol::Fixed</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -476,6 +533,20 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ac686fd78cc03240805841ff00cbc9f60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac686fd78cc03240805841ff00cbc9f60">&#9670;&nbsp;</a></span>Post</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t ArgoProtocol::Post</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a72c5dbd39ccbac31d5cfc39beaa87d92"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a72c5dbd39ccbac31d5cfc39beaa87d92">&#9670;&nbsp;</a></span>Power</h2>
 
@@ -484,6 +555,34 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">uint32_t ArgoProtocol::Power</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a812f3e3bdeca0f584075df054836e393"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a812f3e3bdeca0f584075df054836e393">&#9670;&nbsp;</a></span>Pre1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint64_t ArgoProtocol::Pre1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abb78dbee396963cd7acccaa2a4c63aed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb78dbee396963cd7acccaa2a4c63aed">&#9670;&nbsp;</a></span>Pre2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint64_t ArgoProtocol::Pre2</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -514,6 +613,20 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">uint64_t ArgoProtocol::RoomTemp</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a827df01ab95494241f781e04924a8245"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a827df01ab95494241f781e04924a8245">&#9670;&nbsp;</a></span>SensorT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t ArgoProtocol::SensorT</td>
         </tr>
       </table>
 </div><div class="memdoc">

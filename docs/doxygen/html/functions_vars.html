@@ -68,7 +68,7 @@ $(function() {
 : <a class="el" href="classIRAirtonAc.html#a1804688a4c0cb89fcf390ef607609339">IRAirtonAc</a>
 , <a class="el" href="classIRAirwellAc.html#af5675d200cdc571911162ecf8c74fdc0">IRAirwellAc</a>
 , <a class="el" href="classIRAmcorAc.html#a57bd1149a63a8c2373eeced414ed0a80">IRAmcorAc</a>
-, <a class="el" href="classIRArgoAC.html#a748a4828682df0f98226754123fe2142">IRArgoAC</a>
+, <a class="el" href="classIRArgoACBase.html#a99608e68d5614dd2119548fe6bcfb37b">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 , <a class="el" href="classIRBosch144AC.html#a323e8fc918658017b032a5523e50891d">IRBosch144AC</a>
 , <a class="el" href="classIRCarrierAc64.html#a79ddb0fb877232a581d0142949a7c356">IRCarrierAc64</a>
 , <a class="el" href="classIRCoolixAC.html#a35c7cd549fcd37c60199b53d67fb9dd2">IRCoolixAC</a>
@@ -122,6 +122,7 @@ $(function() {
 , <a class="el" href="classIRVestelAc.html#a1445480ae91942e752beb2facc9b151b">IRVestelAc</a>
 , <a class="el" href="classIRVoltas.html#a251065338907253521a12e5e0f8aeb26">IRVoltas</a>
 , <a class="el" href="classIRWhirlpoolAc.html#a62d86151ac9fae122927f588953c9712">IRWhirlpoolAc</a>
+, <a class="el" href="classIRYorkAc.html#a381ca2c3b382605f47d960096cfee5d9">IRYorkAc</a>
 </li>
 <li>_8CHeatToggle
 : <a class="el" href="classIRMideaAC.html#af64deb366622c629bb870f97efa4332e">IRMideaAC</a>
@@ -130,7 +131,10 @@ $(function() {
 : <a class="el" href="unionAirtonProtocol.html#ae0a43be32c7ac7d889592c9a46be56ef">AirtonProtocol</a>
 , <a class="el" href="unionAirwellProtocol.html#ac8190704f390caf41b76dc0ee3377056">AirwellProtocol</a>
 , <a class="el" href="unionAmcorProtocol.html#a8678a5bf4a4d917d8b02d854114b2cc0">AmcorProtocol</a>
-, <a class="el" href="unionArgoProtocol.html#a2b15de65bd2368c53c07850b32c240f1">ArgoProtocol</a>
+, <a class="el" href="unionArgoProtocol.html#a4f8d0aecc565f48599323ac9f185648d">ArgoProtocol</a>
+, <a class="el" href="unionArgoProtocolWREM3.html#adb594a8c2eb0607d97bdd84029bd2509">ArgoProtocolWREM3</a>
+, <a class="el" href="structArgoProtocolWREM3_1_1Config.html#a63c1e1d6fba703815b961cf3bb34b57b">ArgoProtocolWREM3::Config</a>
+, <a class="el" href="structArgoProtocolWREM3_1_1Timer.html#ad45ce0f3d2e0b01880fb4992549f4f63">ArgoProtocolWREM3::Timer</a>
 , <a class="el" href="unionBosch144Protocol.html#aea2e87551b2c3a4d230d63b309136091">Bosch144Protocol</a>
 , <a class="el" href="unionCarrierProtocol.html#a8187ddda3722f75d7260b9a20147b2d3">CarrierProtocol</a>
 , <a class="el" href="unionCoolixProtocol.html#aed69535018e1a145ecadf868b9285cce">CoolixProtocol</a>
@@ -184,6 +188,7 @@ $(function() {
 , <a class="el" href="unionVestelProtocol.html#ae1c70f14718a4374f62db9a5ee047525">VestelProtocol</a>
 , <a class="el" href="unionVoltasProtocol.html#a6a9f9ff0c3c7b691ed78738138467afa">VoltasProtocol</a>
 , <a class="el" href="unionWhirlpoolProtocol.html#a346c5be5f86c773065807453a37b1803">WhirlpoolProtocol</a>
+, <a class="el" href="unionYorkProtocol.html#a58312a8fbd166d607f7bd65187e59774">YorkProtocol</a>
 </li>
 <li>__pad10__
 : <a class="el" href="unionArgoProtocol.html#aa2c0eb524c5870ea14aac018834c203f">ArgoProtocol</a>
@@ -259,8 +264,7 @@ $(function() {
 , <a class="el" href="unionWhirlpoolProtocol.html#aee015ccecfa7008bf16b9c94c471d611">WhirlpoolProtocol</a>
 </li>
 <li>__pad14__
-: <a class="el" href="unionArgoProtocol.html#ab35dfc5963cfdcf5a776c78d3ea5f423">ArgoProtocol</a>
-, <a class="el" href="unionDaikin176Protocol.html#a4c4f4784aef4741103dce9d0c9e5d2f3">Daikin176Protocol</a>
+: <a class="el" href="unionDaikin176Protocol.html#a4c4f4784aef4741103dce9d0c9e5d2f3">Daikin176Protocol</a>
 , <a class="el" href="unionDaikin2Protocol.html#a775f2fb0cb2c7814487a595d7dbf9433">Daikin2Protocol</a>
 , <a class="el" href="unionDaikinESPProtocol.html#af60b5d6127571efd945834134e9820cf">DaikinESPProtocol</a>
 , <a class="el" href="unionHaierAc160Protocol.html#a86453a2666790a420b48fb5a6aae468e">HaierAc160Protocol</a>
@@ -273,8 +277,7 @@ $(function() {
 , <a class="el" href="unionWhirlpoolProtocol.html#a3d91bff7afe79cceb9410303625501e8">WhirlpoolProtocol</a>
 </li>
 <li>__pad15__
-: <a class="el" href="unionArgoProtocol.html#a1a3263d128339d19b1dfa2857da3475b">ArgoProtocol</a>
-, <a class="el" href="unionDaikin176Protocol.html#a5b543bdd18b70d0a9ba520cda7a7afe3">Daikin176Protocol</a>
+: <a class="el" href="unionDaikin176Protocol.html#a5b543bdd18b70d0a9ba520cda7a7afe3">Daikin176Protocol</a>
 , <a class="el" href="unionDaikin2Protocol.html#a8e3e56e3e43e01196aa76b26746a7793">Daikin2Protocol</a>
 , <a class="el" href="unionDaikinESPProtocol.html#aa50501fc2b9f3c687fdc6ffae01b0b26">DaikinESPProtocol</a>
 , <a class="el" href="unionHaierAc176Protocol.html#a51c2d2b5ee6dd51dc4159842bd6ee2bb">HaierAc176Protocol</a>
@@ -286,8 +289,7 @@ $(function() {
 , <a class="el" href="unionWhirlpoolProtocol.html#a3befb6d4bc7900b5ce1521557b7ac1da">WhirlpoolProtocol</a>
 </li>
 <li>__pad16__
-: <a class="el" href="unionArgoProtocol.html#a0e901bceaaa0cc966eabb937ad4b549a">ArgoProtocol</a>
-, <a class="el" href="unionDaikin176Protocol.html#a55018c7f81847b9b71ecc8280028ee64">Daikin176Protocol</a>
+: <a class="el" href="unionDaikin176Protocol.html#a55018c7f81847b9b71ecc8280028ee64">Daikin176Protocol</a>
 , <a class="el" href="unionDaikin2Protocol.html#a1cc01ee37d30381041627a436b12b06e">Daikin2Protocol</a>
 , <a class="el" href="unionDaikinESPProtocol.html#a25289149f23cde94303b04579ef5ab51">DaikinESPProtocol</a>
 , <a class="el" href="unionHaierAc176Protocol.html#a8321da7f0bb0e2927694d458973beea4">HaierAc176Protocol</a>
@@ -369,6 +371,7 @@ $(function() {
 , <a class="el" href="unionVestelProtocol.html#a30aa4f861223ae78a3735cbefb71b894">VestelProtocol</a>
 , <a class="el" href="unionVoltasProtocol.html#a80c4eeb8eea30866ef991cab330f6def">VoltasProtocol</a>
 , <a class="el" href="unionWhirlpoolProtocol.html#a1a6a151ac226c361d7fb9c5775959719">WhirlpoolProtocol</a>
+, <a class="el" href="unionYorkProtocol.html#a1844ef985c78f8c38f06cc23f07c6ffa">YorkProtocol</a>
 </li>
 <li>__pad20__
 : <a class="el" href="unionDaikin2Protocol.html#a5263b84da0ca6a26a32f9235054d975a">Daikin2Protocol</a>
@@ -441,6 +444,7 @@ $(function() {
 , <a class="el" href="unionVestelProtocol.html#a4a611ce846177ae4b9bc7cd6a60bf17f">VestelProtocol</a>
 , <a class="el" href="unionVoltasProtocol.html#a4c2798df803074bcde8ddf6c7e855d91">VoltasProtocol</a>
 , <a class="el" href="unionWhirlpoolProtocol.html#ab7f93602ea91e831fbb1d0d5862c690b">WhirlpoolProtocol</a>
+, <a class="el" href="unionYorkProtocol.html#abe501e8153e1c691fcde2f554853cc2b">YorkProtocol</a>
 </li>
 <li>__pad3__
 : <a class="el" href="unionAirtonProtocol.html#af2a6cb70ee9b29ff5a3ca49be7c7a292">AirtonProtocol</a>
@@ -491,6 +495,7 @@ $(function() {
 , <a class="el" href="unionVestelProtocol.html#a0c33c79555a228be2c4daf1fc67d5916">VestelProtocol</a>
 , <a class="el" href="unionVoltasProtocol.html#aa63b5dd18bc7376a712e7dd16d594525">VoltasProtocol</a>
 , <a class="el" href="unionWhirlpoolProtocol.html#a6bbb9f4faf465e74c2d3a66f17b1df48">WhirlpoolProtocol</a>
+, <a class="el" href="unionYorkProtocol.html#a9c2b86d91f3204a263d21957f5e73d73">YorkProtocol</a>
 </li>
 <li>__pad4__
 : <a class="el" href="unionAmcorProtocol.html#a4375506f729c9d45a1269aea9d968889">AmcorProtocol</a>
@@ -537,6 +542,7 @@ $(function() {
 , <a class="el" href="unionVestelProtocol.html#aec62b8fe14c683d97ecae5f35c114a36">VestelProtocol</a>
 , <a class="el" href="unionVoltasProtocol.html#ab0ec8c8b4f98d8ad2185259a1013f20b">VoltasProtocol</a>
 , <a class="el" href="unionWhirlpoolProtocol.html#a4dd07f43eb81c73da20b4090a808cfb4">WhirlpoolProtocol</a>
+, <a class="el" href="unionYorkProtocol.html#a944ac48059ebc47f62ebb29fb813a0f5">YorkProtocol</a>
 </li>
 <li>__pad5__
 : <a class="el" href="unionAmcorProtocol.html#aa2fa57304833e2067f438d74f898dfc8">AmcorProtocol</a>
@@ -579,10 +585,11 @@ $(function() {
 , <a class="el" href="unionVestelProtocol.html#a59279963eb0888f6f0669987f43c7440">VestelProtocol</a>
 , <a class="el" href="unionVoltasProtocol.html#af25903098b89acf7d2b6ebc08eea3ce5">VoltasProtocol</a>
 , <a class="el" href="unionWhirlpoolProtocol.html#a6cd9a96ce3841158165039b0e7e85bcc">WhirlpoolProtocol</a>
+, <a class="el" href="unionYorkProtocol.html#a3d6b5cfb388c77fc6b97a3d0e710ebe2">YorkProtocol</a>
 </li>
 <li>__pad6__
 : <a class="el" href="unionAmcorProtocol.html#ac7c9258f0465028a4d95468e9289a95e">AmcorProtocol</a>
-, <a class="el" href="unionArgoProtocol.html#a644f13f404fc89ac769437a1cf6ef5cc">ArgoProtocol</a>
+, <a class="el" href="unionArgoProtocol.html#a4e7e70246828f7378c565eed079cc3bb">ArgoProtocol</a>
 , <a class="el" href="unionBosch144Protocol.html#a6a2ef6460e3a3f6f698c13ab6c189b83">Bosch144Protocol</a>
 , <a class="el" href="unionCarrierProtocol.html#a683b70f292ffed7253b8956225a71a51">CarrierProtocol</a>
 , <a class="el" href="unionCoronaProtocol.html#aabdd6e87ab321b893f07461f755094c0">CoronaProtocol</a>
@@ -620,7 +627,7 @@ $(function() {
 </li>
 <li>__pad7__
 : <a class="el" href="unionAmcorProtocol.html#a06dbf04a6bb3326c3277308bee61e375">AmcorProtocol</a>
-, <a class="el" href="unionArgoProtocol.html#a981cc0905966560692835630b870bc96">ArgoProtocol</a>
+, <a class="el" href="unionArgoProtocol.html#a2ebaec59a258ffd88106b9208a1904ff">ArgoProtocol</a>
 , <a class="el" href="unionBosch144Protocol.html#acf7e2827772785a440e85eb91af8b97e">Bosch144Protocol</a>
 , <a class="el" href="unionCarrierProtocol.html#a21fe681b7a9b1a507d03b6eef716f57d">CarrierProtocol</a>
 , <a class="el" href="unionCoronaProtocol.html#aa833c2aa87c8b67ded46784d9d9fd506">CoronaProtocol</a>
@@ -732,7 +739,7 @@ $(function() {
 : <a class="el" href="classIRAirtonAc.html#ae4ceec08bcd20f587be899a1608832d3">IRAirtonAc</a>
 , <a class="el" href="classIRAirwellAc.html#a57a01d6e65f6fa1127f8d3dc86ff8071">IRAirwellAc</a>
 , <a class="el" href="classIRAmcorAc.html#a6245bb51fa206031c3348e3eb6cb096d">IRAmcorAc</a>
-, <a class="el" href="classIRArgoAC.html#a1abd8d958c3e153c4f2aaf7a3716414e">IRArgoAC</a>
+, <a class="el" href="classIRArgoACBase.html#a71ffd3dec22dc5b7e07cfdd75e85075f">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 , <a class="el" href="classIRBosch144AC.html#a315dad009025d7b95b7454f40aa8d2a9">IRBosch144AC</a>
 , <a class="el" href="classIRCarrierAc64.html#a17270f2b1d6cab828e2a51fc23b36437">IRCarrierAc64</a>
 , <a class="el" href="classIRCoolixAC.html#a6c7033e72fb860bca600ba6ea6e7afef">IRCoolixAC</a>
@@ -788,6 +795,7 @@ $(function() {
 , <a class="el" href="classIRVestelAc.html#a56d35fc5d39c97b4c6f2decf176e2cae">IRVestelAc</a>
 , <a class="el" href="classIRVoltas.html#a09225bcf0cdff72f0fe35a88a91a88ad">IRVoltas</a>
 , <a class="el" href="classIRWhirlpoolAc.html#af4fdac2382048e2776c787bebd482e9e">IRWhirlpoolAc</a>
+, <a class="el" href="classIRYorkAc.html#ad76a86732e1e08591d3109243e6c057b">IRYorkAc</a>
 </li>
 <li>_lastfan
 : <a class="el" href="classIRTrumaAc.html#a7793142d962316d930372ea6beac2069">IRTrumaAc</a>
@@ -807,11 +815,17 @@ $(function() {
 <li>_lastSleep
 : <a class="el" href="classIRSamsungAc.html#a82676ff37a40731697e0ed080b2dee1d">IRSamsungAc</a>
 </li>
+<li>_length
+: <a class="el" href="classIRArgoACBase.html#a6fb15d8b77a20568730532ce39e7e50d">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
+</li>
 <li>_light
 : <a class="el" href="classIRLgAc.html#a6c28369f65d40272ee5978346ef96f52">IRLgAc</a>
 </li>
 <li>_LightToggle
 : <a class="el" href="classIRMideaAC.html#ab466b5939e796f818203220e0ca6896d">IRMideaAC</a>
+</li>
+<li>_messageType
+: <a class="el" href="classIRArgoACBase.html#a7bbc592b34e0da3ae6f39caf30ffd6ad">IRArgoACBase&lt; ARGO_PROTOCOL_T &gt;</a>
 </li>
 <li>_mode
 : <a class="el" href="classIRSharpAc.html#a169d5636aead556234dc301729050619">IRSharpAc</a>

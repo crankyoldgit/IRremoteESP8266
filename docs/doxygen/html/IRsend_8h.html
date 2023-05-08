@@ -115,7 +115,8 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383aa022f15e910eb36278094efb6e808a07">stdAc::fanspeed_t::kHigh</a> = 4, 
 <a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383aa0b1ac8aae6b1cfbbe89085c642b3b4b">stdAc::fanspeed_t::kMax</a> = 5, 
-<a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383ab2d2a6993491fd666f1fa0afff5913ad">stdAc::fanspeed_t::kLastFanspeedEnum</a> = kMax
+<a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383a6facfd5c89ee45abf6c01322d79d0433">stdAc::fanspeed_t::kMediumHigh</a> = 6, 
+<a class="el" href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383ab2d2a6993491fd666f1fa0afff5913ad">stdAc::fanspeed_t::kLastFanspeedEnum</a> = kMediumHigh
 <br />
  }</td></tr>
 <tr class="memdesc:a8bb0dbf18fe69f639f4ac0b3ff133383"><td class="mdescLeft">&#160;</td><td class="mdescRight">Common A/C settings for Fan Speeds.  <a href="namespacestdAc.html#a8bb0dbf18fe69f639f4ac0b3ff133383">More...</a><br /></td></tr>
@@ -129,11 +130,24 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43ab3199775e825c139b44e3e9ccf3cbc7e">stdAc::swingv_t::kMiddle</a> = 3, 
 <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43acd8fe42741a3bbc973bbf1d404afeff4">stdAc::swingv_t::kLow</a> = 4, 
 <a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43a334c684494b7f19d765cf062ae94a314">stdAc::swingv_t::kLowest</a> = 5, 
-<a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43a4127912afc084d51c71c4ea0c7dd7b30">stdAc::swingv_t::kLastSwingvEnum</a> = kLowest
+<a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43a7a498a7e1eea5e760c10942c6a011889">stdAc::swingv_t::kUpperMiddle</a> = 6, 
+<br />
+&#160;&#160;<a class="el" href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43a4127912afc084d51c71c4ea0c7dd7b30">stdAc::swingv_t::kLastSwingvEnum</a> = kUpperMiddle
 <br />
  }</td></tr>
 <tr class="memdesc:ac07f224c7bb47cac55dd01f24770ef43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Common A/C settings for Vertical Swing.  <a href="namespacestdAc.html#ac07f224c7bb47cac55dd01f24770ef43">More...</a><br /></td></tr>
 <tr class="separator:ac07f224c7bb47cac55dd01f24770ef43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9273f2effbd3b783862b82ae509fb832"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832">stdAc::ac_command_t</a> { <br />
+&#160;&#160;<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832ac90f66495b3fcb0e578b7d1bd9e2473c">stdAc::ac_command_t::kControlCommand</a> = 0, 
+<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832aa267dfd5c81a23748781129839e960eb">stdAc::ac_command_t::kSensorTempReport</a> = 1, 
+<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832afae9973f9c6642bc139f69ff488e4027">stdAc::ac_command_t::kTimerCommand</a> = 2, 
+<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832a7907956232af8076e97276fba05dce0d">stdAc::ac_command_t::kConfigCommand</a> = 3, 
+<br />
+&#160;&#160;<a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832ae16de72b183953ca7bb11e233ef79fa5">stdAc::ac_command_t::kLastAcCommandEnum</a> = kConfigCommand
+<br />
+ }</td></tr>
+<tr class="memdesc:a9273f2effbd3b783862b82ae509fb832"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tyoe of A/C command (if the remote uses different codes for each)  <a href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832">More...</a><br /></td></tr>
+<tr class="separator:a9273f2effbd3b783862b82ae509fb832"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae50ee315fa9c9ec1a4078da40d6b147"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestdAc.html#aae50ee315fa9c9ec1a4078da40d6b147">stdAc::swingh_t</a> { <br />
 &#160;&#160;<a class="el" href="namespacestdAc.html#aae50ee315fa9c9ec1a4078da40d6b147acc9ab5e60ac2a9a675ba64bf4bb49dc8">stdAc::swingh_t::kOff</a> = -1, 
 <a class="el" href="namespacestdAc.html#aae50ee315fa9c9ec1a4078da40d6b147aa8c857c2f1b000c92f9794ebf53888d7">stdAc::swingh_t::kAuto</a> = 0, 
@@ -228,6 +242,11 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a50c54713e16502d280723334879dc83b"><td class="mdescLeft">&#160;</td><td class="mdescRight">LG A/C model numbers.  <a href="IRsend_8h.html#a50c54713e16502d280723334879dc83b">More...</a><br /></td></tr>
 <tr class="separator:a50c54713e16502d280723334879dc83b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74f9bf4c9a7d43ce018ec07af16e5b7c"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRsend_8h.html#a74f9bf4c9a7d43ce018ec07af16e5b7c">argo_ac_remote_model_t</a> { <a class="el" href="IRsend_8h.html#a74f9bf4c9a7d43ce018ec07af16e5b7caabe56c52f874597db9b3b8e7d82b630f">SAC_WREM2</a> = 1, 
+<a class="el" href="IRsend_8h.html#a74f9bf4c9a7d43ce018ec07af16e5b7ca6f4a10abe598918a5207529353d7bebe">SAC_WREM3</a>
+ }</td></tr>
+<tr class="memdesc:a74f9bf4c9a7d43ce018ec07af16e5b7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Argo A/C model numbers.  <a href="IRsend_8h.html#a74f9bf4c9a7d43ce018ec07af16e5b7c">More...</a><br /></td></tr>
+<tr class="separator:a74f9bf4c9a7d43ce018ec07af16e5b7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -241,8 +260,31 @@ Variables</h2></td></tr>
 <tr class="separator:a527e66125f3ae6ce87adbc72eab7d0b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad49e9828319afbad49fd5082c50ef4a7"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRsend_8h.html#ad49e9828319afbad49fd5082c50ef4a7">kDefaultMessageGap</a> = 100000</td></tr>
 <tr class="separator:ad49e9828319afbad49fd5082c50ef4a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abda7337d6073fc38ab6fd1d091d12eea"><td class="memItemLeft" align="right" valign="top">const float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IRsend_8h.html#abda7337d6073fc38ab6fd1d091d12eea">kNoTempValue</a> = -100.0</td></tr>
+<tr class="memdesc:abda7337d6073fc38ab6fd1d091d12eea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Placeholder for missing sensor temp value.  <a href="IRsend_8h.html#abda7337d6073fc38ab6fd1d091d12eea">More...</a><br /></td></tr>
+<tr class="separator:abda7337d6073fc38ab6fd1d091d12eea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a74f9bf4c9a7d43ce018ec07af16e5b7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74f9bf4c9a7d43ce018ec07af16e5b7c">&#9670;&nbsp;</a></span>argo_ac_remote_model_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="IRsend_8h.html#a74f9bf4c9a7d43ce018ec07af16e5b7c">argo_ac_remote_model_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Argo A/C model numbers. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a74f9bf4c9a7d43ce018ec07af16e5b7caabe56c52f874597db9b3b8e7d82b630f"></a>SAC_WREM2&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a74f9bf4c9a7d43ce018ec07af16e5b7ca6f4a10abe598918a5207529353d7bebe"></a>SAC_WREM3&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
 <a id="a7204e78a1fe37a819c0b66f87a685dc0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7204e78a1fe37a819c0b66f87a685dc0">&#9670;&nbsp;</a></span>fujitsu_ac_remote_model_t</h2>
 
@@ -537,6 +579,23 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="abda7337d6073fc38ab6fd1d091d12eea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abda7337d6073fc38ab6fd1d091d12eea">&#9670;&nbsp;</a></span>kNoTempValue</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const float kNoTempValue = -100.0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Placeholder for missing sensor temp value. </p>
+<dl class="section note"><dt>Note</dt><dd>Not using "-1" as it may be a valid external temp </dd></dl>
 
 </div>
 </div>

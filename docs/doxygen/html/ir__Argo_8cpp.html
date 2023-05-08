@@ -72,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Argo A/C protocol. Controls an Argo Ulisse 13 DCI A/C.  
+<p>Argo A/C protocol.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
@@ -89,9 +89,19 @@ Variables</h2></td></tr>
 <tr class="separator:a5e06b6d522b35f503ca1e5db27f32ff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a28fc063dea8beacbaac39cf8e9b81b"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8cpp.html#a1a28fc063dea8beacbaac39cf8e9b81b">kArgoGap</a> = <a class="el" href="IRsend_8h.html#ad49e9828319afbad49fd5082c50ef4a7">kDefaultMessageGap</a></td></tr>
 <tr class="separator:a1a28fc063dea8beacbaac39cf8e9b81b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3921c4affd5bc3fad9c70773e5ceab0e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8cpp.html#a3921c4affd5bc3fad9c70773e5ceab0e">kArgoSensorCheck</a> = 52</td></tr>
+<tr class="separator:a3921c4affd5bc3fad9c70773e5ceab0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae32a0dfe93d50a1168eb717f1ed72c5e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8cpp.html#ae32a0dfe93d50a1168eb717f1ed72c5e">kArgoSensorFixed</a> = 0b011</td></tr>
+<tr class="separator:ae32a0dfe93d50a1168eb717f1ed72c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75d9bb6bcb5ad3a112371114bea69e9e"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8cpp.html#a75d9bb6bcb5ad3a112371114bea69e9e">kArgoWrem3Preamble</a> = 0b1011</td></tr>
+<tr class="separator:a75d9bb6bcb5ad3a112371114bea69e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abedc9ae2d051007d5101e21f5919a4fc"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8cpp.html#abedc9ae2d051007d5101e21f5919a4fc">kArgoWrem3Postfix_Timer</a> = 0b1</td></tr>
+<tr class="separator:abedc9ae2d051007d5101e21f5919a4fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43cbdb2b5887e301c453462e76175b15"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ir__Argo_8cpp.html#a43cbdb2b5887e301c453462e76175b15">kArgoWrem3Postfix_ACControl</a> = 0b110000</td></tr>
+<tr class="separator:a43cbdb2b5887e301c453462e76175b15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Argo A/C protocol. Controls an Argo Ulisse 13 DCI A/C. </p>
+<div class="textblock"><p>Argo A/C protocol. </p>
 </div><h2 class="groupheader">Variable Documentation</h2>
 <a id="aa15902c11e3a7d3cbb25504764b163c1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa15902c11e3a7d3cbb25504764b163c1">&#9670;&nbsp;</a></span>kArgoBitMark</h2>
@@ -132,6 +142,9 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="section see"><dt>See also</dt><dd><a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1859">https://github.com/crankyoldgit/IRremoteESP8266/issues/1859</a> </dd>
+<dd>
+<a href="https://github.com/crankyoldgit/IRremoteESP8266/issues/1912">https://github.com/crankyoldgit/IRremoteESP8266/issues/1912</a> </dd></dl>
 
 </div>
 </div>
@@ -157,6 +170,76 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const uint16_t kArgoOneSpace = 2200</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3921c4affd5bc3fad9c70773e5ceab0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3921c4affd5bc3fad9c70773e5ceab0e">&#9670;&nbsp;</a></span>kArgoSensorCheck</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kArgoSensorCheck = 52</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae32a0dfe93d50a1168eb717f1ed72c5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae32a0dfe93d50a1168eb717f1ed72c5e">&#9670;&nbsp;</a></span>kArgoSensorFixed</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kArgoSensorFixed = 0b011</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a43cbdb2b5887e301c453462e76175b15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43cbdb2b5887e301c453462e76175b15">&#9670;&nbsp;</a></span>kArgoWrem3Postfix_ACControl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kArgoWrem3Postfix_ACControl = 0b110000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abedc9ae2d051007d5101e21f5919a4fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abedc9ae2d051007d5101e21f5919a4fc">&#9670;&nbsp;</a></span>kArgoWrem3Postfix_Timer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kArgoWrem3Postfix_Timer = 0b1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a75d9bb6bcb5ad3a112371114bea69e9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75d9bb6bcb5ad3a112371114bea69e9e">&#9670;&nbsp;</a></span>kArgoWrem3Preamble</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint8_t kArgoWrem3Preamble = 0b1011</td>
         </tr>
       </table>
 </div><div class="memdoc">

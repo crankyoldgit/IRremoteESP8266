@@ -198,8 +198,11 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:a52b844f80df7f64edf9ce9cc189ac5b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied NEC (Renesas) message. Status: STABLE / Known good.  <a href="classIRrecv.html#a52b844f80df7f64edf9ce9cc189ac5b9">More...</a><br /></td></tr>
 <tr class="separator:a52b844f80df7f64edf9ce9cc189ac5b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94f12dc000a6e7b75ea8680fd48fc487"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a94f12dc000a6e7b75ea8680fd48fc487">decodeArgo</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a351efcd1805c87bd338de81dab3f8fb2">kArgoBits</a>, const bool strict=true)</td></tr>
-<tr class="memdesc:a94f12dc000a6e7b75ea8680fd48fc487"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Argo message. Status: BETA / Probably works.  <a href="classIRrecv.html#a94f12dc000a6e7b75ea8680fd48fc487">More...</a><br /></td></tr>
+<tr class="memdesc:a94f12dc000a6e7b75ea8680fd48fc487"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Argo message (WREM2). Status: BETA / Probably works.  <a href="classIRrecv.html#a94f12dc000a6e7b75ea8680fd48fc487">More...</a><br /></td></tr>
 <tr class="separator:a94f12dc000a6e7b75ea8680fd48fc487"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94bd1f1d588650070eda437e9db6a44e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a94bd1f1d588650070eda437e9db6a44e">decodeArgoWREM3</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a790a7f9ce2be1ea2a53a424003dd912d">kArgo3AcControlStateLength</a> *8, const bool strict=true)</td></tr>
+<tr class="memdesc:a94bd1f1d588650070eda437e9db6a44e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Argo message (WREM3). Status: Confirmed working w/ Argo 13 ECO (WREM-3)  <a href="classIRrecv.html#a94bd1f1d588650070eda437e9db6a44e">More...</a><br /></td></tr>
+<tr class="separator:a94bd1f1d588650070eda437e9db6a44e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fd7bf14eae9b16e32c88e596768007c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a3fd7bf14eae9b16e32c88e596768007c">decodeArris</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#af2f4e097aef5fa0ec5526936e93108d8">kArrisBits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:a3fd7bf14eae9b16e32c88e596768007c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Arris "Manchester code" message. Status: STABLE / Confirmed working.  <a href="classIRrecv.html#a3fd7bf14eae9b16e32c88e596768007c">More...</a><br /></td></tr>
 <tr class="separator:a3fd7bf14eae9b16e32c88e596768007c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -362,6 +365,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a4bdb35ec34f49401a6b9becd15b8a3b5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a4bdb35ec34f49401a6b9becd15b8a3b5">decodeCarrierAC40</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a56d1176a7b3fe59aeb3f4f39926c617d">kCarrierAc40Bits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:a4bdb35ec34f49401a6b9becd15b8a3b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Carrier 40-bit HVAC message. Carrier HVAC messages contain only 40 bits, but it is sent three(3) times. Status: STABLE / Tested against a real device.  <a href="classIRrecv.html#a4bdb35ec34f49401a6b9becd15b8a3b5">More...</a><br /></td></tr>
 <tr class="separator:a4bdb35ec34f49401a6b9becd15b8a3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af52326732338424a9ec08075f9425788"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#af52326732338424a9ec08075f9425788">decodeCarrierAC84</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#af788a36230553c6a36342fb338228ba5">kCarrierAc84Bits</a>, const bool strict=true)</td></tr>
+<tr class="memdesc:af52326732338424a9ec08075f9425788"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Carroer A/C 84 Bit formatted message. Status: STABLE / Confirmed Working.  <a href="classIRrecv.html#af52326732338424a9ec08075f9425788">More...</a><br /></td></tr>
+<tr class="separator:af52326732338424a9ec08075f9425788"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79d03c31da48a385ab47cc8f342ef9b3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a79d03c31da48a385ab47cc8f342ef9b3">decodeCarrierAC64</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a41bc7ab7289e499ad33901da3eab661a">kCarrierAc64Bits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:a79d03c31da48a385ab47cc8f342ef9b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Carrier 64-bit HVAC message. Status: STABLE / Known to be working.  <a href="classIRrecv.html#a79d03c31da48a385ab47cc8f342ef9b3">More...</a><br /></td></tr>
 <tr class="separator:a79d03c31da48a385ab47cc8f342ef9b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -371,6 +377,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a64650ce7dbaf5fc860a6a253d906e9de"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a64650ce7dbaf5fc860a6a253d906e9de">decodeGoodweather</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#afa2675ce42d00175ec95caa6cd87a425">kGoodweatherBits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:a64650ce7dbaf5fc860a6a253d906e9de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Goodweather message. Status: BETA / Probably works.  <a href="classIRrecv.html#a64650ce7dbaf5fc860a6a253d906e9de">More...</a><br /></td></tr>
 <tr class="separator:a64650ce7dbaf5fc860a6a253d906e9de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3f1934446c6cc8db5d91e17157fc2f6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#af3f1934446c6cc8db5d91e17157fc2f6">decodeGorenje</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#aea36ab288c800922c32d4b0916f0b234">kGorenjeBits</a>, const bool strict=true)</td></tr>
+<tr class="memdesc:af3f1934446c6cc8db5d91e17157fc2f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Gorenje Cooker Hood message. Status: STABLE / Known working.  <a href="classIRrecv.html#af3f1934446c6cc8db5d91e17157fc2f6">More...</a><br /></td></tr>
+<tr class="separator:af3f1934446c6cc8db5d91e17157fc2f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e756342d7524a13d53d6c656700638c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a2e756342d7524a13d53d6c656700638c">decodeGree</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#acadcc5d03e09784642f008d4d2913c7d">kGreeBits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:a2e756342d7524a13d53d6c656700638c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Gree HVAC message. Status: STABLE / Working.  <a href="classIRrecv.html#a2e756342d7524a13d53d6c656700638c">More...</a><br /></td></tr>
 <tr class="separator:a2e756342d7524a13d53d6c656700638c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -482,7 +491,7 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:a823387b95b6adb676e976a8eeaf01a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied EcoClim A/C message. Status: STABLE / Confirmed working on real remote.  <a href="classIRrecv.html#a823387b95b6adb676e976a8eeaf01a0b">More...</a><br /></td></tr>
 <tr class="separator:a823387b95b6adb676e976a8eeaf01a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c7c5cdee244070d5999232a1bcdae60"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a9c7c5cdee244070d5999232a1bcdae60">decodeXmp</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#adfcd08adae1243b1108353ef5cfe8776">kXmpBits</a>, const bool strict=true)</td></tr>
-<tr class="memdesc:a9c7c5cdee244070d5999232a1bcdae60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied XMP packet/message. Status: BETA / Probably works.  <a href="classIRrecv.html#a9c7c5cdee244070d5999232a1bcdae60">More...</a><br /></td></tr>
+<tr class="memdesc:a9c7c5cdee244070d5999232a1bcdae60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied XMP packet/message. Status: STABLE / Confirmed working against a real device.  <a href="classIRrecv.html#a9c7c5cdee244070d5999232a1bcdae60">More...</a><br /></td></tr>
 <tr class="separator:a9c7c5cdee244070d5999232a1bcdae60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76a85fb183cc943532bc9c589c42a17a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a76a85fb183cc943532bc9c589c42a17a">decodeTruma</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#aa5ba6ea5669410e37620b616c75e766f">kTrumaBits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:a76a85fb183cc943532bc9c589c42a17a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Truma message. Status: STABLE / Confirmed working with real device.  <a href="classIRrecv.html#a76a85fb183cc943532bc9c589c42a17a">More...</a><br /></td></tr>
@@ -517,6 +526,12 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a1f9af9e0a0a51bfe019f91e53d7eaec3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a1f9af9e0a0a51bfe019f91e53d7eaec3">decodeBosch144</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a4c8d18c879efa5ea17c6e9f8d002133f">kBosch144Bits</a>, const bool strict=true)</td></tr>
 <tr class="memdesc:a1f9af9e0a0a51bfe019f91e53d7eaec3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied Bosch 144-bit / 18-byte A/C message. Status: STABLE / Confirmed Working.  <a href="classIRrecv.html#a1f9af9e0a0a51bfe019f91e53d7eaec3">More...</a><br /></td></tr>
 <tr class="separator:a1f9af9e0a0a51bfe019f91e53d7eaec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b52c9a9266cb414b56c336eac0b55bb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#a2b52c9a9266cb414b56c336eac0b55bb">decodeWowwee</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t offset=<a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t nbits=<a class="el" href="IRremoteESP8266_8h.html#a1b6fcb542ff26b176fbc6b3e829e8cbf">kWowweeBits</a>, const bool strict=true)</td></tr>
+<tr class="memdesc:a2b52c9a9266cb414b56c336eac0b55bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied WowWee message. Status: STABLE / Confirmed working with real device.  <a href="classIRrecv.html#a2b52c9a9266cb414b56c336eac0b55bb">More...</a><br /></td></tr>
+<tr class="separator:a2b52c9a9266cb414b56c336eac0b55bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8e86255523c33f0a113eaf08a042439"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classIRrecv.html#af8e86255523c33f0a113eaf08a042439">decodeYork</a> (<a class="el" href="classdecode__results.html">decode_results</a> *results, uint16_t <a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a>, const uint16_t <a class="el" href="IRremoteESP8266_8h.html#ad138059d2944406a953f4586610eeab1">kYorkBits</a>, const bool strict=true)</td></tr>
+<tr class="memdesc:af8e86255523c33f0a113eaf08a042439"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode the supplied message. Status: ALPHA / Tested, some values still are not mapped to the internal state of AC.  <a href="classIRrecv.html#af8e86255523c33f0a113eaf08a042439">More...</a><br /></td></tr>
+<tr class="separator:af8e86255523c33f0a113eaf08a042439"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -1376,7 +1391,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Decode the supplied Argo message. Status: BETA / Probably works. </p>
+<p>Decode the supplied Argo message (WREM2). Status: BETA / Probably works. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decode result. </td></tr>
@@ -1388,6 +1403,67 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This decoder is based soley off sendArgo(). We have no actual captures to test this against. If you have one of these units, please let us know. </dd></dl>
+
+</div>
+</div>
+<a id="a94bd1f1d588650070eda437e9db6a44e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94bd1f1d588650070eda437e9db6a44e">&#9670;&nbsp;</a></span>decodeArgoWREM3()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::decodeArgoWREM3 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecode__results.html">decode_results</a> *&#160;</td>
+          <td class="paramname"><em>results</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>offset</em> = <code><a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a790a7f9ce2be1ea2a53a424003dd912d">kArgo3AcControlStateLength</a>&#160;*&#160;8</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>strict</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decode the supplied Argo message (WREM3). Status: Confirmed working w/ Argo 13 ECO (WREM-3) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decode result. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This decoder is separate from <code>decodeArgo</code> to maintain backwards compatibility. Contrary to WREM2, this expects a footer and gap! </dd></dl>
 
 </div>
 </div>
@@ -1799,6 +1875,66 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Decode the supplied Carrier 64-bit HVAC message. Status: STABLE / Known to be working. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decode result. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
+
+</div>
+</div>
+<a id="af52326732338424a9ec08075f9425788"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af52326732338424a9ec08075f9425788">&#9670;&nbsp;</a></span>decodeCarrierAC84()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::decodeCarrierAC84 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecode__results.html">decode_results</a> *&#160;</td>
+          <td class="paramname"><em>results</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>offset</em> = <code><a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#af788a36230553c6a36342fb338228ba5">kCarrierAc84Bits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>strict</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decode the supplied Carroer A/C 84 Bit formatted message. Status: STABLE / Confirmed Working. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decode result. </td></tr>
@@ -3322,6 +3458,66 @@ Private Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decode result. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
+
+</div>
+</div>
+<a id="af3f1934446c6cc8db5d91e17157fc2f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3f1934446c6cc8db5d91e17157fc2f6">&#9670;&nbsp;</a></span>decodeGorenje()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::decodeGorenje </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecode__results.html">decode_results</a> *&#160;</td>
+          <td class="paramname"><em>results</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>offset</em> = <code><a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#aea36ab288c800922c32d4b0916f0b234">kGorenjeBits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>strict</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decode the supplied Gorenje Cooker Hood message. Status: STABLE / Known working. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decoded result </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
@@ -7595,6 +7791,65 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 
 </div>
 </div>
+<a id="a2b52c9a9266cb414b56c336eac0b55bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b52c9a9266cb414b56c336eac0b55bb">&#9670;&nbsp;</a></span>decodeWowwee()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::decodeWowwee </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecode__results.html">decode_results</a> *&#160;</td>
+          <td class="paramname"><em>results</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>offset</em> = <code><a class="el" href="IRrecv_8h.html#a44a836a34428f8f75b1ae566de4bb972">kStartOffset</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em> = <code><a class="el" href="IRremoteESP8266_8h.html#a1b6fcb542ff26b176fbc6b3e829e8cbf">kWowweeBits</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>strict</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decode the supplied WowWee message. Status: STABLE / Confirmed working with real device. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the result </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a9c7c5cdee244070d5999232a1bcdae60"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9c7c5cdee244070d5999232a1bcdae60">&#9670;&nbsp;</a></span>decodeXmp()</h2>
 
@@ -7641,7 +7896,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 </table>
 </div><div class="memdoc">
 
-<p>Decode the supplied XMP packet/message. Status: BETA / Probably works. </p>
+<p>Decode the supplied XMP packet/message. Status: STABLE / Confirmed working against a real device. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the result </td></tr>
@@ -7652,6 +7907,66 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if it can decode it, false if it can't. </dd></dl>
+
+</div>
+</div>
+<a id="af8e86255523c33f0a113eaf08a042439"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8e86255523c33f0a113eaf08a042439">&#9670;&nbsp;</a></span>decodeYork()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool IRrecv::decodeYork </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classdecode__results.html">decode_results</a> *&#160;</td>
+          <td class="paramname"><em>results</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>nbits</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>strict</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decode the supplied message. Status: ALPHA / Tested, some values still are not mapped to the internal state of AC. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">results</td><td>Ptr to the data to decode &amp; where to store the decode </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">offset</td><td>The starting index to use when attempting to decode the raw data. Typically/Defaults to kStartOffset. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">nbits</td><td>The number of data bits to expect. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">strict</td><td>Flag indicating if we should perform strict matching. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A boolean. True if it can decode it, false if it can't. </dd></dl>
 
 </div>
 </div>
@@ -9426,6 +9741,7 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 <li>src/<a class="el" href="ir__Fujitsu_8cpp.html">ir_Fujitsu.cpp</a></li>
 <li>src/<a class="el" href="ir__GICable_8cpp.html">ir_GICable.cpp</a></li>
 <li>src/<a class="el" href="ir__Goodweather_8cpp.html">ir_Goodweather.cpp</a></li>
+<li>src/<a class="el" href="ir__Gorenje_8cpp.html">ir_Gorenje.cpp</a></li>
 <li>src/<a class="el" href="ir__Gree_8cpp.html">ir_Gree.cpp</a></li>
 <li>src/<a class="el" href="ir__Haier_8cpp.html">ir_Haier.cpp</a></li>
 <li>src/<a class="el" href="ir__Hitachi_8cpp.html">ir_Hitachi.cpp</a></li>
@@ -9472,7 +9788,9 @@ LG 32bit protocol appears near identical to the Samsung protocol. They possibly 
 <li>src/<a class="el" href="ir__Voltas_8cpp.html">ir_Voltas.cpp</a></li>
 <li>src/<a class="el" href="ir__Whirlpool_8cpp.html">ir_Whirlpool.cpp</a></li>
 <li>src/<a class="el" href="ir__Whynter_8cpp.html">ir_Whynter.cpp</a></li>
+<li>src/<a class="el" href="ir__Wowwee_8cpp.html">ir_Wowwee.cpp</a></li>
 <li>src/<a class="el" href="ir__Xmp_8cpp.html">ir_Xmp.cpp</a></li>
+<li>src/<a class="el" href="ir__York_8cpp.html">ir_York.cpp</a></li>
 <li>src/<a class="el" href="ir__Zepeal_8cpp.html">ir_Zepeal.cpp</a></li>
 <li>src/<a class="el" href="IRrecv_8cpp.html">IRrecv.cpp</a></li>
 </ul>
