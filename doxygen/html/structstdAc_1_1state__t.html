@@ -116,6 +116,12 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a94fa6098d7422292a1c6943973cd106a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1d76172930ebfe992fd9b700369e787"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstdAc_1_1state__t.html#ab1d76172930ebfe992fd9b700369e787">clock</a> = -1</td></tr>
 <tr class="separator:ab1d76172930ebfe992fd9b700369e787"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2724610cffb5c3531f7ca3c777cc17ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832">stdAc::ac_command_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstdAc_1_1state__t.html#a2724610cffb5c3531f7ca3c777cc17ba">command</a> = <a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832ac90f66495b3fcb0e578b7d1bd9e2473c">stdAc::ac_command_t::kControlCommand</a></td></tr>
+<tr class="separator:a2724610cffb5c3531f7ca3c777cc17ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab55a01cd881e14e7cd942588a5f7751b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstdAc_1_1state__t.html#ab55a01cd881e14e7cd942588a5f7751b">iFeel</a> = false</td></tr>
+<tr class="separator:ab55a01cd881e14e7cd942588a5f7751b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabd8fb5bfc966d7bf34b858c717e8768"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstdAc_1_1state__t.html#aabd8fb5bfc966d7bf34b858c717e8768">sensorTemperature</a> = <a class="el" href="IRsend_8h.html#abda7337d6073fc38ab6fd1d091d12eea">kNoTempValue</a></td></tr>
+<tr class="separator:aabd8fb5bfc966d7bf34b858c717e8768"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Structure to hold a common A/C state. </p>
@@ -176,6 +182,20 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a2724610cffb5c3531f7ca3c777cc17ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2724610cffb5c3531f7ca3c777cc17ba">&#9670;&nbsp;</a></span>command</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832">stdAc::ac_command_t</a> stdAc::state_t::command = <a class="el" href="namespacestdAc.html#a9273f2effbd3b783862b82ae509fb832ac90f66495b3fcb0e578b7d1bd9e2473c">stdAc::ac_command_t::kControlCommand</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a3d1ff0ff2e0035db4ee8ead5c53b2dbd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3d1ff0ff2e0035db4ee8ead5c53b2dbd">&#9670;&nbsp;</a></span>degrees</h2>
 
@@ -226,6 +246,20 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">bool stdAc::state_t::filter = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab55a01cd881e14e7cd942588a5f7751b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab55a01cd881e14e7cd942588a5f7751b">&#9670;&nbsp;</a></span>iFeel</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool stdAc::state_t::iFeel = false</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -310,6 +344,20 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">bool stdAc::state_t::quiet = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aabd8fb5bfc966d7bf34b858c717e8768"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabd8fb5bfc966d7bf34b858c717e8768">&#9670;&nbsp;</a></span>sensorTemperature</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float stdAc::state_t::sensorTemperature = <a class="el" href="IRsend_8h.html#abda7337d6073fc38ab6fd1d091d12eea">kNoTempValue</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

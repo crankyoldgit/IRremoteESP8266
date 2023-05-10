@@ -1,0 +1,5 @@
+<map id="ArgoProtocolWREM3" name="ArgoProtocolWREM3">
+<area shape="rect" id="node1" title="Native representation of A/C IR message for WREM&#45;3 remote." alt="" coords="103,109,257,136"/>
+<area shape="rect" id="node2" href="$structArgoProtocolWREM3_1_1Timer.html" title=" " alt="" coords="5,5,168,47"/>
+<area shape="rect" id="node3" href="$structArgoProtocolWREM3_1_1Config.html" title=" " alt="" coords="192,5,355,47"/>
+</map>
