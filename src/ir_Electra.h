@@ -53,7 +53,7 @@ union ElectraProtocol {
     // Byte 5
     uint8_t         :6;
     uint8_t Turbo   :1;
-    uint8_t         :1;
+    uint8_t Quiet   :1;
     // Byte 6
     uint8_t         :3;
     uint8_t IFeel   :1;
@@ -146,6 +146,8 @@ class IRElectraAc {
   bool getLightToggle(void) const;
   void setTurbo(const bool on);
   bool getTurbo(void) const;
+  void setQuiet(const bool on);
+  bool getQuiet(void) const;
   void setIFeel(const bool on);
   bool getIFeel(void) const;
   void setSensorUpdate(const bool on);
