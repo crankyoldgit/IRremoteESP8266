@@ -1169,7 +1169,8 @@ void IRac::electra(IRElectraAc *ac,
                    const float degrees, const float sensorTemp,
                    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                    const stdAc::swingh_t swingh, const bool iFeel,
-                   const bool quiet, const bool turbo, const bool lighttoggle, const bool clean) {
+                   const bool quiet, const bool turbo, const bool lighttoggle, 
+		   const bool clean) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -3217,8 +3218,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRElectraAc ac(_pin, _inverted, _modulation);
       electra(&ac, send.power, send.mode, degC, sensorTempC, send.fanspeed,
-              send.swingv, send.swingh, send.iFeel, send.quiet, send.turbo, send.light,
-              send.clean);
+              send.swingv, send.swingh, send.iFeel, send.quiet, send.turbo, 
+   	      send.light, send.clean);
       break;
     }
 #endif  // SEND_ELECTRA_AC
