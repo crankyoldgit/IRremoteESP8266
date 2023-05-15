@@ -3234,7 +3234,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       fujitsu(&ac, (fujitsu_ac_remote_model_t)send.model, send.power, send.mode,
               send.celsius, send.degrees, send.fanspeed,
               send.swingv, send.swingh, send.quiet,
-              send.turbo, send.econo, send.filter, send.clean);
+              send.turbo, send.econo, send.filter, send.clean, send.sleep);
       break;
     }
 #endif  // SEND_FUJITSU_AC
