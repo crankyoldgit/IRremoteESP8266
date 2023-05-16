@@ -26,6 +26,7 @@
 //   Brand: Vailland,  Model: YACIFB remote
 //   Brand: Vailland,  Model: VAI5-035WNI A/C
 //   Brand: Soleus Air,  Model: window A/C (YX1FSF)
+//   Brand: Frigidaire, Model: YX1F8F remote
 
 #ifndef IR_GREE_H_
 #define IR_GREE_H_
@@ -76,7 +77,7 @@ union GreeProtocol{
     uint8_t IFeel       :1;
     uint8_t unknown2    :3;  // value = 0b100
     uint8_t WiFi        :1;
-    uint8_t             :1;
+    uint8_t unknown3    :1;  // value = 0b0
     // Byte 6
     uint8_t             :8;
     // Byte 7

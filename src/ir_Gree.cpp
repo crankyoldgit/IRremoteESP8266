@@ -122,8 +122,16 @@ void IRGreeAC::stateReset(void) {
   std::memset(_.remote_state, 0, sizeof _.remote_state);
   _.Temp = 9;  // _.remote_state[1] = 0x09;
   _.Light = true;  // _.remote_state[2] = 0x20;
-  _.unknown1 = 5;  // _.remote_state[3] = 0x50;
-  _.unknown2 = 4;  // _.remote_state[5] = 0x20;
+
+  if (_model == gree_ac_remote_model_t::YX1F8F) {
+      _.unknown1 = 10;  // _.remote_state[3] = 0x0A;
+      _.unknown2 = 0;   // _.remote_state[5] = 0x01;
+      _.unknown3 = 1;   // _.remote_state[5] = 0x01;
+  } else {
+    _.unknown1 = 5;  // _.remote_state[3] = 0x50;
+    _.unknown2 = 4;  // _.remote_state[5] = 0x20;
+    _.unknown3 = 0;  // _.remote_state[5] = 0x20;
+  }
 }
 
 /// Fix up the internal state so it is correct.
@@ -188,7 +196,8 @@ void IRGreeAC::setModel(const gree_ac_remote_model_t model) {
   switch (model) {
     case gree_ac_remote_model_t::YAW1F:
     case gree_ac_remote_model_t::YBOFB:
-    case gree_ac_remote_model_t::YX1FSF: _model = model; break;
+    case gree_ac_remote_model_t::YX1FSF:
+    case gree_ac_remote_model_t::YX1F8F: _model = model; break;
     default: _model = gree_ac_remote_model_t::YAW1F;
   }
 }
