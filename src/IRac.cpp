@@ -371,7 +371,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_YORK
     case decode_type_t::YORK:
 #endif
+#if SEND_WHIRLPOOL_AC
     case decode_type_t::WHIRLPOOL_AC:
+#endif
       return true;
     default:
       return false;
