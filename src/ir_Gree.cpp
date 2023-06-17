@@ -218,7 +218,8 @@ void IRGreeAC::off(void) { setPower(false); }
 void IRGreeAC::setPower(const bool on) {
   _.Power = on;
   // May not be needed. See #814
-  _.ModelA = (on && (_model == gree_ac_remote_model_t::YAW1F || _model == gree_ac_remote_model_t::YX1F8F));
+  _.ModelA = (on && (_model == gree_ac_remote_model_t::YAW1F
+                  || _model == gree_ac_remote_model_t::YX1F8F));
 }
 
 /// Get the value of the current power setting.
