@@ -3256,7 +3256,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
                   _modulation);
       gree(&ac, (gree_ac_remote_model_t)send.model, send.power, send.mode,
            send.celsius, send.degrees, send.fanspeed, send.swingv, send.swingh,
-           send.turbo, send.econo, send.light, send.clean, send.sleep);
+           send.iFeel, send.turbo, send.econo, send.light, send.clean,
+           send.sleep);
       break;
     }
 #endif  // SEND_GREE
