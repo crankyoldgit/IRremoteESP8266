@@ -20,6 +20,7 @@
 //   Brand: Panasonic,  Model: CS-Z9RKR A/C (PANASONIC_AC RKR/6)
 //   Brand: Panasonic,  Model: CS-Z24RKR A/C (PANASONIC_AC RKR/6)
 //   Brand: Panasonic,  Model: CS-YW9MKD A/C (PANASONIC_AC JKE/4)
+//   Brand: Panasonic,  Model: CS-E12QKEW A/C (PANASONIC_AC DKE/3)
 //   Brand: Panasonic,  Model: A75C2311 remote (PANASONIC_AC CKP/5)
 //   Brand: Panasonic,  Model: A75C2616-1 remote (PANASONIC_AC DKE/3)
 //   Brand: Panasonic,  Model: A75C3704 remote (PANASONIC_AC DKE/3)
