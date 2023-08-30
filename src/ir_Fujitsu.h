@@ -1,6 +1,7 @@
 // Copyright 2017 Jonny Graham
 // Copyright 2018-2022 David Conran
 // Copyright 2021 siriuslzx
+// Copyright 2023 Takeshi Shimizu
 
 /// @file
 /// @brief Support for Fujitsu A/C protocols.
@@ -41,12 +42,14 @@
 //   Brand: Fujitsu,  Model: AR-REG1U remote (ARRAH2E)
 //   Brand: OGeneral,  Model: AR-RCL1E remote (ARRAH2E)
 //   Brand: Fujitsu General,  Model: AR-JW17 remote (ARDB1)
+//   Brand: Fujitsu,  Model: AS-AH402M A/C (FUJITSU_AC264 AR-RLB2J)
 
 #ifndef IR_FUJITSU_H_
 #define IR_FUJITSU_H_
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#include <cstring>
 #ifdef ARDUINO
 #include <Arduino.h>
 #endif
@@ -151,6 +154,189 @@ const uint8_t kFujitsuAcSleepTimer =                       0b01;  // 1
 const uint8_t kFujitsuAcOffTimer =                         0b10;  // 2
 const uint8_t kFujitsuAcOnTimer =                          0b11;  // 3
 const uint16_t kFujitsuAcTimerMax = 12 * 60;  ///< Minutes.
+
+/// Native representation of a Fujitsu 264 bit A/C message.
+union Fujitsu264Protocol {
+  struct {
+    uint8_t raw[kFujitsuAc264StateLength];  ///< The state of the IR remote.
+  };
+  struct {
+    uint8_t middlecode[kFujitsuAc264StateLengthMiddle];
+    uint8_t shortcode[kFujitsuAc264StateLengthShort];
+  };
+  struct {
+    // Byte 0~1
+    uint8_t               :8;  // Fixed header
+    uint8_t               :8;  // Fixed header
+    // Byte 2
+    uint8_t               :8;
+    // Byte 3-4
+    uint8_t               :8;
+    uint8_t               :8;
+    // Byte 5
+    uint8_t               :8;
+    // Byte 6
+    uint8_t RestLength    :8;   // Nr. of bytes in the message after this byte.
+    // Byte 7
+    uint8_t Protocol      :8;   // Seems like a protocol version number.
+    // Byte 8
+    uint64_t SubCmd       :1;
+    uint64_t              :1;
+    uint64_t Temp         :6;   // Temperature in modes except auto
+    // Byte 9
+    uint64_t Mode             :4;
+    uint64_t SleepTimerEnable :1;
+    uint64_t                  :3;
+    // Byte 10
+    uint64_t FanSpeed     :4;
+    uint64_t Swing        :1;
+    uint64_t              :3;
+    // Byte 11~12
+    uint64_t SleepTimer   :12;
+    uint64_t              :4;
+    // Byte 13
+    uint64_t              :8;
+    // Byte 14
+    uint64_t TempAuto     :8;   // Temperature in auto mode
+    // Byte 15
+    uint64_t Economy      :1;
+    uint64_t              :7;
+    // Byte 16
+    uint8_t Clean         :1;
+    uint8_t               :7;
+    // Byte 17
+    uint8_t               :8;
+    // Byte 18
+    uint8_t Cmd           :8;
+    // Byte 19
+    uint8_t ClockHours    :8;
+    // Byte 20
+    uint8_t ClockMins     :8;
+    // Byte 21
+    uint8_t               :5;
+    uint8_t WeakDry       :1;   // Valid only when mode = dry
+    uint8_t               :2;
+    // Byte 22
+    uint8_t TimerEnable   :4;
+    uint8_t               :4;
+    // Byte 23
+    uint8_t OnTimer       :8;
+    // Byte 24
+    uint8_t OffTimer      :8;
+    // Byte 25~27
+    uint8_t               :8;
+    uint8_t               :8;
+    uint8_t               :8;
+    // Byte 28
+    uint8_t FanAngle      :4;
+    uint8_t               :4;
+    // Byte 29~31
+    uint8_t               :8;
+    uint8_t               :8;
+    uint8_t               :8;
+    // Byte 32
+    uint8_t CheckSum      :8;
+  };
+};
+
+// Constants
+const uint8_t kFujitsuAc264ModeAuto = 0x0;  // 0b0000
+const uint8_t kFujitsuAc264ModeCool = 0x1;  // 0b0001
+const uint8_t kFujitsuAc264ModeFan = 0x3;   // 0b0011
+const uint8_t kFujitsuAc264ModeHeat = 0x4;  // 0b0100
+const uint8_t kFujitsuAc264ModeDry = 0x5;   // 0b0101
+
+const uint8_t kFujitsuAc264CmdCool = 0x01;              // 0b00000001
+const uint8_t kFujitsuAc264CmdHeat = 0x02;              // 0b00000010
+const uint8_t kFujitsuAc264CmdDry = 0x03;               // 0b00000011
+const uint8_t kFujitsuAc264CmdAuto = 0x04;              // 0b00000100
+const uint8_t kFujitsuAc264CmdFan = 0x05;               // 0b00000101
+const uint8_t kFujitsuAc264CmdTemp = 0x07;              // 0b00000111
+const uint8_t kFujitsuAc264CmdSwing = 0x0B;             // 0b00001011
+const uint8_t kFujitsuAc264CmdSleepTime = 0x0E;         // 0b00001110
+const uint8_t kFujitsuAc264CmdEconomy = 0x14;           // 0b00010100
+const uint8_t kFujitsuAc264CmdClean = 0x1B;             // 0b00011011
+const uint8_t kFujitsuAc264CmdFanSpeed = 0x1E;          // 0b00011110
+const uint8_t kFujitsuAc264CmdFanAngle = 0x22;          // 0b00100010
+const uint8_t kFujitsuAc264CmdCancelSleepTimer = 0x30;  // 0b00110000
+const uint8_t kFujitsuAc264CmdOnTimer = 0x39;           // 0b00111001
+const uint8_t kFujitsuAc264CmdOffTimer = 0x3A;          // 0b00111010
+const uint8_t kFujitsuAc264CmdCancelOnOffTimer = 0x3B;  // 0b00111011
+
+const uint8_t kFujitsuAc264SpCmdTogglePowerful = 0xF0;        // 0b11110000
+const uint8_t kFujitsuAc264SpCmdTurnOff = 0xF1;               // 0b11110001
+const uint8_t kFujitsuAc264SpCmdEcoFanOff = 0xF2;             // 0b11110010
+const uint8_t kFujitsuAc264SpCmdEcoFanOn = 0xF3;              // 0b11110011
+const uint8_t kFujitsuAc264SpCmdOutsideQuietOff = 0xF4;       // 0b11110100
+const uint8_t kFujitsuAc264SpCmdOutsideQuietOn = 0xF5;        // 0b11110101
+const uint8_t kFujitsuAc264SpCmdToggleSterilization = 0xF6;   // 0b11110110
+
+const uint8_t kFujitsuAc264FanSpeedAuto = 0x0;    // 0b0000
+const uint8_t kFujitsuAc264FanSpeedQuiet = 0x1;   // 0b0001
+const uint8_t kFujitsuAc264FanSpeedLow = 0x3;     // 0b0011
+const uint8_t kFujitsuAc264FanSpeedMed = 0x6;     // 0b0110
+const uint8_t kFujitsuAc264FanSpeedHigh = 0x8;    // 0b1000
+
+const uint8_t kFujitsuAc264FanAngle1 = 0x1;       // 0b0001
+const uint8_t kFujitsuAc264FanAngle2 = 0x2;       // 0b0010
+const uint8_t kFujitsuAc264FanAngle3 = 0x3;       // 0b0011
+const uint8_t kFujitsuAc264FanAngle4 = 0x4;       // 0b0100
+const uint8_t kFujitsuAc264FanAngle5 = 0x5;       // 0b0101
+const uint8_t kFujitsuAc264FanAngle6 = 0x6;       // 0b0110
+const uint8_t kFujitsuAc264FanAngle7 = 0x7;       // 0b0111
+const uint8_t kFujitsuAc264FanAngleStay = 0xF;    // 0b1111
+
+const uint8_t kFujitsuAc264MinHeat = 16;          // 16C
+const uint8_t kFujitsuAc264MinTemp = 18;          // 18C
+const uint8_t kFujitsuAc264MaxTemp = 30;          // 30C
+const uint8_t kFujitsuAc264TempOffsetC = 16;
+const int8_t kFujitsuAc264MinTempAuto = -2;       // -2C
+const int8_t kFujitsuAc264MaxTempAuto = 2;        // 2C
+
+const uint16_t kFujitsuAc264SleepTimerMax = 12 * 60;      ///< Minutes.
+const uint8_t kFujitsuAc264OnOffTimerDisable = 0x0;       // 0b0000
+const uint8_t kFujitsuAc264OnTimerEnable = 0x1;           // 0b0001
+const uint8_t kFujitsuAc264OffTimerEnable = 0x2;          // 0b0010
+const uint8_t kFujitsuAc264OnOffTimerEnable = 0x3;        // 0b0011
+const uint16_t kFujitsuAc26OnOffTimerMax = 24 * 6 - 1;    ///< 10 Minutes.
+
+/// Special command for Power Off
+const uint8_t kFujitsuAc264StatesTurnOff
+                [kFujitsuAc264StateLengthShort] = {
+  0x14, 0x63, 0x00, 0x10, 0x10, 0x02, 0xFD};
+/// Special command for Toggle Powerful
+const uint8_t kFujitsuAc264StatesTogglePowerful
+                [kFujitsuAc264StateLengthShort] = {
+  0x14, 0x63, 0x00, 0x10, 0x10, 0x39, 0xC6};
+/// Special command for Eco Fan Off
+const uint8_t kFujitsuAc264StatesEcoFanOff
+                [kFujitsuAc264StateLengthShort] = {
+  0x14, 0x63, 0x00, 0x10, 0x10, 0x51, 0xAE};
+/// Special command for Eco Fan On
+const uint8_t kFujitsuAc264StatesEcoFanOn
+                [kFujitsuAc264StateLengthShort] = {
+  0x14, 0x63, 0x00, 0x10, 0x10, 0x50, 0xAF};
+/// Special command for Outside Quiet Off
+/// @note This command uses the same protocol with FujitsuAC's ARRAH2E,
+///       but has different meaning.
+const uint8_t kFujitsuAc264StatesOutsideQuietOff
+                [kFujitsuAc264StateLengthMiddle] = {
+  0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0xC1,
+  0x40, 0x01, 0x00, 0x00, 0xFE, 0xBF, 0x00, 0x41};
+/// Special command for Outside Quiet Off
+/// @note This command uses the same protocol with FujitsuAC's ARRAH2E,
+///       but has different meaning.
+const uint8_t kFujitsuAc264StatesOutsideQuietOn
+                [kFujitsuAc264StateLengthMiddle] = {
+  0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0xC1,
+  0x40, 0x00, 0x00, 0x00, 0xFF, 0xBF, 0x00, 0x41};
+/// Special command for Toggle Sterilization
+/// @note This command uses the same protocol with FujitsuAC's ARRAH2E,
+///       but has different meaning.
+const uint8_t kFujitsuAc264StatesToggleSterilization
+                [kFujitsuAc264StateLengthMiddle] = {
+  0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0xC1,
+  0x60, 0x03, 0x00, 0x00, 0xFC, 0x9F, 0x00, 0x41};
 
 // Legacy defines.
 #define FUJITSU_AC_MODE_AUTO kFujitsuAcModeAuto
@@ -261,6 +447,98 @@ class IRFujitsuAC {
   bool updateUseLongOrShort(void);
   void buildFromState(const uint16_t length);
   void setOffSleepTimer(const uint16_t nr_mins);
+};
+
+/// Class for handling detailed Fujitsu 264 bit A/C messages.
+class IRFujitsuAC264 {
+ public:
+  explicit IRFujitsuAC264(const uint16_t pin,
+                          const bool inverted = false,
+                          const bool use_modulation = true);
+#if SEND_FUJITSU_AC264
+  void send(const uint16_t repeat = kFujitsuAc264DefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
+  int8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_FUJITSU_AC264
+  void begin(void);
+  uint8_t* getRaw(void);
+  bool setRaw(const uint8_t newState[], const uint16_t length);
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kFujitsuAc264StateLength);
+
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void) const;
+  bool isTempStayed(void) const;
+  void setTemp(const float temp);
+  float getTemp(void) const;
+  void setTempAuto(const float temp);
+  float getTempAuto(void) const;
+  void setMode(const uint8_t mode, const bool weakdry = false);
+  uint8_t getMode(void) const;
+  bool isWeakDry(void) const;
+  void setFanSpeed(const uint8_t fanSpeed);
+  uint8_t getFanSpeed(void) const;
+  void setFanAngle(const uint8_t fanAngle);
+  uint8_t getFanAngle(void) const;
+  void setSwing(const bool on);
+  bool getSwing(void) const;
+  void setEconomy(const bool on);
+  bool getEconomy(void) const;
+  void setClean(const bool on);
+  bool getClean(void) const;
+
+  void toggleSterilization(void);
+  void setOutsideQuiet(const bool on);
+  bool getOutsideQuiet(void) const;
+  void setEcoFan(const bool on);
+  bool getEcoFan(void) const;
+  void togglePowerful(void);
+
+  void setClock(const uint16_t mins_since_midnight);
+  uint16_t getClock(void) const;
+  void setSleepTimer(const uint16_t mins);
+  uint16_t getSleepTimer(void) const;
+  void setTimerEnable(const uint8_t timer_enable);
+  uint8_t getTimerEnable(void) const;
+  void setOnTimer(const uint8_t mins10);
+  uint8_t getOnTimer(void) const;
+  void setOffTimer(const uint8_t mins10);
+  uint8_t getOffTimer(void) const;
+
+  void setCmd(const uint8_t cmd);
+  uint8_t getCmd(void) const;
+  uint8_t getStateLength(void);
+
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFanSpeed(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(const stdAc::state_t *prev = NULL);
+  String toString(void) const;
+
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;  ///< Instance of the IR send class
+#else
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< Instance of the testing IR send class
+  /// @endcond
+#endif
+  Fujitsu264Protocol _;
+  uint8_t _cmd;
+  bool _ispoweredon;
+  bool _isecofan;
+  bool _isoutsidequiet;
+  uint8_t _settemp;
+  void stateReset(void);
+  void checkSum(void);
+  bool isSpecialCommand(void) const;
 };
 
 #endif  // IR_FUJITSU_H_

@@ -562,6 +562,12 @@ class IRrecv {
                        const uint16_t nbits = kFujitsuAcBits,
                        const bool strict = false);
 #endif
+#if DECODE_FUJITSU_AC264
+  bool decodeFujitsuAC264(decode_results* results,
+                          uint16_t offset = kStartOffset,
+                          const uint16_t nbits = kFujitsuAc264Bits,
+                          const bool strict = true);
+#endif  // DECODE_FUJITSU_AC264
 #if DECODE_LASERTAG
   bool decodeLasertag(decode_results *results, uint16_t offset = kStartOffset,
                       const uint16_t nbits = kLasertagBits,
