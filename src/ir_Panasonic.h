@@ -24,6 +24,7 @@
 //   Brand: Panasonic,  Model: A75C2311 remote (PANASONIC_AC CKP/5)
 //   Brand: Panasonic,  Model: A75C2616-1 remote (PANASONIC_AC DKE/3)
 //   Brand: Panasonic,  Model: A75C3704 remote (PANASONIC_AC DKE/3)
+//   Brand: Panasonic,  Model: PN1122V remote (PANASONIC_AC DKE/3)
 //   Brand: Panasonic,  Model: A75C3747 remote (PANASONIC_AC JKE/4)
 //   Brand: Panasonic,  Model: CS-E9CKP series A/C (PANASONIC_AC32)
 //   Brand: Panasonic,  Model: A75C2295 remote (PANASONIC_AC32)
