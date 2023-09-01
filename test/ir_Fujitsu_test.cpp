@@ -1455,7 +1455,7 @@ TEST(TestIRFujitsuACClass, Improve10CHeat) {
   EXPECT_EQ(kFujitsuAcMinHeat, ac.toCommon().degrees);
 }
 
-// Tests for Fujitsu A/C 264 methods.
+// Tests for Fujitsu 264 bit A/C methods.
 TEST(TestDecodeFujitsuAc264, RealExample) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
