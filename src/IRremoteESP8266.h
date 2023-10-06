@@ -51,6 +51,9 @@
 #include <iostream>
 #include <string>
 #endif  // UNIT_TEST
+#if __cplusplus >= 202002L
+#include <atomic>
+#endif
 
 // Library Version Information
 // Major version number (X.x.x)

@@ -443,7 +443,11 @@ char Hostname[kHostnameLength + 1] = "ir_server";  // Default hostname.
 uint16_t *codeArray;
 uint32_t lastReconnectAttempt = 0;  // MQTT last attempt reconnection number
 bool boot = true;
+#if __cplusplus >= 202002L
+atomic<bool> lockIr = false;  // Primitive locking for gating the IR LED.
+#else
 volatile bool lockIr = false;  // Primitive locking for gating the IR LED.
+#endif
 uint32_t sendReqCounter = 0;
 bool lastSendSucceeded = false;  // Store the success status of the last send.
 uint32_t lastSendTime = 0;

@@ -111,7 +111,11 @@ class decode_results {
     uint8_t state[kStateSizeMax];  // Multi-byte results.
   };
   uint16_t bits;              // Number of bits in decoded value
+  #if __cplusplus >= 202002L
+  atomic<uint16_t> *rawbuf;   // Raw intervals in .5 us ticks
+  #else
   volatile uint16_t *rawbuf;  // Raw intervals in .5 us ticks
+  #endif
   uint16_t rawlen;            // Number of records in rawbuf.
   bool overflow;
   bool repeat;  // Is the result a repeat code?
@@ -171,11 +175,23 @@ class IRrecv {
   uint16_t _unknown_threshold;
 #endif
 #ifdef UNIT_TEST
-  volatile irparams_t *_getParamsPtr(void);
+  #if __cplusplus >= 202002L
+  atomic<irparams_t>
+  #else
+  volatile irparams_t 
+  #endif
+                      *_getParamsPtr(void);
 #endif  // UNIT_TEST
   // These are called by decode
   uint8_t _validTolerance(const uint8_t percentage);
-  void copyIrParams(volatile irparams_t *src, irparams_t *dst);
+  void copyIrParams(
+                    #if __cplusplus >= 202002L
+                    atomic<irparams_t>
+                    #else
+                    volatile irparams_t
+                    #endif
+                                        *src,
+                    irparams_t *dst);
   uint16_t compare(const uint16_t oldval, const uint16_t newval);
   uint32_t ticksLow(const uint32_t usecs,
                     const uint8_t tolerance = kUseDefTol,
@@ -186,7 +202,12 @@ class IRrecv {
   bool matchAtLeast(const uint32_t measured, const uint32_t desired,
                     const uint8_t tolerance = kUseDefTol,
                     const uint16_t delta = 0);
-  uint16_t _matchGeneric(volatile uint16_t *data_ptr,
+  uint16_t _matchGeneric(
+                         #if __cplusplus >= 202002L
+                         atomic<uint16_t> *data_ptr,
+                         #else
+                         volatile uint16_t *data_ptr,
+                         #endif
                          uint64_t *result_bits_ptr,
                          uint8_t *result_ptr,
                          const bool use_bits,
@@ -204,14 +225,26 @@ class IRrecv {
                          const uint8_t tolerance = kUseDefTol,
                          const int16_t excess = kMarkExcess,
                          const bool MSBfirst = true);
-  match_result_t matchData(volatile uint16_t *data_ptr, const uint16_t nbits,
+  match_result_t matchData(
+                           #if __cplusplus >= 202002L
+                           atomic<uint16_t> *data_ptr
+                           #else
+                           volatile uint16_t *data_ptr
+                           #endif
+                           , const uint16_t nbits,
                            const uint16_t onemark, const uint32_t onespace,
                            const uint16_t zeromark, const uint32_t zerospace,
                            const uint8_t tolerance = kUseDefTol,
                            const int16_t excess = kMarkExcess,
                            const bool MSBfirst = true,
                            const bool expectlastspace = true);
-  uint16_t matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
+  uint16_t matchBytes(
+                      #if __cplusplus >= 202002L
+                      atomic<uint16_t> *data_ptr
+                      #else
+                      volatile uint16_t *data_ptr
+                      #endif
+                      , uint8_t *result_ptr,
                       const uint16_t remaining, const uint16_t nbytes,
                       const uint16_t onemark, const uint32_t onespace,
                       const uint16_t zeromark, const uint32_t zerospace,
@@ -219,7 +252,12 @@ class IRrecv {
                       const int16_t excess = kMarkExcess,
                       const bool MSBfirst = true,
                       const bool expectlastspace = true);
-  uint16_t matchGeneric(volatile uint16_t *data_ptr,
+  uint16_t matchGeneric(
+                        #if __cplusplus >= 202002L
+                        atomic<uint16_t> *data_ptr,
+                        #else
+                        volatile uint16_t *data_ptr,
+                        #endif
                         uint64_t *result_ptr,
                         const uint16_t remaining, const uint16_t nbits,
                         const uint16_t hdrmark, const uint32_t hdrspace,
@@ -230,7 +268,13 @@ class IRrecv {
                         const uint8_t tolerance = kUseDefTol,
                         const int16_t excess = kMarkExcess,
                         const bool MSBfirst = true);
-  uint16_t matchGeneric(volatile uint16_t *data_ptr, uint8_t *result_ptr,
+  uint16_t matchGeneric(
+                        #if __cplusplus >= 202002L
+                        atomic<uint16_t> *data_ptr,
+                        #else
+                        volatile uint16_t *data_ptr,
+                        #endif
+                        uint8_t *result_ptr,
                         const uint16_t remaining, const uint16_t nbits,
                         const uint16_t hdrmark, const uint32_t hdrspace,
                         const uint16_t onemark, const uint32_t onespace,
@@ -241,7 +285,12 @@ class IRrecv {
                         const uint8_t tolerance = kUseDefTol,
                         const int16_t excess = kMarkExcess,
                         const bool MSBfirst = true);
-  uint16_t matchGenericConstBitTime(volatile uint16_t *data_ptr,
+  uint16_t matchGenericConstBitTime(
+                                    #if __cplusplus >= 202002L
+                                    atomic<uint16_t> *data_ptr,
+                                    #else
+                                    volatile uint16_t *data_ptr,
+                                    #endif
                                     uint64_t *result_ptr,
                                     const uint16_t remaining,
                                     const uint16_t nbits,
@@ -255,7 +304,12 @@ class IRrecv {
                                     const uint8_t tolerance = kUseDefTol,
                                     const int16_t excess = kMarkExcess,
                                     const bool MSBfirst = true);
-  uint16_t matchManchesterData(volatile const uint16_t *data_ptr,
+  uint16_t matchManchesterData(
+                               #if __cplusplus >= 202002L
+                               atomic<const uint16_t> *data_ptr,
+                               #else
+                               volatile const uint16_t *data_ptr,
+                               #endif
                                uint64_t *result_ptr,
                                const uint16_t remaining,
                                const uint16_t nbits,
@@ -265,7 +319,12 @@ class IRrecv {
                                const int16_t excess = kMarkExcess,
                                const bool MSBfirst = true,
                                const bool GEThomas = true);
-  uint16_t matchManchester(volatile const uint16_t *data_ptr,
+  uint16_t matchManchester(
+                           #if __cplusplus >= 202002L
+                           atomic<const> uint16_t *data_ptr,
+                           #else
+                           volatile const uint16_t *data_ptr,
+                           #endif
                            uint64_t *result_ptr,
                            const uint16_t remaining,
                            const uint16_t nbits,

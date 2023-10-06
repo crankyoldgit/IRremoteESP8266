@@ -144,7 +144,11 @@ namespace _IRrecv {  // Namespace extension
 #if defined(ESP32)
 portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #endif  // ESP32
+#if __cplusplus >= 202002L
+atomic<irparams_t> params;
+#else
 volatile irparams_t params;
+#endif
 irparams_t *params_save;  // A copy of the interrupt state while decoding.
 }  // namespace _IRrecv
 
@@ -437,7 +441,13 @@ void IRrecv::resume(void) {
 /// i.e. In kStopState.
 /// @param[in] src Pointer to an irparams_t structure to copy from.
 /// @param[out] dst Pointer to an irparams_t structure to copy to.
-void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
+void IRrecv::copyIrParams(
+  #if __cplusplus >= 202002L
+  atomic<irparams_t> *src
+  #else
+  volatile irparams_t *src
+  #endif
+  , irparams_t *dst) {
   // Typecast src and dst addresses to (char *)
   char *csrc = (char *)src;  // NOLINT(readability/casting)
   char *cdst = (char *)dst;  // NOLINT(readability/casting)
@@ -1449,7 +1459,12 @@ bool IRrecv::decodeHash(decode_results *results) {
 /// @return A match_result_t structure containing the success (or not), the
 ///   data value, and how many buffer entries were used.
 match_result_t IRrecv::matchData(
-    volatile uint16_t *data_ptr, const uint16_t nbits, const uint16_t onemark,
+    #if __cplusplus >= 202002L
+    atomic<uint16_t> *data_ptr
+    #else
+    volatile uint16_t *data_ptr
+    #endif
+    , const uint16_t nbits, const uint16_t onemark,
     const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace,
     const uint8_t tolerance, const int16_t excess, const bool MSBfirst,
     const bool expectlastspace) {
@@ -1509,7 +1524,13 @@ match_result_t IRrecv::matchData(
 ///   true is Most Significant Bit First Order, false is Least Significant First
 /// @param[in] expectlastspace Do we expect a space at the end of the message?
 /// @return If successful, how many buffer entries were used. Otherwise 0.
-uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
+uint16_t IRrecv::matchBytes(
+                            #if __cplusplus >= 202002L
+                            atomic<uint16_t> *data_ptr
+                            #else
+                            volatile uint16_t *data_ptr
+                            #endif
+                            , uint8_t *result_ptr,
                             const uint16_t remaining, const uint16_t nbytes,
                             const uint16_t onemark, const uint32_t onespace,
                             const uint16_t zeromark, const uint32_t zerospace,
@@ -1561,7 +1582,12 @@ uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
 /// @param[in] MSBfirst Bit order to save the data in. (Def: true)
 ///   true is Most Significant Bit First Order, false is Least Significant First
 /// @return If successful, how many buffer entries were used. Otherwise 0.
-uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
+uint16_t IRrecv::_matchGeneric(
+                              #if __cplusplus >= 202002L
+                              atomic<uint16_t> *data_ptr,
+                              #else
+                              volatile uint16_t *data_ptr,
+                              #endif
                               uint64_t *result_bits_ptr,
                               uint8_t *result_bytes_ptr,
                               const bool use_bits,
@@ -1663,7 +1689,12 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
 /// @param[in] MSBfirst Bit order to save the data in. (Def: true)
 ///   true is Most Significant Bit First Order, false is Least Significant First
 /// @return If successful, how many buffer entries were used. Otherwise 0.
-uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
+uint16_t IRrecv::matchGeneric(
+                              #if __cplusplus >= 202002L
+                              atomic<uint16_t> *data_ptr,
+                              #else
+                              volatile uint16_t *data_ptr,
+                              #endif
                               uint64_t *result_ptr,
                               const uint16_t remaining,
                               const uint16_t nbits,
@@ -1710,7 +1741,12 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
 /// @param[in] MSBfirst Bit order to save the data in. (Def: true)
 ///   true is Most Significant Bit First Order, false is Least Significant First
 /// @return If successful, how many buffer entries were used. Otherwise 0.
-uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
+uint16_t IRrecv::matchGeneric(
+                              #if __cplusplus >= 202002L
+                              atomic<uint16_t> *data_ptr,
+                              #else
+                              volatile uint16_t *data_ptr,
+                              #endif
                               uint8_t *result_ptr,
                               const uint16_t remaining,
                               const uint16_t nbits,
@@ -1757,7 +1793,12 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
 /// @return If successful, how many buffer entries were used. Otherwise 0.
 /// @note Parameters one + zero add up to the total time for a bit.
 ///   e.g. mark(one) + space(zero) is a `1`, mark(zero) + space(one) is a `0`.
-uint16_t IRrecv::matchGenericConstBitTime(volatile uint16_t *data_ptr,
+uint16_t IRrecv::matchGenericConstBitTime(
+                                          #if __cplusplus >= 202002L
+                                          atomic<uint16_t> *data_ptr,
+                                          #else
+                                          volatile uint16_t *data_ptr,
+                                          #endif
                                           uint64_t *result_ptr,
                                           const uint16_t remaining,
                                           const uint16_t nbits,
@@ -1844,7 +1885,12 @@ uint16_t IRrecv::matchGenericConstBitTime(volatile uint16_t *data_ptr,
 /// @return If successful, how many buffer entries were used. Otherwise 0.
 /// @see https://en.wikipedia.org/wiki/Manchester_code
 /// @see http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf
-uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
+uint16_t IRrecv::matchManchester(
+                                 #if __cplusplus >= 202002L
+                                 atomic<const uint16_t> *data_ptr,
+                                 #else
+                                 volatile const uint16_t *data_ptr,
+                                 #endif
                                  uint64_t *result_ptr,
                                  const uint16_t remaining,
                                  const uint16_t nbits,
@@ -1951,7 +1997,12 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
 /// @see https://en.wikipedia.org/wiki/Manchester_code
 /// @see http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf
 /// @todo Clean up and optimise this. It is just "get it working code" atm.
-uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
+uint16_t IRrecv::matchManchesterData(
+                                     #if __cplusplus >= 202002L
+                                     atomic<const uint16_t> *data_ptr,
+                                     #else
+                                     volatile const uint16_t *data_ptr,
+                                     #endif
                                      uint64_t *result_ptr,
                                      const uint16_t remaining,
                                      const uint16_t nbits,
@@ -2072,7 +2123,12 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
 
 #if UNIT_TEST
 /// Unit test helper to get access to the params structure.
-volatile irparams_t *IRrecv::_getParamsPtr(void) {
+#if __cplusplus >= 202002L
+atomic<irparams_t> 
+#else
+volatile irparams_t 
+#endif
+                    *IRrecv::_getParamsPtr(void) {
   return &params;
 }
 #endif  // UNIT_TEST
