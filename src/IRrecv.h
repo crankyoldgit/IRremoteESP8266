@@ -86,11 +86,7 @@ typedef struct {
   uint8_t timeout;   // Nr. of milliSeconds before we give up.
 } irparams_t;
 
-#if __cplusplus >= 202002L
 typedef volatile irparams_t atomic_irparams_t;
-#else
-typedef volatile irparams_t atomic_irparams_t;
-#endif
 
 /// Results from a data match
 typedef struct {

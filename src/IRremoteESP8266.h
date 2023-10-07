@@ -54,15 +54,13 @@
 #if __cplusplus >= 202002L
 #include <atomic>
 typedef std::atomic< bool > atomic_bool;
-typedef volatile uint16_t atomic_uint16_t;
-typedef volatile const uint16_t atomic_const_uint16_t;
 typedef std::atomic<uint32_t> atomic_uint32_t;
 #else
 typedef volatile bool atomic_bool;
-typedef volatile uint16_t atomic_uint16_t;
-typedef volatile const uint16_t atomic_const_uint16_t;
 typedef volatile uint32_t atomic_uint32_t;
 #endif
+typedef volatile uint16_t atomic_uint16_t;
+typedef volatile const uint16_t atomic_const_uint16_t;
 
 // Library Version Information
 // Major version number (X.x.x)
