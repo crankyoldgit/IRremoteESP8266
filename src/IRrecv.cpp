@@ -21,6 +21,12 @@ extern "C" {
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
 
+#if defined(ESP32)
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+#include <driver/gpio.h>
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#endif
+
 #ifdef UNIT_TEST
 #undef ICACHE_RAM_ATTR
 #define ICACHE_RAM_ATTR
@@ -431,11 +437,7 @@ void IRrecv::pause(void) {
   params.rawlen = 0;
   params.overflow = false;
 #if defined(ESP32)
-#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
-  noInterrupts();  // Bluntly switch off, not sure if we really want this...
-#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   gpio_intr_disable((gpio_num_t)params.recvpin);
-#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
 #endif  // ESP32
 }
 
@@ -450,11 +452,10 @@ void IRrecv::resume(void) {
 #if defined(ESP32)
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerEnd(timer);
-  interrupts();  // Back on
 #else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
-  gpio_intr_enable((gpio_num_t)params.recvpin);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+  gpio_intr_enable((gpio_num_t)params.recvpin);
 #endif  // ESP32
 }
 
