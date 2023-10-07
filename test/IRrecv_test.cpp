@@ -48,11 +48,7 @@ TEST(TestIRrecv, DecodeHeapOverflow) {
   IRrecv irrecv(1);
   irrecv.enableIRIn();
   ASSERT_EQ(kRawBuf, irrecv.getBufSize());
-  #if __cplusplus >= 202002L
-  atomic<irparams_t> *params_ptr = irrecv._getParamsPtr();
-  #else
-  volatile irparams_t *params_ptr = irrecv._getParamsPtr();
-  #endif
+  atomic_irparams_t *params_ptr = irrecv._getParamsPtr();
   // replace the buffer with a slightly bigger one to see if we go past the end
   // accidentally.
   params_ptr->rawbuf = new uint16_t[kRawBuf + 10];
