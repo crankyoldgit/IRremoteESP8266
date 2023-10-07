@@ -379,7 +379,7 @@ void IRrecv::enableIRIn(const bool pullup) {
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
   timerAttachInterrupt(timer, &read_timeout);
-#else // ESP_ARDUINO_VERSION_MAJOR >= 3
+#else  // ESP_ARDUINO_VERSION_MAJOR >= 3
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
   timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
   // Note: Interrupt needs to be attached before it can be enabled or disabled.
@@ -414,11 +414,11 @@ void IRrecv::disableIRIn(void) {
 #if defined(ESP32)
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerEnd(timer);
-#else // ESP_ARDUINO_VERSION_MAJOR >= 3
+#else  // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
   timerDetachInterrupt(timer);
   timerEnd(timer);
-#endif // ESP_ARDUINO_VERSION_MAJOR >= 3
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
 #endif  // ESP32
   detachInterrupt(params.recvpin);
 #endif  // UNIT_TEST
@@ -446,9 +446,9 @@ void IRrecv::resume(void) {
 #if defined(ESP32)
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerEnd(timer);
-#else // ESP_ARDUINO_VERSION_MAJOR >= 3
+#else  // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
-#endif // ESP_ARDUINO_VERSION_MAJOR >= 3
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
   gpio_intr_enable((gpio_num_t)params.recvpin);
 #endif  // ESP32
 }
