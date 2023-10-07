@@ -245,7 +245,7 @@ static void USE_IRAM_ATTR gpio_intr() {
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
   timerAttachInterrupt(timer, &read_timeout);
-#else // ESP_ARDUINO_VERSION_MAJOR >= 3
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerWrite(timer, 0);
   timerAlarmEnable(timer);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
@@ -366,7 +366,7 @@ void IRrecv::enableIRIn(const bool pullup) {
   // 80MHz / 80 = 1 uSec granularity.
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timer = timerBegin(80);
-#else // ESP_ARDUINO_VERSION_MAJOR >= 3
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timer = timerBegin(_timer_num, 80, true);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
 #ifdef DEBUG
@@ -379,7 +379,7 @@ void IRrecv::enableIRIn(const bool pullup) {
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
   timerAttachInterrupt(timer, &read_timeout);
-#else  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
   timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
   // Note: Interrupt needs to be attached before it can be enabled or disabled.
@@ -414,7 +414,7 @@ void IRrecv::disableIRIn(void) {
 #if defined(ESP32)
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerEnd(timer);
-#else  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
   timerDetachInterrupt(timer);
   timerEnd(timer);
@@ -446,7 +446,7 @@ void IRrecv::resume(void) {
 #if defined(ESP32)
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerEnd(timer);
-#else  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
   gpio_intr_enable((gpio_num_t)params.recvpin);
