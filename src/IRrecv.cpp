@@ -432,7 +432,7 @@ void IRrecv::pause(void) {
   params.overflow = false;
 #if defined(ESP32)
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
-  noInterrupts();  // Bluntly switch off (and on), not sure if we really want this...
+  noInterrupts();  // Bluntly switch off, not sure if we really want this...
 #else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   gpio_intr_disable((gpio_num_t)params.recvpin);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
