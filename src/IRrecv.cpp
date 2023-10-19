@@ -530,7 +530,7 @@ void IRrecv::crudeNoiseFilter(decode_results *results, const uint16_t floor) {
       for (uint16_t i = offset + 2; i <= results->rawlen && i < kBufSize; i++)
         results->rawbuf[i - 2] = results->rawbuf[i];
       if (offset > 1) {  // There is a previous pair we can add to.
-        // Merge this pair into into the previous space.
+        // Merge this pair into into the previous space. // C++20 fix applied
         results->rawbuf[offset - 1] = results->rawbuf[offset - 1] + addition;
       }
       results->rawlen -= 2;  // Adjust the length.
