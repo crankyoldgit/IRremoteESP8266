@@ -249,8 +249,8 @@ static void USE_IRAM_ATTR gpio_intr() {
   timer->dev->config.alarm_en = 1;
 #else  // _ESP32_IRRECV_TIMER_HACK
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
-  timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
-  timerAttachInterrupt(timer, &read_timeout);
+  timerWrite(timer, 0);
+  timerStart(timer);
 #else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerWrite(timer, 0);
   timerAlarmEnable(timer);
@@ -344,9 +344,6 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 /// timers or interrupts used.
 IRrecv::~IRrecv(void) {
   disableIRIn();
-#if defined(ESP32)
-  if (timer != NULL) timerEnd(timer);  // Cleanup the ESP32 timeout timer.
-#endif  // ESP32
   delete[] params.rawbuf;
   if (params_save != NULL) {
     delete[] params_save->rawbuf;
@@ -371,9 +368,9 @@ void IRrecv::enableIRIn(const bool pullup) {
   // Initialise the ESP32 timer.
   // 80MHz / 80 = 1 uSec granularity.
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
-  timer = timerBegin(80);
+  timer = timerBegin(1000000);  // 1 MHz
 #else   // ESP_ARDUINO_VERSION_MAJOR >= 3
-  timer = timerBegin(_timer_num, 80, true);
+  timer = timerBegin(_timer_num, 80, true);  // 1 MHz : 80 MHz with divider 80
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
 #ifdef DEBUG
   if (timer == NULL) {
@@ -383,8 +380,8 @@ void IRrecv::enableIRIn(const bool pullup) {
 #endif  // DEBUG
   assert(timer != NULL);  // Check we actually got the timer.
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
-  timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
   timerAttachInterrupt(timer, &read_timeout);
+  timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
 #else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
   timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
@@ -418,13 +415,16 @@ void IRrecv::disableIRIn(void) {
   os_timer_disarm(&timer);
 #endif  // ESP8266
 #if defined(ESP32)
+  if (timer == NULL) { return; }  // Call only once (defensive)
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timerDetachInterrupt(timer);
   timerEnd(timer);
 #else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
   timerDetachInterrupt(timer);
   timerEnd(timer);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+  timer = NULL;  // Cleanup the ESP32 timeout timer.
 #endif  // ESP32
   detachInterrupt(params.recvpin);
 #endif  // UNIT_TEST
@@ -451,7 +451,7 @@ void IRrecv::resume(void) {
   params.overflow = false;
 #if defined(ESP32)
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
-  timerEnd(timer);
+  timerStop(timer);
 #else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
