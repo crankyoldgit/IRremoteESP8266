@@ -613,7 +613,7 @@ TEST(TestIRac, Electra) {
   char expected[] =
       "Power: On, Mode: 6 (Fan), Temp: 26C, Fan: 1 (High), "
       "Swing(V): On, Swing(H): On, Light: Toggle, Clean: On, Turbo: On, "
-      "IFeel: Off";
+      "Quiet: On, IFeel: Off";
 
   ac.begin();
   irac.electra(&ac,
@@ -625,6 +625,7 @@ TEST(TestIRac, Electra) {
                stdAc::swingv_t::kAuto,      // Vertical swing
                stdAc::swingh_t::kLeft,      // Horizontal swing
                false,                       // iFeel
+               true,                        // Quiet
                true,                        // Turbo
                true,                        // Light (toggle)
                true);                       // Clean
