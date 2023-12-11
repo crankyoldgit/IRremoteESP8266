@@ -99,7 +99,7 @@ union DaikinESPProtocol{
     uint64_t Mode     :3;
     uint64_t          :1;
     // Byte 22
-    uint64_t Temp2    :8;  // Temp2 should be between 20 - 64 (10 C - 32 C)
+    uint64_t Temp     :8;  // Temp should be between 20 - 64 (10 C - 32 C)
     // Byte 23
     uint64_t          :8;
 

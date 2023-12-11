@@ -225,12 +225,12 @@ bool IRDaikinESP::getPower(void) const {
 void IRDaikinESP::setTemp(const float temp) {
   float degrees = std::max(temp, static_cast<float>(kDaikinMinTemp));
   degrees = std::min(degrees, static_cast<float>(kDaikinMaxTemp));
-  _.Temp2 = degrees * 2.0f;
+  _.Temp = degrees * 2.0f;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-float IRDaikinESP::getTemp(void) const { return _.Temp2 / 2.0f; }
+float IRDaikinESP::getTemp(void) const { return _.Temp / 2.0f; }
 
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting.
@@ -537,7 +537,7 @@ stdAc::state_t IRDaikinESP::toCommon(void) const {
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = _.Temp2 / 2.0f;
+  result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.swingv = _.SwingV ? stdAc::swingv_t::kAuto :
                                              stdAc::swingv_t::kOff;
@@ -564,7 +564,7 @@ String IRDaikinESP::toString(void) const {
   result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
-  result += addTempFloatToString(_.Temp2 / 2.0f);
+  result += addTempFloatToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
   result += addBoolToString(_.Powerful, kPowerfulStr);
