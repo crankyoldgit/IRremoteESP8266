@@ -6,6 +6,9 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#ifdef PYTHONLIB
+#include <vector>
+#endif // PYTHONLIB
 #include "IRremoteESP8266.h"
 
 // Originally from https://github.com/shirriff/Arduino-IRremote/
@@ -14,6 +17,11 @@
 
 #if TEST || UNIT_TEST
 #define VIRTUAL virtual
+#ifdef PYTHONLIB
+#define VIRTUALMS
+#else
+#define VIRTUALMS virtual
+#endif // PYTHONLIB
 #else
 #define VIRTUAL
 #endif
@@ -42,6 +50,11 @@ const uint32_t kDefaultMessageGap = 100000;
 /// Placeholder for missing sensor temp value
 /// @note Not using "-1" as it may be a valid external temp
 const float kNoTempValue = -100.0;
+
+#ifdef PYTHONLIB
+// Global
+extern std::vector<int> timingList;
+#endif
 
 /// Enumerators and Structures for the Common A/C API.
 namespace stdAc {
@@ -228,6 +241,7 @@ enum argo_ac_remote_model_t {
   SAC_WREM3        // (2) ARGO WREM3 remote (touch buttons), bit-len vary by cmd
 };
 
+#ifndef SWIG
 // Classes
 
 /// Class for sending all basic IR protocols.
@@ -241,8 +255,8 @@ class IRsend {
   void begin();
   void enableIROut(uint32_t freq, uint8_t duty = kDutyDefault);
   VIRTUAL void _delayMicroseconds(uint32_t usec);
-  VIRTUAL uint16_t mark(uint16_t usec);
-  VIRTUAL void space(uint32_t usec);
+  VIRTUALMS uint16_t mark(uint16_t usec);
+  VIRTUALMS void space(uint32_t usec);
   int8_t calibrate(uint16_t hz = 38000U);
   void sendRaw(const uint16_t buf[], const uint16_t len, const uint16_t hz);
   void sendData(uint16_t onemark, uint32_t onespace, uint16_t zeromark,
@@ -917,5 +931,5 @@ class IRsend {
                  const uint16_t repeat, const uint16_t freq);
 #endif  // SEND_SONY
 };
-
+#endif //SWIG
 #endif  // IRSEND_H_

@@ -8,12 +8,19 @@
 #else
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#ifdef PYTHONLIB
+#include <iostream>
+#endif
 #endif
 #include <algorithm>
 #ifdef UNIT_TEST
 #include <cmath>
 #endif
 #include "IRtimer.h"
+
+#ifdef PYTHONLIB
+std::vector<int> timingList;
+#endif
 
 /// Constructor for an IRsend object.
 /// @param[in] IRsendPin Which GPIO pin to use when sending an IR command.
@@ -155,6 +162,11 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
 /// Ref:
 ///   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
 uint16_t IRsend::mark(uint16_t usec) {
+#ifdef PYTHONLIB
+  // std::cout << usec << " ";
+  timingList.push_back(usec);
+  return 1;
+#else
   // Handle the simple case of no required frequency modulation.
   if (!modulation || _dutycycle >= 100) {
     ledOn();
@@ -185,6 +197,7 @@ uint16_t IRsend::mark(uint16_t usec) {
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
   return counter;
+#endif
 }
 
 /// Turn the pin (LED) off for a given time.
@@ -194,7 +207,12 @@ uint16_t IRsend::mark(uint16_t usec) {
 void IRsend::space(uint32_t time) {
   ledOff();
   if (time == 0) return;
+#ifdef PYTHONLIB
+  // std::cout << time << " ";
+  timingList.push_back(time);
+#else
   _delayMicroseconds(time);
+#endif
 }
 
 /// Calculate & set any offsets to account for execution times during sending.

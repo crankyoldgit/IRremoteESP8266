@@ -8,6 +8,9 @@
 #else
 #include <memory>
 #endif
+#ifdef PYTHONLIB
+#include <vector>
+#endif
 #include "IRremoteESP8266.h"
 #include "ir_Airton.h"
 #include "ir_Airwell.h"
@@ -107,15 +110,21 @@ class IRac {
   static String swinghToString(const stdAc::swingh_t swingh);
   stdAc::state_t getState(void);
   stdAc::state_t getStatePrev(void);
+#ifdef PYTHONLIB
+  std::vector<int> getTiming(void);
+  void resetTiming(void);
+#endif
   bool hasStateChanged(void);
   stdAc::state_t next;  ///< The state we want the device to be in after we send
 #ifdef UNIT_TEST
+#ifndef PYTHONLIB
   /// @cond IGNORE
   /// UT-specific
   /// See @c OUTPUT_DECODE_RESULTS_FOR_UT macro description in IRac.cpp
   std::shared_ptr<IRrecv> _utReceiver = nullptr;
   std::unique_ptr<decode_results> _lastDecodeResults = nullptr;
   /// @endcond
+#endif
 #else
 
  private:
