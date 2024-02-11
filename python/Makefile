@@ -75,7 +75,7 @@ IRrecv.o : $(SRC_DIR)/IRrecv.cpp $(SRC_DIR)/IRrecv.h $(SRC_DIR)/IRremoteESP8266.
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(SRC_DIR)/IRrecv.cpp
 
 libirhvac_wrap.o : libirhvac_wrap.cxx
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -I/usr/include/python -c libirhvac_wrap.cxx
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -I/usr/include/python3.10 -I/usr/include/python3.11 -I/usr/include/python3.12 -c libirhvac_wrap.cxx
 
 libirhvac_wrap.cxx :
 	swig $(INCLUDES) $(DEFFLAGS) -c++ -python libirhvac.i
