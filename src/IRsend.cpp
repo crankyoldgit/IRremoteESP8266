@@ -8,9 +8,6 @@
 #else
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
-#ifdef PYTHONLIB
-#include <iostream>
-#endif
 #endif
 #include <algorithm>
 #ifdef UNIT_TEST
