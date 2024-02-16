@@ -28,7 +28,7 @@ CPPFLAGS += -D_IR_LOCALE_=en-AU -fPIC $(DEFFLAGS)
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread -std=gnu++11
 
-
+PYTHONINCL = $(shell python3-config --includes)
 
 objects = $(patsubst %.cpp,%,$(wildcard *.cpp))
 
@@ -75,7 +75,7 @@ IRrecv.o : $(SRC_DIR)/IRrecv.cpp $(SRC_DIR)/IRrecv.h $(SRC_DIR)/IRremoteESP8266.
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(SRC_DIR)/IRrecv.cpp
 
 libirhvac_wrap.o : libirhvac_wrap.cxx
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) -I/usr/include/python3.10 -I/usr/include/python3.11 -I/usr/include/python3.12 -I/usr/include/python -c libirhvac_wrap.cxx
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) $(PYTHONINCL) -c libirhvac_wrap.cxx
 
 libirhvac_wrap.cxx :
 	swig $(INCLUDES) $(DEFFLAGS) -c++ -python libirhvac.i
