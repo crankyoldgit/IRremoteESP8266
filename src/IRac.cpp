@@ -105,7 +105,7 @@ extern std::vector<int> timingList;
   }
 #else
 #define OUTPUT_DECODE_RESULTS_FOR_UT(ac)
-#endif // PYTHONLIB
+#endif  // PYTHONLIB
 #endif  // UNIT_TEST
 
 /// Class constructor

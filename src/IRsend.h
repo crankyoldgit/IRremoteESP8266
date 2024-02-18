@@ -8,7 +8,7 @@
 #include <stdint.h>
 #ifdef PYTHONLIB
 #include <vector>
-#endif // PYTHONLIB
+#endif  // PYTHONLIB
 #include "IRremoteESP8266.h"
 
 // Originally from https://github.com/shirriff/Arduino-IRremote/
@@ -21,7 +21,7 @@
 #define VIRTUALMS
 #else
 #define VIRTUALMS virtual
-#endif // PYTHONLIB
+#endif  // PYTHONLIB
 #else
 #define VIRTUAL
 #endif
@@ -931,5 +931,5 @@ class IRsend {
                  const uint16_t repeat, const uint16_t freq);
 #endif  // SEND_SONY
 };
-#endif //SWIG
+#endif  //SWIG
 #endif  // IRSEND_H_
