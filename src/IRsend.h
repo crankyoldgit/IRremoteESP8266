@@ -931,5 +931,5 @@ class IRsend {
                  const uint16_t repeat, const uint16_t freq);
 #endif  // SEND_SONY
 };
-#endif  //SWIG
+#endif  // SWIG
 #endif  // IRSEND_H_
