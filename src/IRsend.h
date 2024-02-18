@@ -24,6 +24,7 @@
 #endif  // PYTHONLIB
 #else
 #define VIRTUAL
+#define VIRTUALMS
 #endif
 
 // Constants
