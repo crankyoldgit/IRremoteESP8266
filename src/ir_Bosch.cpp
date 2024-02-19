@@ -94,8 +94,8 @@ bool IRBosch144AC::getPower(void) const {
 }
 
 void IRBosch144AC::setTempRaw(const uint8_t code) {
-  _.TempS1 = _.TempS2 = code >> 1; // save 4 bits in S1 and S2
-  _.TempS3 = code & 1;             // save 1 bit in Section3
+  _.TempS1 = _.TempS2 = code >> 1;  // save 4 bits in S1 and S2
+  _.TempS3 = code & 1;              // save 1 bit in Section3
 }
 
 /// Set the temperature. Allow 0.5 degree steps.
@@ -119,7 +119,7 @@ float IRBosch144AC::getTemp(void) const {
       retemp = kBosch144TempMin + i;
     }
   }
-  return (float)retemp + (_.TempHalfDegree ? 0.5f : 0.0f);
+  return static_cast<float>(retemp) + (_.TempHalfDegree ? 0.5f : 0.0f);
 }
 
 /// Set the speed of the fan.
