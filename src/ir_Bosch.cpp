@@ -240,7 +240,7 @@ stdAc::state_t IRBosch144AC::toCommon(void) const {
   result.power = getPower();
   result.mode = toCommonMode(getMode());
   result.celsius = true;
-  result.degrees = getTemp();
+  result.degrees = getTempFloat();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.quiet = getQuiet();
   // Not supported.
@@ -273,7 +273,7 @@ String IRBosch144AC::toString(void) const {
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kMedium));
-  result += addTempToString(getTemp());
+  result += addTempToString(getTempFloat());
   result += addBoolToString(_.Quiet, kQuietStr);
   return result;
 }
