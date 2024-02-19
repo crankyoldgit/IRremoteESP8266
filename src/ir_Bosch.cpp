@@ -265,7 +265,7 @@ String IRBosch144AC::toString(void) const {
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kMedium));
-  result += addTempToString(getTemp());
+  result += addTempFloatToString(getTemp());
   result += addBoolToString(_.Quiet, kQuietStr);
   return result;
 }

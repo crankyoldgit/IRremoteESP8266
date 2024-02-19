@@ -41,7 +41,7 @@ const uint16_t kBosch144BytesPerSection = 6;
 using irutils::addBoolToString;
 using irutils::addModeToString;
 using irutils::addFanToString;
-using irutils::addTempToString;
+using irutils::addTempFloatToString;
 using std::min;
 using std::max;
 using std::memcpy;
