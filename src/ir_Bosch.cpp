@@ -106,6 +106,14 @@ void IRBosch144AC::setTemp(const uint8_t degrees) {
   setTempRaw(kBosch144TempMap[temp - kBosch144TempMin]);
 }
 
+void IRBosch144AC::setTemp(const float degrees)
+{
+  uint8_t temp = static_cast<uint8_t>(degrees);
+  setTemp(temp);
+
+  _.TempS3 = (degrees - temp) >= 0.5;
+}
+
 uint8_t IRBosch144AC::getTemp(void) const {
   uint8_t temp = (_.TempS1 << 1) + _.TempS3;
   uint8_t retemp = 25;
@@ -115,6 +123,10 @@ uint8_t IRBosch144AC::getTemp(void) const {
     }
   }
   return retemp;
+}
+
+float IRBosch144AC::getTempFloat(void) const {
+  return getTemp() + (_.TempS3 ? 0.5 : 0);
 }
 
 /// Set the speed of the fan.

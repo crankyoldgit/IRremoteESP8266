@@ -100,37 +100,39 @@ const uint8_t kBosch144DefaultState[kBosch144StateLength] = {
 union Bosch144Protocol {
   uint8_t raw[kBosch144StateLength];  ///< The state in IR code form.
   struct {
-    uint8_t            :8;   // Fixed value 0b10110010 / 0xB2.   ############
-    uint8_t InnvertS1_1:8;   // Invert byte  0b01001101 / 0x4D   #
-    uint8_t            :5;   // not used (without timer use)     #
-    uint8_t FanS1      :3;   // Fan speed bits in Section 1      #
-    uint8_t InnvertS1_2:8;   // Invert byte                      #  Section 1 =
-    uint8_t            :2;   // not used (without timer use)     #   Sektion 2
-    uint8_t ModeS1     :2;   // Operation mode bits S1           #
-    uint8_t TempS1     :4;   // Desired temperature (Celsius) S2 #
-    uint8_t InnvertS1_3:8;   // Invert byte (without timer use)  ############
+    uint8_t             :8;   // Fixed value 0b10110010 / 0xB2.   ############
+    uint8_t InnvertS1_1 :8;   // Invert byte  0b01001101 / 0x4D   #
+    uint8_t             :5;   // not used (without timer use)     #
+    uint8_t FanS1       :3;   // Fan speed bits in Section 1      #
+    uint8_t InnvertS1_2 :8;   // Invert byte                      #  Section 1 =
+    uint8_t             :2;   // not used (without timer use)     #   Sektion 2
+    uint8_t ModeS1      :2;   // Operation mode bits S1           #
+    uint8_t TempS1      :4;   // Desired temperature (Celsius) S2 #
+    uint8_t InnvertS1_3 :8;   // Invert byte (without timer use)  ############
 
-    uint8_t            :8;   // Fixed value 0b10110010 / 0xB2.   ############
-    uint8_t InnvertS2_1:8;   // Invert byte  0b01001101 / 0x4D   #
-    uint8_t            :5;   // not used (without timer use)     #
-    uint8_t FanS2      :3;   // Fan speed bits in Section 2      #
-    uint8_t InnvertS2_2:8;   // Invert byte                      #  Section 2 =
-    uint8_t            :2;   // not used (without timer use)     #   Sektion 1
-    uint8_t ModeS2     :2;   // Operation mode bits S2           #
-    uint8_t TempS2     :4;   // Desired temperature (Celsius) S2 #
-    uint8_t InnvertS2_3:8;   // Invert byte (without timer use)  ###########
+    uint8_t             :8;   // Fixed value 0b10110010 / 0xB2.   ############
+    uint8_t InnvertS2_1 :8;   // Invert byte  0b01001101 / 0x4D   #
+    uint8_t             :5;   // not used (without timer use)     #
+    uint8_t FanS2       :3;   // Fan speed bits in Section 2      #
+    uint8_t InnvertS2_2 :8;   // Invert byte                      #  Section 2 =
+    uint8_t             :2;   // not used (without timer use)     #   Sektion 1
+    uint8_t ModeS2      :2;   // Operation mode bits S2           #
+    uint8_t TempS2      :4;   // Desired temperature (Celsius) S2 #
+    uint8_t InnvertS2_3 :8;   // Invert byte (without timer use)  ###########
 
-    uint8_t            :8;   // Fixed value 0b11010101 / 0xD5    ###########
-    uint8_t ModeS3     :1;   // ModeBit in Section 3             #
-    uint8_t FanS3      :6;   // Fan speed bits in Section 3      #
-    uint8_t            :1;   // Unknown                          #
-    uint8_t            :7;   // Unknown                          #
-    uint8_t Quiet      :1;   // Silent-Mode                      #    Section 3
-    uint8_t            :4;   // Unknown                          #
-    uint8_t TempS3     :1;   // Desired temp. Bit in Section3    #
-    uint8_t            :3;   // Unknown                          #
-    uint8_t            :8;   // Unknown                          #
-    uint8_t ChecksumS3 :8;   // Checksum from byte 13-17         ###########
+    uint8_t             :8;   // Fixed value 0b11010101 / 0xD5    ###########
+    uint8_t ModeS3      :1;   // ModeBit in Section 3             #
+    uint8_t FanS3       :6;   // Fan speed bits in Section 3      #
+    uint8_t             :1;   // Unknown                          #
+    uint8_t             :5;    // Unknown                         #
+    uint8_t TempDecimals:1;  // Desired temp. Bit in Section3     #
+    uint8_t             :1;   // Unknown                          #
+    uint8_t Quiet       :1;   // Silent-Mode                      #    Section 3
+    uint8_t             :4;   // Unknown                          #
+    uint8_t TempS3      :1;   // Desired temp. Bit in Section3    #
+    uint8_t             :3;   // Unknown                          #
+    uint8_t             :8;   // Unknown                          #
+    uint8_t ChecksumS3  :8;   // Checksum from byte 13-17         ###########
   };
 };
 
@@ -154,7 +156,9 @@ class IRBosch144AC {
   void setPower(const bool state);
   bool getPower(void) const;
   void setTemp(const uint8_t temp);
+  void setTemp(const float temp);
   uint8_t getTemp(void) const;
+  float getTempFloat(void) const;
   void setFan(const uint16_t speed);
   uint16_t getFan(void) const;
   void setMode(const uint8_t mode);
