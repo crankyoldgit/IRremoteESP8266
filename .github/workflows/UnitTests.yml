@@ -28,3 +28,12 @@ jobs:
       run: (cd test; make all)
     - name: Run library unit tests
       run: (cd test; make run)
+
+  Swig_Tests:
+    runs-on: ubuntu-latest
+    env:
+      MAKEFLAGS: "-j 2"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build extension and run simple test
+      run: (cd python; make test)
