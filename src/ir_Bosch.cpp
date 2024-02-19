@@ -94,28 +94,24 @@ bool IRBosch144AC::getPower(void) const {
 }
 
 void IRBosch144AC::setTempRaw(const uint8_t code) {
-  _.TempS1 = _.TempS2 = code >> 1;  // save 4 bits in S1 and S2
-  _.TempS3 = code & 1;              // save 1 bit in Section3
-}
-
-/// Set the temperature.
-/// @param[in] degrees The temperature in degrees celsius.
-void IRBosch144AC::setTemp(const uint8_t degrees) {
-  uint8_t temp = max(kBosch144TempMin, degrees);
-  temp = min(kBosch144TempMax, temp);
-  setTempRaw(kBosch144TempMap[temp - kBosch144TempMin]);
+  _.TempS1 = _.TempS2 = code >> 1; // save 4 bits in S1 and S2
+  _.TempS3 = code & 1;             // save 1 bit in Section3
 }
 
 /// Set the temperature. Allow 0.5 degree steps.
 /// @param[in] degrees The temperature in degrees celsius.
 void IRBosch144AC::setTemp(const float degrees) {
   uint8_t temp = static_cast<uint8_t>(degrees);
-  setTemp(temp);
+  temp = max(kBosch144TempMin, temp);
+  temp = min(kBosch144TempMax, temp);
+  setTempRaw(kBosch144TempMap[temp - kBosch144TempMin]);
 
-  _.TempS3 = (degrees - temp) >= 0.5;
+  _.TempHalfDegree = (degrees - temp) >= 0.5;
 }
 
-uint8_t IRBosch144AC::getTemp(void) const {
+/// Get the temperature with 0.5 degree steps.
+/// @return The temperature in degrees celsius.
+float IRBosch144AC::getTemp(void) const {
   uint8_t temp = (_.TempS1 << 1) + _.TempS3;
   uint8_t retemp = 25;
   for (uint8_t i = 0; i < kBosch144TempRange; i++) {
@@ -123,11 +119,7 @@ uint8_t IRBosch144AC::getTemp(void) const {
       retemp = kBosch144TempMin + i;
     }
   }
-  return retemp;
-}
-
-float IRBosch144AC::getTempFloat(void) const {
-  return getTemp() + (_.TempS3 ? 0.5 : 0);
+  return (float)retemp + (_.TempHalfDegree ? 0.5f : 0.0f);
 }
 
 /// Set the speed of the fan.
@@ -240,7 +232,7 @@ stdAc::state_t IRBosch144AC::toCommon(void) const {
   result.power = getPower();
   result.mode = toCommonMode(getMode());
   result.celsius = true;
-  result.degrees = getTempFloat();
+  result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.quiet = getQuiet();
   // Not supported.
@@ -273,7 +265,7 @@ String IRBosch144AC::toString(void) const {
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kMedium));
-  result += addTempToString(getTempFloat());
+  result += addTempToString(getTemp());
   result += addBoolToString(_.Quiet, kQuietStr);
   return result;
 }
