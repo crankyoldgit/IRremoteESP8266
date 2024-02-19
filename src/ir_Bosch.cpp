@@ -106,8 +106,9 @@ void IRBosch144AC::setTemp(const uint8_t degrees) {
   setTempRaw(kBosch144TempMap[temp - kBosch144TempMin]);
 }
 
-void IRBosch144AC::setTemp(const float degrees)
-{
+/// Set the temperature. Allow 0.5 degree steps.
+/// @param[in] degrees The temperature in degrees celsius.
+void IRBosch144AC::setTemp(const float degrees) {
   uint8_t temp = static_cast<uint8_t>(degrees);
   setTemp(temp);
 
