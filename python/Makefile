@@ -37,8 +37,8 @@ all : _irhvac.so
 library : $(objects)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -Wl,-soname,lib_irhvac.so -o _irhvac.so $(COMMON_OBJ)
 
-swig :	libirhvac_wrap.cxx swig-4.2.0/swig
-	swig-4.2.0/swig $(INCLUDES) $(DEFFLAGS) -c++ -python libirhvac.i
+swig :	libirhvac_wrap.cxx
+	swig $(INCLUDES) $(DEFFLAGS) -c++ -python libirhvac.i
 clean :
 	rm -f  *.o *.pyc *.cxx *.cpp
 	rm -rf swig-4.2.0
@@ -46,12 +46,13 @@ distclean :
 	rm -f  *.o *.pyc libirhvac_wrap.cxx irhvac.py _irhvac.so
 	rm -rf swig-4.2.0
 
-install-swig : swig-4.2.0/swig
-	rm -rf swig-4.2.0
-	curl -s -L -o - http://downloads.sourceforge.net/project/swig/swig/swig-4.2.0/swig-4.2.0.tar.gz | tar xfz -
-	( cd swig-4.2.0; ./configure ; make )
 
 test : _irhvac.so
+	python test_lib.py
+
+docker : swig-4.2.0/swig _irhvac.so
+
+testdocker : swig-4.2.0/swig _irhvac.so
 	python test_lib.py
 
 # Keep all intermediate files.
@@ -86,8 +87,8 @@ IRrecv.o : $(SRC_DIR)/IRrecv.cpp $(SRC_DIR)/IRrecv.h $(SRC_DIR)/IRremoteESP8266.
 libirhvac_wrap.o : libirhvac_wrap.cxx
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(INCLUDES) $(PYTHONINCL) -c libirhvac_wrap.cxx
 
-libirhvac_wrap.cxx : swig-4.2.0/swig
-	swig-4.2.0/swig $(INCLUDES) $(DEFFLAGS) -c++ -python libirhvac.i
+libirhvac_wrap.cxx :
+	swig $(INCLUDES) $(DEFFLAGS) -c++ -python libirhvac.i
 
 _irhvac.so : $(COMMON_OBJ)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -Wl,-soname,lib_irhvac.so -o _irhvac.so $(COMMON_OBJ)
@@ -95,7 +96,7 @@ _irhvac.so : $(COMMON_OBJ)
 swig-4.2.0/swig :
 	rm -rf swig-4.2.0
 	curl -s -L -o - http://downloads.sourceforge.net/project/swig/swig/swig-4.2.0/swig-4.2.0.tar.gz | tar xfz -
-	( cd swig-4.2.0; ./configure ; make )
+	( cd swig-4.2.0; ./configure ; make; make install )
 # new specific targets goes above this line
 
 $(objects) : %: $(COMMON_OBJ)
