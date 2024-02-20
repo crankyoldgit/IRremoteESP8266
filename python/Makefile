@@ -11,6 +11,11 @@
 # project, except GTEST_HEADERS, which you can use in your own targets
 # but shouldn't modify.
 
+ifeq (,$(wildcard ./.dockerenv))
+SWIGTYPE = local
+else
+SWIGTYPE = global
+endif
 
 # Where to find user code.
 SRC_DIR = ../src
@@ -38,7 +43,12 @@ library : $(objects)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -Wl,-soname,lib_irhvac.so -o _irhvac.so $(COMMON_OBJ)
 
 swig :	libirhvac_wrap.cxx
+ifneq (,$(wildcard /.dockerenv))
+	SWIG_LIB=$(shell realpath -qe swig-4.2.0/Lib) ./swig-4.2.0/swig $(INCLUDES) $(DEFFLAGS) -c++ -python libirhvac.i
+else
 	swig $(INCLUDES) $(DEFFLAGS) -c++ -python libirhvac.i
+endif
+
 clean :
 	rm -f  *.o *.pyc *.cxx *.cpp
 	rm -rf swig-4.2.0
@@ -96,7 +106,7 @@ _irhvac.so : $(COMMON_OBJ)
 swig-4.2.0/swig :
 	rm -rf swig-4.2.0
 	curl -s -L -o - http://downloads.sourceforge.net/project/swig/swig/swig-4.2.0/swig-4.2.0.tar.gz | tar xfz -
-	( cd swig-4.2.0; ./configure ; make; make install )
+	( cd swig-4.2.0; ./configure ; make )
 # new specific targets goes above this line
 
 $(objects) : %: $(COMMON_OBJ)
