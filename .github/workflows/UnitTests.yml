@@ -14,7 +14,7 @@ jobs:
     - name: Run tools unit tests
       run: (cd tools; make run_tests)
     - name: Build swig extension and run simple test
-      run: (apt-get -y install libpcre2-dev python3-dev; cd python; make testdocker)
+      run: (cd python; make testdocker)
 
   Unit_Tests:
     runs-on: ubuntu-latest
