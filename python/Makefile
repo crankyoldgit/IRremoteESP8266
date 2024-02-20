@@ -104,7 +104,6 @@ _irhvac.so : $(COMMON_OBJ)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -Wl,-soname,lib_irhvac.so -o _irhvac.so $(COMMON_OBJ)
 
 swig-4.2.0/swig :
-	rm -rf swig-4.2.0
 	curl -s -L -o - http://downloads.sourceforge.net/project/swig/swig/swig-4.2.0/swig-4.2.0.tar.gz | tar xfz -
 	( cd swig-4.2.0; ./configure ; make )
 # new specific targets goes above this line
