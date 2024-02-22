@@ -24,7 +24,7 @@ SRC_DIR = ../src
 TEST_DIR = ../test
 
 INCLUDES = -I$(SRC_DIR) -I$(TEST_DIR)
-DEFFLAGS = -DUNIT_TEST -DPYTHONLIB
+DEFFLAGS = -DUNIT_TEST -DSWIGLIB
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
