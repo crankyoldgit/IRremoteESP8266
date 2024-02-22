@@ -8,7 +8,7 @@
 #else
 #include <memory>
 #endif
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
 #include <vector>
 #endif
 #include "IRremoteESP8266.h"
@@ -110,14 +110,14 @@ class IRac {
   static String swinghToString(const stdAc::swingh_t swingh);
   stdAc::state_t getState(void);
   stdAc::state_t getStatePrev(void);
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
   std::vector<int> getTiming(void);
   void resetTiming(void);
 #endif
   bool hasStateChanged(void);
   stdAc::state_t next;  ///< The state we want the device to be in after we send
 #ifdef UNIT_TEST
-#ifndef PYTHONLIB
+#ifndef SWIGLIB
   /// @cond IGNORE
   /// UT-specific
   /// See @c OUTPUT_DECODE_RESULTS_FOR_UT macro description in IRac.cpp

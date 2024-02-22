@@ -6,9 +6,9 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
 #include <vector>
-#endif  // PYTHONLIB
+#endif  // SWIGLIB
 #include "IRremoteESP8266.h"
 
 // Originally from https://github.com/shirriff/Arduino-IRremote/
@@ -17,11 +17,11 @@
 
 #if TEST || UNIT_TEST
 #define VIRTUAL virtual
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
 #define VIRTUALMS
 #else
 #define VIRTUALMS virtual
-#endif  // PYTHONLIB
+#endif  // SWIGLIB
 #else
 #define VIRTUAL
 #define VIRTUALMS
@@ -52,7 +52,7 @@ const uint32_t kDefaultMessageGap = 100000;
 /// @note Not using "-1" as it may be a valid external temp
 const float kNoTempValue = -100.0;
 
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
 // Global
 extern std::vector<int> timingList;
 #endif

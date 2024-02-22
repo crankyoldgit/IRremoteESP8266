@@ -18,7 +18,7 @@
 #else
     using ::roundf;
 #endif
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
 #include <vector>
 extern std::vector<int> timingList;
 #endif
@@ -77,7 +77,7 @@ extern std::vector<int> timingList;
 #ifndef UNIT_TEST
 #define OUTPUT_DECODE_RESULTS_FOR_UT(ac)
 #else
-#ifndef PYTHONLIB
+#ifndef SWIGLIB
 /* NOTE: THIS IS NOT A DOXYGEN COMMENT (would require ENABLE_PREPROCESSING-YES)
 /// If compiling for UT *and* a test receiver @c IRrecv is provided via the
 /// @c _utReceived param, this injects an "output" gadget @c _lastDecodeResults
@@ -105,7 +105,7 @@ extern std::vector<int> timingList;
   }
 #else
 #define OUTPUT_DECODE_RESULTS_FOR_UT(ac)
-#endif  // PYTHONLIB
+#endif  // SWIGLIB
 #endif  // UNIT_TEST
 
 /// Class constructor
@@ -189,7 +189,7 @@ stdAc::state_t IRac::getState(void) { return next; }
 /// @return A Ptr to a state containing the previously sent settings.
 stdAc::state_t IRac::getStatePrev(void) { return _prev; }
 
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
 std::vector<int> IRac::getTiming(void) { return timingList; }
 void IRac::resetTiming(void) { timingList.clear(); }
 #endif

@@ -15,7 +15,7 @@
 #endif
 #include "IRtimer.h"
 
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
 std::vector<int> timingList;
 #endif
 
@@ -159,7 +159,7 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
 /// Ref:
 ///   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
 uint16_t IRsend::mark(uint16_t usec) {
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
   // std::cout << usec << " ";
   timingList.push_back(usec);
   return 1;
@@ -204,7 +204,7 @@ uint16_t IRsend::mark(uint16_t usec) {
 void IRsend::space(uint32_t time) {
   ledOff();
   if (time == 0) return;
-#ifdef PYTHONLIB
+#ifdef SWIGLIB
   // std::cout << time << " ";
   timingList.push_back(time);
 #else
