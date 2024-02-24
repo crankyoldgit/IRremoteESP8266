@@ -871,6 +871,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kXmpBits;
     case YORK:
       return kYorkBits;
+    case BANG_OLUFSEN:
+      return kBangOlufsenBits;
     // No default amount of bits.
     case FUJITSU_AC:
     case MWM:
@@ -911,6 +913,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendArris(data, nbits, min_repeat);
       break;
 #endif  // SEND_ARRIS
+#if SEND_BANG_OLUFSEN
+    case BANG_OLUFSEN:
+      sendBangOlufsen(data, nbits, min_repeat);
+      break;
+#endif  // SEND_BANG_OLUFSEN
 #if SEND_BOSE
     case BOSE:
       sendBose(data, nbits, min_repeat);

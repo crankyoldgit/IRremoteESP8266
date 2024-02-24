@@ -874,6 +874,15 @@ class IRsend {
                     const uint16_t nbytes = kYorkStateLength,
                     const uint16_t repeat = kNoRepeat);
 #endif  // SEND_YORK
+#if SEND_BANG_OLUFSEN
+  void sendBangOlufsen(const uint64_t data,
+                       const uint16_t nbits = kBangOlufsenBits,
+                       const uint16_t repeat = kNoRepeat);
+  void sendBangOlufsenRaw(const uint64_t rawData,
+                          const uint16_t bits,
+                          const bool datalink,
+                          const bool backToBack);
+#endif  // SEND_BANG_OLUFSEN
 
  protected:
 #ifdef UNIT_TEST

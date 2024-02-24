@@ -394,6 +394,14 @@ TEST(TestSend, GenericSimpleSendMethod) {
   EXPECT_EQ(0x1234, irsend.capture.value);
 
   irsend.reset();
+  ASSERT_TRUE(irsend.send(BANG_OLUFSEN, 0x1234, kBangOlufsenBits));
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(BANG_OLUFSEN, irsend.capture.decode_type);
+  EXPECT_EQ(kBangOlufsenBits, irsend.capture.bits);
+  EXPECT_EQ(0x1234, irsend.capture.value);
+
+  irsend.reset();
   ASSERT_TRUE(irsend.send(CARRIER_AC, 0x1234, kCarrierAcBits));
   irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&irsend.capture));

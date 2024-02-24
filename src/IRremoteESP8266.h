@@ -952,6 +952,13 @@
 #define SEND_YORK           _IR_ENABLE_DEFAULT_
 #endif  // SEND_YORK
 
+#ifndef DECODE_BANG_OLUFSEN
+#define DECODE_BANG_OLUFSEN          _IR_ENABLE_DEFAULT_
+#endif  // DECODE_BANG_OLUFSEN
+#ifndef SEND_BANG_OLUFSEN
+#define SEND_BANG_OLUFSEN            _IR_ENABLE_DEFAULT_
+#endif  // SEND_BANG_OLUFSEN
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -1137,8 +1144,9 @@ enum decode_type_t {
   WOWWEE,
   CARRIER_AC84,  // 125
   YORK,
+  BANG_OLUFSEN,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = YORK,
+  kLastDecodeType = BANG_OLUFSEN,
 };
 
 // Message lengths & required repeat values
@@ -1435,6 +1443,7 @@ const uint16_t kRhossDefaultRepeat = 0;
 const uint16_t kClimaButlerBits = 52;
 const uint16_t kYorkBits = 136;
 const uint16_t kYorkStateLength = 17;
+const uint16_t kBangOlufsenBits = 16;
 
 
 // Legacy defines. (Deprecated)
