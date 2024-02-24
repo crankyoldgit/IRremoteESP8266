@@ -239,18 +239,18 @@ TEST(TestLowLevelSend, MarkFrequencyModulationAt38kHz) {
 
   irsend.reset();
   irsend.enableIROut(38000, 50);
-  EXPECT_EQ(5, irsend.mark(100));
+  EXPECT_EQ(4, irsend.mark(100));
   EXPECT_EQ(
-      "[On]10usecs[Off]11usecs[On]10usecs[Off]11usecs[On]10usecs[Off]11usecs"
-      "[On]10usecs[Off]11usecs[On]10usecs[Off]6usecs",
+      "[On]13usecs[Off]13usecs[On]13usecs[Off]13usecs[On]13usecs[Off]13usecs"
+      "[On]13usecs[Off]9usecs",
       irsend.low_level_sequence);
 
   irsend.reset();
   irsend.enableIROut(38000, 33);
-  EXPECT_EQ(5, irsend.mark(100));
+  EXPECT_EQ(4, irsend.mark(100));
   EXPECT_EQ(
-      "[On]6usecs[Off]15usecs[On]6usecs[Off]15usecs[On]6usecs[Off]15usecs"
-      "[On]6usecs[Off]15usecs[On]6usecs[Off]10usecs",
+      "[On]8usecs[Off]18usecs[On]8usecs[Off]18usecs[On]8usecs[Off]18usecs"
+      "[On]8usecs[Off]14usecs",
       irsend.low_level_sequence);
 
   irsend.reset();
@@ -266,18 +266,18 @@ TEST(TestLowLevelSend, MarkFrequencyModulationAt36_7kHz) {
 
   irsend.reset();
   irsend.enableIROut(36700, 50);
-  EXPECT_EQ(5, irsend.mark(100));
+  EXPECT_EQ(4, irsend.mark(100));
   EXPECT_EQ(
-      "[On]11usecs[Off]11usecs[On]11usecs[Off]11usecs[On]11usecs[Off]11usecs"
-      "[On]11usecs[Off]11usecs[On]11usecs[Off]1usecs",
+      "[On]13usecs[Off]14usecs[On]13usecs[Off]14usecs[On]13usecs[Off]14usecs"
+      "[On]13usecs[Off]6usecs",
       irsend.low_level_sequence);
 
   irsend.reset();
   irsend.enableIROut(36700, 33);
-  EXPECT_EQ(5, irsend.mark(100));
+  EXPECT_EQ(4, irsend.mark(100));
   EXPECT_EQ(
-      "[On]7usecs[Off]15usecs[On]7usecs[Off]15usecs[On]7usecs[Off]15usecs"
-      "[On]7usecs[Off]15usecs[On]7usecs[Off]5usecs",
+      "[On]8usecs[Off]19usecs[On]8usecs[Off]19usecs[On]8usecs[Off]19usecs"
+      "[On]8usecs[Off]11usecs",
       irsend.low_level_sequence);
 
   irsend.reset();
@@ -293,18 +293,18 @@ TEST(TestLowLevelSend, MarkFrequencyModulationAt40kHz) {
 
   irsend.reset();
   irsend.enableIROut(40000, 50);
-  EXPECT_EQ(5, irsend.mark(100));
+  EXPECT_EQ(4, irsend.mark(100));
   EXPECT_EQ(
-      "[On]10usecs[Off]10usecs[On]10usecs[Off]10usecs[On]10usecs[Off]10usecs"
-      "[On]10usecs[Off]10usecs[On]10usecs[Off]10usecs",
+      "[On]12usecs[Off]13usecs[On]12usecs[Off]13usecs[On]12usecs[Off]13usecs"
+      "[On]12usecs[Off]13usecs",
       irsend.low_level_sequence);
 
   irsend.reset();
   irsend.enableIROut(40000, 33);
-  EXPECT_EQ(5, irsend.mark(100));
+  EXPECT_EQ(4, irsend.mark(100));
   EXPECT_EQ(
-      "[On]6usecs[Off]14usecs[On]6usecs[Off]14usecs[On]6usecs[Off]14usecs"
-      "[On]6usecs[Off]14usecs[On]6usecs[Off]14usecs",
+      "[On]8usecs[Off]17usecs[On]8usecs[Off]17usecs[On]8usecs[Off]17usecs"
+      "[On]8usecs[Off]17usecs",
       irsend.low_level_sequence);
 
   irsend.reset();
