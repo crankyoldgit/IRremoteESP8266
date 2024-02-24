@@ -31,12 +31,14 @@ const uint8_t  kZepealTolerance = 40;
 // but might need change (removal) if more devices are detected
 const uint8_t kZepealSignature = 0x6C;
 
+#ifndef UNIT_TEST
 // Known Zepeal DRT-A3311(BG) Buttons - documentation rather than actual usage
 const uint16_t kZepealCommandSpeed =    0x6C82;
 const uint16_t kZepealCommandOffOn =    0x6C81;
 const uint16_t kZepealCommandRhythm =   0x6C84;
 const uint16_t kZepealCommandOffTimer = 0x6C88;
 const uint16_t kZepealCommandOnTimer =  0x6CC3;
+#endif
 
 #if SEND_ZEPEAL
 /// Send a Zepeal formatted message.

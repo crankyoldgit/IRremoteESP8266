@@ -14,7 +14,7 @@ const uint8_t kAirwellOverhead = 4;
 const uint16_t kAirwellHalfClockPeriod = 950;  // uSeconds
 const uint16_t kAirwellHdrMark = 3 * kAirwellHalfClockPeriod;  // uSeconds
 const uint16_t kAirwellHdrSpace = 3 * kAirwellHalfClockPeriod;  // uSeconds
-const uint16_t kAirwellFooterMark = 5 * kAirwellHalfClockPeriod;  // uSeconds
+//const uint16_t kAirwellFooterMark = 5 * kAirwellHalfClockPeriod;  // uSeconds
 
 using irutils::addBoolToString;
 using irutils::addModeToString;

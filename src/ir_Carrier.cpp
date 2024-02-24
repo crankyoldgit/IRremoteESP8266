@@ -51,7 +51,7 @@ const uint16_t kCarrierAc84HdrMark = 5850;
 const uint16_t kCarrierAc84Zero = 1175;
 const uint16_t kCarrierAc84One = 430;
 const uint16_t kCarrierAc84HdrSpace = kCarrierAc84Zero;
-const uint32_t kCarrierAc84Gap = kDefaultMessageGap;  // A guess.
+//const uint32_t kCarrierAc84Gap = kDefaultMessageGap;  // A guess.
 const uint8_t  kCarrierAc84ExtraBits = 4;
 const uint8_t  kCarrierAc84ExtraTolerance = 5;
 
@@ -64,7 +64,7 @@ const uint16_t kCarrierAc128OneSpace = 1000;
 const uint16_t kCarrierAc128ZeroSpace = 400;
 const uint16_t kCarrierAc128SectionGap = 20600;
 const uint16_t kCarrierAc128InterSpace = 6700;
-const uint16_t kCarrierAc128SectionBits = kCarrierAc128Bits / 2;
+//const uint16_t kCarrierAc128SectionBits = kCarrierAc128Bits / 2;
 
 #if SEND_CARRIER_AC
 /// Send a Carrier HVAC formatted message.
