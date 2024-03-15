@@ -99,8 +99,7 @@ union DaikinESPProtocol{
     uint64_t Mode     :3;
     uint64_t          :1;
     // Byte 22
-    uint64_t          :1;
-    uint64_t Temp     :7;  // Temp should be between 10 - 32
+    uint64_t Temp     :8;  // Temp should be between 20 - 64 (10 C - 32 C)
     // Byte 23
     uint64_t          :8;
 
@@ -738,8 +737,8 @@ class IRDaikinESP {
   void off(void);
   void setPower(const bool on);
   bool getPower(void) const;
-  void setTemp(const uint8_t temp);
-  uint8_t getTemp(void) const;
+  void setTemp(const float temp);
+  float getTemp(void) const;
   void setFan(const uint8_t fan);
   uint8_t getFan(void) const;
   void setMode(const uint8_t mode);

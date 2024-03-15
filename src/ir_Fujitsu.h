@@ -42,6 +42,7 @@
 //   Brand: Fujitsu,  Model: AR-REG1U remote (ARRAH2E)
 //   Brand: OGeneral,  Model: AR-RCL1E remote (ARRAH2E)
 //   Brand: Fujitsu General,  Model: AR-JW17 remote (ARDB1)
+//   Brand: Fujitsu General,  Model: AR-JW19 remote (ARDB1)
 //   Brand: Fujitsu,  Model: AS-AH402M A/C (FUJITSU_AC264 AR-RLB2J)
 
 #ifndef IR_FUJITSU_H_

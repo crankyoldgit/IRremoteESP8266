@@ -46,6 +46,7 @@ using irutils::addModeToString;
 using irutils::addSwingHToString;
 using irutils::addSwingVToString;
 using irutils::addTempToString;
+using irutils::addTempFloatToString;
 using irutils::addFanToString;
 using irutils::bcdToUint8;
 using irutils::minsToString;
@@ -221,15 +222,15 @@ bool IRDaikinESP::getPower(void) const {
 
 /// Set the temperature.
 /// @param[in] temp The temperature in degrees celsius.
-void IRDaikinESP::setTemp(const uint8_t temp) {
-  uint8_t degrees = std::max(temp, kDaikinMinTemp);
-  degrees = std::min(degrees, kDaikinMaxTemp);
-  _.Temp = degrees;
+void IRDaikinESP::setTemp(const float temp) {
+  float degrees = std::max(temp, static_cast<float>(kDaikinMinTemp));
+  degrees = std::min(degrees, static_cast<float>(kDaikinMaxTemp));
+  _.Temp = degrees * 2.0f;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-uint8_t IRDaikinESP::getTemp(void) const { return _.Temp; }
+float IRDaikinESP::getTemp(void) const { return _.Temp / 2.0f; }
 
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting.
@@ -536,7 +537,7 @@ stdAc::state_t IRDaikinESP::toCommon(void) const {
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = _.Temp;
+  result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.swingv = _.SwingV ? stdAc::swingv_t::kAuto :
                                              stdAc::swingv_t::kOff;
@@ -563,7 +564,7 @@ String IRDaikinESP::toString(void) const {
   result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
-  result += addTempToString(_.Temp);
+  result += addTempFloatToString(getTemp());
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
   result += addBoolToString(_.Powerful, kPowerfulStr);
