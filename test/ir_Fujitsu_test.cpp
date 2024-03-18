@@ -1,4 +1,5 @@
 // Copyright 2017 Jonny Graham, David Conran
+// Copyright 2023 Takeshi Shimizu
 #include "IRac.h"
 #include "IRrecv_test.h"
 #include "IRsend.h"
@@ -1171,6 +1172,13 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::FUJITSU_AC));
   ASSERT_EQ(0, IRsend::defaultBits(decode_type_t::FUJITSU_AC));  // No default
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::FUJITSU_AC));
+
+  ASSERT_EQ("FUJITSU_AC264", typeToString(decode_type_t::FUJITSU_AC264));
+  ASSERT_EQ(decode_type_t::FUJITSU_AC264, strToDecodeType("FUJITSU_AC264"));
+  ASSERT_TRUE(hasACState(decode_type_t::FUJITSU_AC264));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::FUJITSU_AC264));
+  ASSERT_EQ(264, IRsend::defaultBits(decode_type_t::FUJITSU_AC264));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::FUJITSU_AC264));
 }
 
 TEST(TestIRFujitsuACClass, Temperature) {
@@ -1445,4 +1453,768 @@ TEST(TestIRFujitsuACClass, Improve10CHeat) {
   ASSERT_TRUE(ac.get10CHeat());
   EXPECT_EQ(fujitsu_ac_remote_model_t::ARRAH2E, ac.toCommon().model);
   EXPECT_EQ(kFujitsuAcMinHeat, ac.toCommon().degrees);
+}
+
+// Tests for Fujitsu 264 bit A/C methods.
+TEST(TestDecodeFujitsuAc264, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  uint16_t rawData[531] = {3378, 1534, 498, 322, 526, 294, 524, 1116, 522, 302,
+    492, 1166, 472, 350, 470, 352, 466, 352, 468, 1172, 468, 1176, 466, 352,
+    466, 354, 466, 356, 466, 1176, 464, 1174, 468, 354, 466, 356, 464, 352,
+    468, 356, 466, 352, 466, 354, 466, 356, 464, 354, 468, 352, 466, 356, 466,
+    352, 466, 356, 464, 356, 464, 1178, 464, 356, 466, 356, 464, 356, 462, 356,
+    466, 356, 464, 356, 462, 356, 464, 1178, 464, 356, 466, 356, 462, 358, 464,
+    354, 464, 1176, 464, 1178, 464, 1180, 462, 1176, 454, 1188, 442, 1202, 440,
+    1198, 442, 380, 464, 1176, 440, 382, 442, 1200, 438, 1202, 440, 380, 440,
+    382, 438, 382, 440, 404, 416, 382, 440, 380, 440, 382, 438, 380, 440, 380,
+    440, 1202, 440, 404, 414, 1202, 440, 382, 440, 380, 438, 1204, 440, 380,
+    440, 382, 436, 400, 422, 1226, 416, 1226, 416, 404, 416, 406, 414, 406,
+    414, 406, 414, 406, 416, 404, 416, 404, 418, 404, 414, 406, 416, 404, 418,
+    404, 416, 404, 416, 404, 416, 404, 414, 404, 416, 406, 416, 404, 414, 404,
+    416, 406, 414, 406, 414, 406, 416, 404, 414, 406, 414, 408, 414, 404, 414,
+    408, 412, 406, 416, 404, 414, 406, 414, 408, 414, 406, 414, 408, 412, 406,
+    414, 408, 412, 408, 414, 404, 414, 408, 412, 406, 414, 404, 416, 406, 412,
+    408, 414, 404, 414, 410, 412, 408, 412, 406, 412, 408, 414, 408, 414, 406,
+    412, 1230, 412, 408, 414, 408, 412, 1228, 414, 408, 412, 408, 412, 406,
+    414, 408, 412, 1228, 414, 1228, 412, 408, 416, 408, 410, 408, 412, 408,
+    414, 408, 412, 408, 412, 410, 410, 408, 410, 408, 412, 408, 414, 408, 412,
+    408, 414, 408, 412, 1228, 414, 408, 412, 408, 410, 410, 410, 410, 412, 406,
+    412, 408, 412, 410, 410, 1232, 410, 408, 410, 410, 410, 412, 386, 1254,
+    412, 410, 408, 412, 412, 408, 410, 1230, 412, 1232, 410, 1230, 408, 1232,
+    410, 1232, 386, 432, 386, 436, 408, 410, 386, 434, 404, 418, 386, 434, 386,
+    432, 390, 432, 386, 1254, 388, 1254, 386, 434, 388, 432, 388, 434, 386,
+    436, 384, 456, 362, 1256, 386, 434, 386, 434, 386, 434, 384, 436, 386, 434,
+    386, 1256, 386, 458, 360, 434, 388, 1254, 386, 434, 388, 434, 386, 434,
+    388, 434, 384, 460, 360, 436, 384, 458, 360, 436, 386, 460, 362, 434, 386,
+    458, 360, 460, 360, 460, 362, 460, 360, 458, 362, 460, 360, 458, 360, 460,
+    362, 460, 360, 460, 360, 460, 362, 456, 362, 458, 360, 462, 360, 458, 362,
+    458, 362, 456, 364, 458, 362, 460, 360, 460, 362, 458, 362, 458, 360, 460,
+    360, 458, 360, 1282, 360, 1280, 362, 1280, 360, 1282, 360, 1280, 360, 1280,
+    360, 1282, 360, 1278, 362, 1280, 360, 1282, 360, 1280, 362, 1280, 360,
+    1282, 360, 1280, 362, 1280, 360, 1282, 360, 1282, 362, 1280, 360, 1280,
+    360, 1282, 358, 1282, 360, 1282, 360, 1282, 358, 1282, 360, 462, 358, 462,
+    358, 462, 360, 460, 360, 462, 360, 484, 334, 462, 360, 462, 358, 458, 360,
+    462, 356, 1282, 360, 1282, 360, 1308, 332, 486, 334, 1284, 358, 462, 360
+    };  // FUJITSU_AC264
+
+  uint8_t expectedState[kFujitsuAc264StateLength] = {
+    0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x1A, 0x40,
+    0x89, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12,
+    0x06, 0x00, 0x01, 0x11, 0x1F, 0x60, 0x10, 0x24,
+    0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0x00,
+    0x5C};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendRaw(rawData, 531, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(FUJITSU_AC264, irsend.capture.decode_type);
+  ASSERT_EQ(kFujitsuAc264Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.setRaw(irsend.capture.state, irsend.capture.bits / 8);
+  EXPECT_EQ("Power: On, Mode: 1 (Cool), Temp: 25C, Temp (Auto): 0C, "
+    "Fan: 0 (Auto), Fan Angle: 15 (Stay), Swing: Off, Economy: Off, "
+    "Clean: Off, Command: Cool, Current Time: 17:31, Sleep Timer: Off, "
+    "On Timer: Off, Off Timer: Off",
+    ac.toString());
+}
+
+TEST(TestDecodeFujitsuAc264, SyntheticExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+
+  uint8_t sendCode[kFujitsuAc264StateLength] = {
+    0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x1A, 0x40,
+    0x89, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12,
+    0x06, 0x00, 0x01, 0x11, 0x1F, 0x60, 0x10, 0x24,
+    0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0x00,
+    0x5C};
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendFujitsuAC264(sendCode);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(FUJITSU_AC264, irsend.capture.decode_type);
+  ASSERT_EQ(kFujitsuAc264Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(sendCode, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "f38000d50"
+      "m3324s1574"
+      "m448s390m448s390m448s1182m448s390m448s1182m448s390m448s390m448s390"
+      "m448s1182m448s1182m448s390m448s390m448s390m448s1182m448s1182m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s1182m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s1182m448s390m448s390m448s390"
+      "m448s390m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182"
+      "m448s390m448s1182m448s390m448s1182m448s1182m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s1182m448s390"
+      "m448s1182m448s390m448s390m448s1182m448s390m448s390m448s390m448s1182"
+      "m448s1182m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s1182m448s390m448s390m448s1182m448s390m448s390m448s390"
+      "m448s390m448s1182m448s1182m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s1182m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s1182m448s390m448s390m448s390m448s1182m448s390m448s390m448s390"
+      "m448s1182m448s1182m448s1182m448s1182m448s1182m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s1182m448s1182m448s390"
+      "m448s390m448s390m448s390m448s390m448s1182m448s390m448s390m448s390"
+      "m448s390m448s390m448s1182m448s390m448s390m448s1182m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182"
+      "m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182"
+      "m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182m448s1182"
+      "m448s390m448s390m448s390m448s390m448s390m448s390m448s390m448s390"
+      "m448s390m448s390m448s1182m448s1182m448s1182m448s390m448s1182m448s390"
+      "m448s8100",
+      irsend.outputStr());
+}
+
+TEST(TestFujitsuAc264Class, toCommon) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.setPower(true);
+  ac.setMode(kFujitsuAc264ModeCool);
+  ac.setTemp(20);
+  ac.setFanSpeed(kFujitsuAc264FanSpeedHigh);
+  ac.setSwing(true);
+  ac.setEcoFan(false);
+  ac.setClock(1 * 60 + 23);   // "1:23"
+  ac.setSleepTimer(2 * 60);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::FUJITSU_AC264, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(83, ac.toCommon().clock);
+  ASSERT_EQ(120, ac.toCommon().sleep);
+  // Unsupported.
+  ASSERT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ASSERT_FALSE(ac.toCommon().turbo);
+  ASSERT_FALSE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_FALSE(ac.toCommon().light);
+  ASSERT_FALSE(ac.toCommon().filter);
+  ASSERT_FALSE(ac.toCommon().beep);
+}
+
+TEST(TestFujitsuAc264Class, Power) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  // Value from getPower is not updated untill ac.send()
+  ac.on();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.on();
+  ac.send();
+  EXPECT_TRUE(ac.getPower());
+
+  // Value from getPower is not updated untill ac.send()
+  ac.off();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  ac.send();
+  EXPECT_FALSE(ac.getPower());
+
+  // Value from getPower is not updated untill ac.send()
+  ac.setPower(true);
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  ac.send();
+  EXPECT_TRUE(ac.getPower());
+
+  // Value from getPower is not updated untill ac.send()
+  ac.setPower(false);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  ac.send();
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestFujitsuAc264Class, Temperature) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kFujitsuAc264ModeHeat);
+  // Value over maximum is fixed to maximum (30C)
+  ac.setTemp(40);
+  EXPECT_EQ(30, ac.getTemp());
+
+  // Value under minimum is fixed to minimum (16C in Heat)
+  ac.setTemp(10);
+  EXPECT_EQ(16, ac.getTemp());
+
+  ac.setMode(kFujitsuAc264ModeCool);
+  // Value over maximum is fixed to maximum (30C)
+  ac.setTemp(40);
+  EXPECT_EQ(30, ac.getTemp());
+
+  // Value under minimum is fixed to minimum (18C)
+  ac.setTemp(10);
+  EXPECT_EQ(18, ac.getTemp());
+
+  // Valid values in suppoerted range
+  ac.setMode(kFujitsuAc264ModeHeat);
+  for (float i = 16; i <= 30; i += 0.5) {
+    ac.setTemp(i);
+    EXPECT_EQ(i, ac.getTemp());
+  }
+
+  // Valid values in suppoerted range
+  ac.setMode(kFujitsuAc264ModeCool);
+  for (float i = 18; i <= 30; i += 0.5) {
+    ac.setTemp(i);
+    EXPECT_EQ(i, ac.getTemp());
+  }
+
+  // Value in supported range, but not multiple of 0.5
+  // Fractional part of the value which is not multiple of 0.5 is truncated.
+  ac.setTemp(22.9);
+  EXPECT_EQ(22.5, ac.getTemp());
+
+  ac.setTemp(20.1);
+  EXPECT_EQ(20, ac.getTemp());
+}
+
+TEST(TestFujitsuAc264Class, TemperatureAuto) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  // Value over maximum is fixed to maximum (+2C)
+  ac.setTempAuto(10);
+  EXPECT_EQ(2, ac.getTempAuto());
+
+  // Value under minimum is fixed to minimum (-2C)
+  ac.setTempAuto(-10);
+  EXPECT_EQ(-2, ac.getTempAuto());
+
+  // Valid values in suppoerted range
+  for (float i = -2; i <= 2; i += 0.5) {
+    ac.setTempAuto(i);
+    EXPECT_EQ(i, ac.getTempAuto());
+  }
+
+  // Value in supported range, but not multiple of 0.5
+  // Fractional part of the value which is not multiple of 0.5 is truncated.
+  ac.setTempAuto(0.8);
+  EXPECT_EQ(0.5, ac.getTempAuto());
+
+  ac.setTempAuto(1.2);
+  EXPECT_EQ(1, ac.getTempAuto());
+
+  ac.setTempAuto(-1.4);
+  EXPECT_EQ(-1, ac.getTempAuto());
+}
+
+TEST(TestFujitsuAc264Class, Mode) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setMode(2);
+  EXPECT_EQ(kFujitsuAc264ModeAuto, ac.getMode());
+  EXPECT_FALSE(ac.isWeakDry());
+
+  // Unexpected value should default to Auto.
+  ac.setMode(255);
+  EXPECT_EQ(kFujitsuAc264ModeAuto, ac.getMode());
+  EXPECT_FALSE(ac.isWeakDry());
+
+  ac.setMode(kFujitsuAc264ModeAuto);
+  EXPECT_EQ(kFujitsuAc264ModeAuto, ac.getMode());
+  EXPECT_FALSE(ac.isWeakDry());
+
+  ac.setMode(kFujitsuAc264ModeCool);
+  EXPECT_EQ(kFujitsuAc264ModeCool, ac.getMode());
+  EXPECT_FALSE(ac.isWeakDry());
+
+  ac.setMode(kFujitsuAc264ModeFan);
+  EXPECT_EQ(kFujitsuAc264ModeFan, ac.getMode());
+  EXPECT_FALSE(ac.isWeakDry());
+
+  ac.setMode(kFujitsuAc264ModeHeat);
+  EXPECT_EQ(kFujitsuAc264ModeHeat, ac.getMode());
+  EXPECT_FALSE(ac.isWeakDry());
+
+  ac.setMode(kFujitsuAc264ModeDry);
+  EXPECT_EQ(kFujitsuAc264ModeDry, ac.getMode());
+  EXPECT_FALSE(ac.isWeakDry());
+
+  ac.setMode(kFujitsuAc264ModeDry, true);
+  EXPECT_EQ(kFujitsuAc264ModeDry, ac.getMode());
+  EXPECT_TRUE(ac.isWeakDry());
+}
+
+TEST(TestFujitsuAc264Class, FanSpeed) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value should default to Auto.
+  ac.setFanSpeed(0);
+  EXPECT_EQ(kFujitsuAc264FanSpeedAuto, ac.getFanSpeed());
+
+  // Unexpected value should default to Auto.
+  ac.setFanSpeed(255);
+  EXPECT_EQ(kFujitsuAc264FanSpeedAuto, ac.getFanSpeed());
+
+  // Unexpected value should default to Auto.
+  ac.setFanSpeed(2);
+  EXPECT_EQ(kFujitsuAc264FanSpeedAuto, ac.getFanSpeed());
+
+  // Unexpected value should default to Auto.
+  ac.setFanSpeed(4);
+  EXPECT_EQ(kFujitsuAc264FanSpeedAuto, ac.getFanSpeed());
+
+  // Unexpected value should default to Auto.
+  ac.setFanSpeed(5);
+  EXPECT_EQ(kFujitsuAc264FanSpeedAuto, ac.getFanSpeed());
+
+  // Unexpected value should default to Auto.
+  ac.setFanSpeed(7);
+  EXPECT_EQ(kFujitsuAc264FanSpeedAuto, ac.getFanSpeed());
+
+  // Beyond Max should default to Auto.
+  ac.setFanSpeed(kFujitsuAc264FanSpeedHigh + 1);
+  EXPECT_EQ(kFujitsuAc264FanSpeedAuto, ac.getFanSpeed());
+
+  ac.setFanSpeed(kFujitsuAc264FanSpeedAuto);
+  EXPECT_EQ(kFujitsuAc264FanSpeedAuto, ac.getFanSpeed());
+
+  ac.setFanSpeed(kFujitsuAc264FanSpeedQuiet);
+  EXPECT_EQ(kFujitsuAc264FanSpeedQuiet, ac.getFanSpeed());
+
+  ac.setFanSpeed(kFujitsuAc264FanSpeedLow);
+  EXPECT_EQ(kFujitsuAc264FanSpeedLow, ac.getFanSpeed());
+
+  ac.setFanSpeed(kFujitsuAc264FanSpeedMed);
+  EXPECT_EQ(kFujitsuAc264FanSpeedMed, ac.getFanSpeed());
+
+  ac.setFanSpeed(kFujitsuAc264FanSpeedHigh);
+  EXPECT_EQ(kFujitsuAc264FanSpeedHigh, ac.getFanSpeed());
+}
+
+TEST(TestFujitsuAc264Class, FanAngle) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value should default to Stay.
+  ac.setFanAngle(0);
+  EXPECT_EQ(kFujitsuAc264FanAngleStay, ac.getFanAngle());
+
+  // Unexpected value should default to Stay.
+  ac.setFanAngle(255);
+  EXPECT_EQ(kFujitsuAc264FanAngleStay, ac.getFanAngle());
+
+  // Unexpected value should default to Stay.
+  ac.setFanAngle(8);
+  EXPECT_EQ(kFujitsuAc264FanAngleStay, ac.getFanAngle());
+
+  // Unexpected value should default to Stay.
+  ac.setFanAngle(13);
+  EXPECT_EQ(kFujitsuAc264FanAngleStay, ac.getFanAngle());
+
+  // Unexpected value should default to Stay.
+  ac.setFanAngle(32);
+  EXPECT_EQ(kFujitsuAc264FanAngleStay, ac.getFanAngle());
+
+  ac.setFanAngle(kFujitsuAc264FanAngle1);
+  EXPECT_EQ(kFujitsuAc264FanAngle1, ac.getFanAngle());
+
+  ac.setFanAngle(kFujitsuAc264FanAngle2);
+  EXPECT_EQ(kFujitsuAc264FanAngle2, ac.getFanAngle());
+
+  ac.setFanAngle(kFujitsuAc264FanAngle3);
+  EXPECT_EQ(kFujitsuAc264FanAngle3, ac.getFanAngle());
+
+  ac.setFanAngle(kFujitsuAc264FanAngle4);
+  EXPECT_EQ(kFujitsuAc264FanAngle4, ac.getFanAngle());
+
+  ac.setFanAngle(kFujitsuAc264FanAngle5);
+  EXPECT_EQ(kFujitsuAc264FanAngle5, ac.getFanAngle());
+
+  ac.setFanAngle(kFujitsuAc264FanAngle6);
+  EXPECT_EQ(kFujitsuAc264FanAngle6, ac.getFanAngle());
+
+  ac.setFanAngle(kFujitsuAc264FanAngle7);
+  EXPECT_EQ(kFujitsuAc264FanAngle7, ac.getFanAngle());
+
+  ac.setFanAngle(kFujitsuAc264FanAngleStay);
+  EXPECT_EQ(kFujitsuAc264FanAngleStay, ac.getFanAngle());
+}
+
+TEST(TestFujitsuAc264Class, Swing) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setSwing(true);
+  EXPECT_TRUE(ac.getSwing());
+
+  ac.setSwing(false);
+  EXPECT_FALSE(ac.getSwing());
+}
+
+TEST(TestFujitsuAc264Class, Economy) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setEconomy(true);
+  EXPECT_TRUE(ac.getEconomy());
+
+  ac.setEconomy(false);
+  EXPECT_FALSE(ac.getEconomy());
+}
+
+TEST(TestFujitsuAc264Class, Clean) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setClean(true);
+  EXPECT_TRUE(ac.getClean());
+
+  ac.setClean(false);
+  EXPECT_FALSE(ac.getClean());
+}
+
+TEST(TestFujitsuAc264Class, Clock) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value should default to 0.
+  ac.setClock(2000);
+  EXPECT_EQ(0, ac.getClock());
+
+  // Valid values in suppoerted range
+  for (uint16_t i = 0; i < 1440; ++i) {
+    ac.setClock(i);
+    EXPECT_EQ(i, ac.getClock());
+  }
+}
+
+TEST(TestFujitsuAc264Class, SleepTimer) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value should default to 0 (invalid).
+  ac.setSleepTimer(12 * 60 + 1);
+  EXPECT_EQ(0, ac.getSleepTimer());
+
+  // Valid values in suppoerted range
+  for (uint16_t i = 0; i <= 12; ++i) {
+    ac.setSleepTimer(i * 60);
+    EXPECT_EQ(i * 60, ac.getSleepTimer());
+  }
+}
+
+TEST(TestFujitsuAc264Class, OnTimer) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value is ignored.
+  ac.setOnTimer(144);
+  EXPECT_EQ(0, ac.getOnTimer());
+
+  // Valid values in suppoerted range
+  for (uint8_t i = 0; i < 144; ++i) {
+    ac.setOnTimer(i);
+    EXPECT_EQ(i, ac.getOnTimer());
+  }
+
+  // Unexpected value is ignored.
+  ac.setOnTimer(255);
+  EXPECT_EQ(143, ac.getOnTimer());
+
+  // On timer enabled
+  ac.setTimerEnable(kFujitsuAc264OnTimerEnable);
+  EXPECT_EQ(kFujitsuAc264OnTimerEnable, ac.getTimerEnable());
+
+  // On timer disabled
+  ac.setTimerEnable(kFujitsuAc264OnOffTimerDisable);
+  EXPECT_EQ(kFujitsuAc264OnOffTimerDisable, ac.getTimerEnable());
+}
+
+TEST(TestFujitsuAc264Class, OffTimer) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  // Unexpected value is ignored.
+  ac.setOffTimer(144);
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  // Valid values in suppoerted range
+  for (uint8_t i = 0; i < 144; ++i) {
+    ac.setOffTimer(i);
+    EXPECT_EQ(i, ac.getOffTimer());
+  }
+
+  // Unexpected value is ignored.
+  ac.setOffTimer(255);
+  EXPECT_EQ(143, ac.getOffTimer());
+
+  // Off timer enabled
+  ac.setTimerEnable(kFujitsuAc264OffTimerEnable);
+  EXPECT_EQ(kFujitsuAc264OffTimerEnable, ac.getTimerEnable());
+
+  // On & off timer enabled
+  ac.setTimerEnable(kFujitsuAc264OnOffTimerEnable);
+  EXPECT_EQ(kFujitsuAc264OnOffTimerEnable, ac.getTimerEnable());
+
+  // On & Off timer disabled
+  ac.setTimerEnable(kFujitsuAc264OnOffTimerDisable);
+  EXPECT_EQ(kFujitsuAc264OnOffTimerDisable, ac.getTimerEnable());
+}
+
+TEST(TestFujitsuAc264Class, Sterilization) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  ac.send();
+
+  // When AC is powered on, sterilization is ignored.
+  ac.toggleSterilization();
+  EXPECT_EQ(kFujitsuAc264CmdCool, ac.getCmd());
+
+  ac.off();
+  ac.send();
+
+  // When AC is powered off, sterilization is accepted.
+  ac.toggleSterilization();
+  EXPECT_EQ(kFujitsuAc264SpCmdToggleSterilization, ac.getCmd());
+}
+
+TEST(TestFujitsuAc264Class, OutsideQuiet) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  ac.send();
+
+  // When AC is powered on, outside quiet is ignored.
+  ac.setOutsideQuiet(true);
+  ac.send();
+  EXPECT_FALSE(ac.getOutsideQuiet());
+
+  ac.off();
+  ac.send();
+
+  // When AC is powered off, outside quiet is accepted.
+  ac.setOutsideQuiet(true);
+  ac.send();
+  EXPECT_TRUE(ac.getOutsideQuiet());
+
+  ac.setOutsideQuiet(false);
+  ac.send();
+  EXPECT_FALSE(ac.getOutsideQuiet());
+}
+
+TEST(TestFujitsuAc264Class, EcoFan) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  ac.send();
+
+  // When AC is powered on, eco fan is ignored.
+  ac.setEcoFan(true);
+  ac.send();
+  EXPECT_FALSE(ac.getEcoFan());
+
+  ac.off();
+  ac.send();
+
+  // When AC is powered off, eco fan is accepted.
+  ac.setEcoFan(true);
+  ac.send();
+  EXPECT_TRUE(ac.getEcoFan());
+
+  ac.setEcoFan(false);
+  ac.send();
+  EXPECT_FALSE(ac.getEcoFan());
+}
+
+TEST(TestFujitsuAc264Class, Powerful) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  ac.off();
+  ac.send();
+
+  // When AC is powered off, powerful is ignored.
+  ac.togglePowerful();
+  ac.send();
+  EXPECT_EQ(kFujitsuAc264SpCmdTurnOff, ac.getCmd());
+
+  ac.on();
+  ac.send();
+
+  // When AC is powered on, powerful is accepted.
+  ac.togglePowerful();
+  ac.send();
+  EXPECT_EQ(kFujitsuAc264SpCmdTogglePowerful, ac.getCmd());
+
+  ac.togglePowerful();
+  ac.send();
+  EXPECT_EQ(kFujitsuAc264SpCmdTogglePowerful, ac.getCmd());
+}
+
+TEST(TestFujitsuAc264Class, NormalCommands) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  ac.send();
+
+  // Special commands are ignored.
+  ac.setCmd(kFujitsuAc264SpCmdTogglePowerful);
+  EXPECT_EQ(kFujitsuAc264CmdCool, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264SpCmdTurnOff);
+  EXPECT_EQ(kFujitsuAc264CmdCool, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264SpCmdEcoFanOff);
+  EXPECT_EQ(kFujitsuAc264CmdCool, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264SpCmdEcoFanOn);
+  EXPECT_EQ(kFujitsuAc264CmdCool, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264SpCmdOutsideQuietOff);
+  EXPECT_EQ(kFujitsuAc264CmdCool, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264SpCmdOutsideQuietOn);
+  EXPECT_EQ(kFujitsuAc264CmdCool, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264SpCmdToggleSterilization);
+  EXPECT_EQ(kFujitsuAc264CmdCool, ac.getCmd());
+
+  // Normal commands can be set.
+  ac.setCmd(kFujitsuAc264CmdCool);
+  EXPECT_EQ(kFujitsuAc264CmdCool, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdHeat);
+  EXPECT_EQ(kFujitsuAc264CmdHeat, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdDry);
+  EXPECT_EQ(kFujitsuAc264CmdDry, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdAuto);
+  EXPECT_EQ(kFujitsuAc264CmdAuto, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdFan);
+  EXPECT_EQ(kFujitsuAc264CmdFan, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdTemp);
+  EXPECT_EQ(kFujitsuAc264CmdTemp, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdSwing);
+  EXPECT_EQ(kFujitsuAc264CmdSwing, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdSleepTime);
+  EXPECT_EQ(kFujitsuAc264CmdSleepTime, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdEconomy);
+  EXPECT_EQ(kFujitsuAc264CmdEconomy, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdClean);
+  EXPECT_EQ(kFujitsuAc264CmdClean, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdFanSpeed);
+  EXPECT_EQ(kFujitsuAc264CmdFanSpeed, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdFanAngle);
+  EXPECT_EQ(kFujitsuAc264CmdFanAngle, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdCancelSleepTimer);
+  EXPECT_EQ(kFujitsuAc264CmdCancelSleepTimer, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdOnTimer);
+  EXPECT_EQ(kFujitsuAc264CmdOnTimer, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdOffTimer);
+  EXPECT_EQ(kFujitsuAc264CmdOffTimer, ac.getCmd());
+
+  ac.setCmd(kFujitsuAc264CmdCancelOnOffTimer);
+  EXPECT_EQ(kFujitsuAc264CmdCancelOnOffTimer, ac.getCmd());
+}
+
+TEST(TestFujitsuAc264Class, SpecialCommands) {
+  IRFujitsuAC264 ac(kGpioUnused);
+  ac.begin();
+
+  uint8_t expected_turnoff[7] = {0x14, 0x63, 0x0, 0x10, 0x10, 0x02, 0xFD};
+  uint8_t expected_powerful[7] = {0x14, 0x63, 0x00, 0x10, 0x10, 0x39, 0xC6};
+  uint8_t expected_ecofanoff[7] = {0x14, 0x63, 0x00, 0x10, 0x10, 0x51, 0xAE};
+  uint8_t expected_ecofanon[7] = {0x14, 0x63, 0x00, 0x10, 0x10, 0x50, 0xAF};
+  uint8_t expected_outsidequietoff[16] = {
+    0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0xC1,
+    0x40, 0x01, 0x00, 0x00, 0xFE, 0xBF, 0x00, 0x41};
+  uint8_t expected_outsidequieton[16] = {
+    0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0xC1,
+    0x40, 0x00, 0x00, 0x00, 0xFF, 0xBF, 0x00, 0x41};
+  uint8_t expected_sterilization[16] = {
+    0x14, 0x63, 0x00, 0x10, 0x10, 0xFE, 0x09, 0xC1,
+    0x60, 0x03, 0x00, 0x00, 0xFC, 0x9F, 0x00, 0x41};
+
+  ac.on();
+  ac.send();
+
+  ac.togglePowerful();
+  ac.send();
+  EXPECT_STATE_EQ(expected_powerful, ac.getRaw(), 7 * 8);
+  EXPECT_EQ(kFujitsuAc264StateLengthShort, ac.getStateLength());
+  EXPECT_EQ("Command: Powerful", ac.toString());
+
+  ac.off();
+  ac.send();
+  EXPECT_STATE_EQ(expected_turnoff, ac.getRaw(), 7 * 8);
+  EXPECT_EQ(kFujitsuAc264StateLengthShort, ac.getStateLength());
+  EXPECT_EQ("Command: Power Off", ac.toString());
+
+  ac.setEcoFan(true);
+  ac.send();
+  EXPECT_STATE_EQ(expected_ecofanon, ac.getRaw(), 7 * 8);
+  EXPECT_EQ(kFujitsuAc264StateLengthShort, ac.getStateLength());
+  EXPECT_EQ("Command: Eco Fan On", ac.toString());
+
+  ac.setEcoFan(false);
+  ac.send();
+  EXPECT_STATE_EQ(expected_ecofanoff, ac.getRaw(), 7 * 8);
+  EXPECT_EQ(kFujitsuAc264StateLengthShort, ac.getStateLength());
+  EXPECT_EQ("Command: Eco Fan Off", ac.toString());
+
+  ac.setOutsideQuiet(true);
+  ac.send();
+  EXPECT_STATE_EQ(expected_outsidequieton, ac.getRaw(), 16 * 8);
+  EXPECT_EQ(kFujitsuAc264StateLengthMiddle, ac.getStateLength());
+  EXPECT_EQ("Command: Outside Quiet On", ac.toString());
+
+  ac.setOutsideQuiet(false);
+  ac.send();
+  EXPECT_STATE_EQ(expected_outsidequietoff, ac.getRaw(), 16 * 8);
+  EXPECT_EQ(kFujitsuAc264StateLengthMiddle, ac.getStateLength());
+  EXPECT_EQ("Command: Outside Quiet Off", ac.toString());
+
+  ac.toggleSterilization();
+  ac.send();
+  EXPECT_STATE_EQ(expected_sterilization, ac.getRaw(), 16 * 8);
+  EXPECT_EQ(kFujitsuAc264StateLengthMiddle, ac.getStateLength());
+  EXPECT_EQ("Command: Sterilization", ac.toString());
 }
