@@ -84,7 +84,7 @@ TEST_P(TestDecodeGorenjeSyntheticSendTestFixture, SyntheticExample) {
   EXPECT_FALSE(irsend.capture.repeat);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   TestDecodeGorenje,
   TestDecodeGorenjeSyntheticSendTestFixture,
   ::testing::Values(0x2, 0x8, 0x4, 0x10, 0x20, 0x1));
@@ -112,7 +112,7 @@ TEST_P(TestDecodeGorenjeReceiveTestFixture, RealExample) {
   EXPECT_FALSE(irsend.capture.repeat);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   TestDecodeGorenje,
   TestDecodeGorenjeReceiveTestFixture,
   ::testing::Values(
