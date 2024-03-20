@@ -157,6 +157,7 @@ enum gree_ac_remote_model_t {
   YBOFB,      // (2) Green, YBOFB2, YAPOF3
   YX1FSF,     // (3) Soleus Air window unit (Similar to YAW1F, but with an
               //     Operation mode of Energy Saver (Econo))
+  YX1F8F,     // Similiar to YX1FSF
 };
 
 /// HAIER_AC176 A/C model numbers
