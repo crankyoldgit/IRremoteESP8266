@@ -35,7 +35,7 @@ const uint8_t kGlobalCacheStartIndex = kGlobalCacheRptStartIndex + 1;
 void IRsend::sendGC(uint16_t buf[], uint16_t len) {
   uint16_t hz = buf[kGlobalCacheFreqIndex];  // GC frequency is in Hz.
   enableIROut(hz);
-  uint32_t periodic_time = calcUSecPeriod(hz, false);
+  uint32_t periodic_time = calcUSecPeriod(hz);
   uint8_t emits =
       std::min(buf[kGlobalCacheRptIndex], (uint16_t)kGlobalCacheMaxRepeat);
   // Repeat

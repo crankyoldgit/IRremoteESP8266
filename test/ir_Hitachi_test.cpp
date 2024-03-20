@@ -1831,7 +1831,7 @@ TEST(TestIRHitachiAc1Class, FanSpeedInDryMode) {
   ac.setPower(true);
   ac.setPowerToggle(true);
   ac.setMode(kHitachiAc1Dry);
-  ac.setTemp(22.5);
+  ac.setTemp((uint8_t)22.5);
   ac.setFan(kHitachiAc1FanLow);
   ac.setSwingV(false);
   ac.setSwingH(false);

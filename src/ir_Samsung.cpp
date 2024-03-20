@@ -32,8 +32,8 @@ const uint16_t kSamsungOneSpaceTicks = 3;
 const uint16_t kSamsungOneSpace = kSamsungOneSpaceTicks * kSamsungTick;
 const uint16_t kSamsungZeroSpaceTicks = 1;
 const uint16_t kSamsungZeroSpace = kSamsungZeroSpaceTicks * kSamsungTick;
-const uint16_t kSamsungRptSpaceTicks = 4;
-const uint16_t kSamsungRptSpace = kSamsungRptSpaceTicks * kSamsungTick;
+//const uint16_t kSamsungRptSpaceTicks = 4;
+//const uint16_t kSamsungRptSpace = kSamsungRptSpaceTicks * kSamsungTick;
 const uint16_t kSamsungMinMessageLengthTicks = 193;
 const uint32_t kSamsungMinMessageLength =
     kSamsungMinMessageLengthTicks * kSamsungTick;
@@ -46,7 +46,7 @@ const uint32_t kSamsungMinGap = kSamsungMinGapTicks * kSamsungTick;
 
 const uint16_t kSamsungAcHdrMark = 690;
 const uint16_t kSamsungAcHdrSpace = 17844;
-const uint8_t kSamsungAcSections = 2;
+//const uint8_t kSamsungAcSections = 2;
 const uint16_t kSamsungAcSectionMark = 3086;
 const uint16_t kSamsungAcSectionSpace = 8864;
 const uint16_t kSamsungAcSectionGap = 2886;

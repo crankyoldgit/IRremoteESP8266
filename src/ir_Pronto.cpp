@@ -72,7 +72,7 @@ void IRsend::sendPronto(uint16_t data[], uint16_t len, uint16_t repeat) {
   uint16_t seq_1_start = kProntoDataOffset;
   uint16_t seq_2_start = kProntoDataOffset + seq_1_len;
 
-  uint32_t periodic_time_x10 = calcUSecPeriod(hz / 10, false);
+  uint32_t periodic_time_x10 = calcUSecPeriod(hz / 10);
 
   // Normal (1st sequence) case.
   // Is there a first (normal) sequence to send?

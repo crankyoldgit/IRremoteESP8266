@@ -25,7 +25,7 @@
 
 // Constants
 // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1220
-const uint16_t kPioneerTick = 534;  ///< uSeconds.
+//const uint16_t kPioneerTick = 534;  ///< uSeconds.
 const uint16_t kPioneerHdrMark = 8506;  ///< uSeconds.
 const uint16_t kPioneerHdrSpace = 4191;  ///< uSeconds.
 const uint16_t kPioneerBitMark = 568;  ///< uSeconds.

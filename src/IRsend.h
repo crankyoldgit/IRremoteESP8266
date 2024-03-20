@@ -21,17 +21,6 @@
 // Constants
 // Offset (in microseconds) to use in Period time calculations to account for
 // code excution time in producing the software PWM signal.
-#if defined(ESP32)
-// Calculated on a generic ESP-WROOM-32 board with v3.2-18 SDK @ 240MHz
-const int8_t kPeriodOffset = -2;
-#elif (defined(ESP8266) && F_CPU == 160000000L)  // NOLINT(whitespace/parens)
-// Calculated on an ESP8266 NodeMCU v2 board using:
-// v2.6.0 with v2.5.2 ESP core @ 160MHz
-const int8_t kPeriodOffset = -2;
-#else  // (defined(ESP8266) && F_CPU == 160000000L)
-// Calculated on ESP8266 Wemos D1 mini using v2.4.1 with v2.4.0 ESP core @ 40MHz
-const int8_t kPeriodOffset = -5;
-#endif  // (defined(ESP8266) && F_CPU == 160000000L)
 const uint8_t kDutyDefault = 50;  // Percentage
 const uint8_t kDutyMax = 100;     // Percentage
 // delayMicroseconds() is only accurate to 16383us.
@@ -885,6 +874,15 @@ class IRsend {
                     const uint16_t nbytes = kYorkStateLength,
                     const uint16_t repeat = kNoRepeat);
 #endif  // SEND_YORK
+#if SEND_BANG_OLUFSEN
+  void sendBangOlufsen(const uint64_t data,
+                       const uint16_t nbits = kBangOlufsenBits,
+                       const uint16_t repeat = kNoRepeat);
+  void sendBangOlufsenRaw(const uint64_t rawData,
+                          const uint16_t bits,
+                          const bool datalink,
+                          const bool backToBack);
+#endif  // SEND_BANG_OLUFSEN
 
  protected:
 #ifdef UNIT_TEST
@@ -905,13 +903,13 @@ class IRsend {
 #else
   uint32_t _freq_unittest;
 #endif  // UNIT_TEST
-  uint16_t onTimePeriod;
-  uint16_t offTimePeriod;
+  uint16_t onTimePeriod; // Fixed point.
+  uint16_t offTimePeriod; // Fixed point.
+  uint8_t _fractionalBits; // Number of fractional bits in on/offTimePeriod.
   uint16_t IRpin;
-  int8_t periodOffset;
   uint8_t _dutycycle;
   bool modulation;
-  uint32_t calcUSecPeriod(uint32_t hz, bool use_offset = true);
+  uint32_t calcUSecPeriod(uint32_t hz);
 #if SEND_SONY
   void _sendSony(const uint64_t data, const uint16_t nbits,
                  const uint16_t repeat, const uint16_t freq);

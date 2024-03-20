@@ -14,7 +14,7 @@
 #include "IRutils.h"
 
 // Constants
-const uint16_t kRcmmTick = 28;  // Technically it would be 27.777*
+//const uint16_t kRcmmTick = 28;  // Technically it would be 27.777*
 const uint16_t kRcmmHdrMarkTicks = 15;
 const uint16_t kRcmmHdrMark = 416;
 const uint16_t kRcmmHdrSpaceTicks = 10;
@@ -29,7 +29,7 @@ const uint16_t kRcmmBitSpace2Ticks = 22;
 const uint16_t kRcmmBitSpace2 = 611;
 const uint16_t kRcmmBitSpace3Ticks = 28;
 const uint16_t kRcmmBitSpace3 = 777;
-const uint16_t kRcmmRptLengthTicks = 992;
+//const uint16_t kRcmmRptLengthTicks = 992;
 const uint32_t kRcmmRptLength = 27778;
 const uint16_t kRcmmMinGapTicks = 120;
 const uint32_t kRcmmMinGap = 3360;

@@ -262,8 +262,8 @@ String resultToSourceCode(const decode_results * const results) {
   //   "uint32_t address = 0xDEADBEEF;\n"
   //   "uint32_t command = 0xDEADBEEF;\n"
   //   "uint64_t data = 0xDEADBEEFDEADBEEF;" = ~116 chars max.
-  output.reserve(55 + (length * 7) + hasState ? 25 + (results->bits / 8) * 6
-                                              : 116);
+  output.reserve(55 + (length * 7) + (hasState ? 25 + (results->bits / 8) * 6
+                                               : 116));
   // Start declaration
   output += F("uint16_t ");  // variable type
   output += F("rawData[");   // array name

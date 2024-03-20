@@ -26,6 +26,7 @@ const uint64_t kRcz01Signature =     0x800B304800;
 const uint8_t  kRcz01CommandMask =           0xFE;
 const uint8_t  kRcz01ChannelMask =           0x01;
 
+#ifndef UNIT_TEST
 // Known commands - Here for documentation rather than actual usage
 const uint8_t  kRcz01CommandSwitchChannel =  0xD2;
 const uint8_t  kRcz01CommandTimmer60 =       0x52;
@@ -43,6 +44,7 @@ const uint8_t  kRcz01CommandLevel4 =         0xD0;
 const uint8_t  kRcz01CommandOn =             0xC0;
 const uint8_t  kRcz01CommandNightLight =     0xC8;
 // end Known commands
+#endif
 
 #if SEND_DOSHISHA
 /// Send a Doshisha formatted message.
