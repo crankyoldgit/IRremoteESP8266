@@ -105,7 +105,7 @@ uint16_t IRToshibaAC::getInternalStateLength(const uint8_t state[],
                                              const uint16_t size) {
   if (size < kToshibaAcLengthByte) return 0;
   // Fix: Extract the last 4 bits instead
-  return std::min((uint16_t)((state[kToshibaAcLengthByte] & 0xF) 
+  return std::min((uint16_t)((state[kToshibaAcLengthByte] & 0xF)
     + kToshibaAcMinLength), kToshibaACStateLengthLong);
 }
 
