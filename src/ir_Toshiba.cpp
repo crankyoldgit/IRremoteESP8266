@@ -104,7 +104,8 @@ void IRToshibaAC::send(const uint16_t repeat) {
 uint16_t IRToshibaAC::getInternalStateLength(const uint8_t state[],
                                              const uint16_t size) {
   if (size < kToshibaAcLengthByte) return 0;
-  return std::min((uint16_t)(state[kToshibaAcLengthByte] + kToshibaAcMinLength),
+  // Fix: Extract the last 4 bits instead
+  return std::min((uint16_t)((state[kToshibaAcLengthByte] & 0xF) + kToshibaAcMinLength),
                   kToshibaACStateLengthLong);
 }
 
@@ -491,6 +492,23 @@ String IRToshibaAC::toString(void) const {
       result += addBoolToString(getFilter(), kFilterStr);
   }
   return result;
+}
+
+void IRToshibaAC::setRemoteControl(const uint8_t remote_type) {
+  switch (remote_type)
+  {
+  case kToshibaAcRemoteA:
+  case kToshibaAcRemoteB:
+    _.Remote = remote_type;
+    break;
+  default:
+    _.Remote = kToshibaAcRemoteA;
+    break;
+  }
+}
+
+uint8_t IRToshibaAC::getRemoteControl() const {
+  return _.Remote;
 }
 
 #if DECODE_TOSHIBA_AC
