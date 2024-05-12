@@ -105,8 +105,8 @@ uint16_t IRToshibaAC::getInternalStateLength(const uint8_t state[],
                                              const uint16_t size) {
   if (size < kToshibaAcLengthByte) return 0;
   // Fix: Extract the last 4 bits instead
-  return std::min((uint16_t)((state[kToshibaAcLengthByte] & 0xF) + kToshibaAcMinLength),
-                  kToshibaACStateLengthLong);
+  return std::min((uint16_t)((state[kToshibaAcLengthByte] & 0xF) 
+    + kToshibaAcMinLength), kToshibaACStateLengthLong);
 }
 
 /// Get the length of the current internal state per the protocol structure.
@@ -495,8 +495,7 @@ String IRToshibaAC::toString(void) const {
 }
 
 void IRToshibaAC::setRemoteControl(const uint8_t remote_type) {
-  switch (remote_type)
-  {
+  switch (remote_type) {
   case kToshibaAcRemoteA:
   case kToshibaAcRemoteB:
     _.Remote = remote_type;
