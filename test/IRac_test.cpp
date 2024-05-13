@@ -3145,8 +3145,8 @@ TEST(TestIRac, Issue1250) {
 
   // Now send the state so we can actually decode/capture what we sent.
   char expected_on[] =
-      "Temp: 19C, Power: On, Mode: 4 (Fan), Fan: 0 (Auto), "
-      "Turbo: Off, Econo: Off, Filter: Off";
+      "Model: 0 (TOSHIBA REMOTE A), Temp: 19C, Power: On, Mode: 4 (Fan), "
+      "Fan: 0 (Auto), Turbo: Off, Econo: Off, Filter: Off";
   ac._irsend.reset();
   irac.toshiba(&ac,
                irac.next.power,     // Power
