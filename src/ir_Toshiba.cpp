@@ -499,16 +499,18 @@ String IRToshibaAC::toString(void) const {
 /// Get the model information currently known.
 /// @return The known model number.
 toshiba_ac_remote_model_t IRToshibaAC::getModel(void) const {
-  switch(_.Model) {
-    case kToshibaAcRemoteB: return toshiba_ac_remote_model_t::kToshibaGenericRemote_B;
-    default:                return toshiba_ac_remote_model_t::kToshibaGenericRemote_A; 
+  switch (_.Model) {
+    case kToshibaAcRemoteB:
+      return toshiba_ac_remote_model_t::kToshibaGenericRemote_B;
+    default:
+      return toshiba_ac_remote_model_t::kToshibaGenericRemote_A;
   }
 }
 
 /// Set the current model for the remote.
 /// @param[in] model The model number.
 void IRToshibaAC::setModel(const toshiba_ac_remote_model_t model) {
-  switch(model) {
+  switch (model) {
     case toshiba_ac_remote_model_t::kToshibaGenericRemote_B:
       _.Model = kToshibaAcRemoteB;
       break;
