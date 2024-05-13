@@ -2158,8 +2158,8 @@ TEST(TestIRac, Toshiba) {
   IRac irac(kGpioUnused);
   IRrecv capture(kGpioUnused);
   char expected[] =
-      "Temp: 29C, Power: On, Mode: 2 (Dry), Fan: 2 (UNKNOWN), "
-      "Turbo: Off, Econo: On, Filter: Off";
+      "Model: 0 (TOSHIBA REMOTE A), Temp: 29C, Power: On, Mode: 2 (Dry), "
+      "Fan: 2 (UNKNOWN), Turbo: Off, Econo: On, Filter: Off";
 
   ac.begin();
   irac.toshiba(&ac,
