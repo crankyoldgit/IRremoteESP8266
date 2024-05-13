@@ -312,21 +312,21 @@ TEST(TestToshibaACClass, HumanReadableOutput) {
 
   ac.setRaw(initial_state);
   EXPECT_EQ("Temp: 17C, Power: On, Mode: 0 (Auto), Fan: 0 (Auto), "
-            "Turbo: Off, Econo: Off, Filter: Off",
+            "Turbo: Off, Econo: Off, Filter: Off, Remote Control Type: A",
             ac.toString());
   ac.setRaw(modified_state);
   EXPECT_EQ("Temp: 17C, Power: On, Mode: 1 (Cool), Fan: 5 (High), "
-            "Turbo: Off, Econo: Off, Filter: Off",
+            "Turbo: Off, Econo: Off, Filter: Off, Remote Control Type: A",
             ac.toString());
   ac.setTemp(25);
   ac.setFan(3);
   ac.setMode(kToshibaAcDry);
   EXPECT_EQ("Temp: 25C, Power: On, Mode: 2 (Dry), Fan: 3 (Medium), "
-            "Turbo: Off, Econo: Off, Filter: Off",
+            "Turbo: Off, Econo: Off, Filter: Off, Remote Control Type: A",
             ac.toString());
   ac.off();
   EXPECT_EQ("Temp: 25C, Power: Off, Fan: 3 (Medium), Turbo: Off, Econo: Off, "
-            "Filter: Off",
+            "Filter: Off, Remote Control Type: A",
             ac.toString());
 }
 
