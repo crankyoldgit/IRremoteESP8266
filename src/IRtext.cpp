@@ -217,6 +217,13 @@ IRTEXT_CONST_STRING(kTimerActiveDaysStr, D_STR_TIMER_ACTIVE_DAYS);
 ///< "TimerActiveDays"
 IRTEXT_CONST_STRING(kKeyStr, D_STR_KEY);  ///< "Key"
 IRTEXT_CONST_STRING(kValueStr, D_STR_VALUE);  ///< "Value"
+///< "Remote Control Types"
+IRTEXT_CONST_STRING(kRemoteControlType, D_STR_REMOTECONTROLTYPE);  ///<
+    ///< "Remote Control Type"
+IRTEXT_CONST_STRING(kToshibaRemoteControlTypeA, D_STR_TOSHIBAREMOTETYPEA);
+    ///< "A"
+IRTEXT_CONST_STRING(kToshibaRemoteControlTypeB, D_STR_TOSHIBAREMOTETYPEB);
+    ///< "B"
 
 // Separators & Punctuation
 const char kTimeSep = D_CHR_TIME_SEP;  ///< ':'

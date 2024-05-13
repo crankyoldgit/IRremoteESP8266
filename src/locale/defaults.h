@@ -478,6 +478,15 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_VALUE
 #define D_STR_VALUE "Value"
 #endif  // D_STR_VALUE
+#ifndef D_STR_REMOTECONTROLTYPE
+#define D_STR_REMOTECONTROLTYPE "Remote Control Type"
+#endif  // D_STR_REMOTECONTROLTYPE
+#ifndef D_STR_TOSHIBAREMOTETYPEA
+#define D_STR_TOSHIBAREMOTETYPEA "A"
+#endif  // D_STR_TOSHIBAREMOTETYPEA
+#ifndef D_STR_TOSHIBAREMOTETYPEB
+#define D_STR_TOSHIBAREMOTETYPEB "B"
+#endif  // D_STR_TOSHIBAREMOTETYPEB
 
 // Compound words/phrases/descriptions from pre-defined words.
 // Note: Obviously these need to be defined *after* their component words.
