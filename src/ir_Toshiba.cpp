@@ -492,15 +492,13 @@ String IRToshibaAC::toString(void) const {
       result += addBoolToString(getFilter(), kFilterStr);
   }
   switch (getRemoteControl()) {
-    case kToshibaAcRemoteA:
-      result += addLabeledString(kToshibaRemoteControlTypeA,
-        kRemoteControlType);
-      break;
     case kToshibaAcRemoteB:
       result += addLabeledString(kToshibaRemoteControlTypeB,
         kRemoteControlType);
       break;
     default:
+      result += addLabeledString(kToshibaRemoteControlTypeA,
+        kRemoteControlType);
       break;
   }
   return result;
