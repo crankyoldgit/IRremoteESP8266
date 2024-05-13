@@ -311,22 +311,25 @@ TEST(TestToshibaACClass, HumanReadableOutput) {
                                                    0x00, 0xC1, 0x00, 0xC0};
 
   ac.setRaw(initial_state);
-  EXPECT_EQ("Model: 0 (TOSHIBA REMOTE A), Temp: 17C, Power: On, Mode: 0 (Auto), "
-            "Fan: 0 (Auto), Turbo: Off, Econo: Off, Filter: Off",
+  EXPECT_EQ("Model: 0 (TOSHIBA REMOTE A), Temp: 17C, Power: On, "
+            "Mode: 0 (Auto), Fan: 0 (Auto), Turbo: Off, Econo: Off, "
+            "Filter: Off",
             ac.toString());
   ac.setRaw(modified_state);
-  EXPECT_EQ("Model: 0 (TOSHIBA REMOTE A), Temp: 17C, Power: On, Mode: 1 (Cool), "
-            "Fan: 5 (High), Turbo: Off, Econo: Off, Filter: Off",
+  EXPECT_EQ("Model: 0 (TOSHIBA REMOTE A), Temp: 17C, Power: On, "
+            "Mode: 1 (Cool), Fan: 5 (High), Turbo: Off, Econo: Off, "
+            "Filter: Off",
             ac.toString());
   ac.setTemp(25);
   ac.setFan(3);
   ac.setMode(kToshibaAcDry);
-  EXPECT_EQ("Model: 0 (TOSHIBA REMOTE A), Temp: 25C, Power: On, Mode: 2 (Dry), "
-            "Fan: 3 (Medium), Turbo: Off, Econo: Off, Filter: Off",
+  EXPECT_EQ("Model: 0 (TOSHIBA REMOTE A), Temp: 25C, Power: On, "
+            "Mode: 2 (Dry), Fan: 3 (Medium), Turbo: Off, Econo: Off, "
+            "Filter: Off",
             ac.toString());
   ac.off();
-  EXPECT_EQ("Model: 0 (TOSHIBA REMOTE A), Temp: 25C, Power: Off, Fan: 3 (Medium), "
-            "Turbo: Off, Econo: Off, Filter: Off",
+  EXPECT_EQ("Model: 0 (TOSHIBA REMOTE A), Temp: 25C, Power: Off, "
+            "Fan: 3 (Medium), Turbo: Off, Econo: Off, Filter: Off",
             ac.toString());
 }
 

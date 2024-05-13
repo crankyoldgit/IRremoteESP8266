@@ -57,7 +57,7 @@ union ToshibaProtocol{
     // Toshiba remote type
     // 0 - Remote control A
     // 1 - Remote control B
-    uint8_t Remote   :4;
+    uint8_t Model   :4;
     // Byte[3] - The bit-inverted value of the "length" byte.
     uint8_t          :8;
     // Byte[4]
@@ -147,8 +147,8 @@ class IRToshibaAC {
   void begin(void);
   void on(void);
   void off(void);
-  void setRemoteControl(const uint8_t remote_type);
-  uint8_t getRemoteControl() const;
+  void setModel(const toshiba_ac_remote_model_t model);
+  toshiba_ac_remote_model_t getModel() const;
   void setPower(const bool on);
   bool getPower(void) const;
   void setTemp(const uint8_t degrees);

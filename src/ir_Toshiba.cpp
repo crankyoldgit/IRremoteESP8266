@@ -40,6 +40,7 @@ using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::checkInvertedBytePairs;
 using irutils::invertBytePairs;
+using irutils::addModelToString;
 
 #if SEND_TOSHIBA_AC
 /// Send a Toshiba A/C message.
@@ -463,7 +464,8 @@ stdAc::state_t IRToshibaAC::toCommon(const stdAc::state_t *prev) const {
 String IRToshibaAC::toString(void) const {
   String result = "";
   result.reserve(95);
-  result += addTempToString(getTemp(), true, false);
+  result += addModelToString(decode_type_t::TOSHIBA_AC, getModel(), false);
+  result += addTempToString(getTemp(), true);
   switch (getStateLength()) {
     case kToshibaACStateLengthShort:
       result += addIntToString(getSwing(true), kSwingVStr);
@@ -494,20 +496,26 @@ String IRToshibaAC::toString(void) const {
   return result;
 }
 
-void IRToshibaAC::setRemoteControl(const uint8_t remote_type) {
-  switch (remote_type) {
-  case kToshibaAcRemoteA:
-  case kToshibaAcRemoteB:
-    _.Remote = remote_type;
-    break;
-  default:
-    _.Remote = kToshibaAcRemoteA;
-    break;
+/// Get the model information currently known.
+/// @return The known model number.
+toshiba_ac_remote_model_t IRToshibaAC::getModel(void) const {
+  switch(_.Model) {
+    case kToshibaAcRemoteB: return toshiba_ac_remote_model_t::kToshibaGenericRemote_B;
+    default:                return toshiba_ac_remote_model_t::kToshibaGenericRemote_A; 
   }
 }
 
-uint8_t IRToshibaAC::getRemoteControl() const {
-  return _.Remote;
+/// Set the current model for the remote.
+/// @param[in] model The model number.
+void IRToshibaAC::setModel(const toshiba_ac_remote_model_t model) {
+  switch(model) {
+    case toshiba_ac_remote_model_t::kToshibaGenericRemote_B:
+      _.Model = kToshibaAcRemoteB;
+      break;
+    default:
+      _.Model = kToshibaAcRemoteA;
+      break;
+  }
 }
 
 #if DECODE_TOSHIBA_AC

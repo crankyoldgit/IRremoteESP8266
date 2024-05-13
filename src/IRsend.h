@@ -228,6 +228,13 @@ enum argo_ac_remote_model_t {
   SAC_WREM3        // (2) ARGO WREM3 remote (touch buttons), bit-len vary by cmd
 };
 
+/// Toshiba A/C model numbers
+enum toshiba_ac_remote_model_t {
+  kToshibaGenericRemote_A = 0, // Default from existing codebase
+  kToshibaGenericRemote_B = 1, // Newly discovered remote control b, applies to
+  // many remote models such as WA-TH03A, WA-TH04A etc.
+};
+
 // Classes
 
 /// Class for sending all basic IR protocols.
