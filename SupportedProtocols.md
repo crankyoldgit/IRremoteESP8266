@@ -121,6 +121,7 @@
 | [Symphony](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Symphony.cpp) | **Symphony** | Air Cooler 3Di |  | - |
 | [Symphony](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Symphony.cpp) | **Westinghouse** | 78095 Remote<BR>Ceiling fan |  | - |
 | [Tcl](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.cpp) | **[Daewoo](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.h)** | DSB-F0934ELH-V A/C<BR>GYKQ-52E remote | GZ055BE1<BR>TAC09CHSD | Yes |
+| [Tcl](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.cpp) | **Electrolux** | EACM CL/N3 series |  | - |
 | [Tcl](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.cpp) | **[Leberg](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.h)** | LBS-TOR07 A/C (TAC09CHSD) | GZ055BE1<BR>TAC09CHSD | Yes |
 | [Tcl](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.cpp) | **[TCL](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.h)** | GYKQ-58(XM) remote (TCL96AC)<BR>TAC-09CHSD/XA31I A/C (TAC09CHSD) | GZ055BE1<BR>TAC09CHSD | Yes |
 | [Tcl](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.cpp) | **[Teknopoint](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Tcl.h)** | Allegro SSA-09H A/C (GZ055BE1)<BR>GZ-055B-E1 remote (GZ055BE1) | GZ055BE1<BR>TAC09CHSD | Yes |
