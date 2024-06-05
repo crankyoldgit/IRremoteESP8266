@@ -3288,7 +3288,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRHaierAC176 ac(_pin, _inverted, _modulation);
       haier176(&ac, (haier_ac176_remote_model_t)send.model, send.power,
                send.mode, send.celsius, send.degrees, send.fanspeed,
-               send.swingv, send.swingh, send.turbo, send.filter, send.sleep);
+               send.swingv, send.swingh, send.turbo, send.quiet, send.filter,
+               send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC176
