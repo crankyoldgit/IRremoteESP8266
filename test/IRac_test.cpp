@@ -247,6 +247,36 @@ TEST(TestIRac, Coolix) {
   ASSERT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 }
 
+TEST(TestIRac, Coolix_Issue2103) {
+  IRCoolixAC ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: On, Mode: 4 (Fan), Fan: 5 (Auto), Zone Follow: Off, "
+      "Sensor Temp: Off";
+
+  ac.begin();
+  irac.coolix(&ac,
+              true,                        // Power
+              stdAc::opmode_t::kFan,       // Mode
+              21,                          // Celsius
+              kNoTempValue,                // Sensor Temp
+              stdAc::fanspeed_t::kAuto,    // Fan speed
+              stdAc::swingv_t::kOff,       // Vertical swing
+              stdAc::swingh_t::kOff,       // Horizontal swing
+              false,                       // iFeel
+              false,                       // Turbo
+              false,                       // Light
+              false,                       // Clean
+              -1);                         // Sleep
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(COOLIX, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kCoolixBits, ac._irsend.capture.bits);
+  ASSERT_EQ(expected, IRAcUtils::resultAcToString(&ac._irsend.capture));
+}
+
 TEST(TestIRac, Corona) {
   IRCoronaAc ac(kGpioUnused);
   IRac irac(kGpioUnused);
