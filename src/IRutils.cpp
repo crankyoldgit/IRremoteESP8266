@@ -701,6 +701,15 @@ namespace irutils {
           default:                                return kUnknownStr;
         }
         break;
+      case decode_type_t::TOSHIBA_AC:
+        switch (model) {
+          case toshiba_ac_remote_model_t::kToshibaGenericRemote_A:
+            return kToshibaGenericRemoteAStr;
+          case toshiba_ac_remote_model_t::kToshibaGenericRemote_B:
+            return kToshibaGenericRemoteBStr;
+          default:
+            return kUnknownStr;
+        }
       default: return kUnknownStr;
     }
   }
