@@ -21,6 +21,12 @@ extern "C" {
 #include "IRremoteESP8266.h"
 #include "IRutils.h"
 
+#if defined(ESP32)
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+#include <driver/gpio.h>
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#endif
+
 #ifdef UNIT_TEST
 #undef ICACHE_RAM_ATTR
 #define ICACHE_RAM_ATTR
@@ -144,7 +150,7 @@ namespace _IRrecv {  // Namespace extension
 #if defined(ESP32)
 portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 #endif  // ESP32
-volatile irparams_t params;
+atomic_irparams_t params;
 irparams_t *params_save;  // A copy of the interrupt state while decoding.
 }  // namespace _IRrecv
 
@@ -215,7 +221,7 @@ static void USE_IRAM_ATTR gpio_intr() {
     else
       params.rawbuf[rawlen] = (now - start) / kRawTick;
   }
-  params.rawlen++;
+  params.rawlen = params.rawlen + 1;  // C++20 fix
 
   start = now;
 
@@ -242,8 +248,13 @@ static void USE_IRAM_ATTR gpio_intr() {
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L176-L178
   timer->dev->config.alarm_en = 1;
 #else  // _ESP32_IRRECV_TIMER_HACK
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timerWrite(timer, 0);
+  timerStart(timer);
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerWrite(timer, 0);
   timerAlarmEnable(timer);
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
 #endif  // _ESP32_IRRECV_TIMER_HACK
 #endif  // ESP32
 }
@@ -333,9 +344,6 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 /// timers or interrupts used.
 IRrecv::~IRrecv(void) {
   disableIRIn();
-#if defined(ESP32)
-  if (timer != NULL) timerEnd(timer);  // Cleanup the ESP32 timeout timer.
-#endif  // ESP32
   delete[] params.rawbuf;
   if (params_save != NULL) {
     delete[] params_save->rawbuf;
@@ -359,7 +367,11 @@ void IRrecv::enableIRIn(const bool pullup) {
 #if defined(ESP32)
   // Initialise the ESP32 timer.
   // 80MHz / 80 = 1 uSec granularity.
-  timer = timerBegin(_timer_num, 80, true);
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timer = timerBegin(1000000);  // 1 MHz
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
+  timer = timerBegin(_timer_num, 80, true);  // 1 MHz : 80 MHz with divider 80
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
 #ifdef DEBUG
   if (timer == NULL) {
     DPRINT("FATAL: Unable enable system timer: ");
@@ -367,12 +379,17 @@ void IRrecv::enableIRIn(const bool pullup) {
   }
 #endif  // DEBUG
   assert(timer != NULL);  // Check we actually got the timer.
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timerAttachInterrupt(timer, &read_timeout);
+  timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   // Set the timer so it only fires once, and set it's trigger in uSeconds.
   timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
   // Note: Interrupt needs to be attached before it can be enabled or disabled.
   // Note: EDGE (true) is not supported, use LEVEL (false). Ref: #1713
   // See: https://github.com/espressif/arduino-esp32/blob/caef4006af491130136b219c1205bdcf8f08bf2b/cores/esp32/esp32-hal-timer.c#L224-L227
   timerAttachInterrupt(timer, &read_timeout, false);
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
 #endif  // ESP32
 
   // Initialise state machine variables
@@ -398,9 +415,16 @@ void IRrecv::disableIRIn(void) {
   os_timer_disarm(&timer);
 #endif  // ESP8266
 #if defined(ESP32)
+  if (timer == NULL) { return; }  // Call only once (defensive)
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timerDetachInterrupt(timer);
+  timerEnd(timer);
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
   timerDetachInterrupt(timer);
   timerEnd(timer);
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+  timer = NULL;  // Cleanup the ESP32 timeout timer.
 #endif  // ESP32
   detachInterrupt(params.recvpin);
 #endif  // UNIT_TEST
@@ -426,7 +450,11 @@ void IRrecv::resume(void) {
   params.rawlen = 0;
   params.overflow = false;
 #if defined(ESP32)
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timerStop(timer);
+#else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
   gpio_intr_enable((gpio_num_t)params.recvpin);
 #endif  // ESP32
 }
@@ -437,7 +465,7 @@ void IRrecv::resume(void) {
 /// i.e. In kStopState.
 /// @param[in] src Pointer to an irparams_t structure to copy from.
 /// @param[out] dst Pointer to an irparams_t structure to copy to.
-void IRrecv::copyIrParams(volatile irparams_t *src, irparams_t *dst) {
+void IRrecv::copyIrParams(atomic_irparams_t *src, irparams_t *dst) {
   // Typecast src and dst addresses to (char *)
   char *csrc = (char *)src;  // NOLINT(readability/casting)
   char *cdst = (char *)dst;  // NOLINT(readability/casting)
@@ -502,8 +530,8 @@ void IRrecv::crudeNoiseFilter(decode_results *results, const uint16_t floor) {
       for (uint16_t i = offset + 2; i <= results->rawlen && i < kBufSize; i++)
         results->rawbuf[i - 2] = results->rawbuf[i];
       if (offset > 1) {  // There is a previous pair we can add to.
-        // Merge this pair into into the previous space.
-        results->rawbuf[offset - 1] += addition;
+        // Merge this pair into into the previous space. // C++20 fix applied
+        results->rawbuf[offset - 1] = results->rawbuf[offset - 1] + addition;
       }
       results->rawlen -= 2;  // Adjust the length.
     } else {
@@ -1449,7 +1477,7 @@ bool IRrecv::decodeHash(decode_results *results) {
 /// @return A match_result_t structure containing the success (or not), the
 ///   data value, and how many buffer entries were used.
 match_result_t IRrecv::matchData(
-    volatile uint16_t *data_ptr, const uint16_t nbits, const uint16_t onemark,
+    atomic_uint16_t *data_ptr, const uint16_t nbits, const uint16_t onemark,
     const uint32_t onespace, const uint16_t zeromark, const uint32_t zerospace,
     const uint8_t tolerance, const int16_t excess, const bool MSBfirst,
     const bool expectlastspace) {
@@ -1509,7 +1537,7 @@ match_result_t IRrecv::matchData(
 ///   true is Most Significant Bit First Order, false is Least Significant First
 /// @param[in] expectlastspace Do we expect a space at the end of the message?
 /// @return If successful, how many buffer entries were used. Otherwise 0.
-uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
+uint16_t IRrecv::matchBytes(atomic_uint16_t *data_ptr, uint8_t *result_ptr,
                             const uint16_t remaining, const uint16_t nbytes,
                             const uint16_t onemark, const uint32_t onespace,
                             const uint16_t zeromark, const uint32_t zerospace,
@@ -1561,7 +1589,7 @@ uint16_t IRrecv::matchBytes(volatile uint16_t *data_ptr, uint8_t *result_ptr,
 /// @param[in] MSBfirst Bit order to save the data in. (Def: true)
 ///   true is Most Significant Bit First Order, false is Least Significant First
 /// @return If successful, how many buffer entries were used. Otherwise 0.
-uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
+uint16_t IRrecv::_matchGeneric(atomic_uint16_t *data_ptr,
                               uint64_t *result_bits_ptr,
                               uint8_t *result_bytes_ptr,
                               const bool use_bits,
@@ -1663,7 +1691,7 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
 /// @param[in] MSBfirst Bit order to save the data in. (Def: true)
 ///   true is Most Significant Bit First Order, false is Least Significant First
 /// @return If successful, how many buffer entries were used. Otherwise 0.
-uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
+uint16_t IRrecv::matchGeneric(atomic_uint16_t *data_ptr,
                               uint64_t *result_ptr,
                               const uint16_t remaining,
                               const uint16_t nbits,
@@ -1710,7 +1738,7 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
 /// @param[in] MSBfirst Bit order to save the data in. (Def: true)
 ///   true is Most Significant Bit First Order, false is Least Significant First
 /// @return If successful, how many buffer entries were used. Otherwise 0.
-uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
+uint16_t IRrecv::matchGeneric(atomic_uint16_t *data_ptr,
                               uint8_t *result_ptr,
                               const uint16_t remaining,
                               const uint16_t nbits,
@@ -1757,7 +1785,7 @@ uint16_t IRrecv::matchGeneric(volatile uint16_t *data_ptr,
 /// @return If successful, how many buffer entries were used. Otherwise 0.
 /// @note Parameters one + zero add up to the total time for a bit.
 ///   e.g. mark(one) + space(zero) is a `1`, mark(zero) + space(one) is a `0`.
-uint16_t IRrecv::matchGenericConstBitTime(volatile uint16_t *data_ptr,
+uint16_t IRrecv::matchGenericConstBitTime(atomic_uint16_t *data_ptr,
                                           uint64_t *result_ptr,
                                           const uint16_t remaining,
                                           const uint16_t nbits,
@@ -1844,7 +1872,7 @@ uint16_t IRrecv::matchGenericConstBitTime(volatile uint16_t *data_ptr,
 /// @return If successful, how many buffer entries were used. Otherwise 0.
 /// @see https://en.wikipedia.org/wiki/Manchester_code
 /// @see http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf
-uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
+uint16_t IRrecv::matchManchester(atomic_const_uint16_t *data_ptr,
                                  uint64_t *result_ptr,
                                  const uint16_t remaining,
                                  const uint16_t nbits,
@@ -1951,7 +1979,7 @@ uint16_t IRrecv::matchManchester(volatile const uint16_t *data_ptr,
 /// @see https://en.wikipedia.org/wiki/Manchester_code
 /// @see http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf
 /// @todo Clean up and optimise this. It is just "get it working code" atm.
-uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
+uint16_t IRrecv::matchManchesterData(atomic_const_uint16_t *data_ptr,
                                      uint64_t *result_ptr,
                                      const uint16_t remaining,
                                      const uint16_t nbits,
@@ -2072,7 +2100,7 @@ uint16_t IRrecv::matchManchesterData(volatile const uint16_t *data_ptr,
 
 #if UNIT_TEST
 /// Unit test helper to get access to the params structure.
-volatile irparams_t *IRrecv::_getParamsPtr(void) {
+atomic_irparams_t *IRrecv::_getParamsPtr(void) {
   return &params;
 }
 #endif  // UNIT_TEST
