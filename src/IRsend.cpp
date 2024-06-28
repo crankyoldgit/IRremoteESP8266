@@ -798,6 +798,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kXmpBits;
     case YORK:
       return kYorkBits;
+    case FUJITSU_AC264:
+      return kFujitsuAc264Bits;
     // No default amount of bits.
     case FUJITSU_AC:
     case MWM:
@@ -1246,6 +1248,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendFujitsuAC(state, nbytes);
       break;
 #endif  // SEND_FUJITSU_AC
+#if SEND_FUJITSU_AC264
+    case FUJITSU_AC264:
+      sendFujitsuAC264(state, nbytes);
+      break;
+#endif
 #if SEND_GREE
     case GREE:
       sendGree(state, nbytes);
