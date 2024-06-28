@@ -24,36 +24,6 @@
 /// @see Daikin200 https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
 /// @see Daikin312 https://github.com/crankyoldgit/IRremoteESP8266/issues/1829
 
-// Supports:
-//   Brand: Daikin,  Model: ARC433** remote (DAIKIN)
-//   Brand: Daikin,  Model: ARC477A1 remote (DAIKIN2)
-//   Brand: Daikin,  Model: FTXZ25NV1B A/C (DAIKIN2)
-//   Brand: Daikin,  Model: FTXZ35NV1B A/C (DAIKIN2)
-//   Brand: Daikin,  Model: FTXZ50NV1B A/C (DAIKIN2)
-//   Brand: Daikin,  Model: ARC433B69 remote (DAIKIN216)
-//   Brand: Daikin,  Model: ARC423A5 remote (DAIKIN160)
-//   Brand: Daikin,  Model: FTE12HV2S A/C
-//   Brand: Daikin,  Model: BRC4C153 remote (DAIKIN176)
-//   Brand: Daikin,  Model: FFQ35B8V1B A/C (DAIKIN176)
-//   Brand: Daikin,  Model: BRC4C151 remote (DAIKIN176)
-//   Brand: Daikin,  Model: 17 Series FTXB09AXVJU A/C (DAIKIN128)
-//   Brand: Daikin,  Model: 17 Series FTXB12AXVJU A/C (DAIKIN128)
-//   Brand: Daikin,  Model: 17 Series FTXB24AXVJU A/C (DAIKIN128)
-//   Brand: Daikin,  Model: BRC52B63 remote (DAIKIN128)
-//   Brand: Daikin,  Model: ARC480A5 remote (DAIKIN152)
-//   Brand: Daikin,  Model: FFN-C/FCN-F Series A/C (DAIKIN64)
-//   Brand: Daikin,  Model: DGS01 remote (DAIKIN64)
-//   Brand: Daikin,  Model: M Series A/C (DAIKIN)
-//   Brand: Daikin,  Model: FTXM-M A/C (DAIKIN)
-//   Brand: Daikin,  Model: ARC466A12 remote (DAIKIN)
-//   Brand: Daikin,  Model: ARC466A33 remote (DAIKIN)
-//   Brand: Daikin,  Model: FTWX35AXV1 A/C (DAIKIN64)
-//   Brand: Daikin,  Model: ARC484A4 remote (DAIKIN216)
-//   Brand: Daikin,  Model: FTQ60TV16U2 A/C (DAIKIN216)
-//   Brand: Daikin,  Model: BRC4M150W16 remote (DAIKIN200)
-//   Brand: Daikin,  Model: FTXM20R5V1B A/C (DAIKIN312)
-//   Brand: Daikin,  Model: ARC466A67 remote (DAIKIN312)
-
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_
 
