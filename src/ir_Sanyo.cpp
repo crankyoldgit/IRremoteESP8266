@@ -35,18 +35,18 @@ using irutils::sumNibbles;
 
 // Constants
 // Sanyo SA 8650B
-const uint16_t kSanyoSa8650bHdrMark = 3500;  // seen range 3500
+/*const uint16_t kSanyoSa8650bHdrMark = 3500;  // seen range 3500
 const uint16_t kSanyoSa8650bHdrSpace = 950;  // seen 950
 const uint16_t kSanyoSa8650bOneMark = 2400;  // seen 2400
 const uint16_t kSanyoSa8650bZeroMark = 700;  // seen 700
 // usually see 713 - not using ticks as get number wrapround
 const uint16_t kSanyoSa8650bDoubleSpaceUsecs = 800;
-const uint16_t kSanyoSa8650bRptLength = 45000;
+const uint16_t kSanyoSa8650bRptLength = 45000;*/
 
 // Sanyo LC7461
 const uint16_t kSanyoLc7461AddressMask = (1 << kSanyoLC7461AddressBits) - 1;
 const uint16_t kSanyoLc7461CommandMask = (1 << kSanyoLC7461CommandBits) - 1;
-const uint16_t kSanyoLc7461HdrMark = 9000;
+/*const uint16_t kSanyoLc7461HdrMark = 9000;
 const uint16_t kSanyoLc7461HdrSpace = 4500;
 const uint16_t kSanyoLc7461BitMark = 560;    // 1T
 const uint16_t kSanyoLc7461OneSpace = 1690;  // 3T
@@ -58,7 +58,7 @@ const uint16_t kSanyoLc7461MinGap =
     (kSanyoLc7461HdrMark + kSanyoLc7461HdrSpace +
      kSanyoLC7461Bits * (kSanyoLc7461BitMark +
                          (kSanyoLc7461OneSpace + kSanyoLc7461ZeroSpace) / 2) +
-     kSanyoLc7461BitMark);
+     kSanyoLc7461BitMark);*/
 
 const uint16_t kSanyoAcHdrMark = 8500;   ///< uSeconds
 const uint16_t kSanyoAcHdrSpace = 4200;  ///< uSeconds

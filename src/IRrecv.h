@@ -883,6 +883,12 @@ class IRrecv {
                   const uint16_t kYorkBits,
                   const bool strict = true);
 #endif  // DECODE_YORK
+#if DECODE_BANG_OLUFSEN
+  bool decodeBangOlufsen(decode_results *results,
+                  uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kBangOlufsenBits,
+                  const bool strict = false);
+#endif  // DECODE_BANG_OLUFSEN
 };
 
 #endif  // IRRECV_H_

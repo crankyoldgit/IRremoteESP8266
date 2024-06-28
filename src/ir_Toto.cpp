@@ -19,7 +19,7 @@ const uint16_t kTotoBitMark = 600;
 const uint16_t kTotoOneSpace = 1634;
 const uint16_t kTotoZeroSpace = 516;
 const uint16_t kTotoGap = 38000;
-const uint16_t kTotoSpecialGap = 42482;
+//const uint16_t kTotoSpecialGap = 42482;
 const uint64_t kTotoPrefix = 0x0802;
 const uint16_t kTotoPrefixBits = 15;
 

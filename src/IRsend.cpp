@@ -26,7 +26,7 @@
 ///  i.e. If not, assume a 100% duty cycle. Ignore attempts to change the
 ///  duty cycle etc.
 IRsend::IRsend(uint16_t IRsendPin, bool inverted, bool use_modulation)
-    : IRpin(IRsendPin), periodOffset(kPeriodOffset) {
+    : IRpin(IRsendPin) {
   if (inverted) {
     outputOn = LOW;
     outputOff = HIGH;
@@ -68,15 +68,12 @@ void IRsend::ledOn() {
 /// @param[in] use_offset Should we use the calculated offset or not?
 /// @return nr. of uSeconds.
 /// @note (T = 1/f)
-uint32_t IRsend::calcUSecPeriod(uint32_t hz, bool use_offset) {
+uint32_t IRsend::calcUSecPeriod(uint32_t hz) {
   if (hz == 0) hz = 1;  // Avoid Zero hz. Divide by Zero is nasty.
   uint32_t period =
       (1000000UL + hz / 2) / hz;  // The equiv of round(1000000/hz).
-  // Apply the offset and ensure we don't result in a <= 0 value.
-  if (use_offset)
-    return std::max((uint32_t)1, period + periodOffset);
-  else
-    return std::max((uint32_t)1, period);
+  // Ensure we don't result in a <= 0 value.
+  return std::max((uint32_t)1, period);
 }
 
 /// Set the output frequency modulation and duty cycle.
@@ -101,11 +98,34 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
 #ifdef UNIT_TEST
   _freq_unittest = freq;
 #endif  // UNIT_TEST
+
+#ifndef UNIT_TEST
+  _fractionalBits = 14;
+
+  // Maximum signed value that fits.
+  uint32_t maxValue = 0x7FFF >> _fractionalBits;
+  uint32_t period = calcUSecPeriod(freq);
+
+  // Decrement the number of fractional bits until the period fits.
+  while (maxValue < period)
+  {
+    --_fractionalBits;
+    maxValue = 0x7FFF >> _fractionalBits;
+  }
+
+  uint32_t fixedPointPeriod = ((1000000ULL << _fractionalBits) + freq / 2) / freq;
+
+  // Nr. of uSeconds the LED will be on per pulse.
+  onTimePeriod = (fixedPointPeriod * _dutycycle) / kDutyMax;
+  // Nr. of uSeconds the LED will be off per pulse.
+  offTimePeriod = fixedPointPeriod - onTimePeriod;
+#else
   uint32_t period = calcUSecPeriod(freq);
   // Nr. of uSeconds the LED will be on per pulse.
   onTimePeriod = (period * _dutycycle) / kDutyMax;
   // Nr. of uSeconds the LED will be off per pulse.
   offTimePeriod = period - onTimePeriod;
+#endif
 }
 
 #if ALLOW_DELAY_CALLS
@@ -166,6 +186,58 @@ uint16_t IRsend::mark(uint16_t usec) {
   // Not simple, so do it assuming frequency modulation.
   uint16_t counter = 0;
   IRtimer usecTimer = IRtimer();
+#ifndef UNIT_TEST
+#if SEND_BANG_OLUFSEN && ESP8266 && F_CPU < 160000000L
+  // Free running loop to attempt to get close to the 455 kHz required by Bang & Olufsen.
+  // Define BANG_OLUFSEN_CHECK_MODULATION temporarily to test frequency and time.
+  // Runs at ~300 kHz on an 80 MHz ESP8266.
+  // This is far from ideal but works if the transmitter is close enough.
+  uint32_t periodUInt = (onTimePeriod + offTimePeriod) >> _fractionalBits;
+  periodUInt = std::max(uint32_t(1), periodUInt);
+  if (periodUInt <= 5) {
+    uint32_t nextCheck = usec / periodUInt / 2; // Assume we can at least run for this number of periods.
+    for (;;) {  // nextStop is not updated in this loop.
+      ledOn();
+      ledOff();
+      counter++;
+      if (counter >= nextCheck) {
+        uint32_t now = usecTimer.elapsed();
+        int32_t timeLeft = usec - now;
+        if (timeLeft <= 1) {
+          return counter;
+        }
+        uint32_t periodsToEnd = counter * timeLeft / now;
+        // Check again when we are half way closer to the end.
+        nextCheck = (periodsToEnd >> 2) + counter;
+      }
+    }
+  }
+#endif
+
+  // Use absolute time for zero drift (but slightly uneven period).
+  // Using IRtimer.elapsed() instead of _delayMicroseconds is better for short period times.
+  // Maxed out at ~190 kHz on an 80 MHz ESP8266.
+  // Maxed out at ~460 kHz on ESP32.
+  uint32_t nextStop = 0; // Must be 32 bits to not overflow when usec is near max.
+  while ((nextStop >> _fractionalBits) < usec) {  // Loop until we've met/exceeded our required time.
+    ledOn();
+    nextStop += onTimePeriod;
+    uint32_t nextStopUInt = std::min(nextStop >> _fractionalBits, uint32_t(usec));
+    while(usecTimer.elapsed() < nextStopUInt);
+    ledOff();
+    counter++;
+    nextStop += offTimePeriod;
+    nextStopUInt = std::min(nextStop >> _fractionalBits, uint32_t(usec));
+    uint32_t now = usecTimer.elapsed();
+    int32_t delay = nextStopUInt - now;
+    if (delay > 0) {
+      while(usecTimer.elapsed() < nextStopUInt);
+    } else {
+      // This means we ran past nextStop and need to reset to actual time to avoid playing catch-up with a far too short period.
+      nextStop = (now << _fractionalBits) + (offTimePeriod >> 1);
+    }
+  }
+#else
   // Cache the time taken so far. This saves us calling time, and we can be
   // assured that we can't have odd math problems. i.e. unsigned under/overflow.
   uint32_t elapsed = usecTimer.elapsed();
@@ -184,6 +256,7 @@ uint16_t IRsend::mark(uint16_t usec) {
         std::min(usec - elapsed - onTimePeriod, (uint32_t)offTimePeriod));
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
+#endif
   return counter;
 }
 
@@ -207,7 +280,7 @@ void IRsend::space(uint32_t time) {
 int8_t IRsend::calibrate(uint16_t hz) {
   if (hz < 1000)  // Were we given kHz? Supports the old call usage.
     hz *= 1000;
-  periodOffset = 0;  // Turn off any existing offset while we calibrate.
+  int8_t periodOffset = 0;
   enableIROut(hz);
   IRtimer usecTimer = IRtimer();  // Start a timer *just* before we do the call.
   uint16_t pulses = mark(UINT16_MAX);  // Generate a PWM of 65,535 us. (Max.)
@@ -798,6 +871,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kXmpBits;
     case YORK:
       return kYorkBits;
+    case BANG_OLUFSEN:
+      return kBangOlufsenBits;
     // No default amount of bits.
     case FUJITSU_AC:
     case MWM:
@@ -838,6 +913,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendArris(data, nbits, min_repeat);
       break;
 #endif  // SEND_ARRIS
+#if SEND_BANG_OLUFSEN
+    case BANG_OLUFSEN:
+      sendBangOlufsen(data, nbits, min_repeat);
+      break;
+#endif  // SEND_BANG_OLUFSEN
 #if SEND_BOSE
     case BOSE:
       sendBose(data, nbits, min_repeat);

@@ -31,10 +31,7 @@ uint32_t IRtimer::elapsed() {
 #else
   uint32_t now = _IRtimer_unittest_now;
 #endif
-  if (start <= now)      // Check if the system timer has wrapped.
-    return now - start;  // No wrap.
-  else
-    return UINT32_MAX - start + now;  // Has wrapped.
+  return now - start;  // Wrap safe.
 }
 
 /// Add time to the timer to simulate elapsed time.
@@ -64,10 +61,7 @@ uint32_t TimerMs::elapsed() {
 #else
   uint32_t now = _TimerMs_unittest_now;
 #endif
-  if (start <= now)      // Check if the system timer has wrapped.
-    return now - start;  // No wrap.
-  else
-    return UINT32_MAX - start + now;  // Has wrapped.
+  return now - start;  // Wrap safe.
 }
 
 /// Add time to the timer to simulate elapsed time.

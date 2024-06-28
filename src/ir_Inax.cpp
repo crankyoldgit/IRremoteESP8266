@@ -13,7 +13,7 @@
 #include "IRutils.h"
 
 // Constants
-const uint16_t kInaxTick = 500;
+//const uint16_t kInaxTick = 500;
 const uint16_t kInaxHdrMark = 9000;
 const uint16_t kInaxHdrSpace = 4500;
 const uint16_t kInaxBitMark = 560;

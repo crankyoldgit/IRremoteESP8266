@@ -28,13 +28,13 @@ const uint16_t kDenonOneSpaceTicks = 7;
 const uint16_t kDenonOneSpace = kDenonOneSpaceTicks * kDenonTick;
 const uint16_t kDenonZeroSpaceTicks = 3;
 const uint16_t kDenonZeroSpace = kDenonZeroSpaceTicks * kDenonTick;
-const uint16_t kDenonMinCommandLengthTicks = 510;
-const uint16_t kDenonMinGapTicks =
+//const uint16_t kDenonMinCommandLengthTicks = 510;
+/*const uint16_t kDenonMinGapTicks =
     kDenonMinCommandLengthTicks -
     (kDenonHdrMarkTicks + kDenonHdrSpaceTicks +
      kDenonBits * (kDenonBitMarkTicks + kDenonOneSpaceTicks) +
-     kDenonBitMarkTicks);
-const uint32_t kDenonMinGap = kDenonMinGapTicks * kDenonTick;
+     kDenonBitMarkTicks);*/
+//const uint32_t kDenonMinGap = kDenonMinGapTicks * kDenonTick;
 const uint64_t kDenonManufacturer = 0x2A4CULL;
 
 #if SEND_DENON
