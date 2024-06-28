@@ -112,8 +112,8 @@ void IRCoolixAC::send(const uint16_t repeat) {
   // Typically repeat is `kCoolixDefaultRepeat` which is `1`, so this allows
   // it to be 0 normally for this command, and allows additional repeats if
   // requested rather always 0 for that command.
-  _irsend.sendCOOLIX(getRaw(), kCoolixBits, repeat - (getSwingVStep() &&
-                                                          repeat > 0) ? 1 : 0);
+  _irsend.sendCOOLIX(getRaw(), kCoolixBits, repeat - ((getSwingVStep() &&
+                                                           repeat > 0) ? 1 : 0));
   // make sure to remove special state from the internal state
   // after command has being transmitted.
   recoverSavedState();
