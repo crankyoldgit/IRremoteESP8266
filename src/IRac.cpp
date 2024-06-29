@@ -374,6 +374,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_WHIRLPOOL_AC
     case decode_type_t::WHIRLPOOL_AC:
 #endif
+#if SEND_FUNIKI
+    case decode_type_t::FUNIKI:
+#endif
       return true;
     default:
       return false;
@@ -1274,7 +1277,56 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
   ac->send();
 }
 #endif  // SEND_FUJITSU_AC
+#if SEND_FUNIKI
+/// Send a Funiki A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRFujitsuAC object to use.
+/// @param[in] model The A/C model to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
+/// @param[in] clock The clock setting.
+/// @param[in] iFeel Whether to enable iFeel (remote temp) mode on the A/C unit.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] econo Run the device in economical mode.
+/// @param[in] light Turn on the LED/Display mode.
+/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
+/// @param[in] sleep Nr. of minutes for sleep mode. <= 0 is Off, > 0 is on.
+void IRac::funiki(IRFunikiAC *ac, const funiki_ac_remote_model_t model,
+                const bool on, const stdAc::opmode_t mode, const bool celsius,
+                const float degrees, const stdAc::fanspeed_t fan,
+                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                const int16_t clock,
+                const bool iFeel, const bool turbo, const bool econo,
+                const bool light, const bool clean, const int16_t sleep) {
+  ac->begin();
+  ac->setModel(model);
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees, !celsius);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(swingv == stdAc::swingv_t::kAuto,  // Set auto flag.
+                       ac->convertSwingV(swingv));
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  // No Econo setting available.
+  (void)(swingh);
+  (void)(iFeel);
+  (void)(turbo);
+  (void)(econo);
+  (void)(light);
+  (void)(clean);
 
+  // No Filter setting available.
+  // No Beep setting available.
+  // No Quiet setting available.
+  // No Clock setting available.
+  if (clock >= 0) ac->setClock(clock);
+  ac->send();
+}
+#endif  // SEND_FUNIKI
 #if SEND_GOODWEATHER
 /// Send a Goodweather A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRGoodweatherAc object to use.
@@ -3244,6 +3296,18 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_FUJITSU_AC
+#if SEND_FUNIKI
+    case FUNIKI:
+    {
+      IRFunikiAC ac(_pin, (funiki_ac_remote_model_t)send.model, _inverted,
+                  _modulation);
+      funiki(&ac, (funiki_ac_remote_model_t)send.model, send.power, send.mode,
+           send.celsius, send.degrees, send.fanspeed, send.swingv, send.swingh,
+           send.clock,
+           send.turbo, send.econo, send.light, send.clean, send.sleep);
+      break;
+    }
+#endif  // SEND_FUNIKI
 #if SEND_GOODWEATHER
     case GOODWEATHER:
     {
@@ -4215,6 +4279,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_FUJITSU_AC
+#if DECODE_FUNIKI
+      case decode_type_t::FUNIKI: {
+        IRFunikiAC ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_FUNIKI
 #if DECODE_GOODWEATHER
       case decode_type_t::GOODWEATHER: {
         IRGoodweatherAc ac(kGpioUnused);
@@ -4716,6 +4787,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_FUJITSU_AC
+#if DECODE_FUNIKI
+      case decode_type_t::FUNIKI: {
+        IRFunikiAC ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_FUNIKI
 #if DECODE_GOODWEATHER
       case decode_type_t::GOODWEATHER: {
         IRGoodweatherAc ac(kGpioUnused);

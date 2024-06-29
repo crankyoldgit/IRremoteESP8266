@@ -150,7 +150,10 @@ enum fujitsu_ac_remote_model_t {
   ARRY4,        ///< (5) AR-RY4 (Same as AR-RAH2E but with clean & filter)
   ARREW4E,      ///< (6) Similar to ARRAH2E, but with different temp config.
 };
-
+/// Funiki A/C model numbers
+enum funiki_ac_remote_model_t {
+  UNKOWN = 1,  // (1)(Default)
+};
 /// Gree A/C model numbers
 enum gree_ac_remote_model_t {
   YAW1F = 1,  // (1) Ultimate, EKOKAI, RusClimate (Default)
@@ -885,6 +888,11 @@ class IRsend {
                     const uint16_t nbytes = kYorkStateLength,
                     const uint16_t repeat = kNoRepeat);
 #endif  // SEND_YORK
+#if SEND_FUNIKI
+  void sendFuniki(const uint8_t data[],
+                const uint16_t nbytes = kFunikiStateLength,
+                const uint16_t repeat = kFunikiDefaultRepeat);
+#endif  // SEND_FUNIKI
 
  protected:
 #ifdef UNIT_TEST

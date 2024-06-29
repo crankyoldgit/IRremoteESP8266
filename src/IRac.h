@@ -50,7 +50,7 @@
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
 #include "ir_York.h"
-
+#include "ir_Funiki.h"
 // Constants
 const int8_t kGpioUnused = -1;  ///< A placeholder for not using an actual GPIO.
 
@@ -276,6 +276,15 @@ void electra(IRElectraAc *ac,
                const bool quiet, const bool turbo, const bool econo,
                const bool filter, const bool clean, const int16_t sleep = -1);
 #endif  // SEND_FUJITSU_AC
+#if SEND_FUNIKI
+  void funiki(IRFunikiAC *ac, const funiki_ac_remote_model_t model,
+            const bool on, const stdAc::opmode_t mode, const bool celsius,
+            const float degrees, const stdAc::fanspeed_t fan,
+            const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+            const int16_t clock,
+            const bool iFeel, const bool turbo, const bool econo,
+            const bool light, const bool clean, const int16_t sleep = -1);
+#endif  // SEND_FUNIKI
 #if SEND_GOODWEATHER
   void goodweather(IRGoodweatherAc *ac,
                    const bool on, const stdAc::opmode_t mode,
