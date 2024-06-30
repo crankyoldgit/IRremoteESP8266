@@ -4,7 +4,8 @@
 /// @brief Support for FUNIKI A/C protocols.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/2112
 
-
+// Supports:
+//   Brand: Funiki,  Model: AKT-FK3 Remote
 
 #ifndef IR_FUNIKI_H_
 #define IR_FUNIKI_H_
@@ -135,7 +136,6 @@ class IRFunikiAC {
  public:
   explicit IRFunikiAC(
       const uint16_t pin,
-      const funiki_ac_remote_model_t model = funiki_ac_remote_model_t::UNKOWN,
       const bool inverted = false, const bool use_modulation = true);
   void stateReset(void);
 #if SEND_FUNIKI
@@ -149,8 +149,6 @@ class IRFunikiAC {
   void begin(void);
   void on(void);
   void off(void);
-  void setModel(const funiki_ac_remote_model_t model);
-  funiki_ac_remote_model_t getModel(void) const;
   void setPower(const bool on);
   bool getPower(void) const;
   void setTemp(const uint8_t temp, const bool fahrenheit = false);
@@ -170,7 +168,6 @@ class IRFunikiAC {
   uint16_t getTimerOff(void) const;
   bool getTimerOnEnabled(void) const;
   bool getTimerOffEnabled(void) const;
-  // void setTimer(const uint16_t minutes);
 
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
@@ -181,8 +178,6 @@ class IRFunikiAC {
   stdAc::state_t toCommon(void);
   uint8_t* getRaw(void);
   void setRaw(const uint8_t new_code[]);
-  static bool validChecksum(const uint8_t state[],
-                            const uint16_t length = kFunikiStateLength);
   String toString(void);
 #ifndef UNIT_TEST
 
@@ -194,11 +189,7 @@ class IRFunikiAC {
   /// @endcond
 #endif  // UNIT_TEST
   FunikiProtocol _;
-  funiki_ac_remote_model_t _model;
-  void checksum(const uint16_t length = kFunikiStateLength);
   void fixup(void);
-  // void setTimerEnabled(const bool on);
-  // bool getTimerEnabled(void) const;
 };
 
 #endif  // IR_FUNIKI_H_

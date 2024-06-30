@@ -70,14 +70,12 @@ void IRsend::sendFuniki(const uint8_t data[], const uint16_t nbytes,
 
 /// Class constructor
 /// @param[in] pin GPIO to be used when sending.
-/// @param[in] model The enum of the model to be emulated.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
-IRFunikiAC::IRFunikiAC(const uint16_t pin, const funiki_ac_remote_model_t model,
+IRFunikiAC::IRFunikiAC(const uint16_t pin,
                    const bool inverted, const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) {
   stateReset();
-  setModel(model);
 }
 
 /// Reset the internal state to a fixed known good state.
@@ -91,8 +89,7 @@ void IRFunikiAC::stateReset(void) {
 /// Fix up the internal state so it is correct.
 /// @note Internal use only.
 void IRFunikiAC::fixup(void) {
-  setPower(getPower());  // Redo the power bits as they differ between models.
-  checksum();  // Calculate the checksums
+  setPower(getPower());
 }
 
 /// Set up hardware to be able to send a message.
@@ -117,42 +114,7 @@ uint8_t* IRFunikiAC::getRaw(void) {
 /// @param[in] new_code A valid code for this protocol.
 void IRFunikiAC::setRaw(const uint8_t new_code[]) {
   std::memcpy(_.remote_state, new_code, kFunikiStateLength);
-  // We can only detect the difference between models when the power is on.
-  if (_.Power) {
-      _model = funiki_ac_remote_model_t::UNKOWN;
-  }
 }
-
-/// Calculate and set the checksum values for the internal state.
-/// @param[in] length The size/length of the state array to fix the checksum of.
-void IRFunikiAC::checksum(const uint16_t length) {
-  (void)(length);
-  // Funiki uses the same checksum alg. as Kelvinator's block checksum.
-  // _.Sum = IRKelvinatorAC::calcBlockChecksum(_.remote_state, length);
-}
-
-/// Verify the checksum is valid for a given state.
-/// @param[in] state The array to verify the checksum of.
-/// @param[in] length The length of the state array.
-/// @return true, if the state has a valid checksum. Otherwise, false.
-bool IRFunikiAC::validChecksum(const uint8_t state[], const uint16_t length) {
-  // Top 4 bits of the last byte in the state is the state's checksum.
-  return GETBITS8(state[length - 1], kHighNibble, kNibbleSize) ==
-      IRKelvinatorAC::calcBlockChecksum(state, length);
-}
-
-/// Set the model of the A/C to emulate.
-/// @param[in] model The enum of the appropriate model.
-void IRFunikiAC::setModel(const funiki_ac_remote_model_t model) {
-  switch (model) {
-    case funiki_ac_remote_model_t::UNKOWN:
-    default: _model = funiki_ac_remote_model_t::UNKOWN;
-  }
-}
-
-/// Get/Detect the model of the A/C.
-/// @return The enum of the compatible model.
-funiki_ac_remote_model_t IRFunikiAC::getModel(void) const { return _model; }
 
 /// Change the power setting to On.
 void IRFunikiAC::on(void) { setPower(true); }
@@ -162,16 +124,13 @@ void IRFunikiAC::off(void) { setPower(false); }
 
 /// Change the power setting.
 /// @param[in] on true, the setting is on. false, the setting is off.
-/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/814
 void IRFunikiAC::setPower(const bool on) {
   _.Power = on;
 }
 
 /// Get the value of the current power setting.
 /// @return true, the setting is on. false, the setting is off.
-/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/814
 bool IRFunikiAC::getPower(void) const {
-  //  See #814. Not checking/requiring: (_.ModelA)
   return _.Power;
 }
 
@@ -301,7 +260,8 @@ int16_t IRFunikiAC::getClock(void) const {
   + bcdToUint8((_.Minutes1 << kNibbleSize) |  _.Minutes2);
 }
 
-
+/// Set the clock of the A/C.
+/// @param[in] nr_of_minutes Number of minutes in a day
 void IRFunikiAC::setClock(const int16_t nr_of_minutes) {
   uint32_t remaining = nr_of_minutes;
   _.Minutes1 = uint8ToBcd(remaining % 60)>>4;
@@ -312,46 +272,28 @@ void IRFunikiAC::setClock(const int16_t nr_of_minutes) {
 }
 
 
-// /// Set the timer enable setting of the A/C.
-// /// @param[in] on true, the setting is on. false, the setting is off.
-// void IRFunikiAC::setTimerEnabled(const bool on) { _.TimerEnabled = on; }
-
-// /// Get the timer enabled setting of the A/C.
+// /// Get the timer on enabled setting of the A/C.
 // /// @return true, the setting is on. false, the setting is off.
 bool IRFunikiAC::getTimerOnEnabled(void) const { return _.TimerOnEnable; }
+
+// /// Get the timer ofd enabled setting of the A/C.
+// /// @return true, the setting is on. false, the setting is off.
 bool IRFunikiAC::getTimerOffEnabled(void) const { return _.TimerOffEnable; }
 
-// /// Get the timer time value from the A/C.
+// /// Get the timer on time value from the A/C.
 // /// @return The number of minutes the timer is set for.
 uint16_t IRFunikiAC::getTimerOn(void) const {
   uint16_t hrs = irutils::bcdToUint8((_.TimerOnHours1 << kNibbleSize) |
     _.TimerOnHours2);
   return hrs * 60 + (_.TimerOnMinutes * 10);
 }
-// /// Get the timer time value from the A/C.
+// /// Get the timer off time value from the A/C.
 // /// @return The number of minutes the timer is set for.
 uint16_t IRFunikiAC::getTimerOff(void) const {
   uint16_t hrs = irutils::bcdToUint8((_.TimerOffHours1 << kNibbleSize) |
     _.TimerOffHours2);
   return hrs * 60 + (_.TimerOffMinutes * 10);
 }
-
-// /// Set the A/C's timer to turn off in X many minutes.
-// /// @param[in] minutes The number of minutes the timer should be set for.
-// /// @note Stores time internally in 30 min units.
-// /// e.g. 5 mins means 0 (& Off), 95 mins is  90 mins (& On). Max is 24 hours.
-// void IRFunikiAC::setTimer(const uint16_t minutes) {
-//   uint16_t mins = std::min(kFunikiTimerMax, minutes);  // Bounds check.
-//   setTimerEnabled(mins >= 30);  // Timer is enabled when >= 30 mins.
-//   uint8_t hours = mins / 60;
-//   // Set the half hour bit.
-//   _.TimerHalfHr = (mins % 60) >= 30;
-//   // Set the "tens" digit of hours.
-//   _.TimerTensHr = hours / 10;
-//   // Set the "units" digit of hours.
-//   _.TimerHours = hours % 10;
-// }
-
 
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
@@ -445,7 +387,7 @@ stdAc::swingv_t IRFunikiAC::toCommonSwingV(const uint8_t pos) {
 stdAc::state_t IRFunikiAC::toCommon(void) {
   stdAc::state_t result{};
   result.protocol = decode_type_t::FUNIKI;
-  result.model = _model;
+  result.model = -1;
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode, _.AutoMode);
   result.degrees = getTemp();
@@ -470,7 +412,6 @@ stdAc::state_t IRFunikiAC::toCommon(void) {
 String IRFunikiAC::toString(void) {
   String result = "";
   result.reserve(220);  // Reserve some heap for the string to reduce fragging.
-  result += addModelToString(decode_type_t::FUNIKI, _model, false);
   result += addBoolToString(_.Power, kPowerStr);
   if (_.AutoMode == kFunikiAutoModeOn) {
     result += addModeToString(kFunikiAuto, kFunikiAuto, kFunikiCool,
@@ -518,20 +459,13 @@ String IRFunikiAC::toString(void) {
 /// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeFuniki(decode_results* results, uint16_t offset,
                         const uint16_t nbits, bool const strict) {
-  // for(int i = 0; i < results->rawlen; i++)
-  // {
-  //   printf("%d, ",results->rawbuf[i]);
-  // }
   if (results->rawlen <=
       2 * (nbits + kFunikiBlockFooterBits) + (kHeader) - 1 + offset)
     return false;  // Can't possibly be a valid Funiki message.
   if (strict && nbits != kFunikiBits)
     return false;  // Not strictly a Funiki message.
-
-  // printf("\nlen: %d\n", results->rawlen);
   // There are two blocks back-to-back in a full Funiki IR message
   // sequence.
-  uint8_t tole = _tolerance + 20;
   uint16_t used;
   // Header + Data Block #1 (80 bits)
   used = matchGeneric(results->rawbuf + offset, results->state,
@@ -540,35 +474,17 @@ bool IRrecv::decodeFuniki(decode_results* results, uint16_t offset,
                       kFunikiBitMark, kFunikiOneSpace,
                       kFunikiBitMark, kFunikiZeroSpace,
                       0, 0, false,
-                      tole, kMarkExcess, false);
+                      _tolerance, kMarkExcess, false);
   if (used == 0) return false;
   offset += used;
-  // printf("\n ooffset: %d\n", offset);
   // Block #1 footer (3 bits, B101)
   match_result_t data_result;
   data_result = matchData(&(results->rawbuf[offset]), kFunikiBlockFooterBits,
                           kFunikiBitMark, kFunikiOneSpace, kFunikiBitMark,
-                          kFunikiZeroSpace, tole, kMarkExcess, false);
+                          kFunikiZeroSpace, _tolerance, kMarkExcess, false);
   if (data_result.success == false) return false;
-  // printf("\n foot: %lld\n", data_result.data);
-
   if (data_result.data != kFunikiBlockFooter) return false;
   offset += data_result.used;
-  // // Inter-block gap + Data Block #2 (32 bits) + Footer
-  // if (!matchGeneric(results->rawbuf + offset, results->state + 4,
-  //                   results->rawlen - offset, nbits / 2,
-  //                   kFunikiBitMark, kFunikiMsgSpace,
-  //                   kFunikiBitMark, kFunikiOneSpace,
-  //                   kFunikiBitMark, kFunikiZeroSpace,
-  //                   kFunikiBitMark, kFunikiMsgSpace, true,
-  //                   _tolerance, kMarkExcess, false)) return false;
-
-  // // Compliance
-  // if (strict) {
-  //   // Verify the message's checksum is correct.
-  //   if (!IRFunikiAC::validChecksum(results->state)) return false;
-  // }
-
   // Success
   results->decode_type = FUNIKI;
   results->bits = nbits;

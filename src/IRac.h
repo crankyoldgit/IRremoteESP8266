@@ -277,7 +277,7 @@ void electra(IRElectraAc *ac,
                const bool filter, const bool clean, const int16_t sleep = -1);
 #endif  // SEND_FUJITSU_AC
 #if SEND_FUNIKI
-  void funiki(IRFunikiAC *ac, const funiki_ac_remote_model_t model,
+  void funiki(IRFunikiAC *ac,
             const bool on, const stdAc::opmode_t mode, const bool celsius,
             const float degrees, const stdAc::fanspeed_t fan,
             const stdAc::swingv_t swingv,

@@ -1280,7 +1280,6 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
 #if SEND_FUNIKI
 /// Send a Funiki A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRFunikiAC object to use.
-/// @param[in] model The A/C model to use.
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
@@ -1289,13 +1288,12 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] sleep Nr. of minutes for sleep mode. <= 0 is Off, > 0 is on.
 /// @param[in] clock The clock setting.
-void IRac::funiki(IRFunikiAC *ac, const funiki_ac_remote_model_t model,
+void IRac::funiki(IRFunikiAC *ac,
                 const bool on, const stdAc::opmode_t mode, const bool celsius,
                 const float degrees, const stdAc::fanspeed_t fan,
                 const stdAc::swingv_t swingv,
                 const int16_t sleep, const int16_t clock) {
   ac->begin();
-  ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees, !celsius);
@@ -3286,9 +3284,9 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
 #if SEND_FUNIKI
     case FUNIKI:
     {
-      IRFunikiAC ac(_pin, (funiki_ac_remote_model_t)send.model, _inverted,
+      IRFunikiAC ac(_pin, _inverted,
                     _modulation);
-      funiki(&ac, (funiki_ac_remote_model_t)send.model, send.power, send.mode,
+      funiki(&ac, send.power, send.mode,
              send.celsius, send.degrees, send.fanspeed, send.swingv,
              send.sleep, send.clock);
       break;
