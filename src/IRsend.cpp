@@ -798,6 +798,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kXmpBits;
     case YORK:
       return kYorkBits;
+    case FUNIKI:
+      return kFunikiBits;
     // No default amount of bits.
     case FUJITSU_AC:
     case MWM:
@@ -1434,6 +1436,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendYork(state, nbytes);
       break;
 #endif  // SEND_YORK
+#if SEND_FUNIKI
+    case FUNIKI:
+      sendFuniki(state, nbytes);
+      break;
+#endif  // SEND_FUNIKI
     default:
       return false;
   }

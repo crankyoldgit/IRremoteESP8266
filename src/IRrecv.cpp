@@ -1185,6 +1185,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting York decode");
     if (decodeYork(results, offset, kYorkBits)) return true;
 #endif  // DECODE_YORK
+#if DECODE_FUNIKI
+    DPRINTLN("Attempting Funiki decode");
+    if (decodeFuniki(results, offset)) return true;
+#endif
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

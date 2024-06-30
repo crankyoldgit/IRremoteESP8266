@@ -883,6 +883,11 @@ class IRrecv {
                   const uint16_t kYorkBits,
                   const bool strict = true);
 #endif  // DECODE_YORK
+#if DECODE_FUNIKI
+  bool decodeFuniki(decode_results *results, uint16_t offset = kStartOffset,
+                       const uint16_t nbits = kFunikiBits,
+                       const bool strict = true);
+#endif  // DECODE_FUNIKI
 };
 
 #endif  // IRRECV_H_
