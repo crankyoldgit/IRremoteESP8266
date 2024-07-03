@@ -3279,8 +3279,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRHaierAC160 ac(_pin, _inverted, _modulation);
       haier160(&ac, send.power, send.mode, send.celsius, send.degrees,
-               send.fanspeed, send.swingv, send.turbo, send.filter, send.clean,
-               send.light, prev_light, send.sleep);
+               send.fanspeed, send.swingv, send.turbo, send.quiet,
+               send.filter, send.clean, send.light, prev_light, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC160
@@ -3301,7 +3301,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRHaierACYRW02 ac(_pin, _inverted, _modulation);
       haierYrwo2(&ac, send.power, send.mode, send.celsius, send.degrees,
                  send.fanspeed, send.swingv, send.swingh, send.turbo,
-                 send.filter, send.sleep);
+                 send.quiet, send.filter, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC_YRW02
