@@ -246,6 +246,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_FUJITSU_AC
     case decode_type_t::FUJITSU_AC:
 #endif
+#if SEND_FUJITSU_AC264
+    case decode_type_t::FUJITSU_AC264:
+#endif
 #if SEND_GOODWEATHER
     case decode_type_t::GOODWEATHER:
 #endif
@@ -1274,6 +1277,59 @@ void IRac::fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
   ac->send();
 }
 #endif  // SEND_FUJITSU_AC
+
+#if SEND_FUJITSU_AC264
+/// Send a Fujitsu A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRFujitsuAC264 object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] quiet Run the device in quiet/silent mode.
+/// @param[in] turbo Toggle the device's turbo/powerful mode.
+/// @param[in] econo Run the device in economical mode.
+/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
+/// @param[in] sleep Nr. of minutes for sleep mode. <= 0 is Off, > 0 is on.
+/// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignored.
+void IRac::fujitsu264(IRFujitsuAC264 *ac,
+                      const bool on, const stdAc::opmode_t mode,
+                      const float degrees, const stdAc::fanspeed_t fan,
+                      const stdAc::swingv_t swingv,
+                      const bool quiet, const bool turbo, const bool econo,
+                      const bool clean, const int16_t sleep,
+                      const int16_t clock) {
+  ac->begin();
+  if (on) {
+    // Do all special messages (except "Off") first,
+    // These need to be sent separately.
+    // Some functions are only available on some models.
+    if (turbo) {
+      ac->togglePowerful();
+      // Powerful is a separate command.
+      ac->send();
+    }
+    // Normal operation.
+    ac->setMode(ac->convertMode(mode));
+    if (mode == stdAc::opmode_t::kAuto)
+      ac->setTempAuto(degrees);
+    else
+      ac->setTemp(degrees);
+    ac->setFanSpeed(ac->convertFanSpeed(fan));
+    ac->setSwing(swingv != stdAc::swingv_t::kOff);
+    if (quiet) ac->setFanSpeed(kFujitsuAc264FanSpeedQuiet);
+    ac->setEconomy(econo);
+    ac->setClean(clean);
+    ac->setSleepTimer(sleep > 0 ? sleep : 0);
+    if (clock >= 0) ac->setClock(clock);
+    ac->on();
+  } else {
+    // Off is special case/message. We don't need to send other messages.
+    ac->off();
+  }
+  ac->send();
+}
+#endif  // SEND_FUJITSU_AC264
 
 #if SEND_GOODWEATHER
 /// Send a Goodweather A/C message with the supplied settings.
@@ -3244,6 +3300,16 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_FUJITSU_AC
+#if SEND_FUJITSU_AC264
+    case FUJITSU_AC264:
+    {
+      IRFujitsuAC264 ac(_pin, _inverted, _modulation);
+      fujitsu264(&ac, send.power, send.mode, send.degrees, send.fanspeed,
+                 send.swingv, send.quiet, send.turbo, send.econo,
+                 send.clean, send.sleep);
+      break;
+    }
+#endif  // SEND_FUJITSU_AC264
 #if SEND_GOODWEATHER
     case GOODWEATHER:
     {
@@ -4215,6 +4281,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_FUJITSU_AC
+#if DECODE_FUJITSU_AC264
+      case decode_type_t::FUJITSU_AC264: {
+        IRFujitsuAC264 ac(kGpioUnused);
+        ac.setRaw(result->state, result->bits / 8);
+        return ac.toString();
+      }
+#endif  // DECODE_FUJITSU_AC264
 #if DECODE_GOODWEATHER
       case decode_type_t::GOODWEATHER: {
         IRGoodweatherAc ac(kGpioUnused);
@@ -4716,6 +4789,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_FUJITSU_AC
+#if DECODE_FUJITSU_AC264
+      case decode_type_t::FUJITSU_AC264: {
+        IRFujitsuAC264 ac(kGpioUnused);
+        ac.setRaw(decode->state, decode->bits / 8);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_FUJITSU_AC264
 #if DECODE_GOODWEATHER
       case decode_type_t::GOODWEATHER: {
         IRGoodweatherAc ac(kGpioUnused);

@@ -952,6 +952,13 @@
 #define SEND_YORK           _IR_ENABLE_DEFAULT_
 #endif  // SEND_YORK
 
+#ifndef DECODE_FUJITSU_AC264
+#define DECODE_FUJITSU_AC264         _IR_ENABLE_DEFAULT_
+#endif  // DECODE_FUJITSU_AC264
+#ifndef SEND_FUJITSU_AC264
+#define SEND_FUJITSU_AC264           _IR_ENABLE_DEFAULT_
+#endif  // SEND_FUJITSU_AC264
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -970,7 +977,7 @@
      DECODE_KELON168 || DECODE_HITACHI_AC296 || DECODE_CARRIER_AC128 || \
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
-     DECODE_CARRIER_AC84 || DECODE_YORK || \
+     DECODE_CARRIER_AC84 || DECODE_YORK || DECODE_FUJITSU_AC264 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1137,8 +1144,9 @@ enum decode_type_t {
   WOWWEE,
   CARRIER_AC84,  // 125
   YORK,
+  FUJITSU_AC264,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = YORK,
+  kLastDecodeType = FUJITSU_AC264,
 };
 
 // Message lengths & required repeat values
@@ -1241,6 +1249,13 @@ const uint16_t kFujitsuAcStateLength = 16;
 const uint16_t kFujitsuAcStateLengthShort = 7;
 const uint16_t kFujitsuAcBits = kFujitsuAcStateLength * 8;
 const uint16_t kFujitsuAcMinBits = (kFujitsuAcStateLengthShort - 1) * 8;
+const uint16_t kFujitsuAc264DefaultRepeat = kNoRepeat;
+const uint16_t kFujitsuAc264StateLength = 33;
+const uint16_t kFujitsuAc264StateLengthMiddle = 16;
+const uint16_t kFujitsuAc264StateLengthShort = 7;
+const uint16_t kFujitsuAc264Bits = kFujitsuAc264StateLength * 8;
+const uint16_t kFujitsuAc264BitsMiddle = kFujitsuAc264StateLengthMiddle * 8;
+const uint16_t kFujitsuAc264BitsShort = kFujitsuAc264StateLengthShort * 8;
 const uint16_t kGicableBits = 16;
 const uint16_t kGicableMinRepeat = kSingleRepeat;
 const uint16_t kGoodweatherBits = 48;

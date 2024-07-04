@@ -693,6 +693,16 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Fujitsu A/C decode");
     if (decodeFujitsuAC(results, offset)) return true;
 #endif
+#if DECODE_FUJITSU_AC264
+    // FujitsuAC264 should be checked before FujitsuAC
+    // Fujitsu A/C needs to precede Panasonic and Denon as it has a short
+    // message which looks exactly the same as a Panasonic/Denon message.
+    DPRINTLN("Attempting Fujitsu A/C264 decode");
+    if (decodeFujitsuAC264(results, offset, kFujitsuAc264Bits) ||
+        decodeFujitsuAC264(results, offset, kFujitsuAc264BitsMiddle) ||
+        decodeFujitsuAC264(results, offset, kFujitsuAc264BitsShort))
+      return true;
+#endif
 #if DECODE_DENON
     // Denon needs to precede Panasonic as it is a special case of Panasonic.
     DPRINTLN("Attempting Denon decode");

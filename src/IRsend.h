@@ -469,6 +469,11 @@ class IRsend {
   void sendFujitsuAC(const unsigned char data[], const uint16_t nbytes,
                      const uint16_t repeat = kFujitsuAcMinRepeat);
 #endif
+#if SEND_FUJITSU_AC264
+  void sendFujitsuAC264(const unsigned char data[],
+                        const uint16_t nbytes = kFujitsuAc264StateLength,
+                        const uint16_t repeat = kNoRepeat);
+#endif  // SEND_FUJITSU_AC264
 #if SEND_INAX
   void sendInax(const uint64_t data, const uint16_t nbits = kInaxBits,
                 const uint16_t repeat = kInaxMinRepeat);
