@@ -1120,7 +1120,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_ZEPEAL
 #define D_STR_ZEPEAL "ZEPEAL"
 #endif  // D_STR_ZEPEAL
-
+#ifndef D_STR_FUNIKI
+#define D_STR_FUNIKI "FUNIKI"
+#endif  // D_STR_FUNIKI
 // IRrecvDumpV2+
 #ifndef D_STR_TIMESTAMP
 #define D_STR_TIMESTAMP "Timestamp"

@@ -885,6 +885,11 @@ class IRsend {
                     const uint16_t nbytes = kYorkStateLength,
                     const uint16_t repeat = kNoRepeat);
 #endif  // SEND_YORK
+#if SEND_FUNIKI
+  void sendFuniki(const uint8_t data[],
+                const uint16_t nbytes = kFunikiStateLength,
+                const uint16_t repeat = kFunikiDefaultRepeat);
+#endif  // SEND_FUNIKI
 
  protected:
 #ifdef UNIT_TEST
