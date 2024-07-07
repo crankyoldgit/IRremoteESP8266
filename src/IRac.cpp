@@ -18,6 +18,10 @@
 #else
     using ::roundf;
 #endif
+#ifdef SWIGLIB
+#include <vector>
+extern std::vector<int> timingList;
+#endif
 #include "IRsend.h"
 #include "IRremoteESP8266.h"
 #include "IRtext.h"
@@ -73,6 +77,7 @@
 #ifndef UNIT_TEST
 #define OUTPUT_DECODE_RESULTS_FOR_UT(ac)
 #else
+#ifndef SWIGLIB
 /* NOTE: THIS IS NOT A DOXYGEN COMMENT (would require ENABLE_PREPROCESSING-YES)
 /// If compiling for UT *and* a test receiver @c IRrecv is provided via the
 /// @c _utReceived param, this injects an "output" gadget @c _lastDecodeResults
@@ -98,6 +103,9 @@
       }                                                         \
     }                                                           \
   }
+#else
+#define OUTPUT_DECODE_RESULTS_FOR_UT(ac)
+#endif  // SWIGLIB
 #endif  // UNIT_TEST
 
 /// Class constructor
@@ -180,6 +188,11 @@ stdAc::state_t IRac::getState(void) { return next; }
 /// sent to the device. i.e. What the A/C unit should already be set to.
 /// @return A Ptr to a state containing the previously sent settings.
 stdAc::state_t IRac::getStatePrev(void) { return _prev; }
+
+#ifdef SWIGLIB
+std::vector<int> IRac::getTiming(void) { return timingList; }
+void IRac::resetTiming(void) { timingList.clear(); }
+#endif
 
 /// Is the given protocol supported by the IRac class?
 /// @param[in] protocol The vendor/protocol type.

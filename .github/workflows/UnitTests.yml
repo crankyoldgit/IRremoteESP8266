@@ -13,6 +13,8 @@ jobs:
       run: (cd tools; make all)
     - name: Run tools unit tests
       run: (cd tools; make run_tests)
+    - name: Build swig extension and run simple test
+      run: (cd python; make testdocker)
 
   Unit_Tests:
     runs-on: ubuntu-latest
