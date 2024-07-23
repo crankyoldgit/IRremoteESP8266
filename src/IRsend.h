@@ -885,7 +885,11 @@ class IRsend {
                     const uint16_t nbytes = kYorkStateLength,
                     const uint16_t repeat = kNoRepeat);
 #endif  // SEND_YORK
-
+#if SEND_BLUESTARHEAVY
+  void sendBluestarHeavy(const unsigned char data[],
+                       const uint16_t nbytes = kBluestarHeavyStateLength,
+                       const uint16_t repeat = kNoRepeat);
+#endif  // SEND_BLUESTARHEAVY
  protected:
 #ifdef UNIT_TEST
 #ifndef HIGH
