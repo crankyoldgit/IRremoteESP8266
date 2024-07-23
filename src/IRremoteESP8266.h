@@ -1143,6 +1143,7 @@ enum decode_type_t {
   GORENJE,
   WOWWEE,
   CARRIER_AC84,  // 125
+  YORK,
   BLUESTARHEAVY,
   // Add new entries before this one, and update it to point to the last entry.
   kLastDecodeType = BLUESTARHEAVY,
