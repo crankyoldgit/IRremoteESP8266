@@ -883,6 +883,12 @@ class IRrecv {
                   const uint16_t kYorkBits,
                   const bool strict = true);
 #endif  // DECODE_YORK
+#if DECODE_BLUESTARHEAVY
+  bool decodeBluestarHeavy(decode_results *results,
+                  uint16_t kStartOffset,
+                  const uint16_t kBluestarHeavyBits,
+                  const bool strict = true);
+#endif  // DECODE_BLUESTARHEAVY
 };
 
 #endif  // IRRECV_H_

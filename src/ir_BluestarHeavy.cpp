@@ -56,58 +56,58 @@ void IRsend::sendBluestarHeavy(const uint8_t data[], const uint16_t nbytes, cons
 }
 #endif  // SEND_BLUESTARHEAVY
 
-/*
+
 // DANGER: More than 64 bits detected. A uint64_t for 'data' won't work!
-#if DECODE_BLUESTARHEAVY
-// Function should be safe up to 64 bits.
-/// Decode the supplied BluestarHeavy message.
-/// Status: ALPHA / Untested.
-/// @param[in,out] results Ptr to the data to decode & where to store the decode
-/// @param[in] offset The starting index to use when attempting to decode the
-///   raw data. Typically/Defaults to kStartOffset.
-/// @param[in] nbits The number of data bits to expect.
-/// @param[in] strict Flag indicating if we should perform strict matching.
-/// @return A boolean. True if it can decode it, false if it can't.
+// #if DECODE_BLUESTARHEAVY
+// // Function should be safe up to 64 bits.
+// /// Decode the supplied BluestarHeavy message.
+// /// Status: ALPHA / Untested.
+// /// @param[in,out] results Ptr to the data to decode & where to store the decode
+// /// @param[in] offset The starting index to use when attempting to decode the
+// ///   raw data. Typically/Defaults to kStartOffset.
+// /// @param[in] nbits The number of data bits to expect.
+// /// @param[in] strict Flag indicating if we should perform strict matching.
+// /// @return A boolean. True if it can decode it, false if it can't.
 
 
-bool IRrecv::decodeBluestarHeavy(decode_results *results, uint16_t offset, const uint16_t nbits, const bool strict) {
-  if (results->rawlen < 2 * nbits + kBluestarHeavyOverhead - offset)
-    return false;  // Too short a message to match.
-  if (strict && nbits != kBluestarHeavyBits)
-    return false;
+// bool IRrecv::decodeBluestarHeavy(decode_results *results, uint16_t offset, const uint16_t nbits, const bool strict) {
+//   if (results->rawlen < 2 * nbits + kBluestarHeavyOverhead - offset)
+//     return false;  // Too short a message to match.
+//   if (strict && nbits != kBluestarHeavyBits)
+//     return false;
 
-  uint128_t data = 0;
-  match_result_t data_result;
+//   uint64_t data = 0;
+//   match_result_t data_result;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kBluestarHeavyHdrMark))
-    return false;
-  if (!matchSpace(results->rawbuf[offset++], kBluestarHeavyHdrSpace))
-    return false;
+//   // Header
+//   if (!matchMark(results->rawbuf[offset++], kBluestarHeavyHdrMark))
+//     return false;
+//   if (!matchSpace(results->rawbuf[offset++], kBluestarHeavyHdrSpace))
+//     return false;
 
-  // Data Section #1
-  // e.g. data_result.data = 0xD5FED74FFA5FFA5FFF7F5CFDDC, nbits = 104
-  data_result = matchData(&(results->rawbuf[offset]), 104,
-                          kBluestarHeavyBitMark, kBluestarHeavyOneSpace,
-                          kBluestarHeavyBitMark, kBluestarHeavyZeroSpace);
-  offset += data_result.used;
-  if (data_result.success == false) return false;  // Fail
-  data <<= 104;  // Make room for the new bits of data.
-  data |= data_result.data;
+//   // Data Section #1
+//   // e.g. data_result.data = 0xD5FED74FFA5FFA5FFF7F5CFDDC, nbits = 104
+//   data_result = matchData(&(results->rawbuf[offset]), 104,
+//                           kBluestarHeavyBitMark, kBluestarHeavyOneSpace,
+//                           kBluestarHeavyBitMark, kBluestarHeavyZeroSpace);
+//   offset += data_result.used;
+//   if (data_result.success == false) return false;  // Fail
+//   data <<= 104;  // Make room for the new bits of data.
+//   data |= data_result.data;
 
-  // Header
-  if (!matchMark(results->rawbuf[offset++], kBluestarHeavyHdrMark))
-    return false;
+//   // Header
+//   if (!matchMark(results->rawbuf[offset++], kBluestarHeavyHdrMark))
+//     return false;
 
-  // Success
-  results->decode_type = decode_type_t::BLUESTARHEAVY;
-  results->bits = nbits;
-  results->value = data;
-  results->command = 0;
-  results->address = 0;
-  return true;
-}
-#endif  // DECODE_BLUESTARHEAVY
+//   // Success
+//   results->decode_type = decode_type_t::BLUESTARHEAVY;
+//   results->bits = nbits;
+//   results->value = data;
+//   results->command = 0;
+//   results->address = 0;
+//   return true;
+// }
+// #endif  // DECODE_BLUESTARHEAVY
 
 #if DECODE_BLUESTARHEAVY
 // Function should be safe over 64 bits.
@@ -148,4 +148,3 @@ bool IRrecv::decodeBluestarHeavy(decode_results *results, uint16_t offset, const
   return true;
 }
 #endif  // DECODE_BLUESTARHEAVY
-*/
