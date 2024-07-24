@@ -49,9 +49,9 @@ void IRsend::sendBluestarHeavy(const uint8_t data[], const uint16_t nbytes, cons
                 kBluestarHeavyBitMark, kBluestarHeavyOneSpace,
                 kBluestarHeavyBitMark, kBluestarHeavyZeroSpace,
                 kBluestarHeavyHdrMark, kDefaultMessageGap,
-                data + pos, 13,  // Bytes
+                data + pos, nbytes,  // Bytes
                 kBluestarHeavyFreq, true, kNoRepeat, kDutyDefault);
-    pos += 13;  // Adjust by how many bytes of data we sent
+    pos += nbytes;  // Adjust by how many bytes of data we sent
   }
 }
 #endif  // SEND_BLUESTARHEAVY
