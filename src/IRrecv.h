@@ -879,8 +879,8 @@ class IRrecv {
 #endif  // DECODE_WOWWEE
 #if DECODE_YORK
   bool decodeYork(decode_results *results,
-                  uint16_t kStartOffset,
-                  const uint16_t kYorkBits,
+                  uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kYorkBits,
                   const bool strict = true);
 #endif  // DECODE_YORK
 };
