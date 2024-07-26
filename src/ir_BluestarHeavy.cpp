@@ -3,7 +3,7 @@
 /// @brief Support for BluestarHeavy protocol
 
 // Supports:
-// Brand: Bluestar,  Model: TODO add device and remote
+// Brand: Bluestar,  Model: D716LXM0535A2400313 (Remote)
 
 #include "IRrecv.h"
 #include "IRsend.h"
@@ -12,8 +12,8 @@
 const uint16_t kBluestarHeavyHdrMark = 4912;
 const uint16_t kBluestarHeavyBitMark = 465;
 const uint16_t kBluestarHeavyHdrSpace = 5058;
-const uint16_t kBluestarHeavyOneSpace = 1548;
-const uint16_t kBluestarHeavyZeroSpace = 572;
+const uint16_t kBluestarHeavyOneSpace = 572;
+const uint16_t kBluestarHeavyZeroSpace = 1548;
 const uint16_t kBluestarHeavyFreq = 38000;
 const uint16_t kBluestarHeavyOverhead = 3;
 
@@ -25,7 +25,7 @@ const uint16_t kBluestarHeavyOverhead = 3;
 /// e.g.
 /// @code
 /// uint8_t data[kBluestarHeavyStateLength] =
-/// {0xD5,0xFE,0xD7,0x4F,0xFA,0x5F,0xFA,0x5F,0xFF,0x7F,0x5C,0xFD,0xDC};
+/// {0x2A,0x00,0x20,0xD0,0x05,0xA0,0x05,0xA0,0x00,0x80,0xBA,0x02,0x23};
 /// @endcode
 /// @param[in] nbytes Nr. of bytes of data in the array.
 /// @param[in] repeat Nr. of times the message is to be repeated.
