@@ -1174,7 +1174,7 @@ const uint16_t kArgo3ConfigStateLength = 4;  // Bytes
 const uint16_t kArgoDefaultRepeat = kNoRepeat;
 const uint16_t kArrisBits = 32;
 const uint16_t kBluestarHeavyStateLength = 13; 
-const uint16_t kBluestarHeavyBits = 104;
+const uint16_t kBluestarHeavyBits = kBluestarHeavyStateLength * 8;
 const uint16_t kBosch144StateLength = 18;
 const uint16_t kBosch144Bits = kBosch144StateLength * 8;
 const uint16_t kCoolixBits = 24;
@@ -1445,8 +1445,6 @@ const uint16_t kRhossDefaultRepeat = 0;
 const uint16_t kClimaButlerBits = 52;
 const uint16_t kYorkBits = 136;
 const uint16_t kYorkStateLength = 17;
-
-
 
 // Legacy defines. (Deprecated)
 #define AIWA_RC_T501_BITS             kAiwaRcT501Bits
