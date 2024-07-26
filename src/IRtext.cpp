@@ -559,6 +559,8 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
             D_STR_CARRIER_AC84, D_STR_UNSUPPORTED) "\x0"
     COND(DECODE_YORK || SEND_YORK,
             D_STR_YORK, D_STR_UNSUPPORTED) "\x0"
+    COND(DECODE_BLUESTARHEAVY || SEND_BLUESTARHEAVY,
+            D_STR_BLUESTARHEAVY, D_STR_UNSUPPORTED) "\x0"
     ///< New protocol (macro) strings should be added just above this line.
     "\x0"  ///< This string requires double null termination.
 };
