@@ -957,7 +957,7 @@
 #endif  // DECODE_BLUESTARHEAVY
 #ifndef SEND_BLUESTARHEAVY
 #define SEND_BLUESTARHEAVY           _IR_ENABLE_DEFAULT_
-#endif  // SEND_BLUESTARHEAVY 
+#endif  // SEND_BLUESTARHEAVY
 
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
@@ -1173,7 +1173,7 @@ const uint16_t kArgo3TimerStateLength = 9;  // Bytes
 const uint16_t kArgo3ConfigStateLength = 4;  // Bytes
 const uint16_t kArgoDefaultRepeat = kNoRepeat;
 const uint16_t kArrisBits = 32;
-const uint16_t kBluestarHeavyStateLength = 13; 
+const uint16_t kBluestarHeavyStateLength = 13;
 const uint16_t kBluestarHeavyBits = kBluestarHeavyStateLength * 8;
 const uint16_t kBosch144StateLength = 18;
 const uint16_t kBosch144Bits = kBosch144StateLength * 8;
