@@ -701,6 +701,11 @@ TEST(TestGreeClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().filter);
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+
+  // Test kGreeSwingLastPos following the pattern in IRac::gree().
+  ASSERT_EQ(kGreeSwingLastPos, ac.convertSwingV(stdAc::swingv_t::kOff));
+  ac.setSwingVertical(false, kGreeSwingLastPos);
+  ASSERT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
 }
 
 TEST(TestGreeClass, Issue814Power) {
