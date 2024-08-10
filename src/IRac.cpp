@@ -58,6 +58,7 @@
 #include "ir_Vestel.h"
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
+#include "ir_Electrolux.h"
 
 // On the ESP8266 platform we need to use a special version of string handling
 // functions to handle the strings stored in the flash address space.
@@ -374,6 +375,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_WHIRLPOOL_AC
     case decode_type_t::WHIRLPOOL_AC:
 #endif
+#if SEND_ELECTROLUX_AC
+    case decode_type_t::ELETROLUX_AC:
+#endif // SEND_ELECTROLUX_AC
       return true;
     default:
       return false;
@@ -817,7 +821,7 @@ void IRac::corona(IRCoronaAc *ac,
   // No Sleep setting available.
   ac->send();
 }
-#endif  // SEND_CARRIER_AC64
+#endif  // SEND_CORONA_AC
 
 #if SEND_DAIKIN
 /// Send a Daikin A/C message with the supplied settings.
@@ -2852,6 +2856,42 @@ void IRac::rhoss(IRRhossAc *ac,
 }
 #endif  // SEND_RHOSS
 
+#if SEND_ELECTROLUX_AC
+/// Send a Samsung A/C message with the supplied settings.
+/// @note Multiple IR messages may be generated & sent.
+/// @param[in, out] ac A Ptr to an IRSamsungAc object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] celsius The celsius temperature mode.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] quiet Run the device in quiet/silent mode.
+void IRac::electrolux(IRElectroluxAc *ac,
+                   const bool on, const stdAc::opmode_t mode,
+                   const bool celsius, const float degrees,
+                   const stdAc::fanspeed_t fan,
+                   const bool quiet) {
+  ac->begin();
+  ac->stateReset();
+  ac->setPowerToggle(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTempModeFahrenheit(!celsius);
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setQuiet(quiet);
+  ac->setMode(ac->convertMode(mode));
+  ac->send();
+  // No Swing setting available.
+  // No Light setting available.
+  // No Filter setting available.
+  // No Turbo setting available.
+  // No Economy setting available.
+  // No Clean setting available.
+  // No Beep setting available.
+  // No Sleep setting available.
+}
+#endif  // SEND_ELECTROLUX_AC
+
 /// Create a new state base on the provided state that has been suitably fixed.
 /// @note This is for use with Home Assistant, which requires mode to be off if
 ///   the power is off.
@@ -3637,6 +3677,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_TRANSCOLD_AC
+#if SEND_ELECTROLUX_AC
+    case ELETROLUX_AC:
+    {
+      IRElectroluxAc ac(_pin, _inverted, _modulation);
+      electrolux(&ac, send.power, send.mode, send.celsius, send.degrees, send.fanspeed, send.quiet);
+      break;
+    }
+#endif  // SEND_ELECTROLUX_AC
     default:
       return false;  // Fail, didn't match anything.
   }
@@ -4516,6 +4564,13 @@ namespace IRAcUtils {
         return ac.toString();
       }
 #endif  // DECODE_YORK
+#if DECODE_ELECTROLUX_AC
+      case decode_type_t::ELETROLUX_AC: {
+        IRElectroluxAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // ELETROLUX_AC uses value instead of state.
+        return ac.toString();
+      }
+#endif  // DECODE_ELECTROLUX_AC
       default:
         return "";
     }
@@ -5060,6 +5115,14 @@ namespace IRAcUtils {
         break;
       }
 #endif  // DECODE_YORK
+#if DECODE_ELECTROLUX_AC
+      case decode_type_t::ELETROLUX_AC: {
+        IRCarrierAc64 ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_CARRIER_AC64
       default:
         return false;
     }
