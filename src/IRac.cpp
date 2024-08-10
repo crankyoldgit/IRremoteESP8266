@@ -2873,7 +2873,7 @@ void IRac::electrolux(IRElectroluxAc *ac,
                    const bool quiet) {
   ac->begin();
   ac->stateReset();
-  ac->setPowerToggle(on);
+  ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTempModeFahrenheit(!celsius);
   ac->setTemp(degrees);
