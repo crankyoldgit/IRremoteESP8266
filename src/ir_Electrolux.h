@@ -15,25 +15,27 @@
 #endif
 #include "IRremoteESP8266.h"
 #include "IRsend.h"
+#include "map"
 #ifdef UNIT_TEST
 #include "IRsend_test.h"
 #endif
 
 union ElectroluxAcProtocol{
   uint64_t raw;  // The state of the IR remote in native IR code form.
-  struct {
-    uint8_t PowerToggle         :1;
-    uint8_t Fan                 :2;
-    uint8_t Temp                :5;
-    uint8_t Mode                :3;
-    uint8_t TimerEnable         :1;
-    uint8_t Timer               :4;
-    uint8_t Quiet               :1;
-    uint8_t                     :1;
-    uint8_t TempModeFahrenheit  :1;
-    uint8_t                     :5;
-    uint8_t                     :4;
-    uint8_t Sum                 :4;
+    struct {
+        uint8_t Sum                 :4;
+        uint8_t                     :4;
+        uint8_t                     :5;
+        uint8_t TempModeFahrenheit  :1;
+        uint8_t                     :1;
+        uint8_t Quiet               :1;
+        uint8_t Timer               :4;
+        uint8_t TimerEnable         :1;
+        uint8_t Mode                :3;
+        uint8_t Temp                :5;
+        uint8_t Fan                 :2;
+        uint8_t Power               :1;
+        uint64_t                    :0;
   };
 };
 
@@ -45,7 +47,7 @@ const uint8_t kElectroluxAcMaxFTemp = 90;   // 90F
 const uint8_t kElectroluxTimerMax = 12;     // 12H
 const uint8_t kElectroluxTimerMin = 1;      // 1H
 const uint64_t kElectroluxAcKnownGoodState = 0xF3008005;
-const uint8_t kElectroluxAcChecksumOffset = 28;
+const uint8_t kElectroluxAcChecksumOffset = 0;
 const uint8_t kElectroluxAcChecksumSize = 4;
 
 // Fan
@@ -75,8 +77,10 @@ class IRElectroluxAc {
     int8_t calibrate(void) { return _irsend.calibrate(); }
 #endif  // SEND_ELECTROLUX_AC
     void begin();
-    void setPowerToggle(const bool on);
-    bool getPowerToggle(void) const;
+    void on(void);
+    void off(void);
+    void setPower(const bool on);
+    bool getPower(void) const;
     void setTemp(const uint8_t temp);
     uint8_t getTemp(void) const;
     void setFan(const uint8_t speed);

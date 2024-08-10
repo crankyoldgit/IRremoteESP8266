@@ -6,6 +6,7 @@
 //   Brand: Electrolux,  Model: Electrolux EACM EZ/N3
 
 #include "ir_Electrolux.h"
+#include <Arduino.h>
 #include <algorithm>
 #include "IRac.h"
 #include "IRrecv.h"
@@ -36,8 +37,7 @@ void IRsend::sendElectroluxAc(const uint64_t data, const uint16_t nbits, const u
     // Header
     mark(kElectroluxAcHdrMark);
     space(kElectroluxAcHdrSpace);
-    // Data Section #1
-    // e.g. data = 0xED000004, nbits = 32
+    // Data Section
     sendData(kElectroluxAcBitMark, kElectroluxAcOneSpace, kElectroluxAcBitMark, kElectroluxAcZeroSpace, send_data, 32, true);
     send_data >>= 32;
     // Footer
@@ -124,11 +124,11 @@ void IRElectroluxAc::begin(void) { _irsend.begin(); }
 
 /// Turn on/off the Power Airwell setting.
 /// @param[in] on The desired setting state.
-void IRElectroluxAc::setPowerToggle(const bool on) {  _.PowerToggle = on; }
+void IRElectroluxAc::setPower(const bool on) {  _.Power = on; }
 
 /// Get the power toggle setting from the internal state.
 /// @return A boolean indicating the setting.
-bool IRElectroluxAc::getPowerToggle(void) const { return _.PowerToggle; }
+bool IRElectroluxAc::getPower(void) const { return _.Power; }
 
 /// Turn on/off the fahrenheit temp mode.
 /// @param[in] on The desired setting state.
@@ -142,14 +142,15 @@ bool IRElectroluxAc::getTempModeFahrenheit(void) const { return _.TempModeFahren
 /// @param[in] degrees The temperature in celsius or fahrenheit.
 void IRElectroluxAc::setTemp(const uint8_t degrees) {
   if(getTempModeFahrenheit()) {
-    uint8_t temp = std::max(kElectroluxAcMaxFTemp, degrees);
-    temp = std::min(kElectroluxAcMinFTemp, temp);
+    uint8_t temp = max(kElectroluxAcMinFTemp, degrees);
+    temp = min(kElectroluxAcMaxFTemp, temp);
     _.Temp = (temp - kElectroluxAcMinFTemp);
   }
   else {
-    uint8_t temp = std::max(kElectroluxAcMaxTemp, degrees);
-    temp = std::min(kElectroluxAcMinTemp, temp);
-    _.Temp = ((temp - kElectroluxAcMinTemp) * 1.8); //TODO: fix accuracy
+    uint8_t temp = max(kElectroluxAcMinTemp, degrees);
+    temp = min(kElectroluxAcMaxTemp, temp);
+    temp = map(temp, kElectroluxAcMinTemp, kElectroluxAcMaxTemp, kElectroluxAcMinFTemp, kElectroluxAcMaxFTemp);
+    _.Temp = temp - kElectroluxAcMinFTemp;
   }
 }
 
@@ -160,7 +161,8 @@ uint8_t IRElectroluxAc::getTemp(void) const {
     return _.Temp + kElectroluxAcMinFTemp;
   }
   else {
-    return (_.Temp / 1.8) + kElectroluxAcMinTemp; //TODO: fix accuracy
+    uint8_t temp = map(_.Temp + kElectroluxAcMinFTemp, kElectroluxAcMinFTemp, kElectroluxAcMaxFTemp, kElectroluxAcMinTemp, kElectroluxAcMaxTemp);
+    return temp;
   }
 }
 
@@ -239,10 +241,10 @@ void IRElectroluxAc::setRaw(const uint64_t state) { _.raw = state; }
 /// @param[in] state The value to calc the checksum of.
 /// @return The 4-bit checksum stored in a uint_8.
 uint8_t IRElectroluxAc::calcChecksum(const uint64_t state) {
-  uint32_t data = GETBITS32(state, 0, kElectroluxAcBits - 4);
+  uint32_t data = GETBITS64(state, kElectroluxAcChecksumSize + kElectroluxAcChecksumOffset, kElectroluxAcBits - 4);
   uint8_t result = 0;
   for (; data; data >>= 4)  // Add each nibble together.
-    result += GETBITS32(data, 0, 4);
+    result += GETBITS8(data, 0, 4);
   return (result ^ 0xF) & 0xF;
 }
 
@@ -325,7 +327,7 @@ stdAc::state_t IRElectroluxAc::toCommon(const stdAc::state_t *prev) const {
     result.power = false;
   }
   result.protocol = decode_type_t::ELETROLUX_AC;
-  result.power = _.PowerToggle;
+  result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
   result.celsius = !getTempModeFahrenheit();
   result.degrees = getTemp();
@@ -351,17 +353,17 @@ stdAc::state_t IRElectroluxAc::toCommon(const stdAc::state_t *prev) const {
 String IRElectroluxAc::toString(void) const {
   String result = "";
   result.reserve(120);  // Reserve some heap for the string to reduce fragging.
-  result += addBoolToString(_.PowerToggle, kPowerStr, false);
+  result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, kElectroluxModeAuto, kElectroluxModeCool,
                             0xFF, kElectroluxModeDry, kElectroluxModeFan);
-  result += addTempToString(getTemp());
+  result += addTempToString(getTemp(), !getTempModeFahrenheit());
   result += addFanToString(_.Fan, kElectroluxFanHigh, kElectroluxFanLow,
                            kElectroluxFanAuto, kElectroluxFanAuto,
                            kElectroluxFanMedium);
 
   result += addBoolToString(getQuiet(), kQuietStr);
 
-  if(getPowerToggle()) {
+  if(getPower()) {
     result += irutils::addLabeledString(irutils::minsToString(getOnOffTimer()), kOffTimerStr);
   }
   else {
@@ -374,3 +376,9 @@ String IRElectroluxAc::toString(void) const {
 void IRElectroluxAc::checksum(void) {
   _.Sum = calcChecksum(_.raw);
 }
+
+/// Set the requested power state of the A/C to on.
+void IRElectroluxAc::on(void) { setPower(true); }
+
+/// Set the requested power state of the A/C to off.
+void IRElectroluxAc::off(void) { setPower(false); }
