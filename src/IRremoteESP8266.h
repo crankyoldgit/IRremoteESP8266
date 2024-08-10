@@ -1152,9 +1152,9 @@ enum decode_type_t {
   CARRIER_AC84,  // 125
   YORK,
   BLUESTARHEAVY,
-  ELETROLUX_AC,
+  ELECTROLUX_AC,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = ELETROLUX_AC,
+  kLastDecodeType = ELECTROLUX_AC,
 };
 
 // Message lengths & required repeat values

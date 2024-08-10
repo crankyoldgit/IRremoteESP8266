@@ -244,6 +244,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_ELECTRA_AC
     case decode_type_t::ELECTRA_AC:
 #endif
+#if SEND_ELECTROLUX_AC
+    case decode_type_t::ELECTROLUX_AC:
+#endif  // SEND_ELECTROLUX_AC
 #if SEND_FUJITSU_AC
     case decode_type_t::FUJITSU_AC:
 #endif
@@ -375,9 +378,6 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_WHIRLPOOL_AC
     case decode_type_t::WHIRLPOOL_AC:
 #endif
-#if SEND_ELECTROLUX_AC
-    case decode_type_t::ELETROLUX_AC:
-#endif // SEND_ELECTROLUX_AC
       return true;
     default:
       return false;
@@ -3678,10 +3678,12 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     }
 #endif  // SEND_TRANSCOLD_AC
 #if SEND_ELECTROLUX_AC
-    case ELETROLUX_AC:
+    case ELECTROLUX_AC:
     {
       IRElectroluxAc ac(_pin, _inverted, _modulation);
-      electrolux(&ac, send.power, send.mode, send.celsius, send.degrees, send.fanspeed, send.quiet);
+      electrolux(&ac, send.power, send.mode,
+                  send.celsius, send.degrees,
+                  send.fanspeed, send.quiet);
       break;
     }
 #endif  // SEND_ELECTROLUX_AC
@@ -4565,7 +4567,7 @@ namespace IRAcUtils {
       }
 #endif  // DECODE_YORK
 #if DECODE_ELECTROLUX_AC
-      case decode_type_t::ELETROLUX_AC: {
+      case decode_type_t::ELECTROLUX_AC: {
         IRElectroluxAc ac(kGpioUnused);
         ac.setRaw(result->value);  // ELETROLUX_AC uses value instead of state.
         return ac.toString();
@@ -5116,7 +5118,7 @@ namespace IRAcUtils {
       }
 #endif  // DECODE_YORK
 #if DECODE_ELECTROLUX_AC
-      case decode_type_t::ELETROLUX_AC: {
+      case decode_type_t::ELECTROLUX_AC: {
         IRCarrierAc64 ac(kGpioUnused);
         ac.setRaw(decode->value);  // Uses value instead of state.
         *result = ac.toCommon();

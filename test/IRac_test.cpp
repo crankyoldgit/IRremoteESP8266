@@ -12,6 +12,7 @@
 #include "ir_Delonghi.h"
 #include "ir_Ecoclim.h"
 #include "ir_Electra.h"
+#include "ir_Electrolux.h"
 #include "ir_Fujitsu.h"
 #include "ir_Goodweather.h"
 #include "ir_Gree.h"
@@ -664,6 +665,31 @@ TEST(TestIRac, Electra) {
   EXPECT_TRUE(capture.decode(&ac._irsend.capture));
   ASSERT_EQ(ELECTRA_AC, ac._irsend.capture.decode_type);
   ASSERT_EQ(kElectraAcBits, ac._irsend.capture.bits);
+  ac.setRaw(ac._irsend.capture.state);
+  ASSERT_EQ(expected, ac.toString());
+}
+
+TEST(TestIRac, Electrolux) {
+  IRElectroluxAc ac(kGpioUnused);
+  IRac irac(kGpioUnused);
+  IRrecv capture(kGpioUnused);
+  char expected[] =
+      "Power: Off, Mode: 0 (Cool), Temp: 24C, "
+      "Fan: 3 (Auto), Quiet: Off, On Timer: 00:00";
+
+  ac.begin();
+  irac.electrolux(&ac,
+               true,                        // Power
+               stdAc::opmode_t::kCool,       // Mode
+               true,                          // Celsius
+               24,                          // Sensor Temp.
+               stdAc::fanspeed_t::kAuto,    // Fan speed
+               false                        );                       // Quiet
+  ASSERT_EQ(expected, ac.toString());
+  ac._irsend.makeDecodeResult();
+  EXPECT_TRUE(capture.decode(&ac._irsend.capture));
+  ASSERT_EQ(ELECTROLUX_AC, ac._irsend.capture.decode_type);
+  ASSERT_EQ(kElectroluxAcBits, ac._irsend.capture.bits);
   ac.setRaw(ac._irsend.capture.state);
   ASSERT_EQ(expected, ac.toString());
 }

@@ -22,6 +22,7 @@
 #include "ir_Fujitsu.h"
 #include "ir_Ecoclim.h"
 #include "ir_Electra.h"
+#include "ir_Electrolux.h"
 #include "ir_Goodweather.h"
 #include "ir_Gree.h"
 #include "ir_Haier.h"
@@ -50,7 +51,6 @@
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
 #include "ir_York.h"
-#include "ir_Electrolux.h"
 
 // Constants
 const int8_t kGpioUnused = -1;  ///< A placeholder for not using an actual GPIO.

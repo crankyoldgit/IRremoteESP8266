@@ -562,6 +562,7 @@ uint16_t IRsend::minRepeats(const decode_type_t protocol) {
     case COOLIX:
     case COOLIX48:
     case ELITESCREENS:
+    case ELECTROLUX_AC:
     case GICABLE:
     case INAX:
     case MIDEA24:
@@ -646,6 +647,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case ARRIS:
     case CARRIER_AC:
     case ELITESCREENS:
+    case ELECTROLUX_AC:
     case EPSON:
     case NEC:
     case NEC_LIKE:
@@ -914,6 +916,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     case EPSON:
       sendEpson(data, nbits, min_repeat);
       break;
+#endif
+#if SEND_ELECTROLUX_AC
+    case ELECTROLUX_AC:
+      sendElectroluxAc(data, nbits, min_repeat);
+    break;
 #endif
 #if SEND_GICABLE
     case GICABLE:
