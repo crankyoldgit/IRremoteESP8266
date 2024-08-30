@@ -1165,7 +1165,8 @@ const uint16_t kAmcorBits = kAmcorStateLength * 8;
 const uint16_t kAmcorDefaultRepeat = kSingleRepeat;
 const uint16_t kArgoStateLength = 12;
 const uint16_t kArgoShortStateLength = 4;
-const uint16_t kArgoBits = kArgoStateLength * 8;
+const uint16_t kArgoBits = 90;  // The protocol bit length
+                                // is NOT full byte aligned
 const uint16_t kArgoShortBits = kArgoShortStateLength * 8;
 const uint16_t kArgo3AcControlStateLength = 6;  // Bytes
 const uint16_t kArgo3iFeelReportStateLength = 2;  // Bytes

@@ -104,8 +104,9 @@ TEST(TestArgoACClass, MessageConstructon) {
   auto expected = std::vector<uint8_t>({
       0xAC, 0xF5, 0x00, 0x24, 0x02, 0x00, 0x00, 0x00, 0x00, 0xAC, 0xD6, 0x01});
   auto actual = ac.getRaw();
-  EXPECT_THAT(std::vector<uint8_t>(actual, actual + kArgoBits / 8),
-              ::testing::ElementsAreArray(expected));
+  EXPECT_THAT(std::vector<uint8_t>(actual, actual + static_cast<uint8_t>(
+    ceil(static_cast<float>(kArgoBits) / 8.0))),
+    ::testing::ElementsAreArray(expected));
   EXPECT_EQ(
       "Model: 1 (WREM2), Power: On, Mode: 0 (Cool), Fan: 0 (Auto), Temp: 20C, "
       "Sensor Temp: 21C, Max: On, IFeel: On, Night: On",
@@ -1460,6 +1461,55 @@ TEST(TestDecodeArgo, RealShortDecode) {
   EXPECT_EQ(stdAc::ac_command_t::kSensorTempReport, r.command);
   EXPECT_EQ(28, r.sensorTemperature);
 }
+
+TEST(TestDecodeArgo, Issue2133_90bit_message) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  // Full Argo command message (90 bits)
+  const uint16_t command_90bit[193] = {
+    6422, 3190, 408, 872, 428, 848, 428, 2126, 402, 2150, 408, 872, 404, 2152,
+    402, 874, 402, 2152, 402, 2154, 406, 872, 428, 2126, 404, 876, 404, 2150,
+    430, 2124, 432, 2122, 432, 2124, 404, 874, 404, 874, 426, 852, 428, 850,
+    412, 864, 406, 872, 404, 874, 400, 2154, 428, 2128, 402, 876, 402, 874, 400,
+    2154, 404, 2150, 406, 2150, 400, 878, 400, 876, 402, 874, 416, 2136, 404,
+    2152, 402, 876, 402, 874, 402, 874, 428, 852, 402, 874, 404, 872, 400, 876,
+    402, 876, 404, 872, 430, 846, 402, 2152, 406, 2150, 406, 2150, 404, 874,
+    432, 846, 426, 850, 428, 850, 400, 878, 398, 876, 404, 874, 404, 874, 400,
+    2152, 432, 2124, 428, 2128, 432, 846, 426, 852, 400, 2154, 404, 874, 426,
+    2128, 428, 2128, 404, 872, 430, 848, 426, 2128, 404, 872, 414, 2140, 432,
+    848, 400, 876, 426, 850, 404, 872, 402, 876, 400, 876, 430, 848, 404, 872,
+    404, 874, 402, 2154, 402, 876, 428, 2126, 406, 872, 426, 2128, 426, 852,
+    404, 872, 430, 2124, 404, 874, 430, 846, 426, 2128, 400
+  };  // ARGO WREM2 (off command)
+
+  irsend.reset();
+  uint8_t expectedState[kArgoStateLength] = {
+      0xAC, 0xF5, 0x80, 0x39, 0x06, 0xE0, 0x00, 0xA7, 0x29, 0x80, 0x4A, 0x02 };
+  irsend.sendRaw(command_90bit, sizeof(command_90bit) /
+                                sizeof(command_90bit[0]), 38);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::ARGO, irsend.capture.decode_type);
+  EXPECT_EQ(kArgoBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Model: 1 (WREM2), Power: Off, Mode: 0 (Cool), Fan: 3 (Max), Temp: 10C, "
+      "Sensor Temp: 21C, Max: Off, IFeel: On, Night: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  EXPECT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  EXPECT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
+
+  EXPECT_EQ(21, r.sensorTemperature);  // Note: This may be off by 1
+                                       //       per the report in #2133
+  EXPECT_TRUE(r.iFeel);
+  EXPECT_FALSE(r.power);
+  EXPECT_EQ(10, r.degrees);
+  EXPECT_EQ(stdAc::opmode_t::kCool, r.mode);
+}
+
 
 ///
 /// @brief Test Fixture for recorded tests

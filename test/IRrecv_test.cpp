@@ -1289,7 +1289,7 @@ TEST(TestMatchGeneric, UsingBytes) {
   EXPECT_GT(irsend.capture.rawlen - kStartOffset, entries_used);
   EXPECT_EQ(16, entries_used);
 
-  // Asking for non mod-8 size should fail.
+  // Asking for non mod-8 size should SUCCEED and fill-in next byte.
   entries_used = irrecv.matchGeneric(
       irsend.capture.rawbuf + offset, result_data,
       irsend.capture.rawlen - offset,
@@ -1302,7 +1302,11 @@ TEST(TestMatchGeneric, UsingBytes) {
       1,  // 1% Tolerance
       0,  // No excess margin
       true);  // MSB first.
-  ASSERT_EQ(0, entries_used);
+  ASSERT_NE(0, entries_used);
+  EXPECT_EQ(0b10101010, result_data[0]);
+  EXPECT_EQ(0b1, result_data[1]);
+  EXPECT_GT(irsend.capture.rawlen - kStartOffset, entries_used);
+  EXPECT_EQ(18, entries_used);
 
   // Expecting different timings should fail.
   entries_used = irrecv.matchGeneric(
