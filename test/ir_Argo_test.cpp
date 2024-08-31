@@ -1594,6 +1594,9 @@ INSTANTIATE_TEST_CASE_P(
   TestDecodeArgo,
   TestArgoE2E,
   ::testing::Values(
+    //////
+    // WREM3 test cases (capture source: issue #1912)
+    //////
     ArgoE2ETestParam(
       std::vector<uint16_t> {
         6468, 3150,  456, 2154,  428, 2152,  462, 874,  422, 2158,  424, 882,
@@ -1675,7 +1678,7 @@ INSTANTIATE_TEST_CASE_P(
 
 
     //////
-    // WREM2 test cases
+    // WREM2 test cases (capture source: issue #2133)
     //////
     ArgoE2ETestParam(
       std::vector<uint16_t> {
@@ -1765,6 +1768,48 @@ INSTANTIATE_TEST_CASE_P(
       kArgoShortBits,
       std::vector<uint8_t> { 0xAC, 0xF5, 0xAA, 0x4B },
       "Model: 1 (WREM2), Sensor Temp: 25C",
+      argo_ac_remote_model_t::SAC_WREM2),
+
+    //////
+    // WREM2 test cases (capture source: issue #1859)
+    //////
+    ArgoE2ETestParam(
+      std::vector<uint16_t> {
+        6420, 3168, 442, 834, 442, 834, 442, 2112, 442, 2114, 442, 834, 442,
+        2112, 444, 834, 442, 2114, 442, 2114, 440, 836, 442, 2112, 442, 836,
+        442, 2112, 442, 2114, 442, 2114, 442, 2114, 442, 836, 442, 2114, 442,
+        836, 442, 834, 442, 836, 442, 2114, 442, 2114, 442, 2114, 442, 2114,
+        442, 2114, 442, 834, 442, 836, 442, 836, 442, 836, 442, 836, 442, 2114,
+        442
+      },
+      kArgoShortBits,
+      std::vector<uint8_t> { 0xAC, 0xF5, 0xE2, 0x83 },
+      "Model: 1 (WREM2), Sensor Temp: 32C",
+      argo_ac_remote_model_t::SAC_WREM2),
+
+
+    ArgoE2ETestParam(
+      std::vector<uint16_t> {
+        6418, 3168, 442, 836, 442, 834, 442, 2114, 442, 2114, 442, 836, 442,
+        2114, 442, 836, 440, 2114, 442, 2114, 442, 836, 442, 2112, 442, 834,
+        442, 2112, 442, 2112, 444, 2112, 442, 2114, 442, 836, 442, 836, 442,
+        834, 442, 834, 442, 2112, 442, 836, 442, 834, 442, 836, 440, 2114,
+        442, 836, 440, 2114, 442, 836, 442, 836, 440, 836, 442, 2112, 442, 2114,
+        442, 836, 442, 2114, 442, 2114, 442, 836, 442, 836, 442, 836, 440, 836,
+        442, 836, 442, 836, 442, 836, 442, 836, 440, 836, 442, 836, 440, 2114,
+        442, 2114, 442, 2114, 442, 836, 440, 838, 440, 836, 442, 836, 440, 838,
+        440, 836, 440, 836, 440, 836, 442, 2114, 440, 2116, 440, 2114, 442,
+        2114, 440, 2114, 440, 2114, 442, 2114, 442, 836, 440, 2114, 440, 836,
+        442, 2114, 442, 836, 440, 836, 442, 836, 442, 836, 440, 836, 440, 836,
+        440, 836, 440, 836, 440, 836, 440, 836, 440, 2114, 442, 836, 440, 2114,
+        442, 836, 440, 2114, 442, 836, 440, 2116, 440, 836, 440, 836, 440, 836,
+        440, 836, 442, 836, 440, 2114, 442
+      },
+      kArgoBits,
+      std::vector<uint8_t> { 0xAC, 0xF5, 0x10, 0xC5, 0x06, 0xE0, 0x00, 0x7F,
+                             0x05, 0xA0, 0x0A, 0x02 },
+      "Model: 1 (WREM2), Power: On, Mode: 2 (Auto), Fan: 0 (Auto), Temp: 24C, "
+      "Sensor Temp: 26C, Max: Off, IFeel: On, Night: Off",
       argo_ac_remote_model_t::SAC_WREM2)),
   [](const testing::TestParamInfo<ArgoE2ETestParam>& info) {
       return irutils::modelToStr(decode_type_t::ARGO, info.param.expectedModel)
