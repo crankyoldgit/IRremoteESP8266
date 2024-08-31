@@ -1502,8 +1502,7 @@ TEST(TestDecodeArgo, Issue2133_90bit_message) {
   EXPECT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
   EXPECT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
 
-  EXPECT_EQ(21, r.sensorTemperature);  // Note: This may be off by 1
-                                       //       per the report in #2133
+  EXPECT_EQ(21, r.sensorTemperature);
   EXPECT_TRUE(r.iFeel);
   EXPECT_FALSE(r.power);
   EXPECT_EQ(10, r.degrees);
