@@ -243,7 +243,8 @@ static void USE_IRAM_ATTR gpio_intr() {
   timer->dev->config.alarm_en = 1;
 #else  // _ESP32_IRRECV_TIMER_HACK
   // Check the ESP32 core version
-  #if defined(ESP_ARDUINO_VERSION) && (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
+#if defined(ESP_ARDUINO_VERSION) && \
+    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // For ESP32 core version 3.x, replace `timerAlarmEnable`
     timerWrite(timer, 0);
     timerAlarm(timer, 0, true, 0);  // Use the updated function with all arguments
@@ -370,7 +371,8 @@ void IRrecv::enableIRIn(const bool pullup) {
   // Initialise the ESP32 timer.
   // 80MHz / 80 = 1 uSec granularity.
   // Check for ESP32 core version and handle timerBegin differently for each version
-  #if defined(ESP_ARDUINO_VERSION) && (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
+#if defined(ESP_ARDUINO_VERSION) && \
+    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // For ESP32 core version 3.x (three arguments)
     timer = timerBegin(_timer_num);
   #else 
@@ -387,7 +389,8 @@ void IRrecv::enableIRIn(const bool pullup) {
   assert(timer != NULL);  // Check we actually got the timer.
   
   // Set the timer so it only fires once, and set its trigger in microseconds.
-  #if defined(ESP_ARDUINO_VERSION) && (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
+#if defined(ESP_ARDUINO_VERSION) && \
+    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // For ESP32 core version 3.x (use timerWrite)
     timerWrite(timer, 0);  // Reset the timer
     timerAttachInterrupt(timer, &read_timeout);
@@ -424,7 +427,8 @@ void IRrecv::disableIRIn(void) {
 #endif  // ESP8266
 #if defined(ESP32)
   // Check for ESP32 core version and handle timer functions differently
-  #if defined(ESP_ARDUINO_VERSION) && (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
+#if defined(ESP_ARDUINO_VERSION) && \
+    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // For ESP32 core version 3.x
     timerWrite(timer, 0);  // Reset the timer
     timerDetachInterrupt(timer);  // Detach the interrupt
@@ -461,7 +465,8 @@ void IRrecv::resume(void) {
   params.overflow = false;
 #if defined(ESP32)
   // Check for ESP32 core version and handle timer functions differently
-  #if defined(ESP_ARDUINO_VERSION) && (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
+#if defined(ESP_ARDUINO_VERSION) && \
+    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // For ESP32 core version 3.x
     timerWrite(timer, 0);  // Reset the timer (no need for timerAlarmDisable)
   #else
