@@ -375,7 +375,7 @@ void IRrecv::enableIRIn(const bool pullup) {
     (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // For ESP32 core version 3.x (three arguments)
     timer = timerBegin(_timer_num);
-  #else 
+  #else
     // For ESP32 core version 2.0.x (one argument)
     timer = timerBegin(_timer_num, 80, true);
   #endif
@@ -387,7 +387,6 @@ void IRrecv::enableIRIn(const bool pullup) {
   }
 #endif  // DEBUG
   assert(timer != NULL);  // Check we actually got the timer.
-  
   // Set the timer so it only fires once, and set its trigger in microseconds.
 #if defined(ESP_ARDUINO_VERSION) && \
     (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
