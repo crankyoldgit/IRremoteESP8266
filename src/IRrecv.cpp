@@ -247,7 +247,7 @@ static void USE_IRAM_ATTR gpio_intr() {
     (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // For ESP32 core version 3.x, replace `timerAlarmEnable`
     timerWrite(timer, 0);
-    timerAlarm(timer, 0, true, 0);  // Use the updated function with all arguments
+    timerAlarm(timer, 0, true, 0);  // Use the updated function
   #else
     // For ESP32 core version 2.x, keep using `timerAlarmEnable`
     timerWrite(timer, 0);
@@ -370,7 +370,7 @@ void IRrecv::enableIRIn(const bool pullup) {
 #if defined(ESP32)
   // Initialise the ESP32 timer.
   // 80MHz / 80 = 1 uSec granularity.
-  // Check for ESP32 core version and handle timerBegin differently for each version
+  // Check for ESP32 core version and handle timerBegin differently
 #if defined(ESP_ARDUINO_VERSION) && \
     (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // For ESP32 core version 3.x (three arguments)
