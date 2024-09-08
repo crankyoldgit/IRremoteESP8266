@@ -134,7 +134,8 @@ typedef struct hw_timer_s {
 #endif  // _ESP32_IRRECV_TIMER_HACK / End of Horrible Hack.
 
 namespace _IRrecv {
-static hw_timer_t * timer = NULL;
+static hw_timer_t *timer = NULL;  // Declare ESP32 timer variable
+
 }  // namespace _IRrecv
 #endif  // ESP32
 using _IRrecv::timer;
@@ -247,7 +248,9 @@ static void USE_IRAM_ATTR gpio_intr() {
     (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // For ESP32 core version 3.x, replace `timerAlarmEnable`
     timerWrite(timer, 0);
-    timerAlarm(timer, 0, true, 0);  // Use the updated function
+    uint64_t alarm_value = 50000;  // Example value (50ms)
+    timerAlarm(timer, alarm_value, false, 0);  // Disable auto-reload
+
   #else
     // For ESP32 core version 2.x, keep using `timerAlarmEnable`
     timerWrite(timer, 0);
@@ -369,17 +372,22 @@ void IRrecv::enableIRIn(const bool pullup) {
 
 #if defined(ESP32)
   // Initialise the ESP32 timer.
-  // 80MHz / 80 = 1 uSec granularity.
-  // Check for ESP32 core version and handle timerBegin differently
 #if defined(ESP_ARDUINO_VERSION) && \
     (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
-    // For ESP32 core version 3.x (three arguments)
-    timer = timerBegin(_timer_num);
-  #else
-    // For ESP32 core version 2.0.x (one argument)
-    timer = timerBegin(_timer_num, 80, true);
-  #endif
+    // Use newer timerBegin signature for ESP32 core version 3.x
+    timer = timerBegin(1000000);  // Initialize with 1MHz (1us per tick)
+    Serial.println("Starting timer initialization...");
+    Serial.print("Timer number: ");
+    Serial.println(_timer_num);
+    Serial.println((uint16_t)_timer_num);
+#else
+  // Initialise the ESP32 timer.
+  // 80MHz / 80 = 1 uSec granularity.
+  // Check for ESP32 core version and handle timerBegin differently
+  timer = timerBegin(_timer_num, 80, true);
+#endif
 
+  // Ensure the timer is successfully initialized
 #ifdef DEBUG
   if (timer == NULL) {
     DPRINT("FATAL: Unable enable system timer: ");
@@ -390,15 +398,13 @@ void IRrecv::enableIRIn(const bool pullup) {
   // Set the timer so it only fires once, and set its trigger in microseconds.
 #if defined(ESP_ARDUINO_VERSION) && \
     (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
-    // For ESP32 core version 3.x (use timerWrite)
-    timerWrite(timer, 0);  // Reset the timer
+    timerWrite(timer, 0);  // Reset the timer for ESP32 core version 3.x
     timerAttachInterrupt(timer, &read_timeout);
-  #else
-    timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
+#else
+    // Attach timer interrupt for core version 2.x
+    timerAlarmWrite(timer, MS_TO_USEC(params.timeout), true);
     timerAttachInterrupt(timer, &read_timeout, false);
-  #endif
-  // Note: Interrupt needs to be attached before it can be enabled or disabled.
-  // Note: EDGE (true) is not supported, use LEVEL (false). Ref: #1713
+#endif
 
 #endif  // ESP32
 
