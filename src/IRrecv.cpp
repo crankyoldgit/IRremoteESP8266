@@ -243,7 +243,7 @@ static void USE_IRAM_ATTR gpio_intr() {
   timer->dev->config.alarm_en = 1;
 #else  // _ESP32_IRRECV_TIMER_HACK
   timerWrite(timer, 0);
-  timerAlarmEnable(timer);
+  timerAlarm(timer,MS_TO_USEC(params.timeout),0,1);
 #endif  // _ESP32_IRRECV_TIMER_HACK
 #endif  // ESP32
 }
@@ -356,29 +356,8 @@ void IRrecv::enableIRIn(const bool pullup) {
     pinMode(params.recvpin, INPUT);
 #endif  // UNIT_TEST
   }
-#if defined(ESP32)
-  // Initialise the ESP32 timer.
-  // 80MHz / 80 = 1 uSec granularity.
-  timer = timerBegin(_timer_num, 80, true);
-#ifdef DEBUG
-  if (timer == NULL) {
-    DPRINT("FATAL: Unable enable system timer: ");
-    DPRINTLN((uint16_t)_timer_num);
-  }
-#endif  // DEBUG
-  assert(timer != NULL);  // Check we actually got the timer.
-  // Set the timer so it only fires once, and set it's trigger in uSeconds.
-  timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
-  // Note: Interrupt needs to be attached before it can be enabled or disabled.
-  // Note: EDGE (true) is not supported, use LEVEL (false). Ref: #1713
-  // See: https://github.com/espressif/arduino-esp32/blob/caef4006af491130136b219c1205bdcf8f08bf2b/cores/esp32/esp32-hal-timer.c#L224-L227
-  timerAttachInterrupt(timer, &read_timeout, false);
-#endif  // ESP32
-
-  // Initialise state machine variables
-  resume();
-
-#ifndef UNIT_TEST
+  
+  #ifndef UNIT_TEST
 #if defined(ESP8266)
   // Initialise ESP8266 timer.
   os_timer_disarm(&timer);
@@ -388,6 +367,30 @@ void IRrecv::enableIRIn(const bool pullup) {
   // Attach Interrupt
   attachInterrupt(params.recvpin, gpio_intr, CHANGE);
 #endif  // UNIT_TEST
+
+#if defined(ESP32)
+  // Initialise the ESP32 timer.
+  // 80MHz / 80 = 1 uSec granularity.
+  timer = timerBegin(1000000);
+#ifdef DEBUG
+  if (timer == NULL) {
+    DPRINT("FATAL: Unable enable system timer: ");
+    DPRINTLN((uint16_t)_timer_num);
+  }
+#endif  // DEBUG
+  assert(timer != NULL);  // Check we actually got the timer.
+  // Set the timer so it only fires once, and set it's trigger in uSeconds.
+  timerAlarm(timer, MS_TO_USEC(params.timeout), 0,1);
+  // Note: Interrupt needs to be attached before it can be enabled or disabled.
+  // Note: EDGE (true) is not supported, use LEVEL (false). Ref: #1713
+  // See: https://github.com/espressif/arduino-esp32/blob/caef4006af491130136b219c1205bdcf8f08bf2b/cores/esp32/esp32-hal-timer.c#L224-L227
+  timerAttachInterrupt(timer, &read_timeout);
+#endif  // ESP32
+
+  // Initialise state machine variables
+  resume();
+
+
 }
 
 /// Stop collection of any received IR data.
@@ -398,7 +401,7 @@ void IRrecv::disableIRIn(void) {
   os_timer_disarm(&timer);
 #endif  // ESP8266
 #if defined(ESP32)
-  timerAlarmDisable(timer);
+  //timerAlarmDisable(timer);
   timerDetachInterrupt(timer);
   timerEnd(timer);
 #endif  // ESP32
@@ -413,7 +416,8 @@ void IRrecv::pause(void) {
   params.rawlen = 0;
   params.overflow = false;
 #if defined(ESP32)
-  gpio_intr_disable((gpio_num_t)params.recvpin);
+  //gpio_intr_disable((gpio_num_t)params.recvpin);
+  detachInterrupt((gpio_num_t)params.recvpin);
 #endif  // ESP32
 }
 
@@ -426,8 +430,9 @@ void IRrecv::resume(void) {
   params.rawlen = 0;
   params.overflow = false;
 #if defined(ESP32)
-  timerAlarmDisable(timer);
-  gpio_intr_enable((gpio_num_t)params.recvpin);
+  //timerAlarmDisable(timer);
+  //gpio_intr_enable((gpio_num_t)params.recvpin);
+  attachInterrupt(params.recvpin, gpio_intr, CHANGE);
 #endif  // ESP32
 }
 
@@ -1185,10 +1190,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting York decode");
     if (decodeYork(results, offset, kYorkBits)) return true;
 #endif  // DECODE_YORK
-#if DECODE_BLUESTARHEAVY
-    DPRINTLN("Attempting BluestarHeavy decode");
-    if (decodeBluestarHeavy(results, offset, kBluestarHeavyBits)) return true;
-#endif  // DECODE_BLUESTARHEAVY
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
