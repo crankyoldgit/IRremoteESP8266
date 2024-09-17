@@ -69,6 +69,14 @@ static ETSTimer timer;
 #endif  // Version check
 #endif  // !defined(_ESP32_IRRECV_TIMER_HACK)
 
+// Define ARDUINO_COREV3 macro
+#if defined(ESP_ARDUINO_VERSION) && \
+    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
+  #define ARDUINO_COREV3 1
+#else
+  #define ARDUINO_COREV3 0
+#endif
+
 #if _ESP32_IRRECV_TIMER_HACK
 // Required structs/types from:
 // https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L28-L58
@@ -242,21 +250,15 @@ static void USE_IRAM_ATTR gpio_intr() {
   // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L176-L178
   timer->dev->config.alarm_en = 1;
-#else  // _ESP32_IRRECV_TIMER_HACK
-  // Check the ESP32 core version
-#if defined(ESP_ARDUINO_VERSION) && \
-    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
-    // For ESP32 core version 3.x, replace `timerAlarmEnable`
-    timerWrite(timer, 0);
-    uint64_t alarm_value = 50000;  // Example value (50ms)
-    timerAlarm(timer, alarm_value, false, 0);  // Disable auto-reload
-
-  #else
+#elif ARDUINO_COREV3
+  // For ESP32 core version 3.x, replace `timerAlarmEnable`
+  timerWrite(timer, 0);
+  uint64_t alarm_value = 50000;  // Example value (50ms)
+  timerAlarm(timer, alarm_value, false, 0);  // Disable auto-reloadmer, alarm_value, false, 0);  // Disable auto-reload
+#else
     // For ESP32 core version 2.x, keep using `timerAlarmEnable`
     timerWrite(timer, 0);
     timerAlarmEnable(timer);
-  #endif
-
 #endif  // _ESP32_IRRECV_TIMER_HACK
 #endif  // ESP32
 }
@@ -372,15 +374,12 @@ void IRrecv::enableIRIn(const bool pullup) {
 
 #if defined(ESP32)
   // Initialise the ESP32 timer.
-#if defined(ESP_ARDUINO_VERSION) && \
-    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
-    // Use newer timerBegin signature for ESP32 core version 3.x
-    timer = timerBegin(1000000);  // Initialize with 1MHz (1us per tick)
+#if ARDUINO_COREV3
+  // Use newer timerBegin signature for ESP32 core version 3.x
+  timer = timerBegin(1000000);  // Initialize with 1MHz (1us per tick)
 #else
-  // Initialise the ESP32 timer.
-  // 80MHz / 80 = 1 uSec granularity.
-  // Check for ESP32 core version and handle timerBegin differently
-  timer = timerBegin(_timer_num, 80, true);
+  // Fallback for ESP32 core version 2.x or earlier
+  timer = timerBegin(0, 1000000, true);  // Old signature with divider
 #endif
 
   // Ensure the timer is successfully initialized
@@ -392,8 +391,7 @@ void IRrecv::enableIRIn(const bool pullup) {
 #endif  // DEBUG
   assert(timer != NULL);  // Check we actually got the timer.
   // Set the timer so it only fires once, and set its trigger in microseconds.
-#if defined(ESP_ARDUINO_VERSION) && \
-    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
+#if ARDUINO_COREV3
     timerWrite(timer, 0);  // Reset the timer for ESP32 core version 3.x
     timerAttachInterrupt(timer, &read_timeout);
 #else
@@ -428,8 +426,7 @@ void IRrecv::disableIRIn(void) {
 #endif  // ESP8266
 #if defined(ESP32)
   // Check for ESP32 core version and handle timer functions differently
-#if defined(ESP_ARDUINO_VERSION) && \
-    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
+  #if ARDUINO_COREV3
     // For ESP32 core version 3.x
     timerWrite(timer, 0);  // Reset the timer
     timerDetachInterrupt(timer);  // Detach the interrupt
