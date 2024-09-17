@@ -376,10 +376,6 @@ void IRrecv::enableIRIn(const bool pullup) {
     (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
     // Use newer timerBegin signature for ESP32 core version 3.x
     timer = timerBegin(1000000);  // Initialize with 1MHz (1us per tick)
-    Serial.println("Starting timer initialization...");
-    Serial.print("Timer number: ");
-    Serial.println(_timer_num);
-    Serial.println((uint16_t)_timer_num);
 #else
   // Initialise the ESP32 timer.
   // 80MHz / 80 = 1 uSec granularity.
