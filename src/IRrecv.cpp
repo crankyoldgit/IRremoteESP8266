@@ -56,6 +56,10 @@ static ETSTimer timer;
 }  // namespace _IRrecv
 #endif  // ESP8266
 #if defined(ESP32)
+#if ( defined(ESP_ARDUINO_VERSION) && \
+    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)) )
+#define _ESP32_ARDUINOV3
+#endif  // ESP_ARDUINO_VERSION >= 3
 // We need a horrible timer hack for ESP32 Arduino framework < v2.0.0
 #if !defined(_ESP32_IRRECV_TIMER_HACK)
 // Version check
@@ -68,14 +72,6 @@ static ETSTimer timer;
 #define _ESP32_IRRECV_TIMER_HACK true
 #endif  // Version check
 #endif  // !defined(_ESP32_IRRECV_TIMER_HACK)
-
-// Define ARDUINO_COREV3 macro
-#if defined(ESP_ARDUINO_VERSION) && \
-    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
-  #define ARDUINO_COREV3 1
-#else
-  #define ARDUINO_COREV3 0
-#endif  // defined(ESP_ARDUINO_VERSION)
 
 #if _ESP32_IRRECV_TIMER_HACK
 // Required structs/types from:
@@ -142,8 +138,7 @@ typedef struct hw_timer_s {
 #endif  // _ESP32_IRRECV_TIMER_HACK / End of Horrible Hack.
 
 namespace _IRrecv {
-static hw_timer_t *timer = NULL;  // Declare ESP32 timer variable
-
+static hw_timer_t *timer = NULL;
 }  // namespace _IRrecv
 #endif  // ESP32
 using _IRrecv::timer;
@@ -250,15 +245,14 @@ static void USE_IRAM_ATTR gpio_intr() {
   // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L176-L178
   timer->dev->config.alarm_en = 1;
-#elif ARDUINO_COREV3
+#elif defined(_ESP32_ARDUINOV3)
   // For ESP32 core version 3.x, replace `timerAlarmEnable`
   timerWrite(timer, 0);
   uint64_t alarm_value = 50000;  // Example value (50ms)
   timerAlarm(timer, alarm_value, false, 0);
-#else
-    // For ESP32 core version 2.x, keep using `timerAlarmEnable`
-    timerWrite(timer, 0);
-    timerAlarmEnable(timer);
+#else  // !_ESP32_ARDUINOV3
+  timerWrite(timer, 0);
+  timerAlarmEnable(timer);
 #endif  // _ESP32_IRRECV_TIMER_HACK
 #endif  // ESP32
 }
@@ -371,16 +365,15 @@ void IRrecv::enableIRIn(const bool pullup) {
     pinMode(params.recvpin, INPUT);
 #endif  // UNIT_TEST
   }
-
 #if defined(ESP32)
   // Initialise the ESP32 timer.
-#if ARDUINO_COREV3
+#if defined(_ESP32_ARDUINOV3)
   // Use newer timerBegin signature for ESP32 core version 3.x
   timer = timerBegin(1000000);  // Initialize with 1MHz (1us per tick)
-#else
-  // Fallback for ESP32 core version 2.x or earlier
+#else  // _ESP32_ARDUINOV3
+  // 80MHz / 80 = 1 uSec granularity.
   timer = timerBegin(_timer_num, 80, true);
-#endif  // ARDUINO_COREV3
+#endif  // _ESP32_ARDUINOV3
 
   // Ensure the timer is successfully initialized
 #ifdef DEBUG
@@ -391,15 +384,16 @@ void IRrecv::enableIRIn(const bool pullup) {
 #endif  // DEBUG
   assert(timer != NULL);  // Check we actually got the timer.
   // Set the timer so it only fires once, and set its trigger in microseconds.
-#if ARDUINO_COREV3
-    timerWrite(timer, 0);  // Reset the timer for ESP32 core version 3.x
-    timerAttachInterrupt(timer, &read_timeout);
-#else
-    // Attach timer interrupt for core version 2.x
-    timerAlarmWrite(timer, MS_TO_USEC(params.timeout), true);
-    timerAttachInterrupt(timer, &read_timeout, false);
-#endif  // ARDUINO_COREV3
-
+#if defined(_ESP32_ARDUINOV3)
+  timerWrite(timer, 0);  // Reset the timer for ESP32 core version 3.x
+  timerAttachInterrupt(timer, &read_timeout);
+#else  // _ESP32_ARDUINOV3
+  timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
+  // Note: Interrupt needs to be attached before it can be enabled or disabled.
+  // Note: EDGE (true) is not supported, use LEVEL (false). Ref: #1713
+  // See: https://github.com/espressif/arduino-esp32/blob/caef4006af491130136b219c1205bdcf8f08bf2b/cores/esp32/esp32-hal-timer.c#L224-L227
+  timerAttachInterrupt(timer, &read_timeout, false);
+#endif  // _ESP32_ARDUINOV3
 #endif  // ESP32
 
   // Initialise state machine variables
@@ -423,20 +417,14 @@ void IRrecv::disableIRIn(void) {
 #ifndef UNIT_TEST
 #if defined(ESP8266)
   os_timer_disarm(&timer);
-#endif  // ESP8266
-#if defined(ESP32)
-  // Check for ESP32 core version and handle timer functions differently
-  #if ARDUINO_COREV3
-    // For ESP32 core version 3.x
-    timerWrite(timer, 0);  // Reset the timer
-    timerDetachInterrupt(timer);  // Detach the interrupt
-    timerEnd(timer);  // End the timer
-  #else
-    // For ESP32 core version 2.x
-    timerAlarmDisable(timer);  // Disable the alarm
-    timerDetachInterrupt(timer);  // Detach the interrupt
-    timerEnd(timer);  // End the timer
-  #endif
+#elif defined(_ESP32_ARDUINOV3)
+  timerWrite(timer, 0);  // Reset the timer
+  timerDetachInterrupt(timer);
+  timerEnd(timer);
+#elif defined(ESP32)
+  timerAlarmDisable(timer);
+  timerDetachInterrupt(timer);
+  timerEnd(timer);
 #endif  // ESP32
   detachInterrupt(params.recvpin);
 #endif  // UNIT_TEST
@@ -463,14 +451,11 @@ void IRrecv::resume(void) {
   params.overflow = false;
 #if defined(ESP32)
   // Check for ESP32 core version and handle timer functions differently
-  #if ARDUINO_COREV3
-    // For ESP32 core version 3.x
-    timerWrite(timer, 0);  // Reset the timer (no need for timerAlarmDisable)
-  #else
-    // For ESP32 core version 2.x
-    timerAlarmDisable(timer);  // Disable the alarm
-  #endif  // ARDUINO_COREV3
-
+#if defined(_ESP32_ARDUINOV3)
+  timerWrite(timer, 0);  // Reset the timer (no need for timerAlarmDisable)
+#else  // _ESP32_ARDUINOV3
+  timerAlarmDisable(timer);
+#endif  // _ESP32_ARDUINOV3
   // Re-enable GPIO interrupt in both versions
   gpio_intr_enable((gpio_num_t)params.recvpin);
 #endif  // ESP32
