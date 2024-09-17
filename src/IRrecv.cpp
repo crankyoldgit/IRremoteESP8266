@@ -254,7 +254,7 @@ static void USE_IRAM_ATTR gpio_intr() {
   // For ESP32 core version 3.x, replace `timerAlarmEnable`
   timerWrite(timer, 0);
   uint64_t alarm_value = 50000;  // Example value (50ms)
-  timerAlarm(timer, alarm_value, false, 0);  // Disable auto-reloadmer, alarm_value, false, 0);  // Disable auto-reload
+  timerAlarm(timer, alarm_value, false, 0);
 #else
     // For ESP32 core version 2.x, keep using `timerAlarmEnable`
     timerWrite(timer, 0);
