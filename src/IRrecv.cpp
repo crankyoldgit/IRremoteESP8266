@@ -379,7 +379,7 @@ void IRrecv::enableIRIn(const bool pullup) {
   timer = timerBegin(1000000);  // Initialize with 1MHz (1us per tick)
 #else
   // Fallback for ESP32 core version 2.x or earlier
-  timer = timerBegin(0, 1000000, true);  // Old signature with divider
+  timer = timerBegin(_timer_num, 80, true);
 #endif  // ARDUINO_COREV3
 
   // Ensure the timer is successfully initialized
