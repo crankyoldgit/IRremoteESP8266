@@ -75,7 +75,7 @@ static ETSTimer timer;
   #define ARDUINO_COREV3 1
 #else
   #define ARDUINO_COREV3 0
-#endif
+#endif // defined(ESP_ARDUINO_VERSION)
 
 #if _ESP32_IRRECV_TIMER_HACK
 // Required structs/types from:
@@ -380,7 +380,7 @@ void IRrecv::enableIRIn(const bool pullup) {
 #else
   // Fallback for ESP32 core version 2.x or earlier
   timer = timerBegin(0, 1000000, true);  // Old signature with divider
-#endif
+#endif // ARDUINO_COREV3
 
   // Ensure the timer is successfully initialized
 #ifdef DEBUG
@@ -398,7 +398,7 @@ void IRrecv::enableIRIn(const bool pullup) {
     // Attach timer interrupt for core version 2.x
     timerAlarmWrite(timer, MS_TO_USEC(params.timeout), true);
     timerAttachInterrupt(timer, &read_timeout, false);
-#endif
+#endif // ARDUINO_COREV3
 
 #endif  // ESP32
 
@@ -463,14 +463,13 @@ void IRrecv::resume(void) {
   params.overflow = false;
 #if defined(ESP32)
   // Check for ESP32 core version and handle timer functions differently
-#if defined(ESP_ARDUINO_VERSION) && \
-    (ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0))
+  #if ARDUINO_COREV3
     // For ESP32 core version 3.x
     timerWrite(timer, 0);  // Reset the timer (no need for timerAlarmDisable)
   #else
     // For ESP32 core version 2.x
     timerAlarmDisable(timer);  // Disable the alarm
-  #endif
+  #endif // ARDUINO_COREV3
 
   // Re-enable GPIO interrupt in both versions
   gpio_intr_enable((gpio_num_t)params.recvpin);
