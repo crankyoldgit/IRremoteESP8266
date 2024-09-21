@@ -234,6 +234,8 @@ class IRMideaAC {
   void setQuiet(const bool on);
   void setQuiet(const bool on, const bool prev);
   bool getQuiet(void) const;
+  bool getBeep(void) const;
+  void setBeep(const bool on);
   uint8_t getType(void) const;
   bool isOnTimerEnabled(void) const;
   uint16_t getOnTimer(void) const;

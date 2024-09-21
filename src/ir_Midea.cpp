@@ -496,6 +496,14 @@ bool IRMideaAC::getQuiet(void) const {
     return _Quiet;
 }
 
+bool IRMideaAC::getBeep(void) const {
+  return _.BeepDisable;
+}
+
+void IRMideaAC::setBeep(const bool on) {
+  _.BeepDisable = on;
+}
+
 /// Calculate the checksum for a given state.
 /// @param[in] state The value to calc the checksum of.
 /// @return The calculated checksum value.
@@ -740,6 +748,8 @@ String IRMideaAC::toString(void) {
   result += addToggleToString(getLightToggle(), kLightStr);
   result += addToggleToString(getCleanToggle(), kCleanStr);
   result += addToggleToString(get8CHeatToggle(), k8CHeatStr);
+  result += irutils::addBeepToString(getBeep());
+
   return result;
 }
 

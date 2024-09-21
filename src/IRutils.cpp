@@ -794,6 +794,21 @@ namespace irutils {
     return result + ')';
   }
 
+  /// Create a String of human output for the beep bit.
+  /// @param[in] beep Is beep bit set ?
+  /// @return The resulting String.
+  String addBeepToString(const bool beep) {
+    String result = "";
+    if (beep) {
+      result.reserve(10);
+      result += ", Beep: On";
+    } else {
+      result.reserve(11);
+      result += ", Beep: Off";
+    }
+    return result;
+  }
+
   /// Create a String of the 3-letter day of the week from a numerical day of
   /// the week. e.g. "Day: 1 (Mon)"
   /// @param[in] day_of_week A numerical version of the sequential day of the

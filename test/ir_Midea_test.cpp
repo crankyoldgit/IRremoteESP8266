@@ -252,6 +252,25 @@ TEST(TestMideaACClass, Power) {
   EXPECT_EQ(0xA1026FFFFFE2, midea.getRaw());
 }
 
+// Tests for controlling the beep state.
+TEST(TestMideaACClass, Beep) {
+  IRMideaAC midea(0);
+  midea.begin();
+
+  midea.setRaw(0xA1026FFFFFE2);  // Power off.
+
+  midea.on();
+  midea.setBeep(true);
+  EXPECT_TRUE(midea.getBeep());
+
+  EXPECT_EQ(0xA1826FFFFF62, midea.getRaw());
+
+  midea.setBeep(false);
+  EXPECT_FALSE(midea.getBeep());
+  EXPECT_EQ(0xA1026FFFFFE2, midea.getRaw());
+}
+
+
 // Tests for the various Checksum routines.
 TEST(TestMideaACClass, Checksums) {
   IRMideaAC midea(0);

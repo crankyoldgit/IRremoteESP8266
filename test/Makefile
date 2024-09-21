@@ -25,10 +25,10 @@ INCLUDES = -I$(USER_DIR) -I.
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include -DUNIT_TEST -D_IR_LOCALE_=en-AU
+CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include -DUNIT_TEST -D_IR_LOCALE_=en-AU 
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -Werror -pthread -std=gnu++11
+CXXFLAGS += -g -Wall -Wextra -Werror -pthread -std=gnu++11 -Wno-parentheses -Wno-unused-const-variable -Wno-deprecated-declarations -Wno-literal-conversion
 
 # Google Test libraries
 GTEST_LIBS = gtest.a gtest_main.a gmock.a gmock_main.a

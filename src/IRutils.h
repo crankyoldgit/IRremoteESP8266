@@ -88,6 +88,7 @@ namespace irutils {
                            const uint8_t low, const uint8_t lowest,
                            const uint8_t off, const uint8_t swing,
                            const uint8_t breeze, const uint8_t circulate);
+  String addBeepToString(const bool beep = true);
   String addDayToString(const uint8_t day_of_week, const int8_t offset = 0,
                         const bool precomma = true);
   String addTimerModeToString(const uint8_t timerType, const uint8_t noTimer,
