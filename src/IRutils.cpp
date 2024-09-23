@@ -1407,7 +1407,7 @@ namespace irutils {
   ///       issue has been found.
   uint8_t lowLevelSanityCheck(void) {
     const uint64_t kExpectedBitFieldResult = 0x8000012340000039ULL;
-    volatile uint32_t EndianTest = 0x12345678;
+    atomic_uint32_t EndianTest = 0x12345678;
     const uint8_t kBitFieldError =   0b01;
     const uint8_t kEndiannessError = 0b10;
     uint8_t result = 0;
