@@ -22,6 +22,7 @@
 #include "ir_Fujitsu.h"
 #include "ir_Ecoclim.h"
 #include "ir_Electra.h"
+#include "ir_Electrolux.h"
 #include "ir_Goodweather.h"
 #include "ir_Gree.h"
 #include "ir_Haier.h"
@@ -567,6 +568,13 @@ void electra(IRElectraAc *ac,
               const stdAc::fanspeed_t fan,
               const stdAc::swingv_t swingv, const stdAc::swingh_t swingh);
 #endif  // SEND_TRANSCOLD
+#if SEND_ELECTROLUX_AC
+  void electrolux(IRElectroluxAc *ac,
+                   const bool on, const stdAc::opmode_t mode,
+                   const bool celsius, const float degrees,
+                   const stdAc::fanspeed_t fan,
+                   const bool quiet);
+#endif  // SEND_ELECTROLUX_AC
 static stdAc::state_t cleanState(const stdAc::state_t state);
 static stdAc::state_t handleToggles(const stdAc::state_t desired,
                                     const stdAc::state_t *prev = NULL);

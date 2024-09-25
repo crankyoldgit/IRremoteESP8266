@@ -889,6 +889,12 @@ class IRrecv {
                   const uint16_t nbits = kBluestarHeavyBits,
                   const bool strict = true);
 #endif  // DECODE_BLUESTARHEAVY
+#if DECODE_ELECTROLUX_AC
+  bool decodeElectroluxAc(decode_results *results,
+                  uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kElectroluxAcBits,
+                  const bool strict = true);
+#endif  // DECODE_ELECTROLUX_AC
 };
 
 #endif  // IRRECV_H_

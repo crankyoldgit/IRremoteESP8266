@@ -567,6 +567,13 @@
 #define SEND_ELECTRA_AC        _IR_ENABLE_DEFAULT_
 #endif  // SEND_ELECTRA_AC
 
+#ifndef DECODE_ELECTROLUX_AC
+#define DECODE_ELECTROLUX_AC      _IR_ENABLE_DEFAULT_
+#endif  // DECODE_ELECTROLUX_AC
+#ifndef SEND_ELECTROLUX_AC
+#define SEND_ELECTROLUX_AC        _IR_ENABLE_DEFAULT_
+#endif  // SEND_ELECTROLUX_AC
+
 #ifndef DECODE_PANASONIC_AC
 #define DECODE_PANASONIC_AC    _IR_ENABLE_DEFAULT_
 #endif  // DECODE_PANASONIC_AC
@@ -1145,8 +1152,9 @@ enum decode_type_t {
   CARRIER_AC84,  // 125
   YORK,
   BLUESTARHEAVY,
+  ELECTROLUX_AC,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = BLUESTARHEAVY,
+  kLastDecodeType = ELECTROLUX_AC,
 };
 
 // Message lengths & required repeat values
@@ -1244,6 +1252,8 @@ const uint16_t kEpsonMinRepeat = 2;
 const uint16_t kElectraAcStateLength = 13;
 const uint16_t kElectraAcBits = kElectraAcStateLength * 8;
 const uint16_t kElectraAcMinRepeat = kNoRepeat;
+const uint16_t kElectroluxAcBits = 32;
+const uint16_t kElectroluxAcDefaultRepeat = kNoRepeat;
 const uint16_t kEliteScreensBits = 32;
 const uint16_t kEliteScreensDefaultRepeat = kSingleRepeat;
 const uint16_t kFujitsuAcMinRepeat = kNoRepeat;

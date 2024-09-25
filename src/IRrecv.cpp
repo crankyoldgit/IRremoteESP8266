@@ -1189,6 +1189,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting BluestarHeavy decode");
     if (decodeBluestarHeavy(results, offset, kBluestarHeavyBits)) return true;
 #endif  // DECODE_BLUESTARHEAVY
+#if DECODE_ELECTROLUX_AC
+    DPRINTLN("Attempting Electrolux AC decode");
+    if (decodeElectroluxAc(results, offset)) return true;
+#endif  // DECODE_ELECTROLUX_AC
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

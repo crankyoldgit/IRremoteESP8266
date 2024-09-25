@@ -705,6 +705,11 @@ class IRsend {
                      const uint16_t nbytes = kElectraAcStateLength,
                      const uint16_t repeat = kNoRepeat);
 #endif
+#if SEND_ELECTROLUX_AC
+  void sendElectroluxAc(const uint64_t data,
+                     const uint16_t nbytes = kElectroluxAcBits,
+                     const uint16_t repeat = kElectroluxAcDefaultRepeat);
+#endif
 #if SEND_PANASONIC_AC
   void sendPanasonicAC(const unsigned char data[],
                        const uint16_t nbytes = kPanasonicAcStateLength,
