@@ -1583,8 +1583,6 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
                               const uint8_t tolerance,
                               const int16_t excess,
                               const bool MSBfirst) {
-  // If we are expecting byte sizes, check it's a factor of 8 or fail.
-  if (!use_bits && nbits % 8 != 0)  return 0;
   // Calculate if we expect a trailing space in the data section.
   const bool kexpectspace = footermark || (onespace != zerospace);
   // Calculate how much remaining buffer is required.
@@ -1607,23 +1605,34 @@ uint16_t IRrecv::_matchGeneric(volatile uint16_t *data_ptr,
     return 0;
 
   // Data
-  if (use_bits) {  // Bits.
-    match_result_t result = IRrecv::matchData(data_ptr + offset, nbits,
+  if (!use_bits) {  // Bytes.
+    uint16_t data_used = IRrecv::matchBytes(data_ptr + offset, result_bytes_ptr,
+                                              remaining - offset, nbits / 8,
+                                              onemark, onespace,
+                                              zeromark, zerospace, tolerance,
+                                              excess, MSBfirst, kexpectspace);
+      if (!data_used) return 0;
+      offset += data_used;
+  }
+
+  // Only using bits,
+  // -or- using *bytes*, but number of bits was not a multiple of 8
+  if (use_bits || nbits % 8 != 0) {
+    uint16_t target_bit_cnt = (use_bits)? nbits : nbits % 8;
+    match_result_t result = IRrecv::matchData(data_ptr + offset, target_bit_cnt,
                                               onemark, onespace,
                                               zeromark, zerospace, tolerance,
                                               excess, MSBfirst, kexpectspace);
     if (!result.success) return 0;
-    *result_bits_ptr = result.data;
+    if (use_bits) {
+      *result_bits_ptr = result.data;
+    } else {
+      // Fill in last (non-full) byte
+      result_bytes_ptr[nbits / 8] = static_cast<uint8_t>(result.data);
+    }
     offset += result.used;
-  } else {  // bytes
-    uint16_t data_used = IRrecv::matchBytes(data_ptr + offset, result_bytes_ptr,
-                                            remaining - offset, nbits / 8,
-                                            onemark, onespace,
-                                            zeromark, zerospace, tolerance,
-                                            excess, MSBfirst, kexpectspace);
-    if (!data_used) return 0;
-    offset += data_used;
   }
+
   // Footer
   if (footermark && !matchMark(*(data_ptr + offset++), footermark, tolerance,
                                excess))

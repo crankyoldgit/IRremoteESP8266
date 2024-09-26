@@ -4563,7 +4563,8 @@ namespace IRAcUtils {
 #endif  // DECODE_AMCOR
 #if DECODE_ARGO
       case decode_type_t::ARGO: {
-        const uint16_t length = decode->bits / 8;
+        const uint16_t length = static_cast<uint16_t>(
+          ceil(static_cast<float>(decode->bits) / 8.0));
         if (IRArgoAC_WREM3::isValidWrem3Message(decode->state,
                                                 decode->bits, true)) {
           IRArgoAC_WREM3 ac(kGpioUnused);

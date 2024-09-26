@@ -104,7 +104,8 @@ TEST(TestArgoACClass, MessageConstructon) {
   auto expected = std::vector<uint8_t>({
       0xAC, 0xF5, 0x00, 0x24, 0x02, 0x00, 0x00, 0x00, 0x00, 0xAC, 0xD6, 0x01});
   auto actual = ac.getRaw();
-  EXPECT_THAT(std::vector<uint8_t>(actual, actual + kArgoBits / 8),
+  EXPECT_THAT(std::vector<uint8_t>(actual, actual + static_cast<uint8_t>(
+    ceil(static_cast<float>(kArgoBits) / 8.0))),
               ::testing::ElementsAreArray(expected));
   EXPECT_EQ(
       "Model: 1 (WREM2), Power: On, Mode: 0 (Cool), Fan: 0 (Auto), Temp: 20C, "
@@ -1461,25 +1462,87 @@ TEST(TestDecodeArgo, RealShortDecode) {
   EXPECT_EQ(28, r.sensorTemperature);
 }
 
+TEST(TestDecodeArgo, Issue2133_90bit_message) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  // Full Argo command message (90 bits)
+  const uint16_t command_90bit[193] = {
+    6422, 3190, 408, 872, 428, 848, 428, 2126, 402, 2150, 408, 872, 404, 2152,
+    402, 874, 402, 2152, 402, 2154, 406, 872, 428, 2126, 404, 876, 404, 2150,
+    430, 2124, 432, 2122, 432, 2124, 404, 874, 404, 874, 426, 852, 428, 850,
+    412, 864, 406, 872, 404, 874, 400, 2154, 428, 2128, 402, 876, 402, 874, 400,
+    2154, 404, 2150, 406, 2150, 400, 878, 400, 876, 402, 874, 416, 2136, 404,
+    2152, 402, 876, 402, 874, 402, 874, 428, 852, 402, 874, 404, 872, 400, 876,
+    402, 876, 404, 872, 430, 846, 402, 2152, 406, 2150, 406, 2150, 404, 874,
+    432, 846, 426, 850, 428, 850, 400, 878, 398, 876, 404, 874, 404, 874, 400,
+    2152, 432, 2124, 428, 2128, 432, 846, 426, 852, 400, 2154, 404, 874, 426,
+    2128, 428, 2128, 404, 872, 430, 848, 426, 2128, 404, 872, 414, 2140, 432,
+    848, 400, 876, 426, 850, 404, 872, 402, 876, 400, 876, 430, 848, 404, 872,
+    404, 874, 402, 2154, 402, 876, 428, 2126, 406, 872, 426, 2128, 426, 852,
+    404, 872, 430, 2124, 404, 874, 430, 846, 426, 2128, 400
+  };  // ARGO WREM2 (off command)
+
+  irsend.reset();
+  uint8_t expectedState[kArgoStateLength] = {
+      0xAC, 0xF5, 0x80, 0x39, 0x06, 0xE0, 0x00, 0xA7, 0x29, 0x80, 0x4A, 0x02 };
+  irsend.sendRaw(command_90bit, sizeof(command_90bit) /
+                                sizeof(command_90bit[0]), 38);
+  irsend.makeDecodeResult();
+  EXPECT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::ARGO, irsend.capture.decode_type);
+  EXPECT_EQ(kArgoBits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Model: 1 (WREM2), Power: Off, Mode: 0 (Cool), Fan: 3 (Max), Temp: 10C, "
+      "Sensor Temp: 21C, Max: Off, IFeel: On, Night: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  EXPECT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+  EXPECT_EQ(stdAc::ac_command_t::kControlCommand, r.command);
+
+  EXPECT_EQ(21, r.sensorTemperature);
+  EXPECT_TRUE(r.iFeel);
+  EXPECT_FALSE(r.power);
+  EXPECT_EQ(10, r.degrees);
+  EXPECT_EQ(stdAc::opmode_t::kCool, r.mode);
+}
+
+
 ///
 /// @brief Test Fixture for recorded tests
 ///
 struct ArgoE2ETestParam {
   const std::vector<uint16_t> rawDataInput;
-  const uint8_t expectedEncodedSizeBytes;
+  const uint8_t expectedEncodedSizeBits;
   const std::vector<uint8_t> expectedEncodedValue;
   const std::string expectedString;
+  const argo_ac_remote_model_t expectedModel;
 
-  ArgoE2ETestParam(std::vector<uint16_t> _raw, uint8_t _encSize,
+  ArgoE2ETestParam(std::vector<uint16_t> _raw, uint8_t _encSizeBits,
+                  std::vector<uint8_t> _encValue, std::string _str,
+                  argo_ac_remote_model_t _model)
+    : rawDataInput(_raw), expectedEncodedSizeBits(_encSizeBits),
+      expectedEncodedValue(_encValue), expectedString(_str),
+      expectedModel(_model) {}
+
+  ArgoE2ETestParam(std::vector<uint16_t> _raw, uint8_t _encSizeBytes,
                    std::vector<uint8_t> _encValue, std::string _str)
-    : rawDataInput(_raw), expectedEncodedSizeBytes(_encSize),
-      expectedEncodedValue(_encValue), expectedString(_str) {}
+    : ArgoE2ETestParam(_raw, _encSizeBytes * 8, _encValue, _str,
+                       argo_ac_remote_model_t::SAC_WREM3) {}
+
+  inline uint16_t getExpectedEncodedSizeBytes() const {
+    return static_cast<int>(ceil(static_cast<float>(
+                                   expectedEncodedSizeBits) / 8.0));
+  }
 
   friend std::ostream& operator<<(std::ostream& os, const ArgoE2ETestParam& v) {
     return os << "rawDataInput: " << ::testing::PrintToString(v.rawDataInput)
       << "\n\texpectedEncodedSize: "
-      << static_cast<int>(v.expectedEncodedSizeBytes)
-      << "[B]" << "\n\texpectedEncodedValue: 0x"
+      << static_cast<int>(v.expectedEncodedSizeBits)
+      << "[b] (" << v.getExpectedEncodedSizeBytes() << "[B])"
+      << "\n\texpectedEncodedValue: 0x"
       <<  bytesToHexString(v.expectedEncodedValue) << "\n\texpectedString: "
       << v.expectedString;
   }
@@ -1503,13 +1566,20 @@ TEST_P(TestArgoE2E, RealExampleCommands) {
 
   ASSERT_TRUE(irrecv.decode(&irsend.capture));
   EXPECT_EQ(decode_type_t::ARGO, irsend.capture.decode_type);
-  ASSERT_TRUE(IRArgoAC_WREM3::isValidWrem3Message(irsend.capture.state,
-    irsend.capture.bits, true));
 
-  EXPECT_EQ(GetParam().expectedEncodedSizeBytes * 8, irsend.capture.bits);
+  if (GetParam().expectedModel == argo_ac_remote_model_t::SAC_WREM3) {
+    ASSERT_TRUE(IRArgoAC_WREM3::isValidWrem3Message(irsend.capture.state,
+      irsend.capture.bits, true));
+  } else if (GetParam().expectedEncodedSizeBits != kArgoShortBits) {
+    ASSERT_TRUE(IRArgoAC::validChecksum(irsend.capture.state,
+                                        ceil(static_cast<float>(
+                                          irsend.capture.bits) / 8.0)));
+  }
+
+  EXPECT_EQ(GetParam().expectedEncodedSizeBits, irsend.capture.bits);
 
   std::vector<uint8_t> stateActual(irsend.capture.state, irsend.capture.state
-    + GetParam().expectedEncodedSizeBytes);
+    + GetParam().getExpectedEncodedSizeBytes());
   EXPECT_THAT(stateActual, ::testing::ElementsAreArray(
     GetParam().expectedEncodedValue));
 
@@ -1524,6 +1594,9 @@ INSTANTIATE_TEST_CASE_P(
   TestDecodeArgo,
   TestArgoE2E,
   ::testing::Values(
+    //////
+    // WREM3 test cases (capture source: issue #1912)
+    //////
     ArgoE2ETestParam(
       std::vector<uint16_t> {
         6468, 3150,  456, 2154,  428, 2152,  462, 874,  422, 2158,  424, 882,
@@ -1601,8 +1674,145 @@ INSTANTIATE_TEST_CASE_P(
       },
       kArgo3ConfigStateLength,
       std::vector<uint8_t> { 0xCB, 0x0C, 0x4A, 0x21 },
-      "Config[CH#0]: Model: 2 (WREM3), Key: 12, Value: 74")),
+      "Config[CH#0]: Model: 2 (WREM3), Key: 12, Value: 74"),
+
+
+    //////
+    // WREM2 test cases (capture source: issue #2133)
+    //////
+    ArgoE2ETestParam(
+      std::vector<uint16_t> {
+        6390, 3192, 430, 848, 424, 852, 432, 2124, 424, 2132, 426, 850, 422,
+        2134, 424, 852, 432, 2124, 424, 2132, 426, 852, 432, 2122, 424, 852,
+        432, 2124, 424, 2132, 426, 2130, 428, 2126, 432, 846, 426, 850, 422,
+        854, 430, 848, 426, 850, 432, 844, 428, 850, 424, 2130, 426, 2128, 430,
+        848, 426, 852, 432, 2122, 424, 2132, 426, 850, 422, 854, 430, 2126, 432,
+        844, 430, 2126, 432, 2124, 424, 852, 430, 848, 426, 850, 424, 854, 428,
+        848, 424, 852, 432, 844, 430, 848, 424, 852, 432, 846, 428, 2128, 430,
+        2124, 434, 2122, 424, 852, 432, 846, 428, 850, 424, 854, 430, 846, 426,
+        850, 422, 854, 430, 848, 426, 2130, 430, 2126, 430, 2124, 422, 2132,
+        426, 2130, 428, 2126, 430, 2124, 422, 2132, 426, 2128, 430, 2126, 432,
+        2124, 424, 2130, 426, 2128, 430, 848, 426, 852, 432, 844, 428, 848, 424,
+        852, 432, 846, 428, 850, 424, 854, 430, 846, 426, 850, 434, 844, 430,
+        848, 424, 2130, 428, 850, 424, 854, 430, 846, 426, 850, 422, 854, 430,
+        848, 426, 2128, 428, 2128, 430
+      },
+      kArgoBits,
+      std::vector<uint8_t> { 0xAC, 0xF5, 0x80, 0x99, 0x06, 0xE0, 0x00, 0xFF,
+                             0x1F, 0x00, 0x02, 0x03 },
+      "Model: 1 (WREM2), Power: Off, Mode: 0 (Cool), Fan: 3 (Max), Temp: 10C, "
+      "Sensor Temp: 24C, Max: Off, IFeel: Off, Night: Off",
+      argo_ac_remote_model_t::SAC_WREM2),
+
+
+    ArgoE2ETestParam(
+      std::vector<uint16_t> {
+        6420, 3164, 426, 850, 422, 854, 462, 2092, 432, 2122, 424, 852, 432,
+        2124, 422, 854, 462, 2092, 434, 2122, 458, 820, 454, 2102, 424, 854,
+        430, 2126, 454, 2100, 458, 2096, 428, 2126, 432, 846, 460, 816, 424,
+        854, 464, 814, 426, 852, 432, 844, 430, 848, 490, 2066, 426, 2128, 452,
+        826, 458, 818, 454, 2100, 458, 2098, 462, 816, 422, 854, 452, 2102, 456,
+        822, 462, 2092, 454, 2100, 458, 820, 454, 824, 460, 816, 456, 820, 452,
+        824, 460, 818, 422, 854, 462, 814, 458, 818, 454, 822, 428, 2126, 454,
+        2102, 456, 2098, 458, 818, 432, 844, 462, 816, 458, 820, 454, 824, 460,
+        816, 458, 820, 452, 824, 426, 2128, 462, 2092, 454, 2102, 456, 2098,
+        458, 2096, 462, 2092, 454, 2102, 456, 2098, 426, 2128, 464, 2092, 456,
+        2100, 456, 2098, 460, 2094, 452, 824, 460, 818, 456, 820, 462, 814, 458,
+        818, 454, 824, 460, 816, 456, 820, 452, 2102, 456, 822, 462, 816, 458,
+        820, 454, 2102, 424, 854, 452, 824, 460, 818, 456, 822, 462, 814, 458,
+        2098, 460, 2094, 454, 2102, 424
+      },
+      kArgoBits,
+      std::vector<uint8_t> { 0xAC, 0xF5, 0x80, 0x99, 0x06, 0xE0, 0x00, 0xFF,
+                             0x1F, 0x20, 0x82, 0x03 },
+      "Model: 1 (WREM2), Power: On, Mode: 0 (Cool), Fan: 3 (Max), Temp: 10C, "
+      "Sensor Temp: 24C, Max: Off, IFeel: Off, Night: Off",
+      argo_ac_remote_model_t::SAC_WREM2),
+
+
+    ArgoE2ETestParam(
+      std::vector<uint16_t> {
+        6388, 3196, 428, 850, 424, 852, 430, 2124, 424, 2132, 426, 852, 432,
+        2124, 424, 854, 430, 2124, 422, 2132, 426, 852, 434, 2122, 424, 852,
+        432, 2124, 422, 2134, 424, 2130, 428, 2126, 432, 846, 428, 850, 422,
+        854, 430, 848, 426, 852, 432, 844, 428, 848, 424, 2130, 428, 2128, 430,
+        848, 424, 852, 432, 2124, 424, 2132, 426, 850, 422, 854, 430, 2126, 432,
+        846, 428, 2128, 430, 2124, 422, 854, 428, 848, 424, 852, 432, 846, 428,
+        850, 424, 854, 430, 846, 426, 850, 422, 854, 430, 848, 426, 2130, 428,
+        2128, 430, 2124, 422, 854, 484, 794, 424, 852, 432, 844, 428, 850, 424,
+        852, 430, 846, 426, 850, 422, 2132, 426, 2130, 428, 2126, 430, 2124,
+        422, 2132, 426, 2130, 428, 2126, 430, 2124, 434, 2122, 426, 2130, 428,
+        2126, 430, 2124, 434, 2122, 424, 852, 432, 844, 428, 850, 422, 854, 430,
+        846, 426, 852, 432, 844, 428, 848, 424, 2130, 428, 848, 424, 2132, 426,
+        852, 432, 2122, 424, 852, 432, 846, 428, 850, 424, 854, 430, 846, 426,
+        2128, 430, 2126, 432, 846, 428
+      },
+      kArgoBits,
+      std::vector<uint8_t> { 0xAC, 0xF5, 0x80, 0x99, 0x06, 0xE0, 0x00, 0xFF,
+                             0x1F, 0xA0, 0x82, 0x01 },
+      "Model: 1 (WREM2), Power: On, Mode: 0 (Cool), Fan: 3 (Max), Temp: 10C, "
+      "Sensor Temp: 24C, Max: Off, IFeel: On, Night: Off",
+      argo_ac_remote_model_t::SAC_WREM2),
+
+
+
+    ArgoE2ETestParam(
+      std::vector<uint16_t> {
+        6388, 3194, 430, 848, 426, 852, 432, 2122, 424, 2130, 428, 850, 424,
+        2132, 426, 850, 434, 2122, 424, 2130, 426, 850, 424, 2132, 426, 852,
+        422, 2132, 424, 2130, 428, 2128, 430, 2124, 422, 854, 430, 2126, 434,
+        844, 428, 2126, 432, 846, 426, 2128, 430, 846, 426, 2130, 428, 2126,
+        432, 2122, 424, 854, 432, 2124, 424, 854, 430, 846, 426, 2130, 428,
+        848, 424
+      },
+      kArgoShortBits,
+      std::vector<uint8_t> { 0xAC, 0xF5, 0xAA, 0x4B },
+      "Model: 1 (WREM2), Sensor Temp: 25C",
+      argo_ac_remote_model_t::SAC_WREM2),
+
+    //////
+    // WREM2 test cases (capture source: issue #1859)
+    //////
+    ArgoE2ETestParam(
+      std::vector<uint16_t> {
+        6420, 3168, 442, 834, 442, 834, 442, 2112, 442, 2114, 442, 834, 442,
+        2112, 444, 834, 442, 2114, 442, 2114, 440, 836, 442, 2112, 442, 836,
+        442, 2112, 442, 2114, 442, 2114, 442, 2114, 442, 836, 442, 2114, 442,
+        836, 442, 834, 442, 836, 442, 2114, 442, 2114, 442, 2114, 442, 2114,
+        442, 2114, 442, 834, 442, 836, 442, 836, 442, 836, 442, 836, 442, 2114,
+        442
+      },
+      kArgoShortBits,
+      std::vector<uint8_t> { 0xAC, 0xF5, 0xE2, 0x83 },
+      "Model: 1 (WREM2), Sensor Temp: 32C",
+      argo_ac_remote_model_t::SAC_WREM2),
+
+
+    ArgoE2ETestParam(
+      std::vector<uint16_t> {
+        6418, 3168, 442, 836, 442, 834, 442, 2114, 442, 2114, 442, 836, 442,
+        2114, 442, 836, 440, 2114, 442, 2114, 442, 836, 442, 2112, 442, 834,
+        442, 2112, 442, 2112, 444, 2112, 442, 2114, 442, 836, 442, 836, 442,
+        834, 442, 834, 442, 2112, 442, 836, 442, 834, 442, 836, 440, 2114,
+        442, 836, 440, 2114, 442, 836, 442, 836, 440, 836, 442, 2112, 442, 2114,
+        442, 836, 442, 2114, 442, 2114, 442, 836, 442, 836, 442, 836, 440, 836,
+        442, 836, 442, 836, 442, 836, 442, 836, 440, 836, 442, 836, 440, 2114,
+        442, 2114, 442, 2114, 442, 836, 440, 838, 440, 836, 442, 836, 440, 838,
+        440, 836, 440, 836, 440, 836, 442, 2114, 440, 2116, 440, 2114, 442,
+        2114, 440, 2114, 440, 2114, 442, 2114, 442, 836, 440, 2114, 440, 836,
+        442, 2114, 442, 836, 440, 836, 442, 836, 442, 836, 440, 836, 440, 836,
+        440, 836, 440, 836, 440, 836, 440, 836, 440, 2114, 442, 836, 440, 2114,
+        442, 836, 440, 2114, 442, 836, 440, 2116, 440, 836, 440, 836, 440, 836,
+        440, 836, 442, 836, 440, 2114, 442
+      },
+      kArgoBits,
+      std::vector<uint8_t> { 0xAC, 0xF5, 0x10, 0xC5, 0x06, 0xE0, 0x00, 0x7F,
+                             0x05, 0xA0, 0x0A, 0x02 },
+      "Model: 1 (WREM2), Power: On, Mode: 2 (Auto), Fan: 0 (Auto), Temp: 24C, "
+      "Sensor Temp: 26C, Max: Off, IFeel: On, Night: Off",
+      argo_ac_remote_model_t::SAC_WREM2)),
   [](const testing::TestParamInfo<ArgoE2ETestParam>& info) {
-      return bytesToHexString(info.param.expectedEncodedValue);
+      return irutils::modelToStr(decode_type_t::ARGO, info.param.expectedModel)
+        + "_" + bytesToHexString(info.param.expectedEncodedValue);
   }
 );
