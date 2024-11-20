@@ -237,8 +237,8 @@ static void USE_IRAM_ATTR gpio_intr() {
   // USE_IRAM_ATTR in this ISR.
   // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L106-L110
-  timer->dev->load_high = (uint32_t) 0;
-  timer->dev->load_low = (uint32_t) 0;
+  timer->dev->load_high = static_cast<uint32_t>(0);
+  timer->dev->load_low = static_cast<uint32_t>(0);
   timer->dev->reload = 1;
   // The next line is the same, but instead replaces:
   //   `timerAlarmEnable(timer);`
