@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <set>
+#include <utility>
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #endif  // UNIT_TEST

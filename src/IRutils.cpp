@@ -1422,7 +1422,7 @@ uint8_t lowLevelSanityCheck(void) {
       uint64_t _usused_2:18;    // 44-61st bits
       uint64_t highest2bits:2;  // 62-63rd bits
     };
-   uint64_t all;
+    uint64_t all;
   };
 
   bitpackdata data;

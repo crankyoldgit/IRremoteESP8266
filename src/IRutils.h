@@ -122,17 +122,17 @@ bool getBit(const uint8_t data, const uint8_t position);
 #define GETBIT32(a, b) ((a) & (static_cast<uint32_t>(1) << (b)))
 #define GETBIT64(a, b) ((a) & (static_cast<uint64_t>(1) << (b)))
 #define GETBITS8(data, offset, size) \
-    (((data) & ((static_cast<uint8_t>(UINT8_MAX) >> (8 - (size))) << (offset))) >> \
-     (offset))
+    (((data) & ((static_cast<uint8_t>(UINT8_MAX) >> (8 - (size))) << \
+                (offset))) >> (offset))
 #define GETBITS16(data, offset, size) \
-    (((data) & ((static_cast<uint16_t>(UINT16_MAX) >> (16 - (size))) << (offset))) >> \
-     (offset))
+    (((data) & ((static_cast<uint16_t>(UINT16_MAX) >> (16 - (size))) << \
+                (offset))) >> (offset))
 #define GETBITS32(data, offset, size) \
-    (((data) & ((static_cast<uint32_t>(UINT32_MAX) >> (32 - (size))) << (offset))) >> \
-     (offset))
+    (((data) & ((static_cast<uint32_t>(UINT32_MAX) >> (32 - (size))) << \
+                (offset))) >> (offset))
 #define GETBITS64(data, offset, size) \
-    (((data) & ((static_cast<uint64_t>(UINT64_MAX) >> (64 - (size))) << (offset))) >> \
-     (offset))
+    (((data) & ((static_cast<uint64_t>(UINT64_MAX) >> (64 - (size))) << \
+                (offset))) >> (offset))
 uint64_t setBit(const uint64_t data, const uint8_t position,
                 const bool on = true, const uint8_t size = 64);
 uint8_t setBit(const uint8_t data, const uint8_t position,

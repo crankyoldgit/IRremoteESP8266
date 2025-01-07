@@ -1659,7 +1659,8 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       stateSize = inputLength / 2;  // Every two hex chars is a byte.
       // Use at least the minimum size.
       stateSize = std::max(stateSize,
-                           static_cast<uint16_t>(kFujitsuAcStateLengthShort - 1));
+                           static_cast<uint16_t>(kFujitsuAcStateLengthShort -
+                                                 1));
       // If we think it isn't a "short" message.
       if (stateSize > kFujitsuAcStateLengthShort)
         // Then it has to be at least the smaller version of the "normal" size.
@@ -1703,12 +1704,13 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       // the correct length/byte size.
       stateSize = inputLength / 2;  // Every two hex chars is a byte.
       // Use at least the minimum size.
-      stateSize = std::max(stateSize, static_cast<uint16_t>(kSamsungAcStateLength));
+      stateSize = std::max(stateSize,
+                           static_cast<uint16_t>(kSamsungAcStateLength));
       // If we think it isn't a "normal" message.
       if (stateSize > kSamsungAcStateLength)
         // Then it probably the extended size.
-        stateSize = std::max(stateSize,
-                             static_cast<uint16_t>(kSamsungAcExtendedStateLength));
+        stateSize = std::max(
+            stateSize, static_cast<uint16_t>(kSamsungAcExtendedStateLength));
       // Lastly, it should never exceed the maximum "extended" size.
       stateSize = std::min(stateSize, kSamsungAcExtendedStateLength);
       break;

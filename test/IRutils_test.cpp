@@ -611,7 +611,8 @@ TEST(TestUtils, setBit) {
   EXPECT_EQ(0b100, irutils::setBit(static_cast<uint64_t>(0b110), 1, false));
   EXPECT_EQ(0b111, irutils::setBit(static_cast<uint64_t>(0b101), 1, true));
   EXPECT_EQ(0b110, irutils::setBit(static_cast<uint64_t>(0b110), 1, true));
-  EXPECT_EQ(0b11111111, irutils::setBit(static_cast<uint64_t>(0b01111111), 7, true));
+  EXPECT_EQ(0b11111111,
+            irutils::setBit(static_cast<uint64_t>(0b01111111), 7, true));
   EXPECT_EQ(0, irutils::setBit(static_cast<uint64_t>(0b10000000), 7, false));
   // uint8_t Pointer method.
   uint8_t data = 0;

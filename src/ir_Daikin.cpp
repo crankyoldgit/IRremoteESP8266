@@ -74,7 +74,8 @@ void IRsend::sendDaikin(const unsigned char data[], const uint16_t nbytes,
     sendGeneric(0, 0,  // No header for the header
                 kDaikinBitMark, kDaikinOneSpace, kDaikinBitMark,
                 kDaikinZeroSpace, kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
-                static_cast<uint64_t>(0b00000), kDaikinHeaderLength, 38, false, 0, 50);
+                static_cast<uint64_t>(0b00000), kDaikinHeaderLength, 38, false,
+                0, 50);
     // Data #1
     if (nbytes < kDaikinStateLength) {  // Are we using the legacy size?
       // Do this as a constant to save RAM and keep in flash memory

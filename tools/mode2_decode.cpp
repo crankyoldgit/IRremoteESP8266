@@ -20,8 +20,8 @@ space 500000
 #include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
-#include <cstdio.h>
 #include <string.h>
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 #include <string>

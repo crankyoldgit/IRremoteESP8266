@@ -1231,8 +1231,8 @@ uint32_t IRrecv::ticksLow(const uint32_t usecs, const uint8_t tolerance,
 /// @return Nr. of ticks.
 uint32_t IRrecv::ticksHigh(const uint32_t usecs, const uint8_t tolerance,
                            const uint16_t delta) {
-  return ((uint32_t)(usecs * (1.0 + _validTolerance(tolerance) / 100.0)) + 1 +
-          delta);
+  return (static_cast<uint32_t>(usecs * (1.0 + _validTolerance(tolerance) /
+                                100.0)) + 1 + delta);
 }
 
 /// Check if we match a pulse(measured) with the desired within
@@ -1283,7 +1283,8 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   DPRINT(". Matching: ");
   DPRINT(measured);
   DPRINT(" >= ");
-  DPRINT(ticksLow(std::min(desired, static_cast<uint32_t>(MS_TO_USEC(params.timeout))),
+  DPRINT(ticksLow(std::min(desired,
+                           static_cast<uint32_t>(MS_TO_USEC(params.timeout))),
                   tolerance, delta));
   DPRINT(" [min(");
   DPRINT(ticksLow(desired, tolerance, delta));
@@ -1305,7 +1306,8 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   // in the buffer. If that is the case, then assume infinity and return true.
   if (measured == 0) return true;
   return measured >= ticksLow(std::min(
-      desired, static_cast<uint32_t>(MS_TO_USEC(params.timeout))), tolerance, delta);
+      desired, static_cast<uint32_t>(MS_TO_USEC(params.timeout))), tolerance,
+      delta);
 }
 
 /// Check if we match a mark signal(measured) with the desired within
