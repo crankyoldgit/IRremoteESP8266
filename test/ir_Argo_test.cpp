@@ -2,7 +2,11 @@
 // Copyright 2022 Mateusz Bronk (mbronk)
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <algorithm>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 #include "ir_Argo.h"
 #include "IRac.h"
 #include "IRrecv.h"

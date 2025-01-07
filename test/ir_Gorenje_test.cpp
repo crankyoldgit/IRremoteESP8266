@@ -1,5 +1,6 @@
 // Copyright 2022 Mateusz Bronk (mbronk)
 
+#include <vector>
 #include "IRac.h"
 #include "IRsend.h"
 #include "IRsend_test.h"

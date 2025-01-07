@@ -233,8 +233,8 @@ static void USE_IRAM_ATTR gpio_intr() {
   // USE_IRAM_ATTR in this ISR.
   // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L106-L110
-  timer->dev->load_high = (uint32_t) 0;
-  timer->dev->load_low = (uint32_t) 0;
+  timer->dev->load_high = static_cast<uint32_t>(0);
+  timer->dev->load_low = static_cast<uint32_t>(0);
   timer->dev->reload = 1;
   // The next line is the same, but instead replaces:
   //   `timerAlarmEnable(timer);`
@@ -1219,9 +1219,9 @@ uint8_t IRrecv::_validTolerance(const uint8_t percentage) {
 uint32_t IRrecv::ticksLow(const uint32_t usecs, const uint8_t tolerance,
                           const uint16_t delta) {
   // max() used to ensure the result can't drop below 0 before the cast.
-  return ((uint32_t)std::max(
-      (int32_t)(usecs * (1.0 - _validTolerance(tolerance) / 100.0) - delta),
-      (int32_t)0));
+  return (static_cast<uint32_t>(std::max(
+      static_cast<int32_t>(usecs * (1.0 - _validTolerance(tolerance) / 100.0) - delta),
+      static_cast<int32_t>(0))));
 }
 
 /// Calculate the upper bound of the nr. of ticks.
@@ -1283,7 +1283,7 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   DPRINT(". Matching: ");
   DPRINT(measured);
   DPRINT(" >= ");
-  DPRINT(ticksLow(std::min(desired, (uint32_t)MS_TO_USEC(params.timeout)),
+  DPRINT(ticksLow(std::min(desired, static_cast<uint32_t>(MS_TO_USEC(params.timeout))),
                   tolerance, delta));
   DPRINT(" [min(");
   DPRINT(ticksLow(desired, tolerance, delta));
@@ -1304,9 +1304,8 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   // We really should never get a value of 0, except as the last value
   // in the buffer. If that is the case, then assume infinity and return true.
   if (measured == 0) return true;
-  return measured >= ticksLow(std::min(desired,
-                                       (uint32_t)MS_TO_USEC(params.timeout)),
-                              tolerance, delta);
+  return measured >= ticksLow(std::min(
+      desired, static_cast<uint32_t>(MS_TO_USEC(params.timeout))), tolerance, delta);
 }
 
 /// Check if we match a mark signal(measured) with the desired within

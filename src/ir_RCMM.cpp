@@ -101,7 +101,7 @@ bool IRrecv::decodeRCMM(decode_results *results, uint16_t offset,
 
   // Calc the maximum size in bits, the message can be, or that we can accept.
   int16_t maxBitSize =
-      std::min((uint16_t)results->rawlen - 5, (uint16_t)sizeof(data) * 8);
+      std::min(static_cast<uint16_t>(results->rawlen) - 5, (uint16_t)sizeof(data) * 8);
   // Compliance
   if (strict) {
     // Technically the spec says bit sizes should be 12 xor 24. however

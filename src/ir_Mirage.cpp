@@ -390,7 +390,7 @@ void IRMirageAc::setClock(const uint32_t nr_of_seconds) {
       break;
     default:
       uint32_t remaining = std::min(
-          nr_of_seconds, (uint32_t)(24 * 60 * 60 - 1));  // Limit to 23:59:59.
+          nr_of_seconds, static_cast<uint32_t>(24 * 60 * 60 - 1));  // Limit to 23:59:59
       _.Seconds = uint8ToBcd(remaining % 60);
       remaining /= 60;
       _.Minutes = uint8ToBcd(remaining % 60);
@@ -612,7 +612,7 @@ uint16_t IRMirageAc::getOffTimer(void) const {
 /// Set the number of minutes for the Off Timer.
 /// @param[in] nr_of_mins How long to set the timer for. 0 disables the timer.
 void IRMirageAc::setOffTimer(const uint16_t nr_of_mins) {
-  uint16_t mins = std::min(nr_of_mins, (uint16_t)(24 * 60));
+  uint16_t mins = std::min(nr_of_mins, static_cast<uint16_t>(24 * 60));
   switch (_model) {
     case mirage_ac_remote_model_t::KKG29AC1:
       _.OffTimerEnable = (mins > 0);

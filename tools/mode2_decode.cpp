@@ -20,6 +20,7 @@ space 500000
 #include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <cstdio.h>
 #include <string.h>
 #include <iostream>
 #include <sstream>
@@ -37,7 +38,7 @@ void str_to_uint16(char *str, uint16_t *res, uint8_t base) {
   if (errno == ERANGE || val < 0 || val > UINT16_MAX || end == str ||
       *end != '\0')
     return;
-  *res = (uint16_t)val;
+  *res = static_cast<uint16_t>(val);
 }
 
 void usage_error(char *name) {
