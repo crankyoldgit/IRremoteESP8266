@@ -126,8 +126,8 @@ void IRsend::sendXmp(const uint64_t data, const uint16_t nbits,
   uint64_t send_data = data;
   for (uint16_t r = 0; r <= repeat; r++) {
     uint16_t bits_so_far = kXmpWordSize;
-    for (uint64_t mask = static_cast<uint64_t>(kXmpMaxWordValue) << (nbits -
-                                                                     kXmpWordSize);
+    for (uint64_t mask = static_cast<uint64_t>(kXmpMaxWordValue) <<
+             (nbits - kXmpWordSize);
          mask;
          mask >>= kXmpWordSize) {
       uint8_t word = (send_data & mask) >> (nbits - bits_so_far);

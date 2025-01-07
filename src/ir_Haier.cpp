@@ -743,7 +743,7 @@ void IRHaierAC176::setTemp(const uint8_t degree, const bool fahrenheit) {
 /// The unit of temperature is specified by UseFahrenheit value.
 /// @return The current setting for temperature.
 uint8_t IRHaierAC176::getTemp(void) const {
-  if (!_.UseFahrenheit) 
+  if (!_.UseFahrenheit)
     return _.Temp + kHaierAcYrw02MinTempC;
   uint8_t degree = _.Temp*2 + kHaierAcYrw02MinTempF + _.ExtraDegreeF;
   // The way of coding the temperature in degree Fahrenheit is

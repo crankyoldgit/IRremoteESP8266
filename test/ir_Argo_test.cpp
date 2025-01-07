@@ -4,7 +4,9 @@
 #include <gmock/gmock.h>
 #include <algorithm>
 #include <memory>
+#include <set>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 #include "ir_Argo.h"

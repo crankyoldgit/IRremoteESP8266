@@ -1220,7 +1220,8 @@ uint32_t IRrecv::ticksLow(const uint32_t usecs, const uint8_t tolerance,
                           const uint16_t delta) {
   // max() used to ensure the result can't drop below 0 before the cast.
   return (static_cast<uint32_t>(std::max(
-      static_cast<int32_t>(usecs * (1.0 - _validTolerance(tolerance) / 100.0) - delta),
+      static_cast<int32_t>(usecs * (1.0 - _validTolerance(tolerance) / 100.0) -
+          delta),
       static_cast<int32_t>(0))));
 }
 

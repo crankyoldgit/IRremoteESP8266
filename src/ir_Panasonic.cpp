@@ -89,8 +89,7 @@ void IRsend::sendPanasonic64(const uint64_t data, const uint16_t nbits,
 void IRsend::sendPanasonic(const uint16_t address, const uint32_t data,
                            const uint16_t nbits, const uint16_t repeat) {
   sendPanasonic64(static_cast<uint64_t>(address) << 32 |
-		  static_cast<uint64_t>(data),
-                  nbits, repeat);
+                  static_cast<uint64_t>(data), nbits, repeat);
 }
 
 /// Calculate the raw Panasonic data based on device, subdevice, & function.
