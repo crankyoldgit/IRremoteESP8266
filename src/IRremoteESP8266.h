@@ -1507,12 +1507,24 @@ const uint16_t kYorkStateLength = 17;
 
 #ifdef DEBUG
 #ifdef UNIT_TEST
-#define DPRINT(x) do { std::cout << x; } while (0)
-#define DPRINTLN(x) do { std::cout << x << std::endl; } while (0)
+#define DPRINT(x) do { \
+    std::cout << x; \
+  } \
+  while (0)
+#define DPRINTLN(x) do { \
+    std::cout << x << std::endl; \
+  } \
+  while (0)
 #endif  // UNIT_TEST
 #ifdef ARDUINO
-#define DPRINT(x) do { Serial.print(x); } while (0)
-#define DPRINTLN(x) do { Serial.println(x); } while (0)
+#define DPRINT(x) do { \
+    Serial.print(x); \
+  } \
+  while (0)
+#define DPRINTLN(x) do { \
+  Serial.println(x); \
+  } \
+  while (0)
 #endif  // ARDUINO
 #else  // DEBUG
 #define DPRINT(x)

@@ -1659,11 +1659,13 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       stateSize = inputLength / 2;  // Every two hex chars is a byte.
       // Use at least the minimum size.
       stateSize = std::max(stateSize,
-                           (uint16_t) (kFujitsuAcStateLengthShort - 1));
+                           static_cast<uint16_t>(kFujitsuAcStateLengthShort -
+                                                 1));
       // If we think it isn't a "short" message.
       if (stateSize > kFujitsuAcStateLengthShort)
         // Then it has to be at least the smaller version of the "normal" size.
-        stateSize = std::max(stateSize, (uint16_t) (kFujitsuAcStateLength - 1));
+        stateSize = std::max(stateSize,
+                             static_cast<uint16_t>(kFujitsuAcStateLength - 1));
       // Lastly, it should never exceed the maximum "normal" size.
       stateSize = std::min(stateSize, kFujitsuAcStateLength);
       break;
@@ -1675,12 +1677,12 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       stateSize = inputLength / 2;  // Every two hex chars is a byte.
       // Use at least the minimum size.
       stateSize = std::max(stateSize,
-                           (uint16_t) (kHitachiAc3MinStateLength));
+                           static_cast<uint16_t>(kHitachiAc3MinStateLength));
       // If we think it isn't a "short" message.
       if (stateSize > kHitachiAc3MinStateLength)
         // Then it probably the "normal" size.
         stateSize = std::max(stateSize,
-                             (uint16_t) (kHitachiAc3StateLength));
+                             static_cast<uint16_t>(kHitachiAc3StateLength));
       // Lastly, it should never exceed the maximum "normal" size.
       stateSize = std::min(stateSize, kHitachiAc3StateLength);
       break;
@@ -1691,7 +1693,7 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       // the correct length/byte size.
       stateSize = inputLength / 2;  // Every two hex chars is a byte.
       // Use at least the minimum size.
-      stateSize = std::max(stateSize, (uint16_t) 3);
+      stateSize = std::max(stateSize, static_cast<uint16_t>(3));
       // Cap the maximum size.
       stateSize = std::min(stateSize, kStateSizeMax);
       break;
@@ -1702,12 +1704,13 @@ bool parseStringAndSendAirCon(IRsend *irsend, const decode_type_t irType,
       // the correct length/byte size.
       stateSize = inputLength / 2;  // Every two hex chars is a byte.
       // Use at least the minimum size.
-      stateSize = std::max(stateSize, (uint16_t) (kSamsungAcStateLength));
+      stateSize = std::max(stateSize,
+                           static_cast<uint16_t>(kSamsungAcStateLength));
       // If we think it isn't a "normal" message.
       if (stateSize > kSamsungAcStateLength)
         // Then it probably the extended size.
-        stateSize = std::max(stateSize,
-                             (uint16_t) (kSamsungAcExtendedStateLength));
+        stateSize = std::max(
+            stateSize, static_cast<uint16_t>(kSamsungAcExtendedStateLength));
       // Lastly, it should never exceed the maximum "extended" size.
       stateSize = std::min(stateSize, kSamsungAcExtendedStateLength);
       break;
@@ -2671,7 +2674,8 @@ void receivingMQTT(String const topic_name, String const callback_str) {
     switch (ircommand[0]) {
       case kPauseChar:
         {  // It's a pause. Everything after the 'P' should be a number.
-          int32_t msecs = std::min((int32_t) strtoul(ircommand + 1, NULL, 10),
+          int32_t msecs = std::min(static_cast<int32_t>(strtoul(ircommand + 1,
+                                                        NULL, 10)),
                                    kMaxPauseMs);
           delay(msecs);
           mqtt_client.publish(MqttAck.c_str(),

@@ -74,7 +74,8 @@ void IRsend::sendDaikin(const unsigned char data[], const uint16_t nbytes,
     sendGeneric(0, 0,  // No header for the header
                 kDaikinBitMark, kDaikinOneSpace, kDaikinBitMark,
                 kDaikinZeroSpace, kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
-                (uint64_t)0b00000, kDaikinHeaderLength, 38, false, 0, 50);
+                static_cast<uint64_t>(0b00000), kDaikinHeaderLength, 38, false,
+                0, 50);
     // Data #1
     if (nbytes < kDaikinStateLength) {  // Are we using the legacy size?
       // Do this as a constant to save RAM and keep in flash memory
@@ -675,7 +676,7 @@ void IRsend::sendDaikin2(const unsigned char data[], const uint16_t nbytes,
   for (uint16_t r = 0; r <= repeat; r++) {
     // Leader
     sendGeneric(kDaikin2LeaderMark, kDaikin2LeaderSpace,
-                0, 0, 0, 0, 0, 0, (uint64_t) 0,  // No data payload.
+                0, 0, 0, 0, 0, 0, static_cast<uint64_t>(0),  // No data payload.
                 0, kDaikin2Freq, false, 0, 50);
     // Section #1
     sendGeneric(kDaikin2HdrMark, kDaikin2HdrSpace, kDaikin2BitMark,
@@ -2937,7 +2938,8 @@ bool IRrecv::decodeDaikin128(decode_results *results, uint16_t offset,
                     kDaikinTolerance, kDaikinMarkExcess)) return false;
   }
   const uint16_t ksectionSize[kDaikin128Sections] = {
-      kDaikin128SectionLength, (uint16_t)(nbits / 8 - kDaikin128SectionLength)};
+      kDaikin128SectionLength,
+      static_cast<uint16_t>(nbits / 8 - kDaikin128SectionLength)};
   // Data Sections
   uint16_t pos = 0;
   for (uint8_t section = 0; section < kDaikin128Sections; section++) {
@@ -2987,7 +2989,7 @@ void IRsend::sendDaikin152(const unsigned char data[], const uint16_t nbytes,
     sendGeneric(0, 0, kDaikin152BitMark, kDaikin152OneSpace,
                 kDaikin152BitMark, kDaikin152ZeroSpace,
                 kDaikin152BitMark, kDaikin152Gap,
-                (uint64_t)0, kDaikin152LeaderBits,
+                static_cast<uint64_t>(0), kDaikin152LeaderBits,
                 kDaikin152Freq, false, 0, kDutyDefault);
     // Header + Data + Footer
     sendGeneric(kDaikin152HdrMark, kDaikin152HdrSpace, kDaikin152BitMark,
@@ -3839,7 +3841,7 @@ void IRsend::sendDaikin312(const unsigned char data[], const uint16_t nbytes,
                 kDaikin312BitMark, kDaikin312OneSpace,
                 kDaikin312BitMark, kDaikin312ZeroSpace,
                 kDaikin312BitMark, kDaikin312HdrGap,
-                (uint64_t)0b00000, kDaikinHeaderLength,
+                static_cast<uint64_t>(0b00000), kDaikinHeaderLength,
                 kDaikin2Freq, false, 0, kDutyDefault);
     // Section #1
     sendGeneric(kDaikin312HdrMark, kDaikin312HdrSpace, kDaikin312BitMark,

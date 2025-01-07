@@ -202,7 +202,7 @@ TEST(TestSendGree, CompareUint64ToCharResults) {
   irsend_chars.reset();
   irsend_uint64.reset();
   irsend_chars.sendGree(gree_zero_code);
-  irsend_uint64.sendGree((uint64_t)0x0);
+  irsend_uint64.sendGree(static_cast<uint64_t>(0x0));
   ASSERT_EQ(irsend_chars.outputStr(), irsend_uint64.outputStr());
 }
 

@@ -574,8 +574,8 @@ static stdAc::state_t handleToggles(const stdAc::state_t desired,
 
 /// Common functions for use with all A/Cs supported by the IRac class.
 namespace IRAcUtils {
-  String resultAcToString(const decode_results * const results);
-  bool decodeToState(const decode_results *decode, stdAc::state_t *result,
-                     const stdAc::state_t *prev = NULL);
+String resultAcToString(const decode_results * const results);
+bool decodeToState(const decode_results *decode, stdAc::state_t *result,
+                   const stdAc::state_t *prev = NULL);
 }  // namespace IRAcUtils
 #endif  // IRAC_H_
