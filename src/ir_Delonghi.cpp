@@ -468,3 +468,436 @@ String IRDelonghiAc::toString(void) const {
                              kOffTimerStr);
   return result;
 }
+
+
+const uint16_t kDelonghi_N_HdrMark = 9096;
+const uint16_t kDelonghi_N_BitMark = 564;
+const uint16_t kDelonghi_N_HdrSpace = 4440;
+const uint16_t kDelonghi_N_OneSpace = 1623;
+const uint16_t kDelonghi_N_ZeroSpace = 534;
+const uint16_t kDelonghi_N_Freq = 38000;
+const bool kDelonghi_N_MsbFirst = true;
+const uint16_t kDelonghi_N_Overhead = 3;
+
+#if SEND_DELONGHI_N
+// Function should be safe up to 64 bits.
+/// Send a Delonghi_N formatted message.
+/// Status: ALPHA / Untested.
+/// @param[in] data containing the IR command.
+/// @param[in] nbits Nr. of bits to send. usually kDelonghi_NBits
+/// @param[in] repeat Nr. of times the message is to be repeated.
+void IRsend::sendDelonghi_N(const uint64_t data,
+                            const uint16_t nbits,
+                            const uint16_t repeat) {
+  enableIROut(kDelonghi_N_Freq);
+  for (uint16_t r = 0; r <= repeat; r++) {
+    uint64_t send_data = data;
+    // Header
+    mark(kDelonghi_N_HdrMark);
+    space(kDelonghi_N_HdrSpace);
+    // Data Section #1
+    // e.g. data = 0x12188100, nbits = 32
+    sendData(kDelonghi_N_BitMark, kDelonghi_N_OneSpace,
+             kDelonghi_N_BitMark, kDelonghi_N_ZeroSpace,
+             send_data, nbits, kDelonghi_N_MsbFirst);
+    send_data >>= 32;
+    // Footer
+    mark(kDelonghi_N_BitMark);
+    space(kDefaultMessageGap);
+  }
+}
+#endif  // SEND_DELONGHI_N
+
+#if DECODE_DELONGHI_N
+// Function should be safe up to 64 bits.
+/// Decode the supplied Delonghi_N message.
+/// Status: ALPHA / Untested.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+bool IRrecv::decodeDelonghi_N(decode_results *results,
+                              uint16_t offset, const uint16_t nbits,
+                              const bool strict) {
+  if (results->rawlen < 2 * nbits + kDelonghi_N_Overhead - offset)
+    return false;  // Too short a message to match.
+  if (strict && nbits != kDelonghi_N_Bits)
+    return false;
+
+  uint64_t data = 0;
+  match_result_t data_result;
+
+  // Header
+  if (!matchMark(results->rawbuf[offset++], kDelonghi_N_HdrMark))
+    return false;
+  if (!matchSpace(results->rawbuf[offset++], kDelonghi_N_HdrSpace))
+    return false;
+
+  // Data Section #1
+  // e.g. data_result.data = 0x12188100, nbits = 32
+  data_result = matchData(&(results->rawbuf[offset]), 32,
+                          kDelonghi_N_BitMark, kDelonghi_N_OneSpace,
+                          kDelonghi_N_BitMark, kDelonghi_N_ZeroSpace,
+                          kUseDefTol, kMarkExcess, kDelonghi_N_MsbFirst);
+  offset += data_result.used;
+  if (data_result.success == false) return false;  // Fail
+  data <<= 32;  // Make room for the new bits of data.
+  data |= data_result.data;
+
+  // Footer
+  if (!matchMark(results->rawbuf[offset++], kDelonghi_N_BitMark))
+    return false;
+
+  // The data should start with 0x12,
+  // Look at the various values in the struct
+  // So value should be between 0x12110000 and 0x1248FFFF
+  if ((data < 0x12110000) || (data > 0x1248ffff))
+    return false;
+
+  // Success
+  results->decode_type = decode_type_t::DELONGHI_N;
+  results->bits = nbits;
+  results->value = data;
+  results->command = 0;
+  results->address = 0;
+  return true;
+}
+#endif  // DECODE_DELONGHI_N
+
+/// Class constructor.
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+IRDelonghi_N::IRDelonghi_N(const uint16_t pin, const bool inverted,
+                           const bool use_modulation)
+      : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+/// Set up hardware to be able to send a message.
+void IRDelonghi_N::begin(void) { _irsend.begin(); }
+
+#if SEND_DELONGHI_N
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
+void IRDelonghi_N::send(const uint16_t repeat) {
+  _irsend.sendDelonghi_N(getRaw(), kDelonghi_N_Bits, repeat);
+}
+#endif  // SEND_DELONGHI_N
+
+/// Reset the internal state to a fixed known good state.
+void IRDelonghi_N::stateReset(void) {
+  _.raw = 0x12000000;
+  _.Head = 0x12;
+  _saved_temp = 23;  // DegC  (Random reasonable default value)
+  _saved_temp_units = 0;  // Celsius
+}
+
+/// Get a copy of the internal state as a valid code for this protocol.
+/// @return A valid code for this protocol based on the current internal state.
+uint32_t IRDelonghi_N::getRaw(void) {
+  return _.raw;
+}
+
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] state A valid code for this protocol.
+void IRDelonghi_N::setRaw(const uint32_t state) { _.raw = state; }
+
+/// Change the power setting to On.
+void IRDelonghi_N::on(void) { setPower(true); }
+
+/// Change the power setting to Off.
+void IRDelonghi_N::off(void) { setPower(false); }
+
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDelonghi_N::setPower(const bool on) {
+  _.Power = on;
+}
+
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDelonghi_N::getPower(void) const {
+  return _.Power;
+}
+
+/// Change the temperature scale units.
+/// @param[in] fahrenheit true, use Fahrenheit. false, use Celsius.
+void IRDelonghi_N::setTempUnit(const bool fahrenheit) {
+  _.Fahrenheit = fahrenheit;
+}
+
+/// Get the temperature scale unit of measure currently in use.
+/// @return true, is Fahrenheit. false, is Celsius.
+bool IRDelonghi_N::getTempUnit(void) const {
+  return _.Fahrenheit;
+}
+
+/// Set the temperature.
+/// @param[in] degrees The temperature in degrees.
+/// @param[in] fahrenheit Use Fahrenheit as the temperature scale.
+/// @param[in] force Do we ignore any sanity checks?
+void IRDelonghi_N::setTemp(const uint8_t degrees, const bool fahrenheit,
+                           const bool force) {
+  uint8_t temp;
+  if (force) {
+    temp = degrees;  // We've been asked to force set this value.
+  } else {
+    uint8_t temp_min = kDelonghi_N_TempMinC;
+    uint8_t temp_max = kDelonghi_N_TempMaxC;
+    setTempUnit(fahrenheit);
+    if (fahrenheit) {
+      temp_min = kDelonghi_N_TempMinF;
+      temp_max = kDelonghi_N_TempMaxF;
+    }
+    temp = std::max(temp_min, degrees);
+    temp = std::min(temp_max, temp);
+    _saved_temp = temp;
+    _saved_temp_units = fahrenheit;
+    if (!fahrenheit) {
+      temp = temp - kDelonghi_N_TempMinC;
+    }
+  }
+  _.Temp = reverseBits(temp, 8);
+}
+
+/// Get the current temperature setting.
+/// @return The current setting for temp. in currently configured units/scale.
+uint8_t IRDelonghi_N::getTemp(void) const {
+  return reverseBits(_.Temp, 8) + (_.Fahrenheit ? 0 : kDelonghi_N_TempMinC);
+}
+
+/// Set the speed of the fan.
+/// @param[in] speed The desired native setting.
+void IRDelonghi_N::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kDelonghi_N_FanLow:
+    case kDelonghi_N_FanMedium:
+    case kDelonghi_N_FanHigh:
+      _.Fan = speed;
+      break;
+    default:
+      _.Fan = kDelonghi_N_FanHigh;
+      break;
+  }
+}
+
+/// Get the current native fan speed setting.
+/// @return The current fan speed.
+uint8_t IRDelonghi_N::getFan(void) const {
+  return _.Fan;
+}
+
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRDelonghi_N::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:
+    case stdAc::fanspeed_t::kLow:
+      return kDelonghi_N_FanLow;
+    case stdAc::fanspeed_t::kMedium:
+      return kDelonghi_N_FanMedium;
+    case stdAc::fanspeed_t::kHigh:
+    case stdAc::fanspeed_t::kMax:
+      return kDelonghi_N_FanHigh;
+    default:
+      return kDelonghi_N_FanHigh;;
+  }
+}
+
+/// Convert a native fan speed into its stdAc equivalent.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::fanspeed_t IRDelonghi_N::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kDelonghi_N_FanHigh:
+      return stdAc::fanspeed_t::kMax;
+    case kDelonghi_N_FanMedium:
+      return stdAc::fanspeed_t::kMedium;
+    case kDelonghi_N_FanLow:
+      return stdAc::fanspeed_t::kMin;
+    default:
+      return stdAc::fanspeed_t::kMin;
+  }
+}
+
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
+uint8_t IRDelonghi_N::getMode(void) const {
+  return _.Mode;
+}
+
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired native operating mode.
+void IRDelonghi_N::setMode(const uint8_t mode) {
+  switch (mode) {
+    case kDelonghi_N_Cool:
+    case kDelonghi_N_Dry:
+    case kDelonghi_N_Fan:
+      _.Mode = mode;
+      break;
+    default:
+      _.Mode = kDelonghi_N_Cool;
+      break;
+  }
+}
+
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRDelonghi_N::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kCool:
+      return kDelonghi_N_Cool;
+    case stdAc::opmode_t::kDry:
+      return kDelonghi_N_Dry;
+    case stdAc::opmode_t::kFan:
+      return kDelonghi_N_Fan;
+    default:
+      return kDelonghi_N_Cool;
+  }
+}
+
+/// Convert a native mode into its stdAc equivalent.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::opmode_t IRDelonghi_N::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kDelonghi_N_Cool:
+      return stdAc::opmode_t::kCool;
+    case kDelonghi_N_Dry:
+      return stdAc::opmode_t::kDry;
+    case kDelonghi_N_Fan:
+      return stdAc::opmode_t::kFan;
+    default:
+      return stdAc::opmode_t::kCool;
+  }
+}
+
+/// Set the enable status of the On Timer.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDelonghi_N::setOnTimerEnabled(const bool on) {
+  setTimerEnabled(on);
+}
+
+/// Get the enable status of the On Timer.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDelonghi_N::getOnTimerEnabled(void) const {
+  return getTimerEnabled();
+}
+
+/// Set the On timer to activate in nr of minutes.
+/// @param[in] nr_of_mins Total nr of mins to wait before waking the device.
+/// @note Max 23 hrs and 59 minutes. i.e. 1439 mins.
+void IRDelonghi_N::setOnTimer(const uint16_t nr_of_mins) {
+  setTimer(nr_of_mins);
+}
+
+/// Get the On timer time.
+/// @return Total nr of mins before the device turns on.
+uint16_t IRDelonghi_N::getOnTimer(void) const {
+  return getTimer();
+}
+
+/// Set the enable status of the Off Timer.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDelonghi_N::setOffTimerEnabled(const bool on) {
+  setTimerEnabled(on);
+}
+
+/// Get the enable status of the Off Timer.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDelonghi_N::getOffTimerEnabled(void) const {
+  return getTimerEnabled();
+}
+
+/// Set the Off timer to activate in nr of minutes.
+/// @param[in] nr_of_mins Total nr of mins to wait before turning off the device
+/// @note Max 23 hrs and 59 minutes. i.e. 1439 mins.
+void IRDelonghi_N::setOffTimer(const uint16_t nr_of_mins) {
+  setTimer(nr_of_mins);
+}
+
+/// Get the Off timer time.
+/// @return Total nr of mins before the device turns off.
+uint16_t IRDelonghi_N::getOffTimer(void) const {
+  return getTimer();
+}
+
+/// Set the enable status of the Timer.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDelonghi_N::setTimerEnabled(const bool on) {
+  _.Timer = on;
+}
+
+/// Get the enable status of the Timer.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDelonghi_N::getTimerEnabled(void) const {
+  return _.Timer;
+}
+
+/// Set the timer to activate in nr of minutes.
+/// @param[in] nr_of_mins Total nr of mins to wait before waking
+///                       or sleeping the device.
+/// @note Max 23 hrs and 59 minutes. i.e. 1439 mins.
+void IRDelonghi_N::setTimer(const uint16_t nr_of_mins) {
+  uint16_t value = nr_of_mins /60;
+  value = std::min(kDelonghi_N_TimerMax, value);
+  _.Hours =  reverseBits(value, 4);
+  // Enable or not?
+  setTimerEnabled(value > 0);
+}
+
+/// Get the timer time.
+/// @return Total nr of mins before the device turns on.
+uint16_t IRDelonghi_N::getTimer(void) const {
+  return reverseBits(_.Hours, 4) * 60;
+}
+
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
+stdAc::state_t IRDelonghi_N::toCommon(void) const {
+  stdAc::state_t result{};
+  result.protocol = decode_type_t::DELONGHI_N;
+  result.power = _.Power;
+  result.mode = toCommonMode(getMode());
+  result.celsius = !_.Fahrenheit;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  // Not supported.
+  result.turbo = false;
+  result.sleep = false;
+  result.model = -1;
+  result.swingv = stdAc::swingv_t::kOff;
+  result.swingh = stdAc::swingh_t::kOff;
+  result.light = false;
+  result.filter = false;
+  result.econo = false;
+  result.quiet = false;
+  result.clean = false;
+  result.beep = false;
+  result.clock = -1;
+  return result;
+}
+
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
+String IRDelonghi_N::toString(void) const {
+  String result = "";
+  result.reserve(80);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, 0, kDelonghi_N_Cool,
+                            0, kDelonghi_N_Dry, kDelonghi_N_Fan);
+  result += addFanToString(_.Fan, kDelonghi_N_FanHigh, kDelonghi_N_FanLow,
+                           0, 0,
+                           kDelonghi_N_FanMedium);
+  result += addTempToString(getTemp(), !_.Fahrenheit);
+  uint16_t mins = getTimer();
+  result += addLabeledString((mins && _.Timer) ? minsToString(mins)
+                                                 : kOffStr,
+                             kTimerStr);
+  return result;
+}
+
+
