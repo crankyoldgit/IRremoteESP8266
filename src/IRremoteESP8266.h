@@ -959,6 +959,15 @@
 #define SEND_BLUESTARHEAVY           _IR_ENABLE_DEFAULT_
 #endif  // SEND_BLUESTARHEAVY
 
+#ifndef DECODE_BRYSTON
+#define DECODE_BRYSTON           _IR_ENABLE_DEFAULT_
+#endif  // DECODE_BRYSTON
+#ifndef SEND_BRYSTON
+#define SEND_BRYSTON             _IR_ENABLE_DEFAULT_
+#endif  // SEND_BRYSTON
+
+
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -1145,8 +1154,9 @@ enum decode_type_t {
   CARRIER_AC84,  // 125
   YORK,
   BLUESTARHEAVY,
+  BRYSTON,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = BLUESTARHEAVY,
+  kLastDecodeType = BRYSTON,
 };
 
 // Message lengths & required repeat values
@@ -1445,6 +1455,7 @@ const uint16_t kRhossDefaultRepeat = 0;
 const uint16_t kClimaButlerBits = 52;
 const uint16_t kYorkBits = 136;
 const uint16_t kYorkStateLength = 17;
+const uint16_t kBrystonBits = 18;
 
 // Legacy defines. (Deprecated)
 #define AIWA_RC_T501_BITS             kAiwaRcT501Bits
