@@ -318,7 +318,7 @@ bool IREuromAc::getSleep(void) const {
 }
 
 /// Set the internal state to use the desired "off timer" duration.
-/// @param[in] hours The desired duration, in hours.
+/// @param[in] duration The desired duration, in hours.
 void IREuromAc::setOffTimer(const uint8_t duration) {
   uint8_t hours = std::max(kEuromTimerMin, duration);
   hours = std::min(kEuromTimerMax, hours);
@@ -333,7 +333,7 @@ uint8_t IREuromAc::getOffTimer(void) const {
 }
 
 /// Set the internal state to use the desired "on timer" duration.
-/// @param[in] hours The desired duration, in hours.
+/// @param[in] duration The desired duration, in hours.
 void IREuromAc::setOnTimer(const uint8_t duration) {
   uint8_t hours = std::max(kEuromTimerMin, duration);
   hours = std::min(kEuromTimerMax, hours);
