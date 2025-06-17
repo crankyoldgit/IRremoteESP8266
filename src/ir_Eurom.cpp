@@ -436,7 +436,7 @@ stdAc::fanspeed_t IREuromAc::toCommonFanSpeed(const uint8_t speed) {
 }
 
 /// Convert a native swing setting into its stdAc enum equivalent.
-/// @param[in] speed The native swing setting to be converted.
+/// @param[in] swing The native swing setting to be converted.
 /// @return The stdAc enum equivalent of the native setting.
 stdAc::swingv_t IREuromAc::toCommonSwing(const bool swing) {
   // The only choice is on or off, so let's just treat the former as auto mode
