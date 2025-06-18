@@ -8,6 +8,8 @@
 
 #include "ir_Eurom.h"
 #include <algorithm>
+#include <cmath>
+#include <cstring>
 #include "IRrecv.h"
 #include "IRsend.h"
 #include "IRtext.h"
