@@ -15,6 +15,12 @@
 #include "IRtext.h"
 #include "IRutils.h"
 
+#if __cplusplus >= 201103L && defined(_GLIBCXX_USE_C99_MATH_TR1)
+  using std::roundf;
+#else
+  using ::roundf;
+#endif
+
 using irutils::uint8ToBcd;
 using irutils::bcdToUint8;
 using irutils::addBoolToString;
@@ -241,7 +247,7 @@ void IREuromAc::setTemp(const uint8_t degrees, const bool fahrenheit) {
   if (fahrenheit) {
     temp_f = std::max(kEuromMinTempF, degrees);
     temp_f = std::min(kEuromMaxTempF, temp_f);
-    temp_c = static_cast<uint8_t>(std::round(fahrenheitToCelsius(temp_f)));
+    temp_c = static_cast<uint8_t>(roundf(fahrenheitToCelsius(temp_f)));
     _.Fahrenheit = kEuromFahrenheitEnabled + temp_f;
   } else {
     temp_c = degrees;
