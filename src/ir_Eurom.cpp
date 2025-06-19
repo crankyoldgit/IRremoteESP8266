@@ -3,9 +3,6 @@
 /// @brief Support for Eurom A/C protocols.
 /// @see https://eurom.nl/wp-content/uploads/2022/04/Polar-12C-16CH-v1.0.pdf
 
-// Supports:
-//   Brand: Eurom,  Model: Polar 16CH
-
 #include "ir_Eurom.h"
 #include <algorithm>
 #include <cmath>
