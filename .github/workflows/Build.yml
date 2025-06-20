@@ -25,7 +25,7 @@ jobs:
         JSONI=${JSONI//$'\n'}
         echo $JSONI
         # Set output
-        echo "::set-output name=matrix::[${JSONI}]"
+        echo "matrix=[${JSONI}]" >> $GITHUB_OUTPUT
   Build_Example:
     needs: Gen_Matrix
     runs-on: ubuntu-latest
