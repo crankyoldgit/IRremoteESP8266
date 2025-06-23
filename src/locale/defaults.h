@@ -844,6 +844,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_EPSON
 #define D_STR_EPSON "EPSON"
 #endif  // D_STR_EPSON
+#ifndef D_STR_EUROM
+#define D_STR_EUROM "EUROM"
+#endif  // D_STR_EUROM
 #ifndef D_STR_FUJITSU_AC
 #define D_STR_FUJITSU_AC "FUJITSU_AC"
 #endif  // D_STR_FUJITSU_AC

@@ -959,6 +959,13 @@
 #define SEND_BLUESTARHEAVY           _IR_ENABLE_DEFAULT_
 #endif  // SEND_BLUESTARHEAVY
 
+#ifndef DECODE_EUROM
+#define DECODE_EUROM         _IR_ENABLE_DEFAULT_
+#endif  // DECODE_EUROM
+#ifndef SEND_EUROM
+#define SEND_EUROM           _IR_ENABLE_DEFAULT_
+#endif  // SEND_EUROM
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -978,6 +985,7 @@
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
      DECODE_CARRIER_AC84 || DECODE_YORK || DECODE_BLUESTARHEAVY || \
+     DECODE_EUROM || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1145,8 +1153,9 @@ enum decode_type_t {
   CARRIER_AC84,  // 125
   YORK,
   BLUESTARHEAVY,
+  EUROM,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = BLUESTARHEAVY,
+  kLastDecodeType = EUROM,
 };
 
 // Message lengths & required repeat values
@@ -1445,6 +1454,8 @@ const uint16_t kRhossDefaultRepeat = 0;
 const uint16_t kClimaButlerBits = 52;
 const uint16_t kYorkBits = 136;
 const uint16_t kYorkStateLength = 17;
+const uint16_t kEuromStateLength = 12;
+const uint16_t kEuromBits = kEuromStateLength * 8;
 
 // Legacy defines. (Deprecated)
 #define AIWA_RC_T501_BITS             kAiwaRcT501Bits

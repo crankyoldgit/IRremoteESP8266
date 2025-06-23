@@ -34,6 +34,7 @@
 #include "ir_Daikin.h"
 #include "ir_Ecoclim.h"
 #include "ir_Electra.h"
+#include "ir_Eurom.h"
 #include "ir_Fujitsu.h"
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
@@ -243,6 +244,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_ELECTRA_AC
     case decode_type_t::ELECTRA_AC:
+#endif
+#if SEND_EUROM
+    case decode_type_t::EUROM:
 #endif
 #if SEND_FUJITSU_AC
     case decode_type_t::FUJITSU_AC:
@@ -1210,6 +1214,31 @@ void IRac::electra(IRElectraAc *ac,
   ac->send();
 }
 #endif  // SEND_ELECTRA_AC
+
+#if SEND_EUROM
+/// Send an Eurom A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IREuromAc object to use.
+/// @param[in] power The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees, normally Celsius.
+/// @param[in] fahrenheit If the given temperature is in Fahrenheit instead.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The swing setting.
+/// @param[in] sleep The sleep mode setting.
+void IRac::eurom(IREuromAc *ac, const bool power, const stdAc::opmode_t mode,
+                 const float degrees, const bool fahrenheit,
+                 const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                 const bool sleep) {
+  ac->begin();
+  ac->setPower(power);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees, fahrenheit);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwing(ac->convertSwing(swingv));
+  ac->setSleep(sleep);
+  ac->send();
+}
+#endif  // SEND_EUROM
 
 #if SEND_FUJITSU_AC
 /// Send a Fujitsu A/C message with the supplied settings.
@@ -3239,6 +3268,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_ELECTRA_AC
+#if SEND_EUROM
+    case EUROM:
+    {
+      IREuromAc ac(_pin, _inverted, _modulation);
+      eurom(&ac, send.power, send.mode, send.degrees, !send.celsius,
+            send.fanspeed, send.swingv, send.sleep);
+      break;
+    }
+#endif  // SEND_EUROM
 #if SEND_FUJITSU_AC
     case FUJITSU_AC:
     {
@@ -4215,6 +4253,13 @@ String resultAcToString(const decode_results * const result) {
       return ac.toString();
     }
 #endif  // DECODE_ELECTRA_AC
+#if DECODE_EUROM
+    case decode_type_t::EUROM: {
+      IREuromAc ac(kGpioUnused);
+      ac.setRaw(result->state);
+      return ac.toString();
+    }
+#endif  // DECODE_EUROM
 #if DECODE_FUJITSU_AC
     case decode_type_t::FUJITSU_AC: {
       IRFujitsuAC ac(kGpioUnused);
@@ -4715,6 +4760,14 @@ bool decodeToState(const decode_results *decode, stdAc::state_t *result,
       break;
     }
 #endif  // DECODE_ELECTRA_AC
+#if DECODE_EUROM
+    case decode_type_t::EUROM: {
+      IREuromAc ac(kGpioUnused);
+      ac.setRaw(decode->state);
+      *result = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_EUROM
 #if DECODE_FUJITSU_AC
     case decode_type_t::FUJITSU_AC: {
       IRFujitsuAC ac(kGpioUnused);

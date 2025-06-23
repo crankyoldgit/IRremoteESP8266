@@ -721,6 +721,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kDaikin64Bits;
     case ELECTRA_AC:
       return kElectraAcBits;
+    case EUROM:
+      return kEuromBits;
     case GREE:
       return kGreeBits;
     case HAIER_AC:
@@ -1245,6 +1247,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendElectraAC(state, nbytes);
       break;
 #endif  // SEND_ELECTRA_AC
+#if SEND_EUROM
+    case EUROM:
+      sendEurom(state, nbytes);
+      break;
+#endif  // SEND_EUROM
 #if SEND_FUJITSU_AC
     case FUJITSU_AC:
       sendFujitsuAC(state, nbytes);
