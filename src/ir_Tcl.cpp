@@ -35,6 +35,7 @@ using irutils::addModeToString;
 using irutils::addModelToString;
 using irutils::addSwingVToString;
 using irutils::addTempFloatToString;
+using irutils::addTempToString;
 using irutils::minsToString;
 
 #if SEND_TCL112AC
@@ -372,6 +373,26 @@ void IRTcl112Ac::setOffTimer(const uint16_t mins) {
   _.TimerIndicator = _.OnTimerEnabled || _.OffTimerEnabled;
 }
 
+void IRTcl112Ac::setIFeel(const bool on)
+{
+  _.IFeel = on;
+}
+
+bool IRTcl112Ac::getIFeel(void) const
+{
+    return _.IFeel;
+}
+
+void IRTcl112Ac::setSensorTemp(const uint8_t celsius)
+{
+  _.CurrentTemp = celsius;
+}
+
+uint8_t IRTcl112Ac::getSensorTemp(void) const
+{
+    return _.CurrentTemp;
+}
+
 /// Convert a stdAc::opmode_t enum into its native mode.
 /// @param[in] mode The enum to be converted.
 /// @return The native equivalent of the enum.
@@ -515,6 +536,9 @@ String IRTcl112Ac::toString(void) const {
         result += addBoolToString(_.Health, kHealthStr);
         result += addBoolToString(_.Turbo, kTurboStr);
         result += addBoolToString(getLight(), kLightStr);
+        result += addBoolToString(_.IFeel, kIFeelStr);
+        if (_.IFeel)
+          result += addTempToString(getSensorTemp(), true, true, true);
       }
       result += addLabeledString(
           _.OnTimerEnabled ? minsToString(getOnTimer()) : kOffStr,
