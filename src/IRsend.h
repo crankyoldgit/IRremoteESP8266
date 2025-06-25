@@ -899,7 +899,10 @@ class IRsend {
                        const uint16_t nbytes = kBluestarHeavyStateLength,
                        const uint16_t repeat = kNoRepeat);
 #endif  // SEND_BLUESTARHEAVY
-
+#if SEND_BRYSTON
+  void sendBryston(uint64_t data, uint16_t nbits = kBrystonBits,
+                 uint16_t repeat = kNoRepeat);
+#endif
  protected:
 #ifdef UNIT_TEST
 #ifndef HIGH
