@@ -99,15 +99,20 @@ void IRBosch144AC::setTempRaw(const uint8_t code) {
   _.TempS3 = code & 1;              // save 1 bit in Section3
 }
 
-/// Set the temperature.
+/// Set the temperature. Allow 0.5 degree steps.
 /// @param[in] degrees The temperature in degrees celsius.
-void IRBosch144AC::setTemp(const uint8_t degrees) {
-  uint8_t temp = max(kBosch144TempMin, degrees);
+void IRBosch144AC::setTemp(const float degrees) {
+  uint8_t temp = static_cast<uint8_t>(degrees);
+  temp = max(kBosch144TempMin, temp);
   temp = min(kBosch144TempMax, temp);
   setTempRaw(kBosch144TempMap[temp - kBosch144TempMin]);
+
+  _.TempHalfDegree = (degrees - temp) >= 0.5;
 }
 
-uint8_t IRBosch144AC::getTemp(void) const {
+/// Get the temperature with 0.5 degree steps.
+/// @return The temperature in degrees celsius.
+float IRBosch144AC::getTemp(void) const {
   uint8_t temp = (_.TempS1 << 1) + _.TempS3;
   uint8_t retemp = 25;
   for (uint8_t i = 0; i < kBosch144TempRange; i++) {
@@ -115,7 +120,7 @@ uint8_t IRBosch144AC::getTemp(void) const {
       retemp = kBosch144TempMin + i;
     }
   }
-  return retemp;
+  return static_cast<float>(retemp) + (_.TempHalfDegree ? 0.5f : 0.0f);
 }
 
 /// Set the speed of the fan.
@@ -261,7 +266,7 @@ String IRBosch144AC::toString(void) const {
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kMedium));
-  result += addTempToString(getTemp());
+  result += addTempFloatToString(getTemp());
   result += addBoolToString(_.Quiet, kQuietStr);
   return result;
 }
