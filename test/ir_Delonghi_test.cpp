@@ -17,6 +17,13 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ(kDelonghiAcBits, IRsend::defaultBits(decode_type_t::DELONGHI_AC));
   ASSERT_EQ(kDelonghiAcDefaultRepeat,
             IRsend::minRepeats(decode_type_t::DELONGHI_AC));
+  ASSERT_EQ("DELONGHI_N", typeToString(decode_type_t::DELONGHI_N));
+  ASSERT_EQ(decode_type_t::DELONGHI_N, strToDecodeType("DELONGHI_N"));
+  ASSERT_FALSE(hasACState(decode_type_t::DELONGHI_N));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DELONGHI_N));
+  ASSERT_EQ(kDelonghi_N_Bits, IRsend::defaultBits(decode_type_t::DELONGHI_N));
+  ASSERT_EQ(kDelonghi_N_DefaultRepeat,
+            IRsend::minRepeats(decode_type_t::DELONGHI_N));
 }
 
 TEST(TestDecodeDelonghiAc, SyntheticSelfDecode) {
@@ -360,3 +367,291 @@ TEST(TestIRDelonghiAcClass, OffTimer) {
   EXPECT_FALSE(ac.getOnTimerEnabled());
   EXPECT_EQ(0, ac.getOnTimer());
 }
+
+TEST(TestDecodeDelonghi_N, SyntheticSelfDecode) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+
+  irsend.begin();
+  irsend.reset();
+  irsend.sendDelonghi_N(0x12188100);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(DELONGHI_N, irsend.capture.decode_type);
+  EXPECT_EQ(kDelonghi_N_Bits, irsend.capture.bits);
+  EXPECT_EQ(0x12188100, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.command);
+  EXPECT_EQ(0, irsend.capture.address);
+}
+
+TEST(TestDecodeDelonghi_N, RealExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  uint16_t rawData[67] = {9096, 4440,  582, 522,  558, 548,  556, 524,  582,
+	  1602,  558, 572,  532, 550,  578, 1628,  558, 548,  556, 526,  578,
+	  524,  556, 550,  558, 1626,  582, 1628,  558, 522,  582, 522,  582,
+	  524,  556, 1628,  582, 522,  558, 548,  532, 572,  558, 522,  580,
+	  524,  558, 548,  556, 1628,  556, 550,  556, 526,  580, 522,  580,
+	  524,  556, 548,  558, 524,  582, 524,  580, 522,  556};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 135, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(DELONGHI_N, irsend.capture.decode_type);
+  EXPECT_EQ(kDelonghi_N_Bits, irsend.capture.bits);
+  EXPECT_EQ(0x12188100, irsend.capture.value);
+  EXPECT_EQ(0, irsend.capture.command);
+  EXPECT_EQ(0, irsend.capture.address);
+  EXPECT_EQ("Power: On, Mode: 8 (Cool), Fan: 1 (High), Temp: 16C, Timer: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t r, p;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+// Tests for IRDelonghi_N class.
+
+TEST(TestIRDelonghi_NClass, Power) {
+  IRDelonghi_N ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+
+  // Ref:
+  //   https://github.com/crankyoldgit/IRremoteESP8266/issues/1096#issuecomment-622521726
+  ac.setRaw(0x12188100);  // Power on
+  EXPECT_TRUE(ac.getPower());
+  ac.setRaw(0x12188000);  // Power off
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestIRDelonghi_NClass, Temperature) {
+  IRDelonghi_N ac(kGpioUnused);
+  ac.begin();
+
+  // Celsius
+  ac.setTemp(0);
+  EXPECT_EQ(kDelonghi_N_TempMinC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDelonghi_N_TempMaxC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghi_N_TempMinC);
+  EXPECT_EQ(kDelonghi_N_TempMinC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghi_N_TempMaxC);
+  EXPECT_EQ(kDelonghi_N_TempMaxC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghi_N_TempMinC - 1);
+  EXPECT_EQ(kDelonghi_N_TempMinC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghi_N_TempMaxC + 1);
+  EXPECT_EQ(kDelonghi_N_TempMaxC, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(19);
+  EXPECT_EQ(19, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  ac.setTemp(29, false);
+  EXPECT_EQ(29, ac.getTemp());
+  EXPECT_FALSE(ac.getTempUnit());
+
+  // Fahrenheit
+  ac.setTemp(0, true);
+  EXPECT_EQ(kDelonghi_N_TempMinF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(255, true);
+  EXPECT_EQ(kDelonghi_N_TempMaxF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghi_N_TempMinF, true);
+  EXPECT_EQ(kDelonghi_N_TempMinF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghi_N_TempMaxF, true);
+  EXPECT_EQ(kDelonghi_N_TempMaxF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghi_N_TempMinF - 1, true);
+  EXPECT_EQ(kDelonghi_N_TempMinF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(kDelonghi_N_TempMaxF + 1, true);
+  EXPECT_EQ(kDelonghi_N_TempMaxF, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(66, true);
+  EXPECT_EQ(66, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(75, true);
+  EXPECT_EQ(75, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(80, true);
+  EXPECT_EQ(80, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+
+  ac.setTemp(88, true);
+  EXPECT_EQ(88, ac.getTemp());
+  EXPECT_TRUE(ac.getTempUnit());
+}
+
+TEST(TestIRDelonghi_NClass, OperatingMode) {
+  IRDelonghi_N ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kDelonghi_N_Cool);
+  EXPECT_EQ(kDelonghi_N_Cool, ac.getMode());
+
+  ac.setMode(kDelonghi_N_Dry);
+  EXPECT_EQ(kDelonghi_N_Dry, ac.getMode());
+
+  ac.setMode(kDelonghi_N_Fan);
+  EXPECT_EQ(kDelonghi_N_Fan, ac.getMode());
+
+  ac.setMode(255);
+  EXPECT_EQ(kDelonghi_N_Cool, ac.getMode());
+}
+
+TEST(TestIRDelonghi_NClass, FanSpeed) {
+  IRDelonghi_N ac(kGpioUnused);
+  ac.begin();
+  ac.setMode(kDelonghi_N_Cool);  // All fan speeds available in this mode.
+
+  ac.setFan(0);
+  EXPECT_EQ(kDelonghi_N_FanHigh, ac.getFan());
+
+  ac.setFan(255);
+  EXPECT_EQ(kDelonghi_N_FanHigh, ac.getFan());
+
+  ac.setFan(kDelonghi_N_FanHigh);
+  EXPECT_EQ(kDelonghi_N_FanHigh, ac.getFan());
+
+  ac.setFan(kDelonghi_N_FanLow + 1);
+  EXPECT_EQ(kDelonghi_N_FanHigh, ac.getFan());
+
+  ac.setFan(1);
+  EXPECT_EQ(1, ac.getFan());
+
+  ac.setFan(2);
+  EXPECT_EQ(2, ac.getFan());
+
+  ac.setFan(4);
+  EXPECT_EQ(4, ac.getFan());
+
+  // Confirm changing to fan mode handles speed behaviour correctly.
+  ac.setFan(kDelonghi_N_FanLow);
+  ac.setMode(kDelonghi_N_Fan);
+  EXPECT_EQ(kDelonghi_N_FanLow, ac.getFan());
+  ac.setFan(kDelonghi_N_FanMedium);
+  EXPECT_EQ(kDelonghi_N_FanMedium, ac.getFan());
+  ac.setFan(kDelonghi_N_FanHigh);
+  EXPECT_EQ(kDelonghi_N_FanHigh, ac.getFan());
+}
+
+TEST(TestIRDelonghi_NClass, OnTimer) {
+  IRDelonghi_N ac(kGpioUnused);
+  ac.begin();
+
+  ac.setOnTimerEnabled(false);
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+  ac.setOnTimerEnabled(true);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  ac.setOnTimerEnabled(false);
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+
+  ac.setOnTimer(480);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(480, ac.getOnTimer());
+
+  ac.setOnTimer(60);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(60, ac.getOnTimer());
+
+  ac.setOnTimer(61);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(60, ac.getOnTimer());
+
+  ac.setOnTimerEnabled(false);
+  ac.setOnTimer(23 * 60 + 59);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(12 * 60, ac.getOnTimer());
+
+  ac.setOnTimerEnabled(false);
+  ac.setOnTimer(24 * 60);
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(12 * 60 , ac.getOnTimer());
+}
+
+TEST(TestIRDelonghi_NClass, OffTimer) {
+  IRDelonghi_N ac(kGpioUnused);
+  ac.begin();
+
+  ac.setOffTimerEnabled(false);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+  ac.setOffTimerEnabled(true);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  ac.setOffTimerEnabled(false);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+
+  ac.setOffTimer(0);
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+  EXPECT_EQ(0, ac.getOffTimer());
+
+  ac.setOffTimer(60);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(60, ac.getOffTimer());
+
+  ac.setOffTimer(61);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(60, ac.getOffTimer());
+
+  ac.setOffTimerEnabled(false);
+  ac.setOffTimer(11 * 60 + 59);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(11 * 60 , ac.getOffTimer());
+
+  ac.setOffTimerEnabled(false);
+  ac.setOffTimer(12 * 60);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(12 * 60 , ac.getOffTimer());
+
+  // Real Data
+  // From: https://github.com/crankyoldgit/IRremoteESP8266/issues/1096#issuecomment-623115619
+  // Setting off timer to 8:51 when the time on the remote displayed 16:05.
+  // (8:51 + 24:00 - 16:05 == 32:51 - 16:05 == 16:46) i.e. Turn off in 16h46m.
+  ac.setRaw(0x1218e300);
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(7 * 60 , ac.getOffTimer());
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(7 * 60 , ac.getOnTimer());
+}
+

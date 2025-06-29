@@ -655,6 +655,7 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
     case SAMSUNG:
     case SHERWOOD:
     case WHYNTER:
+    case DELONGHI_N:
       return 32;
     case AIRWELL:
       return 34;
@@ -885,6 +886,11 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
 #if SEND_DELONGHI_AC
     case DELONGHI_AC:
       sendDelonghiAc(data, nbits, min_repeat);
+      break;
+#endif
+#if SEND_DELONGHI_N
+    case DELONGHI_N:
+      sendDelonghi_N(data, nbits, min_repeat);
       break;
 #endif
 #if SEND_DENON

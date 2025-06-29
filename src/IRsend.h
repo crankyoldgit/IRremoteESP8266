@@ -899,6 +899,10 @@ class IRsend {
                        const uint16_t nbytes = kBluestarHeavyStateLength,
                        const uint16_t repeat = kNoRepeat);
 #endif  // SEND_BLUESTARHEAVY
+#if SEND_DELONGHI_N
+  void sendDelonghi_N(uint64_t data, uint16_t nbits = kDelonghi_N_Bits,
+                      uint16_t repeat = kDelonghi_N_DefaultRepeat);
+#endif
 
  protected:
 #ifdef UNIT_TEST

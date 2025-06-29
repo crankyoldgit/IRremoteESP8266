@@ -7,6 +7,7 @@
 
 // Supports:
 //   Brand: Delonghi,  Model: PAC A95
+//   Brand: Delonghi,  Model: PAC N75, N80, N82, N85, N87, N90, N91, N115, N135
 
 #ifndef IR_DELONGHI_H_
 #define IR_DELONGHI_H_
@@ -66,6 +67,36 @@ const uint8_t kDelonghiAcFan =    0b010;
 const uint8_t kDelonghiAcAuto =   0b100;
 const uint16_t kDelonghiAcTimerMax = 23 * 60 + 59;
 const uint8_t kDelonghiAcChecksumOffset = 56;
+
+/// Native representation of a DelonghiN N message.
+union Delonghi_N_Protocol{
+  uint32_t raw;  ///< The state of the IR remote.
+  struct {
+    uint8_t Temp      :8;
+    uint8_t Power     :1;
+    uint8_t Timer     :1;
+    uint8_t Fahrenheit:1;
+    uint8_t           :1;
+    uint8_t Hours     :4;
+    uint8_t Mode      :4;
+    uint8_t Fan       :4;
+    uint8_t Head      :8;  // Header = 0x12
+  };
+};
+
+// Constants
+const uint8_t kDelonghi_N_TempMinC = 16;  // Deg C
+const uint8_t kDelonghi_N_TempMaxC = 32;  // Deg C
+const uint8_t kDelonghi_N_TempMinF = 61;  // Deg F
+const uint8_t kDelonghi_N_TempMaxF = 89;  // Deg F
+const uint8_t kDelonghi_N_FanHigh =   1;
+const uint8_t kDelonghi_N_FanMedium = 2;
+const uint8_t kDelonghi_N_FanLow =    4;
+const uint8_t kDelonghi_N_Cool =   8;
+const uint8_t kDelonghi_N_Dry =    2;
+const uint8_t kDelonghi_N_Fan =    1;
+const uint16_t kDelonghi_N_TimerMax = 12;
+
 
 // Classes
 
@@ -133,4 +164,68 @@ class IRDelonghiAc {
   uint8_t _saved_temp_units;  ///< The previously user requested temp units.
   void checksum(void);
 };
+
+/// Class for handling detailed DelonghiN A/C messages.
+class IRDelonghi_N {
+ public:
+  explicit IRDelonghi_N(const uint16_t pin, const bool inverted = false,
+                        const bool use_modulation = true);
+  void stateReset(void);
+#if SEND_DELONGHI_N
+  void send(const uint16_t repeat = kDelonghi_N_DefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
+  int8_t calibrate(void) { return _irsend.calibrate(); }
+#endif  // SEND_DELONGI_N
+  void begin(void);
+  void setPower(const bool on);
+  bool getPower(void) const;
+  void on(void);
+  void off(void);
+  void setTempUnit(const bool celsius);
+  bool getTempUnit(void) const;
+  void setTemp(const uint8_t temp, const bool fahrenheit = false,
+               const bool force = false);
+  uint8_t getTemp(void) const;
+  void setFan(const uint8_t speed);
+  uint8_t getFan(void) const;
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void) const;
+  void setOnTimerEnabled(const bool on);
+  bool getOnTimerEnabled(void) const;
+  void setOnTimer(const uint16_t nr_of_mins);
+  uint16_t getOnTimer(void) const;
+  void setOffTimerEnabled(const bool on);
+  bool getOffTimerEnabled(void) const;
+  void setOffTimer(const uint16_t nr_of_mins);
+  uint16_t getOffTimer(void) const;
+  void setTimerEnabled(const bool on);
+  bool getTimerEnabled(void) const;
+  void setTimer(const uint16_t nr_of_mins);
+  uint16_t getTimer(void) const;
+  uint32_t getRaw(void);
+  void setRaw(const uint32_t state);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static stdAc::opmode_t toCommonMode(const uint8_t mode);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;  ///< instance of the IR send class
+#else
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< instance of the testing IR send class
+  /// @endcond
+#endif
+  Delonghi_N_Protocol _;
+  uint8_t _saved_temp;  ///< The previously user requested temp value.
+  uint8_t _saved_temp_units;  ///< The previously user requested temp units.
+};
+
+
 #endif  // IR_DELONGHI_H_

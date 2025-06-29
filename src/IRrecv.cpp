@@ -802,6 +802,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
       return true;
 #endif
   */
+#if DECODE_DELONGHI_N
+    DPRINTLN("Attempting Delonghi N decode");
+    if (decodeDelonghi_N(results, offset)) return true;
+#endif  // DECODE_DELONGHI_N
 #if DECODE_NEC
     // Some devices send NEC-like codes that don't follow the true NEC spec.
     // This should detect those. e.g. Apple TV remote etc.

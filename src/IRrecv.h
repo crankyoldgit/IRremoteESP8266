@@ -889,6 +889,11 @@ class IRrecv {
                   const uint16_t nbits = kBluestarHeavyBits,
                   const bool strict = true);
 #endif  // DECODE_BLUESTARHEAVY
+#if DECODE_DELONGHI_N
+  bool decodeDelonghi_N(decode_results *results, uint16_t offset = kStartOffset,
+                     const uint16_t nbits = kDelonghi_N_Bits,
+                     const bool strict = true);
+#endif  // DECODE_DELONGHI_N
 };
 
 #endif  // IRRECV_H_
