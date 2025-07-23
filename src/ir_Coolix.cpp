@@ -99,6 +99,8 @@ void IRCoolixAC::stateReset(void) {
   cleanFlag = false;
   sleepFlag = false;
   swingFlag = false;
+  tempLowF = false;
+  tempHighF = false;
 }
 
 /// Set up hardware to be able to send a message.
@@ -138,6 +140,27 @@ void IRCoolixAC::setRaw(const uint32_t new_code) {
   // must be a command changing Temp|Mode|Fan
   // it is safe to just copy to remote var
   _.raw = new_code;
+}
+
+// Set internal state from a COOLIX48 read, handling F data hidden in parity.
+void IRCoolixAC::setRawFromCoolix48(const uint64_t data) {
+  // Assume parity bits as in coolix24, let's strip them.
+  CoolixProtocol coolix24;
+  coolix24.raw = 0;
+  coolix24.raw |= ((data >> 8) & 0xff);
+  coolix24.raw |= ((data >> 24) & 0xff) << 8;
+  coolix24.raw |= ((data >> 40) & 0xff) << 16;
+
+  // Delegate to coolix24 code.
+  setRaw(coolix24.raw);
+
+  // Handle Fahrenheit range.
+  uint8_t fRange = (data >> 37) & 3;
+  if (fRange == 2) {
+    setTempFRange(false);
+  } else if (fRange == 3) {
+    setTempFRange(true);
+  }
 }
 
 /// Is the current state is a special state?
@@ -217,6 +240,13 @@ void IRCoolixAC::setTempRaw(const uint8_t code) { _.Temp = code; }
 /// @return The native temperature value.
 uint8_t IRCoolixAC::getTempRaw(void) const { return _.Temp; }
 
+/// Set the fahrenheit temperature range.
+/// @param[in] high True if setting high F range, false if low F range.
+void IRCoolixAC::setTempFRange(const bool high) {
+  tempLowF = !high;
+  tempHighF = high;
+}
+
 /// Set the temperature.
 /// @param[in] desired The temperature in degrees celsius.
 void IRCoolixAC::setTemp(const uint8_t desired) {
@@ -230,6 +260,14 @@ void IRCoolixAC::setTemp(const uint8_t desired) {
 /// @return The current setting for temp. in degrees celsius.
 uint8_t IRCoolixAC::getTemp(void) const {
   const uint8_t code = getTempRaw();
+  if (tempLowF) {
+    for (uint8_t i = 0; i < kCoolixTempLowFRange; i++)
+      if (kCoolixTempMapLowF[i] == code) return kCoolixTempLowFMin + i;
+  }
+  if (tempHighF) {
+    for (uint8_t i = 0; i < kCoolixTempHighFRange; i++)
+      if (kCoolixTempMapHighF[i] == code) return kCoolixTempHighFMin + i;
+  }
   for (uint8_t i = 0; i < kCoolixTempRange; i++)
     if (kCoolixTempMap[i] == code) return kCoolixTempMin + i;
   return kCoolixTempMax;  // Not a temp we expected.

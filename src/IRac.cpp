@@ -4128,6 +4128,14 @@ String resultAcToString(const decode_results * const result) {
       return ac.toString();
     }
 #endif  // DECODE_COOLIX
+#if DECODE_COOLIX48
+    case decode_type_t::COOLIX48: {
+      IRCoolixAC ac(kGpioUnused);
+      ac.on();
+      ac.setRawFromCoolix48(result->value);  // Coolix uses value instead of state.
+      return ac.toString();
+    }
+#endif  // DECODE_COOLIX
 #if DECODE_CORONA_AC
     case decode_type_t::CORONA_AC: {
       IRCoronaAc ac(kGpioUnused);
