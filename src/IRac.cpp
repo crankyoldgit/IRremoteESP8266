@@ -13,7 +13,6 @@
 #include <string>
 #endif
 #include <cmath>
-#include <memory>
 #if __cplusplus >= 201103L && defined(_GLIBCXX_USE_C99_MATH_TR1)
     using std::roundf;
 #else
@@ -59,6 +58,8 @@
 #include "ir_Vestel.h"
 #include "ir_Voltas.h"
 #include "ir_Whirlpool.h"
+#include "ir_Elux.h"
+#include "ir_Green.h"
 
 // On the ESP8266 platform we need to use a special version of string handling
 // functions to handle the strings stored in the flash address space.
@@ -252,6 +253,12 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #endif
 #if SEND_GREE
     case decode_type_t::GREE:
+#endif
+#if SEND_GREEN
+    case decode_type_t::GREEN:
+#endif
+#if SEND_ELUX
+    case decode_type_t::ELUX:
 #endif
 #if SEND_HAIER_AC
     case decode_type_t::HAIER_AC:
@@ -591,19 +598,13 @@ void IRac::argoWrem3_ConfigSet(IRArgoAC_WREM3 *ac, const uint8_t param,
   if (safe) {
     switch (param) {
       case 5:  // temp. scale (note this is likely excess as not transmitted)
-        if (value > 1) {
-          return;  /* invalid */
-        }
+        if (value > 1) { return;  /* invalid */ }
         break;
       case 6:  // channel (note this is likely excess as not transmitted)
-        if (value > 3) {
-          return;  /* invalid */
-        }
+        if (value > 3) { return;  /* invalid */ }
         break;
       case 12:  // eco power limit
-        if (value < 30 || value > 99) {
-          return;  /* invalid */
-        }
+        if (value < 30 || value > 99) { return;  /* invalid */ }
         break;
       default:
         return;  /* invalid */
@@ -743,10 +744,8 @@ void IRac::coolix(IRCoolixAC *ac,
       ac->send();
       return;
   }
-  ac->setTemp(degrees);
-  // Mode needs to be set after temp as Fan-only uses a special temp.
   ac->setMode(ac->convertMode(mode));
-  // Fan needs to be set after mode, as setMode can change the fan speed.
+  ac->setTemp(degrees);
   ac->setFan(ac->convertFan(fan));
   // No Filter setting available.
   // No Beep setting available.
@@ -1176,7 +1175,6 @@ void IRac::ecoclim(IREcoclimAc *ac,
 /// @param[in] swingv The vertical swing setting.
 /// @param[in] swingh The horizontal swing setting.
 /// @param[in] iFeel Whether to enable iFeel (remote temp) mode on the A/C unit.
-/// @param[in] quiet Run the device in quiet/silent mode.
 /// @param[in] turbo Run the device in turbo/powerful mode.
 /// @param[in] lighttoggle Should we toggle the LED/Display?
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
@@ -1185,8 +1183,7 @@ void IRac::electra(IRElectraAc *ac,
                    const float degrees, const float sensorTemp,
                    const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
                    const stdAc::swingh_t swingh, const bool iFeel,
-                   const bool quiet, const bool turbo, const bool lighttoggle,
-                   const bool clean) {
+                   const bool turbo, const bool lighttoggle, const bool clean) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
@@ -1197,7 +1194,7 @@ void IRac::electra(IRElectraAc *ac,
   ac->setFan(ac->convertFan(fan));
   ac->setSwingV(swingv != stdAc::swingv_t::kOff);
   ac->setSwingH(swingh != stdAc::swingh_t::kOff);
-  ac->setQuiet(quiet);
+  // No Quiet setting available.
   ac->setTurbo(turbo);
   ac->setLightToggle(lighttoggle);
   // No Econo setting available.
@@ -1367,6 +1364,94 @@ void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
   ac->send();
 }
 #endif  // SEND_GREE
+
+#if SEND_GREEN
+/// Send a Green A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRGreenAC object to use.
+/// @param[in] model The A/C model to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] econo Toggle the device's economical mode.
+/// @param[in] light Turn on the LED/Display mode.
+/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
+void IRac::green(IRGreenAC *ac, const green_ac_remote_model_t model,
+                const bool on, const stdAc::opmode_t mode, const bool celsius,
+                const float degrees, const stdAc::fanspeed_t fan,
+                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                const bool turbo, const bool econo, const bool light,
+                const bool clean, const int16_t sleep) {
+  ac->begin();
+  ac->setModel(model);
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees, !celsius);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(swingv == stdAc::swingv_t::kAuto,  // Set auto flag.
+                       ac->convertSwingV(swingv));
+  //ac->setSwingHorizontal(ac->convertSwingH(swingh));
+  ac->setLight(light);
+  ac->setTurbo(turbo);
+  //ac->setEcono(econo);
+  ac->setXFan(clean);
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  // No Econo setting available.
+  // No Filter setting available.
+  // No Beep setting available.
+  // No Quiet setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_GREEN
+
+#if SEND_ELUX
+/// Send a Elux A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRGreeAC object to use.
+/// @param[in] model The A/C model to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] light Turn on the LED/Display mode.
+/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
+void IRac::elux(IREluxAC *ac, const elux_ac_remote_model_t model,
+                const bool on, const stdAc::opmode_t mode, const bool celsius,
+                const float degrees, const stdAc::fanspeed_t fan,
+                const stdAc::swingv_t swingv, const bool turbo,
+                const bool light, const bool clean, const int16_t sleep) {
+  ac->begin();
+  ac->setModel(model);
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees, !celsius);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(swingv == stdAc::swingv_t::kAuto,  // Set auto flag.
+                       ac->convertSwingV(swingv));
+  ac->setLight(light);
+  ac->setTurbo(turbo);
+  ac->setXFan(clean);
+  ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
+  // No Horizontal Swing setting available.
+  // No Econo setting available.
+  // No Filter setting available.
+  // No Beep setting available.
+  // No Quiet setting available.
+  // No Clock setting available.
+  ac->send();
+}
+#endif  // SEND_ELUX
+
+
 
 #if SEND_HAIER_AC
 /// Send a Haier A/C message with the supplied settings.
@@ -3234,8 +3319,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRElectraAc ac(_pin, _inverted, _modulation);
       electra(&ac, send.power, send.mode, degC, sensorTempC, send.fanspeed,
-              send.swingv, send.swingh, send.iFeel, send.quiet, send.turbo,
-              send.light, send.clean);
+              send.swingv, send.swingh, send.iFeel, send.turbo, send.light,
+              send.clean);
       break;
     }
 #endif  // SEND_ELECTRA_AC
@@ -3272,6 +3357,30 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_GREE
+
+#if SEND_GREEN
+    case GREEN:
+    {
+      IRGreenAC ac(_pin, (green_ac_remote_model_t)send.model, _inverted,
+                  _modulation);
+      green(&ac, (green_ac_remote_model_t)send.model, send.power, send.mode,
+           send.celsius, send.degrees, send.fanspeed, send.swingv, send.swingh,
+           send.turbo, send.econo, send.light, send.clean, send.sleep);
+      break;
+    }
+#endif  // SEND_GREEN
+#if SEND_ELUX
+    case ELUX:
+    {
+      IREluxAC ac(_pin, (elux_ac_remote_model_t)send.model, _inverted,
+                  _modulation);
+      elux(&ac, (elux_ac_remote_model_t)send.model, send.power, send.mode,
+           send.celsius, send.degrees, send.fanspeed, send.swingv, send.turbo,
+           send.light, send.clean, send.sleep);
+      break;
+    }
+#endif  // SEND_ELUX
+
 #if SEND_HAIER_AC
     case HAIER_AC:
     {
@@ -3286,8 +3395,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     {
       IRHaierAC160 ac(_pin, _inverted, _modulation);
       haier160(&ac, send.power, send.mode, send.celsius, send.degrees,
-               send.fanspeed, send.swingv, send.turbo, send.quiet,
-               send.filter, send.clean, send.light, prev_light, send.sleep);
+               send.fanspeed, send.swingv, send.turbo, send.filter, send.clean,
+               send.light, prev_light, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC160
@@ -3297,8 +3406,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRHaierAC176 ac(_pin, _inverted, _modulation);
       haier176(&ac, (haier_ac176_remote_model_t)send.model, send.power,
                send.mode, send.celsius, send.degrees, send.fanspeed,
-               send.swingv, send.swingh, send.turbo, send.quiet, send.filter,
-               send.sleep);
+               send.swingv, send.swingh, send.turbo, send.filter, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC176
@@ -3308,7 +3416,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       IRHaierACYRW02 ac(_pin, _inverted, _modulation);
       haierYrwo2(&ac, send.power, send.mode, send.celsius, send.degrees,
                  send.fanspeed, send.swingv, send.swingh, send.turbo,
-                 send.quiet, send.filter, send.sleep);
+                 send.filter, send.sleep);
       break;
     }
 #endif  // SEND_HAIER_AC_YRW02
@@ -3869,6 +3977,16 @@ int16_t IRac::strToModel(const char *str, const int16_t def) {
     return gree_ac_remote_model_t::YBOFB;
   } else if (!STRCASECMP(str, kYx1fsfStr)) {
     return gree_ac_remote_model_t::YX1FSF;
+    // Green
+  } else if (!STRCASECMP(str, kYaw1fStr)) {
+    return green_ac_remote_model_t::YAW1FG;
+  } else if (!STRCASECMP(str, kYbofbStr)) {
+    return green_ac_remote_model_t::YBOFBG;
+  // Elux
+  } else if (!STRCASECMP(str, kEaw1fStr)) {
+    return elux_ac_remote_model_t::EAW1F;
+  } else if (!STRCASECMP(str, kEbofbStr)) {
+    return elux_ac_remote_model_t::EBOFB;  
   // Haier models
   } else if (!STRCASECMP(str, kV9014557AStr)) {
     return haier_ac176_remote_model_t::V9014557_A;
@@ -4065,1011 +4183,1011 @@ String IRac::swinghToString(const stdAc::swingh_t swingh) {
 }
 
 namespace IRAcUtils {
-/// Display the human readable state of an A/C message if we can.
-/// @param[in] result A Ptr to the captured `decode_results` that contains an
-///   A/C mesg.
-/// @return A string with the human description of the A/C message.
-///   An empty string if we can't.
-String resultAcToString(const decode_results * const result) {
-  switch (result->decode_type) {
+  /// Display the human readable state of an A/C message if we can.
+  /// @param[in] result A Ptr to the captured `decode_results` that contains an
+  ///   A/C mesg.
+  /// @return A string with the human description of the A/C message.
+  ///   An empty string if we can't.
+  String resultAcToString(const decode_results * const result) {
+    switch (result->decode_type) {
 #if DECODE_AIRTON
-    case decode_type_t::AIRTON: {
-      IRAirtonAc ac(kGpioUnused);
-      ac.setRaw(result->value);  // AIRTON uses value instead of state.
-      return ac.toString();
-    }
+      case decode_type_t::AIRTON: {
+        IRAirtonAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // AIRTON uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_AIRTON
 #if DECODE_AIRWELL
-    case decode_type_t::AIRWELL: {
-      IRAirwellAc ac(kGpioUnused);
-      ac.setRaw(result->value);  // AIRWELL uses value instead of state.
-      return ac.toString();
-    }
+      case decode_type_t::AIRWELL: {
+        IRAirwellAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // AIRWELL uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_AIRWELL
 #if DECODE_AMCOR
-    case decode_type_t::AMCOR: {
-      IRAmcorAc ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_AMCOR
-#if DECODE_ARGO
-    case decode_type_t::ARGO: {
-      if (IRArgoAC_WREM3::isValidWrem3Message(result->state, result->bits,
-                                              true)) {
-        IRArgoAC_WREM3 ac(kGpioUnused);
-        ac.setRaw(result->state, result->bits / 8);
-        return ac.toString();
-      }
-      IRArgoAC ac(kGpioUnused);
-      ac.setRaw(result->state, result->bits / 8);
-      return ac.toString();
-    }
-#endif  // DECODE_ARGO
-#if DECODE_BOSCH144
-    case decode_type_t::BOSCH144: {
-      IRBosch144AC ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_BOSCH144
-#if DECODE_CARRIER_AC64
-    case decode_type_t::CARRIER_AC64: {
-      IRCarrierAc64 ac(kGpioUnused);
-      ac.setRaw(result->value);  // CARRIER_AC64 uses value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_CARRIER_AC64
-#if DECODE_COOLIX
-    case decode_type_t::COOLIX: {
-      IRCoolixAC ac(kGpioUnused);
-      ac.on();
-      ac.setRaw(result->value);  // Coolix uses value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_COOLIX
-#if DECODE_CORONA_AC
-    case decode_type_t::CORONA_AC: {
-      IRCoronaAc ac(kGpioUnused);
-      ac.setRaw(result->state, result->bits / 8);
-      return ac.toString();
-    }
-#endif  // DECODE_CORONA_AC
-#if DECODE_DAIKIN
-    case decode_type_t::DAIKIN: {
-      IRDaikinESP ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_DAIKIN
-#if DECODE_DAIKIN128
-    case decode_type_t::DAIKIN128: {
-      IRDaikin128 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_DAIKIN128
-#if DECODE_DAIKIN152
-    case decode_type_t::DAIKIN152: {
-      IRDaikin152 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_DAIKIN152
-#if DECODE_DAIKIN160
-    case decode_type_t::DAIKIN160: {
-      IRDaikin160 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_DAIKIN160
-#if DECODE_DAIKIN176
-    case decode_type_t::DAIKIN176: {
-      IRDaikin176 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_DAIKIN160
-#if DECODE_DAIKIN2
-    case decode_type_t::DAIKIN2: {
-      IRDaikin2 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_DAIKIN2
-#if DECODE_DAIKIN216
-    case decode_type_t::DAIKIN216: {
-      IRDaikin216 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_DAIKIN216
-#if DECODE_DAIKIN64
-    case decode_type_t::DAIKIN64: {
-      IRDaikin64 ac(kGpioUnused);
-      ac.setRaw(result->value);  // Daikin64 uses value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_DAIKIN64
-#if DECODE_DELONGHI_AC
-    case decode_type_t::DELONGHI_AC: {
-      IRDelonghiAc ac(kGpioUnused);
-      ac.setRaw(result->value);  // DelonghiAc uses value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_DELONGHI_AC
-#if DECODE_ECOCLIM
-    case decode_type_t::ECOCLIM: {
-      if (result->bits == kEcoclimBits) {
-        IREcoclimAc ac(kGpioUnused);
-        ac.setRaw(result->value);  // EcoClim uses value instead of state.
-        return ac.toString();
-      }
-      return "";
-    }
-#endif  // DECODE_ECOCLIM
-#if DECODE_ELECTRA_AC
-    case decode_type_t::ELECTRA_AC: {
-      IRElectraAc ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_ELECTRA_AC
-#if DECODE_FUJITSU_AC
-    case decode_type_t::FUJITSU_AC: {
-      IRFujitsuAC ac(kGpioUnused);
-      ac.setRaw(result->state, result->bits / 8);
-      return ac.toString();
-    }
-#endif  // DECODE_FUJITSU_AC
-#if DECODE_GOODWEATHER
-    case decode_type_t::GOODWEATHER: {
-      IRGoodweatherAc ac(kGpioUnused);
-      ac.setRaw(result->value);  // Goodweather uses value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_GOODWEATHER
-#if DECODE_GREE
-    case decode_type_t::GREE: {
-      IRGreeAC ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_GREE
-#if DECODE_HAIER_AC
-    case decode_type_t::HAIER_AC: {
-      IRHaierAC ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HAIER_AC
-#if DECODE_HAIER_AC160
-    case decode_type_t::HAIER_AC160: {
-      IRHaierAC160 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HAIER_AC160
-#if DECODE_HAIER_AC176
-    case decode_type_t::HAIER_AC176: {
-      IRHaierAC176 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HAIER_AC176
-#if DECODE_HAIER_AC_YRW02
-    case decode_type_t::HAIER_AC_YRW02: {
-      IRHaierACYRW02 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HAIER_AC_YRW02
-#if DECODE_HITACHI_AC
-    case decode_type_t::HITACHI_AC: {
-      IRHitachiAc ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HITACHI_AC
-#if DECODE_HITACHI_AC1
-    case decode_type_t::HITACHI_AC1: {
-      IRHitachiAc1 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HITACHI_AC1
-#if DECODE_HITACHI_AC264
-    case decode_type_t::HITACHI_AC264: {
-      IRHitachiAc264 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HITACHI_AC264
-#if DECODE_HITACHI_AC296
-    case decode_type_t::HITACHI_AC296: {
-      IRHitachiAc296 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HITACHI_AC296
-#if DECODE_HITACHI_AC344
-    case decode_type_t::HITACHI_AC344: {
-      IRHitachiAc344 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HITACHI_AC344
-#if DECODE_HITACHI_AC424
-    case decode_type_t::HITACHI_AC424: {
-      IRHitachiAc424 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_HITACHI_AC424
-#if DECODE_KELON
-    case decode_type_t::KELON: {
-      IRKelonAc ac(kGpioUnused);
-      ac.setRaw(result->value);
-      return ac.toString();
-    }
-#endif  // DECODE_KELON
-#if DECODE_KELVINATOR
-    case decode_type_t::KELVINATOR: {
-      IRKelvinatorAC ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_KELVINATOR
-#if DECODE_LG
-    case decode_type_t::LG:
-    case decode_type_t::LG2: {
-      IRLgAc ac(kGpioUnused);
-      ac.setRaw(result->value, result->decode_type);  // Use value, not state.
-      return ac.isValidLgAc() ? ac.toString() : "";
-    }
-#endif  // DECODE_LG
-#if DECODE_MIDEA
-    case decode_type_t::MIDEA: {
-      IRMideaAC ac(kGpioUnused);
-      ac.setRaw(result->value);  // Midea uses value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_MIDEA
-#if DECODE_MIRAGE
-    case decode_type_t::MIRAGE: {
-      IRMirageAc ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_MIRAGE
-#if DECODE_MITSUBISHI_AC
-    case decode_type_t::MITSUBISHI_AC: {
-      IRMitsubishiAC ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_MITSUBISHI_AC
-#if DECODE_MITSUBISHI112
-    case decode_type_t::MITSUBISHI112: {
-      IRMitsubishi112 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_MITSUBISHI112
-#if DECODE_MITSUBISHI136
-    case decode_type_t::MITSUBISHI136: {
-      IRMitsubishi136 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_MITSUBISHI136
-#if DECODE_MITSUBISHIHEAVY
-    case decode_type_t::MITSUBISHI_HEAVY_88: {
-      IRMitsubishiHeavy88Ac ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-    case decode_type_t::MITSUBISHI_HEAVY_152: {
-      IRMitsubishiHeavy152Ac ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_MITSUBISHIHEAVY
-#if DECODE_NEOCLIMA
-    case decode_type_t::NEOCLIMA: {
-      IRNeoclimaAc ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_NEOCLIMA
-#if DECODE_PANASONIC_AC
-    case decode_type_t::PANASONIC_AC: {
-      if (result->bits > kPanasonicAcShortBits) {
-        IRPanasonicAc ac(kGpioUnused);
+      case decode_type_t::AMCOR: {
+        IRAmcorAc ac(kGpioUnused);
         ac.setRaw(result->state);
         return ac.toString();
       }
-      return "";
-    }
-#endif  // DECODE_PANASONIC_AC
-#if DECODE_PANASONIC_AC32
-    case decode_type_t::PANASONIC_AC32: {
-      if (result->bits >= kPanasonicAc32Bits) {
-        IRPanasonicAc32 ac(kGpioUnused);
-        ac.setRaw(result->value);  // Uses value instead of state.
-        return ac.toString();
-      }
-      return "";
-    }
-#endif  // DECODE_PANASONIC_AC
-#if DECODE_RHOSS
-  case decode_type_t::RHOSS: {
-    IRRhossAc ac(kGpioUnused);
-    ac.setRaw(result->state);
-    return ac.toString();
-  }
-#endif  // DECODE_RHOSS
-#if DECODE_SAMSUNG_AC
-    case decode_type_t::SAMSUNG_AC: {
-      IRSamsungAc ac(kGpioUnused);
-      ac.setRaw(result->state, result->bits / 8);
-      return ac.toString();
-    }
-#endif  // DECODE_SAMSUNG_AC
-#if DECODE_SANYO_AC
-    case decode_type_t::SANYO_AC: {
-      IRSanyoAc ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_SANYO_AC
-#if DECODE_SANYO_AC88
-    case decode_type_t::SANYO_AC88: {
-      IRSanyoAc88 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_SANYO_AC88
-#if DECODE_SHARP_AC
-    case decode_type_t::SHARP_AC: {
-      IRSharpAc ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_SHARP_AC
-#if (DECODE_TCL112AC || DECODE_TEKNOPOINT)
-    case decode_type_t::TCL112AC:
-    case decode_type_t::TEKNOPOINT: {
-      IRTcl112Ac ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // (DECODE_TCL112AC || DECODE_TEKNOPOINT)
-#if DECODE_TECHNIBEL_AC
-    case decode_type_t::TECHNIBEL_AC: {
-      IRTechnibelAc ac(kGpioUnused);
-      ac.setRaw(result->value);  // TechnibelAc uses value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_TECHNIBEL_AC
-#if DECODE_TECO
-    case decode_type_t::TECO: {
-      IRTecoAc ac(kGpioUnused);
-      ac.setRaw(result->value);  // Like Coolix, use value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_TECO
-#if DECODE_TOSHIBA_AC
-    case decode_type_t::TOSHIBA_AC: {
-      IRToshibaAC ac(kGpioUnused);
-      ac.setRaw(result->state, result->bits / 8);
-      return ac.toString();
-    }
-#endif  // DECODE_TOSHIBA_AC
-#if DECODE_TRANSCOLD
-    case decode_type_t::TRANSCOLD: {
-      IRTranscoldAc ac(kGpioUnused);
-      ac.on();
-      ac.setRaw(result->value);  // TRANSCOLD uses value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_TRANSCOLD
-#if DECODE_TROTEC
-    case decode_type_t::TROTEC: {
-      IRTrotecESP ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_TROTEC
-#if DECODE_TROTEC_3550
-    case decode_type_t::TROTEC_3550: {
-      IRTrotec3550 ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_TROTEC_3550
-#if DECODE_TRUMA
-    case decode_type_t::TRUMA: {
-      IRTrumaAc ac(kGpioUnused);
-      ac.setRaw(result->value);  // Truma uses value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_TRUMA
-#if DECODE_VESTEL_AC
-    case decode_type_t::VESTEL_AC: {
-      IRVestelAc ac(kGpioUnused);
-      ac.setRaw(result->value);  // Like Coolix, use value instead of state.
-      return ac.toString();
-    }
-#endif  // DECODE_VESTEL_AC
-#if DECODE_VOLTAS
-    case decode_type_t::VOLTAS: {
-      IRVoltas ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_VOLTAS
-#if DECODE_WHIRLPOOL_AC
-    case decode_type_t::WHIRLPOOL_AC: {
-      IRWhirlpoolAc ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_WHIRLPOOL_AC
-#if DECODE_YORK
-    case decode_type_t::YORK: {
-      IRYorkAc ac(kGpioUnused);
-      ac.setRaw(result->state);
-      return ac.toString();
-    }
-#endif  // DECODE_YORK
-    default:
-      return "";
-  }
-}
-
-/// Convert a valid IR A/C remote message that we understand enough into a
-/// Common A/C state.
-/// @param[in] decode A PTR to a successful raw IR decode object.
-/// @param[in] result A PTR to a state structure to store the result in.
-/// @param[in] prev A PTR to a state structure which has the prev. state.
-/// @return A boolean indicating success or failure.
-bool decodeToState(const decode_results *decode, stdAc::state_t *result,
-                   const stdAc::state_t *prev
-/// @cond IGNORE
-// *prev flagged as "unused" due to potential compiler warning when some
-// protocols that use it are disabled. It really is used.
-                                              __attribute__((unused))
-/// @endcond
-                  ) {
-  if (decode == NULL || result == NULL) return false;  // Safety check.
-  switch (decode->decode_type) {
-#if DECODE_AIRTON
-    case decode_type_t::AIRTON: {
-      IRAirtonAc ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon();
-      break;
-    }
-#endif  // DECODE_AIRTON
-#if DECODE_AIRWELL
-    case decode_type_t::AIRWELL: {
-      IRAirwellAc ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon(prev);
-      break;
-    }
-#endif  // DECODE_AIRWELL
-#if DECODE_AMCOR
-    case decode_type_t::AMCOR: {
-      IRAmcorAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
 #endif  // DECODE_AMCOR
 #if DECODE_ARGO
-    case decode_type_t::ARGO: {
-      const uint16_t length = decode->bits / 8;
-      if (IRArgoAC_WREM3::isValidWrem3Message(decode->state,
-                                              decode->bits, true)) {
-        IRArgoAC_WREM3 ac(kGpioUnused);
-        ac.setRaw(decode->state, length);
-        *result = ac.toCommon();
-      } else {
-        IRArgoAC ac(kGpioUnused);
-        switch (length) {
-          case kArgoStateLength:
-          case kArgoShortStateLength:
-            ac.setRaw(decode->state, length);
-            *result = ac.toCommon();
-            break;
-          default:
-            return false;
+      case decode_type_t::ARGO: {
+        if (IRArgoAC_WREM3::isValidWrem3Message(result->state, result->bits,
+                                                true)) {
+          IRArgoAC_WREM3 ac(kGpioUnused);
+          ac.setRaw(result->state, result->bits / 8);
+          return ac.toString();
         }
+        IRArgoAC ac(kGpioUnused);
+        ac.setRaw(result->state, result->bits / 8);
+        return ac.toString();
       }
-      break;
-    }
 #endif  // DECODE_ARGO
 #if DECODE_BOSCH144
-    case decode_type_t::BOSCH144: {
-      IRBosch144AC ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::BOSCH144: {
+        IRBosch144AC ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_BOSCH144
 #if DECODE_CARRIER_AC64
-    case decode_type_t::CARRIER_AC64: {
-      IRCarrierAc64 ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::CARRIER_AC64: {
+        IRCarrierAc64 ac(kGpioUnused);
+        ac.setRaw(result->value);  // CARRIER_AC64 uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_CARRIER_AC64
 #if DECODE_COOLIX
-    case decode_type_t::COOLIX: {
-      IRCoolixAC ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::COOLIX: {
+        IRCoolixAC ac(kGpioUnused);
+        ac.on();
+        ac.setRaw(result->value);  // Coolix uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_COOLIX
 #if DECODE_CORONA_AC
-    case decode_type_t::CORONA_AC: {
-      IRCoronaAc ac(kGpioUnused);
-      ac.setRaw(decode->state, decode->bits / 8);
-      *result = ac.toCommon();
-      break;
-    }
-#endif  // DECODE_CARRIER_AC64
+      case decode_type_t::CORONA_AC: {
+        IRCoronaAc ac(kGpioUnused);
+        ac.setRaw(result->state, result->bits / 8);
+        return ac.toString();
+      }
+#endif  // DECODE_CORONA_AC
 #if DECODE_DAIKIN
-    case decode_type_t::DAIKIN: {
-      IRDaikinESP ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::DAIKIN: {
+        IRDaikinESP ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_DAIKIN
 #if DECODE_DAIKIN128
-    case decode_type_t::DAIKIN128: {
-      IRDaikin128 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::DAIKIN128: {
+        IRDaikin128 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_DAIKIN128
 #if DECODE_DAIKIN152
-    case decode_type_t::DAIKIN152: {
-      IRDaikin152 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::DAIKIN152: {
+        IRDaikin152 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_DAIKIN152
 #if DECODE_DAIKIN160
-    case decode_type_t::DAIKIN160: {
-      IRDaikin160 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::DAIKIN160: {
+        IRDaikin160 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_DAIKIN160
 #if DECODE_DAIKIN176
-    case decode_type_t::DAIKIN176: {
-      IRDaikin176 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::DAIKIN176: {
+        IRDaikin176 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_DAIKIN160
 #if DECODE_DAIKIN2
-    case decode_type_t::DAIKIN2: {
-      IRDaikin2 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::DAIKIN2: {
+        IRDaikin2 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_DAIKIN2
 #if DECODE_DAIKIN216
-    case decode_type_t::DAIKIN216: {
-      IRDaikin216 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::DAIKIN216: {
+        IRDaikin216 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_DAIKIN216
 #if DECODE_DAIKIN64
-    case decode_type_t::DAIKIN64: {
-      IRDaikin64 ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::DAIKIN64: {
+        IRDaikin64 ac(kGpioUnused);
+        ac.setRaw(result->value);  // Daikin64 uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_DAIKIN64
 #if DECODE_DELONGHI_AC
-    case decode_type_t::DELONGHI_AC: {
-      IRDelonghiAc ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::DELONGHI_AC: {
+        IRDelonghiAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // DelonghiAc uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_DELONGHI_AC
 #if DECODE_ECOCLIM
-    case decode_type_t::ECOCLIM: {
-      if (decode->bits == kEcoclimBits) {
-        IREcoclimAc ac(kGpioUnused);
-        ac.setRaw(decode->value);  // Uses value instead of state.
-        *result = ac.toCommon();
-      } else {
-        return false;
+      case decode_type_t::ECOCLIM: {
+        if (result->bits == kEcoclimBits) {
+          IREcoclimAc ac(kGpioUnused);
+          ac.setRaw(result->value);  // EcoClim uses value instead of state.
+          return ac.toString();
+        }
+        return "";
       }
-      break;
-    }
 #endif  // DECODE_ECOCLIM
 #if DECODE_ELECTRA_AC
-    case decode_type_t::ELECTRA_AC: {
-      IRElectraAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::ELECTRA_AC: {
+        IRElectraAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_ELECTRA_AC
 #if DECODE_FUJITSU_AC
-    case decode_type_t::FUJITSU_AC: {
-      IRFujitsuAC ac(kGpioUnused);
-      ac.setRaw(decode->state, decode->bits / 8);
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::FUJITSU_AC: {
+        IRFujitsuAC ac(kGpioUnused);
+        ac.setRaw(result->state, result->bits / 8);
+        return ac.toString();
+      }
 #endif  // DECODE_FUJITSU_AC
 #if DECODE_GOODWEATHER
-    case decode_type_t::GOODWEATHER: {
-      IRGoodweatherAc ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::GOODWEATHER: {
+        IRGoodweatherAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // Goodweather uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_GOODWEATHER
 #if DECODE_GREE
-    case decode_type_t::GREE: {
-      IRGreeAC ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::GREE: {
+        IRGreeAC ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_GREE
 #if DECODE_HAIER_AC
-    case decode_type_t::HAIER_AC: {
-      IRHaierAC ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::HAIER_AC: {
+        IRHaierAC ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_HAIER_AC
 #if DECODE_HAIER_AC160
-    case decode_type_t::HAIER_AC160: {
-      IRHaierAC160 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::HAIER_AC160: {
+        IRHaierAC160 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_HAIER_AC160
 #if DECODE_HAIER_AC176
-    case decode_type_t::HAIER_AC176: {
-      IRHaierAC176 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::HAIER_AC176: {
+        IRHaierAC176 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_HAIER_AC176
 #if DECODE_HAIER_AC_YRW02
-    case decode_type_t::HAIER_AC_YRW02: {
-      IRHaierACYRW02 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::HAIER_AC_YRW02: {
+        IRHaierACYRW02 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_HAIER_AC_YRW02
-#if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
-    case decode_type_t::HITACHI_AC: {
-      IRHitachiAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
-#endif  // (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
+#if DECODE_HITACHI_AC
+      case decode_type_t::HITACHI_AC: {
+        IRHitachiAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+#endif  // DECODE_HITACHI_AC
 #if DECODE_HITACHI_AC1
-    case decode_type_t::HITACHI_AC1: {
-      IRHitachiAc1 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::HITACHI_AC1: {
+        IRHitachiAc1 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_HITACHI_AC1
 #if DECODE_HITACHI_AC264
-    case decode_type_t::HITACHI_AC264: {
-      IRHitachiAc264 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::HITACHI_AC264: {
+        IRHitachiAc264 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_HITACHI_AC264
 #if DECODE_HITACHI_AC296
-    case decode_type_t::HITACHI_AC296: {
-      IRHitachiAc296 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::HITACHI_AC296: {
+        IRHitachiAc296 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_HITACHI_AC296
 #if DECODE_HITACHI_AC344
-    case decode_type_t::HITACHI_AC344: {
-      IRHitachiAc344 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::HITACHI_AC344: {
+        IRHitachiAc344 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_HITACHI_AC344
 #if DECODE_HITACHI_AC424
-    case decode_type_t::HITACHI_AC424: {
-      IRHitachiAc424 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::HITACHI_AC424: {
+        IRHitachiAc424 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_HITACHI_AC424
 #if DECODE_KELON
-    case decode_type_t::KELON: {
-      IRKelonAc ac(kGpioUnused);
-      ac.setRaw(decode->value);
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::KELON: {
+        IRKelonAc ac(kGpioUnused);
+        ac.setRaw(result->value);
+        return ac.toString();
+      }
 #endif  // DECODE_KELON
 #if DECODE_KELVINATOR
-    case decode_type_t::KELVINATOR: {
-      IRKelvinatorAC ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::KELVINATOR: {
+        IRKelvinatorAC ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_KELVINATOR
 #if DECODE_LG
-    case decode_type_t::LG:
-    case decode_type_t::LG2: {
-      IRLgAc ac(kGpioUnused);
-      ac.setRaw(decode->value, decode->decode_type);  // Use value, not state.
-      if (!ac.isValidLgAc()) return false;
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::LG:
+      case decode_type_t::LG2: {
+        IRLgAc ac(kGpioUnused);
+        ac.setRaw(result->value, result->decode_type);  // Use value, not state.
+        return ac.isValidLgAc() ? ac.toString() : "";
+      }
 #endif  // DECODE_LG
 #if DECODE_MIDEA
-    case decode_type_t::MIDEA: {
-      IRMideaAC ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::MIDEA: {
+        IRMideaAC ac(kGpioUnused);
+        ac.setRaw(result->value);  // Midea uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_MIDEA
 #if DECODE_MIRAGE
-    case decode_type_t::MIRAGE: {
-      IRMirageAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::MIRAGE: {
+        IRMirageAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_MIRAGE
 #if DECODE_MITSUBISHI_AC
-    case decode_type_t::MITSUBISHI_AC: {
-      IRMitsubishiAC ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::MITSUBISHI_AC: {
+        IRMitsubishiAC ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_MITSUBISHI_AC
 #if DECODE_MITSUBISHI112
-    case decode_type_t::MITSUBISHI112: {
-      IRMitsubishi112 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::MITSUBISHI112: {
+        IRMitsubishi112 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_MITSUBISHI112
 #if DECODE_MITSUBISHI136
-    case decode_type_t::MITSUBISHI136: {
-      IRMitsubishi136 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::MITSUBISHI136: {
+        IRMitsubishi136 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_MITSUBISHI136
 #if DECODE_MITSUBISHIHEAVY
-    case decode_type_t::MITSUBISHI_HEAVY_88: {
-      IRMitsubishiHeavy88Ac ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
-    case decode_type_t::MITSUBISHI_HEAVY_152: {
-      IRMitsubishiHeavy152Ac ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::MITSUBISHI_HEAVY_88: {
+        IRMitsubishiHeavy88Ac ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
+      case decode_type_t::MITSUBISHI_HEAVY_152: {
+        IRMitsubishiHeavy152Ac ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_MITSUBISHIHEAVY
 #if DECODE_NEOCLIMA
-    case decode_type_t::NEOCLIMA: {
-      IRNeoclimaAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::NEOCLIMA: {
+        IRNeoclimaAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_NEOCLIMA
 #if DECODE_PANASONIC_AC
-    case decode_type_t::PANASONIC_AC: {
-      IRPanasonicAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::PANASONIC_AC: {
+        if (result->bits > kPanasonicAcShortBits) {
+          IRPanasonicAc ac(kGpioUnused);
+          ac.setRaw(result->state);
+          return ac.toString();
+        }
+        return "";
+      }
 #endif  // DECODE_PANASONIC_AC
 #if DECODE_PANASONIC_AC32
-    case decode_type_t::PANASONIC_AC32: {
-      IRPanasonicAc32 ac(kGpioUnused);
-      if (decode->bits >= kPanasonicAc32Bits) {
-        ac.setRaw(decode->value);  // Uses value instead of state.
-        *result = ac.toCommon(prev);
-      } else {
-        return false;
+      case decode_type_t::PANASONIC_AC32: {
+        if (result->bits >= kPanasonicAc32Bits) {
+          IRPanasonicAc32 ac(kGpioUnused);
+          ac.setRaw(result->value);  // Uses value instead of state.
+          return ac.toString();
+        }
+        return "";
       }
-      break;
-    }
-#endif  // DECODE_PANASONIC_AC32
+#endif  // DECODE_PANASONIC_AC
 #if DECODE_RHOSS
     case decode_type_t::RHOSS: {
       IRRhossAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
+      ac.setRaw(result->state);
+      return ac.toString();
     }
 #endif  // DECODE_RHOSS
 #if DECODE_SAMSUNG_AC
-    case decode_type_t::SAMSUNG_AC: {
-      IRSamsungAc ac(kGpioUnused);
-      ac.setRaw(decode->state, decode->bits / 8);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::SAMSUNG_AC: {
+        IRSamsungAc ac(kGpioUnused);
+        ac.setRaw(result->state, result->bits / 8);
+        return ac.toString();
+      }
 #endif  // DECODE_SAMSUNG_AC
 #if DECODE_SANYO_AC
-    case decode_type_t::SANYO_AC: {
-      IRSanyoAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::SANYO_AC: {
+        IRSanyoAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_SANYO_AC
 #if DECODE_SANYO_AC88
-    case decode_type_t::SANYO_AC88: {
-      IRSanyoAc88 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::SANYO_AC88: {
+        IRSanyoAc88 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_SANYO_AC88
 #if DECODE_SHARP_AC
-    case decode_type_t::SHARP_AC: {
-      IRSharpAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::SHARP_AC: {
+        IRSharpAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_SHARP_AC
 #if (DECODE_TCL112AC || DECODE_TEKNOPOINT)
-    case decode_type_t::TCL112AC:
-    case decode_type_t::TEKNOPOINT: {
-      IRTcl112Ac ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon(prev);
-      // Teknopoint uses the TCL protocol, but with a different model number.
-      // Just keep the original protocol type ... for now.
-      result->protocol = decode->decode_type;
-      break;
-    }
+      case decode_type_t::TCL112AC:
+      case decode_type_t::TEKNOPOINT: {
+        IRTcl112Ac ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // (DECODE_TCL112AC || DECODE_TEKNOPOINT)
 #if DECODE_TECHNIBEL_AC
-    case decode_type_t::TECHNIBEL_AC: {
-      IRTechnibelAc ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::TECHNIBEL_AC: {
+        IRTechnibelAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // TechnibelAc uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_TECHNIBEL_AC
 #if DECODE_TECO
-    case decode_type_t::TECO: {
-      IRTecoAc ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::TECO: {
+        IRTecoAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // Like Coolix, use value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_TECO
 #if DECODE_TOSHIBA_AC
-    case decode_type_t::TOSHIBA_AC: {
-      IRToshibaAC ac(kGpioUnused);
-      ac.setRaw(decode->state, decode->bits / 8);
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::TOSHIBA_AC: {
+        IRToshibaAC ac(kGpioUnused);
+        ac.setRaw(result->state, result->bits / 8);
+        return ac.toString();
+      }
 #endif  // DECODE_TOSHIBA_AC
 #if DECODE_TRANSCOLD
-    case decode_type_t::TRANSCOLD: {
-      IRTranscoldAc ac(kGpioUnused);
-      ac.setRaw(decode->value);  // TRANSCOLD Uses value instead of state.
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::TRANSCOLD: {
+        IRTranscoldAc ac(kGpioUnused);
+        ac.on();
+        ac.setRaw(result->value);  // TRANSCOLD uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_TRANSCOLD
 #if DECODE_TROTEC
-    case decode_type_t::TROTEC: {
-      IRTrotecESP ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::TROTEC: {
+        IRTrotecESP ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_TROTEC
 #if DECODE_TROTEC_3550
-    case decode_type_t::TROTEC_3550: {
-      IRTrotec3550 ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::TROTEC_3550: {
+        IRTrotec3550 ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_TROTEC_3550
 #if DECODE_TRUMA
-    case decode_type_t::TRUMA: {
-      IRTrumaAc ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::TRUMA: {
+        IRTrumaAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // Truma uses value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_TRUMA
 #if DECODE_VESTEL_AC
-    case decode_type_t::VESTEL_AC: {
-      IRVestelAc ac(kGpioUnused);
-      ac.setRaw(decode->value);  // Uses value instead of state.
-      *result = ac.toCommon();
-      break;
-    }
+      case decode_type_t::VESTEL_AC: {
+        IRVestelAc ac(kGpioUnused);
+        ac.setRaw(result->value);  // Like Coolix, use value instead of state.
+        return ac.toString();
+      }
 #endif  // DECODE_VESTEL_AC
 #if DECODE_VOLTAS
-    case decode_type_t::VOLTAS: {
-      IRVoltas ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::VOLTAS: {
+        IRVoltas ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_VOLTAS
 #if DECODE_WHIRLPOOL_AC
-    case decode_type_t::WHIRLPOOL_AC: {
-      IRWhirlpoolAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::WHIRLPOOL_AC: {
+        IRWhirlpoolAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_WHIRLPOOL_AC
 #if DECODE_YORK
-    case decode_type_t::YORK: {
-      IRYorkAc ac(kGpioUnused);
-      ac.setRaw(decode->state);
-      *result = ac.toCommon(prev);
-      break;
-    }
+      case decode_type_t::YORK: {
+        IRYorkAc ac(kGpioUnused);
+        ac.setRaw(result->state);
+        return ac.toString();
+      }
 #endif  // DECODE_YORK
-    default:
-      return false;
+      default:
+        return "";
+    }
   }
-  return true;
-}
+
+  /// Convert a valid IR A/C remote message that we understand enough into a
+  /// Common A/C state.
+  /// @param[in] decode A PTR to a successful raw IR decode object.
+  /// @param[in] result A PTR to a state structure to store the result in.
+  /// @param[in] prev A PTR to a state structure which has the prev. state.
+  /// @return A boolean indicating success or failure.
+  bool decodeToState(const decode_results *decode, stdAc::state_t *result,
+                     const stdAc::state_t *prev
+/// @cond IGNORE
+// *prev flagged as "unused" due to potential compiler warning when some
+// protocols that use it are disabled. It really is used.
+                                                __attribute__((unused))
+/// @endcond
+                    ) {
+    if (decode == NULL || result == NULL) return false;  // Safety check.
+    switch (decode->decode_type) {
+#if DECODE_AIRTON
+      case decode_type_t::AIRTON: {
+        IRAirtonAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_AIRTON
+#if DECODE_AIRWELL
+      case decode_type_t::AIRWELL: {
+        IRAirwellAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_AIRWELL
+#if DECODE_AMCOR
+      case decode_type_t::AMCOR: {
+        IRAmcorAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_AMCOR
+#if DECODE_ARGO
+      case decode_type_t::ARGO: {
+        const uint16_t length = decode->bits / 8;
+        if (IRArgoAC_WREM3::isValidWrem3Message(decode->state,
+                                                decode->bits, true)) {
+          IRArgoAC_WREM3 ac(kGpioUnused);
+          ac.setRaw(decode->state, length);
+          *result = ac.toCommon();
+        } else {
+          IRArgoAC ac(kGpioUnused);
+          switch (length) {
+            case kArgoStateLength:
+            case kArgoShortStateLength:
+              ac.setRaw(decode->state, length);
+              *result = ac.toCommon();
+              break;
+            default:
+              return false;
+          }
+        }
+        break;
+      }
+#endif  // DECODE_ARGO
+#if DECODE_BOSCH144
+      case decode_type_t::BOSCH144: {
+        IRBosch144AC ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_BOSCH144
+#if DECODE_CARRIER_AC64
+      case decode_type_t::CARRIER_AC64: {
+        IRCarrierAc64 ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_CARRIER_AC64
+#if DECODE_COOLIX
+      case decode_type_t::COOLIX: {
+        IRCoolixAC ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_COOLIX
+#if DECODE_CORONA_AC
+      case decode_type_t::CORONA_AC: {
+        IRCoronaAc ac(kGpioUnused);
+        ac.setRaw(decode->state, decode->bits / 8);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_CARRIER_AC64
+#if DECODE_DAIKIN
+      case decode_type_t::DAIKIN: {
+        IRDaikinESP ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DAIKIN
+#if DECODE_DAIKIN128
+      case decode_type_t::DAIKIN128: {
+        IRDaikin128 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_DAIKIN128
+#if DECODE_DAIKIN152
+      case decode_type_t::DAIKIN152: {
+        IRDaikin152 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DAIKIN152
+#if DECODE_DAIKIN160
+      case decode_type_t::DAIKIN160: {
+        IRDaikin160 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DAIKIN160
+#if DECODE_DAIKIN176
+      case decode_type_t::DAIKIN176: {
+        IRDaikin176 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DAIKIN160
+#if DECODE_DAIKIN2
+      case decode_type_t::DAIKIN2: {
+        IRDaikin2 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DAIKIN2
+#if DECODE_DAIKIN216
+      case decode_type_t::DAIKIN216: {
+        IRDaikin216 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN64
+      case decode_type_t::DAIKIN64: {
+        IRDaikin64 ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_DAIKIN64
+#if DECODE_DELONGHI_AC
+      case decode_type_t::DELONGHI_AC: {
+        IRDelonghiAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_DELONGHI_AC
+#if DECODE_ECOCLIM
+      case decode_type_t::ECOCLIM: {
+        if (decode->bits == kEcoclimBits) {
+          IREcoclimAc ac(kGpioUnused);
+          ac.setRaw(decode->value);  // Uses value instead of state.
+          *result = ac.toCommon();
+        } else {
+          return false;
+        }
+        break;
+      }
+#endif  // DECODE_ECOCLIM
+#if DECODE_ELECTRA_AC
+      case decode_type_t::ELECTRA_AC: {
+        IRElectraAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_ELECTRA_AC
+#if DECODE_FUJITSU_AC
+      case decode_type_t::FUJITSU_AC: {
+        IRFujitsuAC ac(kGpioUnused);
+        ac.setRaw(decode->state, decode->bits / 8);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_FUJITSU_AC
+#if DECODE_GOODWEATHER
+      case decode_type_t::GOODWEATHER: {
+        IRGoodweatherAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_GOODWEATHER
+#if DECODE_GREE
+      case decode_type_t::GREE: {
+        IRGreeAC ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_GREE
+#if DECODE_HAIER_AC
+      case decode_type_t::HAIER_AC: {
+        IRHaierAC ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HAIER_AC
+#if DECODE_HAIER_AC160
+      case decode_type_t::HAIER_AC160: {
+        IRHaierAC160 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_HAIER_AC160
+#if DECODE_HAIER_AC176
+      case decode_type_t::HAIER_AC176: {
+        IRHaierAC176 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HAIER_AC176
+#if DECODE_HAIER_AC_YRW02
+      case decode_type_t::HAIER_AC_YRW02: {
+        IRHaierACYRW02 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HAIER_AC_YRW02
+#if (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
+      case decode_type_t::HITACHI_AC: {
+        IRHitachiAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // (DECODE_HITACHI_AC || DECODE_HITACHI_AC2)
+#if DECODE_HITACHI_AC1
+      case decode_type_t::HITACHI_AC1: {
+        IRHitachiAc1 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HITACHI_AC1
+#if DECODE_HITACHI_AC264
+      case decode_type_t::HITACHI_AC264: {
+        IRHitachiAc264 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HITACHI_AC264
+#if DECODE_HITACHI_AC296
+      case decode_type_t::HITACHI_AC296: {
+        IRHitachiAc296 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HITACHI_AC296
+#if DECODE_HITACHI_AC344
+      case decode_type_t::HITACHI_AC344: {
+        IRHitachiAc344 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HITACHI_AC344
+#if DECODE_HITACHI_AC424
+      case decode_type_t::HITACHI_AC424: {
+        IRHitachiAc424 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_HITACHI_AC424
+#if DECODE_KELON
+      case decode_type_t::KELON: {
+        IRKelonAc ac(kGpioUnused);
+        ac.setRaw(decode->value);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_KELON
+#if DECODE_KELVINATOR
+      case decode_type_t::KELVINATOR: {
+        IRKelvinatorAC ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_KELVINATOR
+#if DECODE_LG
+      case decode_type_t::LG:
+      case decode_type_t::LG2: {
+        IRLgAc ac(kGpioUnused);
+        ac.setRaw(decode->value, decode->decode_type);  // Use value, not state.
+        if (!ac.isValidLgAc()) return false;
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_LG
+#if DECODE_MIDEA
+      case decode_type_t::MIDEA: {
+        IRMideaAC ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_MIDEA
+#if DECODE_MIRAGE
+      case decode_type_t::MIRAGE: {
+        IRMirageAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_MIRAGE
+#if DECODE_MITSUBISHI_AC
+      case decode_type_t::MITSUBISHI_AC: {
+        IRMitsubishiAC ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_MITSUBISHI_AC
+#if DECODE_MITSUBISHI112
+      case decode_type_t::MITSUBISHI112: {
+        IRMitsubishi112 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_MITSUBISHI112
+#if DECODE_MITSUBISHI136
+      case decode_type_t::MITSUBISHI136: {
+        IRMitsubishi136 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_MITSUBISHI136
+#if DECODE_MITSUBISHIHEAVY
+      case decode_type_t::MITSUBISHI_HEAVY_88: {
+        IRMitsubishiHeavy88Ac ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+      case decode_type_t::MITSUBISHI_HEAVY_152: {
+        IRMitsubishiHeavy152Ac ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_MITSUBISHIHEAVY
+#if DECODE_NEOCLIMA
+      case decode_type_t::NEOCLIMA: {
+        IRNeoclimaAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_NEOCLIMA
+#if DECODE_PANASONIC_AC
+      case decode_type_t::PANASONIC_AC: {
+        IRPanasonicAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_PANASONIC_AC
+#if DECODE_PANASONIC_AC32
+      case decode_type_t::PANASONIC_AC32: {
+        IRPanasonicAc32 ac(kGpioUnused);
+        if (decode->bits >= kPanasonicAc32Bits) {
+          ac.setRaw(decode->value);  // Uses value instead of state.
+          *result = ac.toCommon(prev);
+        } else {
+          return false;
+        }
+        break;
+      }
+#endif  // DECODE_PANASONIC_AC32
+#if DECODE_RHOSS
+      case decode_type_t::RHOSS: {
+        IRRhossAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_RHOSS
+#if DECODE_SAMSUNG_AC
+      case decode_type_t::SAMSUNG_AC: {
+        IRSamsungAc ac(kGpioUnused);
+        ac.setRaw(decode->state, decode->bits / 8);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_SAMSUNG_AC
+#if DECODE_SANYO_AC
+      case decode_type_t::SANYO_AC: {
+        IRSanyoAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_SANYO_AC
+#if DECODE_SANYO_AC88
+      case decode_type_t::SANYO_AC88: {
+        IRSanyoAc88 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_SANYO_AC88
+#if DECODE_SHARP_AC
+      case decode_type_t::SHARP_AC: {
+        IRSharpAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_SHARP_AC
+#if (DECODE_TCL112AC || DECODE_TEKNOPOINT)
+      case decode_type_t::TCL112AC:
+      case decode_type_t::TEKNOPOINT: {
+        IRTcl112Ac ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon(prev);
+        // Teknopoint uses the TCL protocol, but with a different model number.
+        // Just keep the original protocol type ... for now.
+        result->protocol = decode->decode_type;
+        break;
+      }
+#endif  // (DECODE_TCL112AC || DECODE_TEKNOPOINT)
+#if DECODE_TECHNIBEL_AC
+      case decode_type_t::TECHNIBEL_AC: {
+        IRTechnibelAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_TECHNIBEL_AC
+#if DECODE_TECO
+      case decode_type_t::TECO: {
+        IRTecoAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_TECO
+#if DECODE_TOSHIBA_AC
+      case decode_type_t::TOSHIBA_AC: {
+        IRToshibaAC ac(kGpioUnused);
+        ac.setRaw(decode->state, decode->bits / 8);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_TOSHIBA_AC
+#if DECODE_TRANSCOLD
+      case decode_type_t::TRANSCOLD: {
+        IRTranscoldAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // TRANSCOLD Uses value instead of state.
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_TRANSCOLD
+#if DECODE_TROTEC
+      case decode_type_t::TROTEC: {
+        IRTrotecESP ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_TROTEC
+#if DECODE_TROTEC_3550
+      case decode_type_t::TROTEC_3550: {
+        IRTrotec3550 ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_TROTEC_3550
+#if DECODE_TRUMA
+      case decode_type_t::TRUMA: {
+        IRTrumaAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_TRUMA
+#if DECODE_VESTEL_AC
+      case decode_type_t::VESTEL_AC: {
+        IRVestelAc ac(kGpioUnused);
+        ac.setRaw(decode->value);  // Uses value instead of state.
+        *result = ac.toCommon();
+        break;
+      }
+#endif  // DECODE_VESTEL_AC
+#if DECODE_VOLTAS
+      case decode_type_t::VOLTAS: {
+        IRVoltas ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_VOLTAS
+#if DECODE_WHIRLPOOL_AC
+      case decode_type_t::WHIRLPOOL_AC: {
+        IRWhirlpoolAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_WHIRLPOOL_AC
+#if DECODE_YORK
+      case decode_type_t::YORK: {
+        IRYorkAc ac(kGpioUnused);
+        ac.setRaw(decode->state);
+        *result = ac.toCommon(prev);
+        break;
+      }
+#endif  // DECODE_YORK
+      default:
+        return false;
+    }
+    return true;
+  }
 }  // namespace IRAcUtils

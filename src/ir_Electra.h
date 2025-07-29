@@ -15,7 +15,6 @@
 //   Brand: Centek,  Model: YKR-P/002E remote
 //   Brand: AEG,  Model: Chillflex Pro AXP26U338CW A/C
 //   Brand: Electrolux,  Model: YKR-H/531E A/C
-//   Brand: Delonghi, Modell: PAC EM90
 
 #ifndef IR_ELECTRA_H_
 #define IR_ELECTRA_H_
@@ -53,7 +52,7 @@ union ElectraProtocol {
     // Byte 5
     uint8_t         :6;
     uint8_t Turbo   :1;
-    uint8_t Quiet   :1;
+    uint8_t         :1;
     // Byte 6
     uint8_t         :3;
     uint8_t IFeel   :1;
@@ -146,8 +145,6 @@ class IRElectraAc {
   bool getLightToggle(void) const;
   void setTurbo(const bool on);
   bool getTurbo(void) const;
-  void setQuiet(const bool on);
-  bool getQuiet(void) const;
   void setIFeel(const bool on);
   bool getIFeel(void) const;
   void setSensorUpdate(const bool on);

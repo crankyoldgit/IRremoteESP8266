@@ -617,6 +617,16 @@ class IRrecv {
                   const uint16_t nbits = kGreeBits,
                   const bool strict = true);
 #endif
+#if DECODE_GREEN
+  bool decodeGreen(decode_results *results, uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kGreenBits,
+                  const bool strict = true);
+#endif
+#if DECODE_ELUX
+  bool decodeElux(decode_results *results, uint16_t offset = kStartOffset,
+                  const uint16_t nbits = kEluxBits,
+                  const bool strict = true);
+#endif
 #if (DECODE_HAIER_AC | DECODE_HAIER_AC_YRW02 || DECODE_HAIER_AC160 || \
      DECODE_HAIER_AC176)
   bool decodeHaierAC(decode_results *results, uint16_t offset = kStartOffset,
@@ -879,16 +889,10 @@ class IRrecv {
 #endif  // DECODE_WOWWEE
 #if DECODE_YORK
   bool decodeYork(decode_results *results,
-                  uint16_t offset = kStartOffset,
-                  const uint16_t nbits = kYorkBits,
+                  uint16_t kStartOffset,
+                  const uint16_t kYorkBits,
                   const bool strict = true);
 #endif  // DECODE_YORK
-#if DECODE_BLUESTARHEAVY
-  bool decodeBluestarHeavy(decode_results *results,
-                  uint16_t offset = kStartOffset,
-                  const uint16_t nbits = kBluestarHeavyBits,
-                  const bool strict = true);
-#endif  // DECODE_BLUESTARHEAVY
 };
 
 #endif  // IRRECV_H_

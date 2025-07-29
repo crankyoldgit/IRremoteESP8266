@@ -159,6 +159,18 @@ enum gree_ac_remote_model_t {
               //     Operation mode of Energy Saver (Econo))
 };
 
+/// Green A/C model numbers
+enum green_ac_remote_model_t {
+  YAW1FG = 1,  // (1) G Ultimate, EKOKAI, RusClimate (Default)
+  YBOFBG,     // (2) Green, YBOFB2, YAPOF3
+};
+
+/// Elux A/C model numbers
+enum elux_ac_remote_model_t {
+  EAW1F = 1,  // (1) ELUX1 (Default)
+  EBOFB,     // (2) ELUX
+};
+
 /// HAIER_AC176 A/C model numbers
 enum haier_ac176_remote_model_t {
   V9014557_A = 1,  // (1) V9014557 Remote in "A" setting. (Default)
@@ -226,13 +238,6 @@ enum lg_ac_remote_model_t {
 enum argo_ac_remote_model_t {
   SAC_WREM2 = 1,   // (1) ARGO WREM2 remote (default)
   SAC_WREM3        // (2) ARGO WREM3 remote (touch buttons), bit-len vary by cmd
-};
-
-/// Toshiba A/C model numbers
-enum toshiba_ac_remote_model_t {
-  kToshibaGenericRemote_A = 0,  // Default from existing codebase
-  kToshibaGenericRemote_B = 1,  // Newly discovered remote control b, applies to
-  // many remote models such as WA-TH03A, WA-TH04A etc.
 };
 
 // Classes
@@ -547,6 +552,21 @@ class IRsend {
   void sendGree(const uint8_t data[], const uint16_t nbytes = kGreeStateLength,
                 const uint16_t repeat = kGreeDefaultRepeat);
 #endif
+
+#if SEND_GREEN
+  void sendGreen(const uint64_t data, const uint16_t nbits = kGreenBits,
+                const uint16_t repeat = kGreenDefaultRepeat);
+  void sendGreen(const uint8_t data[], const uint16_t nbytes = kGreenStateLength,
+                const uint16_t repeat = kGreenDefaultRepeat);
+#endif
+
+#if SEND_ELUX
+  void sendElux(const uint64_t data, const uint16_t nbits = kEluxBits,
+                const uint16_t repeat = kEluxDefaultRepeat);
+  void sendElux(const uint8_t data[], const uint16_t nbytes = kEluxStateLength,
+                const uint16_t repeat = kEluxDefaultRepeat);
+#endif
+
 #if SEND_GOODWEATHER
   void sendGoodweather(const uint64_t data,
                        const uint16_t nbits = kGoodweatherBits,
@@ -626,13 +646,11 @@ class IRsend {
                         uint16_t nbytes = kCarrierAc128StateLength,
                         uint16_t repeat = kCarrierAc128MinRepeat);
 #endif  // SEND_CARRIER_AC128
-#if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02 || SEND_HAIER_AC160 || \
-    SEND_HAIER_AC176)
+#if (SEND_HAIER_AC || SEND_HAIER_AC_YRW02 || SEND_HAIER_AC176)
   void sendHaierAC(const unsigned char data[],
                    const uint16_t nbytes = kHaierACStateLength,
                    const uint16_t repeat = kHaierAcDefaultRepeat);
-#endif  // (SEND_HAIER_AC || SEND_HAIER_AC_YRW02 || SEND_HAIER_AC160 ||
-        //  SEND_HAIER_AC176)
+#endif  // (SEND_HAIER_AC || SEND_HAIER_AC_YRW02 || SEND_HAIER_AC176)
 #if SEND_HAIER_AC_YRW02
   void sendHaierACYRW02(const unsigned char data[],
                         const uint16_t nbytes = kHaierACYRW02StateLength,
@@ -894,11 +912,6 @@ class IRsend {
                     const uint16_t nbytes = kYorkStateLength,
                     const uint16_t repeat = kNoRepeat);
 #endif  // SEND_YORK
-#if SEND_BLUESTARHEAVY
-  void sendBluestarHeavy(const unsigned char data[],
-                       const uint16_t nbytes = kBluestarHeavyStateLength,
-                       const uint16_t repeat = kNoRepeat);
-#endif  // SEND_BLUESTARHEAVY
 
  protected:
 #ifdef UNIT_TEST

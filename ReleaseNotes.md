@@ -1,5 +1,11 @@
 # Release Notes
 
+## _v2.8.7 (20250730)_
+
+**[Bug Fixes]**
+- Patched IRremoteESP8266 for ESP32 Arduino Core v3.x
+
+
 ## _v2.8.6 (20230727)_
 
 **[Bug Fixes]**

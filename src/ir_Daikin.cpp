@@ -46,7 +46,6 @@ using irutils::addModeToString;
 using irutils::addSwingHToString;
 using irutils::addSwingVToString;
 using irutils::addTempToString;
-using irutils::addTempFloatToString;
 using irutils::addFanToString;
 using irutils::bcdToUint8;
 using irutils::minsToString;
@@ -74,8 +73,7 @@ void IRsend::sendDaikin(const unsigned char data[], const uint16_t nbytes,
     sendGeneric(0, 0,  // No header for the header
                 kDaikinBitMark, kDaikinOneSpace, kDaikinBitMark,
                 kDaikinZeroSpace, kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
-                static_cast<uint64_t>(0b00000), kDaikinHeaderLength, 38, false,
-                0, 50);
+                (uint64_t)0b00000, kDaikinHeaderLength, 38, false, 0, 50);
     // Data #1
     if (nbytes < kDaikinStateLength) {  // Are we using the legacy size?
       // Do this as a constant to save RAM and keep in flash memory
@@ -223,15 +221,15 @@ bool IRDaikinESP::getPower(void) const {
 
 /// Set the temperature.
 /// @param[in] temp The temperature in degrees celsius.
-void IRDaikinESP::setTemp(const float temp) {
-  float degrees = std::max(temp, static_cast<float>(kDaikinMinTemp));
-  degrees = std::min(degrees, static_cast<float>(kDaikinMaxTemp));
-  _.Temp = degrees * 2.0f;
+void IRDaikinESP::setTemp(const uint8_t temp) {
+  uint8_t degrees = std::max(temp, kDaikinMinTemp);
+  degrees = std::min(degrees, kDaikinMaxTemp);
+  _.Temp = degrees;
 }
 
 /// Get the current temperature setting.
 /// @return The current setting for temp. in degrees celsius.
-float IRDaikinESP::getTemp(void) const { return _.Temp / 2.0f; }
+uint8_t IRDaikinESP::getTemp(void) const { return _.Temp; }
 
 /// Set the speed of the fan.
 /// @param[in] fan The desired setting.
@@ -538,7 +536,7 @@ stdAc::state_t IRDaikinESP::toCommon(void) const {
   result.power = _.Power;
   result.mode = toCommonMode(_.Mode);
   result.celsius = true;
-  result.degrees = getTemp();
+  result.degrees = _.Temp;
   result.fanspeed = toCommonFanSpeed(getFan());
   result.swingv = _.SwingV ? stdAc::swingv_t::kAuto :
                                              stdAc::swingv_t::kOff;
@@ -565,7 +563,7 @@ String IRDaikinESP::toString(void) const {
   result += addBoolToString(_.Power, kPowerStr, false);
   result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
                             kDaikinDry, kDaikinFan);
-  result += addTempFloatToString(getTemp());
+  result += addTempToString(_.Temp);
   result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
                            kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
   result += addBoolToString(_.Powerful, kPowerfulStr);
@@ -676,7 +674,7 @@ void IRsend::sendDaikin2(const unsigned char data[], const uint16_t nbytes,
   for (uint16_t r = 0; r <= repeat; r++) {
     // Leader
     sendGeneric(kDaikin2LeaderMark, kDaikin2LeaderSpace,
-                0, 0, 0, 0, 0, 0, static_cast<uint64_t>(0),  // No data payload.
+                0, 0, 0, 0, 0, 0, (uint64_t) 0,  // No data payload.
                 0, kDaikin2Freq, false, 0, 50);
     // Section #1
     sendGeneric(kDaikin2HdrMark, kDaikin2HdrSpace, kDaikin2BitMark,
@@ -2938,8 +2936,7 @@ bool IRrecv::decodeDaikin128(decode_results *results, uint16_t offset,
                     kDaikinTolerance, kDaikinMarkExcess)) return false;
   }
   const uint16_t ksectionSize[kDaikin128Sections] = {
-      kDaikin128SectionLength,
-      static_cast<uint16_t>(nbits / 8 - kDaikin128SectionLength)};
+      kDaikin128SectionLength, (uint16_t)(nbits / 8 - kDaikin128SectionLength)};
   // Data Sections
   uint16_t pos = 0;
   for (uint8_t section = 0; section < kDaikin128Sections; section++) {
@@ -2989,7 +2986,7 @@ void IRsend::sendDaikin152(const unsigned char data[], const uint16_t nbytes,
     sendGeneric(0, 0, kDaikin152BitMark, kDaikin152OneSpace,
                 kDaikin152BitMark, kDaikin152ZeroSpace,
                 kDaikin152BitMark, kDaikin152Gap,
-                static_cast<uint64_t>(0), kDaikin152LeaderBits,
+                (uint64_t)0, kDaikin152LeaderBits,
                 kDaikin152Freq, false, 0, kDutyDefault);
     // Header + Data + Footer
     sendGeneric(kDaikin152HdrMark, kDaikin152HdrSpace, kDaikin152BitMark,
@@ -3841,7 +3838,7 @@ void IRsend::sendDaikin312(const unsigned char data[], const uint16_t nbytes,
                 kDaikin312BitMark, kDaikin312OneSpace,
                 kDaikin312BitMark, kDaikin312ZeroSpace,
                 kDaikin312BitMark, kDaikin312HdrGap,
-                static_cast<uint64_t>(0b00000), kDaikinHeaderLength,
+                (uint64_t)0b00000, kDaikinHeaderLength,
                 kDaikin2Freq, false, 0, kDutyDefault);
     // Section #1
     sendGeneric(kDaikin312HdrMark, kDaikin312HdrSpace, kDaikin312BitMark,

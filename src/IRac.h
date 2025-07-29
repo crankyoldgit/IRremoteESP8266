@@ -24,6 +24,8 @@
 #include "ir_Electra.h"
 #include "ir_Goodweather.h"
 #include "ir_Gree.h"
+#include "ir_Green.h"
+#include "ir_Elux.h"
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
 #include "ir_Kelon.h"
@@ -264,8 +266,8 @@ void electra(IRElectraAc *ac,
              const bool on, const stdAc::opmode_t mode,
              const float degrees, const float sensorTemp,
              const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
-             const stdAc::swingh_t swingh, const bool iFeel, const bool quiet,
-             const bool turbo, const bool lighttoggle, const bool clean);
+             const stdAc::swingh_t swingh, const bool iFeel, const bool turbo,
+             const bool lighttoggle, const bool clean);
 #endif  // SEND_ELECTRA_AC
 #if SEND_FUJITSU_AC
   void fujitsu(IRFujitsuAC *ac, const fujitsu_ac_remote_model_t model,
@@ -293,6 +295,23 @@ void electra(IRElectraAc *ac,
             const bool iFeel, const bool turbo, const bool econo,
             const bool light, const bool clean, const int16_t sleep = -1);
 #endif  // SEND_GREE
+
+#if SEND_GREEN
+  void green(IRGreenAC *ac, const green_ac_remote_model_t model,
+            const bool on, const stdAc::opmode_t mode, const bool celsius,
+            const float degrees, const stdAc::fanspeed_t fan,
+            const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+            const bool turbo, const bool econo, const bool light,
+            const bool clean, const int16_t sleep = -1);
+#endif  // SEND_GREEN
+#if SEND_ELUX
+  void elux(IREluxAC *ac, const elux_ac_remote_model_t model,
+            const bool on, const stdAc::opmode_t mode, const bool celsius,
+            const float degrees, const stdAc::fanspeed_t fan,
+            const stdAc::swingv_t swingv, const bool turbo, const bool light,
+            const bool clean, const int16_t sleep = -1);
+#endif  // SEND_ELUX
+
 #if SEND_HAIER_AC
   void haier(IRHaierAC *ac,
              const bool on, const stdAc::opmode_t mode, const float degrees,
@@ -574,8 +593,8 @@ static stdAc::state_t handleToggles(const stdAc::state_t desired,
 
 /// Common functions for use with all A/Cs supported by the IRac class.
 namespace IRAcUtils {
-String resultAcToString(const decode_results * const results);
-bool decodeToState(const decode_results *decode, stdAc::state_t *result,
-                   const stdAc::state_t *prev = NULL);
+  String resultAcToString(const decode_results * const results);
+  bool decodeToState(const decode_results *decode, stdAc::state_t *result,
+                     const stdAc::state_t *prev = NULL);
 }  // namespace IRAcUtils
 #endif  // IRAC_H_

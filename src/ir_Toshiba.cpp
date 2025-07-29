@@ -40,7 +40,6 @@ using irutils::addModeToString;
 using irutils::addTempToString;
 using irutils::checkInvertedBytePairs;
 using irutils::invertBytePairs;
-using irutils::addModelToString;
 
 #if SEND_TOSHIBA_AC
 /// Send a Toshiba A/C message.
@@ -105,9 +104,8 @@ void IRToshibaAC::send(const uint16_t repeat) {
 uint16_t IRToshibaAC::getInternalStateLength(const uint8_t state[],
                                              const uint16_t size) {
   if (size < kToshibaAcLengthByte) return 0;
-  // Fix: Extract the last 4 bits instead
-  return std::min(static_cast<uint16_t>((state[kToshibaAcLengthByte] & 0xF)
-    + kToshibaAcMinLength), kToshibaACStateLengthLong);
+  return std::min((uint16_t)(state[kToshibaAcLengthByte] + kToshibaAcMinLength),
+                  kToshibaACStateLengthLong);
 }
 
 /// Get the length of the current internal state per the protocol structure.
@@ -464,8 +462,7 @@ stdAc::state_t IRToshibaAC::toCommon(const stdAc::state_t *prev) const {
 String IRToshibaAC::toString(void) const {
   String result = "";
   result.reserve(95);
-  result += addModelToString(decode_type_t::TOSHIBA_AC, getModel(), false);
-  result += addTempToString(getTemp(), true);
+  result += addTempToString(getTemp(), true, false);
   switch (getStateLength()) {
     case kToshibaACStateLengthShort:
       result += addIntToString(getSwing(true), kSwingVStr);
@@ -494,30 +491,6 @@ String IRToshibaAC::toString(void) const {
       result += addBoolToString(getFilter(), kFilterStr);
   }
   return result;
-}
-
-/// Get the model information currently known.
-/// @return The known model number.
-toshiba_ac_remote_model_t IRToshibaAC::getModel(void) const {
-  switch (_.Model) {
-    case kToshibaAcRemoteB:
-      return toshiba_ac_remote_model_t::kToshibaGenericRemote_B;
-    default:
-      return toshiba_ac_remote_model_t::kToshibaGenericRemote_A;
-  }
-}
-
-/// Set the current model for the remote.
-/// @param[in] model The model number.
-void IRToshibaAC::setModel(const toshiba_ac_remote_model_t model) {
-  switch (model) {
-    case toshiba_ac_remote_model_t::kToshibaGenericRemote_B:
-      _.Model = kToshibaAcRemoteB;
-      break;
-    default:
-      _.Model = kToshibaAcRemoteA;
-      break;
-  }
 }
 
 #if DECODE_TOSHIBA_AC

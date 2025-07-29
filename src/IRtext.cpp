@@ -250,6 +250,10 @@ IRTEXT_CONST_STRING(kBitsStr, D_STR_BITS);  ///< "Bits"
 // Model Names
 IRTEXT_CONST_STRING(kYaw1fStr, D_STR_YAW1F);  ///< "YAW1F"
 IRTEXT_CONST_STRING(kYbofbStr, D_STR_YBOFB);  ///< "YBOFB"
+IRTEXT_CONST_STRING(kEaw1fStr, D_STR_ELUX);  ///< "EAW1F"  ELUX
+IRTEXT_CONST_STRING(kEbofbStr, D_STR_ELUX);  ///< "EBOFB"
+
+
 IRTEXT_CONST_STRING(kYx1fsfStr, D_STR_YX1FSF);  ///< "YX1FSF"
 IRTEXT_CONST_STRING(kV9014557AStr, D_STR_V9014557_A);  ///< "V9014557-A"
 IRTEXT_CONST_STRING(kV9014557BStr, D_STR_V9014557_B);  ///< "V9014557-B"
@@ -295,10 +299,6 @@ IRTEXT_CONST_STRING(kDg11j104Str, D_STR_DG11J104);  ///< "DG11J104"
 IRTEXT_CONST_STRING(kDg11j191Str, D_STR_DG11J191);  ///< "DG11J191"
 IRTEXT_CONST_STRING(kArgoWrem2Str, D_STR_ARGO_WREM2);  ///< "WREM3"
 IRTEXT_CONST_STRING(kArgoWrem3Str, D_STR_ARGO_WREM3);  ///< "WREM3"
-IRTEXT_CONST_STRING(kToshibaGenericRemoteAStr, D_STR_TOSHIBAGENERICREMOTEA);
-// "TOSHIBA REMOTE A"
-IRTEXT_CONST_STRING(kToshibaGenericRemoteBStr, D_STR_TOSHIBAGENERICREMOTEB);
-// "TOSHIBA REMOTE B"
 
 #define D_STR_UNSUPPORTED "?"  // Unsupported protocols will be showing as
                                // a question mark, check for length > 1
@@ -355,6 +355,10 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
             D_STR_RC5X, D_STR_UNSUPPORTED) "\x0"
     COND(DECODE_GREE || SEND_GREE,
             D_STR_GREE, D_STR_UNSUPPORTED) "\x0"
+    COND(DECODE_GREEN || SEND_GREEN,
+            D_STR_GREEN, D_STR_UNSUPPORTED) "\x0"
+    COND(DECODE_ELUX || SEND_ELUX,
+            D_STR_ELUX, D_STR_UNSUPPORTED) "\x0"                
     COND(SEND_PRONTO,
             D_STR_PRONTO, D_STR_UNSUPPORTED) "\x0"  // SEND-ONLY
     COND(DECODE_NEC || SEND_NEC,
@@ -559,8 +563,6 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
             D_STR_CARRIER_AC84, D_STR_UNSUPPORTED) "\x0"
     COND(DECODE_YORK || SEND_YORK,
             D_STR_YORK, D_STR_UNSUPPORTED) "\x0"
-    COND(DECODE_BLUESTARHEAVY || SEND_BLUESTARHEAVY,
-            D_STR_BLUESTARHEAVY, D_STR_UNSUPPORTED) "\x0"
     ///< New protocol (macro) strings should be added just above this line.
     "\x0"  ///< This string requires double null termination.
 };

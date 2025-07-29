@@ -371,6 +371,20 @@
 #define SEND_GREE              _IR_ENABLE_DEFAULT_
 #endif  // SEND_GREE
 
+#ifndef DECODE_GREEN
+#define DECODE_GREEN            _IR_ENABLE_DEFAULT_
+#endif  // DECODE_GREEN
+#ifndef SEND_GREEN
+#define SEND_GREEN              _IR_ENABLE_DEFAULT_
+#endif  // SEND_GREEN
+
+#ifndef DECODE_ELUX
+#define DECODE_ELUX            _IR_ENABLE_DEFAULT_
+#endif  // DECODE_ELUX
+#ifndef SEND_ELUX
+#define SEND_ELUX              _IR_ENABLE_DEFAULT_
+#endif  // SEND_ELUX
+
 #ifndef DECODE_PRONTO
 #define DECODE_PRONTO          false  // Not applicable.
 #endif  // DECODE_PRONTO
@@ -952,14 +966,7 @@
 #define SEND_YORK           _IR_ENABLE_DEFAULT_
 #endif  // SEND_YORK
 
-#ifndef DECODE_BLUESTARHEAVY
-#define DECODE_BLUESTARHEAVY         _IR_ENABLE_DEFAULT_
-#endif  // DECODE_BLUESTARHEAVY
-#ifndef SEND_BLUESTARHEAVY
-#define SEND_BLUESTARHEAVY           _IR_ENABLE_DEFAULT_
-#endif  // SEND_BLUESTARHEAVY
-
-#if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
+#if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || DECODE_GREEN || DECODE_ELUX ||\
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
      DECODE_HITACHI_AC1 || DECODE_HITACHI_AC2 || DECODE_HAIER_AC_YRW02 || \
@@ -977,7 +984,7 @@
      DECODE_KELON168 || DECODE_HITACHI_AC296 || DECODE_CARRIER_AC128 || \
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
-     DECODE_CARRIER_AC84 || DECODE_YORK || DECODE_BLUESTARHEAVY || \
+     DECODE_CARRIER_AC84 || DECODE_YORK || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1042,6 +1049,8 @@ enum decode_type_t {
   SANYO_LC7461,
   RC5X,
   GREE,
+  GREEN,
+  ELUX,  
   PRONTO,  // Technically not a protocol, but an encoding. (25)
   NEC_LIKE,
   ARGO,
@@ -1144,9 +1153,8 @@ enum decode_type_t {
   WOWWEE,
   CARRIER_AC84,  // 125
   YORK,
-  BLUESTARHEAVY,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = BLUESTARHEAVY,
+  kLastDecodeType = YORK,
 };
 
 // Message lengths & required repeat values
@@ -1173,8 +1181,6 @@ const uint16_t kArgo3TimerStateLength = 9;  // Bytes
 const uint16_t kArgo3ConfigStateLength = 4;  // Bytes
 const uint16_t kArgoDefaultRepeat = kNoRepeat;
 const uint16_t kArrisBits = 32;
-const uint16_t kBluestarHeavyStateLength = 13;
-const uint16_t kBluestarHeavyBits = kBluestarHeavyStateLength * 8;
 const uint16_t kBosch144StateLength = 18;
 const uint16_t kBosch144Bits = kBosch144StateLength * 8;
 const uint16_t kCoolixBits = 24;
@@ -1259,6 +1265,14 @@ const uint16_t kGorenjeBits = 8;
 const uint16_t kGreeStateLength = 8;
 const uint16_t kGreeBits = kGreeStateLength * 8;
 const uint16_t kGreeDefaultRepeat = kNoRepeat;
+
+const uint16_t kGreenStateLength = 14;
+const uint16_t kGreenBits = kGreenStateLength * 8;
+const uint16_t kGreenDefaultRepeat = kNoRepeat;
+const uint16_t kEluxStateLength = 14;
+const uint16_t kEluxBits = kEluxStateLength * 8;
+const uint16_t kEluxDefaultRepeat = kNoRepeat;
+
 const uint16_t kHaierACStateLength = 9;
 const uint16_t kHaierACBits = kHaierACStateLength * 8;
 const uint16_t kHaierAcDefaultRepeat = kNoRepeat;
@@ -1446,6 +1460,7 @@ const uint16_t kClimaButlerBits = 52;
 const uint16_t kYorkBits = 136;
 const uint16_t kYorkStateLength = 17;
 
+
 // Legacy defines. (Deprecated)
 #define AIWA_RC_T501_BITS             kAiwaRcT501Bits
 #define ARGO_COMMAND_LENGTH           kArgoStateLength
@@ -1463,6 +1478,8 @@ const uint16_t kYorkStateLength = 17;
 #define FUJITSU_AC_MIN_BITS           kFujitsuAcMinBits
 #define GICABLE_BITS                  kGicableBits
 #define GREE_STATE_LENGTH             kGreeStateLength
+#define GREEN_STATE_LENGTH             kGreenStateLength
+#define ELUX_STATE_LENGTH             kEluxStateLength
 #define HAIER_AC_STATE_LENGTH         kHaierACStateLength
 #define HAIER_AC_YRW02_STATE_LENGTH   kHaierACYRW02StateLength
 #define HITACHI_AC_STATE_LENGTH       kHitachiAcStateLength
@@ -1507,24 +1524,12 @@ const uint16_t kYorkStateLength = 17;
 
 #ifdef DEBUG
 #ifdef UNIT_TEST
-#define DPRINT(x) do { \
-    std::cout << x; \
-  } \
-  while (0)
-#define DPRINTLN(x) do { \
-    std::cout << x << std::endl; \
-  } \
-  while (0)
+#define DPRINT(x) do { std::cout << x; } while (0)
+#define DPRINTLN(x) do { std::cout << x << std::endl; } while (0)
 #endif  // UNIT_TEST
 #ifdef ARDUINO
-#define DPRINT(x) do { \
-    Serial.print(x); \
-  } \
-  while (0)
-#define DPRINTLN(x) do { \
-  Serial.println(x); \
-  } \
-  while (0)
+#define DPRINT(x) do { Serial.print(x); } while (0)
+#define DPRINTLN(x) do { Serial.println(x); } while (0)
 #endif  // ARDUINO
 #else  // DEBUG
 #define DPRINT(x)

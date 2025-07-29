@@ -15,7 +15,6 @@
 //   Brand: Midea, Model: RG52D/BGE Remote
 //   Brand: Midea, Model: MS12FU-10HRDN1-QRD0GW(B) A/C
 //   Brand: Midea, Model: MSABAU-07HRFN1-QRD0GW A/C (circa 2016)
-//   Brand: Comfee (Midea), Model: Breezy Cool Pro 2.6
 //   Brand: Tokio, Model: AATOEMF17-12CHR1SW split-type RG51|50/BGE Remote
 //   Brand: Airwell, Model: RC08B remote
 //   Brand: Kastron, Model: RG57A7/BGEF Inverter remote

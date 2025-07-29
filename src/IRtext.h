@@ -87,6 +87,8 @@ extern IRTEXT_CONST_PTR(kDkeStr);
 extern IRTEXT_CONST_PTR(kDownStr);
 extern IRTEXT_CONST_PTR(kDryStr);
 extern IRTEXT_CONST_PTR(kDryingStr);
+extern IRTEXT_CONST_PTR(kEaw1fStr);  //ELux
+extern IRTEXT_CONST_PTR(kEbofbStr);
 extern IRTEXT_CONST_PTR(kEconoStr);
 extern IRTEXT_CONST_PTR(kEconoToggleStr);
 extern IRTEXT_CONST_PTR(kEyeAutoStr);
@@ -229,8 +231,6 @@ extern IRTEXT_CONST_PTR(kSetTimerCommandStr);
 extern IRTEXT_CONST_PTR(kTimerStr);
 extern IRTEXT_CONST_PTR(kToggleStr);
 extern IRTEXT_CONST_PTR(kTopStr);
-extern IRTEXT_CONST_PTR(kToshibaGenericRemoteAStr);
-extern IRTEXT_CONST_PTR(kToshibaGenericRemoteBStr);
 extern IRTEXT_CONST_PTR(kTrueStr);
 extern IRTEXT_CONST_PTR(kTurboStr);
 extern IRTEXT_CONST_PTR(kTurboToggleStr);
@@ -254,5 +254,6 @@ extern IRTEXT_CONST_PTR(kYesStr);
 extern IRTEXT_CONST_PTR(kYx1fsfStr);
 extern IRTEXT_CONST_PTR(kZoneFollowStr);
 extern IRTEXT_CONST_PTR(kAllProtocolNamesStr);
+
 
 #endif  // IRTEXT_H_
