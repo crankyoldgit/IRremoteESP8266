@@ -651,7 +651,9 @@ String IRCoolixAC::toString(void) const {
   }
   result += ')';
   // Fan mode doesn't have a temperature.
-  if (getMode() != kCoolixFan) result += addTempToString(getTemp());
+  bool celcius = true;
+  if (tempHighF || tempLowF) celcius = false;
+  if (getMode() != kCoolixFan) result += addTempToString(getTemp(), celcius);
   result += addBoolToString(getZoneFollow(), kZoneFollowStr);
   result += addLabeledString(
       (getSensorTemp() == kCoolixSensorTempIgnoreCode)
