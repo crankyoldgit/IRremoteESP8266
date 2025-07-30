@@ -171,6 +171,7 @@ class IRCoolixAC {
   void setPower(const bool on);
   bool getPower(void) const;
   void setTempFRange(const bool high = false);
+  void clearTempFRange();
   void setTemp(const uint8_t temp);
   uint8_t getTemp(void) const;
   void setSensorTemp(const uint8_t temp);
