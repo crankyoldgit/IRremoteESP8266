@@ -81,10 +81,12 @@ const uint8_t kCoolixTempMap[kCoolixTempRange] = {
 };
 const uint8_t kCoolixTempLowFMin = 63;
 const uint8_t kCoolixTempLowFMax = 75;
-const uint8_t kCoolixTempLowFRange = kCoolixTempLowFMax - kCoolixTempLowFMin + 1;
+const uint8_t kCoolixTempLowFRange =
+    kCoolixTempLowFMax - kCoolixTempLowFMin + 1;
 const uint8_t kCoolixTempHighFMin = kCoolixTempLowFMax + 1;
 const uint8_t kCoolixTempHighFMax = 86;
-const uint8_t kCoolixTempHighFRange = kCoolixTempHighFMax - kCoolixTempHighFMin + 1;
+const uint8_t kCoolixTempHighFRange =
+    kCoolixTempHighFMax - kCoolixTempHighFMin + 1;
 const uint8_t kCoolixTempMapLowF[kCoolixTempLowFRange] = {
   0b1100,  // 63F
   0b0010,  // 64F
@@ -197,7 +199,7 @@ class IRCoolixAC {
   uint32_t getRaw(void) const;
   void setRaw(const uint32_t new_code);
   // Convert from Coolix48 with Fahrenheit handling.
-  void setRawFromCoolix48(const uint64_t new_code);  
+  void setRawFromCoolix48(const uint64_t new_code);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);

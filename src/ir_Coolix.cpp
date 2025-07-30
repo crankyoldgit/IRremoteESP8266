@@ -135,7 +135,7 @@ void IRCoolixAC::send(const uint16_t repeat) {
 
     // Mangle parity as necessary to represent Fahrenheit range.
     coolix48_raw |= static_cast<uint64_t>(tempLowF ? 1 : 3) << (36);
-    
+
     // Send as Coolix48.
     _irsend.sendCoolix48(coolix48_raw, kCoolix48Bits, repeat_override);
   } else {
