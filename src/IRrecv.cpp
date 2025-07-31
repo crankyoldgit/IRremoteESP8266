@@ -3,7 +3,6 @@
 // Copyright 2015 Sebastien Warin
 // Copyright 2017, 2019 David Conran
 // https://github.com/AlexYan001/IRremoteESP8266/tree/main
-// https://github.com/macca448/IRremoteESP8266/
 
 #include "IRrecv.h"
 #include <stddef.h>
