@@ -1,5 +1,11 @@
 # Release Notes
 
+## _v2.8.7 (20250731)_
+
+**[Features]**
+- Add support for Arduino ESP32 core v3.x - IDF v5.x (#2039)
+
+
 ## _v2.8.6 (20230727)_
 
 **[Bug Fixes]**

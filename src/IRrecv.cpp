@@ -2,6 +2,8 @@
 // Copyright 2015 Mark Szabo
 // Copyright 2015 Sebastien Warin
 // Copyright 2017, 2019 David Conran
+// https://github.com/AlexYan001/IRremoteESP8266/tree/main
+// https://github.com/macca448/IRremoteESP8266/
 
 #include "IRrecv.h"
 #include <stddef.h>
@@ -13,6 +15,12 @@ extern "C" {
 }
 #endif  // ESP8266
 #include <Arduino.h>
+#if defined(ESP32)
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+#include <driver/gpio.h>
+#include <esp32-hal-timer.h>  // already included by core, just to be explicit
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#endif
 #endif  // UNIT_TEST
 #include <algorithm>
 #ifdef UNIT_TEST
@@ -215,7 +223,7 @@ static void USE_IRAM_ATTR gpio_intr() {
     else
       params.rawbuf[rawlen] = (now - start) / kRawTick;
   }
-  params.rawlen++;
+  params.rawlen = params.rawlen +1;
 
   start = now;
 
@@ -233,8 +241,8 @@ static void USE_IRAM_ATTR gpio_intr() {
   // USE_IRAM_ATTR in this ISR.
   // @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1350
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L106-L110
-  timer->dev->load_high = static_cast<uint32_t>(0);
-  timer->dev->load_low = static_cast<uint32_t>(0);
+  timer->dev->load_high = (uint32_t) 0;
+  timer->dev->load_low = (uint32_t) 0;
   timer->dev->reload = 1;
   // The next line is the same, but instead replaces:
   //   `timerAlarmEnable(timer);`
@@ -242,8 +250,13 @@ static void USE_IRAM_ATTR gpio_intr() {
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L176-L178
   timer->dev->config.alarm_en = 1;
 #else  // _ESP32_IRRECV_TIMER_HACK
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timerWrite(timer, 0);
+  timerStart(timer);
+#else // ESP_ARDUINO_VERSION_MAJOR == 2
   timerWrite(timer, 0);
   timerAlarmEnable(timer);
+#endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
 #endif  // _ESP32_IRRECV_TIMER_HACK
 #endif  // ESP32
 }
@@ -334,7 +347,12 @@ IRrecv::IRrecv(const uint16_t recvpin, const uint16_t bufsize,
 IRrecv::~IRrecv(void) {
   disableIRIn();
 #if defined(ESP32)
-  if (timer != NULL) timerEnd(timer);  // Cleanup the ESP32 timeout timer.
+  if (timer != NULL) {
+    timerEnd(timer);  // Cleanup the ESP32 timeout timer.
+	#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+		timer = NULL;
+	#endif
+  }
 #endif  // ESP32
   delete[] params.rawbuf;
   if (params_save != NULL) {
@@ -347,8 +365,6 @@ IRrecv::~IRrecv(void) {
 /// @param[in] pullup A flag indicating should the GPIO use the internal pullup
 /// resistor. (Default: `false`. i.e. No.)
 void IRrecv::enableIRIn(const bool pullup) {
-  // ESP32's seem to require explicitly setting the GPIO to INPUT etc.
-  // This wasn't required on the ESP8266s, but it shouldn't hurt to make sure.
   if (pullup) {
 #ifndef UNIT_TEST
     pinMode(params.recvpin, INPUT_PULLUP);
@@ -356,36 +372,40 @@ void IRrecv::enableIRIn(const bool pullup) {
     pinMode(params.recvpin, INPUT);
 #endif  // UNIT_TEST
   }
+
 #if defined(ESP32)
   // Initialise the ESP32 timer.
-  // 80MHz / 80 = 1 uSec granularity.
-  timer = timerBegin(_timer_num, 80, true);
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timer = timerBegin(1000000);  // 1 MHz
+#else
+  timer = timerBegin(_timer_num, 80, true); // 80 MHz / 80 = 1 MHz
+#endif
+
 #ifdef DEBUG
   if (timer == NULL) {
     DPRINT("FATAL: Unable enable system timer: ");
     DPRINTLN((uint16_t)_timer_num);
   }
-#endif  // DEBUG
-  assert(timer != NULL);  // Check we actually got the timer.
-  // Set the timer so it only fires once, and set it's trigger in uSeconds.
+#endif
+  assert(timer != NULL);
+
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  // Correct usage for Core v3: only two args
+  timerAttachInterrupt(timer, &read_timeout);
+  timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
+#else
   timerAlarmWrite(timer, MS_TO_USEC(params.timeout), ONCE);
-  // Note: Interrupt needs to be attached before it can be enabled or disabled.
-  // Note: EDGE (true) is not supported, use LEVEL (false). Ref: #1713
-  // See: https://github.com/espressif/arduino-esp32/blob/caef4006af491130136b219c1205bdcf8f08bf2b/cores/esp32/esp32-hal-timer.c#L224-L227
   timerAttachInterrupt(timer, &read_timeout, false);
+#endif
 #endif  // ESP32
 
-  // Initialise state machine variables
   resume();
 
 #ifndef UNIT_TEST
 #if defined(ESP8266)
-  // Initialise ESP8266 timer.
   os_timer_disarm(&timer);
-  os_timer_setfn(&timer, reinterpret_cast<os_timer_func_t *>(read_timeout),
-                 NULL);
-#endif  // ESP8266
-  // Attach Interrupt
+  os_timer_setfn(&timer, reinterpret_cast<os_timer_func_t *>(read_timeout), NULL);
+#endif
   attachInterrupt(params.recvpin, gpio_intr, CHANGE);
 #endif  // UNIT_TEST
 }
@@ -398,9 +418,14 @@ void IRrecv::disableIRIn(void) {
   os_timer_disarm(&timer);
 #endif  // ESP8266
 #if defined(ESP32)
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timerDetachInterrupt(timer);
+  timerEnd(timer);
+#else // ESP_ARDUINO_VERSION_MAJOR < 3
   timerAlarmDisable(timer);
   timerDetachInterrupt(timer);
   timerEnd(timer);
+#endif // ESP_ARDUINO_VERSION_MAJOR >= 3
 #endif  // ESP32
   detachInterrupt(params.recvpin);
 #endif  // UNIT_TEST
@@ -426,7 +451,11 @@ void IRrecv::resume(void) {
   params.rawlen = 0;
   params.overflow = false;
 #if defined(ESP32)
+#if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
+  timerStop(timer);
+#else // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
+#endif // ESP_ARDUINO_VERSION_MAJOR >= 3
   gpio_intr_enable((gpio_num_t)params.recvpin);
 #endif  // ESP32
 }
@@ -824,6 +853,18 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Gree decode");
     if (decodeGree(results, offset)) return true;
 #endif
+#if DECODE_GREEN
+    // Green based-devices use a similar code to Kelvinator ones, to avoid false
+    // matches this needs to happen after decodeKelvinator().
+    DPRINTLN("Attempting Green decode");
+    if (decodeGreen(results, offset)) return true;
+#endif
+#if DECODE_ELUX
+    // Green based-devices use a similar code to Kelvinator ones, to avoid false
+    // matches this needs to happen after decodeKelvinator().
+    DPRINTLN("Attempting Elux decode");
+    if (decodeElux(results, offset)) return true;
+#endif
 #if DECODE_HAIER_AC
     DPRINTLN("Attempting Haier AC decode");
     if (decodeHaierAC(results, offset)) return true;
@@ -1185,10 +1226,6 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting York decode");
     if (decodeYork(results, offset, kYorkBits)) return true;
 #endif  // DECODE_YORK
-#if DECODE_BLUESTARHEAVY
-    DPRINTLN("Attempting BluestarHeavy decode");
-    if (decodeBluestarHeavy(results, offset, kBluestarHeavyBits)) return true;
-#endif  // DECODE_BLUESTARHEAVY
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
@@ -1219,10 +1256,9 @@ uint8_t IRrecv::_validTolerance(const uint8_t percentage) {
 uint32_t IRrecv::ticksLow(const uint32_t usecs, const uint8_t tolerance,
                           const uint16_t delta) {
   // max() used to ensure the result can't drop below 0 before the cast.
-  return (static_cast<uint32_t>(std::max(
-      static_cast<int32_t>(usecs * (1.0 - _validTolerance(tolerance) / 100.0) -
-          delta),
-      static_cast<int32_t>(0))));
+  return ((uint32_t)std::max(
+      (int32_t)(usecs * (1.0 - _validTolerance(tolerance) / 100.0) - delta),
+      (int32_t)0));
 }
 
 /// Calculate the upper bound of the nr. of ticks.
@@ -1232,8 +1268,8 @@ uint32_t IRrecv::ticksLow(const uint32_t usecs, const uint8_t tolerance,
 /// @return Nr. of ticks.
 uint32_t IRrecv::ticksHigh(const uint32_t usecs, const uint8_t tolerance,
                            const uint16_t delta) {
-  return (static_cast<uint32_t>(usecs * (1.0 + _validTolerance(tolerance) /
-                                100.0)) + 1 + delta);
+  return ((uint32_t)(usecs * (1.0 + _validTolerance(tolerance) / 100.0)) + 1 +
+          delta);
 }
 
 /// Check if we match a pulse(measured) with the desired within
@@ -1284,8 +1320,7 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   DPRINT(". Matching: ");
   DPRINT(measured);
   DPRINT(" >= ");
-  DPRINT(ticksLow(std::min(desired,
-                           static_cast<uint32_t>(MS_TO_USEC(params.timeout))),
+  DPRINT(ticksLow(std::min(desired, (uint32_t)MS_TO_USEC(params.timeout)),
                   tolerance, delta));
   DPRINT(" [min(");
   DPRINT(ticksLow(desired, tolerance, delta));
@@ -1306,9 +1341,9 @@ bool IRrecv::matchAtLeast(uint32_t measured, uint32_t desired,
   // We really should never get a value of 0, except as the last value
   // in the buffer. If that is the case, then assume infinity and return true.
   if (measured == 0) return true;
-  return measured >= ticksLow(std::min(
-      desired, static_cast<uint32_t>(MS_TO_USEC(params.timeout))), tolerance,
-      delta);
+  return measured >= ticksLow(std::min(desired,
+                                       (uint32_t)MS_TO_USEC(params.timeout)),
+                              tolerance, delta);
 }
 
 /// Check if we match a mark signal(measured) with the desired within
