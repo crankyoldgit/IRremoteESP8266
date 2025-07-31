@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lgprotocol_4523',['LGProtocol',['../unionLGProtocol.html',1,'']]]
+  ['lgprotocol_0',['LGProtocol',['../union_l_g_protocol.html',1,'']]]
 ];

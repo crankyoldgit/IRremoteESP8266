@@ -1,0 +1,27 @@
+var class_i_r_amcor_ac =
+[
+    [ "IRAmcorAc", "class_i_r_amcor_ac.html#a92db59a33c861dcd3b2960e9711f97c4", null ],
+    [ "begin", "class_i_r_amcor_ac.html#aa723533eea981f79844f241d5bb84654", null ],
+    [ "calibrate", "class_i_r_amcor_ac.html#a6206e866e859bc4690cb014c49c1ff80", null ],
+    [ "checksum", "class_i_r_amcor_ac.html#a67244a75731be6a3bd96ecc0384d0113", null ],
+    [ "getFan", "class_i_r_amcor_ac.html#a06e64e42bb7bc26afc17e504bf57616a", null ],
+    [ "getMax", "class_i_r_amcor_ac.html#a9cff471d660dd92a48cc8f76b8ee5009", null ],
+    [ "getMode", "class_i_r_amcor_ac.html#a2309c3eba2ce3ec506ce0bb11639d47a", null ],
+    [ "getPower", "class_i_r_amcor_ac.html#aa5c0a82e7425f9e71d303ebcd6af22aa", null ],
+    [ "getRaw", "class_i_r_amcor_ac.html#a4dc24f5aa597dba421fdb0e2e0481875", null ],
+    [ "getTemp", "class_i_r_amcor_ac.html#a5a16756250e4331fffb74608439a5813", null ],
+    [ "off", "class_i_r_amcor_ac.html#a184fbd76463e195beb67b4a8d2096941", null ],
+    [ "on", "class_i_r_amcor_ac.html#a96a1d9858dcdc34a9859311e450e722e", null ],
+    [ "send", "class_i_r_amcor_ac.html#a4fa894c01a8baabfeadb39634a850fd9", null ],
+    [ "setFan", "class_i_r_amcor_ac.html#acf26fc65363e2734e4dc6eb562812553", null ],
+    [ "setMax", "class_i_r_amcor_ac.html#a1250c6b106378286d9db013296c9b16f", null ],
+    [ "setMode", "class_i_r_amcor_ac.html#afa9c2d080ed5c4c7bc64eb13a07eab68", null ],
+    [ "setPower", "class_i_r_amcor_ac.html#a2ccfb2c2f0feb8a8cea9e10e30035988", null ],
+    [ "setRaw", "class_i_r_amcor_ac.html#ac0520033d7a59c817ca8ec08462fe39b", null ],
+    [ "setTemp", "class_i_r_amcor_ac.html#af4b2c476b76534687f14e9be963e9522", null ],
+    [ "stateReset", "class_i_r_amcor_ac.html#a018ab4ca4d738d848d3388ea1300b83b", null ],
+    [ "toCommon", "class_i_r_amcor_ac.html#a67b9fc041a0de132cfac901d1bfd1313", null ],
+    [ "toString", "class_i_r_amcor_ac.html#acf007ffc602b69ebbb7ed680e683fa25", null ],
+    [ "_", "class_i_r_amcor_ac.html#a57bd1149a63a8c2373eeced414ed0a80", null ],
+    [ "_irsend", "class_i_r_amcor_ac.html#a6245bb51fa206031c3348e3eb6cb096d", null ]
+];

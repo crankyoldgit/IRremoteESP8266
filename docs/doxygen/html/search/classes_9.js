@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['kelonprotocol_4521',['KelonProtocol',['../unionKelonProtocol.html',1,'']]],
-  ['kelvinatorprotocol_4522',['KelvinatorProtocol',['../unionKelvinatorProtocol.html',1,'']]]
+  ['kelonprotocol_0',['KelonProtocol',['../union_kelon_protocol.html',1,'']]],
+  ['kelvinatorprotocol_1',['KelvinatorProtocol',['../union_kelvinator_protocol.html',1,'']]]
 ];

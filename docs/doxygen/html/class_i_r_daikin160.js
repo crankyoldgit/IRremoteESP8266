@@ -1,0 +1,27 @@
+var class_i_r_daikin160 =
+[
+    [ "IRDaikin160", "class_i_r_daikin160.html#a76fb744b041c38abb730bce0538a497a", null ],
+    [ "begin", "class_i_r_daikin160.html#a653727b34a1e50bef14ef0033a4f013a", null ],
+    [ "calibrate", "class_i_r_daikin160.html#a608b5556f316c31e3a8aa73684e4e10d", null ],
+    [ "checksum", "class_i_r_daikin160.html#aac3b34aeae49f5179aa3f06fad28925d", null ],
+    [ "getFan", "class_i_r_daikin160.html#a2b0d39a508521a2ee982ed8d012b5e07", null ],
+    [ "getMode", "class_i_r_daikin160.html#a177d6e5e5957f64e6e71e3792d94188a", null ],
+    [ "getPower", "class_i_r_daikin160.html#a0c5e6157a818d2c67046fd4560db7859", null ],
+    [ "getRaw", "class_i_r_daikin160.html#accccba95fee75626871f91861678c57e", null ],
+    [ "getSwingVertical", "class_i_r_daikin160.html#ace47ac509abe05ad9c97eeeb7e9916db", null ],
+    [ "getTemp", "class_i_r_daikin160.html#a3e3e27cc129f49117fa6da49e24f3b1f", null ],
+    [ "off", "class_i_r_daikin160.html#a95f8c71bbf861d3c884656364e04b02a", null ],
+    [ "on", "class_i_r_daikin160.html#a2b6c282ad5cb2a702857532ab020110b", null ],
+    [ "send", "class_i_r_daikin160.html#a0e1c74070c03be02e40fdd05ed56465c", null ],
+    [ "setFan", "class_i_r_daikin160.html#a7f507c64dc7a9fa1e9391e9e8473af1b", null ],
+    [ "setMode", "class_i_r_daikin160.html#a48e6fff63fd8b894c649fb495a467faa", null ],
+    [ "setPower", "class_i_r_daikin160.html#af1a800ef7494c49a868d01039f5c37e4", null ],
+    [ "setRaw", "class_i_r_daikin160.html#a22e8a1600f612dd4326b2f9722d3a269", null ],
+    [ "setSwingVertical", "class_i_r_daikin160.html#a1683a255393f233d3e5b46d186d62881", null ],
+    [ "setTemp", "class_i_r_daikin160.html#abedd99ed838478a7ef856537c6fabb82", null ],
+    [ "stateReset", "class_i_r_daikin160.html#a72f9f1526907f1076348666eb9151f75", null ],
+    [ "toCommon", "class_i_r_daikin160.html#a70778c17bcdd6c8adf50af209406fad5", null ],
+    [ "toString", "class_i_r_daikin160.html#a9608db210fb2df94e1889eced9a63f79", null ],
+    [ "_", "class_i_r_daikin160.html#a391d29ba41097a521b25af3b24554191", null ],
+    [ "_irsend", "class_i_r_daikin160.html#a3094f35b359d8774a95dd3896c0e45e4", null ]
+];

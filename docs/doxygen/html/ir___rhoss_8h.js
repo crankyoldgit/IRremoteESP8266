@@ -1,0 +1,25 @@
+var ir___rhoss_8h =
+[
+    [ "RhossProtocol", "union_rhoss_protocol.html", "union_rhoss_protocol" ],
+    [ "IRRhossAc", "class_i_r_rhoss_ac.html", "class_i_r_rhoss_ac" ],
+    [ "kRhossDefaultFan", "ir___rhoss_8h.html#acb925a98280052398b63ee3c84aa3b52", null ],
+    [ "kRhossDefaultMode", "ir___rhoss_8h.html#a7316162e2704cc5f784da0a56811ee39", null ],
+    [ "kRhossDefaultPower", "ir___rhoss_8h.html#a7c416f735cc29252571e7e4572af470d", null ],
+    [ "kRhossDefaultSwing", "ir___rhoss_8h.html#a879906c09a93d6ebed93c2beda990b7c", null ],
+    [ "kRhossDefaultTemp", "ir___rhoss_8h.html#a795342cf79f933bb1cd7b13a0ce863f9", null ],
+    [ "kRhossFanAuto", "ir___rhoss_8h.html#aba9e0acc4bc7e39b69e32d2701082b57", null ],
+    [ "kRhossFanMax", "ir___rhoss_8h.html#a6fa797c2a687adbb754727ffd295ecda", null ],
+    [ "kRhossFanMed", "ir___rhoss_8h.html#abdca3c193360c1eff3716a252da45f30", null ],
+    [ "kRhossFanMin", "ir___rhoss_8h.html#a675a665d29ada58055734d0151d2607b", null ],
+    [ "kRhossModeAuto", "ir___rhoss_8h.html#a5139030eb12b5a1bf3ad8c19a1f163c2", null ],
+    [ "kRhossModeCool", "ir___rhoss_8h.html#a6e41a7e5437c8277abdd2b2f28f6d446", null ],
+    [ "kRhossModeDry", "ir___rhoss_8h.html#a86fa2df56c9329526f8a38395dae62a2", null ],
+    [ "kRhossModeFan", "ir___rhoss_8h.html#ad782d25f452f5a73b4e56ef691377166", null ],
+    [ "kRhossModeHeat", "ir___rhoss_8h.html#a050782389362d2c89c5b0cefbefb5a47", null ],
+    [ "kRhossPowerOff", "ir___rhoss_8h.html#a0e05cce2ecdbca1913a4dfab83bbbd6b", null ],
+    [ "kRhossPowerOn", "ir___rhoss_8h.html#a2254423d773b01a9e656fa7c54ca3c10", null ],
+    [ "kRhossSwingOff", "ir___rhoss_8h.html#a8b9e708731d15705c59fb4997de90ceb", null ],
+    [ "kRhossSwingOn", "ir___rhoss_8h.html#a5a9e3ea0e76eb85db30322f9e7614905", null ],
+    [ "kRhossTempMax", "ir___rhoss_8h.html#a472166f85d54cec7ca6a06c9f71c7f02", null ],
+    [ "kRhossTempMin", "ir___rhoss_8h.html#aed598953d3a11cd9ad5b76f1aa641c64", null ]
+];

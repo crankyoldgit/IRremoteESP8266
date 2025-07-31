@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['sv_2dse_2eh_4711',['sv-SE.h',['../sv-SE_8h.html',1,'']]]
+  ['sk_2dsk_2eh_0',['sk-SK.h',['../sk-_s_k_8h.html',1,'']]],
+  ['sv_2dse_2eh_1',['sv-SE.h',['../sv-_s_e_8h.html',1,'']]]
 ];

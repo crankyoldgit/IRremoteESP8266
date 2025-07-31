@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rhossprotocol_4535',['RhossProtocol',['../unionRhossProtocol.html',1,'']]]
+  ['rhossprotocol_0',['RhossProtocol',['../union_rhoss_protocol.html',1,'']]]
 ];

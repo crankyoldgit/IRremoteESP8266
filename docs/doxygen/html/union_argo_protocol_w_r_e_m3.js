@@ -1,0 +1,28 @@
+var union_argo_protocol_w_r_e_m3 =
+[
+    [ "Config", "struct_argo_protocol_w_r_e_m3_1_1_config.html", "struct_argo_protocol_w_r_e_m3_1_1_config" ],
+    [ "Timer", "struct_argo_protocol_w_r_e_m3_1_1_timer.html", "struct_argo_protocol_w_r_e_m3_1_1_timer" ],
+    [ "__pad0__", "union_argo_protocol_w_r_e_m3.html#adb594a8c2eb0607d97bdd84029bd2509", null ],
+    [ "CheckHi", "union_argo_protocol_w_r_e_m3.html#a7ebe13fc897032a39eac9f6750a8bbb9", null ],
+    [ "config", "union_argo_protocol_w_r_e_m3.html#a34513e815eea9f74b1cbb653195e5e24", null ],
+    [ "Eco", "union_argo_protocol_w_r_e_m3.html#a575fd7bfc3b59f45c364c7bd812e0585", null ],
+    [ "Fan", "union_argo_protocol_w_r_e_m3.html#ac05cd30368d562f37f01189ab2189afd", null ],
+    [ "Filter", "union_argo_protocol_w_r_e_m3.html#aee10dd268dd6e298956200965ef6e168", null ],
+    [ "Flap", "union_argo_protocol_w_r_e_m3.html#a5daf182a5014da64873534f01802ae2f", null ],
+    [ "iFeel", "union_argo_protocol_w_r_e_m3.html#af6625af7354c44c45c81cc1cf9c7395e", null ],
+    [ "IrChannel", "union_argo_protocol_w_r_e_m3.html#a7cd987f45696e861d2ec2435e7fbfa46", null ],
+    [ "IrCommandType", "union_argo_protocol_w_r_e_m3.html#ac2b78a7874bc7c19b68e7ecc0efed641", null ],
+    [ "Light", "union_argo_protocol_w_r_e_m3.html#ad4842c64d274a9d0de639abbe84a7c55", null ],
+    [ "Max", "union_argo_protocol_w_r_e_m3.html#af0cd309e34173980416c84b3f5b5ee11", null ],
+    [ "Mode", "union_argo_protocol_w_r_e_m3.html#a4706e557687809fc3e8e89e9bea189ec", null ],
+    [ "Night", "union_argo_protocol_w_r_e_m3.html#a0ae093974abc6e24fd2927072eac8b6b", null ],
+    [ "Post1", "union_argo_protocol_w_r_e_m3.html#adf85e9220ef2668d29c4fe63c609e7e9", null ],
+    [ "Power", "union_argo_protocol_w_r_e_m3.html#a16027243f7803919755bf3d7c5d2b314", null ],
+    [ "Pre1", "union_argo_protocol_w_r_e_m3.html#ac1228072b0107fbb2ef753baaebfda04", null ],
+    [ "raw", "union_argo_protocol_w_r_e_m3.html#ae8ebbecb6945cf1a36feacb93b16fd8d", null ],
+    [ "RoomTemp", "union_argo_protocol_w_r_e_m3.html#a141495c3f67ab8bfd6191d00536fc64f", null ],
+    [ "SensorT", "union_argo_protocol_w_r_e_m3.html#aa556840c33f82401ddc0032018579d5b", null ],
+    [ "Sum", "union_argo_protocol_w_r_e_m3.html#a2c9225bd2f33bcc33164a3aedf0fa28d", null ],
+    [ "Temp", "union_argo_protocol_w_r_e_m3.html#a8b55e8222b66e31bb1d70690024502fb", null ],
+    [ "timer", "union_argo_protocol_w_r_e_m3.html#a6a9f04a39726e78ce0cc607fa636d9eb", null ]
+];
