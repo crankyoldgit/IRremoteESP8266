@@ -1,9 +1,0 @@
-var searchData=
-[
-  ['fahrenheittocelsius_0',['fahrenheitToCelsius',['../_i_rutils_8cpp.html#a83538e86145850c24b1c824723089502',1,'fahrenheitToCelsius(const float deg):&#160;IRutils.cpp'],['../_i_rutils_8h.html#a83538e86145850c24b1c824723089502',1,'fahrenheitToCelsius(const float deg):&#160;IRutils.cpp']]],
-  ['fanspeedtostring_1',['fanspeedToString',['../class_i_rac.html#ab8d8a1ce5de8970c07c90fb41731e2e6',1,'IRac']]],
-  ['fixchecksum_2',['fixChecksum',['../class_i_r_panasonic_ac.html#aa40bef35000ddf6d14e286b3f2044897',1,'IRPanasonicAc']]],
-  ['fixup_3',['fixup',['../class_i_r_gree_a_c.html#a5bbdcc83f9d49e32379cd27cad0ba130',1,'IRGreeAC::fixup()'],['../class_i_r_kelvinator_a_c.html#a389af589003c39794ae5d4bd572fa485',1,'IRKelvinatorAC::fixup()']]],
-  ['fromcommon_4',['fromCommon',['../class_i_r_mirage_ac.html#ad67c96d4c2209803c292d33b4a18d255',1,'IRMirageAc']]],
-  ['fujitsu_5',['fujitsu',['../class_i_rac.html#ae951653fc030f30a989dd40f53d30b35',1,'IRac']]]
-];
