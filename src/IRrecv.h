@@ -889,6 +889,11 @@ class IRrecv {
                   const uint16_t nbits = kBluestarHeavyBits,
                   const bool strict = true);
 #endif  // DECODE_BLUESTARHEAVY
+#if DECODE_BRYSTON
+  bool decodeBryston(decode_results *results, uint16_t offset = kStartOffset,
+                   const uint16_t nbits = kBrystonBits,
+                   const bool strict = true);
+#endif // DECODE_BRYSTON
 };
 
 #endif  // IRRECV_H_
