@@ -959,6 +959,13 @@
 #define SEND_BLUESTARHEAVY           _IR_ENABLE_DEFAULT_
 #endif  // SEND_BLUESTARHEAVY
 
+#ifndef DECODE_DELONGHI_N
+#define DECODE_DELONGHI_N     _IR_ENABLE_DEFAULT_
+#endif  // DECODE_DELONGHI_N
+#ifndef SEND_DELONGHI_N
+#define SEND_DELONGHI_N       _IR_ENABLE_DEFAULT_
+#endif  // SEND_DELONGHI_N
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -978,6 +985,7 @@
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
      DECODE_CARRIER_AC84 || DECODE_YORK || DECODE_BLUESTARHEAVY || \
+     DECODE_DELONGHI_N || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1145,8 +1153,9 @@ enum decode_type_t {
   CARRIER_AC84,  // 125
   YORK,
   BLUESTARHEAVY,
+  DELONGHI_N,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = BLUESTARHEAVY,
+  kLastDecodeType = DELONGHI_N,
 };
 
 // Message lengths & required repeat values
@@ -1229,6 +1238,8 @@ const uint16_t kDaikin312Bits = kDaikin312StateLength * 8;
 const uint16_t kDaikin312DefaultRepeat = kNoRepeat;
 const uint16_t kDelonghiAcBits = 64;
 const uint16_t kDelonghiAcDefaultRepeat = kNoRepeat;
+const uint16_t kDelonghi_N_Bits = 32;
+const uint16_t kDelonghi_N_DefaultRepeat = kNoRepeat;
 const uint16_t kTechnibelAcBits = 56;
 const uint16_t kTechnibelAcDefaultRepeat = kNoRepeat;
 const uint16_t kDenonBits = 15;

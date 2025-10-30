@@ -238,6 +238,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DELONGHI_AC
     case decode_type_t::DELONGHI_AC:
 #endif
+#if SEND_DELONGHI_N
+    case decode_type_t::DELONGHI_N:
+#endif
 #if SEND_ECOCLIM
     case decode_type_t::ECOCLIM:
 #endif
@@ -1116,6 +1119,26 @@ void IRac::delonghiac(IRDelonghiAc *ac,
   ac->send();
 }
 #endif  // SEND_DELONGHI_AC
+
+#if SEND_DELONGHI_N
+/// Send a Delonghi N message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRDelonghi_N object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+void IRac::delonghi_n(IRDelonghi_N *ac,
+                  const bool on, const stdAc::opmode_t mode, const bool celsius,
+                  const float degrees, const stdAc::fanspeed_t fan) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees, !celsius);
+  ac->setFan(ac->convertFan(fan));
+  ac->send();
+}
+#endif  // SEND_DELONGHI_N
 
 #if SEND_ECOCLIM
 /// Send an EcoClim A/C message with the supplied settings.
@@ -3220,6 +3243,14 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_DELONGHI_AC
+#if SEND_DELONGHI_N
+    case DELONGHI_N:
+    {
+      IRDelonghi_N ac(_pin, _inverted, _modulation);
+      delonghi_n(&ac, send.power, send.mode, send.celsius, degC, send.fanspeed);
+      break;
+    }
+#endif  // SEND_DELONGHI_N
 #if SEND_ECOCLIM
     case ECOCLIM:
     {
@@ -4198,6 +4229,13 @@ String resultAcToString(const decode_results * const result) {
       return ac.toString();
     }
 #endif  // DECODE_DELONGHI_AC
+#if DECODE_DELONGHI_N
+    case decode_type_t::DELONGHI_N: {
+      IRDelonghi_N ac(kGpioUnused);
+      ac.setRaw(result->value);  // Delonghi_N uses value instead of state.
+      return ac.toString();
+    }
+#endif  // DECODE_DELONGHI_N
 #if DECODE_ECOCLIM
     case decode_type_t::ECOCLIM: {
       if (result->bits == kEcoclimBits) {
@@ -4695,6 +4733,14 @@ bool decodeToState(const decode_results *decode, stdAc::state_t *result,
       break;
     }
 #endif  // DECODE_DELONGHI_AC
+#if DECODE_DELONGHI_N
+    case decode_type_t::DELONGHI_N: {
+      IRDelonghi_N ac(kGpioUnused);
+      ac.setRaw(decode->value);  // Uses value instead of state.
+      *result = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_DELONGHI_N
 #if DECODE_ECOCLIM
     case decode_type_t::ECOCLIM: {
       if (decode->bits == kEcoclimBits) {
