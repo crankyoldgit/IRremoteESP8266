@@ -240,6 +240,7 @@ void IRLgAc::stateReset(void) {
   _light = true;
   _swingv = kLgAcSwingVOff;
   _swingh = false;
+  _swingh_prev = false;
   for (uint8_t i = 0; i < kLgAcSwingVMaxVanes; i++)
     _vaneswingv[i] = 0;  // Reset to an unused value.
   updateSwingPrev();

@@ -515,7 +515,7 @@ TEST_P(TestArgoConfigViaIRAc_Positive,
   EXPECT_EQ(state.command, r.command);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   TestIrAc,
   TestArgoConfigViaIRAc_Positive,
   ::testing::Values(
@@ -552,7 +552,7 @@ TEST_P(TestArgoConfigViaIRAc_Negative,
   ASSERT_EQ(nullptr, irac._lastDecodeResults);  // nothing got sent
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   TestIrAc,
   TestArgoConfigViaIRAc_Negative,
   ::testing::Values(
@@ -571,7 +571,7 @@ INSTANTIATE_TEST_CASE_P(
 
 using IRArgoACBase_typelist = ::testing::Types<ArgoProtocol, ArgoProtocolWREM3>;
 template<class> struct TestArgoACBaseClass : public testing::Test {};
-TYPED_TEST_CASE(TestArgoACBaseClass, IRArgoACBase_typelist);
+TYPED_TEST_SUITE(TestArgoACBaseClass, IRArgoACBase_typelist);
 
 
 TYPED_TEST(TestArgoACBaseClass, SetAndGetTemp) {
@@ -1526,7 +1526,7 @@ TEST_P(TestArgoE2E, RealExampleCommands) {
 }
 
 // Test cases
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   TestDecodeArgo,
   TestArgoE2E,
   ::testing::Values(
