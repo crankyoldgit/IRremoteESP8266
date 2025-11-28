@@ -75,6 +75,57 @@ TEST(TestDecodeBosch144, RealExample) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
+TEST(TestDecodeBosch144, DurastarExample) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+
+  // Mode: Heat; Fan: auto ; Temp: 73°F
+  uint16_t rawData[299] = {
+      4382, 4414, 522, 1630, 522, 552, 550, 1600, 538, 1616, 540, 532, 548,
+      526, 550, 1602, 548, 528, 548, 528, 550, 1604, 522, 552, 548, 528, 548,
+      1604, 522, 1630, 546, 528, 548, 1604, 522, 1628, 524, 552, 548, 1604,
+      546, 1606, 548, 1604, 522, 1630, 520, 1632, 546, 1604, 522, 554, 522,
+      1630, 520, 554, 522, 552, 522, 552, 524, 552, 546, 530, 546, 528, 548,
+      528, 548, 1604, 546, 528, 522, 1630, 522, 1630, 522, 1630, 546, 528, 524,
+      552, 522, 1630, 524, 552, 524, 1630, 520, 554, 522, 554, 522, 554, 548,
+      1606, 520, 1630, 522, 5224, 4404, 4390, 522, 1630, 522, 554, 520, 1632,
+      520, 1632, 520, 554, 520, 556, 520, 1632, 520, 556, 520, 556, 520, 1632,
+      518, 558, 518, 556, 518, 1634, 518, 1634, 518, 558, 518, 1634, 518, 1634,
+      518, 558, 516, 1636, 516, 1636, 516, 1636, 514, 1638, 514, 1638, 514,
+      1638, 514, 582, 494, 1658, 492, 582, 492, 584, 492, 584, 490, 584, 492,
+      584, 490, 586, 488, 586, 488, 1664, 488, 588, 486, 1666, 484, 1666, 486,
+      1666, 484, 590, 484, 592, 484, 1668, 484, 592, 484, 1666, 486, 590, 484,
+      592, 484, 592, 484, 1668, 484, 1666, 486, 5262, 4344, 4450, 484, 1668,
+      484, 1668, 482, 592, 484, 1668, 482, 592, 484, 1680, 472, 594, 482, 1668,
+      482, 616, 460, 1692, 460, 1692, 458, 616, 460, 616, 460, 1692, 460, 1692,
+      458, 616, 460, 616, 458, 618, 458, 616, 460, 616, 458, 616, 460, 614,
+      460, 616, 460, 616, 458, 616, 460, 616, 460, 616, 460, 616, 460, 616,
+      460, 616, 460, 616, 458, 1692, 458, 616, 460, 616, 460, 616, 460, 616,
+      444, 632, 438, 638, 434, 642, 434, 642, 434, 640, 434, 640, 434, 1718,
+      434, 1718, 434, 1718, 434, 1718, 432, 644, 432, 642, 434
+  };  // DURASTAR DRAW09F2A
+
+  uint8_t expectedState[18] = {
+      0xB2, 0x4D, 0xBF, 0x40, 0x5C, 0xA3,
+      0xB2, 0x4D, 0xBF, 0x40, 0x5C, 0xA3,
+      0xD5, 0x66, 0x00, 0x01, 0x00, 0x3C};
+
+  irsend.begin();
+  irsend.reset();
+
+  irsend.sendRaw(rawData, 299, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::BOSCH144, irsend.capture.decode_type);
+  EXPECT_EQ(kBosch144Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Mode: 6 (Heat), Fan: 0 (Auto), Temp: 73F, Quiet: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+}
+
 TEST(TestDecodeBosch144, SyntheticSelfDecode) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);
