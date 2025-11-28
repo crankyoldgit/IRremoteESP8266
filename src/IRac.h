@@ -162,7 +162,7 @@ class IRac {
 #if SEND_BOSCH144
   void bosch144(IRBosch144AC *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,
-              const stdAc::fanspeed_t fan,
+              const bool celsius, const stdAc::fanspeed_t fan,
               const bool quiet);
 #endif  // SEND_BOSCH144
 #if SEND_CARRIER_AC64
