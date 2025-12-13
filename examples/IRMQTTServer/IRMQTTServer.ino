@@ -593,7 +593,7 @@ bool mountSpiffs(void) {
 bool saveConfig(void) {
   debug("Saving the config.");
   bool success = false;
-  DynamicJsonDocument json(kJsonConfigMaxSize);
+  JsonDocument json;
 #if MQTT_ENABLE
   json[kMqttServerKey] = MqttServer;
   json[kMqttPortKey] = MqttPort;
@@ -611,6 +611,8 @@ bool saveConfig(void) {
     const String key = KEY_TX_GPIO + String(i);
     json[key] = static_cast<int>(txGpioTable[i]);
   }
+  if (json.overflowed())
+    debug("ERROR: no enough memory to store the entire json document");
 
   if (mountSpiffs()) {
     File configFile = FILESYSTEM.open(kConfigFile, "w");
@@ -642,7 +644,7 @@ bool loadConfigFile(void) {
         std::unique_ptr<char[]> buf(new char[size]);
 
         configFile.readBytes(buf.get(), size);
-        DynamicJsonDocument json(kJsonConfigMaxSize);
+        JsonDocument json;
         if (!deserializeJson(json, buf.get(), kJsonConfigMaxSize)) {
           debug("Json config file parsed ok.");
 #if MQTT_ENABLE
@@ -3146,7 +3148,7 @@ bool sendFloat(const String topic, const float_t temp, const bool retain) {
 #if MQTT_CLIMATE_JSON
 void sendJsonState(const stdAc::state_t state, const String topic,
                    const bool retain, const bool ha_mode) {
-  DynamicJsonDocument json(kJsonAcStateMaxSize);
+  JsonDocument json;
   json[KEY_PROTOCOL] = typeToString(state.protocol);
   json[KEY_MODEL] = state.model;
   json[KEY_COMMAND] = IRac::commandToString(state.command);
@@ -3172,6 +3174,8 @@ void sendJsonState(const stdAc::state_t state, const String topic,
   json[KEY_CLEAN] = IRac::boolToString(state.clean);
   json[KEY_BEEP] = IRac::boolToString(state.beep);
   json[KEY_SLEEP] = state.sleep;
+  if (json.overflowed())
+    debug("ERROR: no enough memory to store the entire json document");
 
   String payload = "";
   payload.reserve(200);
@@ -3179,16 +3183,16 @@ void sendJsonState(const stdAc::state_t state, const String topic,
   sendString(topic, payload, retain);
 }
 
-bool validJsonStr(DynamicJsonDocument doc, const char* key) {
+bool validJsonStr(JsonDocument doc, const char* key) {
   return doc.containsKey(key) && doc[key].is<char*>();
 }
 
-bool validJsonInt(DynamicJsonDocument doc, const char* key) {
+bool validJsonInt(JsonDocument doc, const char* key) {
   return doc.containsKey(key) && doc[key].is<signed int>();
 }
 
 stdAc::state_t jsonToState(const stdAc::state_t current, const char *str) {
-  DynamicJsonDocument json(kJsonAcStateMaxSize);
+  JsonDocument json;
   if (deserializeJson(json, str, kJsonAcStateMaxSize)) {
     debug("json MQTT message did not parse. Skipping!");
     return current;
