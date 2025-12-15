@@ -6,6 +6,7 @@
 // Supports:
 //   Brand: Bosch,  Model: CL3000i-Set 26 E A/C
 //   Brand: Bosch,  Model: RG10A(G2S)BGEF remote
+//   Brand: Fisher,  Model: R51L1/BGE remote
 
 
 #ifndef IR_BOSCH_H_
