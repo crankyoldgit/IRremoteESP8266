@@ -26,6 +26,7 @@
 //   Brand: Toshiba, Model: WH-E1YE remote
 //   Brand: Bosch, Model: RG36B4/BGE remote
 //   Brand: Bosch, Model: B1ZAI2441W/B1ZAO2441W A/C
+//   Brand: Fisher,  Model: R51L1/BGE remote
 
 #ifndef IR_COOLIX_H_
 #define IR_COOLIX_H_
