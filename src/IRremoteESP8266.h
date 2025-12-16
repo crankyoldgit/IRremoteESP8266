@@ -1305,6 +1305,7 @@ const uint16_t kJvcBits = 16;
 const uint16_t kKelonBits = 48;
 const uint16_t kKelon168StateLength = 21;
 const uint16_t kKelon168Bits = kKelon168StateLength * 8;
+const uint16_t kKelon168DefaultRepeat = kNoRepeat;
 const uint16_t kKelvinatorStateLength = 16;
 const uint16_t kKelvinatorBits = kKelvinatorStateLength * 8;
 const uint16_t kKelvinatorDefaultRepeat = kNoRepeat;

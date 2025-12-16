@@ -449,6 +449,8 @@ String IRKelonAc::toString() const {
   return result;
 }
 
+// KELON168
+
 #if SEND_KELON168
 /// Send a Kelon 168 bit / 21 byte message.
 /// Status: BETA / Probably works.
@@ -544,9 +546,563 @@ bool IRrecv::decodeKelon168(decode_results *results, uint16_t offset,
                       kKelonBitMark, kKelonGap,
                       true, _tolerance, 0, false);
   if (!used) return false;  // Failed to match.
-
   results->decode_type = decode_type_t::KELON168;
   results->bits = nbits;
   return true;
 }
-#endif  // DECODE_KELON168
+#endif
+
+// Constants
+
+
+using irutils::addBoolToString;
+using irutils::addFanToString;
+using irutils::addIntToString;
+using irutils::addLabeledString;
+using irutils::addModeToString;
+using irutils::addModelToString;
+using irutils::addTempToString;
+using irutils::minsToString;
+
+#define GETTIME(x) (_.x##Hours * 60 + _.x##Mins)
+#define SETTIME(x, n) do { \
+  uint16_t mins = n;\
+  _.x##Hours = (mins / 60) % 24;\
+  _.x##Mins = mins % 60;\
+} while (0)
+
+// Class for emulating a Kelon/Hisense (168bit) A/C remote.
+
+/// Class constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+IRKelon168Ac::IRKelon168Ac(const uint16_t pin, const bool inverted,
+                             const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+/// Reset the state of the remote to a known good state/sequence.
+void IRKelon168Ac::stateReset(void) {
+  for (uint8_t i = 2; i < kKelon168StateLength; i++) _.raw[i] = 0x0;
+  _.raw[0]  = 0x83;
+  _.raw[1]  = 0x06;
+  _.raw[6]  = 0x80;
+  _.raw[18] = 0x28;             // Remote model, device off
+  _setTemp(kKelon168AutoTemp);  // Default to a sane value, 23C
+}
+
+/// Set up hardware to be able to send a message.
+void IRKelon168Ac::begin(void) { _irsend.begin(); }
+
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length/size of the array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
+bool IRKelon168Ac::validChecksum(const uint8_t state[],
+                                  const uint16_t length) {
+  if (length > kKelon168ChecksumByte1 &&
+      state[kKelon168ChecksumByte1] !=
+          xorBytes(state + 2, kKelon168ChecksumByte1 - 1 - 2)) {
+    DPRINTLN("DEBUG: First Kelon168 checksum failed.");
+    return false;
+  }
+  if (length > kKelon168ChecksumByte2 &&
+      state[kKelon168ChecksumByte2] !=
+          xorBytes(state + kKelon168ChecksumByte1 + 1,
+                   kKelon168ChecksumByte2 - kKelon168ChecksumByte1 - 1)) {
+    DPRINTLN("DEBUG: Second Kelon168 checksum failed.");
+    return false;
+  }
+  // State is too short to have a checksum or everything checked out.
+  return true;
+}
+
+/// Calculate & set the checksum for the current internal state of the remote.
+/// @param[in] length The length/size of the internal state array.
+void IRKelon168Ac::checksum(uint16_t length) {
+  if (length >= kKelon168ChecksumByte1)
+    _.Sum1 = xorBytes(_.raw + 2, kKelon168ChecksumByte1 - 1 - 2);
+  if (length >= kKelon168ChecksumByte2)
+    _.Sum2 = xorBytes(_.raw + kKelon168ChecksumByte1 + 1,
+                 kKelon168ChecksumByte2 - kKelon168ChecksumByte1 - 1);
+}
+
+#if SEND_KELON168
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
+/// @param[in] calcChecksum Do we need to calculate the checksum?.
+void IRKelon168Ac::send(const uint16_t repeat, const bool calcChecksum) {
+  _irsend.sendKelon168(getRaw(calcChecksum), kKelon168StateLength,
+                          repeat);
+}
+#endif  // SEND_KELON168
+
+/// Get a copy of the internal state/code for this protocol.
+/// @param[in] calcChecksum Do we need to calculate the checksum?.
+/// @return A code for this protocol based on the current internal state.
+uint8_t *IRKelon168Ac::getRaw(const bool calcChecksum) {
+  if (calcChecksum) checksum();
+  return _.raw;
+}
+
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] newCode A valid code for this protocol.
+/// @param[in] length The length/size of the newCode array.
+void IRKelon168Ac::setRaw(const uint8_t newCode[], const uint16_t length) {
+  std::memcpy(_.raw, newCode, std::min(length, kKelon168StateLength));
+}
+
+/// Get/Detect the model of the A/C. Actually only one remote type is supported.
+/// @return The enum of the compatible model.
+kelon168_ac_remote_model_t IRKelon168Ac::getModel(void) const {
+  return DG11R201;
+}
+
+/// Set the model of the A/C to emulate.
+/// @param[in] model The enum of the appropriate model.
+void IRKelon168Ac::setModel(const kelon168_ac_remote_model_t model) {
+  switch (model) {
+    case kelon168_ac_remote_model_t::DG11R201:
+    default:
+      _.Model1 = 0b1000;
+      _.Model2 = 0b001;
+  }
+}
+
+/// Calculate the temp. offset in deg C for the current model.
+/// Actually not used, but left for eventual support.
+/// @return The temperature offset.
+int8_t IRKelon168Ac::getTempOffset(void) const {
+  return 0;
+}
+
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
+/// @param[in] remember Do we save this temperature?
+/// @note Internal use only.
+void IRKelon168Ac::_setTemp(const uint8_t temp, const bool remember) {
+  if (remember) _desiredtemp = temp;
+  int8_t offset = getTempOffset();  // Cache the min temp for the model.
+  uint8_t newtemp = std::max((uint8_t)(kKelon168MinTemp + offset), temp);
+  newtemp = std::min((uint8_t)(kKelon168MaxTemp + offset), newtemp);
+  _.Temp = newtemp - (kKelon168MinTemp + offset);
+}
+
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
+void IRKelon168Ac::setTemp(const uint8_t temp) {
+  _setTemp(temp);
+  setSuper(false);  // Changing temp cancels Super/Jet mode.
+  _.Cmd = kKelon168CommandTemp;
+}
+
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRKelon168Ac::getTemp(void) const {
+  return _.Temp + kKelon168MinTemp + getTempOffset();
+}
+
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
+/// @note Internal use only.
+void IRKelon168Ac::_setMode(const uint8_t mode) {
+  switch (mode) {
+    case kKelon168Auto:
+      setFan(kKelonFanAuto);
+      _setTemp(kKelon168AutoTemp, false);
+      setSleep(false);  // Cancel sleep mode when in auto/6thsense mode.
+      // FALL THRU
+    case kKelon168Heat:
+    case kKelon168Cool:
+    case kKelon168Dry:
+    case kKelon168Fan:
+      _.Mode = mode;
+      _.Cmd = kKelon168CommandMode;
+      break;
+    default:
+      return;
+  }
+  if (mode == kKelon168Auto) _.Cmd = kKelon168CommandIFeel;
+}
+
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
+void IRKelon168Ac::setMode(const uint8_t mode) {
+    setSuper(false);  // Changing mode cancels Super/Jet mode.
+    _setMode(mode);
+}
+
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
+uint8_t IRKelon168Ac::getMode(void) const {
+  return _.Mode;
+}
+
+/// Set the speed of the fan.
+/// @param[in] speed The desired setting.
+void IRKelon168Ac::setFan(const uint8_t speed) {
+  switch (speed) {
+    case kKelon168FanAuto:
+      _.Fan = 0;
+      _.Fan2 = 0;
+      break;
+    case kKelon168FanMin:
+      _.Fan  = 0b11;
+      _.Fan2 = 0;
+      break;
+    case kKelon168FanLow:
+      _.Fan = 0b11;
+      _.Fan2 = 1;
+      break;
+    case kKelon168FanMedium:
+      _.Fan = 0b10;
+      _.Fan2 = 0;
+      break;
+    case kKelon168FanHigh:
+      _.Fan = 0b01;
+      _.Fan2 = 1;
+      break;
+    case kKelon168FanMax:
+      _.Fan = 0b01;
+      _.Fan2 = 0;
+      break;
+  }
+  setSuper(false);  // Changing fan speed cancels Super/Jet mode.
+  _.Cmd = kKelon168CommandFanSpeed;
+}
+
+/// Get the current fan speed setting.
+/// The encoding is distributed across two bits, middle values (2 Low & 4 High)
+/// are encoded on the Fan2 bit. Normal values (1 Minimum, 3 Medium,
+/// 5 High) are written as 3,2,1 (inverted scale)
+/// @return The current fan speed/mode.
+uint8_t IRKelon168Ac::getFan(void) const {
+  switch (_.Fan) {
+    case 0b01:
+      return _.Fan2 == 0 ? kKelon168FanMax : kKelon168FanHigh;
+    case 0b10:
+      return kKelon168FanMedium;
+    case 0b11:
+      return _.Fan2 == 0 ? kKelon168FanMin : kKelon168FanLow;
+    default:
+      return kKelon168FanAuto;
+  }
+}
+
+/// Set the (vertical) swing setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRKelon168Ac::setSwing(const bool on) {
+  _.Swing1 = on;
+  _.Swing2 = on;
+  _.Cmd = kKelon168CommandSwing;
+}
+
+/// Get the (vertical) swing setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRKelon168Ac::getSwing(void) const {
+  return _.Swing1 && _.Swing2;
+}
+
+/// Set the Light (Display/LED) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRKelon168Ac::setLight(const bool on) {
+  // Cleared when on.
+  _.LightOff = !on;
+}
+
+/// Get the Light (Display/LED) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRKelon168Ac::getLight(void) const {
+  return !_.LightOff;
+}
+
+/// Set the clock time in nr. of minutes past midnight.
+/// @param[in] minsPastMidnight The time expressed as minutes past midnight.
+void IRKelon168Ac::setClock(const uint16_t minsPastMidnight) {
+  SETTIME(Clock, minsPastMidnight);
+}
+
+/// Get the clock time in nr. of minutes past midnight.
+/// @return The time expressed as the Nr. of minutes past midnight.
+uint16_t IRKelon168Ac::getClock(void) const {
+  return GETTIME(Clock);
+}
+
+/// Set the Off Timer time.
+/// @param[in] minsPastMidnight The time expressed as minutes past midnight.
+void IRKelon168Ac::setOffTimer(const uint16_t minsPastMidnight) {
+  SETTIME(Off, minsPastMidnight);
+}
+
+/// Get the Off Timer time..
+/// @return The time expressed as the Nr. of minutes past midnight.
+uint16_t IRKelon168Ac::getOffTimer(void) const {
+  return GETTIME(Off);
+}
+
+/// Is the Off timer enabled?
+/// @return true, the Timer is enabled. false, the Timer is disabled.
+bool IRKelon168Ac::isOffTimerEnabled(void) const {
+  return _.OffTimerEnabled;
+}
+
+/// Enable the Off Timer.
+/// @param[in] on true, the timer is enabled. false, the timer is disabled.
+void IRKelon168Ac::enableOffTimer(const bool on) {
+  _.OffTimerEnabled = on;
+  _.Cmd = kKelon168CommandOffTimer;
+}
+
+/// Set the On Timer time.
+/// @param[in] minsPastMidnight The time expressed as minutes past midnight.
+void IRKelon168Ac::setOnTimer(const uint16_t minsPastMidnight) {
+  SETTIME(On, minsPastMidnight);
+}
+
+/// Get the On Timer time..
+/// @return The time expressed as the Nr. of minutes past midnight.
+uint16_t IRKelon168Ac::getOnTimer(void) const {
+  return GETTIME(On);
+}
+
+/// Is the On timer enabled?
+/// @return true, the Timer is enabled. false, the Timer is disabled.
+bool IRKelon168Ac::isOnTimerEnabled(void) const {
+  return _.OnTimerEnabled;
+}
+
+/// Enable the On Timer.
+/// @param[in] on true, the timer is enabled. false, the timer is disabled.
+void IRKelon168Ac::enableOnTimer(const bool on) {
+  _.OnTimerEnabled = on;
+  _.Cmd = kKelon168CommandOnTimer;
+}
+
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRKelon168Ac::setPower(const bool on) {
+  _.Power = true;
+  _.On = on;
+  setSuper(false);  // Changing power cancels Super/Jet mode.
+  _.Cmd = kKelon168CommandPower;
+}
+
+/// Get the value of the current power toggle setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRKelon168Ac::getPower(void) const {
+  return _.Power;
+}
+
+/// Get the Command (Button) setting of the A/C.
+/// @return The current Command (Button) of the A/C.
+uint8_t IRKelon168Ac::getCommand(void) const {
+  return _.Cmd;
+}
+
+/// Set the Sleep setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRKelon168Ac::setSleep(const bool on) {
+  _.Sleep = on;
+  if (on) setFan(kKelon168FanLow);
+  _.Cmd = kKelon168CommandSleep;
+}
+
+/// Get the Sleep setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRKelon168Ac::getSleep(void) const {
+  return _.Sleep;
+}
+
+/// Set the Super (Turbo/Jet) setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRKelon168Ac::setSuper(const bool on) {
+  if (on) {
+    setFan(kKelon168FanHigh);
+    switch (_.Mode) {
+      case kKelon168Heat:
+        setTemp(kKelonMaxTemp + getTempOffset());
+        break;
+      case kKelon168Cool:
+      default:
+        setTemp(kKelonMinTemp + getTempOffset());
+        setMode(kKelon168Cool);
+        break;
+    }
+    _.Super1 = 1;
+    _.Super2 = 1;
+  } else {
+    _.Super1 = 0;
+    _.Super2 = 0;
+  }
+  _.Cmd = kKelon168CommandSuper;
+}
+
+/// Get the Super (Turbo/Jet) setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRKelon168Ac::getSuper(void) const {
+  return _.Super1 && _.Super2;
+}
+
+/// Set the Command (Button) setting of the A/C.
+/// @param[in] code The current Command (Button) of the A/C.
+void IRKelon168Ac::setCommand(const uint8_t code) {
+  _.Cmd = code;
+}
+
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRKelon168Ac::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+    case stdAc::opmode_t::kAuto: return kKelon168Auto;
+    case stdAc::opmode_t::kHeat: return kKelon168Heat;
+    case stdAc::opmode_t::kDry:  return kKelon168Dry;
+    case stdAc::opmode_t::kFan:  return kKelon168Fan;
+    // Default to Cool as some models don't have an Auto mode.
+    // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/1283
+    default:                     return kKelon168Cool;
+  }
+}
+
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRKelon168Ac::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+    case stdAc::fanspeed_t::kMin:    return kKelon168FanMin;
+    case stdAc::fanspeed_t::kLow:    return kKelon168FanLow;
+    case stdAc::fanspeed_t::kMedium: return kKelon168FanMedium;
+    case stdAc::fanspeed_t::kHigh:   return kKelon168FanHigh;
+    case stdAc::fanspeed_t::kMax:    return kKelon168FanMax;
+    default:                         return kKelon168FanAuto;
+  }
+}
+
+/// Convert a native mode into its stdAc equivalent.
+/// @param[in] mode The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::opmode_t IRKelon168Ac::toCommonMode(const uint8_t mode) {
+  switch (mode) {
+    case kKelon168Cool: return stdAc::opmode_t::kCool;
+    case kKelon168Heat: return stdAc::opmode_t::kHeat;
+    case kKelon168Dry:  return stdAc::opmode_t::kDry;
+    case kKelon168Fan:  return stdAc::opmode_t::kFan;
+    default:            return stdAc::opmode_t::kAuto;
+  }
+}
+
+/// Convert a native fan speed into its stdAc equivalent.
+/// @param[in] speed The native setting to be converted.
+/// @return The stdAc equivalent of the native setting.
+stdAc::fanspeed_t IRKelon168Ac::toCommonFanSpeed(const uint8_t speed) {
+  switch (speed) {
+    case kKelon168FanMax:    return stdAc::fanspeed_t::kMax;
+    case kKelon168FanHigh:   return stdAc::fanspeed_t::kHigh;
+    case kKelon168FanMedium: return stdAc::fanspeed_t::kMedium;
+    case kKelon168FanLow:    return stdAc::fanspeed_t::kLow;
+    case kKelon168FanMin:    return stdAc::fanspeed_t::kMin;
+    default:                 return stdAc::fanspeed_t::kAuto;
+  }
+}
+
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @param[in] prev Ptr to the previous state if required.
+/// @return The stdAc equivalent of the native settings.
+stdAc::state_t IRKelon168Ac::toCommon(const stdAc::state_t *prev) const {
+  stdAc::state_t result{};
+  // Start with the previous state if given it.
+  if (prev != NULL) {
+    result = *prev;
+  } else {
+    // Set defaults for non-zero values that are not implicitly set for when
+    // there is no previous state.
+    // e.g. Any setting that toggles should probably go here.
+    result.power = false;
+  }
+  result.protocol = decode_type_t::KELON168;
+  result.model = getModel();
+  if (_.Power) result.power = !result.power;
+  result.mode = toCommonMode(_.Mode);
+  result.celsius = true;
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(_.Fan);
+  result.swingv = getSwing() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.turbo = getSuper();
+  result.light = getLight();
+  result.sleep = _.Sleep ? 0 : -1;
+  // TODO(leonardfactory) add encoding
+  result.swingh = stdAc::swingh_t::kOff;
+  result.quiet = false;
+  result.filter = false;
+  result.econo = false;
+  result.clean = false;
+  result.beep = false;
+  result.clock = -1;
+  return result;
+}
+
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
+String IRKelon168Ac::toString(void) const {
+  String result = "";
+  result.reserve(200);  // Reserve some heap for the string to reduce fragging.
+  result += addModelToString(decode_type_t::KELON168, getModel(), false);
+  result += addBoolToString(_.Power, kPowerToggleStr);
+  result += addModeToString(_.Mode, kKelon168Auto, kKelon168Cool,
+                            kKelon168Heat, kKelon168Dry, kKelon168Fan);
+  result += addTempToString(getTemp());
+  result += addFanToString(_.Fan, kKelon168FanHigh, kKelon168FanLow,
+                           kKelon168FanAuto, kKelon168FanAuto,
+                           kKelon168FanMedium);
+  result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getLight(), kLightStr);
+  result += addLabeledString(minsToString(getClock()), kClockStr);
+  result += addLabeledString(
+      _.OnTimerEnabled ? minsToString(getOnTimer()) : kOffStr, kOnTimerStr);
+  result += addLabeledString(
+      _.OffTimerEnabled ? minsToString(getOffTimer()) : kOffStr, kOffTimerStr);
+  result += addBoolToString(_.Sleep, kSleepStr);
+  result += addBoolToString(getSuper(), kSuperStr);
+  result += addIntToString(_.Cmd, kCommandStr);
+  result += kSpaceLBraceStr;
+  switch (_.Cmd) {
+    case kKelon168CommandLight:
+      result += kLightStr;
+      break;
+    case kKelon168CommandPower:
+      result += kPowerStr;
+      break;
+    case kKelon168CommandTemp:
+      result += kTempStr;
+      break;
+    case kKelon168CommandSleep:
+      result += kSleepStr;
+      break;
+    case kKelon168CommandSuper:
+      result += kSuperStr;
+      break;
+    case kKelon168CommandOnTimer:
+      result += kOnTimerStr;
+      break;
+    case kKelon168CommandMode:
+      result += kModeStr;
+      break;
+    case kKelon168CommandSwing:
+      result += kSwingStr;
+      break;
+    case kKelon168CommandIFeel:
+      result += kIFeelStr;
+      break;
+    case kKelon168CommandFanSpeed:
+      result += kFanStr;
+      break;
+    case kKelon168CommandOffTimer:
+      result += kOffTimerStr;
+      break;
+    default:
+      result += kUnknownStr;
+      break;
+  }
+  result += ')';
+  return result;
+}
