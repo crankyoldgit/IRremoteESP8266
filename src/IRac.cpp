@@ -648,13 +648,14 @@ void IRac::argoWrem3_SetTimer(IRArgoAC_WREM3 *ac, bool on,
 /// @param[in] on The power setting.
 /// @param[in] mode The operation mode setting.
 /// @param[in] degrees The temperature setting in degrees.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
 /// @param[in] fan The speed setting for the fan.
 /// @param[in] quiet Run the device in quiet/silent mode.
 /// @note -1 is Off, >= 0 is on.
 void IRac::bosch144(IRBosch144AC *ac,
                   const bool on, const stdAc::opmode_t mode,
-                  const float degrees, const stdAc::fanspeed_t fan,
-                  const bool quiet) {
+                  const float degrees, const bool celsius,
+                  const stdAc::fanspeed_t fan, const bool quiet) {
   ac->begin();
   ac->setPower(on);
   if (!on) {
@@ -663,7 +664,7 @@ void IRac::bosch144(IRBosch144AC *ac,
       ac->send();
       return;
   }
-  ac->setTemp(degrees);
+  ac->setTemp(degrees, !celsius);
   ac->setFan(ac->convertFan(fan));
   ac->setMode(ac->convertMode(mode));
   ac->setQuiet(quiet);
@@ -3136,7 +3137,8 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
     case BOSCH144:
     {
       IRBosch144AC ac(_pin, _inverted, _modulation);
-      bosch144(&ac, send.power, send.mode, degC, send.fanspeed, send.quiet);
+      bosch144(&ac, send.power, send.mode, send.degrees, send.celsius,
+               send.fanspeed, send.quiet);
       break;
     }
 #endif  // SEND_BOSCH144

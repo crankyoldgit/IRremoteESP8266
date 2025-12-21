@@ -95,27 +95,55 @@ bool IRBosch144AC::getPower(void) const {
 }
 
 void IRBosch144AC::setTempRaw(const uint8_t code) {
-  _.TempS1 = _.TempS2 = code >> 1;  // save 4 bits in S1 and S2
-  _.TempS3 = code & 1;              // save 1 bit in Section3
+  _.TempS1 = _.TempS2 = code >> 2;  // save bits 3-6 in S1 and S2
+  _.TempS3 = code >> 1;             // save bit 2 in Section3
+  _.TempS4 = code;                  // save bit 1 in Section3
 }
 
-/// Set the temperature.
-/// @param[in] degrees The temperature in degrees celsius.
-void IRBosch144AC::setTemp(const uint8_t degrees) {
-  uint8_t temp = max(kBosch144TempMin, degrees);
-  temp = min(kBosch144TempMax, temp);
-  setTempRaw(kBosch144TempMap[temp - kBosch144TempMin]);
+/// Set the temp. in degrees
+/// @param[in] temp Desired temperature in Degrees.
+/// @param[in] fahrenheit Use units of Fahrenheit and set that as units used.
+///   false is Celsius (Default), true is Fahrenheit.
+void IRBosch144AC::setTemp(const uint8_t temp, const bool fahrenheit) {
+  if (fahrenheit) {
+    uint8_t constrainedTemp = max(kBosch144FahrenheitMin, temp);
+    constrainedTemp = min(kBosch144FahrenheitMax, constrainedTemp);
+    setTempRaw(
+      kBosch144FahrenheitMap[constrainedTemp - kBosch144FahrenheitMin]);
+    setUseFahrenheit(true);
+  } else {
+    uint8_t constrainedTemp = max(kBosch144CelsiusMin, temp);
+    constrainedTemp = min(kBosch144CelsiusMax, constrainedTemp);
+    setTempRaw(kBosch144CelsiusMap[constrainedTemp - kBosch144CelsiusMin]);
+    setUseFahrenheit(false);
+  }
 }
 
 uint8_t IRBosch144AC::getTemp(void) const {
-  uint8_t temp = (_.TempS1 << 1) + _.TempS3;
-  uint8_t retemp = 25;
-  for (uint8_t i = 0; i < kBosch144TempRange; i++) {
-    if (temp == kBosch144TempMap[i]) {
-      retemp = kBosch144TempMin + i;
+  uint8_t temp = (_.TempS1 << 2) + (_.TempS3 << 1) + _.TempS4;
+  if (getUseFahrenheit()) {
+    for (uint8_t i = 0; i < sizeof(kBosch144FahrenheitMap); i++) {
+      if (temp == kBosch144FahrenheitMap[i]) {
+        return kBosch144FahrenheitMin + i;
+      }
     }
+    return 77;
+  } else {
+    for (uint8_t i = 0; i < sizeof(kBosch144CelsiusMap); i++) {
+      if (temp == kBosch144CelsiusMap[i]) {
+        return kBosch144CelsiusMin + i;
+      }
+    }
+    return 25;
   }
-  return retemp;
+}
+
+void IRBosch144AC::setUseFahrenheit(const bool on) {
+  _.UseFahrenheit = on;
+}
+
+bool IRBosch144AC::getUseFahrenheit(void) const {
+  return _.UseFahrenheit;
 }
 
 /// Set the speed of the fan.
@@ -227,7 +255,7 @@ stdAc::state_t IRBosch144AC::toCommon(void) const {
   result.protocol = decode_type_t::BOSCH144;
   result.power = getPower();
   result.mode = toCommonMode(getMode());
-  result.celsius = true;
+  result.celsius = !getUseFahrenheit();
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
   result.quiet = getQuiet();
@@ -261,7 +289,7 @@ String IRBosch144AC::toString(void) const {
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kAuto),
                            static_cast<int>(stdAc::fanspeed_t::kMedium));
-  result += addTempToString(getTemp());
+  result += addTempToString(getTemp(), !getUseFahrenheit());
   result += addBoolToString(_.Quiet, kQuietStr);
   return result;
 }
