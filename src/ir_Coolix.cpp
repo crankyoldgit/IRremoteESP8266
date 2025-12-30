@@ -54,6 +54,7 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
   enableIROut(38);
 
   for (uint16_t r = 0; r <= repeat; r++) {
+    beginCritical();
     // Header
     mark(kCoolixHdrMark);
     space(kCoolixHdrSpace);
@@ -75,6 +76,7 @@ void IRsend::sendCOOLIX(uint64_t data, uint16_t nbits, uint16_t repeat) {
     // Footer
     mark(kCoolixBitMark);
     space(kCoolixMinGap);  // Pause before repeating
+    endCritical();
   }
   space(kDefaultMessageGap);
 }

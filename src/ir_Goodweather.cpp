@@ -37,6 +37,7 @@ void IRsend::sendGoodweather(const uint64_t data, const uint16_t nbits,
   enableIROut(38);
 
   for (uint16_t r = 0; r <= repeat; r++) {
+    beginCritical();
     // Header
     mark(kGoodweatherHdrMark);
     space(kGoodweatherHdrSpace);
@@ -54,6 +55,7 @@ void IRsend::sendGoodweather(const uint64_t data, const uint16_t nbits,
     space(kGoodweatherHdrSpace);
     mark(kGoodweatherBitMark);
     space(kDefaultMessageGap);
+    endCritical();
   }
 }
 #endif  // SEND_GOODWEATHER

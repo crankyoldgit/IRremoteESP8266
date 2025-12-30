@@ -58,6 +58,7 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
   enableIROut(38);
 
   for (uint16_t r = 0; r <= repeat; r++) {
+    beginCritical();
     // The protocol sends the message, then follows up with an entirely
     // inverted payload.
     for (size_t inner_loop = 0; inner_loop < 2; inner_loop++) {
@@ -83,6 +84,7 @@ void IRsend::sendMidea(uint64_t data, uint16_t nbits, uint16_t repeat) {
       data = ~data;
     }
     space(kDefaultMessageGap);
+    endCritical();
   }
 }
 #endif  // SEND_MIDEA
