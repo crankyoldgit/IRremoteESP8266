@@ -176,7 +176,8 @@ uint8_t IRBosch144AC::getMode(void) const {
 /// @param[in] on true, the setting is on. false, the setting is off.
 void IRBosch144AC::setQuiet(const bool on) {
   _.Quiet = on;                 // save 1 bit in Section3
-  setFan(kBosch144FanAuto);     // set Fan -> Auto
+  if (on)  // if Quiet is on, set Fan to Auto
+    setFan(kBosch144FanAuto);     // set Fan -> Auto
 }
 
 /// Get the Quiet mode of the A/C.
