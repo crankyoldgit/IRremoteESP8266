@@ -51,7 +51,8 @@ union Tcl112Protocol{
     uint8_t Mode            :4;
     uint8_t Health          :1;
     uint8_t Turbo           :1;
-    uint8_t                 :2;
+    uint8_t                 :1;
+    uint8_t IFeel           :1;
     // Byte 7
     uint8_t Temp            :4;
     uint8_t                 :4;
@@ -69,7 +70,7 @@ union Tcl112Protocol{
     uint8_t OnTimer         :6;
     uint8_t                 :1;  // 0
     // Byte 11
-    uint8_t                 :8;  // 00000000
+    uint8_t CurrentTemp     :8;  // IFEEL function
     // Byte 12
     uint8_t                 :3;
     uint8_t SwingH          :1;
@@ -174,6 +175,10 @@ class IRTcl112Ac {
   void setOnTimer(const uint16_t mins);
   uint16_t getOffTimer(void) const;
   void setOffTimer(const uint16_t mins);
+  void setIFeel(const bool on);
+  bool getIFeel(void) const;
+  void setSensorTemp(const uint8_t celsius);
+  uint8_t getSensorTemp(void) const;
   static bool isTcl(const uint8_t state[]);
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
