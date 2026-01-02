@@ -1,5 +1,54 @@
 # Release Notes
 
+## _v2.8.7 (20260102)_
+
+**[Bug Fixes]**
+- Bosch: Fixed the bug where the wind speed was always set to auto. (#2237)
+- Update IRsend sendHaierAC to include SEND_HAIER_AC160 (#2172)
+- Gree: Fix reporting vertical swing (#2125)
+- Fix `decodeYork()` parameter names & defaults. (#2121)
+- Fix the Coolix fan-only mode in IRac class. (#2104)
+- Fix missing quiet parameter of haier176 (#2102)
+- ESP32-C3: Fix compilation error when USB CDC on Boot is enabled (#2080)
+
+**[Features]**
+- Add Fahrenheit support for the BOSCH144 protocol (#2224)
+- Build: Add compatibility with C++20 (#2040)
+- Add initial detailed support for Kelon168 (Kelon/Hisense) (#1949)
+- Add support for the Eurom A/C protocol (#2208)
+- Add Fahrenheit support for Coolix (#2214)
+- ESP32: Esp32 Core version 3 support (#2144)
+- auto_analyse_raw_data: Add kXxMsbFirst to easy change MSBFirst for the full protocol (#2143)
+- change kAirtonMaxTemp from 25C to 31C (#2124)
+- Added support for Bluestar Heavy AC (#2120)
+- Add support of Toshiba Remote Control B (#2094)
+- Update haier160 & HaierYRWO2 to use quiet in the common class. (#2115)
+- Internationalisation: Solvakian translation (#2091)
+- Daikin: Support setting temperature in 0.5 C unit (#2036)
+- Quiet/Silent Mode for Electra_AC (#1990)
+
+**[Misc]**
+- Document Fischer R51L1/BGE remote support (#2231)
+- CI: pin python v3.13
+- CI: Attempt to fix intelhex failures
+- IRMQTTServer: Fixes for ArduinoJson v7 to remove depreicated calls
+- docs: updated contributing section for clarity (by Prerna Utage) (#2221)
+- Fix typo in Russian language support (#2210)
+- Build: Update CodeQL actions plugin to use v3 as v2 will be deprecated soon
+- Build: Fix soon to be deprecated set-output command
+- Build: Update build scripts to use non-deprecated actions tooling
+- Fix linter issues (#2173)
+- pylint fix raw_to_pronto_code.py (#2150)
+- Document support for Comfee model (#2147)
+- DAIKIN: ARC443A5 Remote supported note (#2138)
+- library.json specifies libCompatMode strict (#2111)
+- Added Electrolux EACM CL/N3 series remote to TCL protocol (#2100)
+- Add AR-JW19 to supported devices (#2069)
+- Remove unused constant `kRcmmExcess` (#2033)
+- Panasonic AC: Document support for PV1122V remote (#2029)
+- Document support for Panasonic CS-E12QKEW A/C (#2028)
+
+
 ## _v2.8.6 (20230727)_
 
 **[Bug Fixes]**
