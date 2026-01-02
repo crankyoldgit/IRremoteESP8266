@@ -1,5 +1,7 @@
 <map id="IRDelonghiAc" name="IRDelonghiAc">
-<area shape="rect" id="node1" title="Class for handling detailed Delonghi A/C messages." alt="" coords="45,95,155,121"/>
-<area shape="rect" id="node2" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
-<area shape="rect" id="node3" href="$unionDelonghiProtocol.html" title="Native representation of a Delonghi A/C message." alt="" coords="96,5,229,32"/>
+<area shape="rect" id="Node000001" title="Class for handling detailed Delonghi A/C messages." alt="" coords="45,93,155,119"/>
+<area shape="rect" id="Node000002" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,41,94,91,89,94,53,44"/>
+<area shape="rect" id="Node000003" href="$unionDelonghiProtocol.html" title="Native representation of a Delonghi A/C message." alt="" coords="96,5,229,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="151,44,133,71,113,95,109,92,129,68,147,41"/>
 </map>

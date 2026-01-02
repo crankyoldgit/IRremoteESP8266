@@ -1,4 +1,5 @@
 <map id="IRArgoAC" name="IRArgoAC">
-<area shape="rect" id="node1" title="Supports Argo A/C SAC&#45;WREM2 IR remote protocol." alt="" coords="78,80,161,107"/>
-<area shape="rect" id="node2" href="$classIRArgoACBase.html" title=" " alt="" coords="5,5,233,32"/>
+<area shape="rect" id="Node000001" title="Supports Argo A/C SAC&#45;WREM2 IR remote protocol." alt="" coords="78,79,161,104"/>
+<area shape="rect" id="Node000002" href="$classIRArgoACBase.html" title=" " alt="" coords="5,5,233,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,44,122,79,117,79,117,44"/>
 </map>

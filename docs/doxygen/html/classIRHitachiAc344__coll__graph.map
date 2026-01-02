@@ -1,6 +1,9 @@
 <map id="IRHitachiAc344" name="IRHitachiAc344">
-<area shape="rect" id="node1" title="Class for handling detailed Hitachi 344&#45;bit A/C messages." alt="" coords="43,171,165,197"/>
-<area shape="rect" id="node2" href="$classIRHitachiAc424.html" title="Class for handling detailed Hitachi 53&#45;byte/424&#45;bit A/C messages." alt="" coords="43,95,165,121"/>
-<area shape="rect" id="node3" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
-<area shape="rect" id="node4" href="$unionHitachi424Protocol.html" title="Native representation of a Hitachi 53&#45;byte/424&#45;bit A/C message." alt="" coords="97,5,242,32"/>
+<area shape="rect" id="Node000001" title="Class for handling detailed Hitachi 344&#45;bit A/C messages." alt="" coords="43,168,165,193"/>
+<area shape="rect" id="Node000002" href="$classIRHitachiAc424.html" title="Class for handling detailed Hitachi 53&#45;byte/424&#45;bit A/C messages." alt="" coords="43,93,165,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,133,107,168,101,168,101,133"/>
+<area shape="rect" id="Node000003" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="58,40,97,91,93,94,54,43"/>
+<area shape="rect" id="Node000004" href="$unionHitachi424Protocol.html" title="Native representation of a Hitachi 53&#45;byte/424&#45;bit A/C message." alt="" coords="97,5,242,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="155,44,135,71,116,95,112,91,131,68,151,41"/>
 </map>

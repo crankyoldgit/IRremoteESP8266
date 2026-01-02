@@ -1,4 +1,5 @@
 <map id="IRac" name="IRac">
-<area shape="rect" id="node1" title="A universal/common/generic interface for controling supported A/Cs." alt="" coords="35,109,86,136"/>
-<area shape="rect" id="node2" href="$structstdAc_1_1state__t.html" title="Structure to hold a common A/C state." alt="" coords="5,5,116,32"/>
+<area shape="rect" id="Node000001" title="A universal/common/generic interface for controling supported A/Cs." alt="" coords="35,108,86,133"/>
+<area shape="rect" id="Node000002" href="$structstdAc_1_1state__t.html" title="Structure to hold a common A/C state." alt="" coords="5,5,116,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,45,63,108,58,108,58,45"/>
 </map>

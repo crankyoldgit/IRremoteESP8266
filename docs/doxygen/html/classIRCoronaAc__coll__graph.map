@@ -1,6 +1,9 @@
 <map id="IRCoronaAc" name="IRCoronaAc">
-<area shape="rect" id="node1" title="Class for handling detailed Corona A/C messages." alt="" coords="31,184,129,211"/>
-<area shape="rect" id="node2" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,95,72,121"/>
-<area shape="rect" id="node3" href="$unionCoronaProtocol.html" title="Native representation of a Corona A/C message." alt="" coords="97,95,218,121"/>
-<area shape="rect" id="node4" href="$structCoronaSection.html" title="Native representation of a section of a Corona A/C message." alt="" coords="99,5,215,32"/>
+<area shape="rect" id="Node000001" title="Class for handling detailed Corona A/C messages." alt="" coords="31,181,129,207"/>
+<area shape="rect" id="Node000002" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,93,72,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="49,130,60,156,74,180,70,183,55,159,44,133"/>
+<area shape="rect" id="Node000003" href="$unionCoronaProtocol.html" title="Native representation of a Corona A/C message." alt="" coords="97,93,218,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="140,131,93,183,89,179,136,127"/>
+<area shape="rect" id="Node000004" href="$structCoronaSection.html" title="Native representation of a section of a Corona A/C message." alt="" coords="99,5,215,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="160,45,160,93,155,93,155,45"/>
 </map>
