@@ -1,8 +1,13 @@
 <map id="IRArgoAC_WREM3" name="IRArgoAC_WREM3">
-<area shape="rect" id="node1" title="Supports Argo A/C SAC&#45;WREM3 IR remote protocol." alt="" coords="42,289,182,316"/>
-<area shape="rect" id="node2" href="$classIRArgoACBase.html" title=" " alt="" coords="5,199,219,240"/>
-<area shape="rect" id="node3" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="25,109,92,136"/>
-<area shape="rect" id="node4" href="$unionArgoProtocolWREM3.html" title="Native representation of A/C IR message for WREM&#45;3 remote." alt="" coords="116,109,271,136"/>
-<area shape="rect" id="node5" href="$structArgoProtocolWREM3_1_1Timer.html" title=" " alt="" coords="19,5,181,47"/>
-<area shape="rect" id="node6" href="$structArgoProtocolWREM3_1_1Config.html" title=" " alt="" coords="205,5,368,47"/>
+<area shape="rect" id="Node000001" title="Supports Argo A/C SAC&#45;WREM3 IR remote protocol." alt="" coords="210,285,350,311"/>
+<area shape="rect" id="Node000002" href="$classIRArgoACBase.html" title=" " alt="" coords="173,196,387,236"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="283,250,283,285,277,285,277,250"/>
+<area shape="rect" id="Node000003" href="$unionArgoProtocolWREM3.html" title="Native representation of A/C IR message for WREM&#45;3 remote." alt="" coords="103,108,257,133"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="204,141,261,194,258,198,201,145"/>
+<area shape="rect" id="Node000004" href="$structArgoProtocolWREM3_1_1Timer.html" title=" " alt="" coords="5,5,168,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="117,53,170,106,166,110,114,57"/>
+<area shape="rect" id="Node000005" href="$structArgoProtocolWREM3_1_1Config.html" title=" " alt="" coords="192,5,355,45"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="246,57,194,110,190,106,243,53"/>
+<area shape="rect" id="Node000006" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="281,108,348,133"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="308,147,290,197,285,195,303,145"/>
 </map>

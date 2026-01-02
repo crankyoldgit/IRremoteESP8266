@@ -1,5 +1,7 @@
 <map id="IRGreeAC" name="IRGreeAC">
-<area shape="rect" id="node1" title="Class for handling detailed Gree A/C messages." alt="" coords="51,95,135,121"/>
-<area shape="rect" id="node2" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
-<area shape="rect" id="node3" href="$unionGreeProtocol.html" title="Native representation of a Gree A/C message." alt="" coords="96,5,203,32"/>
+<area shape="rect" id="Node000001" title="Class for handling detailed Gree A/C messages." alt="" coords="51,93,135,119"/>
+<area shape="rect" id="Node000002" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,42,70,68,87,92,82,95,66,71,50,44"/>
+<area shape="rect" id="Node000003" href="$unionGreeProtocol.html" title="Native representation of a Gree A/C message." alt="" coords="96,5,203,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="139,44,122,71,105,95,100,92,118,68,134,41"/>
 </map>

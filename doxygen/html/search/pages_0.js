@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['deprecated_20list_8943',['Deprecated List',['../deprecated.html',1,'']]]
+  ['api_20documentation_0',['IRremoteESP8266 Library API Documentation',['../index.html',1,'']]]
 ];

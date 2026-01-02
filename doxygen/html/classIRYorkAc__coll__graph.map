@@ -1,5 +1,7 @@
 <map id="IRYorkAc" name="IRYorkAc">
-<area shape="rect" id="node1" title="Class for handling detailed York A/C messages." alt="" coords="55,95,132,121"/>
-<area shape="rect" id="node2" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
-<area shape="rect" id="node3" href="$unionYorkProtocol.html" title="Native representation of a York A/C message." alt="" coords="97,5,199,32"/>
+<area shape="rect" id="Node000001" title="Class for handling detailed York A/C messages." alt="" coords="55,93,132,119"/>
+<area shape="rect" id="Node000002" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="53,41,69,68,86,92,82,95,64,71,49,44"/>
+<area shape="rect" id="Node000003" href="$unionYorkProtocol.html" title="Native representation of a York A/C message." alt="" coords="97,5,199,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="137,44,121,71,104,95,100,92,116,68,132,42"/>
 </map>

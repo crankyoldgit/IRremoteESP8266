@@ -1,5 +1,7 @@
 <map id="IREcoclimAc" name="IREcoclimAc">
-<area shape="rect" id="node1" title="Class for handling detailed EcoClim A/C 56 bit messages." alt="" coords="47,95,150,121"/>
-<area shape="rect" id="node2" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
-<area shape="rect" id="node3" href="$unionEcoclimProtocol.html" title="Native representation of a Ecoclim A/C message." alt="" coords="97,5,223,32"/>
+<area shape="rect" id="Node000001" title="Class for handling detailed EcoClim A/C 56 bit messages." alt="" coords="47,93,150,119"/>
+<area shape="rect" id="Node000002" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,41,92,91,88,94,53,44"/>
+<area shape="rect" id="Node000003" href="$unionEcoclimProtocol.html" title="Native representation of a Ecoclim A/C message." alt="" coords="97,5,223,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="150,45,133,71,113,95,109,91,129,68,145,42"/>
 </map>
