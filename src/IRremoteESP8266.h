@@ -66,9 +66,9 @@ typedef volatile const uint16_t atomic_const_uint16_t;
 // Major version number (X.x.x)
 #define _IRREMOTEESP8266_VERSION_MAJOR 2
 // Minor version number (x.X.x)
-#define _IRREMOTEESP8266_VERSION_MINOR 8
+#define _IRREMOTEESP8266_VERSION_MINOR 9
 // Patch version number (x.x.X)
-#define _IRREMOTEESP8266_VERSION_PATCH 6
+#define _IRREMOTEESP8266_VERSION_PATCH 0
 // Macro to convert version info into an integer
 #define _IRREMOTEESP8266_VERSION_VAL(major, minor, patch) \
                                     (((major) << 16) | ((minor) << 8) | (patch))
