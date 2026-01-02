@@ -1,0 +1,7 @@
+<map id="IRKelon168Ac" name="IRKelon168Ac">
+<area shape="rect" id="Node000001" title=" " alt="" coords="46,93,157,119"/>
+<area shape="rect" id="Node000002" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,40,95,91,90,94,53,43"/>
+<area shape="rect" id="Node000003" href="$unionKelon168Protocol.html" title="Native representation of a Kelon 168 bit A/C message." alt="" coords="97,5,231,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,44,134,71,114,95,110,92,130,68,148,41"/>
+</map>

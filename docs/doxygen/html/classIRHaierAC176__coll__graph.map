@@ -1,5 +1,7 @@
 <map id="IRHaierAC176" name="IRHaierAC176">
-<area shape="rect" id="node1" title="Class for handling detailed Haier 176 bit A/C messages." alt="" coords="49,95,161,121"/>
-<area shape="rect" id="node2" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
-<area shape="rect" id="node3" href="$unionHaierAc176Protocol.html" title="Native representation of a Haier 176 bit A/C message." alt="" coords="97,5,247,32"/>
+<area shape="rect" id="Node000001" title="Class for handling detailed Haier 176 bit A/C messages." alt="" coords="49,93,161,119"/>
+<area shape="rect" id="Node000002" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,40,98,91,94,94,54,43"/>
+<area shape="rect" id="Node000003" href="$unionHaierAc176Protocol.html" title="Native representation of a Haier 176 bit A/C message." alt="" coords="97,5,247,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="157,43,135,71,117,95,113,91,131,68,153,40"/>
 </map>

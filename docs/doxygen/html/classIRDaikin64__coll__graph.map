@@ -1,5 +1,7 @@
 <map id="IRDaikin64" name="IRDaikin64">
-<area shape="rect" id="node1" title="Class for handling detailed Daikin 64&#45;bit A/C messages." alt="" coords="87,95,180,121"/>
-<area shape="rect" id="node2" href="$unionDaikin64Protocol.html" title="Native representation of a Daikin64 A/C message." alt="" coords="5,5,139,32"/>
-<area shape="rect" id="node3" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="163,5,229,32"/>
+<area shape="rect" id="Node000001" title="Class for handling detailed Daikin 64&#45;bit A/C messages." alt="" coords="53,93,147,119"/>
+<area shape="rect" id="Node000002" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,41,94,91,89,94,53,44"/>
+<area shape="rect" id="Node000003" href="$unionDaikin64Protocol.html" title="Native representation of a Daikin64 A/C message." alt="" coords="96,5,229,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="151,44,133,71,113,95,109,92,129,68,147,41"/>
 </map>

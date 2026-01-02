@@ -1,5 +1,7 @@
 <map id="IRMitsubishiHeavy152Ac" name="IRMitsubishiHeavy152Ac">
-<area shape="rect" id="node1" title="Class for handling detailed Mitsubishi Heavy 152&#45;bit A/C messages." alt="" coords="17,95,201,121"/>
-<area shape="rect" id="node2" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,32"/>
-<area shape="rect" id="node3" href="$unionMitsubishi152Protocol.html" title="Native representation of a Mitsubishi Heavy 152&#45;bit A/C message." alt="" coords="97,5,263,32"/>
+<area shape="rect" id="Node000001" title="Class for handling detailed Mitsubishi Heavy 152&#45;bit A/C messages." alt="" coords="17,93,201,119"/>
+<area shape="rect" id="Node000002" href="$classIRsend.html" title="Class for sending all basic IR protocols." alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="59,39,102,91,97,94,55,43"/>
+<area shape="rect" id="Node000003" href="$unionMitsubishi152Protocol.html" title="Native representation of a Mitsubishi Heavy 152&#45;bit A/C message." alt="" coords="97,5,263,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,43,121,94,117,91,160,39"/>
 </map>

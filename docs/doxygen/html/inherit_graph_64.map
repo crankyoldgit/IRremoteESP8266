@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classIRHitachiAc1.html" title="Class for handling detailed Hitachi 104&#45;bit A/C messages." alt="" coords="5,5,111,32"/>
+<area shape="rect" id="Node000000" href="$classIRHaierAC176.html" title="Class for handling detailed Haier 176 bit A/C messages." alt="" coords="5,5,117,31"/>
+<area shape="rect" id="Node000001" href="$classIRHaierACYRW02.html" title="Class for handling detailed Haier ACYRW02 A/C messages." alt="" coords="165,5,300,31"/>
+<area shape="poly" id="edge3_Node000000_Node000001" title=" " alt="" coords="131,15,165,15,165,21,131,21"/>
 </map>

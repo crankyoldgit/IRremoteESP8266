@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['whirlpoolprotocol_4553',['WhirlpoolProtocol',['../unionWhirlpoolProtocol.html',1,'']]]
+  ['whirlpoolprotocol_0',['WhirlpoolProtocol',['../unionWhirlpoolProtocol.html',1,'']]]
 ];
