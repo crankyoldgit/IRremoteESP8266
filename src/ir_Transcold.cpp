@@ -43,6 +43,7 @@ void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
   // Set IR carrier frequency
   enableIROut(38);
   for (uint16_t r = 0; r <= repeat; r++) {
+    beginCritical();
     // Header
     mark(kTranscoldHdrMark);
     space(kTranscoldHdrSpace);
@@ -63,6 +64,7 @@ void IRsend::sendTranscold(uint64_t data, uint16_t nbits, uint16_t repeat) {
     space(kTranscoldHdrSpace);
     mark(kTranscoldBitMark);
     space(kDefaultMessageGap);
+    endCritical();
   }
 }
 #endif  // SEND_TRANSCOLD
