@@ -1029,6 +1029,18 @@ typedef volatile const uint16_t atomic_const_uint16_t;
 #define ENABLE_NOISE_FILTER_OPTION true
 #endif  // ENABLE_NOISE_FILTER_OPTION
 
+// EXPERIMENTAL:
+// Use the 'rmt' functions of the ESP32 processor family for doing real PWM on the GPIO instead of bit-banging it.
+// Turning this on may make for more reliable transmission on the ESP32 platform.
+// Disabled by default.
+#ifndef ENABLE_ESP32_RMT_USAGE
+#if ESP32
+#define ENABLE_ESP32_RMT_USAGE true
+#else  // ESP32
+#define ENABLE_ESP32_RMT_USAGE false
+#endif  // ESP32
+#endif  // ENABLE_ESP32_RMT_USAGE
+
 /// Enumerator for defining and numbering of supported IR protocol.
 /// @note Always add to the end of the list and should never remove entries
 ///  or change order. Projects may save the type number for later usage

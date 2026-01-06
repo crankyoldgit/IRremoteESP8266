@@ -7,6 +7,9 @@
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include "IRremoteESP8266.h"
+#if ENABLE_ESP32_RMT_USAGE
+#include <driver/rmt.h>
+#endif  // ENABLE_ESP32_RMT_USAGE
 
 // Originally from https://github.com/shirriff/Arduino-IRremote/
 // Updated by markszabo (https://github.com/crankyoldgit/IRremoteESP8266) for
@@ -248,8 +251,19 @@ enum toshiba_ac_remote_model_t {
 ///  sending IR code on ESP8266
 class IRsend {
  public:
+#if ENABLE_ESP32_RMT_USAGE
+  explicit IRsend(uint16_t IRsendPin, bool inverted = false,
+                  bool use_modulation = true,
+                  rmt_channel_t rmt_channel = RMT_CHANNEL_0);
+#else
   explicit IRsend(uint16_t IRsendPin, bool inverted = false,
                   bool use_modulation = true);
+#endif  // ENABLE_ESP32_RMT_USAGE
+
+#if ENABLE_ESP32_RMT_USAGE
+  ~IRsend(void);
+#endif  // ENABLE_ESP32_RMT_USAGE
+
   void begin();
   void enableIROut(uint32_t freq, uint8_t duty = kDutyDefault);
   VIRTUAL void _delayMicroseconds(uint32_t usec);
@@ -940,6 +954,9 @@ class IRsend {
   void _sendSony(const uint64_t data, const uint16_t nbits,
                  const uint16_t repeat, const uint16_t freq);
 #endif  // SEND_SONY
+#if ENABLE_ESP32_RMT_USAGE
+  rmt_config_t _rmt_config;
+#endif  // ENABLE_ESP32_RMT_USAGE
 };
 
 #endif  // IRSEND_H_

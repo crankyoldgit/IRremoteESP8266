@@ -15,6 +15,7 @@
 #endif
 #include "IRtimer.h"
 
+#if ENABLE_ESP32_RMT_USAGE
 /// Constructor for an IRsend object.
 /// @param[in] IRsendPin Which GPIO pin to use when sending an IR command.
 /// @param[in] inverted Optional flag to invert the output. (default = false)
@@ -25,7 +26,24 @@
 /// @param[in] use_modulation Do we do frequency modulation during transmission?
 ///  i.e. If not, assume a 100% duty cycle. Ignore attempts to change the
 ///  duty cycle etc.
-IRsend::IRsend(uint16_t IRsendPin, bool inverted, bool use_modulation)
+/// @param[in] rmt_channel Which channel of the ESP32 RMT module to use. 
+IRsend::IRsend(uint16_t IRsendPin, bool inverted,
+               bool use_modulation, rmt_channel_t rmt_channel)
+#else
+/// Constructor for an IRsend object.
+/// @param[in] IRsendPin Which GPIO pin to use when sending an IR command.
+/// @param[in] inverted Optional flag to invert the output. (default = false)
+///  e.g. LED is illuminated when GPIO is LOW rather than HIGH.
+/// @warning Setting `inverted` to something other than the default could
+///  easily destroy your IR LED if you are overdriving it.
+///  Unless you *REALLY* know what you are doing, don't change this.
+/// @param[in] use_modulation Do we do frequency modulation during transmission?
+///  i.e. If not, assume a 100% duty cycle. Ignore attempts to change the
+///  duty cycle etc.
+IRsend::IRsend(uint16_t IRsendPin, bool inverted,
+               bool use_modulation)
+#endif  // ENABLE_ESP32_RMT_USAGE
+
     : IRpin(IRsendPin), periodOffset(kPeriodOffset) {
   if (inverted) {
     outputOn = LOW;
@@ -39,28 +57,72 @@ IRsend::IRsend(uint16_t IRsendPin, bool inverted, bool use_modulation)
     _dutycycle = kDutyDefault;
   else
     _dutycycle = kDutyMax;
+
+#if ENABLE_ESP32_RMT_USAGE
+  // Configure RMT channel for transmission
+  _rmt_config.rmt_mode = RMT_MODE_TX;
+  _rmt_config.channel = rmt_channel;
+  _rmt_config.gpio_num = (gpio_num_t) IRsendPin;
+  _rmt_config.mem_block_num = 1;
+  _rmt_config.clk_div = 80; // 80MHz / 80 = 1MHz tick resolution (1 us per count)
+
+  // TX specific configurations
+  _rmt_config.tx_config.loop_en = false;
+  _rmt_config.tx_config.carrier_en = true;
+  _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
+  _rmt_config.tx_config.carrier_freq_hz = 38000;  // Default IR TX frequency.
+
+  _rmt_config.tx_config.idle_output_en = false;
+  _rmt_config.tx_config.idle_level = inverted ? RMT_IDLE_LEVEL_HIGH :
+                                                RMT_IDLE_LEVEL_LOW;
+#endif  // ENABLE_ESP32_RMT_USAGE
 }
+
+#if ENABLE_ESP32_RMT_USAGE
+/// Class destructor
+/// Cleans up after the object is no longer needed.
+/// e.g. Frees up all memory used by the various buffers, and disables any
+/// timers or interrupts used.
+IRsend::~IRsend(void) {
+  rmt_driver_uninstall(_rmt_config.channel);
+}
+#endif  // ENABLE_ESP32_RMT_USAGE
 
 /// Enable the pin for output.
 void IRsend::begin() {
 #ifndef UNIT_TEST
+#if ENABLE_ESP32_RMT_USAGE
+  _rmt_config.tx_config.idle_output_en = true;
+  rmt_config(&_rmt_config) && rmt_driver_install(_rmt_config.channel, 0, 0);
+#else
   pinMode(IRpin, OUTPUT);
-#endif
+#endif  // ENABLE_ESP32_RMT_USAGE
+#endif  // UNIT_TEST
   ledOff();  // Ensure the LED is in a known safe state when we start.
 }
 
 /// Turn off the IR LED.
 void IRsend::ledOff() {
 #ifndef UNIT_TEST
+#if ENABLE_ESP32_RMT_USAGE
+  rmt_set_idle_level(_rmt_config.channel,
+                     _rmt_config.tx_config.idle_output_en, RMT_IDLE_LEVEL_LOW);
+#else
   digitalWrite(IRpin, outputOff);
-#endif
+#endif  // ENABLE_ESP32_RMT_USAGE
+#endif  // UNIT_TEST
 }
 
 /// Turn on the IR LED.
 void IRsend::ledOn() {
 #ifndef UNIT_TEST
+#if ENABLE_ESP32_RMT_USAGE
+  rmt_set_idle_level(_rmt_config.channel,
+                     _rmt_config.tx_config.idle_output_en, RMT_IDLE_LEVEL_HIGH);
+#else
   digitalWrite(IRpin, outputOn);
-#endif
+#endif  // ENABLE_ESP32_RMT_USAGE
+#endif  // UNIT_TEST
 }
 
 /// Calculate the period for a given frequency.
@@ -96,6 +158,7 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
   } else {
     _dutycycle = kDutyMax;
   }
+
   if (freq < 1000)  // Were we given kHz? Supports the old call usage.
     freq *= 1000;
 #ifdef UNIT_TEST
@@ -106,6 +169,12 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
   onTimePeriod = (period * _dutycycle) / kDutyMax;
   // Nr. of uSeconds the LED will be off per pulse.
   offTimePeriod = period - onTimePeriod;
+#if ENABLE_ESP32_RMT_USAGE
+  _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
+  _rmt_config.tx_config.carrier_freq_hz = freq;
+  // (Re)Load up the rmt config and if the config is okay, install the driver.
+  rmt_config(&_rmt_config);
+#endif  // ENABLE_ESP32_RMT_USAGE
 }
 
 #if ALLOW_DELAY_CALLS
@@ -155,6 +224,23 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
 /// Ref:
 ///   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
 uint16_t IRsend::mark(uint16_t usec) {
+#if ENABLE_ESP32_RMT_USAGE
+  // ESP32 does this very differently if using the RMT drvier
+  _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
+  static const rmt_item32_t payload[] = {
+    // mark signal
+    {{{ usec, 1, 0, 0 }}}, // mark
+    // RMT end marker
+    {{{ 0, 1, 0, 0 }}}
+  };
+  // Try sending the mark signal via rmt.
+  if (!rmt_write_items(RMT_CHANNEL_0, payload, sizeof(payload) / sizeof(payload[0]),
+                       true))
+    return 0;  // We failed. So report no pulses.
+  // Calculate & return how many pulses we should have sent. We can't actually
+  // counthow many were really sent.
+  return (_rmt_config.tx_config.carrier_freq_hz * usec) / 1000000UL;
+#else  // The bit-banging approach.
   // Handle the simple case of no required frequency modulation.
   if (!modulation || _dutycycle >= 100) {
     ledOn();
@@ -162,7 +248,7 @@ uint16_t IRsend::mark(uint16_t usec) {
     ledOff();
     return 1;
   }
-
+  
   // Not simple, so do it assuming frequency modulation.
   uint16_t counter = 0;
   IRtimer usecTimer = IRtimer();
@@ -187,6 +273,7 @@ uint16_t IRsend::mark(uint16_t usec) {
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
   return counter;
+#endif  // ENABLE_ESP32_RMT_USAGE
 }
 
 /// Turn the pin (LED) off for a given time.
