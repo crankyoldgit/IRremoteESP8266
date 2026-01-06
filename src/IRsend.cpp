@@ -158,7 +158,6 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
   } else {
     _dutycycle = kDutyMax;
   }
-
   if (freq < 1000)  // Were we given kHz? Supports the old call usage.
     freq *= 1000;
 #ifdef UNIT_TEST
