@@ -84,7 +84,7 @@ IRsend::IRsend(uint16_t IRsendPin, bool inverted,
 /// e.g. Frees up all memory used by the various buffers, and disables any
 /// timers or interrupts used.
 IRsend::~IRsend(void) {
-  rmt_driver_uninstall(_rmt_config.channel);
+  end();
 }
 #endif  // ENABLE_ESP32_RMT_USAGE
 
@@ -101,12 +101,20 @@ void IRsend::begin() {
   ledOff();  // Ensure the LED is in a known safe state when we start.
 }
 
+#if ENABLE_ESP32_RMT_USAGE
+/// Disable the pin for output.
+void IRsend::end() {
+  rmt_driver_uninstall(_rmt_config.channel);
+}
+#endif  // ENABLE_ESP32_RMT_USAGE
+
 /// Turn off the IR LED.
 void IRsend::ledOff() {
 #ifndef UNIT_TEST
 #if ENABLE_ESP32_RMT_USAGE
   rmt_set_idle_level(_rmt_config.channel,
-                     _rmt_config.tx_config.idle_output_en, RMT_IDLE_LEVEL_LOW);
+                     _rmt_config.tx_config.idle_output_en,
+                     (outputOn == LOW) ? RMT_IDLE_LEVEL_HIGH : RMT_IDLE_LEVEL_LOW);
 #else
   digitalWrite(IRpin, outputOff);
 #endif  // ENABLE_ESP32_RMT_USAGE
@@ -118,7 +126,8 @@ void IRsend::ledOn() {
 #ifndef UNIT_TEST
 #if ENABLE_ESP32_RMT_USAGE
   rmt_set_idle_level(_rmt_config.channel,
-                     _rmt_config.tx_config.idle_output_en, RMT_IDLE_LEVEL_HIGH);
+                     _rmt_config.tx_config.idle_output_en,
+                     (outputOn == HIGH) ? RMT_IDLE_LEVEL_HIGH : RMT_IDLE_LEVEL_LOW);
 #else
   digitalWrite(IRpin, outputOn);
 #endif  // ENABLE_ESP32_RMT_USAGE

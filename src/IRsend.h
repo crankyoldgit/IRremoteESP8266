@@ -262,6 +262,7 @@ class IRsend {
 
 #if ENABLE_ESP32_RMT_USAGE
   ~IRsend(void);
+  void end();
 #endif  // ENABLE_ESP32_RMT_USAGE
 
   void begin();
