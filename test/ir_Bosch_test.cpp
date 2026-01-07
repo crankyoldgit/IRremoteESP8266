@@ -126,6 +126,58 @@ TEST(TestDecodeBosch144, DurastarExample) {
   ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
+// This example command has more extreme timings
+TEST(TestDecodeBosch144, DurastarExample61F) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+
+  // Mode: Heat; Fan: High ; Temp: 61°F
+  uint16_t rawData[299] = {
+      4450, 4345, 590, 1560, 590, 510, 560, 1560, 590, 1560, 590, 510, 565,
+      510, 560, 1565, 590, 510, 560, 515, 560, 1565, 590, 515, 560, 515, 560,
+      1565, 590, 1565, 585, 520, 560, 1570, 560, 515, 560, 515, 555, 1595, 560,
+      1595, 555, 1595, 530, 1620, 530, 1620, 530, 1625, 525, 1625, 525, 1630,
+      520, 555, 525, 550, 525, 550, 525, 550, 525, 550, 550, 525, 550, 530,
+      550, 525, 550, 530, 550, 525, 550, 1605, 520, 1630, 520, 550, 550, 525,
+      550, 1605, 520, 1630, 520, 1630, 525, 1630, 520, 550, 525, 550, 525,
+      1625, 550, 1605, 550, 5200, 4405, 4390, 520, 1630, 520, 555, 520, 1630,
+      520, 1630, 520, 555, 520, 555, 520, 1630, 520, 555, 520, 555, 520, 1635,
+      520, 555, 520, 560, 520, 1635, 515, 1635, 515, 560, 515, 1655, 495, 580,
+      495, 580, 495, 1660, 495, 1660, 495, 1660, 490, 1660, 490, 1660, 490,
+      1660, 490, 1660, 490, 1660, 490, 585, 490, 590, 485, 590, 485, 590, 485,
+      595, 480, 590, 480, 600, 480, 590, 485, 590, 485, 590, 485, 1670, 485,
+      1670, 485, 590, 485, 590, 485, 1670, 480, 1670, 485, 1670, 480, 1670,
+      480, 595, 480, 590, 485, 1670, 480, 1690, 460, 5290, 4320, 4475, 460,
+      1690, 460, 1690, 460, 615, 460, 1690, 460, 615, 460, 1690, 460, 615,
+      460, 1690, 460, 615, 460, 1690, 460, 1690, 460, 615, 460, 615, 460,
+      1690, 460, 615, 460, 615, 460, 615, 460, 620, 460, 1695, 435, 640, 435,
+      640, 435, 640, 435, 640, 435, 640, 435, 640, 440, 640, 435, 665, 410,
+      1740, 410, 665, 410, 665, 410, 665, 410, 1740, 410, 665, 410, 665, 410,
+      670, 410, 665, 410, 665, 410, 665, 410, 670, 405, 670, 405, 670, 410,
+      1745, 405, 1745, 410, 670, 410, 1745, 380, 670, 405, 1770, 385, 690, 385
+  };  // DURASTAR DRAW09F2A
+
+  uint8_t expectedState[18] = {
+      0xB2, 0x4D, 0x3F, 0xC0, 0x0C, 0xF3,
+      0xB2, 0x4D, 0x3F, 0xC0, 0x0C, 0xF3,
+      0xD5, 0x64, 0x20, 0x11, 0x00, 0x6A};
+
+  irsend.begin();
+  irsend.reset();
+
+  irsend.sendRaw(rawData, 299, 38000);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(decode_type_t::BOSCH144, irsend.capture.decode_type);
+  EXPECT_EQ(kBosch144Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
+  EXPECT_EQ(
+      "Power: On, Mode: 6 (Heat), Fan: 5 (High), Temp: 61F, Quiet: Off",
+      IRAcUtils::resultAcToString(&irsend.capture));
+  stdAc::state_t result, prev;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+}
+
 TEST(TestDecodeBosch144, SyntheticSelfDecode) {
   IRsendTest irsend(kGpioUnused);
   IRrecv irrecv(kGpioUnused);

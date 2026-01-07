@@ -30,10 +30,10 @@
 
 // Constants
 const uint16_t kBoschHdrMark = 4366;
-const uint16_t kBoschBitMark = 502;
+const uint16_t kBoschBitMark = 456;
 const uint16_t kBoschHdrSpace = 4415;
 const uint16_t kBoschOneSpace = 1645;
-const uint16_t kBoschZeroSpace = 571;
+const uint16_t kBoschZeroSpace = 610;
 const uint16_t kBoschFooterSpace = 5235;
 const uint16_t kBoschFreq = 38000;  // Hz. (Guessing the most common frequency.)
 const uint16_t kBosch144NrOfSections = 3;
