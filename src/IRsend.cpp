@@ -15,7 +15,6 @@
 #endif
 #include "IRtimer.h"
 
-#if ENABLE_ESP32_RMT_USAGE
 /// Constructor for an IRsend object.
 /// @param[in] IRsendPin Which GPIO pin to use when sending an IR command.
 /// @param[in] inverted Optional flag to invert the output. (default = false)
@@ -26,20 +25,11 @@
 /// @param[in] use_modulation Do we do frequency modulation during transmission?
 ///  i.e. If not, assume a 100% duty cycle. Ignore attempts to change the
 ///  duty cycle etc.
-/// @param[in] rmt_channel Which channel of the ESP32 RMT module to use. 
+/// @param[in] rmt_channel The channel of the RMT module to use. [ESP32]
+#if ENABLE_ESP32_RMT_USAGE
 IRsend::IRsend(uint16_t IRsendPin, bool inverted,
                bool use_modulation, rmt_channel_t rmt_channel)
 #else
-/// Constructor for an IRsend object.
-/// @param[in] IRsendPin Which GPIO pin to use when sending an IR command.
-/// @param[in] inverted Optional flag to invert the output. (default = false)
-///  e.g. LED is illuminated when GPIO is LOW rather than HIGH.
-/// @warning Setting `inverted` to something other than the default could
-///  easily destroy your IR LED if you are overdriving it.
-///  Unless you *REALLY* know what you are doing, don't change this.
-/// @param[in] use_modulation Do we do frequency modulation during transmission?
-///  i.e. If not, assume a 100% duty cycle. Ignore attempts to change the
-///  duty cycle etc.
 IRsend::IRsend(uint16_t IRsendPin, bool inverted,
                bool use_modulation)
 #endif  // ENABLE_ESP32_RMT_USAGE
@@ -64,7 +54,7 @@ IRsend::IRsend(uint16_t IRsendPin, bool inverted,
   _rmt_config.channel = rmt_channel;
   _rmt_config.gpio_num = (gpio_num_t) IRsendPin;
   _rmt_config.mem_block_num = 1;
-  _rmt_config.clk_div = 80; // 80MHz / 80 = 1MHz tick resolution (1 us per count)
+  _rmt_config.clk_div = 80;  // 80MHz/80 = 1MHz tick resolution (1us per count)
 
   // TX specific configurations
   _rmt_config.tx_config.loop_en = false;
@@ -114,7 +104,8 @@ void IRsend::ledOff() {
 #if ENABLE_ESP32_RMT_USAGE
   rmt_set_idle_level(_rmt_config.channel,
                      _rmt_config.tx_config.idle_output_en,
-                     (outputOn == LOW) ? RMT_IDLE_LEVEL_HIGH : RMT_IDLE_LEVEL_LOW);
+                     (outputOn == LOW) ? RMT_IDLE_LEVEL_HIGH
+                                       : RMT_IDLE_LEVEL_LOW);
 #else
   digitalWrite(IRpin, outputOff);
 #endif  // ENABLE_ESP32_RMT_USAGE
@@ -127,7 +118,8 @@ void IRsend::ledOn() {
 #if ENABLE_ESP32_RMT_USAGE
   rmt_set_idle_level(_rmt_config.channel,
                      _rmt_config.tx_config.idle_output_en,
-                     (outputOn == HIGH) ? RMT_IDLE_LEVEL_HIGH : RMT_IDLE_LEVEL_LOW);
+                     (outputOn == HIGH) ? RMT_IDLE_LEVEL_HIGH
+                                        : RMT_IDLE_LEVEL_LOW);
 #else
   digitalWrite(IRpin, outputOn);
 #endif  // ENABLE_ESP32_RMT_USAGE
@@ -237,13 +229,13 @@ uint16_t IRsend::mark(uint16_t usec) {
   _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
   static const rmt_item32_t payload[] = {
     // mark signal
-    {{{ usec, 1, 0, 0 }}}, // mark
+    {{{ usec, 1, 0, 0 }}},  // mark
     // RMT end marker
     {{{ 0, 1, 0, 0 }}}
   };
   // Try sending the mark signal via rmt.
-  if (!rmt_write_items(RMT_CHANNEL_0, payload, sizeof(payload) / sizeof(payload[0]),
-                       true))
+  if (!rmt_write_items(RMT_CHANNEL_0, payload,
+                       sizeof(payload) / sizeof(payload[0]), true))
     return 0;  // We failed. So report no pulses.
   // Calculate & return how many pulses we should have sent. We can't actually
   // counthow many were really sent.
@@ -256,7 +248,7 @@ uint16_t IRsend::mark(uint16_t usec) {
     ledOff();
     return 1;
   }
-  
+
   // Not simple, so do it assuming frequency modulation.
   uint16_t counter = 0;
   IRtimer usecTimer = IRtimer();

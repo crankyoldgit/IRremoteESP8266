@@ -1030,12 +1030,13 @@ typedef volatile const uint16_t atomic_const_uint16_t;
 #endif  // ENABLE_NOISE_FILTER_OPTION
 
 // EXPERIMENTAL:
-// Use the 'rmt' functions of the ESP32 processor family for doing real PWM on the GPIO instead of bit-banging it.
-// Turning this on may make for more reliable transmission on the ESP32 platform.
-// Disabled by default.
+// Use the 'rmt' functions of the ESP32 processor family for doing real PWM on
+// the GPIO instead of bit-banging it.
+// Turning this on may make for more reliable transmission on the ESP32
+// platform. [Disabled by default]
 #ifndef ENABLE_ESP32_RMT_USAGE
 #if ESP32
-#define ENABLE_ESP32_RMT_USAGE true
+#define ENABLE_ESP32_RMT_USAGE true  // Currently enabled for testing.
 #else  // ESP32
 #define ENABLE_ESP32_RMT_USAGE false
 #endif  // ESP32
