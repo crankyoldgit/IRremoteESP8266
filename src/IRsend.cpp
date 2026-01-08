@@ -59,10 +59,10 @@ IRsend::IRsend(uint16_t IRsendPin, bool inverted,
   // TX specific configurations
   _rmt_config.tx_config.loop_en = false;
   _rmt_config.tx_config.carrier_en = true;
+  _rmt_config.tx_config.carrier_level = RMT_CARRIER_LEVEL_HIGH;
   _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
   _rmt_config.tx_config.carrier_freq_hz = 38000;  // Default IR TX frequency.
-
-  _rmt_config.tx_config.idle_output_en = false;
+  _rmt_config.tx_config.idle_output_en = true;
   _rmt_config.tx_config.idle_level = inverted ? RMT_IDLE_LEVEL_HIGH :
                                                 RMT_IDLE_LEVEL_LOW;
 #endif  // ENABLE_ESP32_RMT_USAGE
@@ -82,8 +82,9 @@ IRsend::~IRsend(void) {
 void IRsend::begin() {
 #ifndef UNIT_TEST
 #if ENABLE_ESP32_RMT_USAGE
-  _rmt_config.tx_config.idle_output_en = true;
-  rmt_config(&_rmt_config) && rmt_driver_install(_rmt_config.channel, 0, 0);
+  assert(!rmt_config(&_rmt_config));
+  assert(!rmt_driver_install(_rmt_config.channel, 0, 0));
+  _is_rmt_driver_installed = true;
 #else
   pinMode(IRpin, OUTPUT);
 #endif  // ENABLE_ESP32_RMT_USAGE
@@ -94,35 +95,27 @@ void IRsend::begin() {
 #if ENABLE_ESP32_RMT_USAGE
 /// Disable the pin for output.
 void IRsend::end() {
-  rmt_driver_uninstall(_rmt_config.channel);
+  if (_is_rmt_driver_installed)
+    _is_rmt_driver_installed = rmt_driver_uninstall(_rmt_config.channel);
 }
 #endif  // ENABLE_ESP32_RMT_USAGE
 
 /// Turn off the IR LED.
 void IRsend::ledOff() {
 #ifndef UNIT_TEST
-#if ENABLE_ESP32_RMT_USAGE
-  rmt_set_idle_level(_rmt_config.channel,
-                     _rmt_config.tx_config.idle_output_en,
-                     (outputOn == LOW) ? RMT_IDLE_LEVEL_HIGH
-                                       : RMT_IDLE_LEVEL_LOW);
-#else
+#if !(ENABLE_ESP32_RMT_USAGE)
   digitalWrite(IRpin, outputOff);
-#endif  // ENABLE_ESP32_RMT_USAGE
+#endif  // !(ENABLE_ESP32_RMT_USAGE)
+
 #endif  // UNIT_TEST
 }
 
 /// Turn on the IR LED.
 void IRsend::ledOn() {
 #ifndef UNIT_TEST
-#if ENABLE_ESP32_RMT_USAGE
-  rmt_set_idle_level(_rmt_config.channel,
-                     _rmt_config.tx_config.idle_output_en,
-                     (outputOn == HIGH) ? RMT_IDLE_LEVEL_HIGH
-                                        : RMT_IDLE_LEVEL_LOW);
-#else
+#if !(ENABLE_ESP32_RMT_USAGE)
   digitalWrite(IRpin, outputOn);
-#endif  // ENABLE_ESP32_RMT_USAGE
+#endif  // !(ENABLE_ESP32_RMT_USAGE)
 #endif  // UNIT_TEST
 }
 
@@ -172,8 +165,8 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
 #if ENABLE_ESP32_RMT_USAGE
   _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
   _rmt_config.tx_config.carrier_freq_hz = freq;
-  // (Re)Load up the rmt config and if the config is okay, install the driver.
-  rmt_config(&_rmt_config);
+  // Update rmt config.
+  assert(!rmt_config(&_rmt_config));
 #endif  // ENABLE_ESP32_RMT_USAGE
 }
 
@@ -227,15 +220,11 @@ uint16_t IRsend::mark(uint16_t usec) {
 #if ENABLE_ESP32_RMT_USAGE
   // ESP32 does this very differently if using the RMT drvier
   _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
-  static const rmt_item32_t payload[] = {
-    // mark signal
+  static const rmt_item32_t mark_signal[] = {
     {{{ usec, 1, 0, 0 }}},  // mark
-    // RMT end marker
-    {{{ 0, 1, 0, 0 }}}
   };
   // Try sending the mark signal via rmt.
-  if (!rmt_write_items(RMT_CHANNEL_0, payload,
-                       sizeof(payload) / sizeof(payload[0]), true))
+  if (!rmt_write_items(_rmt_config.channel, mark_signal, 1, true))
     return 0;  // We failed. So report no pulses.
   // Calculate & return how many pulses we should have sent. We can't actually
   // counthow many were really sent.

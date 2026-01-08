@@ -957,6 +957,7 @@ class IRsend {
 #endif  // SEND_SONY
 #if ENABLE_ESP32_RMT_USAGE
   rmt_config_t _rmt_config;
+  bool _is_rmt_driver_installed = false;
 #endif  // ENABLE_ESP32_RMT_USAGE
 };
 

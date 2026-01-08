@@ -1035,11 +1035,11 @@ typedef volatile const uint16_t atomic_const_uint16_t;
 // Turning this on may make for more reliable transmission on the ESP32
 // platform. [Disabled by default]
 #ifndef ENABLE_ESP32_RMT_USAGE
-#if ESP32
+#if defined(ESP32)
 #define ENABLE_ESP32_RMT_USAGE true  // Currently enabled for testing.
-#else  // ESP32
+#else  // defined(ESP32)
 #define ENABLE_ESP32_RMT_USAGE false
-#endif  // ESP32
+#endif  // defined(ESP32)
 #endif  // ENABLE_ESP32_RMT_USAGE
 
 /// Enumerator for defining and numbering of supported IR protocol.
