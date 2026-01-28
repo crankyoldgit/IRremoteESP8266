@@ -746,7 +746,7 @@ union Daikin312Protocol{
     uint64_t Sum1     :8;
     // Byte 20: Always 0x11
     uint64_t          :8;
-	
+
     // Byte 21~24
     //   Byte 21: Always 0xDA
     //   Byte 22: Always 0x27
@@ -846,18 +846,22 @@ const uint8_t kDaikin312SwingHSwing =  kDaikin312SwingHAuto;
 //   https://github.com/crankyoldgit/IRremoteESP8266/issues/1535#issuecomment-882092486
 //   https://docs.google.com/spreadsheets/d/1kxHgFqiUB9ETXYEkszAIN5gE-t2ykvnPCnOV-sPUE0A/edit?usp=sharing
 const uint8_t kDaikin312HumidityOff        = 0x00;
-const uint8_t kDaikin312HumidityHeatLow    = 0x28;  // Humidify (Heat) only (40%?)
-const uint8_t kDaikin312HumidityHeatMedium = 0x2D;  // Humidify (Heat) only (45%?)
-const uint8_t kDaikin312HumidityHeatHigh   = 0x32;  // Humidify (Heat) only (50%?)
+// Humidify (Heat) only (40%?)
+const uint8_t kDaikin312HumidityHeatLow    = 0x28;
+// Humidify (Heat) only (45%?)
+const uint8_t kDaikin312HumidityHeatMedium = 0x2D;
+// Humidify (Heat) only (50%?)
+const uint8_t kDaikin312HumidityHeatHigh   = 0x32;
 const uint8_t kDaikin312HumidityDryLow     = 0x32;  // Dry only (50%?)
 const uint8_t kDaikin312HumidityDryMedium  = 0x37;  // Dry only (55%?)
 const uint8_t kDaikin312HumidityDryHigh    = 0x3C;  // Dry only (60%?)
 const uint8_t kDaikin312HumidityAuto       = 0xFF;
 
-const uint8_t kDaikin312MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
+// Min temp (in C) when in Cool mode.
+const uint8_t kDaikin312MinCoolTemp = 18;
 
 /// Class for handling detailed Daikin 312-bit A/C messages.
-/// @note Code used from Daikin2 by crankyoldgit, Reverse engineering analysis by AntonWert
+/// @note Code by crankyoldgit, Reverse engineering analysis by AntonWert
 class IRDaikin312 {
  public:
   explicit IRDaikin312(const uint16_t pin, const bool inverted = false,

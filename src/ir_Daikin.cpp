@@ -3849,13 +3849,14 @@ void IRDaikin312::send(const uint16_t repeat) {
 bool IRDaikin312::validChecksum(uint8_t state[], const uint16_t length) {
   // Validate the checksum of section #1.
   if (length <= kDaikin312Section1Length - 1 ||
-      state[kDaikin312Section1Length - 1] != sumBytes(state,
-                                                    kDaikin312Section1Length - 1))
+      state[kDaikin312Section1Length - 1] !=
+          sumBytes(state, kDaikin312Section1Length - 1))
     return false;
   // Validate the checksum of section #2 (a.k.a. the rest)
   if (length <= kDaikin312Section1Length + 1 ||
-      state[length - 1] != sumBytes(state + kDaikin312Section1Length,
-                                    length - kDaikin312Section1Length - 1))
+      state[length - 1] !=
+          sumBytes(state + kDaikin312Section1Length,
+                   length - kDaikin312Section1Length - 1))
     return false;
   return true;
 }
@@ -3863,7 +3864,8 @@ bool IRDaikin312::validChecksum(uint8_t state[], const uint16_t length) {
 /// Calculate and set the checksum values for the internal state.
 void IRDaikin312::checksum(void) {
   _.Sum1 = sumBytes(_.raw, kDaikin312Section1Length - 1);
-  _.Sum2 = sumBytes(_.raw + kDaikin312Section1Length, kDaikin312Section2Length - 1);
+  _.Sum2 = sumBytes(_.raw + kDaikin312Section1Length,
+                    kDaikin312Section2Length - 1);
 }
 
 /// Reset the internal state to a fixed known good state.
@@ -3968,13 +3970,14 @@ void IRDaikin312::setMode(const uint8_t desired_mode) {
 
 /// Set the temperature.
 /// @param[in] desired The temperature in degrees celsius.
-/// @note The temperature is used in half gegress, so multiply by 2
+/// @note The temperature is used in half degrees, so multiply by 2
 void IRDaikin312::setTemp(const float desired) {
   // The A/C has a different min temp if in cool mode.
   float temp = std::max(
-      (_.Mode == kDaikinCool) ? (float)kDaikin312MinCoolTemp : (float)kDaikinMinTemp,
+      (_.Mode == kDaikinCool) ? static_cast<float>(kDaikin312MinCoolTemp)
+                              : static_cast<float>(kDaikinMinTemp),
       desired);
-  _.Temp = std::min((float)kDaikinMaxTemp, temp)  * 2.0;
+  _.Temp = std::min(static_cast<float>(kDaikinMaxTemp), temp) * 2.0;
   // If the humidity setting is in use, the temp is a fixed value.
   if (_.HumidOn) _.Temp = kDaikinMaxTemp * 2.0;
 }
