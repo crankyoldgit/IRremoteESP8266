@@ -694,6 +694,118 @@ const uint16_t kDaikin200Section1Length = 7;
 const uint16_t kDaikin200Section2Length = kDaikin200StateLength -
                                           kDaikin200Section1Length;
 
+/// Native representation of a Daikin312 A/C message.
+union Daikin312Protocol{
+  struct{
+    uint8_t pad[3];
+    uint8_t raw[kDaikin312StateLength];  ///< The state of the IR remote.
+  };
+  struct {
+    // Byte -3~4
+    uint64_t :64;
+
+    // Byte 5~6
+    uint64_t CurrentTime  :12;
+    uint64_t              :3;
+    uint64_t Power2       :1;
+    // Byte 7
+    uint64_t              :4;
+    uint64_t              :2;  // Light moved to byte 12
+    uint64_t Beep         :2;
+    // Byte 8
+    uint64_t FreshAir     :1;
+    uint64_t              :2;
+    uint64_t Mold         :1;
+    uint64_t              :2;
+    uint64_t              :1;
+    uint64_t FreshAirHigh :1;
+    // Byte 9~10
+    //   Byte  9: Always 0x06
+    //   Byte 10: Always 0x00
+    uint64_t              :16;
+    // Byte 11
+    uint64_t              :8;
+    // Byte 12
+    uint64_t Light        :2;
+    uint64_t              :6;
+
+    // Byte 13
+    uint64_t          :8;
+
+    // Byte 14
+    uint64_t              :4;
+    uint64_t  Clean       :1;  // AirCleanMode
+    uint64_t              :3;
+    // Byte 15~16
+    uint64_t              :16;
+    // Byte 17: Always 0x00
+    uint64_t              :8;
+    // Byte 18: Always 0x00
+    uint64_t              :8;
+    // Byte 19
+    uint64_t Sum1     :8;
+    // Byte 20: Always 0x11
+    uint64_t          :8;
+	
+    // Byte 21~24
+    //   Byte 21: Always 0xDA
+    //   Byte 22: Always 0x27
+    //   Byte 23: Always 0x00
+    //   Byte 24: Always 0x00
+    uint64_t          :32;
+
+    // Byte 25
+    uint64_t Power    :1;
+    uint64_t OnTimer  :1;
+    uint64_t OffTimer :1;
+    uint64_t          :1;
+    uint64_t Mode     :3;
+    uint64_t          :1;
+    // Byte 26
+    uint64_t Temp     :7;
+    uint64_t HumidOn  :1;
+    // Byte 27
+    uint64_t Humidity :8;
+    // Byte 28
+    uint64_t SwingV   :4;
+    uint64_t Fan      :4;
+
+    // Byte 29
+    uint64_t SwingH   :4;
+    uint64_t          :4;
+    // Byte 30~32
+    /// @see https://github.com/crankyoldgit/IRremoteESP8266/pull/1264
+    uint64_t OnTime     :12;
+    uint64_t OffTime    :12;
+    // Byte 33
+    uint64_t Powerful   :1;
+    uint64_t            :4;
+    uint64_t Quiet      :1;
+    uint64_t            :2;
+    // Byte 34~35
+    //   Byte 35: Always 0xC5
+    uint64_t :16;
+    // Byte 36
+    uint64_t            :1;
+    uint64_t Eye        :1;
+    uint64_t Econo      :1;
+    uint64_t EyeAuto    :1;
+    uint64_t Purify     :1;
+    uint64_t SleepTimer :1;
+    uint64_t            :2;
+
+    // Byte 37: Always 0x08
+    uint8_t       :8;
+    // Byte 38
+    uint8_t Sum2  :8;
+  };
+};
+
+const uint16_t kDaikin312Freq = 36700;  // Modulation Frequency in Hz.
+const uint16_t kDaikin312LeaderMark = 10024;
+const uint16_t kDaikin312LeaderSpace = 25180;
+const uint16_t kDaikin312Gap = kDaikin312LeaderMark + kDaikin312LeaderSpace;
+
 const uint16_t kDaikin312HdrMark = 3518;
 const uint16_t kDaikin312HdrSpace = 1688;
 const uint16_t kDaikin312BitMark = 453;
@@ -705,6 +817,143 @@ const uint16_t kDaikin312Sections = 2;
 const uint16_t kDaikin312Section1Length = 20;
 const uint16_t kDaikin312Section2Length = kDaikin312StateLength -
                                           kDaikin312Section1Length;
+
+
+const uint8_t kDaikin312Tolerance = 5;  // Extra percentage tolerance
+const uint8_t kDaikin312SwingVHighest =     0x1;
+const uint8_t kDaikin312SwingVHigh =        0x2;
+const uint8_t kDaikin312SwingVUpperMiddle = 0x3;
+const uint8_t kDaikin312SwingVLowerMiddle = 0x4;
+const uint8_t kDaikin312SwingVLow =         0x5;
+const uint8_t kDaikin312SwingVLowest =      0x6;
+const uint8_t kDaikin312SwingVBreeze =      0xC;
+const uint8_t kDaikin312SwingVCirculate =   0xD;
+const uint8_t kDaikin312SwingVOff =         0x0;
+const uint8_t kDaikin312SwingVAuto =        0xF;  // A.k.a "Swing"
+const uint8_t kDaikin312SwingVSwing =  kDaikin312SwingVAuto;
+
+const uint8_t kDaikin312SwingHWide =     0xA3;
+const uint8_t kDaikin312SwingHLeftMax =  0xA8;
+const uint8_t kDaikin312SwingHLeft =     0xA9;
+const uint8_t kDaikin312SwingHMiddle =   0xAA;
+const uint8_t kDaikin312SwingHRight =    0xAB;
+const uint8_t kDaikin312SwingHRightMax = 0xAC;
+const uint8_t kDaikin312SwingHAuto =     0xF;  // A.k.a "Swing"
+const uint8_t kDaikin312SwingHOff =      0x0;
+const uint8_t kDaikin312SwingHSwing =  kDaikin312SwingHAuto;
+
+// Ref:
+//   https://github.com/crankyoldgit/IRremoteESP8266/issues/1535#issuecomment-882092486
+//   https://docs.google.com/spreadsheets/d/1kxHgFqiUB9ETXYEkszAIN5gE-t2ykvnPCnOV-sPUE0A/edit?usp=sharing
+const uint8_t kDaikin312HumidityOff        = 0x00;
+const uint8_t kDaikin312HumidityHeatLow    = 0x28;  // Humidify (Heat) only (40%?)
+const uint8_t kDaikin312HumidityHeatMedium = 0x2D;  // Humidify (Heat) only (45%?)
+const uint8_t kDaikin312HumidityHeatHigh   = 0x32;  // Humidify (Heat) only (50%?)
+const uint8_t kDaikin312HumidityDryLow     = 0x32;  // Dry only (50%?)
+const uint8_t kDaikin312HumidityDryMedium  = 0x37;  // Dry only (55%?)
+const uint8_t kDaikin312HumidityDryHigh    = 0x3C;  // Dry only (60%?)
+const uint8_t kDaikin312HumidityAuto       = 0xFF;
+
+const uint8_t kDaikin312MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
+
+/// Class for handling detailed Daikin 312-bit A/C messages.
+/// @note Code used from Daikin2 by crankyoldgit, Reverse engineering analysis by AntonWert
+class IRDaikin312 {
+ public:
+  explicit IRDaikin312(const uint16_t pin, const bool inverted = false,
+                     const bool use_modulation = true);
+
+#if SEND_DAIKIN312
+  void send(const uint16_t repeat = kDaikin312DefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
+  int8_t calibrate(void) { return _irsend.calibrate(); }
+#endif
+  void begin(void);
+  void on(void);
+  void off(void);
+  void setPower(const bool state);
+  bool getPower(void) const;
+  void setTemp(const float temp);
+  float getTemp(void) const;
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void) const;
+  uint8_t getMode(void) const;
+  void setMode(const uint8_t mode);
+  void setSwingVertical(const uint8_t position);
+  uint8_t getSwingVertical(void) const;
+  void setSwingHorizontal(const uint8_t position);
+  uint8_t getSwingHorizontal(void) const;
+  bool getQuiet(void) const;
+  void setQuiet(const bool on);
+  bool getPowerful(void) const;
+  void setPowerful(const bool on);
+  void setEcono(const bool on);
+  bool getEcono(void) const;
+  void setEye(const bool on);
+  bool getEye(void) const;
+  void setEyeAuto(const bool on);
+  bool getEyeAuto(void) const;
+  void setPurify(const bool on);
+  bool getPurify(void) const;
+  void setMold(const bool on);
+  bool getMold(void) const;
+  void enableOnTimer(const uint16_t starttime);
+  void disableOnTimer(void);
+  uint16_t getOnTime(void) const;
+  bool getOnTimerEnabled(void) const;
+  void enableSleepTimer(const uint16_t sleeptime);
+  void disableSleepTimer(void);
+  uint16_t getSleepTime(void) const;
+  bool getSleepTimerEnabled(void) const;
+  void enableOffTimer(const uint16_t endtime);
+  void disableOffTimer(void);
+  uint16_t getOffTime(void) const;
+  bool getOffTimerEnabled(void) const;
+  void setCurrentTime(const uint16_t time);
+  uint16_t getCurrentTime(void) const;
+  void setBeep(const uint8_t beep);
+  uint8_t getBeep(void) const;
+  void setLight(const uint8_t light);
+  uint8_t getLight(void) const;
+  void setClean(const bool on);
+  bool getClean(void) const;
+  void setFreshAir(const bool on);
+  bool getFreshAir(void) const;
+  void setFreshAirHigh(const bool on);
+  bool getFreshAirHigh(void) const;
+  uint8_t getHumidity(void) const;
+  void setHumidity(const uint8_t percent);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[]);
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kDaikin312StateLength);
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertSwingV(const stdAc::swingv_t position);
+  static uint8_t convertSwingH(const stdAc::swingh_t position);
+  static stdAc::swingv_t toCommonSwingV(const uint8_t setting);
+  static stdAc::swingh_t toCommonSwingH(const uint8_t setting);
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;  ///< instance of the IR send class
+#else
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< instance of the testing IR send class
+  /// @endcond
+#endif
+  // # of bytes per command
+  Daikin312Protocol _;
+  void stateReset(void);
+  void checksum(void);
+  void clearOnTimerFlag(void);
+  void clearSleepTimerFlag(void);
+};
 
 // Legacy defines.
 #define DAIKIN_COOL kDaikinCool
