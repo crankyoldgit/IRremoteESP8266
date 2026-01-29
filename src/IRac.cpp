@@ -4292,6 +4292,13 @@ String resultAcToString(const decode_results * const result) {
       return ac.toString();
     }
 #endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN312
+    case decode_type_t::DAIKIN312: {
+      IRDaikin312 ac(kGpioUnused);
+      ac.setRaw(result->state);
+      return ac.toString();
+    }
+#endif  // DECODE_DAIKIN312
 #if DECODE_DAIKIN64
     case decode_type_t::DAIKIN64: {
       IRDaikin64 ac(kGpioUnused);
@@ -4794,6 +4801,14 @@ bool decodeToState(const decode_results *decode, stdAc::state_t *result,
       break;
     }
 #endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN312
+    case decode_type_t::DAIKIN312: {
+      IRDaikin312 ac(kGpioUnused);
+      ac.setRaw(decode->state);
+      *result = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_DAIKIN312
 #if DECODE_DAIKIN64
     case decode_type_t::DAIKIN64: {
       IRDaikin64 ac(kGpioUnused);
