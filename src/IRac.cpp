@@ -1089,10 +1089,12 @@ void IRac::daikin216(IRDaikin216 *ac,
 void IRac::daikin312(IRDaikin312 *ac,
                      const bool on, const stdAc::opmode_t mode,
                      const float degrees, const stdAc::fanspeed_t fan,
-                     const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                     const stdAc::swingv_t swingv,
+                     const stdAc::swingh_t swingh,
                      const bool quiet, const bool turbo, const bool light,
                      const bool econo, const bool filter, const bool clean,
-                     const bool beep, const int16_t sleep, const int16_t clock) {
+                     const bool beep, const int16_t sleep,
+                     const int16_t clock) {
   ac->begin();
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
