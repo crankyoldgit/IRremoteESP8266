@@ -54,6 +54,7 @@
 //   Brand: Daikin,  Model: FTXM20R5V1B A/C (DAIKIN312)
 //   Brand: Daikin,  Model: ARC466A67 remote (DAIKIN312)
 //   Brand: Daikin,  Model: ARC443A5 remote (DAIKIN)
+//   Brand: Daikin,  Model: ARC466A58 remote (DAIKIN312)
 
 #ifndef IR_DAIKIN_H_
 #define IR_DAIKIN_H_

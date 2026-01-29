@@ -22,6 +22,7 @@
 /// @see Daikin216 https://github.com/danny-source/Arduino_DY_IRDaikin
 /// @see Daikin64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
 /// @see Daikin200 https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
+/// @see Daikin312 https://github.com/crankyoldgit/IRremoteESP8266/issues/1829
 
 #include "ir_Daikin.h"
 #include <algorithm>
