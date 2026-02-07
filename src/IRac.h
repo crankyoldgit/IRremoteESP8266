@@ -239,6 +239,16 @@ void daikin216(IRDaikin216 *ac,
                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                const bool quiet, const bool turbo);
 #endif  // SEND_DAIKIN216
+#if SEND_DAIKIN312
+  void daikin312(IRDaikin312 *ac,
+                 const bool on, const stdAc::opmode_t mode,
+                 const float degrees, const stdAc::fanspeed_t fan,
+                 const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                 const bool quiet, const bool turbo, const bool light,
+                 const bool econo, const bool filter, const bool clean,
+                 const bool beep, const int16_t sleep = -1,
+                 const int16_t clock = -1);
+#endif  // SEND_DAIKIN312
 #if SEND_DAIKIN64
   void daikin64(IRDaikin64 *ac,
                  const bool on, const stdAc::opmode_t mode,

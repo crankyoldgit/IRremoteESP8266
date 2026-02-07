@@ -22,6 +22,7 @@
 /// @see Daikin216 https://github.com/danny-source/Arduino_DY_IRDaikin
 /// @see Daikin64 https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
 /// @see Daikin200 https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
+/// @see Daikin312 https://github.com/crankyoldgit/IRremoteESP8266/issues/1829
 
 #include "ir_Daikin.h"
 #include <algorithm>
@@ -3823,6 +3824,655 @@ bool IRrecv::decodeDaikin200(decode_results *results, uint16_t offset,
 }
 #endif  // DECODE_DAIKIN200
 
+/// Class constructor.
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+IRDaikin312::IRDaikin312(const uint16_t pin, const bool inverted,
+                     const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+/// Set up hardware to be able to send a message.
+void IRDaikin312::begin(void) { _irsend.begin(); }
+
+#if SEND_DAIKIN312
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
+void IRDaikin312::send(const uint16_t repeat) {
+  _irsend.sendDaikin312(getRaw(), kDaikin312StateLength, repeat);
+}
+#endif  // SEND_DAIKIN312
+
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
+bool IRDaikin312::validChecksum(uint8_t state[], const uint16_t length) {
+  // Validate the checksum of section #1.
+  if (length <= kDaikin312Section1Length - 1 ||
+      state[kDaikin312Section1Length - 1] !=
+          sumBytes(state, kDaikin312Section1Length - 1))
+    return false;
+  // Validate the checksum of section #2 (a.k.a. the rest)
+  if (length <= kDaikin312Section1Length + 1 ||
+      state[length - 1] !=
+          sumBytes(state + kDaikin312Section1Length,
+                   length - kDaikin312Section1Length - 1))
+    return false;
+  return true;
+}
+
+/// Calculate and set the checksum values for the internal state.
+void IRDaikin312::checksum(void) {
+  _.Sum1 = sumBytes(_.raw, kDaikin312Section1Length - 1);
+  _.Sum2 = sumBytes(_.raw + kDaikin312Section1Length,
+                    kDaikin312Section2Length - 1);
+}
+
+/// Reset the internal state to a fixed known good state.
+void IRDaikin312::stateReset(void) {
+  for (uint8_t i = 0; i < kDaikin312StateLength; i++) _.raw[i] = 0x0;
+
+  _.raw[0] = 0x11;
+  _.raw[1] = 0xDA;
+  _.raw[2] = 0x27;
+  _.raw[3] = 0x00;
+  _.raw[4] = 0x02;
+  _.raw[5] = 0x58;
+  _.raw[6] = 0x64;
+  _.raw[7] = 0x58;
+  _.raw[8] = 0x64;
+  _.raw[9] = 0x06;
+  _.raw[10] = 0x00;
+  _.raw[11] = 0x00;
+  _.raw[12] = 0x01;
+  _.raw[13] = 0x00;
+  _.raw[14] = 0x00;
+  _.raw[15] = 0x00;
+  _.raw[16] = 0x00;
+  _.raw[17] = 0x00;
+  _.raw[18] = 0x00;
+  // _.raw[19] is a checksum byte, it will be set by checksum().
+  _.raw[20] = 0x11;
+  _.raw[21] = 0xDA;
+  _.raw[22] = 0x27;
+  _.raw[23] = 0x00;
+  _.raw[24] = 0x00;
+  _.raw[25] = 0x08;
+  _.raw[26] = 0x2C;
+  _.raw[27] = 0x00;
+  _.raw[28] = 0x00;
+  _.raw[29] = 0x00;
+  _.raw[30] = 0x00;
+  _.raw[31] = 0x06;
+  _.raw[32] = 0x60;
+  _.raw[33] = 0x00;
+  _.raw[34] = 0x00;
+  _.raw[35] = 0xC5;
+  _.raw[36] = 0x00;
+  _.raw[37] = 0x08;
+  // _.raw[38] is a checksum byte, it will be set by checksum().
+  disableOnTimer();
+  disableOffTimer();
+  disableSleepTimer();
+  checksum();
+}
+
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
+uint8_t *IRDaikin312::getRaw(void) {
+  checksum();  // Ensure correct settings before sending.
+  return _.raw;
+}
+
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
+void IRDaikin312::setRaw(const uint8_t new_code[]) {
+  std::memcpy(_.raw, new_code, kDaikin312StateLength);
+}
+
+/// Change the power setting to On.
+void IRDaikin312::on(void) { setPower(true); }
+
+/// Change the power setting to Off.
+void IRDaikin312::off(void) { setPower(false); }
+
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setPower(const bool on) {
+  _.Power = on;
+  _.Power2 = !on;
+}
+
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getPower(void) const { return _.Power && !_.Power2; }
+
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
+uint8_t IRDaikin312::getMode(void) const { return _.Mode; }
+
+/// Set the operating mode of the A/C.
+/// @param[in] desired_mode The desired operating mode.
+void IRDaikin312::setMode(const uint8_t desired_mode) {
+  uint8_t mode = desired_mode;
+  switch (mode) {
+    case kDaikinCool:
+    case kDaikinHeat:
+    case kDaikinFan:
+    case kDaikinDry: break;
+    default: mode = kDaikinAuto;
+  }
+  _.Mode = mode;
+  // Redo the temp setting as Cool mode has a different min temp.
+  if (mode == kDaikinCool) setTemp(getTemp());
+  setHumidity(getHumidity());  // Make sure the humidity is okay for this mode.
+}
+
+/// Set the temperature.
+/// @param[in] desired The temperature in degrees celsius.
+/// @note The temperature is used in half degrees, so multiply by 2
+void IRDaikin312::setTemp(const float desired) {
+  // The A/C has a different min temp if in cool mode.
+  float temp = std::max(
+      (_.Mode == kDaikinCool) ? static_cast<float>(kDaikin312MinCoolTemp)
+                              : static_cast<float>(kDaikinMinTemp),
+      desired);
+  _.Temp = std::min(static_cast<float>(kDaikinMaxTemp), temp) * 2.0;
+  // If the humidity setting is in use, the temp is a fixed value.
+  if (_.HumidOn) _.Temp = kDaikinMaxTemp * 2.0;
+}
+
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+float IRDaikin312::getTemp(void) const { return _.Temp / 2.0; }
+
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
+/// @note 1-5 or kDaikinFanAuto or kDaikinFanQuiet
+void IRDaikin312::setFan(const uint8_t fan) {
+  uint8_t fanset;
+  if (fan == kDaikinFanQuiet || fan == kDaikinFanAuto)
+    fanset = fan;
+  else if (fan < kDaikinFanMin || fan > kDaikinFanMax)
+    fanset = kDaikinFanAuto;
+  else
+    fanset = 2 + fan;
+  _.Fan = fanset;
+}
+
+/// Get the current fan speed setting.
+/// @return The current fan speed.
+uint8_t IRDaikin312::getFan(void) const {
+  const uint8_t fan = _.Fan;
+  switch (fan) {
+    case kDaikinFanAuto:
+    case kDaikinFanQuiet: return fan;
+    default: return fan - 2;
+  }
+}
+
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] position The position/mode to set the swing to.
+void IRDaikin312::setSwingVertical(const uint8_t position) {
+  switch (position) {
+    case kDaikin312SwingVHighest:
+    case kDaikin312SwingVHigh:
+    case kDaikin312SwingVUpperMiddle:
+    case kDaikin312SwingVLowerMiddle:
+    case kDaikin312SwingVLow:
+    case kDaikin312SwingVLowest:
+    case kDaikin312SwingVOff:
+    case kDaikin312SwingVBreeze:
+    case kDaikin312SwingVCirculate:
+    case kDaikin312SwingVAuto:
+      _.SwingV = position;
+  }
+}
+
+/// Get the Vertical Swing mode of the A/C.
+/// @return The native position/mode setting.
+uint8_t IRDaikin312::getSwingVertical(void) const { return _.SwingV; }
+
+/// Convert a stdAc::swingv_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRDaikin312::convertSwingV(const stdAc::swingv_t position) {
+  switch (position) {
+    case stdAc::swingv_t::kHighest:
+    case stdAc::swingv_t::kHigh:
+    case stdAc::swingv_t::kMiddle:
+    case stdAc::swingv_t::kLow:
+    case stdAc::swingv_t::kLowest:
+      return (uint8_t)position + kDaikin312SwingVHighest;
+    case stdAc::swingv_t::kOff:
+      return kDaikin312SwingVOff;
+    default:
+      return kDaikin312SwingVAuto;
+  }
+}
+
+/// Convert a native vertical swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common vertical swing position.
+stdAc::swingv_t IRDaikin312::toCommonSwingV(const uint8_t setting) {
+  switch (setting) {
+    case kDaikin312SwingVHighest:     return stdAc::swingv_t::kHighest;
+    case kDaikin312SwingVHigh:        return stdAc::swingv_t::kHigh;
+    case kDaikin312SwingVUpperMiddle:
+    case kDaikin312SwingVLowerMiddle: return stdAc::swingv_t::kMiddle;
+    case kDaikin312SwingVLow:         return stdAc::swingv_t::kLow;
+    case kDaikin312SwingVLowest:      return stdAc::swingv_t::kLowest;
+    case kDaikin312SwingVOff:         return stdAc::swingv_t::kOff;
+    default:                        return stdAc::swingv_t::kAuto;
+  }
+}
+
+/// Set the Horizontal Swing mode of the A/C.
+/// @param[in] position The position/mode to set the swing to.
+void IRDaikin312::setSwingHorizontal(const uint8_t position) {
+  _.SwingH = position;
+}
+
+/// Get the Horizontal Swing mode of the A/C.
+/// @return The native position/mode setting.
+uint8_t IRDaikin312::getSwingHorizontal(void) const { return _.SwingH; }
+
+/// Set the clock on the A/C unit.
+/// @param[in] numMins Nr. of minutes past midnight.
+void IRDaikin312::setCurrentTime(const uint16_t numMins) {
+  uint16_t mins = numMins;
+  if (numMins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
+  _.CurrentTime = mins;
+}
+
+/// Get the clock time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
+uint16_t IRDaikin312::getCurrentTime(void) const { return _.CurrentTime; }
+
+/// Set the enable status & time of the On Timer.
+/// @param[in] starttime The number of minutes past midnight.
+/// @note Timer location is shared with sleep timer.
+void IRDaikin312::enableOnTimer(const uint16_t starttime) {
+  clearSleepTimerFlag();
+  _.OnTimer = true;
+  _.OnTime = starttime;
+}
+
+/// Clear the On Timer flag.
+void IRDaikin312::clearOnTimerFlag(void) { _.OnTimer = false; }
+
+/// Disable the On timer.
+void IRDaikin312::disableOnTimer(void) {
+  _.OnTime = kDaikinUnusedTime;
+  clearOnTimerFlag();
+  clearSleepTimerFlag();
+}
+
+/// Get the On Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
+uint16_t IRDaikin312::getOnTime(void) const { return _.OnTime; }
+
+/// Get the enable status of the On Timer.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getOnTimerEnabled(void) const { return _.OnTimer; }
+
+/// Set the enable status & time of the Off Timer.
+/// @param[in] endtime The number of minutes past midnight.
+void IRDaikin312::enableOffTimer(const uint16_t endtime) {
+  // Set the Off Timer flag.
+  _.OffTimer = true;
+  _.OffTime = endtime;
+}
+
+/// Disable the Off timer.
+void IRDaikin312::disableOffTimer(void) {
+  _.OffTime = kDaikinUnusedTime;
+  // Clear the Off Timer flag.
+  _.OffTimer = false;
+}
+
+/// Get the Off Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
+uint16_t IRDaikin312::getOffTime(void) const { return _.OffTime; }
+
+/// Get the enable status of the Off Timer.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getOffTimerEnabled(void) const { return _.OffTimer; }
+
+/// Get the Beep status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+uint8_t IRDaikin312::getBeep(void) const { return _.Beep; }
+
+/// Set the Beep mode of the A/C.
+/// @param[in] beep true, the setting is on. false, the setting is off.
+void IRDaikin312::setBeep(const uint8_t beep) { _.Beep = beep; }
+
+/// Get the Light status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+uint8_t IRDaikin312::getLight(void) const { return _.Light; }
+
+/// Set the Light (LED) mode of the A/C.
+/// @param[in] light true, the setting is on. false, the setting is off.
+void IRDaikin312::setLight(const uint8_t light) { _.Light = light; }
+
+/// Set the Mould (filter) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setMold(const bool on) { _.Mold = on; }
+
+/// Get the Mould (filter) mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getMold(void) const { return _.Mold; }
+
+/// Set the Auto clean mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setClean(const bool on) { _.Clean = on; }
+
+/// Get the Auto Clean mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getClean(void) const { return _.Clean; }
+
+/// Set the Fresh Air mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setFreshAir(const bool on) { _.FreshAir = on; }
+
+/// Get the Fresh Air mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getFreshAir(void) const { return _.FreshAir; }
+
+/// Set the (High) Fresh Air mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setFreshAirHigh(const bool on) { _.FreshAirHigh = on; }
+
+/// Get the (High) Fresh Air mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getFreshAirHigh(void) const { return _.FreshAirHigh; }
+
+/// Set the Automatic Eye (Sensor) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setEyeAuto(bool on) { _.EyeAuto = on; }
+
+/// Get the Automatic Eye (Sensor) mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getEyeAuto(void) const { return _.EyeAuto; }
+
+/// Set the Eye (Sensor) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setEye(bool on) { _.Eye = on; }
+
+/// Get the Eye (Sensor) mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getEye(void) const { return _.Eye; }
+
+/// Set the Economy mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setEcono(bool on) { _.Econo = on; }
+
+/// Get the Economical mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getEcono(void) const { return _.Econo; }
+
+/// Set the enable status & time of the Sleep Timer.
+/// @param[in] sleeptime The number of minutes past midnight.
+/// @note The Timer location is shared with On Timer.
+void IRDaikin312::enableSleepTimer(const uint16_t sleeptime) {
+  enableOnTimer(sleeptime);
+  clearOnTimerFlag();
+  _.SleepTimer = true;
+}
+
+/// Clear the sleep timer flag.
+void IRDaikin312::clearSleepTimerFlag(void) { _.SleepTimer = false; }
+
+/// Disable the sleep timer.
+void IRDaikin312::disableSleepTimer(void) { disableOnTimer(); }
+
+/// Get the Sleep Timer time to be sent to the A/C unit.
+/// @return The number of minutes past midnight.
+uint16_t IRDaikin312::getSleepTime(void) const { return getOnTime(); }
+
+/// Get the Sleep timer enabled status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getSleepTimerEnabled(void) const { return _.SleepTimer; }
+
+/// Set the Quiet mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setQuiet(const bool on) {
+  _.Quiet = on;
+  // Powerful & Quiet mode being on are mutually exclusive.
+  if (on) setPowerful(false);
+}
+
+/// Get the Quiet mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getQuiet(void) const { return _.Quiet; }
+
+/// Set the Powerful (Turbo) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setPowerful(const bool on) {
+  _.Powerful = on;
+  // Powerful & Quiet mode being on are mutually exclusive.
+  if (on) setQuiet(false);
+}
+
+/// Get the Powerful (Turbo) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getPowerful(void) const { return _.Powerful; }
+
+/// Set the Purify (Filter) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin312::setPurify(const bool on) { _.Purify = on; }
+
+/// Get the Purify (Filter) mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin312::getPurify(void) const { return _.Purify; }
+
+/// Get the Humidity percentage setting of the A/C.
+/// @return The setting percentage. 255 is Automatic. 0 is Off.
+uint8_t IRDaikin312::getHumidity(void) const { return _.Humidity; }
+
+/// Set the Humidity percentage setting of the A/C.
+/// @param[in] percent Percentage humidty. 255 is Auto. 0 is Off.
+/// @note Only available in Dry & Heat modes, otherwise it is Off.
+void IRDaikin312::setHumidity(const uint8_t percent) {
+  _.Humidity = kDaikin312HumidityOff;  // Default to off.
+  switch (getMode()) {
+    case kDaikinHeat:
+      switch (percent) {
+        case kDaikin312HumidityOff:
+        case kDaikin312HumidityHeatLow:
+        case kDaikin312HumidityHeatMedium:
+        case kDaikin312HumidityHeatHigh:
+        case kDaikin312HumidityAuto:
+          _.Humidity = percent;
+      }
+      break;
+    case kDaikinDry:
+      switch (percent) {
+        case kDaikin312HumidityOff:
+        case kDaikin312HumidityDryLow:
+        case kDaikin312HumidityDryMedium:
+        case kDaikin312HumidityDryHigh:
+        case kDaikin312HumidityAuto:
+          _.Humidity = percent;
+      }
+      break;
+  }
+  _.HumidOn = (_.Humidity != kDaikin312HumidityOff);  // Enabled?
+  setTemp(getTemp());  // Adjust the temperature if we need to.
+}
+
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRDaikin312::convertMode(const stdAc::opmode_t mode) {
+  return IRDaikinESP::convertMode(mode);
+}
+
+/// Convert a stdAc::fanspeed_t enum into it's native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRDaikin312::convertFan(const stdAc::fanspeed_t speed) {
+  return IRDaikinESP::convertFan(speed);
+}
+
+/// Convert a stdAc::swingh_t enum into it's native setting.
+/// @param[in] position The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRDaikin312::convertSwingH(const stdAc::swingh_t position) {
+  switch (position) {
+    case stdAc::swingh_t::kAuto:     return kDaikin312SwingHSwing;
+    case stdAc::swingh_t::kLeftMax:  return kDaikin312SwingHLeftMax;
+    case stdAc::swingh_t::kLeft:     return kDaikin312SwingHLeft;
+    case stdAc::swingh_t::kMiddle:   return kDaikin312SwingHMiddle;
+    case stdAc::swingh_t::kRight:    return kDaikin312SwingHRight;
+    case stdAc::swingh_t::kRightMax: return kDaikin312SwingHRightMax;
+    case stdAc::swingh_t::kWide:     return kDaikin312SwingHWide;
+    default:                         return kDaikin312SwingHAuto;
+  }
+}
+
+/// Convert a native horizontal swing postion to it's common equivalent.
+/// @param[in] setting A native position to convert.
+/// @return The common horizontal swing position.
+stdAc::swingh_t IRDaikin312::toCommonSwingH(const uint8_t setting) {
+  switch (setting) {
+    case kDaikin312SwingHSwing:    return stdAc::swingh_t::kAuto;
+    case kDaikin312SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;
+    case kDaikin312SwingHLeft:     return stdAc::swingh_t::kLeft;
+    case kDaikin312SwingHMiddle:   return stdAc::swingh_t::kMiddle;
+    case kDaikin312SwingHRight:    return stdAc::swingh_t::kRight;
+    case kDaikin312SwingHRightMax: return stdAc::swingh_t::kRightMax;
+    case kDaikin312SwingHWide:     return stdAc::swingh_t::kWide;
+    default:                     return stdAc::swingh_t::kOff;
+  }
+}
+
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
+stdAc::state_t IRDaikin312::toCommon(void) const {
+  stdAc::state_t result{};
+  result.protocol = decode_type_t::DAIKIN312;
+  result.model = -1;  // No models used.
+  result.power = getPower();
+  result.mode = IRDaikinESP::toCommonMode(_.Mode);
+  result.celsius = true;
+  result.degrees = getTemp();
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(getFan());
+  result.swingv = toCommonSwingV(_.SwingV);
+  result.swingh = toCommonSwingH(_.SwingH);
+  result.quiet = _.Quiet;
+  result.light = _.Light != 3;  // 3 is Off, everything else is On.
+  result.turbo = _.Powerful;
+  result.clean = _.Mold;
+  result.econo = _.Econo;
+  // result.eye = _.Eye;
+  // result.eyeauto = _.EyeAuto;
+  result.filter = _.Purify;
+  result.beep = _.Beep != 3;  // 3 is Off, everything else is On.
+  result.sleep = _.SleepTimer ? getSleepTime() : -1;
+  // Not supported.
+  result.clock = -1;
+  return result;
+}
+
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
+String IRDaikin312::toString(void) const {
+  String result = "";
+  result.reserve(330);  // Reserve some heap for the string to reduce fragging.
+  result += addBoolToString(getPower(), kPowerStr, false);
+  result += addModeToString(_.Mode, kDaikinAuto, kDaikinCool, kDaikinHeat,
+                            kDaikinDry, kDaikinFan);
+  result += addTempFloatToString(getTemp());
+  result += addFanToString(getFan(), kDaikinFanMax, kDaikinFanMin,
+                           kDaikinFanAuto, kDaikinFanQuiet, kDaikinFanMed);
+  result += addSwingVToString(_.SwingV, kDaikin312SwingVAuto,
+                              kDaikin312SwingVHighest, kDaikin312SwingVHigh,
+                              kDaikin312SwingVUpperMiddle,
+                              kDaikin312SwingVAuto,  // Middle is unused.
+                              kDaikin312SwingVLowerMiddle,
+                              kDaikin312SwingVLow, kDaikin312SwingVLowest,
+                              kDaikin312SwingVOff,  // Off is unused
+                              kDaikin312SwingVSwing, kDaikin312SwingVBreeze,
+                              kDaikin312SwingVCirculate);
+  result += addSwingHToString(_.SwingH, kDaikin2SwingHAuto,
+                              kDaikin312SwingHLeftMax,
+                              kDaikin312SwingHLeft,
+                              kDaikin312SwingHMiddle,
+                              kDaikin312SwingHRight,
+                              kDaikin312SwingHRightMax,
+                              kDaikin312SwingHOff,
+                              kDaikin312SwingHAuto,  // Unused
+                              kDaikin312SwingHAuto,  // Unused
+                              kDaikin312SwingHAuto,  // Unused
+                              kDaikin312SwingHWide);
+  result += addLabeledString(minsToString(_.CurrentTime), kClockStr);
+  result += addLabeledString(
+      _.OnTimer ? minsToString(_.OnTime) : kOffStr, kOnTimerStr);
+  result += addLabeledString(
+      _.OffTimer ? minsToString(_.OffTime) : kOffStr,
+      kOffTimerStr);
+  result += addLabeledString(
+      _.SleepTimer ? minsToString(getSleepTime()) : kOffStr,
+      kSleepTimerStr);
+  result += addIntToString(_.Beep, kBeepStr);
+  result += kSpaceLBraceStr;
+  switch (_.Beep) {
+    case kDaikinBeepLoud:
+      result += kLoudStr;
+      break;
+    case kDaikinBeepQuiet:
+      result += kQuietStr;
+      break;
+    case kDaikinBeepOff:
+      result += kOffStr;
+      break;
+    default:
+      result += kUnknownStr;
+  }
+  result += ')';
+  result += addIntToString(_.Light, kLightStr);
+  result += kSpaceLBraceStr;
+  switch (_.Light) {
+    case kDaikinLightBright:
+      result += kHighStr;
+      break;
+    case kDaikinLightDim:
+      result += kLowStr;
+      break;
+    case kDaikinLightOff:
+      result += kOffStr;
+      break;
+    default:
+      result += kUnknownStr;
+  }
+  result += ')';
+  result += addBoolToString(_.Mold, kMouldStr);
+  result += addBoolToString(_.Clean, kCleanStr);
+  result += addLabeledString(
+      _.FreshAir ? (_.FreshAirHigh ? kHighStr : kOnStr) : kOffStr,
+      kFreshStr);
+  result += addBoolToString(_.Eye, kEyeStr);
+  result += addBoolToString(_.EyeAuto, kEyeAutoStr);
+  result += addBoolToString(_.Quiet, kQuietStr);
+  result += addBoolToString(_.Powerful, kPowerfulStr);
+  result += addBoolToString(_.Purify, kPurifyStr);
+  result += addBoolToString(_.Econo, kEconoStr);
+  result += addIntToString(_.Humidity, kHumidStr);
+  switch (_.Humidity) {
+    case kDaikin312HumidityOff:
+    case kDaikin312HumidityAuto:
+      result += kSpaceLBraceStr;
+      result += _.Humidity ? kAutoStr : kOffStr;
+      result += ')';
+      break;
+    default:
+      result += '%';
+  }
+  return result;
+}
+
 #if SEND_DAIKIN312
 /// Send a Daikin312 (312-bit / 39 byte) A/C formatted message.
 /// Status: BETA / Untested on a real device.
@@ -3842,20 +4492,20 @@ void IRsend::sendDaikin312(const unsigned char data[], const uint16_t nbytes,
                 kDaikin312BitMark, kDaikin312ZeroSpace,
                 kDaikin312BitMark, kDaikin312HdrGap,
                 static_cast<uint64_t>(0b00000), kDaikinHeaderLength,
-                kDaikin2Freq, false, 0, kDutyDefault);
+                kDaikin312Freq, false, 0, kDutyDefault);
     // Section #1
     sendGeneric(kDaikin312HdrMark, kDaikin312HdrSpace, kDaikin312BitMark,
                 kDaikin312OneSpace, kDaikin312BitMark, kDaikin312ZeroSpace,
                 kDaikin312BitMark, kDaikin312SectionGap, data,
                 kDaikin312Section1Length,
-                kDaikin2Freq, false, 0, kDutyDefault);
+                kDaikin312Freq, false, 0, kDutyDefault);
     // Section #2
     sendGeneric(kDaikin312HdrMark, kDaikin312HdrSpace, kDaikin312BitMark,
                 kDaikin312OneSpace, kDaikin312BitMark, kDaikin312ZeroSpace,
                 kDaikin312BitMark, kDaikin312SectionGap,
                 data + kDaikin312Section1Length,
                 nbytes - kDaikin312Section1Length,
-                kDaikin2Freq, false, 0, kDutyDefault);
+                kDaikin312Freq, false, 0, kDutyDefault);
   }
 }
 #endif  // SEND_DAIKIN312

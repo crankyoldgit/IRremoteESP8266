@@ -1563,7 +1563,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("DAIKIN312", typeToString(decode_type_t::DAIKIN312));
   ASSERT_EQ(decode_type_t::DAIKIN312, strToDecodeType("DAIKIN312"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN312));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::DAIKIN312));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN312));
   ASSERT_EQ(kDaikin312Bits, IRsend::defaultBits(decode_type_t::DAIKIN312));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::DAIKIN312));
 }
@@ -4087,10 +4087,14 @@ TEST(TestDecodeDaikin312, RealExample) {
   ASSERT_EQ(kDaikin312Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 3 (Cool), Temp: 21C, Fan: 10 (Auto), "
+      "Swing(V): 0 (Off), Swing(H): 0 (Off), Clock: 48:34, On Timer: Off, "
+      "Off Timer: Off, Sleep Timer: Off, Beep: 0 (UNKNOWN), Light: 1 (High), "
+      "Mould: Off, Clean: Off, Fresh: Off, Eye: Off, Eye Auto: Off, "
+      "Quiet: Off, Powerful: Off, Purify: Off, Econo: Off, Humid: 0 (Off)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -4115,6 +4119,319 @@ TEST(TestDecodeDaikin312, SyntheticExample) {
   ASSERT_EQ(kDaikin312Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 3 (Cool), Temp: 21C, Fan: 10 (Auto), "
+      "Swing(V): 0 (Off), Swing(H): 0 (Off), Clock: 48:34, On Timer: Off, "
+      "Off Timer: Off, Sleep Timer: Off, Beep: 0 (UNKNOWN), Light: 1 (High), "
+      "Mould: Off, Clean: Off, Fresh: Off, Eye: Off, Eye Auto: Off, "
+      "Quiet: Off, Powerful: Off, Purify: Off, Econo: Off, Humid: 0 (Off)",
       IRAcUtils::resultAcToString(&irsend.capture));
+}
+
+TEST(TestDaikin312Class, Power) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.on();
+  EXPECT_TRUE(ac.getPower());
+
+  ac.off();
+  EXPECT_FALSE(ac.getPower());
+
+  ac.setPower(true);
+  EXPECT_TRUE(ac.getPower());
+
+  ac.setPower(false);
+  EXPECT_FALSE(ac.getPower());
+}
+
+TEST(TestDaikin312Class, Temperature) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kDaikinAuto);
+  ac.setTemp(0);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(255);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMinTemp - 1);
+  EXPECT_EQ(kDaikinMinTemp, ac.getTemp());
+
+  ac.setTemp(kDaikinMaxTemp + 1);
+  EXPECT_EQ(kDaikinMaxTemp, ac.getTemp());
+
+  ac.setTemp(21);
+  EXPECT_EQ(21, ac.getTemp());
+
+  ac.setTemp(25);
+  EXPECT_EQ(25, ac.getTemp());
+
+  // Test Cool mode minimum temperature
+  ac.setMode(kDaikinCool);
+  ac.setTemp(kDaikin312MinCoolTemp - 1);
+  EXPECT_EQ(kDaikin312MinCoolTemp, ac.getTemp());
+  ac.setTemp(kDaikin312MinCoolTemp + 1);
+  EXPECT_EQ(kDaikin312MinCoolTemp + 1, ac.getTemp());
+}
+
+TEST(TestDaikin312Class, OperatingMode) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMode(kDaikinAuto);
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+
+  ac.setMode(kDaikinCool);
+  EXPECT_EQ(kDaikinCool, ac.getMode());
+
+  ac.setMode(kDaikinHeat);
+  EXPECT_EQ(kDaikinHeat, ac.getMode());
+
+  ac.setMode(kDaikinDry);
+  EXPECT_EQ(kDaikinDry, ac.getMode());
+
+  ac.setMode(kDaikinFan);
+  EXPECT_EQ(kDaikinFan, ac.getMode());
+
+  ac.setMode(255);  // Invalid mode should default to Auto
+  EXPECT_EQ(kDaikinAuto, ac.getMode());
+}
+
+TEST(TestDaikin312Class, FanSpeed) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setFan(kDaikinFanAuto);
+  EXPECT_EQ(kDaikinFanAuto, ac.getFan());
+
+  ac.setFan(kDaikinFanMin);
+  EXPECT_EQ(kDaikinFanMin, ac.getFan());
+
+  ac.setFan(kDaikinFanMed);
+  EXPECT_EQ(kDaikinFanMed, ac.getFan());
+
+  ac.setFan(kDaikinFanMax);
+  EXPECT_EQ(kDaikinFanMax, ac.getFan());
+
+  ac.setFan(kDaikinFanQuiet);
+  EXPECT_EQ(kDaikinFanQuiet, ac.getFan());
+}
+
+TEST(TestDaikin312Class, QuietAndPowerful) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setQuiet(false);
+  ac.setPowerful(false);
+  EXPECT_FALSE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
+
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
+
+  ac.setPowerful(true);
+  EXPECT_FALSE(ac.getQuiet());
+  EXPECT_TRUE(ac.getPowerful());
+
+  ac.setQuiet(true);
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_FALSE(ac.getPowerful());
+}
+
+TEST(TestDaikin312Class, EconoMode) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setEcono(false);
+  ASSERT_FALSE(ac.getEcono());
+
+  ac.setEcono(true);
+  ASSERT_TRUE(ac.getEcono());
+
+  ac.setEcono(false);
+  ASSERT_FALSE(ac.getEcono());
+}
+
+TEST(TestDaikin312Class, MoldSetting) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setMold(false);
+  ASSERT_FALSE(ac.getMold());
+
+  ac.setMold(true);
+  ASSERT_TRUE(ac.getMold());
+
+  ac.setMold(false);
+  ASSERT_FALSE(ac.getMold());
+}
+
+TEST(TestDaikin312Class, EyeSetting) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setEye(false);
+  ASSERT_FALSE(ac.getEye());
+
+  ac.setEye(true);
+  ASSERT_TRUE(ac.getEye());
+
+  ac.setEyeAuto(false);
+  ASSERT_FALSE(ac.getEyeAuto());
+
+  ac.setEyeAuto(true);
+  ASSERT_TRUE(ac.getEyeAuto());
+}
+
+TEST(TestDaikin312Class, PurifySetting) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setPurify(false);
+  ASSERT_FALSE(ac.getPurify());
+
+  ac.setPurify(true);
+  ASSERT_TRUE(ac.getPurify());
+}
+
+TEST(TestDaikin312Class, CleanSetting) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setClean(false);
+  ASSERT_FALSE(ac.getClean());
+
+  ac.setClean(true);
+  ASSERT_TRUE(ac.getClean());
+}
+
+TEST(TestDaikin312Class, FreshAirSettings) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setFreshAir(false);
+  ac.setFreshAirHigh(false);
+  ASSERT_FALSE(ac.getFreshAir());
+  ASSERT_FALSE(ac.getFreshAirHigh());
+
+  ac.setFreshAir(true);
+  ASSERT_TRUE(ac.getFreshAir());
+  ASSERT_FALSE(ac.getFreshAirHigh());
+
+  ac.setFreshAirHigh(true);
+  ASSERT_TRUE(ac.getFreshAir());
+  ASSERT_TRUE(ac.getFreshAirHigh());
+}
+
+TEST(TestDaikin312Class, LightAndBeep) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setLight(kDaikinLightBright);
+  EXPECT_EQ(kDaikinLightBright, ac.getLight());
+
+  ac.setLight(kDaikinLightDim);
+  EXPECT_EQ(kDaikinLightDim, ac.getLight());
+
+  ac.setLight(kDaikinLightOff);
+  EXPECT_EQ(kDaikinLightOff, ac.getLight());
+
+  ac.setBeep(kDaikinBeepLoud);
+  EXPECT_EQ(kDaikinBeepLoud, ac.getBeep());
+
+  ac.setBeep(kDaikinBeepQuiet);
+  EXPECT_EQ(kDaikinBeepQuiet, ac.getBeep());
+
+  ac.setBeep(kDaikinBeepOff);
+  EXPECT_EQ(kDaikinBeepOff, ac.getBeep());
+}
+
+TEST(TestDaikin312Class, CurrentTime) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setCurrentTime(0);
+  EXPECT_EQ(0, ac.getCurrentTime());
+
+  ac.setCurrentTime(60);
+  EXPECT_EQ(60, ac.getCurrentTime());
+
+  ac.setCurrentTime(12 * 60 + 30);  // 12:30
+  EXPECT_EQ(12 * 60 + 30, ac.getCurrentTime());
+
+  ac.setCurrentTime(23 * 60 + 59);  // 23:59
+  EXPECT_EQ(23 * 60 + 59, ac.getCurrentTime());
+}
+
+TEST(TestDaikin312Class, Timers) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  // On Timer
+  ac.disableOnTimer();
+  EXPECT_FALSE(ac.getOnTimerEnabled());
+
+  ac.enableOnTimer(8 * 60);  // 8:00
+  EXPECT_TRUE(ac.getOnTimerEnabled());
+  EXPECT_EQ(8 * 60, ac.getOnTime());
+
+  // Off Timer
+  ac.disableOffTimer();
+  EXPECT_FALSE(ac.getOffTimerEnabled());
+
+  ac.enableOffTimer(22 * 60);  // 22:00
+  EXPECT_TRUE(ac.getOffTimerEnabled());
+  EXPECT_EQ(22 * 60, ac.getOffTime());
+
+  // Sleep Timer
+  ac.disableSleepTimer();
+  EXPECT_FALSE(ac.getSleepTimerEnabled());
+
+  ac.enableSleepTimer(2 * 60);  // 2 hours
+  EXPECT_TRUE(ac.getSleepTimerEnabled());
+  EXPECT_EQ(2 * 60, ac.getSleepTime());
+}
+
+TEST(TestDaikin312Class, toCommon) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.setPower(true);
+  ac.setMode(kDaikinCool);
+  ac.setTemp(20);
+  ac.setFan(kDaikinFanMax);
+  ac.setSwingVertical(kDaikin312SwingVAuto);
+  ac.setSwingHorizontal(kDaikin312SwingHAuto);
+  ac.setQuiet(false);
+  ac.setPowerful(true);
+  ac.setEcono(false);
+  ac.setMold(true);
+  ac.setLight(kDaikinLightBright);
+  ac.setPurify(true);
+  ac.setBeep(kDaikinBeepLoud);
+  ac.enableSleepTimer(6 * 60);
+  // Now test it.
+  ASSERT_EQ(decode_type_t::DAIKIN312, ac.toCommon().protocol);
+  ASSERT_EQ(-1, ac.toCommon().model);
+  ASSERT_TRUE(ac.toCommon().power);
+  ASSERT_TRUE(ac.toCommon().celsius);
+  ASSERT_EQ(20, ac.toCommon().degrees);
+  ASSERT_TRUE(ac.toCommon().turbo);
+  ASSERT_TRUE(ac.toCommon().clean);
+  ASSERT_FALSE(ac.toCommon().quiet);
+  ASSERT_FALSE(ac.toCommon().econo);
+  ASSERT_TRUE(ac.toCommon().light);
+  ASSERT_TRUE(ac.toCommon().filter);
+  ASSERT_TRUE(ac.toCommon().beep);
+  ASSERT_EQ(stdAc::opmode_t::kCool, ac.toCommon().mode);
+  ASSERT_EQ(stdAc::fanspeed_t::kMax, ac.toCommon().fanspeed);
+  ASSERT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
+  ASSERT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  ASSERT_EQ(6 * 60, ac.toCommon().sleep);
 }

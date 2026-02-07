@@ -233,6 +233,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN216
     case decode_type_t::DAIKIN216:
 #endif
+#if SEND_DAIKIN312
+    case decode_type_t::DAIKIN312:
+#endif
 #if SEND_DAIKIN64
     case decode_type_t::DAIKIN64:
 #endif
@@ -1064,6 +1067,54 @@ void IRac::daikin216(IRDaikin216 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN216
+
+#if SEND_DAIKIN312
+/// Send a Daikin 312-bit A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRDaikin312 object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
+/// @param[in] quiet Run the device in quiet/silent mode.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+/// @param[in] light Turn on the LED/Display mode.
+/// @param[in] econo Run the device in economical mode.
+/// @param[in] filter Turn on the (ion/pollen/etc) filter mode.
+/// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
+/// @param[in] beep Enable/Disable beeps when receiving IR messages.
+/// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
+/// @param[in] clock The time in Nr. of mins since midnight. < 0 is ignore.
+void IRac::daikin312(IRDaikin312 *ac,
+                     const bool on, const stdAc::opmode_t mode,
+                     const float degrees, const stdAc::fanspeed_t fan,
+                     const stdAc::swingv_t swingv,
+                     const stdAc::swingh_t swingh,
+                     const bool quiet, const bool turbo, const bool light,
+                     const bool econo, const bool filter, const bool clean,
+                     const bool beep, const int16_t sleep,
+                     const int16_t clock) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical(ac->convertSwingV(swingv));
+  ac->setSwingHorizontal(ac->convertSwingH(swingh));
+  ac->setQuiet(quiet);
+  ac->setLight(light ? 1 : 3);  // On/High is 1, Off is 3.
+  ac->setPowerful(turbo);
+  ac->setEcono(econo);
+  ac->setPurify(filter);
+  ac->setMold(clean);
+  ac->setClean(true);  // Hardwire auto clean to be on per request (@sheppy99)
+  ac->setBeep(beep ? 2 : 3);  // On/Loud is 2, Off is 3.
+  if (sleep > 0) ac->enableSleepTimer(sleep);
+  if (clock >= 0) ac->setCurrentTime(clock);
+  ac->send();
+}
+#endif  // SEND_DAIKIN312
 
 #if SEND_DAIKIN64
 /// Send a Daikin 64-bit A/C message with the supplied settings.
@@ -3233,6 +3284,16 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_DAIKIN216
+#if SEND_DAIKIN312
+    case DAIKIN312:
+    {
+      IRDaikin312 ac(_pin, _inverted, _modulation);
+      daikin312(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+                send.swingh, send.quiet, send.turbo, send.light, send.econo,
+                send.filter, send.clean, send.beep, send.sleep, send.clock);
+      break;
+    }
+#endif  // SEND_DAIKIN312
 #if SEND_DAIKIN64
     case DAIKIN64:
     {
@@ -4233,6 +4294,13 @@ String resultAcToString(const decode_results * const result) {
       return ac.toString();
     }
 #endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN312
+    case decode_type_t::DAIKIN312: {
+      IRDaikin312 ac(kGpioUnused);
+      ac.setRaw(result->state);
+      return ac.toString();
+    }
+#endif  // DECODE_DAIKIN312
 #if DECODE_DAIKIN64
     case decode_type_t::DAIKIN64: {
       IRDaikin64 ac(kGpioUnused);
@@ -4735,6 +4803,14 @@ bool decodeToState(const decode_results *decode, stdAc::state_t *result,
       break;
     }
 #endif  // DECODE_DAIKIN216
+#if DECODE_DAIKIN312
+    case decode_type_t::DAIKIN312: {
+      IRDaikin312 ac(kGpioUnused);
+      ac.setRaw(decode->state);
+      *result = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_DAIKIN312
 #if DECODE_DAIKIN64
     case decode_type_t::DAIKIN64: {
       IRDaikin64 ac(kGpioUnused);
