@@ -15,10 +15,10 @@
     _outer = PyList_New($1.size());
     // Populate the PyList.  PyLong_FromLong converts a C++ "long" to a
     // Python PyLong object.
-    for(int x = 0; x < $1.size(); x++) {
-        PyList_SetItem(_outer,x,PyLong_FromLong($1[x]));
+    for(size_t x = 0; x < $1.size(); x++) {
+        PyList_SetItem(_outer, x, PyLong_FromLong($1[x]));
     }
-   $result = SWIG_Python_AppendOutput($result,_outer);
+    $result = _outer;
 %}
 %include <IRsend.h>
 %include <IRremoteESP8266.h>
