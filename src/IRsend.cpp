@@ -13,11 +13,14 @@
 #ifdef UNIT_TEST
 #include <cmath>
 #endif
+#ifdef SWIGLIB
+#include <vector>
+#endif  // SWIGLIB
 #include "IRtimer.h"
 
 #ifdef SWIGLIB
 std::vector<int> timingList;
-#endif
+#endif  // SWIGLIB
 
 /// Constructor for an IRsend object.
 /// @param[in] IRsendPin Which GPIO pin to use when sending an IR command.
