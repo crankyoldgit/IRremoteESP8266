@@ -13,7 +13,14 @@
 #ifdef UNIT_TEST
 #include <cmath>
 #endif
+#ifdef SWIGLIB
+#include <vector>
+#endif  // SWIGLIB
 #include "IRtimer.h"
+
+#ifdef SWIGLIB
+std::vector<int> timingList;
+#endif  // SWIGLIB
 
 /// Constructor for an IRsend object.
 /// @param[in] IRsendPin Which GPIO pin to use when sending an IR command.
@@ -155,6 +162,11 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
 /// Ref:
 ///   https://www.analysir.com/blog/2017/01/29/updated-esp8266-nodemcu-backdoor-upwm-hack-for-ir-signals/
 uint16_t IRsend::mark(uint16_t usec) {
+#ifdef SWIGLIB
+  // std::cout << usec << " ";
+  timingList.push_back(usec);
+  return 1;
+#else  // SWIGLIB
   // Handle the simple case of no required frequency modulation.
   if (!modulation || _dutycycle >= 100) {
     ledOn();
@@ -187,6 +199,7 @@ uint16_t IRsend::mark(uint16_t usec) {
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
   return counter;
+#endif  // SWIGLIB
 }
 
 /// Turn the pin (LED) off for a given time.
@@ -196,7 +209,12 @@ uint16_t IRsend::mark(uint16_t usec) {
 void IRsend::space(uint32_t time) {
   ledOff();
   if (time == 0) return;
+#ifdef SWIGLIB
+  // std::cout << time << " ";
+  timingList.push_back(time);
+#else  // SWIGLIB
   _delayMicroseconds(time);
+#endif  // SWIGLIB
 }
 
 /// Calculate & set any offsets to account for execution times during sending.
