@@ -10,7 +10,7 @@
 #endif
 #ifdef SWIGLIB
 #include <vector>
-#endif
+#endif  // SWIGLIB
 #include "IRremoteESP8266.h"
 #include "ir_Airton.h"
 #include "ir_Airwell.h"
@@ -114,7 +114,7 @@ class IRac {
 #ifdef SWIGLIB
   std::vector<int> getTiming(void);
   void resetTiming(void);
-#endif
+#endif  // SWIGLIB
   bool hasStateChanged(void);
   stdAc::state_t next;  ///< The state we want the device to be in after we send
 #ifdef UNIT_TEST
@@ -125,7 +125,7 @@ class IRac {
   std::shared_ptr<IRrecv> _utReceiver = nullptr;
   std::unique_ptr<decode_results> _lastDecodeResults = nullptr;
   /// @endcond
-#endif
+#endif  // SWIGLIB
 #else
 
  private:

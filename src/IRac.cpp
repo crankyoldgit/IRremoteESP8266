@@ -22,7 +22,7 @@
 #ifdef SWIGLIB
 #include <vector>
 extern std::vector<int> timingList;
-#endif
+#endif  // SWIGLIB
 #include "IRsend.h"
 #include "IRremoteESP8266.h"
 #include "IRtext.h"
@@ -105,7 +105,7 @@ extern std::vector<int> timingList;
       }                                                         \
     }                                                           \
   }
-#else
+#else  // SWIGLIB
 #define OUTPUT_DECODE_RESULTS_FOR_UT(ac)
 #endif  // SWIGLIB
 #endif  // UNIT_TEST
@@ -194,7 +194,7 @@ stdAc::state_t IRac::getStatePrev(void) { return _prev; }
 #ifdef SWIGLIB
 std::vector<int> IRac::getTiming(void) { return timingList; }
 void IRac::resetTiming(void) { timingList.clear(); }
-#endif
+#endif  // SWIGLIB
 
 /// Is the given protocol supported by the IRac class?
 /// @param[in] protocol The vendor/protocol type.

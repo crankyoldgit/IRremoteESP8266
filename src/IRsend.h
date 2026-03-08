@@ -19,7 +19,7 @@
 #define VIRTUAL virtual
 #ifdef SWIGLIB
 #define VIRTUALMS
-#else
+#else  // SWIGLIB
 #define VIRTUALMS virtual
 #endif  // SWIGLIB
 #else
@@ -55,7 +55,7 @@ const float kNoTempValue = -100.0;
 #ifdef SWIGLIB
 // Global
 extern std::vector<int> timingList;
-#endif
+#endif  // SWIGLIB
 
 /// Enumerators and Structures for the Common A/C API.
 namespace stdAc {

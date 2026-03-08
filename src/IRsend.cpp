@@ -166,7 +166,7 @@ uint16_t IRsend::mark(uint16_t usec) {
   // std::cout << usec << " ";
   timingList.push_back(usec);
   return 1;
-#else
+#else  // SWIGLIB
   // Handle the simple case of no required frequency modulation.
   if (!modulation || _dutycycle >= 100) {
     ledOn();
@@ -199,7 +199,7 @@ uint16_t IRsend::mark(uint16_t usec) {
     elapsed = usecTimer.elapsed();  // Update & recache the actual elapsed time.
   }
   return counter;
-#endif
+#endif  // SWIGLIB
 }
 
 /// Turn the pin (LED) off for a given time.
@@ -212,9 +212,9 @@ void IRsend::space(uint32_t time) {
 #ifdef SWIGLIB
   // std::cout << time << " ";
   timingList.push_back(time);
-#else
+#else  // SWIGLIB
   _delayMicroseconds(time);
-#endif
+#endif  // SWIGLIB
 }
 
 /// Calculate & set any offsets to account for execution times during sending.
