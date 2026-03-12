@@ -16,6 +16,7 @@
 #include "IRtimer.h"
 #if ENABLE_ESP32_RMT_USAGE
 #include <vector>
+#include <driver/gpio.h>
 #endif
 
 /// Constructor for an IRsend object.
@@ -86,6 +87,7 @@ IRsend::~IRsend(void) {
 void IRsend::begin() {
 #ifndef UNIT_TEST
 #if ENABLE_ESP32_RMT_USAGE
+  ESP_ERROR_CHECK(gpio_reset_pin((gpio_num_t)IRpin));
   ESP_ERROR_CHECK(rmt_new_tx_channel(&_rmt_tx_chan_config, &_rmt_tx_chan));
   ESP_ERROR_CHECK(rmt_apply_carrier(_rmt_tx_chan, &_rmt_tx_carrier_cfg));
   ESP_ERROR_CHECK(rmt_new_copy_encoder(&_rmt_encoder_config, &_rmt_copy_encoder));
@@ -105,6 +107,10 @@ void IRsend::end() {
   while (_is_rmt_driver_installed) {
     _is_rmt_driver_installed = (rmt_del_channel(_rmt_tx_chan)!=ESP_OK);
   }
+  ESP_ERROR_CHECK(gpio_reset_pin((gpio_num_t)IRpin));
+  ESP_ERROR_CHECK(gpio_pullup_dis((gpio_num_t)IRpin));
+  ESP_ERROR_CHECK(gpio_set_direction((gpio_num_t)IRpin, GPIO_MODE_OUTPUT_OD));
+  ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)IRpin, 0));
 }
 #endif  // ENABLE_ESP32_RMT_USAGE
 
