@@ -103,6 +103,9 @@ void IRsend::begin() {
 #if ENABLE_ESP32_RMT_USAGE
 /// Disable the pin for output.
 void IRsend::end() {
+  if (!_rmt_symbol_buffer.empty()){
+    send();
+  }
   ESP_ERROR_CHECK(rmt_disable(_rmt_tx_chan));
   while (_is_rmt_driver_installed) {
     _is_rmt_driver_installed = (rmt_del_channel(_rmt_tx_chan)!=ESP_OK);
