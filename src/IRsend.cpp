@@ -14,6 +14,9 @@
 #include <cmath>
 #endif
 #include "IRtimer.h"
+#if ENABLE_ESP32_RMT_USAGE
+#include <vector>
+#endif
 
 /// Constructor for an IRsend object.
 /// @param[in] IRsendPin Which GPIO pin to use when sending an IR command.
@@ -26,14 +29,8 @@
 ///  i.e. If not, assume a 100% duty cycle. Ignore attempts to change the
 ///  duty cycle etc.
 /// @param[in] rmt_channel The channel of the RMT module to use. [ESP32]
-#if ENABLE_ESP32_RMT_USAGE
-IRsend::IRsend(uint16_t IRsendPin, bool inverted,
-               bool use_modulation, rmt_channel_t rmt_channel)
-#else
 IRsend::IRsend(uint16_t IRsendPin, bool inverted,
                bool use_modulation)
-#endif  // ENABLE_ESP32_RMT_USAGE
-
     : IRpin(IRsendPin), periodOffset(kPeriodOffset) {
   if (inverted) {
     outputOn = LOW;
@@ -49,22 +46,29 @@ IRsend::IRsend(uint16_t IRsendPin, bool inverted,
     _dutycycle = kDutyMax;
 
 #if ENABLE_ESP32_RMT_USAGE
-  // Configure RMT channel for transmission
-  _rmt_config.rmt_mode = RMT_MODE_TX;
-  _rmt_config.channel = rmt_channel;
-  _rmt_config.gpio_num = (gpio_num_t) IRsendPin;
-  _rmt_config.mem_block_num = 1;
-  _rmt_config.clk_div = 80;  // 80MHz/80 = 1MHz tick resolution (1us per count)
+  // // Configure RMT channel for transmission
+  _rmt_tx_chan_config = (const rmt_tx_channel_config_t){
+    .gpio_num = (gpio_num_t) IRsendPin, // GPIO number
+    .clk_src = RMT_CLK_SRC_DEFAULT,     // select source clock
+    .resolution_hz = 1 * 1000 * 1000,   // 1 MHz tick resolution, i.e., 1 tick = 1 µs
+    .mem_block_symbols = 64,            // memory block size, 64 * 4 = 256 Bytes
+    .trans_queue_depth = 4,             // set the number of transactions that can pend in the background
+    .flags = {
+      .invert_out = inverted,     // do not invert output signal
+      .with_dma = false,          // do not need DMA backend
+    },
+  };
 
-  // TX specific configurations
-  _rmt_config.tx_config.loop_en = false;
-  _rmt_config.tx_config.carrier_en = true;
-  _rmt_config.tx_config.carrier_level = RMT_CARRIER_LEVEL_HIGH;
-  _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
-  _rmt_config.tx_config.carrier_freq_hz = 38000;  // Default IR TX frequency.
-  _rmt_config.tx_config.idle_output_en = true;
-  _rmt_config.tx_config.idle_level = inverted ? RMT_IDLE_LEVEL_HIGH :
-                                                RMT_IDLE_LEVEL_LOW;
+  _rmt_tx_carrier_cfg = {
+    .frequency_hz = 38000,              // 38 KHz
+    .duty_cycle = (_dutycycle/100.f),   // duty cycle
+    .flags = {
+      .polarity_active_low = false, // carrier should be modulated to high level
+    },
+  };
+  _rmt_tx_config = {
+    .loop_count = 0,
+  };
 #endif  // ENABLE_ESP32_RMT_USAGE
 }
 
@@ -82,8 +86,10 @@ IRsend::~IRsend(void) {
 void IRsend::begin() {
 #ifndef UNIT_TEST
 #if ENABLE_ESP32_RMT_USAGE
-  assert(!rmt_config(&_rmt_config));
-  assert(!rmt_driver_install(_rmt_config.channel, 0, 0));
+  ESP_ERROR_CHECK(rmt_new_tx_channel(&_rmt_tx_chan_config, &_rmt_tx_chan));
+  ESP_ERROR_CHECK(rmt_apply_carrier(_rmt_tx_chan, &_rmt_tx_carrier_cfg));
+  ESP_ERROR_CHECK(rmt_new_copy_encoder(&_rmt_encoder_config, &_rmt_copy_encoder));
+  ESP_ERROR_CHECK(rmt_enable(_rmt_tx_chan));
   _is_rmt_driver_installed = true;
 #else
   pinMode(IRpin, OUTPUT);
@@ -95,8 +101,10 @@ void IRsend::begin() {
 #if ENABLE_ESP32_RMT_USAGE
 /// Disable the pin for output.
 void IRsend::end() {
-  if (_is_rmt_driver_installed)
-    _is_rmt_driver_installed = rmt_driver_uninstall(_rmt_config.channel);
+  ESP_ERROR_CHECK(rmt_disable(_rmt_tx_chan));
+  while (_is_rmt_driver_installed) {
+    _is_rmt_driver_installed = (rmt_del_channel(_rmt_tx_chan)!=ESP_OK);
+  }
 }
 #endif  // ENABLE_ESP32_RMT_USAGE
 
@@ -163,10 +171,11 @@ void IRsend::enableIROut(uint32_t freq, uint8_t duty) {
   // Nr. of uSeconds the LED will be off per pulse.
   offTimePeriod = period - onTimePeriod;
 #if ENABLE_ESP32_RMT_USAGE
-  _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
-  _rmt_config.tx_config.carrier_freq_hz = freq;
+  _rmt_tx_carrier_cfg.duty_cycle = (_dutycycle/100.0f);
+  _rmt_tx_carrier_cfg.frequency_hz = freq;
   // Update rmt config.
-  assert(!rmt_config(&_rmt_config));
+  ESP_ERROR_CHECK(rmt_apply_carrier(_rmt_tx_chan, &_rmt_tx_carrier_cfg));
+
 #endif  // ENABLE_ESP32_RMT_USAGE
 }
 
@@ -219,16 +228,9 @@ void IRsend::_delayMicroseconds(uint32_t usec) {
 uint16_t IRsend::mark(uint16_t usec) {
 #if ENABLE_ESP32_RMT_USAGE
   // ESP32 does this very differently if using the RMT drvier
-  _rmt_config.tx_config.carrier_duty_percent = _dutycycle;
-  static const rmt_item32_t mark_signal[] = {
-    {{{ usec, 1, 0, 0 }}},  // mark
-  };
-  // Try sending the mark signal via rmt.
-  if (!rmt_write_items(_rmt_config.channel, mark_signal, 1, true))
-    return 0;  // We failed. So report no pulses.
-  // Calculate & return how many pulses we should have sent. We can't actually
-  // counthow many were really sent.
-  return (_rmt_config.tx_config.carrier_freq_hz * usec) / 1000000UL;
+  // add the mark signal to the half symbol buffer.
+  _rmt_symbol_buffer.push({usec, 1});
+  return (_rmt_tx_carrier_cfg.frequency_hz * usec) / 1000000UL;
 #else  // The bit-banging approach.
   // Handle the simple case of no required frequency modulation.
   if (!modulation || _dutycycle >= 100) {
@@ -270,9 +272,13 @@ uint16_t IRsend::mark(uint16_t usec) {
 /// A space is no output, so the PWM output is disabled.
 /// @param[in] time Time in microseconds (us).
 void IRsend::space(uint32_t time) {
+#if ENABLE_ESP32_RMT_USAGE
+  _rmt_symbol_buffer.push({time, 0});
+#else
   ledOff();
   if (time == 0) return;
   _delayMicroseconds(time);
+#endif
 }
 
 /// Calculate & set any offsets to account for execution times during sending.
@@ -1226,6 +1232,7 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
     default:
       return false;
   }
+  send();
   return true;
 }
 
@@ -1529,5 +1536,56 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
     default:
       return false;
   }
+  send();
   return true;
+}
+
+void IRsend::send(void){
+#if ENABLE_ESP32_RMT_USAGE
+  std::vector<rmt_symbol_word_t> buffer;
+  bool first_run = true;
+  rmt_symbol_half_word_t x1 = {0,0};
+  rmt_symbol_word_t d1 = {0,0,0,0};
+  bool d1_front = true;
+  while (!_rmt_symbol_buffer.empty() || x1.duration != 0){
+    if (x1.duration == 0){
+      if (_rmt_symbol_buffer.empty()){
+        x1 = {0,0};
+      } else {
+        x1 = _rmt_symbol_buffer.front();
+        _rmt_symbol_buffer.pop();
+      }
+    }
+    if (x1.duration >= (1 << 15)){
+      x1.duration = x1.duration - (1<<15) + 1;
+      if (d1_front){
+        d1.duration0 = 0x7FFF;
+        d1.level0 = x1.level;
+      } else {
+        d1.duration1 = 0x7FFF;
+        d1.level1 = x1.level;
+      }
+    } else {
+      if (d1_front){
+        d1.duration0 = x1.duration;
+        d1.level0 = x1.level;
+      } else {
+        d1.duration1 = x1.duration;
+        d1.level1 = x1.level;
+      }
+      x1 = {0,0};
+    }
+    if (!d1_front){
+      buffer.push_back(d1);
+      d1 = {0,0,0,0};
+    }
+    d1_front = !d1_front;
+  }
+  ESP_ERROR_CHECK(rmt_transmit(_rmt_tx_chan, _rmt_copy_encoder, buffer.data(), sizeof(rmt_symbol_word_t)*buffer.size(), &_rmt_tx_config));
+  ESP_ERROR_CHECK(rmt_tx_wait_all_done(_rmt_tx_chan, -1));
+  buffer.clear();
+  return;
+#else
+  return;
+#endif
 }
