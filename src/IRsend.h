@@ -8,6 +8,11 @@
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 #if ENABLE_ESP32_RMT_USAGE
+#if defined __has_include
+#if !(__has_include(<driver/rmt_tx.h>))
+#error "RMT requires ESP-IDF v5.0+"
+#endif
+#endif
 #include <driver/rmt_tx.h>
 #include <queue>
 #endif  // ENABLE_ESP32_RMT_USAGE
