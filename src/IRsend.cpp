@@ -103,17 +103,18 @@ void IRsend::begin() {
 #if ENABLE_ESP32_RMT_USAGE
 /// Disable the pin for output.
 void IRsend::end() {
-  if (!_rmt_symbol_buffer.empty()){
-    send();
+  if (_is_rmt_driver_installed) {
+    if (!_rmt_symbol_buffer.empty()){
+      send();
+    }
+    ESP_ERROR_CHECK(rmt_disable(_rmt_tx_chan));
+    ESP_ERROR_CHECK(rmt_del_channel(_rmt_tx_chan));
+    _is_rmt_driver_installed = false;
+    ESP_ERROR_CHECK(gpio_reset_pin((gpio_num_t)IRpin));
+    ESP_ERROR_CHECK(gpio_pullup_dis((gpio_num_t)IRpin));
+    ESP_ERROR_CHECK(gpio_set_direction((gpio_num_t)IRpin, GPIO_MODE_OUTPUT_OD));
+    ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)IRpin, 0));
   }
-  ESP_ERROR_CHECK(rmt_disable(_rmt_tx_chan));
-  while (_is_rmt_driver_installed) {
-    _is_rmt_driver_installed = (rmt_del_channel(_rmt_tx_chan)!=ESP_OK);
-  }
-  ESP_ERROR_CHECK(gpio_reset_pin((gpio_num_t)IRpin));
-  ESP_ERROR_CHECK(gpio_pullup_dis((gpio_num_t)IRpin));
-  ESP_ERROR_CHECK(gpio_set_direction((gpio_num_t)IRpin, GPIO_MODE_OUTPUT_OD));
-  ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)IRpin, 0));
 }
 #endif  // ENABLE_ESP32_RMT_USAGE
 
