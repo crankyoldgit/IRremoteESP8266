@@ -8,7 +8,13 @@
 #include <stdint.h>
 #include "IRremoteESP8266.h"
 #if ENABLE_ESP32_RMT_USAGE
-#include <driver/rmt.h>
+#if defined __has_include
+#if !(__has_include(<driver/rmt_tx.h>))
+#error "RMT requires ESP-IDF v5.0+"
+#endif
+#endif
+#include <driver/rmt_tx.h>
+#include <queue>
 #endif  // ENABLE_ESP32_RMT_USAGE
 
 // Originally from https://github.com/shirriff/Arduino-IRremote/
@@ -20,6 +26,13 @@
 #else
 #define VIRTUAL
 #endif
+
+#if ENABLE_ESP32_RMT_USAGE
+struct rmt_symbol_half_word_t {
+	uint32_t duration;
+	uint8 level;
+};
+#endif  // ENABLE_ESP32_RMT_USAGE
 
 // Constants
 // Offset (in microseconds) to use in Period time calculations to account for
@@ -251,14 +264,8 @@ enum toshiba_ac_remote_model_t {
 ///  sending IR code on ESP8266
 class IRsend {
  public:
-#if ENABLE_ESP32_RMT_USAGE
-  explicit IRsend(uint16_t IRsendPin, bool inverted = false,
-                  bool use_modulation = true,
-                  rmt_channel_t rmt_channel = RMT_CHANNEL_0);
-#else
   explicit IRsend(uint16_t IRsendPin, bool inverted = false,
                   bool use_modulation = true);
-#endif  // ENABLE_ESP32_RMT_USAGE
 
 #if ENABLE_ESP32_RMT_USAGE
   ~IRsend(void);
@@ -308,6 +315,7 @@ class IRsend {
                    const uint8_t *dataptr, const uint16_t nbytes,
                    const uint16_t frequency, const bool MSBfirst,
                    const uint16_t repeat, const uint8_t dutycycle);
+  void send(void);
   static uint16_t minRepeats(const decode_type_t protocol);
   static uint16_t defaultBits(const decode_type_t protocol);
   bool send(const decode_type_t type, const uint64_t data,
@@ -956,8 +964,14 @@ class IRsend {
                  const uint16_t repeat, const uint16_t freq);
 #endif  // SEND_SONY
 #if ENABLE_ESP32_RMT_USAGE
-  rmt_config_t _rmt_config;
   bool _is_rmt_driver_installed = false;
+  rmt_channel_handle_t _rmt_tx_chan = NULL;
+  rmt_tx_channel_config_t _rmt_tx_chan_config;
+  rmt_carrier_config_t _rmt_tx_carrier_cfg;
+  rmt_encoder_handle_t _rmt_copy_encoder = NULL;
+  rmt_copy_encoder_config_t _rmt_encoder_config = {}; // Reserved for future use
+  rmt_transmit_config_t _rmt_tx_config;
+  std::queue<rmt_symbol_half_word_t> _rmt_symbol_buffer;
 #endif  // ENABLE_ESP32_RMT_USAGE
 };
 
