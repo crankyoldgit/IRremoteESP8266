@@ -970,9 +970,11 @@ typedef volatile const uint16_t atomic_const_uint16_t;
 #endif  // SEND_BLUESTARHEAVY
 
 #ifndef DECODE_EUROM
+#define DECODE_MITSUBISHI_HEAVY_JINLING  true
 #define DECODE_EUROM         _IR_ENABLE_DEFAULT_
 #endif  // DECODE_EUROM
 #ifndef SEND_EUROM
+#define SEND_MITSUBISHI_HEAVY_JINLING  true
 #define SEND_EUROM           _IR_ENABLE_DEFAULT_
 #endif  // SEND_EUROM
 
@@ -1163,9 +1165,10 @@ enum decode_type_t {
   CARRIER_AC84,  // 125
   YORK,
   BLUESTARHEAVY,
+  MITSUBISHI_HEAVY_JINLING,  // 2262
   EUROM,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = EUROM,
+  kLastDecodeType = MITSUBISHI_HEAVY_JINLING,
 };
 
 // Message lengths & required repeat values

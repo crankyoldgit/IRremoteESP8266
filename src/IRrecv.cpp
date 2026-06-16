@@ -1223,6 +1223,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting BluestarHeavy decode");
     if (decodeBluestarHeavy(results, offset, kBluestarHeavyBits)) return true;
 #endif  // DECODE_BLUESTARHEAVY
+#if DECODE_MITSUBISHI_HEAVY_JINLING
+    DPRINTLN("Attempting Mitsubishi Heavy Jinling decode");
+    if (decodeMitsubishiHeavyJinling(results, offset, 64)) return true;
+#endif
 #if DECODE_EUROM
     DPRINTLN("Attempting Eurom decode");
     if (decodeEurom(results, offset, kEuromBits)) return true;

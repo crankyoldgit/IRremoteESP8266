@@ -4596,3 +4596,6 @@ kZepealTolerance	LITERAL1
 kZepealZeroMark	LITERAL1
 kZepealZeroSpace	LITERAL1
 kZoneFollowStr	LITERAL1
+sendMitsubishiHeavyJinling	KEYWORD2
+decodeMitsubishiHeavyJinling	KEYWORD2
+MITSUBISHI_HEAVY_JINLING	LITERAL1

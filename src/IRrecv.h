@@ -893,6 +893,10 @@ class IRrecv {
                   const bool strict = true);
 #endif  // DECODE_BLUESTARHEAVY
 #if DECODE_EUROM
+  bool decodeMitsubishiHeavyJinling(decode_results *results,
+                                     uint16_t offset = kStartOffset,
+                                     const uint16_t nbits = 64,
+                                     const bool strict = false);
   bool decodeEurom(decode_results *results,
                    uint16_t offset = kStartOffset,
                    const uint16_t nbits = kEuromBits,

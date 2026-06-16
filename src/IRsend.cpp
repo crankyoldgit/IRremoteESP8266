@@ -739,6 +739,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kDaikin64Bits;
     case ELECTRA_AC:
       return kElectraAcBits;
+    case MITSUBISHI_HEAVY_JINLING:
+      return 64;
     case EUROM:
       return kEuromBits;
     case GREE:
@@ -1165,13 +1167,17 @@ bool IRsend::send(const decode_type_t type, const uint64_t data,
       sendZepeal(data, nbits, min_repeat);
       break;
 #endif  // SEND_ZEPEAL
+#if SEND_MITSUBISHI_HEAVY_JINLING
+    case MITSUBISHI_HEAVY_JINLING:
+      sendMitsubishiHeavyJinling(data, nbits, min_repeat);
+      break;
+#endif
     default:
       return false;
   }
   return true;
 }
 
-/// Send a complex (>= 64 bits) IR message of a given type.
 /// An unknown/unsupported type will send nothing.
 /// @param[in] type Protocol number/type of the message you want to send.
 /// @param[in] state A pointer to the array of bytes that make up the state[].

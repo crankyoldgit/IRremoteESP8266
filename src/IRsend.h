@@ -920,6 +920,8 @@ class IRsend {
                        const uint16_t repeat = kNoRepeat);
 #endif  // SEND_BLUESTARHEAVY
 #if SEND_EUROM
+  void sendMitsubishiHeavyJinling(const uint64_t data, const uint16_t nbits = 64,
+                                   const uint16_t repeat = kNoRepeat);
   void sendEurom(const uint8_t data[],
                  const uint16_t nbytes = kEuromStateLength,
                  const uint16_t repeat = kNoRepeat);
