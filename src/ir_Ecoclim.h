@@ -46,7 +46,7 @@ const uint8_t kEcoclimTempMax = kEcoclimTempMin + 31;  // Celsius
 const uint16_t kEcoclimTimerDisable = 0x1F * 60 + 7 * 10;  // 4774
 
 // Power: Off, Mode: Auto, Temp: 11C, Sensor: 22C, Fan: Auto, Clock: 00:00
-const uint64_t kEcoclimDefaultState = 0x11063000FFFF02;
+const uint64_t kEcoclimDefaultState = 0x11063000FFFF0A;
 
 /// Native representation of a Ecoclim A/C message.
 union EcoclimProtocol {
@@ -54,7 +54,7 @@ union EcoclimProtocol {
   struct {  // Only 56 bits (7 bytes are used.
     // Byte
     uint64_t            :3;  ///< Fixed 0b010
-    uint64_t            :1;  ///< Unknown
+    uint64_t Sum        :1;  ///< Checksum (even parity over the whole frame)
     uint64_t DipConfig  :4;  ///< 0b0000 = Master, 0b0111 = Slave
     // Byte
     uint64_t OffTenMins :3;  ///< Off Timer minutes (in tens of mins)
@@ -109,8 +109,10 @@ class IREcoclimAc {
   uint8_t getMode(void) const;
   void setClock(const uint16_t nr_of_mins);
   uint16_t getClock(void) const;
-  uint64_t getRaw(void) const;
+  uint64_t getRaw(void);
   void setRaw(const uint64_t new_code);
+  static uint8_t calcChecksum(const uint64_t state);
+  static bool validChecksum(const uint64_t state);
   void setType(const uint8_t code);
   uint8_t getType(void) const;
   static uint8_t convertMode(const stdAc::opmode_t mode);
@@ -137,6 +139,7 @@ class IREcoclimAc {
   /// @endcond
 #endif  // UNIT_TEST
   EcoclimProtocol _;  ///< The state of the IR remote in IR code form.
+  void checksum(void);  ///< Update the parity bit for the internal state.
 };
 
 #endif  // IR_ECOCLIM_H_

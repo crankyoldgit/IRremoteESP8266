@@ -356,3 +356,59 @@ TEST(TestIREcoclimAcClass, HumanReadable) {
       "Clock: 07:59, On Timer: 08:00, Off Timer: 20:40, Type: 7",
       ac.toString());
 }
+
+TEST(TestIREcoclimAcClass, Checksum) {
+  // Real captured frames (incl. the issue #1397 long example, last entry) are
+  // all parity-valid, and calcChecksum() reproduces each frame's parity bit.
+  const uint64_t valid[] = {
+      0x16131320FFFF42, 0x160B431DFFFF4A, 0x1511731CFFFF4A,
+      0x1613531FFFFF4A, 0x1619631EFFFF42, kEcoclimDefaultState,
+      0x110673AEFFFF72};
+  for (const uint64_t v : valid) {
+    EXPECT_TRUE(IREcoclimAc::validChecksum(v)) << "0x" << std::hex << v;
+    EXPECT_EQ((v >> 3) & 1, IREcoclimAc::calcChecksum(v))
+        << "0x" << std::hex << v;
+  }
+
+  // Clearing the parity bit of a valid frame makes it invalid.
+  EXPECT_FALSE(IREcoclimAc::validChecksum(0x160B431DFFFF4A ^ (1ULL << 3)));
+
+  // getRaw() repairs a frame with a bad parity bit.
+  IREcoclimAc ac(kGpioUnused);
+  ac.begin();
+  ac.setRaw(0x160B431DFFFF4A ^ (1ULL << 3));  // Valid frame, parity cleared.
+  EXPECT_EQ(0x160B431DFFFF4A, ac.getRaw());
+}
+
+// Bit 3 of the 56-bit frame is an even-parity bit over the whole frame.
+// The real A/C silently drops frames whose parity is wrong, so getRaw() must
+// always emit a frame with even parity, for every field combination.
+TEST(TestIREcoclimAcClass, ParityIsAlwaysEven) {
+  IREcoclimAc ac(kGpioUnused);
+  ac.begin();
+  // Even parity == the total number of set bits in the 56-bit frame is even.
+  auto isEvenParity = [](const uint64_t v) {
+    return (__builtin_popcountll(v) & 1) == 0;
+  };
+
+  // The reset/default state must itself be a parity-valid frame.
+  EXPECT_TRUE(isEvenParity(ac.getRaw())) << "default state has bad parity";
+
+  // Every power/temp/fan/mode combination must emit a parity-valid frame.
+  ac.setPower(true);
+  for (uint8_t temp = kEcoclimTempMin; temp <= kEcoclimTempMax; temp++) {
+    ac.setTemp(temp);
+    ac.setSensorTemp(temp);
+    for (uint8_t fan = kEcoclimFanMin; fan <= kEcoclimFanAuto; fan++) {
+      ac.setFan(fan);
+      for (uint8_t mode = kEcoclimAuto; mode <= kEcoclimSleep; mode++) {
+        ac.setMode(mode);
+        EXPECT_TRUE(isEvenParity(ac.getRaw()))
+            << "bad parity: temp=" << static_cast<int>(temp)
+            << " fan=" << static_cast<int>(fan)
+            << " mode=" << static_cast<int>(mode)
+            << " raw=0x" << std::hex << ac.getRaw();
+      }
+    }
+  }
+}
