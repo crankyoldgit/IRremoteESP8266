@@ -143,11 +143,38 @@ void IREcoclimAc::send(const uint16_t repeat) {
 
 /// Get a copy of the internal state as a valid code for this protocol.
 /// @return A valid code for this protocol based on the current internal state.
-uint64_t IREcoclimAc::getRaw(void) const { return _.raw; }
+uint64_t IREcoclimAc::getRaw(void) {
+  checksum();  // Ensure the parity bit is correct before returning.
+  return _.raw;
+}
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
 void IREcoclimAc::setRaw(const uint64_t new_code) { _.raw = new_code; }
+
+/// Calculate the checksum (parity) for a given state.
+/// @param[in] state The value to calc the checksum of.
+/// @return The valid checksum value for the state.
+/// @note Bit 3 is an even-parity bit calculated over the whole 56-bit frame;
+///   i.e. the total number of set bits in a valid frame is always even.
+uint8_t IREcoclimAc::calcChecksum(const uint64_t state) {
+  EcoclimProtocol p;
+  p.raw = state;
+  p.Sum = 0;  // The parity bit must be excluded from its own calculation.
+  return countBits(p.raw, kEcoclimBits) & 1;
+}
+
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The value to verify the checksum of.
+/// @return A boolean indicating if it's checksum is valid.
+bool IREcoclimAc::validChecksum(const uint64_t state) {
+  EcoclimProtocol p;
+  p.raw = state;
+  return p.Sum == IREcoclimAc::calcChecksum(state);
+}
+
+/// Update the checksum value for the internal state.
+void IREcoclimAc::checksum(void) { _.Sum = IREcoclimAc::calcChecksum(_.raw); }
 
 /// Set the temperature.
 /// @param[in] celsius The temperature in degrees celsius.
