@@ -739,6 +739,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kDaikin64Bits;
     case ELECTRA_AC:
       return kElectraAcBits;
+    case MITSUBISHI_HEAVY_64:
+      return kMitsubishiHeavy64Bits;
     case EUROM:
       return kEuromBits;
     case GREE:
@@ -1378,6 +1380,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendMitsubishiHeavy152(state, nbytes);
       break;
 #endif  // SEND_MITSUBISHIHEAVY
+#if SEND_MITSUBISHI_HEAVY_64
+    case MITSUBISHI_HEAVY_64:
+      sendMitsubishiHeavy64(state, nbytes);
+      break;
+#endif  // SEND_MITSUBISHI_HEAVY_64
 #if SEND_MWM
     case MWM:
       sendMWM(state, nbytes);

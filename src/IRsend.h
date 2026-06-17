@@ -924,6 +924,12 @@ class IRsend {
                  const uint16_t nbytes = kEuromStateLength,
                  const uint16_t repeat = kNoRepeat);
 #endif  // SEND_EUROM
+#if SEND_MITSUBISHI_HEAVY_64
+  void sendMitsubishiHeavy64(
+      const unsigned char data[],
+      const uint16_t nbytes = kMitsubishiHeavy64StateLength,
+      const uint16_t repeat = kNoRepeat);
+#endif  // SEND_MITSUBISHI_HEAVY_64
 
  protected:
 #ifdef UNIT_TEST

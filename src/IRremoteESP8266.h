@@ -976,6 +976,13 @@ typedef volatile const uint16_t atomic_const_uint16_t;
 #define SEND_EUROM           _IR_ENABLE_DEFAULT_
 #endif  // SEND_EUROM
 
+#ifndef DECODE_MITSUBISHI_HEAVY_64
+#define DECODE_MITSUBISHI_HEAVY_64   _IR_ENABLE_DEFAULT_
+#endif  // DECODE_MITSUBISHI_HEAVY_64
+#ifndef SEND_MITSUBISHI_HEAVY_64
+#define SEND_MITSUBISHI_HEAVY_64     _IR_ENABLE_DEFAULT_
+#endif  // SEND_MITSUBISHI_HEAVY_64
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -995,7 +1002,7 @@ typedef volatile const uint16_t atomic_const_uint16_t;
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
      DECODE_CARRIER_AC84 || DECODE_YORK || DECODE_BLUESTARHEAVY || \
-     DECODE_EUROM || \
+     DECODE_EUROM || DECODE_MITSUBISHI_HEAVY_64 || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1164,8 +1171,9 @@ enum decode_type_t {
   YORK,
   BLUESTARHEAVY,
   EUROM,
+  MITSUBISHI_HEAVY_64,  // 2262
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = EUROM,
+  kLastDecodeType = MITSUBISHI_HEAVY_64,
 };
 
 // Message lengths & required repeat values
@@ -1356,6 +1364,9 @@ const uint16_t kMitsubishiHeavy88MinRepeat = kNoRepeat;
 const uint16_t kMitsubishiHeavy152StateLength = 19;
 const uint16_t kMitsubishiHeavy152Bits = kMitsubishiHeavy152StateLength * 8;
 const uint16_t kMitsubishiHeavy152MinRepeat = kNoRepeat;
+const uint16_t kMitsubishiHeavy64StateLength = 8;
+const uint16_t kMitsubishiHeavy64Bits = kMitsubishiHeavy64StateLength * 8;
+const uint16_t kMitsubishiHeavy64MinRepeat = kNoRepeat;
 const uint16_t kMultibracketsBits = 8;
 const uint16_t kMultibracketsDefaultRepeat = kSingleRepeat;
 const uint16_t kNikaiBits = 24;

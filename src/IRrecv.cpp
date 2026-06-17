@@ -1227,6 +1227,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Eurom decode");
     if (decodeEurom(results, offset, kEuromBits)) return true;
 #endif  // DECODE_EUROM
+#if DECODE_MITSUBISHI_HEAVY_64
+    DPRINTLN("Attempting Mitsubishi Heavy 64-bit decode");
+    if (decodeMitsubishiHeavy64(results, offset, kMitsubishiHeavy64Bits))
+      return true;
+#endif  // DECODE_MITSUBISHI_HEAVY_64
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
