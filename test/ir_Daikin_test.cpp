@@ -4090,7 +4090,8 @@ TEST(TestDecodeDaikin312, RealExample) {
       "Power: On, Mode: 3 (Cool), Temp: 21C, Fan: 10 (Auto), "
       "Swing(V): 0 (Off), Swing(H): 0 (Off), Clock: 48:34, On Timer: Off, "
       "Off Timer: Off, Sleep Timer: Off, Beep: 0 (UNKNOWN), Light: 1 (High), "
-      "Mould: Off, Clean: Off, Fresh: Off, Eye: Off, Eye Auto: Off, "
+      "Announce: Off, Mould: Off, Clean: Off, Fresh: Off, Eye: Off, "
+      "Eye Auto: Off, "
       "Quiet: Off, Powerful: Off, Purify: Off, Econo: Off, Humid: 0 (Off)",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
@@ -4122,7 +4123,8 @@ TEST(TestDecodeDaikin312, SyntheticExample) {
       "Power: On, Mode: 3 (Cool), Temp: 21C, Fan: 10 (Auto), "
       "Swing(V): 0 (Off), Swing(H): 0 (Off), Clock: 48:34, On Timer: Off, "
       "Off Timer: Off, Sleep Timer: Off, Beep: 0 (UNKNOWN), Light: 1 (High), "
-      "Mould: Off, Clean: Off, Fresh: Off, Eye: Off, Eye Auto: Off, "
+      "Announce: Off, Mould: Off, Clean: Off, Fresh: Off, Eye: Off, "
+      "Eye Auto: Off, "
       "Quiet: Off, Powerful: Off, Purify: Off, Econo: Off, Humid: 0 (Off)",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
@@ -4352,6 +4354,23 @@ TEST(TestDaikin312Class, LightAndBeep) {
 
   ac.setBeep(kDaikinBeepOff);
   EXPECT_EQ(kDaikinBeepOff, ac.getBeep());
+}
+
+TEST(TestDaikin312Class, AnnounceSetting) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  // Default after reset is "disabled"
+  EXPECT_EQ(kDaikin312AnnounceDisable, ac.getAnnounce());
+
+  ac.setAnnounce(kDaikin312AnnounceCool);
+  EXPECT_EQ(kDaikin312AnnounceCool, ac.getAnnounce());
+
+  ac.setAnnounce(kDaikin312AnnounceTemp);
+  EXPECT_EQ(kDaikin312AnnounceTemp, ac.getAnnounce());
+
+  ac.setAnnounce(kDaikin312AnnounceDisable);
+  EXPECT_EQ(kDaikin312AnnounceDisable, ac.getAnnounce());
 }
 
 TEST(TestDaikin312Class, CurrentTime) {

@@ -38,6 +38,7 @@ extern IRTEXT_CONST_PTR(kAirFlowStr);
 extern IRTEXT_CONST_PTR(kAkb73757604Str);
 extern IRTEXT_CONST_PTR(kAkb74955603Str);
 extern IRTEXT_CONST_PTR(kAkb75215403Str);
+extern IRTEXT_CONST_PTR(kAnnounceStr);
 extern IRTEXT_CONST_PTR(kArdb1Str);
 extern IRTEXT_CONST_PTR(kArgoWrem2Str);
 extern IRTEXT_CONST_PTR(kArgoWrem3Str);
