@@ -3882,7 +3882,8 @@ void IRDaikin312::stateReset(void) {
   _.raw[5] = 0x58;
   // CurrentTime upper nibble + Power2 (Power2 set by setPower)
   _.raw[6] = 0x64;
-  _.raw[7] = 0x58;
+  // raw[7] bits 6-7 = EyeTimer (0x00=off, 0x40=1hr, 0x80=3hr).
+  _.raw[7] = 0x00;
   // raw[8] bit5 (0x20) is always set by a ARC472A43 remote (meaning unknown).
   //   AC seems to accept commands regardless of the value set here.
   //   Value from the original PR (#2246) is kept.
@@ -4208,6 +4209,21 @@ void IRDaikin312::setEye(bool on) { _.Eye = on; }
 /// Get the Eye (Sensor) mode status of the A/C.
 /// @return true, the setting is on. false, the setting is off.
 bool IRDaikin312::getEye(void) const { return _.Eye; }
+
+/// Set the Eye (Sensor) timer duration of the A/C.
+/// @param[in] duration kDaikin312EyeTimerOff, kDaikin312EyeTimer1Hr, or
+///   kDaikin312EyeTimer3Hr.
+void IRDaikin312::setEyeTimer(const uint8_t duration) {
+  if (duration > kDaikin312EyeTimer3Hr)
+    _.EyeTimer = kDaikin312EyeTimerOff;
+  else
+    _.EyeTimer = duration;
+}
+
+/// Get the Eye (Sensor) timer duration of the A/C.
+/// @return kDaikin312EyeTimerOff, kDaikin312EyeTimer1Hr, or
+///   kDaikin312EyeTimer3Hr.
+uint8_t IRDaikin312::getEyeTimer(void) const { return _.EyeTimer; }
 
 /// Set the Economy mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
