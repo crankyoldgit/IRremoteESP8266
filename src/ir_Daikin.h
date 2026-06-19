@@ -711,8 +711,7 @@ union Daikin312Protocol{
     uint64_t Power2       :1;
     // Byte 7
     uint64_t              :4;
-    uint64_t              :2;  // Light moved to byte 12
-    uint64_t Beep         :2;
+    uint64_t              :4;  // Light & Beep moved to byte 12
     // Byte 8
     uint64_t FreshAir     :1;
     uint64_t              :2;
@@ -728,7 +727,8 @@ union Daikin312Protocol{
     uint64_t              :8;
     // Byte 12
     uint64_t Light        :2;
-    uint64_t              :6;
+    uint64_t Beep         :2;
+    uint64_t              :4;
 
     // Byte 13
     uint64_t          :8;
