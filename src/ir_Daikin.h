@@ -716,8 +716,9 @@ union Daikin312Protocol{
     uint64_t FreshAir     :1;
     uint64_t              :2;
     uint64_t Mold         :1;
-    uint64_t              :2;
-    uint64_t              :1;
+    uint64_t              :1;  // HeatHigh indicator
+    uint64_t              :1;  // always 1 (0x20)
+    uint64_t              :1;  // unknown; always 0 in observed signals
     uint64_t FreshAirHigh :1;
     // Byte 9~10
     //   Byte  9: Always 0x06

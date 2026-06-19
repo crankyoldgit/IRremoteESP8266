@@ -3878,9 +3878,14 @@ void IRDaikin312::stateReset(void) {
   _.raw[2] = 0x27;
   _.raw[3] = 0x00;
   _.raw[4] = 0x02;
+  // CurrentTime lower byte (placeholder; set via setCurrentTime)
   _.raw[5] = 0x58;
+  // CurrentTime upper nibble + Power2 (Power2 set by setPower)
   _.raw[6] = 0x64;
   _.raw[7] = 0x58;
+  // raw[8] bit5 (0x20) is always set by a ARC472A43 remote (meaning unknown).
+  //   AC seems to accept commands regardless of the value set here.
+  //   Value from the original PR (#2246) is kept.
   _.raw[8] = 0x64;
   _.raw[9] = 0x06;
   _.raw[10] = 0x00;
