@@ -33,6 +33,11 @@ lib/googletest/
 # Python compiled files
 **/*.pyc
 
+/python/*.so
+/python/*.o
+/python/*.cxx
+/python/irhvac.py
+
 # Unit Test builds
 test/*.o
 test/*.a
