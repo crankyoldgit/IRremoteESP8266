@@ -1374,6 +1374,8 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t offset,
     if (pos * 8 != kDaikin2Bits) return false;
     // Validate the checksum.
     if (!IRDaikin2::validChecksum(results->state)) return false;
+    // Byte 4 is 0x01 for DAIKIN2; 0x02 indicates DAIKIN312 instead.
+    if (results->state[4] != 0x01) return false;
   }
 
   // Success
@@ -4486,13 +4488,9 @@ void IRsend::sendDaikin312(const unsigned char data[], const uint16_t nbytes,
     return;  // Not enough bytes to send a partial message.
 
   for (uint16_t r = 0; r <= repeat; r++) {
-    // Send the header, 0b00000
-    sendGeneric(0, 0,  // No header for the header
-                kDaikin312BitMark, kDaikin312OneSpace,
-                kDaikin312BitMark, kDaikin312ZeroSpace,
-                kDaikin312BitMark, kDaikin312HdrGap,
-                static_cast<uint64_t>(0b00000), kDaikinHeaderLength,
-                kDaikin312Freq, false, 0, kDutyDefault);
+    // Leader pulse required to wake the AC from off state.
+    mark(kDaikin312LeaderMark);
+    space(kDaikin312LeaderSpace);
     // Section #1
     sendGeneric(kDaikin312HdrMark, kDaikin312HdrSpace, kDaikin312BitMark,
                 kDaikin312OneSpace, kDaikin312BitMark, kDaikin312ZeroSpace,
@@ -4524,34 +4522,25 @@ void IRsend::sendDaikin312(const unsigned char data[], const uint16_t nbytes,
 bool IRrecv::decodeDaikin312(decode_results *results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   // Is there enough data to match successfully?
-  if (results->rawlen < 2 * (nbits + kDaikinHeaderLength + kHeader + kFooter) +
-                        kFooter - 1 + offset)
+  if (results->rawlen < 2 * (nbits + kHeader + kFooter) + kHeader - 1 + offset)
     return false;
 
   // Compliance
   if (strict && nbits != kDaikin312Bits) return false;
 
+  // Leader
+  if (!matchMark(results->rawbuf[offset++], kDaikin312LeaderMark,
+                 _tolerance + kDaikin312Tolerance)) return false;
+  if (!matchSpace(results->rawbuf[offset++], kDaikin312LeaderSpace,
+                  _tolerance + kDaikin312Tolerance)) return false;
+
   const uint8_t ksectionSize[kDaikin312Sections] = {kDaikin312Section1Length,
                                                     kDaikin312Section2Length};
-  // Header/Leader Section
-  uint64_t leaderdata = 0;
-  uint16_t used = matchGeneric(results->rawbuf + offset, &leaderdata,
-                      results->rawlen - offset, kDaikinHeaderLength,
-                      0, 0,  // No Header Mark or Space for the "header"
-                      kDaikin312BitMark, kDaikin312OneSpace,
-                      kDaikin312BitMark, kDaikin312ZeroSpace,
-                      kDaikin312BitMark, kDaikin312HdrGap,
-                      false, kDaikinTolerance, 0, false);
-  if (!used) return false;  // Failed to match.
-  if (leaderdata) return false;  // The header bits should all be zero.
-
-  offset += used;
-
   // Data Sections
   uint16_t pos = 0;
   for (uint8_t section = 0; section < kDaikin312Sections; section++) {
     // Section Header + Section Data + Section Footer
-    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+    uint16_t used = matchGeneric(results->rawbuf + offset, results->state + pos,
                         results->rawlen - offset, ksectionSize[section] * 8,
                         kDaikin312HdrMark, kDaikin312HdrSpace,
                         kDaikin312BitMark, kDaikin312OneSpace,
@@ -4566,6 +4555,10 @@ bool IRrecv::decodeDaikin312(decode_results *results, uint16_t offset,
   // Compliance
   if (strict) {
     if (pos * 8 != kDaikin312Bits) return false;
+    // Validate the checksum.
+    if (!IRDaikin312::validChecksum(results->state)) return false;
+    // Byte 4 is 0x02 for DAIKIN312; 0x01 indicates DAIKIN2 instead.
+    if (results->state[4] != 0x02) return false;
   }
 
   // Success
