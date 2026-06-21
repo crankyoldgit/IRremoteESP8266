@@ -17,6 +17,14 @@ else
 SWIGTYPE = global
 endif
 
+UNAME := $(shell uname)
+ifeq ($(UNAME), Darwin)
+  # macOS: extensions are bundles with dynamic_lookup; don't link libpython
+  SHARED_FLAGS = -bundle -undefined dynamic_lookup
+else
+  SHARED_FLAGS = -shared -Wl,-soname,lib_irhvac.so
+endif
+
 # Where to find user code.
 SRC_DIR = ../src
 
@@ -40,7 +48,7 @@ objects = $(patsubst %.cpp,%,$(wildcard *.cpp))
 all : _irhvac.so
 
 library : $(objects)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -Wl,-soname,lib_irhvac.so -o _irhvac.so $(COMMON_OBJ)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(SHARED_FLAGS) -o _irhvac.so $(COMMON_OBJ)
 
 swig :	libirhvac_wrap.cxx
 ifneq (,$(wildcard /.dockerenv))
@@ -101,7 +109,7 @@ libirhvac_wrap.cxx :
 	swig $(INCLUDES) $(DEFFLAGS) -c++ -python libirhvac.i
 
 _irhvac.so : $(COMMON_OBJ)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -Wl,-soname,lib_irhvac.so -o _irhvac.so $(COMMON_OBJ)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(SHARED_FLAGS) -o _irhvac.so $(COMMON_OBJ)
 
 swig-4.2.0/swig :
 	curl -s -L -o - http://downloads.sourceforge.net/project/swig/swig/swig-4.2.0/swig-4.2.0.tar.gz | tar xfz -
