@@ -720,10 +720,12 @@ union Daikin312Protocol{
     uint64_t              :2;
     uint64_t              :1;
     uint64_t FreshAirHigh :1;
-    // Byte 9~10
-    //   Byte  9: Always 0x06
-    //   Byte 10: Always 0x00
-    uint64_t              :16;
+    // Byte 9: Which button was last pressed (the "announce item").
+    //         The AC uses this to decide what state to verbally announce.
+    //         See kDaikin312Announce* constants and setAnnounce().
+    uint64_t AnnounceItem :8;
+    // Byte 10: Always 0x00
+    uint64_t              :8;
     // Byte 11
     uint64_t              :8;
     // Byte 12
@@ -785,7 +787,9 @@ union Daikin312Protocol{
     uint64_t            :2;
     // Byte 34~35
     //   Byte 35: Always 0xC5
-    uint64_t :16;
+    uint64_t            :3;
+    uint64_t Announce   :1;  // Verbal announcement of current state
+    uint64_t            :12;
     // Byte 36
     uint64_t            :1;
     uint64_t Eye        :1;
@@ -821,6 +825,33 @@ const uint16_t kDaikin312Section2Length = kDaikin312StateLength -
 
 
 const uint8_t kDaikin312Tolerance = 5;  // Extra percentage tolerance
+// Values for the button-category byte (raw[9]), passed to setAnnounce().
+// The AC uses this byte to decide what state to verbally announce.
+// Pass kDaikin312AnnounceDisable to suppress the announcement entirely.
+const uint8_t kDaikin312AnnounceDisable     = 0x00;  ///< No announcement
+const uint8_t kDaikin312AnnouncePower       = 0x02;  ///< Power state
+const uint8_t kDaikin312AnnounceTemp        = 0x03;  ///< Temperature setting
+const uint8_t kDaikin312AnnounceOffTimer    = 0x04;  ///< Off-timer
+const uint8_t kDaikin312AnnounceSwingV      = 0x06;  ///< Vertical swing
+const uint8_t kDaikin312AnnounceFan         = 0x07;  ///< Fan speed
+const uint8_t kDaikin312AnnounceCancel      = 0x0C;  ///< Cancel/clear off-timer
+const uint8_t kDaikin312AnnounceAuto        = 0x0D;  ///< Auto (comfort) mode
+const uint8_t kDaikin312AnnounceCool        = 0x0E;  ///< Cool mode
+const uint8_t kDaikin312AnnounceDry         = 0x0F;  ///< Dry mode
+const uint8_t kDaikin312AnnounceHeat        = 0x10;  ///< Heat mode
+const uint8_t kDaikin312AnnounceHeatHigh    = 0x12;  ///< High power heat mode
+const uint8_t kDaikin312AnnounceHumidity    = 0x13;  ///< Humidity setting
+const uint8_t kDaikin312AnnounceCirculation = 0x14;  ///< Air circulation
+const uint8_t kDaikin312AnnounceSwingSensor = 0x15;  ///< Sensor-based wind dir
+const uint8_t kDaikin312AnnounceSwingH      = 0x16;  ///< Horizontal swing
+const uint8_t kDaikin312AnnounceFilter      = 0x17;  ///< Filter button
+const uint8_t kDaikin312AnnouncePowerful    = 0x19;  ///< Powerful mode
+const uint8_t kDaikin312AnnounceFanOnly     = 0x1A;  ///< Fan-only/air purifier
+const uint8_t kDaikin312AnnounceEye         = 0x24;  ///< Eye mode
+const uint8_t kDaikin312AnnounceLight       = 0x30;  ///< Display light setting
+const uint8_t kDaikin312AnnounceBeep        = 0x31;  ///< Beep setting
+const uint8_t kDaikin312AnnounceAnnounce    = 0x32;  ///< Announcement setting
+const uint8_t kDaikin312AnnounceSleep       = 0x2F;  ///< Sleep mode
 const uint8_t kDaikin312SwingVHighest =     0x1;
 const uint8_t kDaikin312SwingVHigh =        0x2;
 const uint8_t kDaikin312SwingVUpperMiddle = 0x3;
@@ -923,6 +954,8 @@ class IRDaikin312 {
   uint8_t getBeep(void) const;
   void setLight(const uint8_t light);
   uint8_t getLight(void) const;
+  void setAnnounce(const uint8_t category);
+  uint8_t getAnnounce(void) const;
   void setClean(const bool on);
   bool getClean(void) const;
   void setFreshAir(const bool on);

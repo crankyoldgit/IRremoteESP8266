@@ -3882,7 +3882,10 @@ void IRDaikin312::stateReset(void) {
   _.raw[6] = 0x64;
   _.raw[7] = 0x58;
   _.raw[8] = 0x64;
-  _.raw[9] = 0x06;
+  // raw[9] is the pressed-button byte: tells the AC which button was last
+  // pressed so it can verbally announce the updated state.
+  // Default to disabled.
+  _.raw[9] = kDaikin312AnnounceDisable;
   _.raw[10] = 0x00;
   _.raw[11] = 0x00;
   _.raw[12] = 0x01;
@@ -4155,6 +4158,28 @@ uint8_t IRDaikin312::getLight(void) const { return _.Light; }
 /// Set the Light (LED) mode of the A/C.
 /// @param[in] light true, the setting is on. false, the setting is off.
 void IRDaikin312::setLight(const uint8_t light) { _.Light = light; }
+
+/// Get the current announce category.
+/// @return A kDaikin312Announce* constant, or kDaikin312AnnounceDisable if
+/// disabled.
+uint8_t IRDaikin312::getAnnounce(void) const {
+  return _.Announce ? _.AnnounceItem : kDaikin312AnnounceDisable;
+}
+
+/// Set the verbal announcement item.
+/// The AC uses this to decide what state update to read aloud after
+/// receiving a command.
+/// Note that you will not hear the announcement if setBeep is set to
+/// kDaikinBeepOff. Additionally, the AC does not announce the mode
+/// (e.g., cool, heat) and simply beeps if it didn't change.
+/// Invalid item (e.g., kDaikin312AnnouncePower for operations other
+/// than powering off) will be ignored (AC simply beeps).
+/// @param[in] item A kDaikin312Announce* constant.
+///                 kDaikin312AnnounceDisable disables the announcement.
+void IRDaikin312::setAnnounce(const uint8_t item) {
+  _.Announce = (item != kDaikin312AnnounceDisable);
+  _.AnnounceItem = item;
+}
 
 /// Set the Mould (filter) mode of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
@@ -4448,6 +4473,7 @@ String IRDaikin312::toString(void) const {
       result += kUnknownStr;
   }
   result += ')';
+  result += addBoolToString(_.Announce, kAnnounceStr);
   result += addBoolToString(_.Mold, kMouldStr);
   result += addBoolToString(_.Clean, kCleanStr);
   result += addLabeledString(
