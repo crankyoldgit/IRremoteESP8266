@@ -898,6 +898,12 @@ class IRrecv {
                    const uint16_t nbits = kEuromBits,
                    const bool strict = true);
 #endif  // DECODE_EUROM
+#if DECODE_MITSUBISHI_HEAVY_64
+  bool decodeMitsubishiHeavy64(decode_results *results,
+                               uint16_t offset = kStartOffset,
+                               const uint16_t nbits = kMitsubishiHeavy64Bits,
+                               const bool strict = true);
+#endif  // DECODE_MITSUBISHI_HEAVY_64
 };
 
 #endif  // IRRECV_H_

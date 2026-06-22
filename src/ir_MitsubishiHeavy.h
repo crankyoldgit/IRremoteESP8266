@@ -9,6 +9,7 @@
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/660
 /// @see https://github.com/ToniA/Raw-IR-decoder-for-Arduino/blob/master/MitsubishiHeavy.cpp
 /// @see https://github.com/ToniA/arduino-heatpumpir/blob/master/MitsubishiHeavyHeatpumpIR.cpp
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/2262
 
 // Supports:
 //   Brand: Mitsubishi Heavy Industries,  Model: RLA502A700B remote (152 bit)
@@ -16,6 +17,8 @@
 //   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZMXA-S A/C (152 bit)
 //   Brand: Mitsubishi Heavy Industries,  Model: RKX502A001C remote (88 bit)
 //   Brand: Mitsubishi Heavy Industries,  Model: SRKxxZJ-S A/C (88 bit)
+//   Brand: Mitsubishi Heavy Industries,  Model: RYD502A003B remote (64 bit)
+//   Brand: Mitsubishi Heavy Industries,  Model: SRKxxAJ-S A/C (64 bit)
 
 #ifndef IR_MITSUBISHIHEAVY_H_
 #define IR_MITSUBISHIHEAVY_H_
