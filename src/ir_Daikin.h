@@ -709,16 +709,17 @@ union Daikin312Protocol{
     uint64_t CurrentTime  :12;
     uint64_t              :3;
     uint64_t Power2       :1;
-    // Byte 7
-    uint64_t              :4;
-    uint64_t              :2;  // Light moved to byte 12
-    uint64_t Beep         :2;
+    // Byte 7: Eye timer duration (bits 6–7); remaining bits unused.
+    //   Observed remote encodings: 0x00 = off, 0x40 = 1 hr, 0x80 = 3 hr.
+    uint64_t              :6;
+    uint64_t EyeTimer     :2;
     // Byte 8
     uint64_t FreshAir     :1;
     uint64_t              :2;
     uint64_t Mold         :1;
-    uint64_t              :2;
-    uint64_t              :1;
+    uint64_t              :1;  // HeatHigh indicator
+    uint64_t              :1;  // always 1 (0x20)
+    uint64_t              :1;  // unknown; always 0 in observed signals
     uint64_t FreshAirHigh :1;
     // Byte 9~10
     //   Byte  9: Always 0x06
@@ -728,7 +729,8 @@ union Daikin312Protocol{
     uint64_t              :8;
     // Byte 12
     uint64_t Light        :2;
-    uint64_t              :6;
+    uint64_t Beep         :2;
+    uint64_t              :4;
 
     // Byte 13
     uint64_t          :8;
@@ -861,6 +863,11 @@ const uint8_t kDaikin312HumidityAuto       = 0xFF;
 // Min temp (in C) when in Cool mode.
 const uint8_t kDaikin312MinCoolTemp = 18;
 
+// Eye timer duration (byte 7, bits 6-7). @see setEyeTimer()
+const uint8_t kDaikin312EyeTimerOff = 0;  // 0x00
+const uint8_t kDaikin312EyeTimer1Hr = 1;  // 0x40
+const uint8_t kDaikin312EyeTimer3Hr = 2;  // 0x80
+
 /// Class for handling detailed Daikin 312-bit A/C messages.
 /// @note Code by crankyoldgit, Reverse engineering analysis by AntonWert
 class IRDaikin312 {
@@ -901,6 +908,8 @@ class IRDaikin312 {
   bool getEye(void) const;
   void setEyeAuto(const bool on);
   bool getEyeAuto(void) const;
+  void setEyeTimer(const uint8_t duration);
+  uint8_t getEyeTimer(void) const;
   void setPurify(const bool on);
   bool getPurify(void) const;
   void setMold(const bool on);

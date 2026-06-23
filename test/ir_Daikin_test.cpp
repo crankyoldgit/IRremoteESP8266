@@ -4291,6 +4291,24 @@ TEST(TestDaikin312Class, EyeSetting) {
   ASSERT_TRUE(ac.getEyeAuto());
 }
 
+TEST(TestDaikin312Class, EyeTimerSetting) {
+  IRDaikin312 ac(kGpioUnused);
+  ac.begin();
+
+  ac.setEyeTimer(kDaikin312EyeTimerOff);
+  EXPECT_EQ(kDaikin312EyeTimerOff, ac.getEyeTimer());
+
+  ac.setEyeTimer(kDaikin312EyeTimer1Hr);
+  EXPECT_EQ(kDaikin312EyeTimer1Hr, ac.getEyeTimer());
+
+  ac.setEyeTimer(kDaikin312EyeTimer3Hr);
+  EXPECT_EQ(kDaikin312EyeTimer3Hr, ac.getEyeTimer());
+
+  // Out-of-range values fall back to Off.
+  ac.setEyeTimer(3);
+  EXPECT_EQ(kDaikin312EyeTimerOff, ac.getEyeTimer());
+}
+
 TEST(TestDaikin312Class, PurifySetting) {
   IRDaikin312 ac(kGpioUnused);
   ac.begin();
