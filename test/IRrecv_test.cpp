@@ -85,6 +85,55 @@ TEST(TestIRrecv, DecodeHeapOverflow) {
   EXPECT_EQ(99, params_ptr->rawbuf[params_ptr->rawlen + 1]);
 }
 
+// Test for the edge case in issue #2198:
+// rawlen == bufsize but overflow is still false.
+// This happens because the ISR writes rawbuf[rawlen] first, then increments
+// rawlen to bufsize. On the *next* ISR call it sees rawlen >= bufsize and sets
+// overflow = true. But if decode() runs before that next call, overflow is
+// still false while rawlen already equals bufsize, so the old guard
+// `if (!params.overflow)` was insufficient and wrote rawbuf[bufsize] —
+// one element past the end of the heap allocation.
+TEST(TestIRrecv, DecodeHeapOverflowNoOverflowFlag) {
+  // Ref: https://github.com/crankyoldgit/IRremoteESP8266/issues/2198
+  IRrecv irrecv(1);
+  irrecv.enableIRIn();
+  ASSERT_EQ(kRawBuf, irrecv.getBufSize());
+  atomic_irparams_t *params_ptr = irrecv._getParamsPtr();
+  // Replace the buffer with a slightly bigger one so we can plant canaries
+  // past the official end and detect any out-of-bounds write.
+  params_ptr->rawbuf = new uint16_t[kRawBuf + 10];
+  ASSERT_EQ(kRawBuf, irrecv.getBufSize());  // Should not change.
+  // Fill the entire extended buffer: 100 inside the valid range, 99 beyond it.
+  for (uint16_t i = 0; i < irrecv.getBufSize() + 10; i++) {
+    params_ptr->rawbuf[i] = 100;
+    if (i >= irrecv.getBufSize()) params_ptr->rawbuf[i]--;
+  }
+  ASSERT_EQ(100, params_ptr->rawbuf[kRawBuf - 1]);  // Last valid slot.
+  EXPECT_EQ(99, params_ptr->rawbuf[kRawBuf]);        // Canary — must stay 99.
+  EXPECT_EQ(99, params_ptr->rawbuf[kRawBuf + 1]);    // Canary — must stay 99.
+  ASSERT_EQ(kRawBuf, params_ptr->bufsize);
+  decode_results results;
+  // Key difference from DecodeHeapOverflow: overflow is FALSE here.
+  // rawlen == bufsize means the ISR filled the last slot and incremented
+  // rawlen, but hadn't yet looped back to set overflow = true.
+  params_ptr->rawlen = kRawBuf;   // rawlen exactly equals bufsize
+  params_ptr->overflow = false;   // overflow NOT set — the triggering condition
+  params_ptr->rcvstate = kStopState;
+  // Wire up results to point at the same buffer.
+  results.rawbuf = params_ptr->rawbuf;
+  results.rawlen = params_ptr->rawlen;
+  results.overflow = params_ptr->overflow;
+
+  // Do the decode — this must NOT write rawbuf[kRawBuf].
+  irrecv.decode(&results);
+  // Verify the canaries are untouched — a write would change rawbuf[kRawBuf]
+  // from 99 to 0 (the sentinel value the old code would have written).
+  EXPECT_EQ(99, params_ptr->rawbuf[kRawBuf])
+      << "Heap overflow detected: rawbuf[bufsize] was written out-of-bounds!";
+  EXPECT_EQ(99, params_ptr->rawbuf[kRawBuf + 1])
+      << "Heap overflow detected: rawbuf[bufsize+1] was corrupted!";
+}
+
 // Tests for copyIrParams()
 
 TEST(TestCopyIrParams, CopyEmpty) {
