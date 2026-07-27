@@ -602,7 +602,12 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   // resume() but that is a much more expensive operation compare to this.
   // However, don't do this if rawbuf is already full as we stomp over the heap.
   // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/1516
-  if (!params.overflow) params.rawbuf[params.rawlen] = 0;
+  // Also guard against rawlen == bufsize (with overflow still false), which
+  // occurs because the ISR increments rawlen *after* writing the last entry.
+  // Writing rawbuf[bufsize] would be an off-by-one heap overflow.
+  // See: https://github.com/crankyoldgit/IRremoteESP8266/issues/2198
+  if (!params.overflow && params.rawlen < params.bufsize)
+    params.rawbuf[params.rawlen] = 0;
 
   bool resumed = false;  // Flag indicating if we have resumed.
 
