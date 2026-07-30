@@ -39,6 +39,7 @@
 //   Brand: Fujitsu,  Model: ASTG18K A/C (ARREW4E)
 //   Brand: Fujitsu,  Model: AR-REW1E remote (ARREW4E)
 //   Brand: Fujitsu,  Model: AR-REG1U remote (ARRAH2E)
+//   Brand: Fujitsu,  Model: AR-DL3 remote (ARJW2)
 //   Brand: OGeneral,  Model: AR-RCL1E remote (ARRAH2E)
 //   Brand: Fujitsu General,  Model: AR-JW17 remote (ARDB1)
 //   Brand: Fujitsu General,  Model: AR-JW19 remote (ARDB1)
