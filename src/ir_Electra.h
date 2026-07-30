@@ -16,6 +16,7 @@
 //   Brand: AEG,  Model: Chillflex Pro AXP26U338CW A/C
 //   Brand: Electrolux,  Model: YKR-H/531E A/C
 //   Brand: Delonghi, Modell: PAC EM90
+//   Brand: Delonghi, Modell: Pinguino PAC EM82 A/C
 
 #ifndef IR_ELECTRA_H_
 #define IR_ELECTRA_H_
