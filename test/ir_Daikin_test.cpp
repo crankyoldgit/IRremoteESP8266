@@ -4224,6 +4224,26 @@ TEST(TestDaikin312Class, FanSpeed) {
   EXPECT_EQ(kDaikinFanQuiet, ac.getFan());
 }
 
+TEST(TestDaikin312Class, ConvertSwingH) {
+  EXPECT_EQ(
+      kDaikin312SwingHOff,
+      IRDaikin312::convertSwingH(stdAc::swingh_t::kOff));
+
+  EXPECT_EQ(
+      kDaikin312SwingHSwing,
+      IRDaikin312::convertSwingH(stdAc::swingh_t::kAuto));
+}
+
+TEST(TestDaikin312Class, ConvertSwingV) {
+  EXPECT_EQ(
+      kDaikin312SwingVOff,
+      IRDaikin312::convertSwingV(stdAc::swingv_t::kOff));
+
+  EXPECT_EQ(
+      kDaikin312SwingVSwing,
+      IRDaikin312::convertSwingV(stdAc::swingv_t::kAuto));
+}
+
 TEST(TestDaikin312Class, QuietAndPowerful) {
   IRDaikin312 ac(kGpioUnused);
   ac.begin();

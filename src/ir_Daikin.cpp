@@ -4342,6 +4342,7 @@ uint8_t IRDaikin312::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin312::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
+    case stdAc::swingh_t::kOff:      return kDaikin312SwingHOff;
     case stdAc::swingh_t::kAuto:     return kDaikin312SwingHSwing;
     case stdAc::swingh_t::kLeftMax:  return kDaikin312SwingHLeftMax;
     case stdAc::swingh_t::kLeft:     return kDaikin312SwingHLeft;
