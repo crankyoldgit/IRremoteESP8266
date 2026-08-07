@@ -15,6 +15,13 @@ TEST(TestMitsubishiHeavy, Housekeeping) {
   ASSERT_TRUE(hasACState(MITSUBISHI_HEAVY_88));
   ASSERT_EQ("MITSUBISHI_HEAVY_152", typeToString(MITSUBISHI_HEAVY_152));
   ASSERT_TRUE(hasACState(MITSUBISHI_HEAVY_152));
+  ASSERT_EQ("MITSUBISHI_HEAVY_64", typeToString(MITSUBISHI_HEAVY_64));
+  ASSERT_EQ(MITSUBISHI_HEAVY_64, strToDecodeType("MITSUBISHI_HEAVY_64"));
+  ASSERT_TRUE(hasACState(MITSUBISHI_HEAVY_64));
+  ASSERT_FALSE(IRac::isProtocolSupported(MITSUBISHI_HEAVY_64));
+  ASSERT_EQ(kMitsubishiHeavy64Bits,
+            IRsend::defaultBits(MITSUBISHI_HEAVY_64));
+  ASSERT_EQ(kNoRepeat, IRsend::minRepeats(MITSUBISHI_HEAVY_64));
 }
 
 // Tests for IRMitsubishiHeavy152Ac class.
@@ -922,4 +929,167 @@ TEST(TestMitsubishiHeavy88AcClass, toCommon) {
   ASSERT_FALSE(ac.toCommon().beep);
   ASSERT_EQ(-1, ac.toCommon().sleep);
   ASSERT_EQ(-1, ac.toCommon().clock);
+}
+
+// Tests for the 64-bit variant (RYD502A003B remote).
+// Captured frames from a real remote. See issue #2262.
+
+// Cool, 18C, Low fan, power on.
+TEST(TestDecodeMitsubishiHeavy64, RealCool18) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint16_t rawData[133] = {
+      5954, 7476, 508, 3454, 508, 3456, 508, 3454, 508, 3456, 508, 3456, 508,
+      3456, 508, 3456, 508, 3478, 508, 1496, 508, 1496, 508, 1496, 508, 1496,
+      508, 1496, 508, 1498, 506, 1498, 508, 1518, 508, 3456, 508, 3454, 508,
+      3454, 508, 3456, 508, 3456, 508, 1496, 508, 1496, 508, 3478, 508, 1498,
+      506, 1498, 506, 1498, 508, 1496, 508, 1498, 506, 3456, 510, 3452, 508,
+      1518, 508, 1496, 508, 3456, 506, 3458, 506, 1496, 508, 1498, 506, 3456,
+      508, 3456, 506, 3478, 508, 3456, 506, 1498, 508, 1498, 506, 3456, 506,
+      3456, 506, 1498, 506, 1498, 506, 1520, 506, 1498, 508, 3456, 508, 1496,
+      508, 3456, 506, 1498, 506, 3456, 506, 1498, 508, 1520, 508, 3456, 506,
+      1498, 506, 3456, 506, 1498, 506, 3456, 506, 1498, 506, 3456, 506, 3464,
+      506, 7426, 530
+  };
+  const uint8_t expected[kMitsubishiHeavy64StateLength] = {
+      0xFF, 0x00, 0x9F, 0x60, 0xE6, 0x19, 0x2A, 0xD5};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 133, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(MITSUBISHI_HEAVY_64, irsend.capture.decode_type);
+  ASSERT_EQ(kMitsubishiHeavy64Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Cool, 24C, Low fan, power on.
+TEST(TestDecodeMitsubishiHeavy64, RealCool24) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint16_t rawData[133] = {
+      5952, 7476, 508, 3456, 508, 3456, 508, 3456, 508, 3456, 508, 3456, 508,
+      3456, 506, 3456, 508, 3478, 506, 1498, 508, 1496, 508, 1496, 508, 1496,
+      508, 1498, 506, 1498, 506, 1498, 506, 1520, 508, 3456, 506, 3456, 508,
+      3456, 506, 3456, 508, 3456, 506, 1498, 508, 1496, 508, 3478, 508, 1496,
+      508, 1496, 508, 1496, 508, 1496, 508, 1498, 506, 3456, 508, 3456, 506,
+      1520, 506, 1498, 508, 3456, 506, 3458, 506, 1498, 506, 1498, 506, 1498,
+      508, 1498, 506, 3478, 508, 3456, 508, 1498, 506, 1498, 508, 3456, 506,
+      3456, 508, 3456, 506, 3456, 506, 1520, 506, 1498, 506, 3456, 506, 1498,
+      506, 3458, 506, 1498, 506, 3456, 506, 1498, 506, 1520, 508, 3456, 508,
+      1498, 506, 3456, 506, 1498, 506, 3456, 506, 1498, 508, 3458, 506, 3464,
+      506, 7424, 532
+  };
+  const uint8_t expected[kMitsubishiHeavy64StateLength] = {
+      0xFF, 0x00, 0x9F, 0x60, 0x86, 0x79, 0x2A, 0xD5};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 133, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(MITSUBISHI_HEAVY_64, irsend.capture.decode_type);
+  ASSERT_EQ(kMitsubishiHeavy64Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Cool, 30C, Low fan, power on.
+TEST(TestDecodeMitsubishiHeavy64, RealCool30) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint16_t rawData[133] = {
+      5950, 7476, 506, 3456, 508, 3456, 508, 3456, 508, 3456, 508, 3456, 506,
+      3456, 508, 3456, 506, 3478, 508, 1496, 508, 1498, 506, 1498, 508, 1496,
+      508, 1498, 506, 1498, 508, 1496, 508, 1520, 508, 3456, 506, 3456, 506,
+      3456, 508, 3456, 508, 3456, 508, 1498, 506, 1498, 506, 3478, 508, 1496,
+      508, 1496, 508, 1496, 508, 1498, 506, 1498, 506, 3456, 508, 3456, 506,
+      1520, 508, 1498, 506, 3456, 506, 3456, 506, 1498, 506, 1498, 506, 3456,
+      506, 1498, 506, 1520, 506, 3456, 506, 1498, 506, 1498, 506, 3456, 506,
+      3456, 506, 1498, 508, 3456, 506, 3478, 508, 1498, 506, 3456, 506, 1498,
+      506, 3458, 506, 1498, 506, 3456, 510, 1494, 506, 1520, 506, 3456, 506,
+      1498, 506, 3456, 506, 1498, 506, 3458, 506, 1498, 506, 3456, 506, 3464,
+      506, 7424, 532
+  };
+  const uint8_t expected[kMitsubishiHeavy64StateLength] = {
+      0xFF, 0x00, 0x9F, 0x60, 0x26, 0xD9, 0x2A, 0xD5};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 133, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(MITSUBISHI_HEAVY_64, irsend.capture.decode_type);
+  ASSERT_EQ(kMitsubishiHeavy64Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Power off (from Cool, 30C, Low fan).
+TEST(TestDecodeMitsubishiHeavy64, RealOff) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint16_t rawData[133] = {
+      5952, 7476, 508, 3456, 506, 3456, 506, 3456, 508, 3456, 506, 3456, 508,
+      3456, 508, 3456, 508, 3478, 506, 1498, 508, 1496, 508, 1498, 508, 1496,
+      508, 1496, 508, 1498, 508, 1496, 508, 1520, 508, 3456, 506, 3456, 506,
+      3456, 508, 3456, 508, 3456, 506, 1498, 508, 1496, 508, 3478, 508, 1496,
+      508, 1498, 506, 1498, 506, 1498, 506, 1498, 506, 3456, 506, 3456, 508,
+      1520, 506, 1498, 508, 3456, 508, 3456, 506, 3456, 508, 1498, 508, 3458,
+      506, 1498, 506, 1520, 508, 3456, 506, 1498, 506, 1498, 506, 1498, 508,
+      3456, 506, 1502, 504, 3456, 506, 3480, 506, 1498, 506, 3456, 506, 1498,
+      506, 3456, 508, 1498, 506, 3456, 506, 1498, 506, 1522, 506, 3458, 506,
+      1498, 506, 3456, 506, 1498, 506, 3456, 506, 1498, 506, 3456, 506, 3464,
+      506, 7424, 532
+  };
+  const uint8_t expected[kMitsubishiHeavy64StateLength] = {
+      0xFF, 0x00, 0x9F, 0x60, 0x2E, 0xD1, 0x2A, 0xD5};
+
+  irsend.reset();
+  irsend.sendRaw(rawData, 133, 38);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(MITSUBISHI_HEAVY_64, irsend.capture.decode_type);
+  ASSERT_EQ(kMitsubishiHeavy64Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// Send our own synthetic state, decode it, and confirm it round-trips.
+TEST(TestDecodeMitsubishiHeavy64, SendAndDecode) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  const uint8_t expected[kMitsubishiHeavy64StateLength] = {
+      0xFF, 0x00, 0x9F, 0x60, 0xE6, 0x19, 0x2A, 0xD5};
+
+  irsend.reset();
+  irsend.sendMitsubishiHeavy64(expected);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  ASSERT_EQ(MITSUBISHI_HEAVY_64, irsend.capture.decode_type);
+  ASSERT_EQ(kMitsubishiHeavy64Bits, irsend.capture.bits);
+  EXPECT_STATE_EQ(expected, irsend.capture.state, irsend.capture.bits);
+}
+
+// A frame with a broken inverted-byte-pair must be rejected in strict mode.
+TEST(TestDecodeMitsubishiHeavy64, RejectsBadFrame) {
+  IRsendTest irsend(kGpioUnused);
+  IRrecv irrecv(kGpioUnused);
+  irsend.begin();
+
+  // state[3] should be ~state[2] (0x60) but is corrupted to 0x61.
+  const uint8_t bad[kMitsubishiHeavy64StateLength] = {
+      0xFF, 0x00, 0x9F, 0x61, 0xE6, 0x19, 0x2A, 0xD5};
+
+  irsend.reset();
+  irsend.sendMitsubishiHeavy64(bad);
+  irsend.makeDecodeResult();
+  // Strict decode (the default via decode()) must reject it.
+  ASSERT_FALSE(irrecv.decodeMitsubishiHeavy64(&irsend.capture, kStartOffset,
+                                              kMitsubishiHeavy64Bits, true));
 }

@@ -563,6 +563,8 @@ IRTEXT_CONST_BLOB_DECL(kAllProtocolNamesStr) {
             D_STR_BLUESTARHEAVY, D_STR_UNSUPPORTED) "\x0"
     COND(DECODE_EUROM || SEND_EUROM,
             D_STR_EUROM, D_STR_UNSUPPORTED) "\x0"
+    COND(DECODE_MITSUBISHI_HEAVY_64 || SEND_MITSUBISHI_HEAVY_64,
+            D_STR_MITSUBISHI_HEAVY_64, D_STR_UNSUPPORTED) "\x0"
     ///< New protocol (macro) strings should be added just above this line.
     "\x0"  ///< This string requires double null termination.
 };
