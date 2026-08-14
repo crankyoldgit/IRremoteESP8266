@@ -1190,3 +1190,31 @@ TEST(TestIRLgAcClass, SwingVToggle) {
   EXPECT_EQ(ac._swingv, kLgAcSwingVToggle);
   EXPECT_NE(ac._swingv_prev, kLgAcSwingVToggle);
 }
+
+// Ensure Swing(H)'s previous state is initialised & kept up to date.
+TEST(TestIRLgAcClass, SwingHPrevIsTracked) {
+  IRLgAc ac(kGpioUnused);
+  ac.begin();
+  ac.setModel(lg_ac_remote_model_t::AKB73757604);
+  ac.setPower(true);
+  ac.setMode(kLgAcCool);
+  ac.setTemp(25);
+  ac.setFan(kLgAcFanLow);
+  ac.setSwingH(true);
+
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  EXPECT_EQ(121, ac._irsend.capture.rawlen);  // Normal + Swing(H) message.
+
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  EXPECT_EQ(61, ac._irsend.capture.rawlen);  // Unchanged, so normal only.
+
+  ac.setSwingH(false);
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  EXPECT_EQ(121, ac._irsend.capture.rawlen);  // Changed again, so both.
+}

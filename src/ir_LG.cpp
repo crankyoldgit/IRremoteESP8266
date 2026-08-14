@@ -591,6 +591,7 @@ void IRLgAc::setSwingV(const uint32_t position) {
 // Copy the previous swing settings from the current ones.
 void IRLgAc::updateSwingPrev(void) {
   _swingv_prev = _swingv;
+  _swingh_prev = _swingh;
   for (uint8_t i = 0; i < kLgAcSwingVMaxVanes; i++)
     _vaneswingv_prev[i] = _vaneswingv[i];
 }
