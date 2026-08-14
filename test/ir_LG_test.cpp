@@ -1190,3 +1190,39 @@ TEST(TestIRLgAcClass, SwingVToggle) {
   EXPECT_EQ(ac._swingv, kLgAcSwingVToggle);
   EXPECT_NE(ac._swingv_prev, kLgAcSwingVToggle);
 }
+
+// Ensure the Swing(H) "previous" setting is initialised & kept up to date.
+// Without it, `_swingh_prev` is read uninitialised on the first send(), and
+// never tracks `_swingh` afterwards, so the "only send if it changed" check
+// either re-sends Swing(H) forever or never sends it at all.
+TEST(TestIRLgAcClass, SwingHPrevIsTracked) {
+  IRLgAc ac(kGpioUnused);
+  ac.begin();
+  ac.setModel(lg_ac_remote_model_t::AKB73757604);
+  ac.setPower(true);
+  ac.setMode(kLgAcCool);
+  ac.setTemp(25);
+  ac.setFan(kLgAcFanLow);
+  ac.setSwingH(true);
+
+  // Swing(H) has changed since the last send, so we expect the normal
+  // message plus a Swing(H) message.
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  EXPECT_EQ(121, ac._irsend.capture.rawlen);  // i.e. Two messages.
+
+  // Nothing has changed, so the second send should be the normal message
+  // only, with no repeated Swing(H) message.
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  EXPECT_EQ(61, ac._irsend.capture.rawlen);  // i.e. One message.
+
+  // Changing it back should produce a Swing(H) message again.
+  ac.setSwingH(false);
+  ac._irsend.reset();
+  ac.send();
+  ac._irsend.makeDecodeResult();
+  EXPECT_EQ(121, ac._irsend.capture.rawlen);  // i.e. Two messages.
+}
