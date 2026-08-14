@@ -78,6 +78,9 @@
 #ifndef D_STR_BEEP
 #define D_STR_BEEP "Beep"
 #endif  // D_STR_BEEP
+#ifndef D_STR_ANNOUNCE
+#define D_STR_ANNOUNCE "Announce"
+#endif  // D_STR_ANNOUNCE
 #ifndef D_STR_MOULD
 #define D_STR_MOULD "Mould"
 #endif  // D_STR_MOULD
