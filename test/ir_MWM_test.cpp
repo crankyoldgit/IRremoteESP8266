@@ -123,4 +123,50 @@ TEST(TestDecodeMWM, RealExamples) {
   EXPECT_STATE_EQ(long_expected, irsend.capture.state, irsend.capture.bits);
 }
 
+// Test that a trailing stop bit cut off by raw buffer overflow doesn't drop
+// the last byte. The decoder stores each byte only inside case 9 (stop bit)
+// inside IRrecv::decodeMWM. If the buffer ends before the stop bit is read,
+// the last byte is silently lost.
+//
+// Uses sendMWM then truncates rawlen by 1.  Because sendMWM merges the
+// stop-bit space with the trailing gap into one raw entry, removing that
+// entry drops the stop bit while preserving every data bit.  The last byte
+// (0x00) has bit 7 = 0 so the stop bit is NOT merged into a data-bit entry.
+TEST(TestDecodeMWM, TrailingStopBit) {
+  IRsendTest irsend(0);
+  IRrecv irrecv(0);
+  irsend.begin();
+
+  // 9-byte MWM command: header 0x96 (payload_length=6, total=9 bytes),
+  // eight data bytes of 0x00.
+  unsigned char code[] = {0x96, 0x00, 0x00, 0x00, 0x00,
+                          0x00, 0x00, 0x00, 0x00};
+  uint16_t nbytes = 9;
+  uint16_t nbits = nbytes * 8;  // 72
+
+  // --- Full message: should decode cleanly. ---
+  irsend.reset();
+  irsend.sendMWM(code, nbytes, 0);
+  irsend.makeDecodeResult();
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MWM, irsend.capture.decode_type);
+  EXPECT_EQ(nbits, irsend.capture.bits);
+  EXPECT_STATE_EQ(code, irsend.capture.state, nbits);
+
+  // --- Truncated: remove last raw entry (stop bit + trailing gap). ---
+  // For byte 0x00 the stop-bit space is NOT merged into data bits (bit 7 = 0
+  // means a long mark precedes the stop bit).  sendMWM merges the stop-bit
+  // space with the trailing gap into one space entry.  Removing it drops
+  // the stop bit while all 8 data bits remain in the preceding mark entry.
+  irsend.reset();
+  irsend.sendMWM(code, nbytes, 0);
+  irsend.makeDecodeResult();
+  ASSERT_GE(irsend.capture.rawlen, 4);  // at least header + a few entries
+  irsend.capture.rawlen--;
+  ASSERT_TRUE(irrecv.decode(&irsend.capture));
+  EXPECT_EQ(MWM, irsend.capture.decode_type);
+  EXPECT_EQ(nbits, irsend.capture.bits);
+  EXPECT_STATE_EQ(code, irsend.capture.state, nbits);
+}
+
 // vim: et:ts=2:sw=2
