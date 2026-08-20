@@ -142,6 +142,15 @@ bool IRrecv::decodeMWM(decode_results *results, uint16_t offset,
     }
   }
 
+  // If the raw buffer ran out before the stop bit (crankyoldgit/IRremoteESP8266#2289),
+  // store the byte that was awaiting its stop bit. Without this, the final
+  // byte of a frame is silently dropped when the receiver's capture buffer
+  // truncates the trailing stop-bit space.
+  if (data_bits > 0 && frame_bits % bits_per_frame != 0) {
+    results->state[(data_bits - 1) / 8] = data & 0xFF;
+    results->bits = data_bits;
+  }
+
 done:
   // Footer (None)
 
