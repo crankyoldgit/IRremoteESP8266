@@ -15,6 +15,8 @@
 //   Brand: Kelvinator,  Model: KSV80HRC A/C
 //   Brand: Gree,  Model: YAPOF3 remote
 //   Brand: Gree,  Model: YAP0F8 remote
+//   Brand: Gree,  Model: YAP2F remote
+//   Brand: Gree,  Model: GSE-50CI A/C
 //   Brand: Sharp,  Model: YB1FA remote
 //   Brand: Sharp,  Model: A5VEY A/C
 
