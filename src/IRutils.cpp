@@ -205,6 +205,7 @@ bool hasACState(const decode_type_t protocol) {
     case MITSUBISHI136:
     case MITSUBISHI112:
     case MITSUBISHI_AC:
+    case MITSUBISHI_HEAVY_64:
     case MITSUBISHI_HEAVY_88:
     case MITSUBISHI_HEAVY_152:
     case MWM:

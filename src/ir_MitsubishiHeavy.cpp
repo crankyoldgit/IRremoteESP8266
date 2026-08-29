@@ -28,6 +28,19 @@ const uint16_t kMitsubishiHeavyOneSpace = 420;
 const uint16_t kMitsubishiHeavyZeroSpace = 1220;
 const uint32_t kMitsubishiHeavyGap = kDefaultMessageGap;  // Just a guess.
 
+// Timing for the 64-bit "Jinling" variant (RYD502A003B remote).
+// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/2262
+const uint16_t kMitsubishiHeavy64HdrMark = 5950;
+const uint16_t kMitsubishiHeavy64HdrSpace = 7475;
+const uint16_t kMitsubishiHeavy64BitMark = 508;
+const uint16_t kMitsubishiHeavy64OneSpace = 3454;
+const uint16_t kMitsubishiHeavy64ZeroSpace = 1496;
+// Measured gap between repeats. The raw captures end each frame with a trailing
+// space of ~7422-7426us before the leading mark of the next repeat appears, so
+// this is the real inter-message gap, not a guess. It happens to be ~the same
+// as the header space (7475us); this remote uses a short gap between repeats.
+const uint16_t kMitsubishiHeavy64Gap = 7422;
+
 using irutils::addBoolToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
@@ -69,6 +82,27 @@ void IRsend::sendMitsubishiHeavy152(const unsigned char data[],
   sendMitsubishiHeavy88(data, nbytes, repeat);
 }
 #endif  // SEND_MITSUBISHIHEAVY
+
+#if SEND_MITSUBISHI_HEAVY_64
+/// Send a MitsubishiHeavy 64-bit (RYD502A003B remote) A/C message.
+/// Status: STABLE / Confirmed working with a real remote.
+/// @param[in] data The message (8 bytes) to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+/// @note The whole frame is four inverted byte pairs, so it carries no
+///   separate checksum byte. The bytes are sent LSB-first.
+void IRsend::sendMitsubishiHeavy64(const unsigned char data[],
+                                   const uint16_t nbytes,
+                                   const uint16_t repeat) {
+  if (nbytes < kMitsubishiHeavy64StateLength)
+    return;  // Not enough bytes to send a proper message.
+  sendGeneric(kMitsubishiHeavy64HdrMark, kMitsubishiHeavy64HdrSpace,
+              kMitsubishiHeavy64BitMark, kMitsubishiHeavy64OneSpace,
+              kMitsubishiHeavy64BitMark, kMitsubishiHeavy64ZeroSpace,
+              kMitsubishiHeavy64BitMark, kMitsubishiHeavy64Gap,
+              data, nbytes, 38000, false, repeat, kDutyDefault);
+}
+#endif  // SEND_MITSUBISHI_HEAVY_64
 
 // Class for decoding and constructing MitsubishiHeavy152 AC messages.
 
@@ -1048,3 +1082,51 @@ bool IRrecv::decodeMitsubishiHeavy(decode_results* results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_MITSUBISHIHEAVY
+
+#if DECODE_MITSUBISHI_HEAVY_64
+/// Decode the supplied MitsubishiHeavy 64-bit (RYD502A003B remote) message.
+/// Status: STABLE / Confirmed working with a real remote.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return True if it can decode it, false if it can't.
+/// @note Unlike the 88/152-bit variants, this frame is one block of four
+///   inverted byte pairs: `FF 00 | B2 ~B2 | B4 ~B4 | 2A D5`.
+bool IRrecv::decodeMitsubishiHeavy64(decode_results* results, uint16_t offset,
+                                     const uint16_t nbits, const bool strict) {
+  if (strict && nbits != kMitsubishiHeavy64Bits)
+    return false;  // Not what is expected.
+
+  uint16_t used = matchGeneric(results->rawbuf + offset, results->state,
+                               results->rawlen - offset, nbits,
+                               kMitsubishiHeavy64HdrMark,
+                               kMitsubishiHeavy64HdrSpace,
+                               kMitsubishiHeavy64BitMark,
+                               kMitsubishiHeavy64OneSpace,
+                               kMitsubishiHeavy64BitMark,
+                               kMitsubishiHeavy64ZeroSpace,
+                               kMitsubishiHeavy64BitMark,
+                               kMitsubishiHeavy64Gap, true,
+                               _tolerance, 0, false);
+  if (used == 0) return false;
+
+  // Compliance
+  if (strict) {
+    // The whole frame is four inverted byte pairs (it has no separate
+    // checksum), so every second byte must be the complement of the first.
+    if (!checkInvertedBytePairs(results->state, kMitsubishiHeavy64StateLength))
+      return false;
+    // Fixed header & footer signature bytes. The pair check above implies
+    // state[1] == 0x00 and state[7] == 0xD5.
+    if (results->state[0] != 0xFF || results->state[6] != 0x2A) return false;
+  }
+
+  // Success
+  results->decode_type = MITSUBISHI_HEAVY_64;
+  results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  return true;
+}
+#endif  // DECODE_MITSUBISHI_HEAVY_64
