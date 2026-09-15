@@ -958,7 +958,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
 #endif
 #if DECODE_MWM
     DPRINTLN("Attempting MWM decode");
-    if (decodeMWM(results, offset)) return true;
+    // decodeMWM() decodes every complete MWM message in the raw buffer (a
+    // wand sends its command as an A-B-A' triple inside one capture) and
+    // returns them concatenated in a single result.
+    if (decodeMWM(results, offset, 24, true)) return true;
 #endif
 #if DECODE_VESTEL_AC
     DPRINTLN("Attempting Vestel AC decode");
@@ -2118,6 +2121,7 @@ uint16_t IRrecv::matchManchesterData(atomic_const_uint16_t *data_ptr,
   *result_ptr = GETBITS64(data, 0, nbits);
   return offset;
 }
+
 
 #if UNIT_TEST
 /// Unit test helper to get access to the params structure.

@@ -160,6 +160,7 @@ class IRrecv {
   bool matchSpaceRange(const uint32_t measured, const uint32_t desired,
                        const uint16_t range = 100,
                        const int16_t excess = kMarkExcess);
+
 #ifndef UNIT_TEST
 
  private:
@@ -716,6 +717,13 @@ class IRrecv {
   bool decodeMWM(decode_results *results, uint16_t offset = kStartOffset,
                  const uint16_t nbits = 24,
                  const bool strict = true);
+  // Append a decoded MWM frame to `results` if it delivered exactly the
+  // length its first byte declared. Returns true if the frame was truncated
+  // and dropped instead. Used by decodeMWM() to concatenate every complete
+  // frame of a capture into one result.
+  bool finish_frame(decode_results *results, uint16_t *data_bits,
+                    const uint64_t data, uint8_t frame_state[],
+                    uint16_t *frame_bytes, const uint16_t frame_data_bits);
 #endif
 #if DECODE_VESTEL_AC
   bool decodeVestelAc(decode_results *results, uint16_t offset = kStartOffset,
