@@ -151,7 +151,8 @@ bool IRrecv::decodeMWM(decode_results *results, uint16_t offset,
           if (frame_bytes != 0 || frame_data_bits != 0) {
             if (!finish_frame(results, &data_bits, data, frame_state,
                               &frame_bytes, frame_data_bits))
-              goto done;  // Truncated; keep the complete frames decoded before it.
+              goto done;  // Truncated; keep the complete frames that were
+                          // decoded before it.
             data = 0;
             frame_data_bits = 0;
             frame_bytes = 0;
@@ -283,7 +284,8 @@ bool IRrecv::finish_frame(decode_results *results, uint16_t *data_bits,
     DPRINT(frame_data_bits);
     DPRINT(" != ");
     DPRINTLN(needed);
-    return false;  // Frame is incomplete; keep only the complete frames before it.
+    return false;  // Frame is incomplete; keep only the complete frames
+                   // decoded before it.
   }
   // The capture may run out just after the last byte's final data bit but
   // before its stop bit: store the pending, fully-assembled byte.
