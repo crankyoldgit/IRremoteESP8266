@@ -3334,3 +3334,42 @@ TEST(TestIRac, cleanState) {
   clean = irac.cleanState(s);
   EXPECT_FALSE(clean.power);
 }
+
+TEST(TestIRac, GreeYapofb14CommonSend) {
+  IRGreeAC ac(kGpioUnused);
+  IRac common(kGpioUnused);
+  const uint8_t state[] = {
+      0x39, 0x08, 0x00, 0x50, 0x00, 0x40, 0x00, 0xF0,
+      0x39, 0x08, 0x00, 0x70, 0x00, 0x00, 0xB0, 0x60};
+  IRsendTest expected(kGpioUnused);
+  expected.sendGree(state, 8);
+  expected.space(20020);
+  expected.sendGree(state + 8, 8);
+  common.gree(&ac, YAPOFB14, true,
+      stdAc::opmode_t::kCool, true, 24, stdAc::fanspeed_t::kMedium,
+      stdAc::swingv_t::kOff, stdAc::swingh_t::kOff,
+      false, false, false, false, false, -1);
+  EXPECT_EQ(expected.outputStr(), ac._irsend.outputStr());
+}
+
+TEST(TestIRac, GreeYapofb14CommonQuiet) {
+  IRGreeAC ac(kGpioUnused, YAPOFB14);
+  IRac common(kGpioUnused);
+  common.gree(&ac, YAPOFB14, true, stdAc::opmode_t::kCool, true, 27,
+              stdAc::fanspeed_t::kHigh, stdAc::swingv_t::kLowest,
+              stdAc::swingh_t::kOff, false, false, false, true, false,
+              -1, true);
+  IRrecv rx(kGpioUnused);
+  ac._irsend.makeDecodeResult();
+  // Gree and Kelvinator overlap; select the known physical protocol here.
+  ASSERT_TRUE(rx.decodeGree(&ac._irsend.capture, kStartOffset, 128));
+  ASSERT_EQ(GREE, ac._irsend.capture.decode_type);
+  ASSERT_EQ(128, ac._irsend.capture.bits);
+  stdAc::state_t decoded;
+  ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &decoded));
+  EXPECT_EQ(YAPOFB14, decoded.model);
+  EXPECT_EQ(ac.toString(), IRAcUtils::resultAcToString(&ac._irsend.capture));
+  EXPECT_TRUE(decoded.quiet);
+  EXPECT_FALSE(decoded.turbo);
+  EXPECT_EQ(stdAc::fanspeed_t::kMin, decoded.fanspeed);
+}

@@ -1432,31 +1432,32 @@ void IRac::goodweather(IRGoodweatherAc *ac,
 /// @param[in] light Turn on the LED/Display mode.
 /// @param[in] clean Turn on the self-cleaning mode. e.g. Mould, dry filters etc
 /// @param[in] sleep Nr. of minutes for sleep mode. -1 is Off, >= 0 is on.
+/// @param[in] quiet Enable quiet fan mode (YAPOFB14 only).
 void IRac::gree(IRGreeAC *ac, const gree_ac_remote_model_t model,
                 const bool on, const stdAc::opmode_t mode, const bool celsius,
                 const float degrees, const stdAc::fanspeed_t fan,
                 const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
                 const bool iFeel, const bool turbo, const bool econo,
-                const bool light, const bool clean, const int16_t sleep) {
+                const bool light, const bool clean, const int16_t sleep,
+                const bool quiet) {
   ac->begin();
   ac->setModel(model);
   ac->setPower(on);
   ac->setMode(ac->convertMode(mode));
   ac->setTemp(degrees, !celsius);
-  ac->setFan(ac->convertFan(fan));
+  ac->setFan(ac->convertFan(fan, model));
   ac->setSwingVertical(swingv == stdAc::swingv_t::kAuto,  // Set auto flag.
                        ac->convertSwingV(swingv));
   ac->setSwingHorizontal(ac->convertSwingH(swingh));
   ac->setIFeel(iFeel);
   ac->setLight(light);
   ac->setTurbo(turbo);
+  ac->setQuiet(quiet);
   ac->setEcono(econo);
   ac->setXFan(clean);
   ac->setSleep(sleep >= 0);  // Sleep on this A/C is either on or off.
-  // No Econo setting available.
   // No Filter setting available.
   // No Beep setting available.
-  // No Quiet setting available.
   // No Clock setting available.
   ac->send();
 }
@@ -3382,7 +3383,7 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       gree(&ac, (gree_ac_remote_model_t)send.model, send.power, send.mode,
            send.celsius, send.degrees, send.fanspeed, send.swingv, send.swingh,
            send.iFeel, send.turbo, send.econo, send.light, send.clean,
-           send.sleep);
+           send.sleep, send.quiet);
       break;
     }
 #endif  // SEND_GREE
@@ -4372,7 +4373,7 @@ String resultAcToString(const decode_results * const result) {
 #if DECODE_GREE
     case decode_type_t::GREE: {
       IRGreeAC ac(kGpioUnused);
-      ac.setRaw(result->state);
+      ac.setRaw(result->state, result->bits / 8);
       return ac.toString();
     }
 #endif  // DECODE_GREE
@@ -4890,7 +4891,7 @@ bool decodeToState(const decode_results *decode, stdAc::state_t *result,
 #if DECODE_GREE
     case decode_type_t::GREE: {
       IRGreeAC ac(kGpioUnused);
-      ac.setRaw(decode->state);
+      ac.setRaw(decode->state, decode->bits / 8);
       *result = ac.toCommon();
       break;
     }
