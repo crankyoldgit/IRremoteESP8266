@@ -303,6 +303,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_HITACHI_AC424
     case decode_type_t::HITACHI_AC424:
 #endif
+#if SEND_ISLANDAIRE_AC
+    case decode_type_t::ISLANDAIRE_AC:
+#endif
 #if SEND_KELON
     case decode_type_t::KELON:
 #endif
@@ -1829,6 +1832,27 @@ void IRac::hitachi424(IRHitachiAc424 *ac,
   ac->send();
 }
 #endif  // SEND_HITACHI_AC424
+
+#if SEND_ISLANDAIRE_AC
+/// Send an Islandaire A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRIslandaireAc object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] celsius Temperature units. True is Celsius, False is Fahrenheit.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+void IRac::islandaire(IRIslandaireAc *ac,
+                      const bool on, const stdAc::opmode_t mode,
+                      const bool celsius, const float degrees,
+                      const stdAc::fanspeed_t fan) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees, !celsius);
+  ac->setFan(ac->convertFan(fan));
+  ac->send();
+}
+#endif  // SEND_ISLANDAIRE_AC
 
 #if SEND_KELON
 /// Send a Kelon A/C message with the supplied settings.
@@ -3485,6 +3509,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_HITACHI_AC424
+#if SEND_ISLANDAIRE_AC
+    case ISLANDAIRE_AC:
+    {
+      IRIslandaireAc ac(_pin, _inverted, _modulation);
+      islandaire(&ac, send.power, send.mode, send.celsius, send.degrees,
+                 send.fanspeed);
+      break;
+    }
+#endif  // SEND_ISLANDAIRE_AC
 #if SEND_KELON
     case KELON: {
       IRKelonAc ac(_pin, _inverted, _modulation);
@@ -4443,6 +4476,13 @@ String resultAcToString(const decode_results * const result) {
       return ac.toString();
     }
 #endif  // DECODE_HITACHI_AC424
+#if DECODE_ISLANDAIRE_AC
+    case decode_type_t::ISLANDAIRE_AC: {
+      IRIslandaireAc ac(kGpioUnused);
+      ac.setRaw(result->state);
+      return ac.toString();
+    }
+#endif  // DECODE_ISLANDAIRE_AC
 #if DECODE_KELON
     case decode_type_t::KELON: {
       IRKelonAc ac(kGpioUnused);
@@ -4972,6 +5012,14 @@ bool decodeToState(const decode_results *decode, stdAc::state_t *result,
       break;
     }
 #endif  // DECODE_HITACHI_AC424
+#if DECODE_ISLANDAIRE_AC
+    case decode_type_t::ISLANDAIRE_AC: {
+      IRIslandaireAc ac(kGpioUnused);
+      ac.setRaw(decode->state);
+      *result = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_ISLANDAIRE_AC
 #if DECODE_KELON
     case decode_type_t::KELON: {
       IRKelonAc ac(kGpioUnused);

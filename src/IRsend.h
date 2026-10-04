@@ -924,6 +924,11 @@ class IRsend {
                  const uint16_t nbytes = kEuromStateLength,
                  const uint16_t repeat = kNoRepeat);
 #endif  // SEND_EUROM
+#if SEND_ISLANDAIRE_AC
+  void sendIslandaireAc(const uint8_t data[],
+                        const uint16_t nbytes = kIslandaireStateLength,
+                        const uint16_t repeat = kNoRepeat);
+#endif  // SEND_ISLANDAIRE_AC
 
  protected:
 #ifdef UNIT_TEST

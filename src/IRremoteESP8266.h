@@ -976,6 +976,13 @@ typedef volatile const uint16_t atomic_const_uint16_t;
 #define SEND_EUROM           _IR_ENABLE_DEFAULT_
 #endif  // SEND_EUROM
 
+#ifndef DECODE_ISLANDAIRE_AC
+#define DECODE_ISLANDAIRE_AC  _IR_ENABLE_DEFAULT_
+#endif  // DECODE_ISLANDAIRE_AC
+#ifndef SEND_ISLANDAIRE_AC
+#define SEND_ISLANDAIRE_AC    _IR_ENABLE_DEFAULT_
+#endif  // SEND_ISLANDAIRE_AC
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -995,7 +1002,7 @@ typedef volatile const uint16_t atomic_const_uint16_t;
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
      DECODE_CARRIER_AC84 || DECODE_YORK || DECODE_BLUESTARHEAVY || \
-     DECODE_EUROM || \
+     DECODE_EUROM || DECODE_ISLANDAIRE_AC || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1164,8 +1171,9 @@ enum decode_type_t {
   YORK,
   BLUESTARHEAVY,
   EUROM,
+  ISLANDAIRE_AC,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = EUROM,
+  kLastDecodeType = ISLANDAIRE_AC,
 };
 
 // Message lengths & required repeat values
@@ -1311,6 +1319,8 @@ const uint16_t kHitachiAc424StateLength = 53;
 const uint16_t kHitachiAc424Bits = kHitachiAc424StateLength * 8;
 const uint16_t kInaxBits = 24;
 const uint16_t kInaxMinRepeat = kSingleRepeat;
+const uint16_t kIslandaireStateLength = 14;
+const uint16_t kIslandaireBits = kIslandaireStateLength * 8;
 const uint16_t kJvcBits = 16;
 const uint16_t kKelonBits = 48;
 const uint16_t kKelon168StateLength = 21;

@@ -898,6 +898,12 @@ class IRrecv {
                    const uint16_t nbits = kEuromBits,
                    const bool strict = true);
 #endif  // DECODE_EUROM
+#if DECODE_ISLANDAIRE_AC
+  bool decodeIslandaireAc(decode_results *results,
+                          uint16_t offset = kStartOffset,
+                          const uint16_t nbits = kIslandaireBits,
+                          const bool strict = true);
+#endif  // DECODE_ISLANDAIRE_AC
 };
 
 #endif  // IRRECV_H_

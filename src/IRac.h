@@ -30,6 +30,7 @@
 #include "ir_Gree.h"
 #include "ir_Haier.h"
 #include "ir_Hitachi.h"
+#include "ir_Islandaire.h"
 #include "ir_Kelon.h"
 #include "ir_Kelvinator.h"
 #include "ir_LG.h"
@@ -390,6 +391,12 @@ void electra(IRElectraAc *ac,
                   const float degrees, const stdAc::fanspeed_t fan,
                   const stdAc::swingv_t swingv);
 #endif  // SEND_HITACHI_AC424
+#if SEND_ISLANDAIRE_AC
+  void islandaire(IRIslandaireAc *ac,
+                  const bool on, const stdAc::opmode_t mode,
+                  const bool celsius, const float degrees,
+                  const stdAc::fanspeed_t fan);
+#endif  // SEND_ISLANDAIRE_AC
 #if SEND_KELON
   void kelon(IRKelonAc *ac, const bool togglePower, const stdAc::opmode_t mode,
              const int8_t dryGrade, const float degrees,

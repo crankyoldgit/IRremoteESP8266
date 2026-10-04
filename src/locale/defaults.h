@@ -907,6 +907,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_INAX
 #define D_STR_INAX "INAX"
 #endif  // D_STR_INAX
+#ifndef D_STR_ISLANDAIRE_AC
+#define D_STR_ISLANDAIRE_AC "ISLANDAIRE_AC"
+#endif  // D_STR_ISLANDAIRE_AC
 #ifndef D_STR_JVC
 #define D_STR_JVC "JVC"
 #endif  // D_STR_JVC

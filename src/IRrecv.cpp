@@ -1139,6 +1139,11 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting XMP decode");
     if (decodeXmp(results, offset, kXmpBits)) return true;
 #endif  // DECODE_XMP
+#if DECODE_ISLANDAIRE_AC
+    // Must be before Teknopoint, which also matches Islandaire messages.
+    DPRINTLN("Attempting Islandaire A/C decode");
+    if (decodeIslandaireAc(results, offset)) return true;
+#endif  // DECODE_ISLANDAIRE_AC
 #if DECODE_TEKNOPOINT
     DPRINTLN("Attempting Teknopoint decode");
     if (decodeTeknopoint(results, offset)) return true;

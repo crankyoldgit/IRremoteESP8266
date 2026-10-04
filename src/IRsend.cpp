@@ -822,6 +822,8 @@ uint16_t IRsend::defaultBits(const decode_type_t protocol) {
       return kYorkBits;
     case BLUESTARHEAVY:
       return kBluestarHeavyBits;
+    case ISLANDAIRE_AC:
+      return kIslandaireBits;
     // No default amount of bits.
     case FUJITSU_AC:
     case MWM:
@@ -1468,6 +1470,11 @@ bool IRsend::send(const decode_type_t type, const uint8_t *state,
       sendBluestarHeavy(state, nbytes);
       break;
 #endif  // SEND_BLUESTARHEAVY
+#if SEND_ISLANDAIRE_AC
+    case ISLANDAIRE_AC:
+      sendIslandaireAc(state, nbytes);
+      break;
+#endif  // SEND_ISLANDAIRE_AC
     default:
       return false;
   }
