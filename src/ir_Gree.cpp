@@ -133,13 +133,20 @@ void IRGreeAC::stateReset(void) {
   _.Light = true;  // _.remote_state[2] = 0x20;
   _.unknown1 = 5;  // _.remote_state[3] = 0x50;
   _.unknown2 = 4;  // _.remote_state[5] = 0x20;
+  const gree_ac_remote_model_t model = _model;
+  _model = YAW1F;
+  setModel(model);
 }
 
 /// Fix up the internal state so it is correct.
 /// @note Internal use only.
 void IRGreeAC::fixup(void) {
   setPower(getPower());  // Redo the power bits as they differ between models.
-  checksum();  // Calculate the checksums
+  if (_model == YAPOFB14) {
+    std::memcpy(_.remote_state + kGreeStateLength, _.remote_state, 3);
+    _.remote_state[11] = (_.remote_state[3] & 0x0F) | 0x70;
+  }
+  checksum(getStateLength());
 }
 
 /// Set up hardware to be able to send a message.
@@ -149,7 +156,7 @@ void IRGreeAC::begin(void) { _irsend.begin(); }
 /// Send the current internal state as an IR message.
 /// @param[in] repeat Nr. of times the message will be repeated.
 void IRGreeAC::send(const uint16_t repeat) {
-  _irsend.sendGree(getRaw(), kGreeStateLength, repeat);
+  _irsend.sendGree(getRaw(), getStateLength(), repeat);
 }
 #endif  // SEND_GREE
 
@@ -162,8 +169,17 @@ uint8_t* IRGreeAC::getRaw(void) {
 
 /// Set the internal state from a valid code for this protocol.
 /// @param[in] new_code A valid code for this protocol.
-void IRGreeAC::setRaw(const uint8_t new_code[]) {
-  std::memcpy(_.remote_state, new_code, kGreeStateLength);
+/// @param[in] length Number of available bytes in new_code.
+void IRGreeAC::setRaw(const uint8_t new_code[], const uint16_t length) {
+  if (length != kGreeStateLength && length != kGreeExtendedStateLength) return;
+  std::memmove(_.remote_state, new_code, length);
+  std::memset(_.remote_state + length, 0,
+              sizeof(_.remote_state) - length);
+  if (length >= kGreeExtendedStateLength) {
+    _model = YAPOFB14;
+    return;
+  }
+  if (_model == YAPOFB14) _model = YBOFB;
   // We can only detect the difference between models when the power is on.
   if (_.Power) {
     if (_.ModelA)
@@ -177,8 +193,10 @@ void IRGreeAC::setRaw(const uint8_t new_code[]) {
 /// Calculate and set the checksum values for the internal state.
 /// @param[in] length The size/length of the state array to fix the checksum of.
 void IRGreeAC::checksum(const uint16_t length) {
-  // Gree uses the same checksum alg. as Kelvinator's block checksum.
-  _.Sum = IRKelvinatorAC::calcBlockChecksum(_.remote_state, length);
+  // Gree uses the same checksum algorithm as Kelvinator's blocks.
+  for (uint16_t pos = 0; pos < length; pos += kGreeStateLength)
+    _.remote_state[pos + 7] = (_.remote_state[pos + 7] & 0x0F) |
+        (IRKelvinatorAC::calcBlockChecksum(_.remote_state + pos) << 4);
 }
 
 /// Verify the checksum is valid for a given state.
@@ -200,11 +218,29 @@ bool IRGreeAC::validChecksum(const uint8_t state[], const uint16_t length) {
 /// Set the model of the A/C to emulate.
 /// @param[in] model The enum of the appropriate model.
 void IRGreeAC::setModel(const gree_ac_remote_model_t model) {
+  const bool was_extended = _model == gree_ac_remote_model_t::YAPOFB14;
   switch (model) {
     case gree_ac_remote_model_t::YAW1F:
     case gree_ac_remote_model_t::YBOFB:
     case gree_ac_remote_model_t::YX1FSF: _model = model; break;
+    case gree_ac_remote_model_t::YAPOFB14:
+      _model = model;
+      if (!was_extended) {
+        std::memset(_.remote_state + kGreeStateLength, 0,
+                    sizeof(_.remote_state) - kGreeStateLength);
+        _.unknown2 = 0;
+        // This model needs a third group for timers, which is not supported.
+        _.TimerEnabled = _.TimerHalfHr = _.TimerTensHr = _.TimerHours = 0;
+        _.WiFi = true;
+        _.FanExt = _.Fan;
+        setLight(_.Light);
+      }
+      break;
     default: _model = gree_ac_remote_model_t::YAW1F;
+  }
+  if (_model != gree_ac_remote_model_t::YAPOFB14 && was_extended) {
+    _.unknown2 = 4;
+    _.WiFi = false;
   }
 }
 
@@ -285,21 +321,31 @@ uint8_t IRGreeAC::getTemp(void) const {
 }
 
 /// Set the speed of the fan.
-/// @param[in] speed The desired setting. 0 is auto, 1-3 is the speed.
+/// @param[in] speed 0 is auto, 1-3 is the speed (1-5 for YAPOFB14).
 void IRGreeAC::setFan(const uint8_t speed) {
-  uint8_t fan = std::min(kGreeFanMax, speed);  // Bounds check
+  const uint8_t maxfan = _model == YAPOFB14 ? kGreeFanMaxExtended : kGreeFanMax;
+  uint8_t fan = std::min(maxfan, speed);  // Bounds check
   if (_.Mode == kGreeDry) fan = 1;  // DRY mode is always locked to fan 1.
   // Set the basic fan values.
-  _.Fan = fan;
+  _.Fan = std::min(kGreeFanMax, fan);
+  if (_model == YAPOFB14) {
+    _.FanExt = fan;
+    setQuiet(false);
+    _.Turbo = false;
+  }
 }
 
 /// Get the current fan speed setting.
 /// @return The current fan speed.
-uint8_t IRGreeAC::getFan(void) const { return _.Fan; }
+uint8_t IRGreeAC::getFan(void) const {
+  return _model == YAPOFB14 ?
+      _.FanExt : _.Fan;
+}
 
 /// Set the operating mode of the A/C.
 /// @param[in] new_mode The desired operating mode.
 void IRGreeAC::setMode(const uint8_t new_mode) {
+  const uint8_t previous = _.Mode;
   uint8_t mode = new_mode;
   switch (mode) {
     // AUTO is locked to 25C
@@ -314,6 +360,12 @@ void IRGreeAC::setMode(const uint8_t new_mode) {
     default: mode = kGreeAuto;
   }
   _.Mode = mode;
+  if (_model == YAPOFB14 && previous != mode) {
+    if (mode == kGreeHeat || previous == kGreeHeat) {
+      _.Xfan = false;
+      _.AuxHeatDefault = mode == kGreeHeat;
+    }
+  }
 }
 
 /// Get the operating mode setting of the A/C.
@@ -322,7 +374,11 @@ uint8_t IRGreeAC::getMode(void) const { return _.Mode; }
 
 /// Set the Light (LED) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRGreeAC::setLight(const bool on) { _.Light = on; }
+void IRGreeAC::setLight(const bool on) {
+  _.Light = on;
+  if (_model == YAPOFB14)
+    _.LightOff = !on;
+}
 
 /// Get the Light (LED) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
@@ -346,23 +402,38 @@ bool IRGreeAC::getWiFi(void) const { return _.WiFi; }
 
 /// Set the XFan (Mould) setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRGreeAC::setXFan(const bool on) { _.Xfan = on; }
+void IRGreeAC::setXFan(const bool on) {
+  if (_model != YAPOFB14 || _.Mode != kGreeHeat) _.Xfan = on;
+}
 
 /// Get the XFan (Mould) setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getXFan(void) const { return _.Xfan; }
+bool IRGreeAC::getXFan(void) const {
+  return !(_model == YAPOFB14 && _.Mode == kGreeHeat) && _.Xfan;
+}
 
 /// Set the Sleep setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRGreeAC::setSleep(const bool on) { _.Sleep = on; }
+void IRGreeAC::setSleep(const bool on) {
+  if (_model == YAPOFB14) {
+    if (on || getSleep()) setQuiet(on);
+    _.Sleep2 = _.Sleep4 = false;
+  }
+  _.Sleep = on;
+}
 
 /// Get the Sleep setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getSleep(void) const { return _.Sleep; }
+bool IRGreeAC::getSleep(void) const {
+  return _.Sleep || (_model == YAPOFB14 && (_.Sleep2 || _.Sleep4));
+}
 
 /// Set the Turbo setting of the A/C.
 /// @param[in] on true, the setting is on. false, the setting is off.
-void IRGreeAC::setTurbo(const bool on) { _.Turbo = on; }
+void IRGreeAC::setTurbo(const bool on) {
+  if (_model == YAPOFB14 && on) setFan(kGreeFanMaxExtended);
+  _.Turbo = on;
+}
 
 /// Get the Turbo setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
@@ -412,11 +483,18 @@ void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
     }
   }
   _.SwingV = new_position;
+  if (_model == YAPOFB14)
+    _.SwingAuto = getSwingVerticalAuto() || _.SwingH == kGreeSwingHAuto;
 }
 
 /// Get the Vertical Swing Automatic mode setting of the A/C.
 /// @return true, the setting is on. false, the setting is off.
-bool IRGreeAC::getSwingVerticalAuto(void) const { return _.SwingAuto; }
+bool IRGreeAC::getSwingVerticalAuto(void) const {
+  if (_model == YAPOFB14)
+    return _.SwingV == kGreeSwingAuto || _.SwingV == kGreeSwingDownAuto ||
+           _.SwingV == kGreeSwingMiddleAuto || _.SwingV == kGreeSwingUpAuto;
+  return _.SwingAuto;
+}
 
 /// Get the Vertical Swing position setting of the A/C.
 /// @return The native position/mode.
@@ -433,6 +511,8 @@ void IRGreeAC::setSwingHorizontal(const uint8_t position) {
     _.SwingH = position;
   else
     _.SwingH = kGreeSwingHOff;
+  if (_model == YAPOFB14)
+    _.SwingAuto = getSwingVerticalAuto() || _.SwingH == kGreeSwingHAuto;
 }
 
 /// Set the timer enable setting of the A/C.
@@ -446,6 +526,7 @@ bool IRGreeAC::getTimerEnabled(void) const { return _.TimerEnabled; }
 /// Get the timer time value from the A/C.
 /// @return The number of minutes the timer is set for.
 uint16_t IRGreeAC::getTimer(void) const {
+  if (_model == YAPOFB14) return 0;  // Requires an unsupported third group.
   uint16_t hrs = irutils::bcdToUint8((_.TimerTensHr << kNibbleSize) |
     _.TimerHours);
   return hrs * 60 + (_.TimerHalfHr ? 30 : 0);
@@ -455,7 +536,9 @@ uint16_t IRGreeAC::getTimer(void) const {
 /// @param[in] minutes The number of minutes the timer should be set for.
 /// @note Stores time internally in 30 min units.
 ///  e.g. 5 mins means 0 (& Off), 95 mins is  90 mins (& On). Max is 24 hours.
+///  Not supported for YAPOFB14.
 void IRGreeAC::setTimer(const uint16_t minutes) {
+  if (_model == YAPOFB14) return;  // Requires an unsupported third group.
   uint16_t mins = std::min(kGreeTimerMax, minutes);  // Bounds check.
   setTimerEnabled(mins >= 30);  // Timer is enabled when >= 30 mins.
   uint8_t hours = mins / 60;
@@ -502,8 +585,21 @@ uint8_t IRGreeAC::convertMode(const stdAc::opmode_t mode) {
 
 /// Convert a stdAc::fanspeed_t enum into it's native speed.
 /// @param[in] speed The enum to be converted.
+/// @param[in] model The model to use for fan speed conversion.
 /// @return The native equivalent of the enum.
-uint8_t IRGreeAC::convertFan(const stdAc::fanspeed_t speed) {
+uint8_t IRGreeAC::convertFan(const stdAc::fanspeed_t speed,
+                            const gree_ac_remote_model_t model) {
+  if (model == YAPOFB14) {
+    switch (speed) {
+      case stdAc::fanspeed_t::kMin:    return 1;
+      case stdAc::fanspeed_t::kLow:    return 2;
+      case stdAc::fanspeed_t::kMedium: return 3;
+      case stdAc::fanspeed_t::kMediumHigh:
+      case stdAc::fanspeed_t::kHigh:   return 4;
+      case stdAc::fanspeed_t::kMax:    return kGreeFanMaxExtended;
+      default:                       return kGreeFanAuto;
+    }
+  }
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kGreeFanMin;
     case stdAc::fanspeed_t::kLow:
@@ -559,8 +655,20 @@ stdAc::opmode_t IRGreeAC::toCommonMode(const uint8_t mode) {
 
 /// Convert a native fan speed into its stdAc equivalent.
 /// @param[in] speed The native setting to be converted.
+/// @param[in] model The model to use for fan speed conversion.
 /// @return The stdAc equivalent of the native setting.
-stdAc::fanspeed_t IRGreeAC::toCommonFanSpeed(const uint8_t speed) {
+stdAc::fanspeed_t IRGreeAC::toCommonFanSpeed(
+    const uint8_t speed, const gree_ac_remote_model_t model) {
+  if (model == YAPOFB14) {
+    switch (speed) {
+      case 1: return stdAc::fanspeed_t::kMin;
+      case 2: return stdAc::fanspeed_t::kLow;
+      case 3: return stdAc::fanspeed_t::kMedium;
+      case 4: return stdAc::fanspeed_t::kHigh;
+      case 5: return stdAc::fanspeed_t::kMax;
+      default: return stdAc::fanspeed_t::kAuto;
+    }
+  }
   switch (speed) {
     case kGreeFanMax:     return stdAc::fanspeed_t::kMax;
     case kGreeFanMax - 1: return stdAc::fanspeed_t::kMedium;
@@ -610,8 +718,8 @@ stdAc::state_t IRGreeAC::toCommon(void) {
   result.degrees = getTemp();
   // no support for Sensor temp.
   result.iFeel = getIFeel();
-  result.fanspeed = toCommonFanSpeed(_.Fan);
-  if (_.SwingAuto)
+  result.fanspeed = toCommonFanSpeed(getFan(), _model);
+  if (getSwingVerticalAuto())
     result.swingv = stdAc::swingv_t::kAuto;
   else
     result.swingv = toCommonSwingV(_.SwingV);
@@ -619,10 +727,10 @@ stdAc::state_t IRGreeAC::toCommon(void) {
   result.turbo = _.Turbo;
   result.econo = getEcono();
   result.light = _.Light;
-  result.clean = _.Xfan;
-  result.sleep = _.Sleep ? 0 : -1;
+  result.clean = getXFan();
+  result.sleep = getSleep() ? 0 : -1;
+  result.quiet = getQuiet();
   // Not supported.
-  result.quiet = false;
   result.filter = false;
   result.beep = false;
   result.clock = -1;
@@ -646,16 +754,20 @@ String IRGreeAC::toString(void) {
                               kGreeDry, kGreeFan);
   }
   result += addTempToString(getTemp(), !_.UseFahrenheit);
-  result += addFanToString(_.Fan, kGreeFanMax, kGreeFanMin, kGreeFanAuto,
-                           kGreeFanAuto, kGreeFanMed);
+  result += addFanToString(getFan(),
+                           _model == YAPOFB14 ? kGreeFanMaxExtended
+                                              : kGreeFanMax,
+                           kGreeFanMin, kGreeFanAuto, kGreeFanAuto,
+                           _model == YAPOFB14 ? 3 : kGreeFanMed);
   result += addBoolToString(_.Turbo, kTurboStr);
+  if (_model == YAPOFB14) result += addBoolToString(getQuiet(), kQuietStr);
   result += addBoolToString(_.Econo, kEconoStr);
   result += addBoolToString(_.IFeel, kIFeelStr);
   result += addBoolToString(_.WiFi, kWifiStr);
-  result += addBoolToString(_.Xfan, kXFanStr);
+  result += addBoolToString(getXFan(), kXFanStr);
   result += addBoolToString(_.Light, kLightStr);
-  result += addBoolToString(_.Sleep, kSleepStr);
-  result += addLabeledString(_.SwingAuto ? kAutoStr : kManualStr,
+  result += addBoolToString(getSleep(), kSleepStr);
+  result += addLabeledString(getSwingVerticalAuto() ? kAutoStr : kManualStr,
                              kSwingVModeStr);
   result += addIntToString(_.SwingV, kSwingVStr);
   result += kSpaceLBraceStr;
@@ -697,6 +809,24 @@ String IRGreeAC::toString(void) {
   }
   result += ')';
   return result;
+}
+
+/// Get the number of bytes in the current message.
+uint16_t IRGreeAC::getStateLength(void) const {
+  return _model == YAPOFB14 ? kGreeExtendedStateLength : kGreeStateLength;
+}
+
+/// Set quiet fan mode. Only available on YAPOFB14.
+/// @param[in] on Whether to enable quiet mode.
+void IRGreeAC::setQuiet(const bool on) {
+  if (_model != YAPOFB14) return;
+  if (on) setFan(1);
+  _.Quiet = on;
+}
+
+/// @return Whether YAPOFB14 quiet mode is enabled.
+bool IRGreeAC::getQuiet(void) const {
+  return _model == YAPOFB14 && _.Quiet;
 }
 
 #if DECODE_GREE

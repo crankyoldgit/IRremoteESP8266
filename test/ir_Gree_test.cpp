@@ -1,6 +1,7 @@
 // Copyright 2017 David Conran
 
 #include "ir_Gree.h"
+#include <algorithm>
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -992,5 +993,250 @@ TEST(TestDecodeGree, Yapofb14RejectInvalidFrames) {
     tx.makeDecodeResult();
     EXPECT_FALSE(rx.decodeGree(&tx.capture, kStartOffset,
                                kGreeExtendedBits, false));
+  }
+}
+
+TEST(TestGreeClass, Yapofb14FieldsAndNames) {
+  EXPECT_EQ(YAPOFB14, IRac::strToModel("YAPOFB14"));
+  EXPECT_EQ(YAPOFB14, IRac::strToModel("YAP0FB14"));
+  EXPECT_EQ("YAPOFB14", irutils::modelToStr(GREE, YAPOFB14));
+  IRGreeAC ac(kGpioUnused, YAPOFB14);
+  ac.on();
+  ac.setMode(kGreeCool);
+  ac.setTemp(26);
+  ac.setFan(4);
+  ac.setLight(true);
+  // A second independent hardware capture, after raising temp and fan.
+  const uint8_t expected[] = {
+      0x39, 0x0A, 0x20, 0x50, 0x00, 0x40, 0x00, 0x10,
+      0x39, 0x0A, 0x20, 0x70, 0x00, 0x00, 0x40, 0x10};
+  EXPECT_EQ(16, ac.getStateLength());
+  EXPECT_STATE_EQ(expected, ac.getRaw(), 128);
+  EXPECT_EQ(stdAc::fanspeed_t::kHigh, ac.toCommon().fanspeed);
+  for (uint8_t fan = 0; fan <= 5; fan++) {
+    ac.setFan(fan);
+    EXPECT_EQ(fan, ac.getFan());
+    EXPECT_EQ(fan, (ac.getRaw()[14] >> 4) & 7);
+    EXPECT_EQ(std::min(static_cast<uint8_t>(3), fan),
+              (ac.getRaw()[0] >> 4) & 3);
+  }
+  ac.setLight(false);
+  EXPECT_EQ(0x80, ac.getRaw()[14] & 0x80);
+  ac.setLight(true);
+  EXPECT_EQ(0, ac.getRaw()[14] & 0x80);
+  ac.off();
+  EXPECT_EQ(0, ac.getRaw()[0] & 8);
+  EXPECT_EQ(0, ac.getRaw()[8] & 8);
+  ac.stateReset();
+  EXPECT_EQ(16, ac.getStateLength());
+  EXPECT_EQ(0x40, ac.getRaw()[5]);
+  ac.setRaw(expected, sizeof(expected));
+  EXPECT_EQ(YAPOFB14, ac.getModel());
+  EXPECT_EQ(4, ac.getFan());
+  EXPECT_STATE_EQ(expected, ac.getRaw(), 128);
+}
+
+TEST(TestGreeClass, Yapofb14SharedSwingFlag) {
+  // Native captures 47 (off) and 46 (horizontal only), 2026-09-26.
+  const uint8_t off[] = {
+      0x39, 0x0B, 0x20, 0x50, 0, 0x40, 0, 0x20,
+      0x39, 0x0B, 0x20, 0x70, 0, 0, 0xC0, 0xA0};
+  const uint8_t horizontal[] = {
+      0x79, 0x0B, 0x20, 0x50, 0x10, 0x40, 0, 0x30,
+      0x79, 0x0B, 0x20, 0x70, 0, 0, 0xC0, 0xA0};
+  IRGreeAC ac(kGpioUnused, YAPOFB14);
+  ac.setRaw(off, sizeof(off));
+  ac.setSwingHorizontal(kGreeSwingHAuto);
+  EXPECT_STATE_EQ(horizontal, ac.getRaw(), 128);
+  ac.setRaw(horizontal, sizeof(horizontal));
+  EXPECT_FALSE(ac.getSwingVerticalAuto());
+  EXPECT_EQ(stdAc::swingv_t::kOff, ac.toCommon().swingv);
+  EXPECT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  ac.setSwingVertical(true, kGreeSwingAuto);
+  ac.setSwingHorizontal(kGreeSwingHOff);
+  EXPECT_TRUE(ac.getRaw()[0] & 0x40);
+  EXPECT_TRUE(ac.getSwingVerticalAuto());
+  ac.setSwingVertical(false, kGreeSwingLastPos);
+  EXPECT_STATE_EQ(off, ac.getRaw(), 128);
+}
+
+TEST(TestGreeClass, Yapofb14QuietCapture) {
+  // Native fan-button "0 (Quiet)" capture 58.
+  const uint8_t state[] = {
+      0x19, 0x0B, 0x20, 0x50, 6, 0x40, 0, 0x20,
+      0x19, 0x0B, 0x20, 0x70, 0x80, 0, 0x90, 0xF0};
+  IRGreeAC ac(kGpioUnused, YAPOFB14);
+  ac.setRaw(state, sizeof(state));
+  EXPECT_TRUE(ac.toCommon().quiet);
+  EXPECT_EQ(stdAc::fanspeed_t::kMin, ac.toCommon().fanspeed);
+}
+
+TEST(TestGreeClass, Yapofb14FanCycle) {
+  // Native captures 54-62: 4 -> 5 -> Turbo -> Auto -> Quiet -> 1/2/3/4.
+  const uint8_t states[][16] = {
+      {0x39, 0x0B, 0x20, 0x50, 6, 0x40, 0, 0x20,
+       0x39, 0x0B, 0x20, 0x70, 0, 0, 0xC0, 0xA0},
+      {0x39, 0x0B, 0x20, 0x50, 6, 0x40, 0, 0x20,
+       0x39, 0x0B, 0x20, 0x70, 0, 0, 0xD0, 0xB0},
+      {0x39, 0x0B, 0x30, 0x50, 6, 0x40, 0, 0x20,
+       0x39, 0x0B, 0x30, 0x70, 0, 0, 0xD0, 0xB0},
+      {0x09, 0x0B, 0x20, 0x50, 6, 0x40, 0, 0x20,
+       0x09, 0x0B, 0x20, 0x70, 0, 0, 0x80, 0x60},
+      {0x19, 0x0B, 0x20, 0x50, 6, 0x40, 0, 0x20,
+       0x19, 0x0B, 0x20, 0x70, 0x80, 0, 0x90, 0xF0},
+      {0x19, 0x0B, 0x20, 0x50, 6, 0x40, 0, 0x20,
+       0x19, 0x0B, 0x20, 0x70, 0, 0, 0x90, 0x70},
+      {0x29, 0x0B, 0x20, 0x50, 6, 0x40, 0, 0x20,
+       0x29, 0x0B, 0x20, 0x70, 0, 0, 0xA0, 0x80},
+      {0x39, 0x0B, 0x20, 0x50, 6, 0x40, 0, 0x20,
+       0x39, 0x0B, 0x20, 0x70, 0, 0, 0xB0, 0x90},
+      {0x39, 0x0B, 0x20, 0x50, 6, 0x40, 0, 0x20,
+       0x39, 0x0B, 0x20, 0x70, 0, 0, 0xC0, 0xA0}};
+  IRGreeAC ac(kGpioUnused, YAPOFB14);
+  ac.setRaw(states[0], 16);
+  ac.setFan(5);
+  EXPECT_STATE_EQ(states[1], ac.getRaw(), 128);
+  ac.setTurbo(true);
+  EXPECT_STATE_EQ(states[2], ac.getRaw(), 128);
+  ac.setFan(0);
+  EXPECT_STATE_EQ(states[3], ac.getRaw(), 128);
+  ac.setQuiet(true);
+  EXPECT_STATE_EQ(states[4], ac.getRaw(), 128);
+  for (uint8_t fan = 1; fan <= 4; fan++) {
+    ac.setFan(fan);
+    EXPECT_STATE_EQ(states[fan + 4], ac.getRaw(), 128);
+  }
+  // Quiet and Turbo are mutually exclusive, regardless of the prior mode.
+  ac.setTurbo(true);
+  ac.setQuiet(true);
+  EXPECT_STATE_EQ(states[4], ac.getRaw(), 128);
+  ac.setTurbo(true);
+  EXPECT_STATE_EQ(states[2], ac.getRaw(), 128);
+  // Classic Gree has no Quiet field and keeps its existing fan semantics.
+  ac.setModel(YBOFB);
+  ac.setQuiet(true);
+  EXPECT_FALSE(ac.getQuiet());
+}
+
+TEST(TestGreeClass, Yapofb14ModelTransitions) {
+  IRGreeAC ac(kGpioUnused, YBOFB);
+  ac.setFan(kGreeFanMax);
+  ac.setTimer(90);
+  ac.setModel(YAPOFB14);
+  EXPECT_EQ(0, ac.getRaw()[1] & 0xF0);
+  EXPECT_EQ(0, ac.getRaw()[2] & 0x0F);
+  EXPECT_EQ(kGreeFanMax, ac.getFan());
+  ac.setQuiet(true);
+  ac.setWiFi(false);
+  ac.setModel(YAPOFB14);  // Re-selecting a model preserves its settings.
+  EXPECT_TRUE(ac.getQuiet());
+  EXPECT_FALSE(ac.getWiFi());
+  ac.setModel(YBOFB);
+  ac.setFan(kGreeFanMed);
+  ac.setModel(YAPOFB14);
+  EXPECT_FALSE(ac.getQuiet());
+  EXPECT_EQ(kGreeFanMed, ac.getFan());
+  ac.stateReset();
+  EXPECT_EQ(YAPOFB14, ac.getModel());
+  EXPECT_EQ(kGreeExtendedStateLength, ac.getStateLength());
+  EXPECT_TRUE(ac.getWiFi());
+  EXPECT_TRUE(ac.getLight());
+  EXPECT_EQ(kGreeFanAuto, ac.getFan());
+  const uint8_t legacy[] = {0, 9, 0x20, 0x50, 0, 0x20, 0, 0};
+  ac.setRaw(legacy);
+  EXPECT_NE(YAPOFB14, ac.getModel());
+  EXPECT_EQ(kGreeStateLength, ac.getStateLength());
+  ac.setModel(YAPOFB14);
+  ac.setRaw(ac.getRaw(), ac.getStateLength());  // Aliasing is supported.
+  EXPECT_EQ(kGreeExtendedStateLength, ac.getStateLength());
+}
+
+TEST(TestGreeClass, Yapofb14FanConversion) {
+  const stdAc::fanspeed_t speeds[] = {
+      stdAc::fanspeed_t::kAuto, stdAc::fanspeed_t::kMin,
+      stdAc::fanspeed_t::kLow, stdAc::fanspeed_t::kMedium,
+      stdAc::fanspeed_t::kHigh, stdAc::fanspeed_t::kMax};
+  for (uint8_t speed = 0; speed <= kGreeFanMaxExtended; speed++) {
+    EXPECT_EQ(speed, IRGreeAC::convertFan(speeds[speed], YAPOFB14));
+    EXPECT_EQ(speeds[speed], IRGreeAC::toCommonFanSpeed(speed, YAPOFB14));
+  }
+  EXPECT_EQ(4, IRGreeAC::convertFan(stdAc::fanspeed_t::kMediumHigh, YAPOFB14));
+  EXPECT_EQ(kGreeFanAuto,
+            IRGreeAC::convertFan(static_cast<stdAc::fanspeed_t>(255),
+                                 YAPOFB14));
+  EXPECT_EQ(stdAc::fanspeed_t::kAuto, IRGreeAC::toCommonFanSpeed(7, YAPOFB14));
+}
+
+TEST(TestGreeClass, Yapofb14HeatDefaults) {
+  // Native captures 105-107: default auxiliary heat, explicitly on, and off.
+  const uint8_t states[][16] = {
+      {0x3C, 0x0C, 0, 0x50, 0, 0x40, 0, 0x68,
+       0x3C, 0x0C, 0, 0x70, 0, 0, 0xB0, 0xD0},
+      {0x3C, 0x0C, 0, 0x50, 0, 0x40, 0, 0x60,
+       0x3C, 0x0C, 0, 0x70, 0, 0, 0xB0, 0xD0},
+      {0x3C, 0x0C, 0x80, 0x50, 0, 0x40, 0, 0x60,
+       0x3C, 0x0C, 0x80, 0x70, 0, 0, 0xB0, 0xD0}};
+  IRGreeAC ac(kGpioUnused, YAPOFB14);
+  for (const auto &state : states) {
+    ac.setRaw(state, sizeof(state));
+    EXPECT_FALSE(ac.getXFan());
+    EXPECT_FALSE(ac.toCommon().clean);
+    ac.setXFan(true);  // Common Clean must never change auxiliary heat.
+    EXPECT_STATE_EQ(state, ac.getRaw(), kGreeExtendedBits);
+    ac.setXFan(false);
+    EXPECT_STATE_EQ(state, ac.getRaw(), kGreeExtendedBits);
+    ac.setMode(kGreeCool);
+    EXPECT_FALSE(ac.getXFan());
+    EXPECT_EQ(0, ac.getRaw()[7] & 8);
+    ac.setMode(kGreeHeat);
+    EXPECT_STATE_EQ(states[0], ac.getRaw(), kGreeExtendedBits);
+  }
+}
+
+TEST(TestGreeClass, Yapofb14Sleep) {
+  // Original Sleep 1 capture 18, and ordinary control capture 4.
+  const uint8_t sleep[] = {
+      0x99, 0x0A, 0x20, 0x50, 0, 0x40, 0, 0x10,
+      0x99, 0x0A, 0x20, 0x70, 0x80, 0, 0x10, 0x60};
+  const uint8_t normal[] = {
+      0x39, 0x0A, 0x20, 0x50, 0, 0x40, 0, 0x10,
+      0x39, 0x0A, 0x20, 0x70, 0, 0, 0x40, 0x10};
+  IRGreeAC ac(kGpioUnused, YAPOFB14);
+  ac.setRaw(normal, sizeof(normal));
+  ac.setSleep(true);
+  EXPECT_STATE_EQ(sleep, ac.getRaw(), kGreeExtendedBits);
+  ac.setFan(4);
+  ac.setSleep(false);
+  EXPECT_STATE_EQ(normal, ac.getRaw(), kGreeExtendedBits);
+  ac.setQuiet(true);
+  ac.setSleep(false);  // Independent Quiet survives when Sleep is already off.
+  EXPECT_TRUE(ac.getQuiet());
+  // Captured Sleep 2 (19) and Sleep 4 (21) must report boolean sleep correctly.
+  for (const uint8_t mode : {2, 4}) {
+    uint8_t state[sizeof(sleep)];
+    std::memcpy(state, sleep, sizeof(sleep));
+    state[0] = state[8] = mode == 2 ? 0x19 : 0x99;
+    state[12] = mode == 2 ? 0x81 : 0x88;
+    ac.setRaw(state, sizeof(state));
+    EXPECT_TRUE(ac.getSleep());
+    EXPECT_EQ(0, ac.toCommon().sleep);
+    ac.setSleep(true);
+    EXPECT_STATE_EQ(sleep, ac.getRaw(), kGreeExtendedBits);
+  }
+}
+
+TEST(TestGreeClass, Yapofb14UnsupportedExtensions) {
+  IRGreeAC ac(kGpioUnused, YAPOFB14);
+  uint8_t before[kGreeExtendedStateLength];
+  std::memcpy(before, ac.getRaw(), sizeof(before));
+  ac.setTimer(90);
+  EXPECT_EQ(0, ac.getTimer());
+  EXPECT_STATE_EQ(before, ac.getRaw(), kGreeExtendedBits);
+  // Unsupported or partial raw lengths must not truncate into a basic state.
+  const uint8_t unsupported[32] = {};
+  for (uint16_t length : {0, 7, 9, 15, 17, 24, 32}) {
+    ac.setRaw(unsupported, length);
+    EXPECT_EQ(YAPOFB14, ac.getModel());
+    EXPECT_STATE_EQ(before, ac.getRaw(), kGreeExtendedBits);
   }
 }

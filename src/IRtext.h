@@ -249,6 +249,8 @@ extern IRTEXT_CONST_PTR(kWeeklyTimerStr);
 extern IRTEXT_CONST_PTR(kWideStr);
 extern IRTEXT_CONST_PTR(kWifiStr);
 extern IRTEXT_CONST_PTR(kXFanStr);
+extern IRTEXT_CONST_PTR(kYap0fb14Str);
+extern IRTEXT_CONST_PTR(kYapofb14Str);
 extern IRTEXT_CONST_PTR(kYaw1fStr);
 extern IRTEXT_CONST_PTR(kYbofbStr);
 extern IRTEXT_CONST_PTR(kYesStr);

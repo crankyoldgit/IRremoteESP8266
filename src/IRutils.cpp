@@ -615,6 +615,7 @@ String modelToStr(const decode_type_t protocol, const int16_t model) {
       switch (model) {
         case gree_ac_remote_model_t::YAW1F:  return kYaw1fStr;
         case gree_ac_remote_model_t::YBOFB:  return kYbofbStr;
+        case gree_ac_remote_model_t::YAPOFB14: return kYapofb14Str;
         case gree_ac_remote_model_t::YX1FSF: return kYx1fsfStr;
         default:                             return kUnknownStr;
       }
