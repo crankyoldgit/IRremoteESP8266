@@ -843,3 +843,154 @@ TEST(TestGreeClass, Issue1821EnergySaver) {
       "Swing(H): 0 (Off), Timer: Off, Display Temp: 0 (Off)",
       ac.toString());
 }
+
+// Original YAPOFB14 remote captures, 2026-09-26.
+TEST(TestDecodeGree, Yapofb14FullCapture) {
+  const uint16_t raw[] = {
+      9015, 4490, 650, 1685, 625, 580, 625, 555, 650, 1680, 625, 1685,
+      625, 1685, 620, 585, 625, 560, 650, 555, 650, 560, 650, 555,
+      650, 1680, 625, 555, 650, 555, 650, 555, 650, 560, 650, 555,
+      650, 555, 650, 555, 650, 555, 650, 555, 650, 555, 650, 550,
+      655, 555, 650, 555, 650, 555, 650, 550, 650, 550, 650, 1680,
+      625, 555, 650, 1660, 650, 550, 650, 555, 650, 1655, 650, 550,
+      650, 19985, 655, 550, 680, 530, 655, 550, 655, 550, 680, 530,
+      680, 530, 680, 530, 680, 530, 680, 525, 680, 530, 680, 530,
+      675, 530, 680, 530, 680, 530, 680, 1630, 680, 530, 650, 550,
+      655, 550, 665, 540, 680, 525, 680, 525, 680, 525, 680, 525,
+      680, 530, 680, 525, 680, 530, 675, 530, 680, 530, 675, 1630,
+      650, 1580, 730, 1650, 675, 1635, 650, 40000, 8990, 4490, 645, 1660,
+      650, 560, 650, 560, 645, 1660, 645, 1660, 645, 1660, 645, 560,
+      645, 560, 645, 560, 645, 560, 645, 560, 645, 1660, 645, 560,
+      640, 560, 645, 560, 645, 560, 640, 560, 645, 580, 620, 585,
+      620, 580, 620, 585, 625, 580, 620, 585, 620, 580, 620, 585,
+      620, 585, 620, 585, 620, 585, 620, 1685, 620, 1685, 620, 1685,
+      620, 585, 620, 585, 620, 1685, 620, 585, 620, 20020, 620, 585,
+      620, 585, 620, 585, 620, 585, 620, 585, 620, 585, 620, 590,
+      620, 590, 620, 590, 620, 590, 615, 590, 615, 590, 615, 590,
+      615, 590, 615, 590, 615, 590, 615, 590, 615, 590, 615, 590,
+      615, 590, 610, 1695, 615, 1695, 615, 590, 615, 1690, 615, 590,
+      615, 590, 615, 590, 615, 590, 615, 590, 615, 1690, 615, 1695,
+      615, 590, 615,
+  };
+  const uint8_t expected[] = {
+      0x39, 0x08, 0x00, 0x50, 0x00, 0x40, 0x00, 0xF0,
+      0x39, 0x08, 0x00, 0x70, 0x00, 0x00, 0xB0, 0x60};
+  IRsendTest tx(kGpioUnused);
+  IRrecv rx(kGpioUnused);
+  tx.sendRaw(raw, sizeof(raw) / sizeof(raw[0]), 38);
+  tx.makeDecodeResult();
+  ASSERT_TRUE(rx.decode(&tx.capture));
+  ASSERT_EQ(GREE, tx.capture.decode_type);
+  ASSERT_EQ(128, tx.capture.bits);
+  EXPECT_STATE_EQ(expected, tx.capture.state, 128);
+}
+
+TEST(TestSendGreeChars, Yapofb14FullFrame) {
+  const uint8_t state[] = {
+      0x39, 0x08, 0x00, 0x50, 0x00, 0x40, 0x00, 0xF0,
+      0x39, 0x08, 0x00, 0x70, 0x00, 0x00, 0xB0, 0x60};
+  for (uint16_t repeat : {0, 1}) {
+    IRsendTest tx(kGpioUnused), expected(kGpioUnused);
+    tx.sendGree(state, sizeof(state), repeat);
+    for (uint16_t i = 0; i <= repeat; i++) {
+      expected.sendGree(state, 8);
+      expected.space(20020);  // Extend the existing 19980us gap to 40000us.
+      expected.sendGree(state + 8, 8);
+    }
+    EXPECT_EQ(expected.outputStr(), tx.outputStr());
+  }
+}
+
+TEST(TestDecodeGree, Yapofb14RelaxedTimingCapture) {
+  const uint16_t raw[] = {
+      8985, 4495, 645, 560, 640, 565, 640, 565, 620, 1690, 640, 1665,
+      645, 1665, 640, 565, 640, 565, 640, 1665, 640, 565, 640, 565,
+      640, 1670, 640, 565, 615, 590, 640, 590, 615, 590, 615, 590,
+      590, 615, 615, 590, 590, 615, 590, 615, 615, 1690, 590, 615,
+      615, 590, 620, 590, 590, 615, 615, 590, 590, 615, 615, 1690,
+      615, 595, 590, 1715, 590, 615, 615, 590, 590, 1715, 590, 615,
+      600, 20040, 615, 590, 615, 590, 595, 610, 590, 615, 615, 590,
+      615, 590, 615, 590, 615, 590, 615, 590, 615, 590, 590, 615,
+      615, 590, 615, 590, 615, 590, 615, 1690, 615, 590, 590, 620,
+      615, 590, 615, 590, 615, 590, 615, 590, 620, 590, 615, 590,
+      615, 590, 615, 590, 615, 590, 615, 590, 615, 590, 615, 1690,
+      615, 1690, 615, 1690, 615, 1695, 615, 40035, 8955, 4525, 615, 590,
+      615, 590, 615, 590, 615, 1690, 615, 1690, 615, 1695, 615, 590,
+      615, 590, 590, 1720, 615, 590, 615, 590, 590, 1720, 615, 590,
+      615, 590, 615, 590, 615, 590, 615, 590, 615, 590, 615, 590,
+      615, 590, 615, 590, 615, 1695, 615, 590, 615, 590, 615, 590,
+      615, 590, 590, 615, 615, 590, 615, 1690, 615, 1695, 615, 1690,
+      615, 590, 615, 590, 615, 1690, 615, 590, 615, 20025, 615, 590,
+      615, 590, 590, 615, 615, 590, 615, 590, 615, 590, 600, 600,
+      615, 590, 615, 590, 590, 615, 590, 615, 590, 615, 615, 590,
+      615, 590, 615, 590, 615, 590, 610, 595, 615, 590, 615, 590,
+      590, 615, 615, 1690, 615, 1690, 615, 590, 615, 590, 615, 590,
+      590, 615, 615, 590, 615, 590, 610, 595, 615, 1690, 615, 1690,
+      615, 1690, 615,
+  };
+  const uint8_t expected[] = {
+      0x38, 0x09, 0x20, 0x50, 0x00, 0x40, 0x00, 0xF0,
+      0x38, 0x09, 0x20, 0x70, 0x00, 0x00, 0x30, 0xE0,
+  };
+  IRsendTest tx(kGpioUnused);
+  IRrecv rx(kGpioUnused);
+  tx.sendRaw(raw, sizeof(raw) / sizeof(raw[0]), 38);
+  tx.makeDecodeResult();
+  ASSERT_TRUE(rx.decode(&tx.capture));
+  ASSERT_EQ(GREE, tx.capture.decode_type);
+  ASSERT_EQ(128, tx.capture.bits);
+  EXPECT_STATE_EQ(expected, tx.capture.state, 128);
+}
+
+TEST(TestGreeClass, Yapofb14FullChecksum) {
+  uint8_t state[] = {
+      0x39, 0x08, 0x20, 0x50, 0x00, 0x40, 0x00, 0xF0,
+      0x39, 0x08, 0x20, 0x70, 0x00, 0x00, 0x30, 0xE0};
+  EXPECT_TRUE(IRGreeAC::validChecksum(state, sizeof(state)));
+  state[7] ^= 0x10;
+  EXPECT_FALSE(IRGreeAC::validChecksum(state, sizeof(state)));
+  state[7] ^= 0x10;
+  state[15] ^= 0x10;
+  EXPECT_FALSE(IRGreeAC::validChecksum(state, sizeof(state)));
+}
+
+TEST(TestDecodeGree, Yapofb14RejectInvalidFrames) {
+  const uint8_t state[] = {
+      0x39, 0x08, 0x00, 0x50, 0, 0x40, 0, 0xF0,
+      0x39, 0x08, 0x00, 0x70, 0, 0, 0xB0, 0x60};
+  IRsendTest tx(kGpioUnused);
+  IRrecv rx(kGpioUnused);
+  tx.sendGree(state, sizeof(state));
+  tx.makeDecodeResult();
+  ASSERT_TRUE(rx.decodeGree(&tx.capture, kStartOffset, kGreeExtendedBits));
+  const uint16_t rawlen = tx.capture.rawlen;
+  for (uint16_t length = 0; length < rawlen - 1; length++) {
+    tx.capture.rawlen = length;
+    EXPECT_FALSE(rx.decodeGree(&tx.capture, kStartOffset, kGreeExtendedBits));
+  }
+  tx.capture.rawlen = rawlen;
+  for (uint16_t bits : {0, 32, 65, 129, 192, 256, 65535})
+    EXPECT_FALSE(rx.decodeGree(&tx.capture, kStartOffset, bits, false));
+  for (uint8_t block = 0; block < 2; block++) {
+    uint8_t corrupt[sizeof(state)];
+    std::memcpy(corrupt, state, sizeof(state));
+    corrupt[block * kGreeStateLength + 7] ^= 0x10;
+    tx.reset();
+    tx.sendGree(corrupt, sizeof(corrupt));
+    tx.makeDecodeResult();
+    EXPECT_FALSE(rx.decodeGree(&tx.capture, kStartOffset, kGreeExtendedBits));
+    EXPECT_TRUE(rx.decodeGree(&tx.capture, kStartOffset,
+                              kGreeExtendedBits, false));
+  }
+  // Structural checks still apply when checksum checking is disabled.
+  for (uint8_t index : {3, 8, 11}) {
+    uint8_t corrupt[sizeof(state)];
+    std::memcpy(corrupt, state, sizeof(state));
+    corrupt[index] ^= 0x10;
+    tx.reset();
+    tx.sendGree(corrupt, sizeof(corrupt));
+    tx.makeDecodeResult();
+    EXPECT_FALSE(rx.decodeGree(&tx.capture, kStartOffset,
+                               kGreeExtendedBits, false));
+  }
+}

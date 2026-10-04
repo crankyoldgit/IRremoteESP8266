@@ -26,6 +26,7 @@ const uint16_t kGreeBitMark = 620;
 const uint16_t kGreeOneSpace = 1600;
 const uint16_t kGreeZeroSpace = 540;
 const uint16_t kGreeMsgSpace = 19980;  ///< See #1508, #386, & Kelvinator
+const uint16_t kGreeExtendedGap = 40000;
 const uint8_t kGreeBlockFooter = 0b010;
 const uint8_t kGreeBlockFooterBits = 3;
 
@@ -47,6 +48,14 @@ using irutils::minsToString;
 /// @param[in] repeat The number of times the command is to be repeated.
 void IRsend::sendGree(const uint8_t data[], const uint16_t nbytes,
                       const uint16_t repeat) {
+  if (nbytes == kGreeExtendedStateLength) {
+    for (uint16_t r = 0; r <= repeat; r++) {
+      sendGree(data, kGreeStateLength, 0);
+      space(kGreeExtendedGap - kGreeMsgSpace);
+      sendGree(data + kGreeStateLength, kGreeStateLength, 0);
+    }
+    return;
+  }
   if (nbytes < kGreeStateLength)
     return;  // Not enough bytes to send a proper message.
 
@@ -177,6 +186,12 @@ void IRGreeAC::checksum(const uint16_t length) {
 /// @param[in] length The length of the state array.
 /// @return true, if the state has a valid checksum. Otherwise, false.
 bool IRGreeAC::validChecksum(const uint8_t state[], const uint16_t length) {
+  if (length < kGreeStateLength) return false;
+  if (length == kGreeExtendedStateLength) {
+    for (uint16_t pos = 0; pos < length; pos += kGreeStateLength)
+      if (!validChecksum(state + pos, kGreeStateLength)) return false;
+    return true;
+  }
   // Top 4 bits of the last byte in the state is the state's checksum.
   return GETBITS8(state[length - 1], kHighNibble, kNibbleSize) ==
       IRKelvinatorAC::calcBlockChecksum(state, length);
@@ -696,50 +711,46 @@ String IRGreeAC::toString(void) {
 /// @return A boolean. True if it can decode it, false if it can't.
 bool IRrecv::decodeGree(decode_results* results, uint16_t offset,
                         const uint16_t nbits, bool const strict) {
-  if (results->rawlen <=
-      2 * (nbits + kGreeBlockFooterBits) + (kHeader + kFooter + 1) - 1 + offset)
-    return false;  // Can't possibly be a valid Gree message.
-  if (strict && nbits != kGreeBits)
-    return false;  // Not strictly a Gree message.
+  if (nbits != kGreeBits && nbits != kGreeExtendedBits) return false;
+  const uint8_t frames = nbits / kGreeBits;
+  const uint16_t frame_entries = 2 * (kGreeBits + kGreeBlockFooterBits) + 6;
+  if (results->rawlen < frame_entries * frames + offset - 1) return false;
+  // Native YAPOFB14 captures include 620us zero spaces. With mark excess
+  // compensation these fall just outside 25%; keep this local to full frames.
+  const uint8_t tolerance = frames > 1 ?
+      std::min(static_cast<uint16_t>(100),
+               static_cast<uint16_t>(_tolerance + 5)) : _tolerance;
 
-  // There are two blocks back-to-back in a full Gree IR message
-  // sequence.
+  for (uint8_t frame = 0; frame < frames; frame++) {
+    uint8_t *state = results->state + frame * kGreeStateLength;
+    uint16_t used = matchGeneric(results->rawbuf + offset, state,
+        results->rawlen - offset, kGreeBits / 2,
+        kGreeHdrMark, kGreeHdrSpace,
+        kGreeBitMark, kGreeOneSpace, kGreeBitMark, kGreeZeroSpace,
+        0, 0, false, tolerance, kMarkExcess, false);
+    if (!used) return false;
+    offset += used;
 
-  uint16_t used;
-  // Header + Data Block #1 (32 bits)
-  used = matchGeneric(results->rawbuf + offset, results->state,
-                      results->rawlen - offset, nbits / 2,
-                      kGreeHdrMark, kGreeHdrSpace,
-                      kGreeBitMark, kGreeOneSpace,
-                      kGreeBitMark, kGreeZeroSpace,
-                      0, 0, false,
-                      _tolerance, kMarkExcess, false);
-  if (used == 0) return false;
-  offset += used;
+    // The 3-bit separator follows the first four bytes of each frame.
+    match_result_t separator = matchData(results->rawbuf + offset,
+        kGreeBlockFooterBits, kGreeBitMark, kGreeOneSpace,
+        kGreeBitMark, kGreeZeroSpace, tolerance, kMarkExcess, false);
+    if (!separator.success || separator.data != kGreeBlockFooter) return false;
+    offset += separator.used;
 
-  // Block #1 footer (3 bits, B010)
-  match_result_t data_result;
-  data_result = matchData(&(results->rawbuf[offset]), kGreeBlockFooterBits,
-                          kGreeBitMark, kGreeOneSpace, kGreeBitMark,
-                          kGreeZeroSpace, _tolerance, kMarkExcess, false);
-  if (data_result.success == false) return false;
-  if (data_result.data != kGreeBlockFooter) return false;
-  offset += data_result.used;
-
-  // Inter-block gap + Data Block #2 (32 bits) + Footer
-  if (!matchGeneric(results->rawbuf + offset, results->state + 4,
-                    results->rawlen - offset, nbits / 2,
-                    kGreeBitMark, kGreeMsgSpace,
-                    kGreeBitMark, kGreeOneSpace,
-                    kGreeBitMark, kGreeZeroSpace,
-                    kGreeBitMark, kGreeMsgSpace, true,
-                    _tolerance, kMarkExcess, false)) return false;
-
-  // Compliance
-  if (strict) {
-    // Verify the message's checksum is correct.
-    if (!IRGreeAC::validChecksum(results->state)) return false;
+    used = matchGeneric(results->rawbuf + offset, state + 4,
+        results->rawlen - offset, kGreeBits / 2,
+        kGreeBitMark, kGreeMsgSpace,
+        kGreeBitMark, kGreeOneSpace, kGreeBitMark, kGreeZeroSpace,
+        kGreeBitMark, kGreeMsgSpace, true, tolerance, kMarkExcess, false);
+    if (!used) return false;
+    offset += used;
+    if (strict && !IRGreeAC::validChecksum(state)) return false;
   }
+  if (frames > 1 && ((results->state[3] & 0xF0) != 0x50 ||
+      (results->state[11] & 0xF0) != 0x70 ||
+      std::memcmp(results->state, results->state + kGreeStateLength, 3)))
+    return false;
 
   // Success
   results->decode_type = GREE;
