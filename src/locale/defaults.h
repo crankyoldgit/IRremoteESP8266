@@ -605,6 +605,12 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_YBOFB
 #define D_STR_YBOFB "YBOFB"
 #endif  // D_STR_YBOFB
+#ifndef D_STR_YAPOFB14
+#define D_STR_YAPOFB14 "YAPOFB14"
+#endif  // D_STR_YAPOFB14
+#ifndef D_STR_YAP0FB14
+#define D_STR_YAP0FB14 "YAP0FB14"
+#endif  // D_STR_YAP0FB14
 #ifndef D_STR_YX1FSF
 #define D_STR_YX1FSF "YX1FSF"
 #endif  // D_STR_YX1FSF

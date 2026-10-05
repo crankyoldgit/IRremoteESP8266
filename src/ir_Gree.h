@@ -13,6 +13,7 @@
 //   Brand: RusClimate,  Model: YAW1F remote
 //   Brand: Green,  Model: YBOFB remote
 //   Brand: Green,  Model: YBOFB2 remote
+//   Brand: Gree,  Model: YAPOFB14 remote
 //   Brand: Gree,  Model: YAA1FBF remote
 //   Brand: Gree,  Model: YB1F2F remote
 //   Brand: Gree,  Model: YAN1F1 remote
@@ -43,7 +44,7 @@
 
 /// Native representation of a Gree A/C message.
 union GreeProtocol{
-  uint8_t remote_state[kGreeStateLength];  ///< The state in native IR code form
+  uint8_t remote_state[kGreeExtendedStateLength];  ///< Native IR state
   struct {
     // Byte 0
     uint8_t Mode      :3;
@@ -82,8 +83,22 @@ union GreeProtocol{
     // Byte 7
     uint8_t             :2;
     uint8_t Econo       :1;
-    uint8_t             :1;
+    uint8_t AuxHeatDefault :1;  // YAPOFB14, Heat mode only.
     uint8_t Sum         :4;
+  };
+  struct {
+    // Second group (bytes 8-15), identified by byte 11's 0x70 marker.
+    uint8_t pad[12];
+    uint8_t Sleep2   :1;
+    uint8_t          :2;
+    uint8_t Sleep4   :1;
+    uint8_t          :3;
+    uint8_t Quiet    :1;
+    uint8_t          :8;
+    uint8_t          :4;
+    uint8_t FanExt   :3;
+    uint8_t LightOff :1;
+    uint8_t          :8;
   };
 };
 
@@ -100,6 +115,7 @@ const uint8_t kGreeFanAuto = 0;
 const uint8_t kGreeFanMin  = 1;
 const uint8_t kGreeFanMed  = 2;
 const uint8_t kGreeFanMax  = 3;
+const uint8_t kGreeFanMaxExtended = 5;  ///< YAPOFB14 has five fan speeds.
 
 const uint8_t kGreeMinTempC = 16;  // Celsius
 const uint8_t kGreeMaxTempC = 30;  // Celsius
@@ -191,6 +207,8 @@ class IRGreeAC {
   bool getSleep(void) const;
   void setTurbo(const bool on);
   bool getTurbo(void) const;
+  void setQuiet(const bool on);
+  bool getQuiet(void) const;
   void setEcono(const bool on);
   bool getEcono(void) const;
   void setIFeel(const bool on);
@@ -207,16 +225,20 @@ class IRGreeAC {
   void setDisplayTempSource(const uint8_t mode);
   uint8_t getDisplayTempSource(void) const;
   static uint8_t convertMode(const stdAc::opmode_t mode);
-  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  static uint8_t convertFan(const stdAc::fanspeed_t speed,
+      const gree_ac_remote_model_t model = YAW1F);
   static uint8_t convertSwingV(const stdAc::swingv_t swingv);
   static uint8_t convertSwingH(const stdAc::swingh_t swingh);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
-  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed);
+  static stdAc::fanspeed_t toCommonFanSpeed(const uint8_t speed,
+      const gree_ac_remote_model_t model = YAW1F);
   static stdAc::swingv_t toCommonSwingV(const uint8_t pos);
   static stdAc::swingh_t toCommonSwingH(const uint8_t pos);
   stdAc::state_t toCommon(void);
   uint8_t* getRaw(void);
-  void setRaw(const uint8_t new_code[]);
+  uint16_t getStateLength(void) const;
+  void setRaw(const uint8_t new_code[],
+              const uint16_t length = kGreeStateLength);
   static bool validChecksum(const uint8_t state[],
                             const uint16_t length = kGreeStateLength);
   String toString(void);
@@ -230,7 +252,7 @@ class IRGreeAC {
   /// @endcond
 #endif  // UNIT_TEST
   GreeProtocol _;
-  gree_ac_remote_model_t _model;
+  gree_ac_remote_model_t _model = YAW1F;
   void checksum(const uint16_t length = kGreeStateLength);
   void fixup(void);
   void setTimerEnabled(const bool on);

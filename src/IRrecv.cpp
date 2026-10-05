@@ -861,6 +861,7 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     // Gree based-devices use a similar code to Kelvinator ones, to avoid false
     // matches this needs to happen after decodeKelvinator().
     DPRINTLN("Attempting Gree decode");
+    if (decodeGree(results, offset, kGreeExtendedBits)) return true;
     if (decodeGree(results, offset)) return true;
 #endif
 #if DECODE_HAIER_AC

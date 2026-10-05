@@ -317,7 +317,8 @@ void electra(IRElectraAc *ac,
             const float degrees, const stdAc::fanspeed_t fan,
             const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
             const bool iFeel, const bool turbo, const bool econo,
-            const bool light, const bool clean, const int16_t sleep = -1);
+            const bool light, const bool clean, const int16_t sleep = -1,
+            const bool quiet = false);
 #endif  // SEND_GREE
 #if SEND_HAIER_AC
   void haier(IRHaierAC *ac,
