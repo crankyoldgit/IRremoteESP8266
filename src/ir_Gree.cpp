@@ -132,10 +132,8 @@ void IRGreeAC::stateReset(void) {
   _.Temp = 9;  // _.remote_state[1] = 0x09;
   _.Light = true;  // _.remote_state[2] = 0x20;
   _.unknown1 = 5;  // _.remote_state[3] = 0x50;
-  _.unknown2 = 4;  // _.remote_state[5] = 0x20;
-  const gree_ac_remote_model_t model = _model;
-  _model = YAW1F;
-  setModel(model);
+  _.unknown2 = _model == YAPOFB14 ? 0 : 4;
+  _.WiFi = _model == YAPOFB14;
 }
 
 /// Fix up the internal state so it is correct.
@@ -173,8 +171,6 @@ uint8_t* IRGreeAC::getRaw(void) {
 void IRGreeAC::setRaw(const uint8_t new_code[], const uint16_t length) {
   if (length != kGreeStateLength && length != kGreeExtendedStateLength) return;
   std::memmove(_.remote_state, new_code, length);
-  std::memset(_.remote_state + length, 0,
-              sizeof(_.remote_state) - length);
   if (length >= kGreeExtendedStateLength) {
     _model = YAPOFB14;
     return;
@@ -233,6 +229,8 @@ void IRGreeAC::setModel(const gree_ac_remote_model_t model) {
         _.TimerEnabled = _.TimerHalfHr = _.TimerTensHr = _.TimerHours = 0;
         _.WiFi = true;
         _.FanExt = _.Fan;
+        _.AuxHeatDefault = _.Mode == kGreeHeat;
+        if (_.Mode == kGreeHeat) _.Xfan = false;
         setLight(_.Light);
       }
       break;
@@ -241,6 +239,8 @@ void IRGreeAC::setModel(const gree_ac_remote_model_t model) {
   if (_model != gree_ac_remote_model_t::YAPOFB14 && was_extended) {
     _.unknown2 = 4;
     _.WiFi = false;
+    _.AuxHeatDefault = false;
+    if (_.Mode == kGreeHeat) _.Xfan = false;
   }
 }
 
@@ -330,8 +330,7 @@ void IRGreeAC::setFan(const uint8_t speed) {
   _.Fan = std::min(kGreeFanMax, fan);
   if (_model == YAPOFB14) {
     _.FanExt = fan;
-    setQuiet(false);
-    _.Turbo = false;
+    _.Quiet = _.Turbo = false;
   }
 }
 
@@ -457,7 +456,8 @@ bool IRGreeAC::getEcono(void) const {
 /// @param[in] automatic Do we use the automatic setting?
 /// @param[in] position The position/mode to set the vanes to.
 void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
-  _.SwingAuto = automatic;
+  _.SwingAuto = automatic ||
+      (_model == YAPOFB14 && _.SwingH == kGreeSwingHAuto);
   uint8_t new_position = position;
   if (!automatic) {
     switch (position) {
@@ -483,8 +483,6 @@ void IRGreeAC::setSwingVertical(const bool automatic, const uint8_t position) {
     }
   }
   _.SwingV = new_position;
-  if (_model == YAPOFB14)
-    _.SwingAuto = getSwingVerticalAuto() || _.SwingH == kGreeSwingHAuto;
 }
 
 /// Get the Vertical Swing Automatic mode setting of the A/C.
@@ -590,15 +588,10 @@ uint8_t IRGreeAC::convertMode(const stdAc::opmode_t mode) {
 uint8_t IRGreeAC::convertFan(const stdAc::fanspeed_t speed,
                             const gree_ac_remote_model_t model) {
   if (model == YAPOFB14) {
-    switch (speed) {
-      case stdAc::fanspeed_t::kMin:    return 1;
-      case stdAc::fanspeed_t::kLow:    return 2;
-      case stdAc::fanspeed_t::kMedium: return 3;
-      case stdAc::fanspeed_t::kMediumHigh:
-      case stdAc::fanspeed_t::kHigh:   return 4;
-      case stdAc::fanspeed_t::kMax:    return kGreeFanMaxExtended;
-      default:                       return kGreeFanAuto;
-    }
+    if (speed == stdAc::fanspeed_t::kMediumHigh) return 4;
+    return speed >= stdAc::fanspeed_t::kAuto &&
+           speed <= stdAc::fanspeed_t::kMax ?
+        static_cast<uint8_t>(speed) : kGreeFanAuto;
   }
   switch (speed) {
     case stdAc::fanspeed_t::kMin:    return kGreeFanMin;
@@ -659,16 +652,9 @@ stdAc::opmode_t IRGreeAC::toCommonMode(const uint8_t mode) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRGreeAC::toCommonFanSpeed(
     const uint8_t speed, const gree_ac_remote_model_t model) {
-  if (model == YAPOFB14) {
-    switch (speed) {
-      case 1: return stdAc::fanspeed_t::kMin;
-      case 2: return stdAc::fanspeed_t::kLow;
-      case 3: return stdAc::fanspeed_t::kMedium;
-      case 4: return stdAc::fanspeed_t::kHigh;
-      case 5: return stdAc::fanspeed_t::kMax;
-      default: return stdAc::fanspeed_t::kAuto;
-    }
-  }
+  if (model == YAPOFB14)
+    return static_cast<stdAc::fanspeed_t>(
+        speed <= kGreeFanMaxExtended ? speed : kGreeFanAuto);
   switch (speed) {
     case kGreeFanMax:     return stdAc::fanspeed_t::kMax;
     case kGreeFanMax - 1: return stdAc::fanspeed_t::kMedium;

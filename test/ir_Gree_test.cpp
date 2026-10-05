@@ -1164,6 +1164,8 @@ TEST(TestGreeClass, Yapofb14FanConversion) {
   EXPECT_EQ(kGreeFanAuto,
             IRGreeAC::convertFan(static_cast<stdAc::fanspeed_t>(255),
                                  YAPOFB14));
+  EXPECT_EQ(kGreeFanAuto,
+            IRGreeAC::convertFan(static_cast<stdAc::fanspeed_t>(-1), YAPOFB14));
   EXPECT_EQ(stdAc::fanspeed_t::kAuto, IRGreeAC::toCommonFanSpeed(7, YAPOFB14));
 }
 
@@ -1190,6 +1192,23 @@ TEST(TestGreeClass, Yapofb14HeatDefaults) {
     EXPECT_EQ(0, ac.getRaw()[7] & 8);
     ac.setMode(kGreeHeat);
     EXPECT_STATE_EQ(states[0], ac.getRaw(), kGreeExtendedBits);
+  }
+  // Selecting YAPOFB14 while already in Heat uses the same remote defaults.
+  ac.setModel(YBOFB);
+  ac.setXFan(true);
+  ac.setModel(YAPOFB14);
+  ac.setMode(kGreeHeat);
+  EXPECT_STATE_EQ(states[0], ac.getRaw(), kGreeExtendedBits);
+  // Preserve captured heater selection when the model does not change.
+  ac.setRaw(states[2], sizeof(states[2]));
+  ac.setModel(YAPOFB14);
+  EXPECT_STATE_EQ(states[2], ac.getRaw(), kGreeExtendedBits);
+  // Neither heater bit should leak into legacy Gree state.
+  for (const auto &state : states) {
+    ac.setRaw(state, sizeof(state));
+    ac.setModel(YBOFB);
+    EXPECT_FALSE(ac.getXFan());
+    EXPECT_EQ(0, ac.getRaw()[7] & 8);
   }
 }
 
