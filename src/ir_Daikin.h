@@ -325,6 +325,81 @@ const uint8_t kDaikin2HumidityAuto       = 0xFF;
 
 const uint8_t kDaikin2MinCoolTemp = 18;  // Min temp (in C) when in Cool mode.
 
+/// Native representation of a Daikin200 A/C message.
+union Daikin200Protocol {
+  uint8_t raw[kDaikin200StateLength];
+  struct {
+    // Frame 1
+    uint8_t pad0[6];  // 0-5
+    uint8_t Sum1;     // 6
+    // Frame 2
+    uint8_t pad1[5];    // 7-11
+    uint8_t MsgType;    // 12: 0x73=normal, 0x04=timerON,
+                        // 0x08=timerOFF, 0x0C=both
+    uint8_t Unknown13;  // 13: 0x00 normal, 0x04 seen in mode change
+    uint8_t Power : 1;  // 14 bit0
+    uint8_t : 3;        // 14 bits1-3
+    uint8_t Mode : 4;   // 14 bits4-7: 0=fan,1=heat,2=cool,3=auto,7=dry
+    uint8_t TimerOn;    // 15: 0x00=off, 0x80|hours=on
+    uint8_t TimerOff;   // 16: 0x00=off, 0x80|hours=on
+    uint8_t Temp;       // 17: (temp-9)*2
+    uint8_t Swing : 4;  // 18 low nibble: 7=auto,0-4=position
+    uint8_t Fan : 4;    // 18 high nibble: 0=auto,1-5=speed
+    uint8_t pad3[5];    // 19-23
+    uint8_t Sum2;       // 24
+  };
+};
+
+const uint8_t kDaikin200MsgTypeTimerOn = 0x04;
+const uint8_t kDaikin200MsgTypeTimerOff = 0x08;
+const uint8_t kDaikin200MsgTypeTimerBoth = 0x0C;  // unverified
+const uint8_t kDaikin200TimerEnabled = 0x80;
+const uint8_t kDaikin200TimerMax = 24;  // verify on remote
+
+// Fan speed (upper nibble of byte 18)
+const uint8_t kDaikin200FanAuto = 0x0;
+const uint8_t kDaikin200FanSpeed1 = 0x1;
+const uint8_t kDaikin200FanSpeed2 = 0x2;
+const uint8_t kDaikin200FanSpeed3 = 0x3;
+const uint8_t kDaikin200FanSpeed4 = 0x4;
+const uint8_t kDaikin200FanSpeed5 = 0x5;
+const uint8_t kDaikin200FanMin = kDaikin200FanSpeed1;
+const uint8_t kDaikin200FanMax = kDaikin200FanSpeed5;
+
+// Swing/direction (lower nibble of byte 18)
+const uint8_t kDaikin200SwingAuto = 0xF;  // continuous swing
+const uint8_t kDaikin200SwingWide = 0x7;  // all directions / wide
+const uint8_t kDaikin200SwingPos1 = 0x0;  // most up
+const uint8_t kDaikin200SwingPos2 = 0x1;
+const uint8_t kDaikin200SwingPos3 = 0x2;
+const uint8_t kDaikin200SwingPos4 = 0x3;
+const uint8_t kDaikin200SwingPos5 = 0x4;                 // most down
+const uint8_t kDaikin200SwingOff = kDaikin200SwingPos3;  // default fixed
+
+
+const uint8_t kDaikin200Fan = 0x0;
+const uint8_t kDaikin200Heat = 0x1;
+const uint8_t kDaikin200Cool = 0x2;
+const uint8_t kDaikin200Auto = 0x3;
+const uint8_t kDaikin200Dry = 0x7;
+
+// Byte 12 values per mode
+const uint8_t kDaikin200MsgTypeNormal = 0x73;  // cool, heat, auto
+const uint8_t kDaikin200MsgTypeDry = 0x23;
+const uint8_t kDaikin200MsgTypeFan = 0x63;
+
+const uint16_t kDaikin200Freq = 38000;  // Modulation Frequency in Hz.
+const uint16_t kDaikin200HdrMark = 4920;
+const uint16_t kDaikin200HdrSpace = 2230;
+const uint16_t kDaikin200BitMark = 290;
+const uint16_t kDaikin200OneSpace = 1850;
+const uint16_t kDaikin200ZeroSpace = 780;
+const uint16_t kDaikin200Gap = 29400;
+const uint16_t kDaikin200Sections = 2;
+const uint16_t kDaikin200Section1Length = 7;
+const uint16_t kDaikin200Section2Length = kDaikin200StateLength -
+                                          kDaikin200Section1Length;
+
 /// Native representation of a Daikin216 A/C message.
 union Daikin216Protocol{
   uint8_t raw[kDaikin216StateLength];  ///< The state of the IR remote.
@@ -683,17 +758,6 @@ const uint8_t kDaikin64MaxTemp = 30;  // Celsius
 const uint8_t kDaikin64ChecksumOffset = 60;
 const uint8_t kDaikin64ChecksumSize = 4;  // Mask 0b1111 << 59
 
-const uint16_t kDaikin200Freq = 38000;  // Modulation Frequency in Hz.
-const uint16_t kDaikin200HdrMark = 4920;
-const uint16_t kDaikin200HdrSpace = 2230;
-const uint16_t kDaikin200BitMark = 290;
-const uint16_t kDaikin200OneSpace = 1850;
-const uint16_t kDaikin200ZeroSpace = 780;
-const uint16_t kDaikin200Gap = 29400;
-const uint16_t kDaikin200Sections = 2;
-const uint16_t kDaikin200Section1Length = 7;
-const uint16_t kDaikin200Section2Length = kDaikin200StateLength -
-                                          kDaikin200Section1Length;
 
 /// Native representation of a Daikin312 A/C message.
 union Daikin312Protocol{
@@ -1193,6 +1257,70 @@ class IRDaikin2 {
   void checksum(void);
   void clearOnTimerFlag(void);
   void clearSleepTimerFlag(void);
+};
+
+/// Class for handling detailed Daikin 200-bit A/C messages.
+class IRDaikin200 {
+ public:
+  explicit IRDaikin200(const uint16_t pin, const bool inverted = false,
+                       const bool use_modulation = true);
+
+#if SEND_DAIKIN200
+  void send(const uint16_t repeat = kDaikin200DefaultRepeat);
+  /// Run the calibration to calculate uSec timing offsets for this platform.
+  /// @return The uSec timing offset needed per modulation of the IR Led.
+  /// @note This will produce a 65ms IR signal pulse at 38kHz.
+  ///   Only ever needs to be run once per object instantiation, if at all.
+  int8_t calibrate(void) { return _irsend.calibrate(); }
+#endif
+  void begin(void);
+  uint8_t* getRaw(void);
+  void setRaw(const uint8_t new_code[]);
+  static bool validChecksum(uint8_t state[],
+                            const uint16_t length = kDaikin200StateLength);
+  void on(void);
+  void off(void);
+  void setPower(const bool on);
+  bool getPower(void) const;
+  void setTemp(const uint8_t temp);
+  uint8_t getTemp(void) const;
+  void setMode(const uint8_t mode);
+  uint8_t getMode(void) const;
+  static uint8_t convertMode(const stdAc::opmode_t mode);
+  void setFan(const uint8_t fan);
+  uint8_t getFan(void) const;
+  static uint8_t convertFan(const stdAc::fanspeed_t speed);
+  void setSwingVertical(const bool on);
+  bool getSwingVertical(void) const;
+  void setSwingVPosition(const uint8_t position);  // ADD THIS
+  uint8_t getSwingVPosition(void) const;           // ADD THIS
+  void setSwingHorizontal(const bool on);
+  bool getSwingHorizontal(void) const;
+  void setQuiet(const bool on);
+  bool getQuiet(void) const;
+  void setPowerful(const bool on);
+  bool getPowerful(void) const;
+  void setTimerOn(const bool on, const uint8_t hours = 0);
+  bool getTimerOnEnabled(void) const;
+  uint8_t getTimerOnHours(void) const;
+  void setTimerOff(const bool on, const uint8_t hours = 0);
+  bool getTimerOffEnabled(void) const;
+  uint8_t getTimerOffHours(void) const;
+  stdAc::state_t toCommon(void) const;
+  String toString(void) const;
+#ifndef UNIT_TEST
+
+ private:
+  IRsend _irsend;  ///< instance of the IR send class
+#else
+  /// @cond IGNORE
+  IRsendTest _irsend;  ///< instance of the testing IR send class
+  /// @endcond
+#endif
+  // # of bytes per command
+  Daikin200Protocol _;
+  void stateReset(void);
+  void checksum(void);
 };
 
 /// Class for handling detailed Daikin 216-bit A/C messages.

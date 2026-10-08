@@ -25,6 +25,7 @@
 /// @see Daikin312 https://github.com/crankyoldgit/IRremoteESP8266/issues/1829
 
 #include "ir_Daikin.h"
+
 #include <algorithm>
 #include <cstring>
 #ifndef ARDUINO
@@ -41,14 +42,14 @@
 
 using irutils::addBoolToString;
 using irutils::addDayToString;
+using irutils::addFanToString;
 using irutils::addIntToString;
 using irutils::addLabeledString;
 using irutils::addModeToString;
 using irutils::addSwingHToString;
 using irutils::addSwingVToString;
-using irutils::addTempToString;
 using irutils::addTempFloatToString;
-using irutils::addFanToString;
+using irutils::addTempToString;
 using irutils::bcdToUint8;
 using irutils::minsToString;
 using irutils::setBit;
@@ -112,7 +113,7 @@ void IRsend::sendDaikin(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikinESP::IRDaikinESP(const uint16_t pin, const bool inverted,
                          const bool use_modulation)
-      : _irsend(pin, inverted, use_modulation) { stateReset(); }
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Set up hardware to be able to send a message.
 void IRDaikinESP::begin(void) { _irsend.begin(); }
@@ -141,10 +142,9 @@ bool IRDaikinESP::validChecksum(uint8_t state[], const uint16_t length) {
     return false;
   // Data #3
   if (length < kDaikinSection1Length + kDaikinSection2Length + 2 ||
-      state[length - 1] != sumBytes(state + kDaikinSection1Length +
-                                    kDaikinSection2Length,
-                                    length - (kDaikinSection1Length +
-                                              kDaikinSection2Length) - 1))
+  state[length - 1] !=
+          sumBytes(state + kDaikinSection1Length + kDaikinSection2Length,
+                  length - (kDaikinSection1Length + kDaikinSection2Length) - 1))
     return false;
   return true;
 }
@@ -186,7 +186,7 @@ void IRDaikinESP::stateReset(void) {
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t *IRDaikinESP::getRaw(void) {
+uint8_t* IRDaikinESP::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return _.raw;
 }
@@ -253,7 +253,8 @@ void IRDaikinESP::setFan(const uint8_t fan) {
 /// @return The current fan speed.
 uint8_t IRDaikinESP::getFan(void) const {
   uint8_t fan = _.Fan;
-  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
+  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto)
+    fan -= 2;
   return fan;
 }
 
@@ -267,15 +268,15 @@ uint8_t IRDaikinESP::getMode(void) const {
 /// @param[in] mode The desired operating mode.
 void IRDaikinESP::setMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikinAuto:
-    case kDaikinCool:
-    case kDaikinHeat:
-    case kDaikinFan:
-    case kDaikinDry:
-      _.Mode = mode;
-      break;
-    default:
-      _.Mode = kDaikinAuto;
+  case kDaikinAuto:
+  case kDaikinCool:
+  case kDaikinHeat:
+  case kDaikinFan:
+  case kDaikinDry:
+    _.Mode = mode;
+    break;
+  default:
+    _.Mode = kDaikinAuto;
   }
 }
 
@@ -308,7 +309,8 @@ bool IRDaikinESP::getSwingHorizontal(void) const {
 void IRDaikinESP::setQuiet(const bool on) {
   _.Quiet = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) setPowerful(false);
+  if (on)
+    setPowerful(false);
 }
 
 /// Get the Quiet mode status of the A/C.
@@ -351,7 +353,8 @@ bool IRDaikinESP::getSensor(void) const {
 void IRDaikinESP::setEcono(const bool on) {
   _.Econo = on;
   // Powerful & Econo mode being on are mutually exclusive.
-  if (on) setPowerful(false);
+  if (on)
+    setPowerful(false);
 }
 
 /// Get the Economical mode of the A/C.
@@ -438,7 +441,8 @@ bool IRDaikinESP::getOffTimerEnabled(void) const {
 /// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikinESP::setCurrentTime(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
-  if (mins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
+  if (mins > 24 * 60)
+    mins = 0;  // If > 23:59, set to 00:00
   _.CurrentTime = mins;
 }
 
@@ -480,11 +484,16 @@ bool IRDaikinESP::getWeeklyTimerEnable(void) const {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool: return kDaikinCool;
-    case stdAc::opmode_t::kHeat: return kDaikinHeat;
-    case stdAc::opmode_t::kDry: return kDaikinDry;
-    case stdAc::opmode_t::kFan: return kDaikinFan;
-    default: return kDaikinAuto;
+  case stdAc::opmode_t::kCool:
+    return kDaikinCool;
+  case stdAc::opmode_t::kHeat:
+    return kDaikinHeat;
+  case stdAc::opmode_t::kDry:
+    return kDaikinDry;
+  case stdAc::opmode_t::kFan:
+    return kDaikinFan;
+  default:
+    return kDaikinAuto;
   }
 }
 
@@ -493,12 +502,18 @@ uint8_t IRDaikinESP::convertMode(const stdAc::opmode_t mode) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin: return kDaikinFanQuiet;
-    case stdAc::fanspeed_t::kLow: return kDaikinFanMin;
-    case stdAc::fanspeed_t::kMedium: return kDaikinFanMed;
-    case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
-    case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
-    default: return kDaikinFanAuto;
+  case stdAc::fanspeed_t::kMin:
+    return kDaikinFanQuiet;
+  case stdAc::fanspeed_t::kLow:
+    return kDaikinFanMin;
+  case stdAc::fanspeed_t::kMedium:
+    return kDaikinFanMed;
+  case stdAc::fanspeed_t::kHigh:
+    return kDaikinFanMax - 1;
+  case stdAc::fanspeed_t::kMax:
+    return kDaikinFanMax;
+  default:
+    return kDaikinFanAuto;
   }
 }
 
@@ -507,11 +522,16 @@ uint8_t IRDaikinESP::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRDaikinESP::toCommonMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikinCool: return stdAc::opmode_t::kCool;
-    case kDaikinHeat: return stdAc::opmode_t::kHeat;
-    case kDaikinDry: return stdAc::opmode_t::kDry;
-    case kDaikinFan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+  case kDaikinCool:
+    return stdAc::opmode_t::kCool;
+  case kDaikinHeat:
+    return stdAc::opmode_t::kHeat;
+  case kDaikinDry:
+    return stdAc::opmode_t::kDry;
+  case kDaikinFan:
+    return stdAc::opmode_t::kFan;
+  default:
+    return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -520,13 +540,19 @@ stdAc::opmode_t IRDaikinESP::toCommonMode(const uint8_t mode) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRDaikinESP::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kDaikinFanMax: return stdAc::fanspeed_t::kMax;
-    case kDaikinFanMax - 1: return stdAc::fanspeed_t::kHigh;
-    case kDaikinFanMed:
-    case kDaikinFanMin + 1: return stdAc::fanspeed_t::kMedium;
-    case kDaikinFanMin: return stdAc::fanspeed_t::kLow;
-    case kDaikinFanQuiet: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+  case kDaikinFanMax:
+    return stdAc::fanspeed_t::kMax;
+  case kDaikinFanMax - 1:
+    return stdAc::fanspeed_t::kHigh;
+  case kDaikinFanMed:
+  case kDaikinFanMin + 1:
+    return stdAc::fanspeed_t::kMedium;
+  case kDaikinFanMin:
+    return stdAc::fanspeed_t::kLow;
+  case kDaikinFanQuiet:
+    return stdAc::fanspeed_t::kMin;
+  default:
+    return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -541,10 +567,8 @@ stdAc::state_t IRDaikinESP::toCommon(void) const {
   result.celsius = true;
   result.degrees = getTemp();
   result.fanspeed = toCommonFanSpeed(getFan());
-  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto :
-                                             stdAc::swingv_t::kOff;
-  result.swingh = _.SwingH ? stdAc::swingh_t::kAuto :
-                                               stdAc::swingh_t::kOff;
+  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.swingh = _.SwingH ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.quiet = _.Quiet;
   result.turbo = _.Powerful;
   result.clean = _.Mold;
@@ -579,10 +603,12 @@ String IRDaikinESP::toString(void) const {
   result += addLabeledString(minsToString(_.CurrentTime), kClockStr);
   result += addDayToString(_.CurrentDay, -1);
   result += addLabeledString(_.OnTimer
-                             ? minsToString(_.OnTime) : kOffStr,
+                                 ? minsToString(_.OnTime)
+                                 : kOffStr,
                              kOnTimerStr);
   result += addLabeledString(_.OffTimer
-                             ? minsToString(_.OffTime) : kOffStr,
+                                 ? minsToString(_.OffTime)
+                                 : kOffStr,
                              kOffTimerStr);
   result += addBoolToString(getWeeklyTimerEnable(), kWeeklyTimerStr);
   return result;
@@ -599,16 +625,17 @@ String IRDaikinESP::toString(void) const {
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
 /// @see https://github.com/mharizanov/Daikin-AC-remote-control-over-the-Internet/tree/master/IRremote
-bool IRrecv::decodeDaikin(decode_results *results, uint16_t offset,
+bool IRrecv::decodeDaikin(decode_results* results, uint16_t offset,
                           const uint16_t nbits, const bool strict) {
   // Is there enough data to match successfully?
   if (results->rawlen < (2 * (nbits + kDaikinHeaderLength) +
                          kDaikinSections * (kHeader + kFooter) + kFooter - 1) +
-                         offset)
+                            offset)
     return false;
 
   // Compliance
-  if (strict && nbits != kDaikinBits) return false;
+  if (strict && nbits != kDaikinBits)
+    return false;
 
   match_result_t data_result;
 
@@ -618,13 +645,17 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t offset,
                           kDaikinBitMark, kDaikinZeroSpace,
                           kDaikinTolerance, kDaikinMarkExcess, false);
   offset += data_result.used;
-  if (data_result.success == false) return false;  // Fail
-  if (data_result.data) return false;  // The header bits should be zero.
+  if (data_result.success == false)
+    return false;  // Fail
+  if (data_result.data)
+    return false;  // The header bits should be zero.
   // Footer
   if (!matchMark(results->rawbuf[offset++], kDaikinBitMark,
-                 kDaikinTolerance, kDaikinMarkExcess)) return false;
+                 kDaikinTolerance, kDaikinMarkExcess))
+    return false;
   if (!matchSpace(results->rawbuf[offset++], kDaikinZeroSpace + kDaikinGap,
-                  kDaikinTolerance, kDaikinMarkExcess)) return false;
+                  kDaikinTolerance, kDaikinMarkExcess))
+    return false;
   // Sections
   const uint8_t ksectionSize[kDaikinSections] = {
       kDaikinSection1Length, kDaikinSection2Length, kDaikinSection3Length};
@@ -640,16 +671,19 @@ bool IRrecv::decodeDaikin(decode_results *results, uint16_t offset,
                         kDaikinBitMark, kDaikinZeroSpace + kDaikinGap,
                         section >= kDaikinSections - 1,
                         kDaikinTolerance, kDaikinMarkExcess, false);
-    if (used == 0) return false;
+    if (used == 0)
+      return false;
     offset += used;
     pos += ksectionSize[section];
   }
   // Compliance
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
-    if (pos * 8 != kDaikinBits) return false;
+    if (pos * 8 != kDaikinBits)
+      return false;
     // Validate the checksum.
-    if (!IRDaikinESP::validChecksum(results->state)) return false;
+    if (!IRDaikinESP::validChecksum(results->state))
+      return false;
   }
 
   // Success
@@ -774,7 +808,7 @@ void IRDaikin2::stateReset(void) {
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t *IRDaikin2::getRaw(void) {
+uint8_t* IRDaikin2::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return _.raw;
 }
@@ -811,15 +845,18 @@ uint8_t IRDaikin2::getMode(void) const { return _.Mode; }
 void IRDaikin2::setMode(const uint8_t desired_mode) {
   uint8_t mode = desired_mode;
   switch (mode) {
-    case kDaikinCool:
-    case kDaikinHeat:
-    case kDaikinFan:
-    case kDaikinDry: break;
-    default: mode = kDaikinAuto;
+  case kDaikinCool:
+  case kDaikinHeat:
+  case kDaikinFan:
+  case kDaikinDry:
+    break;
+  default:
+    mode = kDaikinAuto;
   }
   _.Mode = mode;
   // Redo the temp setting as Cool mode has a different min temp.
-  if (mode == kDaikinCool) setTemp(getTemp());
+  if (mode == kDaikinCool)
+    setTemp(getTemp());
   setHumidity(getHumidity());  // Make sure the humidity is okay for this mode.
 }
 
@@ -832,7 +869,8 @@ void IRDaikin2::setTemp(const uint8_t desired) {
       desired);
   _.Temp = std::min(kDaikinMaxTemp, temp);
   // If the humidity setting is in use, the temp is a fixed value.
-  if (_.HumidOn) _.Temp = kDaikinMaxTemp;
+  if (_.HumidOn)
+    _.Temp = kDaikinMaxTemp;
 }
 
 /// Get the current temperature setting.
@@ -858,9 +896,11 @@ void IRDaikin2::setFan(const uint8_t fan) {
 uint8_t IRDaikin2::getFan(void) const {
   const uint8_t fan = _.Fan;
   switch (fan) {
-    case kDaikinFanAuto:
-    case kDaikinFanQuiet: return fan;
-    default: return fan - 2;
+  case kDaikinFanAuto:
+  case kDaikinFanQuiet:
+    return fan;
+  default:
+    return fan - 2;
   }
 }
 
@@ -868,17 +908,17 @@ uint8_t IRDaikin2::getFan(void) const {
 /// @param[in] position The position/mode to set the swing to.
 void IRDaikin2::setSwingVertical(const uint8_t position) {
   switch (position) {
-    case kDaikin2SwingVHighest:
-    case kDaikin2SwingVHigh:
-    case kDaikin2SwingVUpperMiddle:
-    case kDaikin2SwingVLowerMiddle:
-    case kDaikin2SwingVLow:
-    case kDaikin2SwingVLowest:
-    case kDaikin2SwingVOff:
-    case kDaikin2SwingVBreeze:
-    case kDaikin2SwingVCirculate:
-    case kDaikin2SwingVAuto:
-      _.SwingV = position;
+  case kDaikin2SwingVHighest:
+  case kDaikin2SwingVHigh:
+  case kDaikin2SwingVUpperMiddle:
+  case kDaikin2SwingVLowerMiddle:
+  case kDaikin2SwingVLow:
+  case kDaikin2SwingVLowest:
+  case kDaikin2SwingVOff:
+  case kDaikin2SwingVBreeze:
+  case kDaikin2SwingVCirculate:
+  case kDaikin2SwingVAuto:
+    _.SwingV = position;
   }
 }
 
@@ -891,16 +931,16 @@ uint8_t IRDaikin2::getSwingVertical(void) const { return _.SwingV; }
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
-    case stdAc::swingv_t::kHighest:
-    case stdAc::swingv_t::kHigh:
-    case stdAc::swingv_t::kMiddle:
-    case stdAc::swingv_t::kLow:
-    case stdAc::swingv_t::kLowest:
-      return (uint8_t)position + kDaikin2SwingVHighest;
-    case stdAc::swingv_t::kOff:
-      return kDaikin2SwingVOff;
-    default:
-      return kDaikin2SwingVAuto;
+  case stdAc::swingv_t::kHighest:
+  case stdAc::swingv_t::kHigh:
+  case stdAc::swingv_t::kMiddle:
+  case stdAc::swingv_t::kLow:
+  case stdAc::swingv_t::kLowest:
+    return (uint8_t)position + kDaikin2SwingVHighest;
+  case stdAc::swingv_t::kOff:
+    return kDaikin2SwingVOff;
+  default:
+    return kDaikin2SwingVAuto;
   }
 }
 
@@ -909,14 +949,21 @@ uint8_t IRDaikin2::convertSwingV(const stdAc::swingv_t position) {
 /// @return The common vertical swing position.
 stdAc::swingv_t IRDaikin2::toCommonSwingV(const uint8_t setting) {
   switch (setting) {
-    case kDaikin2SwingVHighest:     return stdAc::swingv_t::kHighest;
-    case kDaikin2SwingVHigh:        return stdAc::swingv_t::kHigh;
-    case kDaikin2SwingVUpperMiddle:
-    case kDaikin2SwingVLowerMiddle: return stdAc::swingv_t::kMiddle;
-    case kDaikin2SwingVLow:         return stdAc::swingv_t::kLow;
-    case kDaikin2SwingVLowest:      return stdAc::swingv_t::kLowest;
-    case kDaikin2SwingVOff:         return stdAc::swingv_t::kOff;
-    default:                        return stdAc::swingv_t::kAuto;
+  case kDaikin2SwingVHighest:
+    return stdAc::swingv_t::kHighest;
+  case kDaikin2SwingVHigh:
+    return stdAc::swingv_t::kHigh;
+  case kDaikin2SwingVUpperMiddle:
+  case kDaikin2SwingVLowerMiddle:
+    return stdAc::swingv_t::kMiddle;
+  case kDaikin2SwingVLow:
+    return stdAc::swingv_t::kLow;
+  case kDaikin2SwingVLowest:
+    return stdAc::swingv_t::kLowest;
+  case kDaikin2SwingVOff:
+    return stdAc::swingv_t::kOff;
+  default:
+    return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -934,7 +981,8 @@ uint8_t IRDaikin2::getSwingHorizontal(void) const { return _.SwingH; }
 /// @param[in] numMins Nr. of minutes past midnight.
 void IRDaikin2::setCurrentTime(const uint16_t numMins) {
   uint16_t mins = numMins;
-  if (numMins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
+  if (numMins > 24 * 60)
+    mins = 0;  // If > 23:59, set to 00:00
   _.CurrentTime = mins;
 }
 
@@ -1092,7 +1140,8 @@ bool IRDaikin2::getSleepTimerEnabled(void) const { return _.SleepTimer; }
 void IRDaikin2::setQuiet(const bool on) {
   _.Quiet = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) setPowerful(false);
+  if (on)
+    setPowerful(false);
 }
 
 /// Get the Quiet mode status of the A/C.
@@ -1104,7 +1153,8 @@ bool IRDaikin2::getQuiet(void) const { return _.Quiet; }
 void IRDaikin2::setPowerful(const bool on) {
   _.Powerful = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) setQuiet(false);
+  if (on)
+    setQuiet(false);
 }
 
 /// Get the Powerful (Turbo) mode of the A/C.
@@ -1129,26 +1179,26 @@ uint8_t IRDaikin2::getHumidity(void) const { return _.Humidity; }
 void IRDaikin2::setHumidity(const uint8_t percent) {
   _.Humidity = kDaikin2HumidityOff;  // Default to off.
   switch (getMode()) {
-    case kDaikinHeat:
-      switch (percent) {
-        case kDaikin2HumidityOff:
-        case kDaikin2HumidityHeatLow:
-        case kDaikin2HumidityHeatMedium:
-        case kDaikin2HumidityHeatHigh:
-        case kDaikin2HumidityAuto:
-          _.Humidity = percent;
-      }
-      break;
-    case kDaikinDry:
-      switch (percent) {
-        case kDaikin2HumidityOff:
-        case kDaikin2HumidityDryLow:
-        case kDaikin2HumidityDryMedium:
-        case kDaikin2HumidityDryHigh:
-        case kDaikin2HumidityAuto:
-          _.Humidity = percent;
-      }
-      break;
+  case kDaikinHeat:
+    switch (percent) {
+    case kDaikin2HumidityOff:
+    case kDaikin2HumidityHeatLow:
+    case kDaikin2HumidityHeatMedium:
+    case kDaikin2HumidityHeatHigh:
+    case kDaikin2HumidityAuto:
+      _.Humidity = percent;
+    }
+    break;
+  case kDaikinDry:
+    switch (percent) {
+    case kDaikin2HumidityOff:
+    case kDaikin2HumidityDryLow:
+    case kDaikin2HumidityDryMedium:
+    case kDaikin2HumidityDryHigh:
+    case kDaikin2HumidityAuto:
+      _.Humidity = percent;
+    }
+    break;
   }
   _.HumidOn = (_.Humidity != kDaikin2HumidityOff);  // Enabled?
   setTemp(getTemp());  // Adjust the temperature if we need to.
@@ -1173,14 +1223,22 @@ uint8_t IRDaikin2::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin2::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
-    case stdAc::swingh_t::kAuto:     return kDaikin2SwingHSwing;
-    case stdAc::swingh_t::kLeftMax:  return kDaikin2SwingHLeftMax;
-    case stdAc::swingh_t::kLeft:     return kDaikin2SwingHLeft;
-    case stdAc::swingh_t::kMiddle:   return kDaikin2SwingHMiddle;
-    case stdAc::swingh_t::kRight:    return kDaikin2SwingHRight;
-    case stdAc::swingh_t::kRightMax: return kDaikin2SwingHRightMax;
-    case stdAc::swingh_t::kWide:     return kDaikin2SwingHWide;
-    default:                         return kDaikin2SwingHAuto;
+  case stdAc::swingh_t::kAuto:
+    return kDaikin2SwingHSwing;
+  case stdAc::swingh_t::kLeftMax:
+    return kDaikin2SwingHLeftMax;
+  case stdAc::swingh_t::kLeft:
+    return kDaikin2SwingHLeft;
+  case stdAc::swingh_t::kMiddle:
+    return kDaikin2SwingHMiddle;
+  case stdAc::swingh_t::kRight:
+    return kDaikin2SwingHRight;
+  case stdAc::swingh_t::kRightMax:
+    return kDaikin2SwingHRightMax;
+  case stdAc::swingh_t::kWide:
+    return kDaikin2SwingHWide;
+  default:
+    return kDaikin2SwingHAuto;
   }
 }
 
@@ -1189,14 +1247,22 @@ uint8_t IRDaikin2::convertSwingH(const stdAc::swingh_t position) {
 /// @return The common horizontal swing position.
 stdAc::swingh_t IRDaikin2::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
-    case kDaikin2SwingHSwing:    return stdAc::swingh_t::kAuto;
-    case kDaikin2SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;
-    case kDaikin2SwingHLeft:     return stdAc::swingh_t::kLeft;
-    case kDaikin2SwingHMiddle:   return stdAc::swingh_t::kMiddle;
-    case kDaikin2SwingHRight:    return stdAc::swingh_t::kRight;
-    case kDaikin2SwingHRightMax: return stdAc::swingh_t::kRightMax;
-    case kDaikin2SwingHWide:     return stdAc::swingh_t::kWide;
-    default:                     return stdAc::swingh_t::kOff;
+  case kDaikin2SwingHSwing:
+    return stdAc::swingh_t::kAuto;
+  case kDaikin2SwingHLeftMax:
+    return stdAc::swingh_t::kLeftMax;
+  case kDaikin2SwingHLeft:
+    return stdAc::swingh_t::kLeft;
+  case kDaikin2SwingHMiddle:
+    return stdAc::swingh_t::kMiddle;
+  case kDaikin2SwingHRight:
+    return stdAc::swingh_t::kRight;
+  case kDaikin2SwingHRightMax:
+    return stdAc::swingh_t::kRightMax;
+  case kDaikin2SwingHWide:
+    return stdAc::swingh_t::kWide;
+  default:
+    return stdAc::swingh_t::kOff;
   }
 }
 
@@ -1269,33 +1335,33 @@ String IRDaikin2::toString(void) const {
   result += addIntToString(_.Beep, kBeepStr);
   result += kSpaceLBraceStr;
   switch (_.Beep) {
-    case kDaikinBeepLoud:
-      result += kLoudStr;
-      break;
-    case kDaikinBeepQuiet:
-      result += kQuietStr;
-      break;
-    case kDaikinBeepOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
+  case kDaikinBeepLoud:
+    result += kLoudStr;
+    break;
+  case kDaikinBeepQuiet:
+    result += kQuietStr;
+    break;
+  case kDaikinBeepOff:
+    result += kOffStr;
+    break;
+  default:
+    result += kUnknownStr;
   }
   result += ')';
   result += addIntToString(_.Light, kLightStr);
   result += kSpaceLBraceStr;
   switch (_.Light) {
-    case kDaikinLightBright:
-      result += kHighStr;
-      break;
-    case kDaikinLightDim:
-      result += kLowStr;
-      break;
-    case kDaikinLightOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
+  case kDaikinLightBright:
+    result += kHighStr;
+    break;
+  case kDaikinLightDim:
+    result += kLowStr;
+    break;
+  case kDaikinLightOff:
+    result += kOffStr;
+    break;
+  default:
+    result += kUnknownStr;
   }
   result += ')';
   result += addBoolToString(_.Mold, kMouldStr);
@@ -1311,14 +1377,14 @@ String IRDaikin2::toString(void) const {
   result += addBoolToString(_.Econo, kEconoStr);
   result += addIntToString(_.Humidity, kHumidStr);
   switch (_.Humidity) {
-    case kDaikin2HumidityOff:
-    case kDaikin2HumidityAuto:
-      result += kSpaceLBraceStr;
-      result += _.Humidity ? kAutoStr : kOffStr;
-      result += ')';
-      break;
-    default:
-      result += '%';
+  case kDaikin2HumidityOff:
+  case kDaikin2HumidityAuto:
+    result += kSpaceLBraceStr;
+    result += _.Humidity ? kAutoStr : kOffStr;
+    result += ')';
+    break;
+  default:
+    result += '%';
   }
   return result;
 }
@@ -1333,22 +1399,25 @@ String IRDaikin2::toString(void) const {
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
-bool IRrecv::decodeDaikin2(decode_results *results, uint16_t offset,
+bool IRrecv::decodeDaikin2(decode_results* results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) + kHeader - 1 + offset)
     return false;
 
   // Compliance
-  if (strict && nbits != kDaikin2Bits) return false;
+  if (strict && nbits != kDaikin2Bits)
+    return false;
 
   const uint8_t ksectionSize[kDaikin2Sections] = {kDaikin2Section1Length,
                                                   kDaikin2Section2Length};
 
   // Leader
   if (!matchMark(results->rawbuf[offset++], kDaikin2LeaderMark,
-                 _tolerance + kDaikin2Tolerance)) return false;
+                 _tolerance + kDaikin2Tolerance))
+    return false;
   if (!matchSpace(results->rawbuf[offset++], kDaikin2LeaderSpace,
-                  _tolerance + kDaikin2Tolerance)) return false;
+                  _tolerance + kDaikin2Tolerance))
+    return false;
 
   // Sections
   uint16_t pos = 0;
@@ -1364,16 +1433,19 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t offset,
                         section >= kDaikin2Sections - 1,
                         _tolerance + kDaikin2Tolerance, kDaikinMarkExcess,
                         false);
-    if (used == 0) return false;
+    if (used == 0)
+      return false;
     offset += used;
     pos += ksectionSize[section];
   }
   // Compliance
   if (strict) {
     // Re-check we got the correct size/length due to the way we read the data.
-    if (pos * 8 != kDaikin2Bits) return false;
+    if (pos * 8 != kDaikin2Bits)
+      return false;
     // Validate the checksum.
-    if (!IRDaikin2::validChecksum(results->state)) return false;
+    if (!IRDaikin2::validChecksum(results->state))
+      return false;
   }
 
   // Success
@@ -1385,6 +1457,493 @@ bool IRrecv::decodeDaikin2(decode_results *results, uint16_t offset,
   return true;
 }
 #endif  // DECODE_DAIKIN2
+
+#if SEND_DAIKIN200
+/// Send a Daikin200 (200-bit) A/C formatted message.
+/// Status: BETA / Untested on a real device.
+/// @param[in] data The message to be sent.
+/// @param[in] nbytes The number of bytes of message to be sent.
+/// @param[in] repeat The number of times the command is to be repeated.
+void IRsend::sendDaikin200(const unsigned char data[], const uint16_t nbytes,
+                           const uint16_t repeat) {
+  if (nbytes < kDaikin200Section1Length)
+    return;  // Not enough bytes to send a partial message.
+
+  for (uint16_t r = 0; r <= repeat; r++) {
+    // Section #1
+    sendGeneric(kDaikin200HdrMark, kDaikin200HdrSpace, kDaikin200BitMark,
+                kDaikin200OneSpace, kDaikin200BitMark, kDaikin200ZeroSpace,
+                kDaikin200BitMark, kDaikin200Gap, data,
+                kDaikin200Section1Length,
+                kDaikin200Freq, false, 0, kDutyDefault);
+    // Section #2
+    sendGeneric(kDaikin200HdrMark, kDaikin200HdrSpace, kDaikin200BitMark,
+                kDaikin200OneSpace, kDaikin200BitMark, kDaikin200ZeroSpace,
+                kDaikin200BitMark, kDaikin200Gap,
+                data + kDaikin200Section1Length,
+                nbytes - kDaikin200Section1Length,
+                kDaikin200Freq, false, 0, kDutyDefault);
+  }
+}
+#endif  // SEND_DAIKIN200
+
+/// Class Constructor
+/// @param[in] pin GPIO to be used when sending.
+/// @param[in] inverted Is the output signal to be inverted?
+/// @param[in] use_modulation Is frequency modulation to be used?
+IRDaikin200::IRDaikin200(const uint16_t pin, const bool inverted,
+                         const bool use_modulation)
+    : _irsend(pin, inverted, use_modulation) { stateReset(); }
+
+/// Set up hardware to be able to send a message.
+void IRDaikin200::begin(void) { _irsend.begin(); }
+
+#if SEND_DAIKIN200
+/// Send the current internal state as an IR message.
+/// @param[in] repeat Nr. of times the message will be repeated.
+void IRDaikin200::send(const uint16_t repeat) {
+  _irsend.sendDaikin200(getRaw(), kDaikin200StateLength, repeat);
+}
+#endif  // SEND_DAIKIN200
+
+/// Verify the checksum is valid for a given state.
+/// @param[in] state The array to verify the checksum of.
+/// @param[in] length The length of the state array.
+/// @return true, if the state has a valid checksum. Otherwise, false.
+bool IRDaikin200::validChecksum(uint8_t state[], const uint16_t length) {
+  // Validate the checksum of section #1.
+  if (length <= kDaikin200Section1Length - 1 ||
+      state[kDaikin200Section1Length - 1] != sumBytes(
+          state, kDaikin200Section1Length - 1))
+    return false;
+  // Validate the checksum of section #2
+  if (length <= kDaikin200Section1Length + 1 ||
+      state[length - 1] != sumBytes(state + kDaikin200Section1Length,
+                                    length - kDaikin200Section1Length - 1))
+    return false;
+  return true;
+}
+
+/// Calculate and set the checksum values for the internal state.
+void IRDaikin200::checksum(void) {
+  _.Sum1 = sumBytes(_.raw, kDaikin200Section1Length - 1);
+  _.Sum2 = sumBytes(_.raw + kDaikin200Section1Length,
+                    kDaikin200Section2Length - 1);
+}
+
+/// Reset the internal state to a fixed known good state.
+void IRDaikin200::stateReset(void) {
+  for (uint8_t i = 0; i < kDaikin200StateLength; i++) _.raw[i] = 0x00;
+  _.raw[0] = 0x11;
+  _.raw[1] = 0xDA;
+  _.raw[2] = 0x17;
+  _.raw[3] = 0x48;
+  _.raw[4] = 0x04;
+  // _.raw[6] is Sum1, set by checksum()
+  _.raw[7] = 0x11;
+  _.raw[8] = 0xDA;
+  _.raw[9] = 0x17;
+  _.raw[10] = 0x48;
+  _.raw[12] = 0x73;
+  _.raw[14] = 0x21;  // power on, mode cool
+  _.raw[17] = 0x20;  // 25C
+  _.raw[18] = 0x32;  // fan 3, swing
+  _.raw[20] = 0x20;
+  // _.raw[24] is Sum2, set by checksum()
+}
+
+/// Get a PTR to the internal state/code for this protocol.
+/// @return PTR to a code for this protocol based on the current internal state.
+uint8_t* IRDaikin200::getRaw(void) {
+  checksum();
+  return _.raw;
+}
+
+/// Set the internal state from a valid code for this protocol.
+/// @param[in] new_code A valid code for this protocol.
+void IRDaikin200::setRaw(const uint8_t new_code[]) {
+  std::memcpy(_.raw, new_code, kDaikin200StateLength);
+}
+
+/// Change the power setting to On.
+void IRDaikin200::on(void) { setPower(true); }
+
+/// Change the power setting to Off.
+void IRDaikin200::off(void) { setPower(false); }
+
+/// Change the power setting.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin200::setPower(const bool on) { _.Power = on; }
+
+/// Get the value of the current power setting.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin200::getPower(void) const { return _.Power; }
+
+/// Get the operating mode setting of the A/C.
+/// @return The current operating mode setting.
+uint8_t IRDaikin200::getMode(void) const { return _.Mode; }
+
+/// Set the operating mode of the A/C.
+/// @param[in] mode The desired operating mode.
+void IRDaikin200::setMode(const uint8_t mode) {
+  switch (mode) {
+  case kDaikin200Fan:
+    _.Mode = kDaikin200Fan;
+    _.MsgType = kDaikin200MsgTypeFan;
+    _.Temp = 0x00;
+    break;
+  case kDaikin200Heat:
+    _.Mode = kDaikin200Heat;
+    _.MsgType = kDaikin200MsgTypeNormal;
+    break;
+  case kDaikin200Cool:
+    _.Mode = kDaikin200Cool;
+    _.MsgType = kDaikin200MsgTypeNormal;
+    break;
+  case kDaikin200Auto:
+    _.Mode = kDaikin200Auto;
+    _.MsgType = kDaikin200MsgTypeNormal;
+    break;
+  case kDaikin200Dry:
+    _.Mode = kDaikin200Dry;
+    _.MsgType = kDaikin200MsgTypeDry;
+    _.Temp = 0x00;
+    break;
+  default:
+    _.Mode = kDaikin200Auto;
+    _.MsgType = kDaikin200MsgTypeNormal;
+  }
+}
+
+/// Convert a stdAc::opmode_t enum into its native mode.
+/// @param[in] mode The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRDaikin200::convertMode(const stdAc::opmode_t mode) {
+  switch (mode) {
+  case stdAc::opmode_t::kCool:
+    return kDaikin200Cool;
+  case stdAc::opmode_t::kHeat:
+    return kDaikin200Heat;
+  case stdAc::opmode_t::kDry:
+    return kDaikin200Dry;
+  case stdAc::opmode_t::kFan:
+    return kDaikin200Fan;
+  default:
+    return kDaikin200Auto;
+  }
+}
+
+/// Set the temperature.
+/// @param[in] temp The temperature in degrees celsius.
+void IRDaikin200::setTemp(const uint8_t temp) {
+  uint8_t degrees = std::max(temp, kDaikinMinTemp);
+  degrees = std::min(degrees, kDaikinMaxTemp);
+  _.Temp = (degrees - 9) * 2;  // your formula
+}
+
+/// Get the current temperature setting.
+/// @return The current setting for temp. in degrees celsius.
+uint8_t IRDaikin200::getTemp(void) const { return _.Temp / 2 + 9; }
+
+/// Set the speed of the fan.
+/// @param[in] fan The desired setting.
+void IRDaikin200::setFan(const uint8_t fan) {
+  if (fan >= kDaikin200FanMin && fan <= kDaikin200FanMax)
+    _.Fan = fan;
+  else
+    _.Fan = kDaikin200FanAuto;
+}
+
+/// Get the current fan speed setting.
+/// @return The current fan speed.
+uint8_t IRDaikin200::getFan(void) const { return _.Fan; }
+/// Convert a stdAc::fanspeed_t enum into its native speed.
+/// @param[in] speed The enum to be converted.
+/// @return The native equivalent of the enum.
+uint8_t IRDaikin200::convertFan(const stdAc::fanspeed_t speed) {
+  switch (speed) {
+  case stdAc::fanspeed_t::kMin:
+    return kDaikin200FanSpeed1;
+  case stdAc::fanspeed_t::kLow:
+    return kDaikin200FanSpeed2;
+  case stdAc::fanspeed_t::kMedium:
+    return kDaikin200FanSpeed3;
+  case stdAc::fanspeed_t::kHigh:
+    return kDaikin200FanSpeed4;
+  case stdAc::fanspeed_t::kMax:
+    return kDaikin200FanSpeed5;
+  default:
+    return kDaikin200FanAuto;
+  }
+}
+
+/// Set the Vertical Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin200::setSwingVertical(const bool on) {
+  _.Swing = on ? kDaikin200SwingAuto : kDaikin200SwingPos3;
+}
+/// Get the Vertical Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+
+bool IRDaikin200::getSwingVertical(void) const {
+  return _.Swing == kDaikin200SwingAuto || _.Swing == kDaikin200SwingWide;
+}
+
+void IRDaikin200::setSwingVPosition(const uint8_t position) {
+  switch (position) {
+  case kDaikin200SwingAuto:
+  case kDaikin200SwingPos1:
+  case kDaikin200SwingPos2:
+  case kDaikin200SwingPos3:
+  case kDaikin200SwingPos4:
+  case kDaikin200SwingPos5:
+    _.Swing = position;
+    break;
+  default:
+    _.Swing = kDaikin200SwingPos3;
+  }
+}
+
+uint8_t IRDaikin200::getSwingVPosition(void) const { return _.Swing; }
+
+/// Set the Horizontal Swing mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin200::setSwingHorizontal(const bool on) {
+  (void)on;  // Horizontal swing byte/bit not identified yet.
+}
+/// Get the Horizontal Swing mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin200::getSwingHorizontal(void) const { return false; }
+
+/// Set the Quiet mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin200::setQuiet(const bool on) {
+  if (on) {
+    setFan(kDaikinFanQuiet);
+    setPowerful(false);
+  } else if (getFan() == kDaikinFanQuiet) {
+    setFan(kDaikinFanAuto);
+  }
+}
+
+/// Get the Quiet mode status of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin200::getQuiet(void) const { return getFan() == kDaikinFanQuiet; }
+
+/// Set the Powerful (Turbo) mode of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRDaikin200::setPowerful(const bool on) {
+  // stub until byte is known, mirrors quiet interaction
+  if (on)
+    setQuiet(false);
+}
+
+void IRDaikin200::setTimerOn(const bool on, const uint8_t hours) {
+  if (on) {
+    _.TimerOn = kDaikin200TimerEnabled |
+                std::min(hours, kDaikin200TimerMax);
+    _.MsgType |= kDaikin200MsgTypeTimerOn;
+  } else {
+    _.TimerOn = 0x00;
+    _.MsgType &= ~kDaikin200MsgTypeTimerOn;
+  }
+  // restore normal msgtype if no timers active
+  if (_.TimerOn == 0x00 && _.TimerOff == 0x00)
+    _.MsgType = kDaikin200MsgTypeNormal;
+}
+
+bool IRDaikin200::getTimerOnEnabled(void) const {
+  return _.TimerOn & kDaikin200TimerEnabled;
+}
+
+uint8_t IRDaikin200::getTimerOnHours(void) const {
+  return _.TimerOn & ~kDaikin200TimerEnabled;
+}
+
+void IRDaikin200::setTimerOff(const bool on, const uint8_t hours) {
+  if (on) {
+    _.TimerOff = kDaikin200TimerEnabled |
+                 std::min(hours, kDaikin200TimerMax);
+    _.MsgType |= kDaikin200MsgTypeTimerOff;
+  } else {
+    _.TimerOff = 0x00;
+    _.MsgType &= ~kDaikin200MsgTypeTimerOff;
+  }
+  if (_.TimerOn == 0x00 && _.TimerOff == 0x00)
+    _.MsgType = kDaikin200MsgTypeNormal;
+}
+
+bool IRDaikin200::getTimerOffEnabled(void) const {
+  return _.TimerOff & kDaikin200TimerEnabled;
+}
+
+uint8_t IRDaikin200::getTimerOffHours(void) const {
+  return _.TimerOff & ~kDaikin200TimerEnabled;
+}
+
+/// Get the Powerful (Turbo) mode of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRDaikin200::getPowerful(void) const { return false; }
+
+/// Convert the current internal state into its stdAc::state_t equivalent.
+/// @return The stdAc equivalent of the native settings.
+stdAc::state_t IRDaikin200::toCommon(void) const {
+  stdAc::state_t result{};
+  result.protocol = decode_type_t::DAIKIN200;
+  result.model = -1;
+  result.power = _.Power;
+  result.mode = IRDaikinESP::toCommonMode(_.Mode);  // fix this too
+  result.celsius = true;
+  result.degrees = getTemp();
+  result.fanspeed = IRDaikinESP::toCommonFanSpeed(getFan());
+  // Map swing positions to swingv_t
+  switch (_.Swing) {
+  case kDaikin200SwingAuto:
+    result.swingv = stdAc::swingv_t::kAuto;
+    break;
+  case kDaikin200SwingPos1:
+    result.swingv = stdAc::swingv_t::kHighest;
+    break;
+  case kDaikin200SwingPos2:
+    result.swingv = stdAc::swingv_t::kHigh;
+    break;
+  case kDaikin200SwingPos3:
+    result.swingv = stdAc::swingv_t::kMiddle;
+    break;
+  case kDaikin200SwingPos4:
+    result.swingv = stdAc::swingv_t::kLow;
+    break;
+  case kDaikin200SwingPos5:
+    result.swingv = stdAc::swingv_t::kLowest;
+    break;
+  default:
+    result.swingv = stdAc::swingv_t::kOff;
+    break;
+  }
+  result.swingh = stdAc::swingh_t::kOff;
+  result.quiet = getQuiet();
+  result.turbo = false;
+  result.light = false;
+  result.clean = false;
+  result.econo = false;
+  result.filter = false;
+  result.beep = false;
+  result.sleep = -1;
+  result.clock = -1;
+  return result;
+}
+
+/// Convert the current internal state into a human readable string.
+/// @return A human readable string.
+String IRDaikin200::toString(void) const {
+  String result = "";
+  result.reserve(120);
+  result += addBoolToString(_.Power, kPowerStr, false);
+  result += addModeToString(_.Mode, kDaikin200Auto, kDaikin200Cool,
+                            kDaikin200Heat, kDaikin200Dry, kDaikin200Fan);
+  result += addTempToString(getTemp());
+  result += addFanToString(getFan(),
+                          kDaikin200FanSpeed4,   // high
+                          kDaikin200FanSpeed1,   // low
+                          kDaikin200FanAuto,     // automatic
+                          kDaikin200FanAuto,     // quiet
+                          kDaikin200FanSpeed3,   // medium
+                          kDaikin200FanSpeed5,   // maximum
+                          kDaikin200FanSpeed2);  // medium_high
+  switch (_.Swing) {
+  case kDaikin200SwingWide:
+    result += addLabeledString("Wide", kSwingVStr);
+    break;  // 0xF = wide = shows as Auto
+  case kDaikin200SwingAuto:
+    result += addLabeledString(kAutoStr, kSwingVStr);
+    break;  // 0x7 = auto swing
+  case kDaikin200SwingPos1:
+    result += addLabeledString("1 (Highest)", kSwingVStr);
+    break;
+  case kDaikin200SwingPos2:
+    result += addLabeledString("2 (High)", kSwingVStr);
+    break;
+  case kDaikin200SwingPos3:
+    result += addLabeledString("3 (Middle)", kSwingVStr);
+    break;
+  case kDaikin200SwingPos4:
+    result += addLabeledString("4 (Low)", kSwingVStr);
+    break;
+  case kDaikin200SwingPos5:
+    result += addLabeledString("5 (Lowest)", kSwingVStr);
+    break;
+  default:
+    result += addLabeledString(kUnknownStr, kSwingVStr);
+    break;
+  }
+  if (getTimerOnEnabled())
+    result += addLabeledString(uint64ToString(getTimerOnHours()) + "h",
+                               kOnTimerStr);
+  if (getTimerOffEnabled())
+    result += addLabeledString(uint64ToString(getTimerOffHours()) + "h",
+                               kOffTimerStr);
+  result += addBoolToString(getQuiet(), kQuietStr);
+  return result;
+}
+
+#if DECODE_DAIKIN200
+/// Decode the supplied Daikin 200-bit message. (DAIKIN200)
+/// Status: STABLE / Known to be working.
+/// @param[in,out] results Ptr to the data to decode & where to store the decode
+///   result.
+/// @param[in] offset The starting index to use when attempting to decode the
+///   raw data. Typically/Defaults to kStartOffset.
+/// @param[in] nbits The number of data bits to expect.
+/// @param[in] strict Flag indicating if we should perform strict matching.
+/// @return A boolean. True if it can decode it, false if it can't.
+/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
+bool IRrecv::decodeDaikin200(decode_results* results, uint16_t offset,
+                             const uint16_t nbits, const bool strict) {
+  if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1 + offset)
+    return false;
+
+  // Compliance
+  if (strict && nbits != kDaikin200Bits)
+    return false;
+
+  const uint8_t ksectionSize[kDaikin200Sections] = {kDaikin200Section1Length,
+                                                    kDaikin200Section2Length};
+  // Sections
+  uint16_t pos = 0;
+  for (uint8_t section = 0; section < kDaikin200Sections; section++) {
+    uint16_t used;
+    // Section Header + Section Data + Section Footer
+    used = matchGeneric(results->rawbuf + offset, results->state + pos,
+                        results->rawlen - offset, ksectionSize[section] * 8,
+                        kDaikin200HdrMark, kDaikin200HdrSpace,
+                        kDaikin200BitMark, kDaikin200OneSpace,
+                        kDaikin200BitMark, kDaikin200ZeroSpace,
+                        kDaikin200BitMark, kDaikin200Gap,
+                        section >= kDaikin200Sections - 1,
+                        kDaikinTolerance, 0, false);
+    if (used == 0)
+      return false;
+    offset += used;
+    pos += ksectionSize[section];
+  }
+  // Compliance
+  if (strict) {
+    if (pos * 8 != kDaikin200Bits)
+      return false;
+    // Validate the checksum.
+    if (!IRDaikin200::validChecksum(results->state, pos))
+      return false;
+  }
+
+  // Success
+  results->decode_type = decode_type_t::DAIKIN200;
+  results->bits = nbits;
+  // No need to record the state as we stored it as we decoded it.
+  // As we use result->state, we don't record value, address, or command as it
+  // is a union data type.
+  return true;
+}
+#endif  // DECODE_DAIKIN200
 
 #if SEND_DAIKIN216
 /// Send a Daikin216 (216-bit) A/C formatted message.
@@ -1443,8 +2002,8 @@ void IRDaikin216::send(const uint16_t repeat) {
 bool IRDaikin216::validChecksum(uint8_t state[], const uint16_t length) {
   // Validate the checksum of section #1.
   if (length <= kDaikin216Section1Length - 1 ||
-      state[kDaikin216Section1Length - 1] != sumBytes(
-          state, kDaikin216Section1Length - 1))
+      state[kDaikin216Section1Length - 1] !=
+          sumBytes(state, kDaikin216Section1Length - 1))
     return false;
   // Validate the checksum of section #2 (a.k.a. the rest)
   if (length <= kDaikin216Section1Length + 1 ||
@@ -1464,13 +2023,13 @@ void IRDaikin216::checksum(void) {
 /// Reset the internal state to a fixed known good state.
 void IRDaikin216::stateReset(void) {
   for (uint8_t i = 0; i < kDaikin216StateLength; i++) _.raw[i] = 0x00;
-  _.raw[0] =  0x11;
-  _.raw[1] =  0xDA;
-  _.raw[2] =  0x27;
-  _.raw[3] =  0xF0;
+  _.raw[0] = 0x11;
+  _.raw[1] = 0xDA;
+  _.raw[2] = 0x27;
+  _.raw[3] = 0xF0;
   // _.raw[7] is a checksum byte, it will be set by checksum().
-  _.raw[8] =  0x11;
-  _.raw[9] =  0xDA;
+  _.raw[8] = 0x11;
+  _.raw[9] = 0xDA;
   _.raw[10] = 0x27;
   _.raw[23] = 0xC0;
   // _.raw[26] is a checksum byte, it will be set by checksum().
@@ -1478,7 +2037,7 @@ void IRDaikin216::stateReset(void) {
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t *IRDaikin216::getRaw(void) {
+uint8_t* IRDaikin216::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return _.raw;
 }
@@ -1511,15 +2070,15 @@ uint8_t IRDaikin216::getMode(void) const { return _.Mode; }
 /// @param[in] mode The desired operating mode.
 void IRDaikin216::setMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikinAuto:
-    case kDaikinCool:
-    case kDaikinHeat:
-    case kDaikinFan:
-    case kDaikinDry:
-      _.Mode = mode;
-      break;
-    default:
-      _.Mode = kDaikinAuto;
+  case kDaikinAuto:
+  case kDaikinCool:
+  case kDaikinHeat:
+  case kDaikinFan:
+  case kDaikinDry:
+    _.Mode = mode;
+    break;
+  default:
+    _.Mode = kDaikinAuto;
   }
 }
 
@@ -1561,7 +2120,8 @@ void IRDaikin216::setFan(const uint8_t fan) {
 /// @return The current fan speed.
 uint8_t IRDaikin216::getFan(void) const {
   uint8_t fan = _.Fan;
-  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
+  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto)
+    fan -= 2;
   return fan;
 }
 
@@ -1615,7 +2175,8 @@ bool IRDaikin216::getQuiet(void) const { return getFan() == kDaikinFanQuiet; }
 void IRDaikin216::setPowerful(const bool on) {
   _.Powerful = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) setQuiet(false);
+  if (on)
+    setQuiet(false);
 }
 
 /// Get the Powerful (Turbo) mode of the A/C.
@@ -1633,10 +2194,8 @@ stdAc::state_t IRDaikin216::toCommon(void) const {
   result.celsius = true;
   result.degrees = _.Temp;
   result.fanspeed = IRDaikinESP::toCommonFanSpeed(getFan());
-  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto :
-                              stdAc::swingv_t::kOff;
-  result.swingh = _.SwingH ? stdAc::swingh_t::kAuto :
-                              stdAc::swingh_t::kOff;
+  result.swingv = _.SwingV ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
+  result.swingh = _.SwingH ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.quiet = getQuiet();
   result.turbo = _.Powerful;
   // Not supported.
@@ -1680,13 +2239,14 @@ String IRDaikin216::toString(void) const {
 /// @return A boolean. True if it can decode it, false if it can't.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/689
 /// @see https://github.com/danny-source/Arduino_DY_IRDaikin
-bool IRrecv::decodeDaikin216(decode_results *results, uint16_t offset,
+bool IRrecv::decodeDaikin216(decode_results* results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1 + offset)
     return false;
 
   // Compliance
-  if (strict && nbits != kDaikin216Bits) return false;
+  if (strict && nbits != kDaikin216Bits)
+    return false;
 
   const uint8_t ksectionSize[kDaikin216Sections] = {kDaikin216Section1Length,
                                                     kDaikin216Section2Length};
@@ -1703,15 +2263,18 @@ bool IRrecv::decodeDaikin216(decode_results *results, uint16_t offset,
                         kDaikin216BitMark, kDaikin216Gap,
                         section >= kDaikin216Sections - 1,
                         kDaikinTolerance, kDaikinMarkExcess, false);
-    if (used == 0) return false;
+    if (used == 0)
+      return false;
     offset += used;
     pos += ksectionSize[section];
   }
   // Compliance
   if (strict) {
-    if (pos * 8 != kDaikin216Bits) return false;
+    if (pos * 8 != kDaikin216Bits)
+      return false;
     // Validate the checksum.
-    if (!IRDaikin216::validChecksum(results->state)) return false;
+    if (!IRDaikin216::validChecksum(results->state))
+      return false;
   }
 
   // Success
@@ -1793,15 +2356,15 @@ void IRDaikin160::checksum(void) {
 /// Reset the internal state to a fixed known good state.
 void IRDaikin160::stateReset(void) {
   for (uint8_t i = 0; i < kDaikin160StateLength; i++) _.raw[i] = 0x00;
-  _.raw[0] =  0x11;
-  _.raw[1] =  0xDA;
-  _.raw[2] =  0x27;
-  _.raw[3] =  0xF0;
-  _.raw[4] =  0x0D;
+  _.raw[0] = 0x11;
+  _.raw[1] = 0xDA;
+  _.raw[2] = 0x27;
+  _.raw[3] = 0xF0;
+  _.raw[4] = 0x0D;
   // _.raw[6] is a checksum byte, it will be set by checksum().
-  _.raw[7] =  0x11;
-  _.raw[8] =  0xDA;
-  _.raw[9] =  0x27;
+  _.raw[7] = 0x11;
+  _.raw[8] = 0xDA;
+  _.raw[9] = 0x27;
   _.raw[11] = 0xD3;
   _.raw[12] = 0x30;
   _.raw[13] = 0x11;
@@ -1813,7 +2376,7 @@ void IRDaikin160::stateReset(void) {
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t *IRDaikin160::getRaw(void) {
+uint8_t* IRDaikin160::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return _.raw;
 }
@@ -1854,14 +2417,15 @@ uint8_t IRDaikin160::getMode(void) const { return _.Mode; }
 /// @param[in] mode The desired operating mode.
 void IRDaikin160::setMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikinAuto:
-    case kDaikinCool:
-    case kDaikinHeat:
-    case kDaikinFan:
-    case kDaikinDry:
-      _.Mode = mode;
-      break;
-    default: _.Mode = kDaikinAuto;
+  case kDaikinAuto:
+  case kDaikinCool:
+  case kDaikinHeat:
+  case kDaikinFan:
+  case kDaikinDry:
+    _.Mode = mode;
+    break;
+  default:
+    _.Mode = kDaikinAuto;
   }
 }
 
@@ -1902,7 +2466,8 @@ void IRDaikin160::setFan(const uint8_t fan) {
 /// @return The current fan speed.
 uint8_t IRDaikin160::getFan(void) const {
   uint8_t fan = _.Fan;
-  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto) fan -= 2;
+  if (fan != kDaikinFanQuiet && fan != kDaikinFanAuto)
+    fan -= 2;
   return fan;
 }
 
@@ -1911,13 +2476,18 @@ uint8_t IRDaikin160::getFan(void) const {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin160::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin: return kDaikinFanMin;
-    case stdAc::fanspeed_t::kLow: return kDaikinFanMin + 1;
-    case stdAc::fanspeed_t::kMedium: return kDaikinFanMin + 2;
-    case stdAc::fanspeed_t::kHigh: return kDaikinFanMax - 1;
-    case stdAc::fanspeed_t::kMax: return kDaikinFanMax;
-    default:
-      return kDaikinFanAuto;
+  case stdAc::fanspeed_t::kMin:
+    return kDaikinFanMin;
+  case stdAc::fanspeed_t::kLow:
+    return kDaikinFanMin + 1;
+  case stdAc::fanspeed_t::kMedium:
+    return kDaikinFanMin + 2;
+  case stdAc::fanspeed_t::kHigh:
+    return kDaikinFanMax - 1;
+  case stdAc::fanspeed_t::kMax:
+    return kDaikinFanMax;
+  default:
+    return kDaikinFanAuto;
   }
 }
 
@@ -1925,15 +2495,16 @@ uint8_t IRDaikin160::convertFan(const stdAc::fanspeed_t speed) {
 /// @param[in] position The position/mode to set the swing to.
 void IRDaikin160::setSwingVertical(const uint8_t position) {
   switch (position) {
-    case kDaikin160SwingVLowest:
-    case kDaikin160SwingVLow:
-    case kDaikin160SwingVMiddle:
-    case kDaikin160SwingVHigh:
-    case kDaikin160SwingVHighest:
-    case kDaikin160SwingVAuto:
-      _.SwingV = position;
-      break;
-    default: _.SwingV = kDaikin160SwingVAuto;
+  case kDaikin160SwingVLowest:
+  case kDaikin160SwingVLow:
+  case kDaikin160SwingVMiddle:
+  case kDaikin160SwingVHigh:
+  case kDaikin160SwingVHighest:
+  case kDaikin160SwingVAuto:
+    _.SwingV = position;
+    break;
+  default:
+    _.SwingV = kDaikin160SwingVAuto;
   }
 }
 
@@ -1946,14 +2517,14 @@ uint8_t IRDaikin160::getSwingVertical(void) const { return _.SwingV; }
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin160::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
-    case stdAc::swingv_t::kHighest:
-    case stdAc::swingv_t::kHigh:
-    case stdAc::swingv_t::kMiddle:
-    case stdAc::swingv_t::kLow:
-    case stdAc::swingv_t::kLowest:
-      return kDaikin160SwingVHighest + 1 - (uint8_t)position;
-    default:
-      return kDaikin160SwingVAuto;
+  case stdAc::swingv_t::kHighest:
+  case stdAc::swingv_t::kHigh:
+  case stdAc::swingv_t::kMiddle:
+  case stdAc::swingv_t::kLow:
+  case stdAc::swingv_t::kLowest:
+    return kDaikin160SwingVHighest + 1 - (uint8_t)position;
+  default:
+    return kDaikin160SwingVAuto;
   }
 }
 
@@ -1962,13 +2533,18 @@ uint8_t IRDaikin160::convertSwingV(const stdAc::swingv_t position) {
 /// @return The common vertical swing position.
 stdAc::swingv_t IRDaikin160::toCommonSwingV(const uint8_t setting) {
   switch (setting) {
-    case kDaikin160SwingVHighest: return stdAc::swingv_t::kHighest;
-    case kDaikin160SwingVHigh:    return stdAc::swingv_t::kHigh;
-    case kDaikin160SwingVMiddle:  return stdAc::swingv_t::kMiddle;
-    case kDaikin160SwingVLow:     return stdAc::swingv_t::kLow;
-    case kDaikin160SwingVLowest:  return stdAc::swingv_t::kLowest;
-    default:
-      return stdAc::swingv_t::kAuto;
+  case kDaikin160SwingVHighest:
+    return stdAc::swingv_t::kHighest;
+  case kDaikin160SwingVHigh:
+    return stdAc::swingv_t::kHigh;
+  case kDaikin160SwingVMiddle:
+    return stdAc::swingv_t::kMiddle;
+  case kDaikin160SwingVLow:
+    return stdAc::swingv_t::kLow;
+  case kDaikin160SwingVLowest:
+    return stdAc::swingv_t::kLowest;
+  default:
+    return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -2012,13 +2588,26 @@ String IRDaikin160::toString(void) const {
   result += addIntToString(_.SwingV, kSwingVStr);
   result += kSpaceLBraceStr;
   switch (_.SwingV) {
-    case kDaikin160SwingVHighest: result += kHighestStr; break;
-    case kDaikin160SwingVHigh:    result += kHighStr; break;
-    case kDaikin160SwingVMiddle:  result += kMiddleStr; break;
-    case kDaikin160SwingVLow:     result += kLowStr; break;
-    case kDaikin160SwingVLowest:  result += kLowestStr; break;
-    case kDaikin160SwingVAuto:    result += kAutoStr; break;
-    default:                      result += kUnknownStr;
+  case kDaikin160SwingVHighest:
+    result += kHighestStr;
+    break;
+  case kDaikin160SwingVHigh:
+    result += kHighStr;
+    break;
+  case kDaikin160SwingVMiddle:
+    result += kMiddleStr;
+    break;
+  case kDaikin160SwingVLow:
+    result += kLowStr;
+    break;
+  case kDaikin160SwingVLowest:
+    result += kLowestStr;
+    break;
+  case kDaikin160SwingVAuto:
+    result += kAutoStr;
+    break;
+  default:
+    result += kUnknownStr;
   }
   result += ')';
   return result;
@@ -2035,13 +2624,14 @@ String IRDaikin160::toString(void) const {
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/731
-bool IRrecv::decodeDaikin160(decode_results *results, uint16_t offset,
+bool IRrecv::decodeDaikin160(decode_results* results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1 + offset)
     return false;
 
   // Compliance
-  if (strict && nbits != kDaikin160Bits) return false;
+  if (strict && nbits != kDaikin160Bits)
+    return false;
 
   const uint8_t ksectionSize[kDaikin160Sections] = {kDaikin160Section1Length,
                                                     kDaikin160Section2Length};
@@ -2059,14 +2649,16 @@ bool IRrecv::decodeDaikin160(decode_results *results, uint16_t offset,
                         kDaikin160BitMark, kDaikin160Gap,
                         section >= kDaikin160Sections - 1,
                         kDaikinTolerance, kDaikinMarkExcess, false);
-    if (used == 0) return false;
+    if (used == 0)
+      return false;
     offset += used;
     pos += ksectionSize[section];
   }
   // Compliance
   if (strict) {
     // Validate the checksum.
-    if (!IRDaikin160::validChecksum(results->state)) return false;
+    if (!IRDaikin160::validChecksum(results->state))
+      return false;
   }
 
   // Success
@@ -2147,15 +2739,15 @@ void IRDaikin176::checksum(void) {
 /// Reset the internal state to a fixed known good state.
 void IRDaikin176::stateReset(void) {
   for (uint8_t i = 0; i < kDaikin176StateLength; i++) _.raw[i] = 0x00;
-  _.raw[0] =  0x11;
-  _.raw[1] =  0xDA;
-  _.raw[2] =  0x17;
-  _.raw[3] =  0x18;
-  _.raw[4] =  0x04;
+  _.raw[0] = 0x11;
+  _.raw[1] = 0xDA;
+  _.raw[2] = 0x17;
+  _.raw[3] = 0x18;
+  _.raw[4] = 0x04;
   // _.raw[6] is a checksum byte, it will be set by checksum().
-  _.raw[7] =  0x11;
-  _.raw[8] =  0xDA;
-  _.raw[9] =  0x17;
+  _.raw[7] = 0x11;
+  _.raw[8] = 0xDA;
+  _.raw[9] = 0x17;
   _.raw[10] = 0x18;
   _.raw[12] = 0x73;
   _.raw[14] = 0x20;
@@ -2167,7 +2759,7 @@ void IRDaikin176::stateReset(void) {
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t *IRDaikin176::getRaw(void) {
+uint8_t* IRDaikin176::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return _.raw;
 }
@@ -2218,12 +2810,21 @@ void IRDaikin176::setMode(const uint8_t mode) {
   // in line with the operating mode. The following few lines match up these
   // bits with the corresponding operating bits.
   switch (mode) {
-    case kDaikin176Dry:  altmode = 2; break;
-    case kDaikin176Fan:  altmode = 6; break;
-    case kDaikin176Auto:
-    case kDaikin176Cool:
-    case kDaikin176Heat: altmode = 7; break;
-    default: _.Mode = kDaikin176Cool; altmode = 7; break;
+  case kDaikin176Dry:
+    altmode = 2;
+    break;
+  case kDaikin176Fan:
+    altmode = 6;
+    break;
+  case kDaikin176Auto:
+  case kDaikin176Cool:
+  case kDaikin176Heat:
+    altmode = 7;
+    break;
+  default:
+    _.Mode = kDaikin176Cool;
+    altmode = 7;
+    break;
   }
   // Set the additional mode bits.
   _.AltMode = altmode;
@@ -2237,11 +2838,16 @@ void IRDaikin176::setMode(const uint8_t mode) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kDry:   return kDaikin176Dry;
-    case stdAc::opmode_t::kHeat:  return kDaikin176Heat;
-    case stdAc::opmode_t::kFan:   return kDaikin176Fan;
-    case stdAc::opmode_t::kAuto:  return kDaikin176Auto;
-    default:                      return kDaikin176Cool;
+  case stdAc::opmode_t::kDry:
+    return kDaikin176Dry;
+  case stdAc::opmode_t::kHeat:
+    return kDaikin176Heat;
+  case stdAc::opmode_t::kFan:
+    return kDaikin176Fan;
+  case stdAc::opmode_t::kAuto:
+    return kDaikin176Auto;
+  default:
+    return kDaikin176Cool;
   }
 }
 
@@ -2250,11 +2856,16 @@ uint8_t IRDaikin176::convertMode(const stdAc::opmode_t mode) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRDaikin176::toCommonMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikin176Dry:  return stdAc::opmode_t::kDry;
-    case kDaikin176Heat: return stdAc::opmode_t::kHeat;
-    case kDaikin176Fan:  return stdAc::opmode_t::kFan;
-    case kDaikin176Auto: return stdAc::opmode_t::kAuto;
-    default: return stdAc::opmode_t::kCool;
+  case kDaikin176Dry:
+    return stdAc::opmode_t::kDry;
+  case kDaikin176Heat:
+    return stdAc::opmode_t::kHeat;
+  case kDaikin176Fan:
+    return stdAc::opmode_t::kFan;
+  case kDaikin176Auto:
+    return stdAc::opmode_t::kAuto;
+  default:
+    return stdAc::opmode_t::kCool;
   }
 }
 
@@ -2264,9 +2875,10 @@ void IRDaikin176::setTemp(const uint8_t temp) {
   uint8_t degrees = std::min(kDaikinMaxTemp, std::max(temp, kDaikinMinTemp));
   _saved_temp = degrees;
   switch (_.Mode) {
-    case kDaikin176Dry:
-    case kDaikin176Fan:
-      degrees = kDaikin176DryFanTemp; break;
+  case kDaikin176Dry:
+  case kDaikin176Fan:
+    degrees = kDaikin176DryFanTemp;
+    break;
   }
   _.Temp = degrees - 9;
   _.ModeButton = 0;
@@ -2281,13 +2893,13 @@ uint8_t IRDaikin176::getTemp(void) const { return _.Temp + 9; }
 /// @note 1 for Min or 3 for Max
 void IRDaikin176::setFan(const uint8_t fan) {
   switch (fan) {
-    case kDaikinFanMin:
-    case kDaikin176FanMax:
-      _.Fan = fan;
-      break;
-    default:
-      _.Fan = kDaikin176FanMax;
-      break;
+  case kDaikinFanMin:
+  case kDaikin176FanMax:
+    _.Fan = fan;
+    break;
+  default:
+    _.Fan = kDaikin176FanMax;
+    break;
   }
   _.ModeButton = 0;
 }
@@ -2301,9 +2913,11 @@ uint8_t IRDaikin176::getFan(void) const { return _.Fan; }
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin:
-    case stdAc::fanspeed_t::kLow: return kDaikinFanMin;
-    default: return kDaikin176FanMax;
+  case stdAc::fanspeed_t::kMin:
+  case stdAc::fanspeed_t::kLow:
+    return kDaikinFanMin;
+  default:
+    return kDaikin176FanMax;
   }
 }
 
@@ -2311,11 +2925,12 @@ uint8_t IRDaikin176::convertFan(const stdAc::fanspeed_t speed) {
 /// @param[in] position The position/mode to set the swing to.
 void IRDaikin176::setSwingHorizontal(const uint8_t position) {
   switch (position) {
-    case kDaikin176SwingHOff:
-    case kDaikin176SwingHAuto:
-      _.SwingH = position;
-      break;
-    default: _.SwingH = kDaikin176SwingHAuto;
+  case kDaikin176SwingHOff:
+  case kDaikin176SwingHAuto:
+    _.SwingH = position;
+    break;
+  default:
+    _.SwingH = kDaikin176SwingHAuto;
   }
 }
 
@@ -2337,9 +2952,12 @@ void IRDaikin176::setId(const uint8_t num) { _.Id1 = _.Id2 = num; }
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
-    case stdAc::swingh_t::kOff:  return kDaikin176SwingHOff;
-    case stdAc::swingh_t::kAuto: return kDaikin176SwingHAuto;
-    default: return kDaikin176SwingHAuto;
+  case stdAc::swingh_t::kOff:
+    return kDaikin176SwingHOff;
+  case stdAc::swingh_t::kAuto:
+    return kDaikin176SwingHAuto;
+  default:
+    return kDaikin176SwingHAuto;
   }
 }
 
@@ -2348,10 +2966,12 @@ uint8_t IRDaikin176::convertSwingH(const stdAc::swingh_t position) {
 /// @return The common horizontal swing position.
 stdAc::swingh_t IRDaikin176::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
-    case kDaikin176SwingHOff: return stdAc::swingh_t::kOff;
-    case kDaikin176SwingHAuto: return stdAc::swingh_t::kAuto;
-    default:
-      return stdAc::swingh_t::kAuto;
+  case kDaikin176SwingHOff:
+    return stdAc::swingh_t::kOff;
+  case kDaikin176SwingHAuto:
+    return stdAc::swingh_t::kAuto;
+  default:
+    return stdAc::swingh_t::kAuto;
   }
 }
 
@@ -2427,14 +3047,15 @@ String IRDaikin176::toString(void) const {
 /// @param[in] nbits The number of data bits to expect.
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
-bool IRrecv::decodeDaikin176(decode_results *results, uint16_t offset,
+bool IRrecv::decodeDaikin176(decode_results* results, uint16_t offset,
                              const uint16_t nbits,
                              const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1 + offset)
     return false;
 
   // Compliance
-  if (strict && nbits != kDaikin176Bits) return false;
+  if (strict && nbits != kDaikin176Bits)
+    return false;
 
   const uint8_t ksectionSize[kDaikin176Sections] = {kDaikin176Section1Length,
                                                     kDaikin176Section2Length};
@@ -2452,14 +3073,16 @@ bool IRrecv::decodeDaikin176(decode_results *results, uint16_t offset,
                         kDaikin176BitMark, kDaikin176Gap,
                         section >= kDaikin176Sections - 1,
                         kDaikinTolerance, kDaikinMarkExcess, false);
-    if (used == 0) return false;
+    if (used == 0)
+      return false;
     offset += used;
     pos += ksectionSize[section];
   }
   // Compliance
   if (strict) {
     // Validate the checksum.
-    if (!IRDaikin176::validChecksum(results->state)) return false;
+    if (!IRDaikin176::validChecksum(results->state))
+      return false;
   }
 
   // Success
@@ -2521,7 +3144,8 @@ void IRDaikin128::begin(void) { _irsend.begin(); }
 
 uint8_t IRDaikin128::calcFirstChecksum(const uint8_t state[]) {
   return sumNibbles(state, kDaikin128SectionLength - 1,
-                    state[kDaikin128SectionLength - 1] & 0x0F) & 0x0F;
+                    state[kDaikin128SectionLength - 1] & 0x0F) &
+         0x0F;
 }
 
 uint8_t IRDaikin128::calcSecondChecksum(const uint8_t state[]) {
@@ -2559,7 +3183,7 @@ void IRDaikin128::stateReset(void) {
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t *IRDaikin128::getRaw(void) {
+uint8_t* IRDaikin128::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return _.raw;
 }
@@ -2594,16 +3218,16 @@ uint8_t IRDaikin128::getMode(void) const { return _.Mode; }
 /// @param[in] mode The desired operating mode.
 void IRDaikin128::setMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikin128Auto:
-    case kDaikin128Cool:
-    case kDaikin128Heat:
-    case kDaikin128Fan:
-    case kDaikin128Dry:
-      _.Mode = mode;
-      break;
-    default:
-      _.Mode = kDaikin128Auto;
-      break;
+  case kDaikin128Auto:
+  case kDaikin128Cool:
+  case kDaikin128Heat:
+  case kDaikin128Fan:
+  case kDaikin128Dry:
+    _.Mode = mode;
+    break;
+  default:
+    _.Mode = kDaikin128Auto;
+    break;
   }
   // Force a reset of mode dependant things.
   setFan(getFan());  // Covers Quiet & Powerful too.
@@ -2615,11 +3239,16 @@ void IRDaikin128::setMode(const uint8_t mode) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin128::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kCool: return kDaikin128Cool;
-    case stdAc::opmode_t::kHeat: return kDaikin128Heat;
-    case stdAc::opmode_t::kDry: return kDaikinDry;
-    case stdAc::opmode_t::kFan: return kDaikin128Fan;
-    default: return kDaikin128Auto;
+  case stdAc::opmode_t::kCool:
+    return kDaikin128Cool;
+  case stdAc::opmode_t::kHeat:
+    return kDaikin128Heat;
+  case stdAc::opmode_t::kDry:
+    return kDaikinDry;
+  case stdAc::opmode_t::kFan:
+    return kDaikin128Fan;
+  default:
+    return kDaikin128Auto;
   }
 }
 
@@ -2628,11 +3257,16 @@ uint8_t IRDaikin128::convertMode(const stdAc::opmode_t mode) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRDaikin128::toCommonMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikin128Cool: return stdAc::opmode_t::kCool;
-    case kDaikin128Heat: return stdAc::opmode_t::kHeat;
-    case kDaikin128Dry: return stdAc::opmode_t::kDry;
-    case kDaikin128Fan: return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+  case kDaikin128Cool:
+    return stdAc::opmode_t::kCool;
+  case kDaikin128Heat:
+    return stdAc::opmode_t::kHeat;
+  case kDaikin128Dry:
+    return stdAc::opmode_t::kDry;
+  case kDaikin128Fan:
+    return stdAc::opmode_t::kFan;
+  default:
+    return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -2640,7 +3274,7 @@ stdAc::opmode_t IRDaikin128::toCommonMode(const uint8_t mode) {
 /// @param[in] temp The temperature in degrees celsius.
 void IRDaikin128::setTemp(const uint8_t temp) {
   _.Temp = uint8ToBcd(std::min(kDaikin128MaxTemp,
-                              std::max(temp, kDaikin128MinTemp)));
+                               std::max(temp, kDaikin128MinTemp)));
 }
 
 /// Get the current temperature setting.
@@ -2657,19 +3291,20 @@ void IRDaikin128::setFan(const uint8_t speed) {
   uint8_t new_speed = speed;
   uint8_t mode = _.Mode;
   switch (speed) {
-    case kDaikin128FanQuiet:
-    case kDaikin128FanPowerful:
-      if (mode == kDaikin128Auto) new_speed = kDaikin128FanAuto;
-      // FALL-THRU
-    case kDaikin128FanAuto:
-    case kDaikin128FanHigh:
-    case kDaikin128FanMed:
-    case kDaikin128FanLow:
-      _.Fan = new_speed;
-      break;
-    default:
-      _.Fan = kDaikin128FanAuto;
-      return;
+  case kDaikin128FanQuiet:
+  case kDaikin128FanPowerful:
+    if (mode == kDaikin128Auto)
+      new_speed = kDaikin128FanAuto;
+    // FALL-THRU
+  case kDaikin128FanAuto:
+  case kDaikin128FanHigh:
+  case kDaikin128FanMed:
+  case kDaikin128FanLow:
+    _.Fan = new_speed;
+    break;
+  default:
+    _.Fan = kDaikin128FanAuto;
+    return;
   }
 }
 
@@ -2678,12 +3313,18 @@ void IRDaikin128::setFan(const uint8_t speed) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin128::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin: return kDaikinFanQuiet;
-    case stdAc::fanspeed_t::kLow: return kDaikin128FanLow;
-    case stdAc::fanspeed_t::kMedium: return kDaikin128FanMed;
-    case stdAc::fanspeed_t::kHigh: return kDaikin128FanHigh;
-    case stdAc::fanspeed_t::kMax: return kDaikin128FanPowerful;
-    default: return kDaikin128FanAuto;
+  case stdAc::fanspeed_t::kMin:
+    return kDaikinFanQuiet;
+  case stdAc::fanspeed_t::kLow:
+    return kDaikin128FanLow;
+  case stdAc::fanspeed_t::kMedium:
+    return kDaikin128FanMed;
+  case stdAc::fanspeed_t::kHigh:
+    return kDaikin128FanHigh;
+  case stdAc::fanspeed_t::kMax:
+    return kDaikin128FanPowerful;
+  default:
+    return kDaikin128FanAuto;
   }
 }
 
@@ -2692,12 +3333,18 @@ uint8_t IRDaikin128::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRDaikin128::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kDaikin128FanPowerful: return stdAc::fanspeed_t::kMax;
-    case kDaikin128FanHigh: return stdAc::fanspeed_t::kHigh;
-    case kDaikin128FanMed: return stdAc::fanspeed_t::kMedium;
-    case kDaikin128FanLow: return stdAc::fanspeed_t::kLow;
-    case kDaikinFanQuiet: return stdAc::fanspeed_t::kMin;
-    default: return stdAc::fanspeed_t::kAuto;
+  case kDaikin128FanPowerful:
+    return stdAc::fanspeed_t::kMax;
+  case kDaikin128FanHigh:
+    return stdAc::fanspeed_t::kHigh;
+  case kDaikin128FanMed:
+    return stdAc::fanspeed_t::kMedium;
+  case kDaikin128FanLow:
+    return stdAc::fanspeed_t::kLow;
+  case kDaikinFanQuiet:
+    return stdAc::fanspeed_t::kMin;
+  default:
+    return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -2762,7 +3409,8 @@ bool IRDaikin128::getPowerful(void) const {
 /// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin128::setClock(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
-  if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
+  if (mins_since_midnight >= 24 * 60)
+    mins = 0;  // Bounds check.
   // Hours.
   _.ClockHours = uint8ToBcd(mins / 60);
   // Minutes.
@@ -2783,12 +3431,14 @@ void IRDaikin128::setOnTimerEnabled(const bool on) { _.OnTimer = on; }
 /// @return true, the setting is on. false, the setting is off.
 bool IRDaikin128::getOnTimerEnabled(void) const { return _.OnTimer; }
 
-#define SETTIME(x, n) do { \
-  uint16_t mins = n;\
-  if (n >= 24 * 60) mins = 0;\
-  _.x##HalfHour = (mins % 60) >= 30;\
-  _.x##Hours = uint8ToBcd(mins / 60);\
-} while (0)
+#define SETTIME(x, n)                   \
+  do {                                  \
+    uint16_t mins = n;                  \
+    if (n >= 24 * 60)                   \
+      mins = 0;                         \
+    _.x##HalfHour = (mins % 60) >= 30;  \
+    _.x##Hours = uint8ToBcd(mins / 60); \
+  } while (0)
 
 #define GETTIME(x) bcdToUint8(_.x##Hours) * 60 + (_.x##HalfHour ? 30 : 0)
 
@@ -2827,12 +3477,12 @@ void IRDaikin128::setLightToggle(const uint8_t unit) {
   _.Ceiling = 0;
   _.Wall = 0;
   switch (unit) {
-    case kDaikin128BitCeiling:
-      _.Ceiling = 1;
-      break;
-    case kDaikin128BitWall:
-      _.Wall = 1;
-      break;
+  case kDaikin128BitCeiling:
+    _.Ceiling = 1;
+    break;
+  case kDaikin128BitWall:
+    _.Wall = 1;
+    break;
   }
 }
 
@@ -2874,10 +3524,17 @@ String IRDaikin128::toString(void) const {
   result += addIntToString(getLightToggle(), kLightToggleStr);
   result += kSpaceLBraceStr;
   switch (getLightToggle()) {
-    case kDaikin128BitCeiling: result += kCeilingStr; break;
-    case kDaikin128BitWall: result += kWallStr; break;
-    case 0: result += kOffStr; break;
-    default: result += kUnknownStr;
+  case kDaikin128BitCeiling:
+    result += kCeilingStr;
+    break;
+  case kDaikin128BitWall:
+    result += kWallStr;
+    break;
+  case 0:
+    result += kOffStr;
+    break;
+  default:
+    result += kUnknownStr;
   }
   result += ')';
   return result;
@@ -2886,9 +3543,10 @@ String IRDaikin128::toString(void) const {
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @param[in] prev Ptr to a previous state.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) const {
+stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t* prev) const {
   stdAc::state_t result{};
-  if (prev != NULL) result = *prev;
+  if (prev != NULL)
+    result = *prev;
   result.protocol = decode_type_t::DAIKIN128;
   result.model = -1;  // No models used.
   result.power ^= _.Power;
@@ -2922,21 +3580,25 @@ stdAc::state_t IRDaikin128::toCommon(const stdAc::state_t *prev) const {
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/827
-bool IRrecv::decodeDaikin128(decode_results *results, uint16_t offset,
+bool IRrecv::decodeDaikin128(decode_results* results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (nbits + kHeader) + kFooter - 1 + offset)
     return false;
-  if (nbits / 8 <= kDaikin128SectionLength) return false;
+  if (nbits / 8 <= kDaikin128SectionLength)
+    return false;
 
   // Compliance
-  if (strict && nbits != kDaikin128Bits) return false;
+  if (strict && nbits != kDaikin128Bits)
+    return false;
 
   // Leader
   for (uint8_t i = 0; i < 2; i++) {
     if (!matchMark(results->rawbuf[offset++], kDaikin128LeaderMark,
-                   kDaikinTolerance, kDaikinMarkExcess)) return false;
+                   kDaikinTolerance, kDaikinMarkExcess))
+      return false;
     if (!matchSpace(results->rawbuf[offset++], kDaikin128LeaderSpace,
-                    kDaikinTolerance, kDaikinMarkExcess)) return false;
+                    kDaikinTolerance, kDaikinMarkExcess))
+      return false;
   }
   const uint16_t ksectionSize[kDaikin128Sections] = {
       kDaikin128SectionLength,
@@ -2957,13 +3619,15 @@ bool IRrecv::decodeDaikin128(decode_results *results, uint16_t offset,
                         kDaikin128Gap,
                         section > 0,
                         kDaikinTolerance, kDaikinMarkExcess, false);
-    if (used == 0) return false;
+    if (used == 0)
+      return false;
     offset += used;
     pos += ksectionSize[section];
   }
   // Compliance
   if (strict) {
-    if (!IRDaikin128::validChecksum(results->state)) return false;
+    if (!IRDaikin128::validChecksum(results->state))
+      return false;
   }
 
   // Success
@@ -3012,14 +3676,16 @@ void IRsend::sendDaikin152(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/873
-bool IRrecv::decodeDaikin152(decode_results *results, uint16_t offset,
+bool IRrecv::decodeDaikin152(decode_results* results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * (5 + nbits + kFooter) + kHeader - 1 + offset)
     return false;
-  if (nbits / 8 < kDaikin152StateLength) return false;
+  if (nbits / 8 < kDaikin152StateLength)
+    return false;
 
   // Compliance
-  if (strict && nbits != kDaikin152Bits) return false;
+  if (strict && nbits != kDaikin152Bits)
+    return false;
 
   uint16_t used;
 
@@ -3032,7 +3698,8 @@ bool IRrecv::decodeDaikin152(decode_results *results, uint16_t offset,
                       kDaikin152BitMark, kDaikin152ZeroSpace,
                       kDaikin152BitMark, kDaikin152Gap,  // Footer gap
                       false, _tolerance, kMarkExcess, false);
-  if (used == 0 || leader != 0) return false;
+  if (used == 0 || leader != 0)
+    return false;
   offset += used;
 
   // Header + Data + Footer
@@ -3043,11 +3710,13 @@ bool IRrecv::decodeDaikin152(decode_results *results, uint16_t offset,
                       kDaikin152BitMark, kDaikin152ZeroSpace,
                       kDaikin152BitMark, kDaikin152Gap,
                       true, _tolerance, kMarkExcess, false);
-  if (used == 0) return false;
+  if (used == 0)
+    return false;
 
   // Compliance
   if (strict) {
-    if (!IRDaikin152::validChecksum(results->state)) return false;
+    if (!IRDaikin152::validChecksum(results->state))
+      return false;
   }
 
   // Success
@@ -3099,16 +3768,16 @@ void IRDaikin152::checksum(void) {
 /// Reset the internal state to a fixed known good state.
 void IRDaikin152::stateReset(void) {
   for (uint8_t i = 3; i < kDaikin152StateLength; i++) _.raw[i] = 0x00;
-  _.raw[0] =  0x11;
-  _.raw[1] =  0xDA;
-  _.raw[2] =  0x27;
+  _.raw[0] = 0x11;
+  _.raw[1] = 0xDA;
+  _.raw[2] = 0x27;
   _.raw[15] = 0xC5;
   // _.raw[19] is a checksum byte, it will be set by checksum().
 }
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t *IRDaikin152::getRaw(void) {
+uint8_t* IRDaikin152::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return _.raw;
 }
@@ -3141,19 +3810,19 @@ uint8_t IRDaikin152::getMode(void) const { return _.Mode; }
 /// @param[in] mode The desired operating mode.
 void IRDaikin152::setMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikinFan:
-      setTemp(kDaikin152FanTemp);  // Handle special temp for fan mode.
-      break;
-    case kDaikinDry:
-      setTemp(kDaikin152DryTemp);  // Handle special temp for dry mode.
-      break;
-    case kDaikinAuto:
-    case kDaikinCool:
-    case kDaikinHeat:
-      break;
-    default:
-      _.Mode = kDaikinAuto;
-      return;
+  case kDaikinFan:
+    setTemp(kDaikin152FanTemp);  // Handle special temp for fan mode.
+    break;
+  case kDaikinDry:
+    setTemp(kDaikin152DryTemp);  // Handle special temp for dry mode.
+    break;
+  case kDaikinAuto:
+  case kDaikinCool:
+  case kDaikinHeat:
+    break;
+  default:
+    _.Mode = kDaikinAuto;
+    return;
   }
   _.Mode = mode;
 }
@@ -3171,7 +3840,8 @@ void IRDaikin152::setTemp(const uint8_t temp) {
   uint8_t degrees = std::max(
       temp, (_.Mode == kDaikinHeat) ? kDaikinMinTemp : kDaikin2MinCoolTemp);
   degrees = std::min(degrees, kDaikinMaxTemp);
-  if (temp == kDaikin152FanTemp) degrees = temp;  // Handle fan only temp.
+  if (temp == kDaikin152FanTemp)
+    degrees = temp;  // Handle fan only temp.
   _.Temp = degrees;
 }
 
@@ -3199,9 +3869,11 @@ void IRDaikin152::setFan(const uint8_t fan) {
 uint8_t IRDaikin152::getFan(void) const {
   const uint8_t fan = _.Fan;
   switch (fan) {
-    case kDaikinFanAuto:
-    case kDaikinFanQuiet: return fan;
-    default: return fan - 2;
+  case kDaikinFanAuto:
+  case kDaikinFanQuiet:
+    return fan;
+  default:
+    return fan - 2;
   }
 }
 
@@ -3227,7 +3899,8 @@ bool IRDaikin152::getSwingV(void) const { return _.SwingV; }
 void IRDaikin152::setQuiet(const bool on) {
   _.Quiet = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) setPowerful(false);
+  if (on)
+    setPowerful(false);
 }
 
 /// Get the Quiet mode status of the A/C.
@@ -3255,7 +3928,8 @@ bool IRDaikin152::getPowerful(void) const { return _.Powerful; }
 void IRDaikin152::setEcono(const bool on) {
   _.Econo = on;
   // Powerful & Econo mode being on are mutually exclusive.
-  if (on) setPowerful(false);
+  if (on)
+    setPowerful(false);
 }
 
 /// Get the Economical mode of the A/C.
@@ -3373,7 +4047,7 @@ void IRsend::sendDaikin64(const uint64_t data, const uint16_t nbits,
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1064
-bool IRrecv::decodeDaikin64(decode_results *results, uint16_t offset,
+bool IRrecv::decodeDaikin64(decode_results* results, uint16_t offset,
                             const uint16_t nbits, const bool strict) {
   if (results->rawlen < 2 * nbits + kDaikin64Overhead - offset)
     return false;  // Too short a message to match.
@@ -3397,14 +4071,16 @@ bool IRrecv::decodeDaikin64(decode_results *results, uint16_t offset,
                                kDaikin64BitMark, kDaikin64Gap,
                                false, _tolerance + kDaikin64ToleranceDelta,
                                kMarkExcess, false);
-  if (used == 0) return false;
+  if (used == 0)
+    return false;
   offset += used;
   // Footer #2
   if (!matchMark(results->rawbuf[offset++], kDaikin64HdrMark))
     return false;
 
   // Compliance
-  if (strict && !IRDaikin64::validChecksum(results->value)) return false;
+  if (strict && !IRDaikin64::validChecksum(results->value))
+    return false;
   // Success
   results->decode_type = decode_type_t::DAIKIN64;
   results->bits = nbits;
@@ -3419,7 +4095,7 @@ bool IRrecv::decodeDaikin64(decode_results *results, uint16_t offset,
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikin64::IRDaikin64(const uint16_t pin, const bool inverted,
-                         const bool use_modulation)
+                       const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Set up hardware to be able to send a message.
@@ -3498,14 +4174,14 @@ uint8_t IRDaikin64::getMode(void) const { return _.Mode; }
 /// @param[in] mode The desired operating mode.
 void IRDaikin64::setMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikin64Fan:
-    case kDaikin64Dry:
-    case kDaikin64Cool:
-    case kDaikin64Heat:
-      _.Mode = mode;
-      break;
-    default:
-      _.Mode = kDaikin64Cool;
+  case kDaikin64Fan:
+  case kDaikin64Dry:
+  case kDaikin64Cool:
+  case kDaikin64Heat:
+    _.Mode = mode;
+    break;
+  default:
+    _.Mode = kDaikin64Cool;
   }
 }
 
@@ -3514,10 +4190,14 @@ void IRDaikin64::setMode(const uint8_t mode) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin64::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
-    case stdAc::opmode_t::kDry: return kDaikin64Dry;
-    case stdAc::opmode_t::kFan: return kDaikin64Fan;
-    case stdAc::opmode_t::kHeat: return kDaikin64Heat;
-    default: return kDaikin64Cool;
+  case stdAc::opmode_t::kDry:
+    return kDaikin64Dry;
+  case stdAc::opmode_t::kFan:
+    return kDaikin64Fan;
+  case stdAc::opmode_t::kHeat:
+    return kDaikin64Heat;
+  default:
+    return kDaikin64Cool;
   }
 }
 
@@ -3526,11 +4206,16 @@ uint8_t IRDaikin64::convertMode(const stdAc::opmode_t mode) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::opmode_t IRDaikin64::toCommonMode(const uint8_t mode) {
   switch (mode) {
-    case kDaikin64Cool: return stdAc::opmode_t::kCool;
-    case kDaikin64Heat: return stdAc::opmode_t::kHeat;
-    case kDaikin64Dry:  return stdAc::opmode_t::kDry;
-    case kDaikin64Fan:  return stdAc::opmode_t::kFan;
-    default: return stdAc::opmode_t::kAuto;
+  case kDaikin64Cool:
+    return stdAc::opmode_t::kCool;
+  case kDaikin64Heat:
+    return stdAc::opmode_t::kHeat;
+  case kDaikin64Dry:
+    return stdAc::opmode_t::kDry;
+  case kDaikin64Fan:
+    return stdAc::opmode_t::kFan;
+  default:
+    return stdAc::opmode_t::kAuto;
   }
 }
 
@@ -3542,16 +4227,16 @@ uint8_t IRDaikin64::getFan(void) const { return _.Fan; }
 /// @param[in] speed The desired setting.
 void IRDaikin64::setFan(const uint8_t speed) {
   switch (speed) {
-    case kDaikin64FanQuiet:
-    case kDaikin64FanTurbo:
-    case kDaikin64FanAuto:
-    case kDaikin64FanHigh:
-    case kDaikin64FanMed:
-    case kDaikin64FanLow:
-      _.Fan = speed;
-      break;
-    default:
-      _.Fan = kDaikin64FanAuto;
+  case kDaikin64FanQuiet:
+  case kDaikin64FanTurbo:
+  case kDaikin64FanAuto:
+  case kDaikin64FanHigh:
+  case kDaikin64FanMed:
+  case kDaikin64FanLow:
+    _.Fan = speed;
+    break;
+  default:
+    _.Fan = kDaikin64FanAuto;
   }
 }
 
@@ -3560,12 +4245,18 @@ void IRDaikin64::setFan(const uint8_t speed) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin64::convertFan(const stdAc::fanspeed_t speed) {
   switch (speed) {
-    case stdAc::fanspeed_t::kMin:    return kDaikin64FanQuiet;
-    case stdAc::fanspeed_t::kLow:    return kDaikin64FanLow;
-    case stdAc::fanspeed_t::kMedium: return kDaikin64FanMed;
-    case stdAc::fanspeed_t::kHigh:   return kDaikin64FanHigh;
-    case stdAc::fanspeed_t::kMax:    return kDaikin64FanTurbo;
-    default:                         return kDaikin64FanAuto;
+  case stdAc::fanspeed_t::kMin:
+    return kDaikin64FanQuiet;
+  case stdAc::fanspeed_t::kLow:
+    return kDaikin64FanLow;
+  case stdAc::fanspeed_t::kMedium:
+    return kDaikin64FanMed;
+  case stdAc::fanspeed_t::kHigh:
+    return kDaikin64FanHigh;
+  case stdAc::fanspeed_t::kMax:
+    return kDaikin64FanTurbo;
+  default:
+    return kDaikin64FanAuto;
   }
 }
 
@@ -3574,12 +4265,18 @@ uint8_t IRDaikin64::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The stdAc equivalent of the native setting.
 stdAc::fanspeed_t IRDaikin64::toCommonFanSpeed(const uint8_t speed) {
   switch (speed) {
-    case kDaikin64FanTurbo: return stdAc::fanspeed_t::kMax;
-    case kDaikin64FanHigh:  return stdAc::fanspeed_t::kHigh;
-    case kDaikin64FanMed:   return stdAc::fanspeed_t::kMedium;
-    case kDaikin64FanLow:   return stdAc::fanspeed_t::kLow;
-    case kDaikinFanQuiet:   return stdAc::fanspeed_t::kMin;
-    default:                return stdAc::fanspeed_t::kAuto;
+  case kDaikin64FanTurbo:
+    return stdAc::fanspeed_t::kMax;
+  case kDaikin64FanHigh:
+    return stdAc::fanspeed_t::kHigh;
+  case kDaikin64FanMed:
+    return stdAc::fanspeed_t::kMedium;
+  case kDaikin64FanLow:
+    return stdAc::fanspeed_t::kLow;
+  case kDaikinFanQuiet:
+    return stdAc::fanspeed_t::kMin;
+  default:
+    return stdAc::fanspeed_t::kAuto;
   }
 }
 
@@ -3593,7 +4290,7 @@ void IRDaikin64::setTurbo(const bool on) {
   if (on) {
     setFan(kDaikin64FanTurbo);
   } else if (_.Fan == kDaikin64FanTurbo) {
-     setFan(kDaikin64FanAuto);
+    setFan(kDaikin64FanAuto);
   }
 }
 
@@ -3607,7 +4304,7 @@ void IRDaikin64::setQuiet(const bool on) {
   if (on) {
     setFan(kDaikin64FanQuiet);
   } else if (_.Fan == kDaikin64FanQuiet) {
-     setFan(kDaikin64FanAuto);
+    setFan(kDaikin64FanAuto);
   }
 }
 
@@ -3631,7 +4328,8 @@ bool IRDaikin64::getSleep(void) const { return _.Sleep; }
 /// @param[in] mins_since_midnight Nr. of minutes past midnight.
 void IRDaikin64::setClock(const uint16_t mins_since_midnight) {
   uint16_t mins = mins_since_midnight;
-  if (mins_since_midnight >= 24 * 60) mins = 0;  // Bounds check.
+  if (mins_since_midnight >= 24 * 60)
+    mins = 0;  // Bounds check.
   _.ClockMins = uint8ToBcd(mins % 60);
   _.ClockHours = uint8ToBcd(mins / 60);
 }
@@ -3703,10 +4401,12 @@ String IRDaikin64::toString(void) const {
   result += addBoolToString(_.Sleep, kSleepStr);
   result += addLabeledString(minsToString(getClock()), kClockStr);
   result += addLabeledString(_.OnTimer
-                             ? minsToString(getOnTime()) : kOffStr,
+                                 ? minsToString(getOnTime())
+                                 : kOffStr,
                              kOnTimerStr);
   result += addLabeledString(_.OffTimer
-                             ? minsToString(getOffTime()) : kOffStr,
+                                 ? minsToString(getOffTime())
+                                 : kOffStr,
                              kOffTimerStr);
   return result;
 }
@@ -3714,9 +4414,10 @@ String IRDaikin64::toString(void) const {
 /// Convert the current internal state into its stdAc::state_t equivalent.
 /// @param[in] prev Ptr to a previous state.
 /// @return The stdAc equivalent of the native settings.
-stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) const {
+stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t* prev) const {
   stdAc::state_t result{};
-  if (prev != NULL) result = *prev;
+  if (prev != NULL)
+    result = *prev;
   result.protocol = decode_type_t::DAIKIN64;
   result.model = -1;  // No models used.
   result.power ^= _.Power;
@@ -3739,97 +4440,12 @@ stdAc::state_t IRDaikin64::toCommon(const stdAc::state_t *prev) const {
   return result;
 }
 
-#if SEND_DAIKIN200
-/// Send a Daikin200 (200-bit) A/C formatted message.
-/// Status: BETA / Untested on a real device.
-/// @param[in] data The message to be sent.
-/// @param[in] nbytes The number of bytes of message to be sent.
-/// @param[in] repeat The number of times the command is to be repeated.
-/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
-void IRsend::sendDaikin200(const unsigned char data[], const uint16_t nbytes,
-                           const uint16_t repeat) {
-  if (nbytes < kDaikin200Section1Length)
-    return;  // Not enough bytes to send a partial message.
-
-  for (uint16_t r = 0; r <= repeat; r++) {
-    // Section #1
-    sendGeneric(kDaikin200HdrMark, kDaikin200HdrSpace, kDaikin200BitMark,
-                kDaikin200OneSpace, kDaikin200BitMark, kDaikin200ZeroSpace,
-                kDaikin200BitMark, kDaikin200Gap, data,
-                kDaikin200Section1Length,
-                kDaikin200Freq, false, 0, kDutyDefault);
-    // Section #2
-    sendGeneric(kDaikin200HdrMark, kDaikin200HdrSpace, kDaikin200BitMark,
-                kDaikin200OneSpace, kDaikin200BitMark, kDaikin200ZeroSpace,
-                kDaikin200BitMark, kDaikin200Gap,
-                data + kDaikin200Section1Length,
-                nbytes - kDaikin200Section1Length,
-                kDaikin200Freq, false, 0, kDutyDefault);
-  }
-}
-#endif  // SEND_DAIKIN200
-
-#if DECODE_DAIKIN200
-/// Decode the supplied Daikin 200-bit message. (DAIKIN200)
-/// Status: STABLE / Known to be working.
-/// @param[in,out] results Ptr to the data to decode & where to store the decode
-///   result.
-/// @param[in] offset The starting index to use when attempting to decode the
-///   raw data. Typically/Defaults to kStartOffset.
-/// @param[in] nbits The number of data bits to expect.
-/// @param[in] strict Flag indicating if we should perform strict matching.
-/// @return A boolean. True if it can decode it, false if it can't.
-/// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1802
-bool IRrecv::decodeDaikin200(decode_results *results, uint16_t offset,
-                             const uint16_t nbits, const bool strict) {
-  if (results->rawlen < 2 * (nbits + kHeader + kFooter) - 1 + offset)
-    return false;
-
-  // Compliance
-  if (strict && nbits != kDaikin200Bits) return false;
-
-  const uint8_t ksectionSize[kDaikin200Sections] = {kDaikin200Section1Length,
-                                                    kDaikin200Section2Length};
-  // Sections
-  uint16_t pos = 0;
-  for (uint8_t section = 0; section < kDaikin200Sections; section++) {
-    uint16_t used;
-    // Section Header + Section Data + Section Footer
-    used = matchGeneric(results->rawbuf + offset, results->state + pos,
-                        results->rawlen - offset, ksectionSize[section] * 8,
-                        kDaikin200HdrMark, kDaikin200HdrSpace,
-                        kDaikin200BitMark, kDaikin200OneSpace,
-                        kDaikin200BitMark, kDaikin200ZeroSpace,
-                        kDaikin200BitMark, kDaikin200Gap,
-                        section >= kDaikin200Sections - 1,
-                        kDaikinTolerance, 0, false);
-    if (used == 0) return false;
-    offset += used;
-    pos += ksectionSize[section];
-  }
-  // Compliance
-  if (strict) {
-    if (pos * 8 != kDaikin200Bits) return false;
-    // Validate the checksum.
-    if (!IRDaikin176::validChecksum(results->state, pos)) return false;
-  }
-
-  // Success
-  results->decode_type = decode_type_t::DAIKIN200;
-  results->bits = nbits;
-  // No need to record the state as we stored it as we decoded it.
-  // As we use result->state, we don't record value, address, or command as it
-  // is a union data type.
-  return true;
-}
-#endif  // DECODE_DAIKIN200
-
 /// Class constructor.
 /// @param[in] pin GPIO to be used when sending.
 /// @param[in] inverted Is the output signal to be inverted?
 /// @param[in] use_modulation Is frequency modulation to be used?
 IRDaikin312::IRDaikin312(const uint16_t pin, const bool inverted,
-                     const bool use_modulation)
+                         const bool use_modulation)
     : _irsend(pin, inverted, use_modulation) { stateReset(); }
 
 /// Set up hardware to be able to send a message.
@@ -3929,7 +4545,7 @@ void IRDaikin312::stateReset(void) {
 
 /// Get a PTR to the internal state/code for this protocol.
 /// @return PTR to a code for this protocol based on the current internal state.
-uint8_t *IRDaikin312::getRaw(void) {
+uint8_t* IRDaikin312::getRaw(void) {
   checksum();  // Ensure correct settings before sending.
   return _.raw;
 }
@@ -3966,15 +4582,18 @@ uint8_t IRDaikin312::getMode(void) const { return _.Mode; }
 void IRDaikin312::setMode(const uint8_t desired_mode) {
   uint8_t mode = desired_mode;
   switch (mode) {
-    case kDaikinCool:
-    case kDaikinHeat:
-    case kDaikinFan:
-    case kDaikinDry: break;
-    default: mode = kDaikinAuto;
+  case kDaikinCool:
+  case kDaikinHeat:
+  case kDaikinFan:
+  case kDaikinDry:
+    break;
+  default:
+    mode = kDaikinAuto;
   }
   _.Mode = mode;
   // Redo the temp setting as Cool mode has a different min temp.
-  if (mode == kDaikinCool) setTemp(getTemp());
+  if (mode == kDaikinCool)
+    setTemp(getTemp());
   setHumidity(getHumidity());  // Make sure the humidity is okay for this mode.
 }
 
@@ -3989,7 +4608,8 @@ void IRDaikin312::setTemp(const float desired) {
       desired);
   _.Temp = std::min(static_cast<float>(kDaikinMaxTemp), temp) * 2.0;
   // If the humidity setting is in use, the temp is a fixed value.
-  if (_.HumidOn) _.Temp = kDaikinMaxTemp * 2.0;
+  if (_.HumidOn)
+    _.Temp = kDaikinMaxTemp * 2.0;
 }
 
 /// Get the current temperature setting.
@@ -4015,9 +4635,11 @@ void IRDaikin312::setFan(const uint8_t fan) {
 uint8_t IRDaikin312::getFan(void) const {
   const uint8_t fan = _.Fan;
   switch (fan) {
-    case kDaikinFanAuto:
-    case kDaikinFanQuiet: return fan;
-    default: return fan - 2;
+  case kDaikinFanAuto:
+  case kDaikinFanQuiet:
+    return fan;
+  default:
+    return fan - 2;
   }
 }
 
@@ -4025,17 +4647,17 @@ uint8_t IRDaikin312::getFan(void) const {
 /// @param[in] position The position/mode to set the swing to.
 void IRDaikin312::setSwingVertical(const uint8_t position) {
   switch (position) {
-    case kDaikin312SwingVHighest:
-    case kDaikin312SwingVHigh:
-    case kDaikin312SwingVUpperMiddle:
-    case kDaikin312SwingVLowerMiddle:
-    case kDaikin312SwingVLow:
-    case kDaikin312SwingVLowest:
-    case kDaikin312SwingVOff:
-    case kDaikin312SwingVBreeze:
-    case kDaikin312SwingVCirculate:
-    case kDaikin312SwingVAuto:
-      _.SwingV = position;
+  case kDaikin312SwingVHighest:
+  case kDaikin312SwingVHigh:
+  case kDaikin312SwingVUpperMiddle:
+  case kDaikin312SwingVLowerMiddle:
+  case kDaikin312SwingVLow:
+  case kDaikin312SwingVLowest:
+  case kDaikin312SwingVOff:
+  case kDaikin312SwingVBreeze:
+  case kDaikin312SwingVCirculate:
+  case kDaikin312SwingVAuto:
+    _.SwingV = position;
   }
 }
 
@@ -4048,16 +4670,16 @@ uint8_t IRDaikin312::getSwingVertical(void) const { return _.SwingV; }
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin312::convertSwingV(const stdAc::swingv_t position) {
   switch (position) {
-    case stdAc::swingv_t::kHighest:
-    case stdAc::swingv_t::kHigh:
-    case stdAc::swingv_t::kMiddle:
-    case stdAc::swingv_t::kLow:
-    case stdAc::swingv_t::kLowest:
-      return (uint8_t)position + kDaikin312SwingVHighest;
-    case stdAc::swingv_t::kOff:
-      return kDaikin312SwingVOff;
-    default:
-      return kDaikin312SwingVAuto;
+  case stdAc::swingv_t::kHighest:
+  case stdAc::swingv_t::kHigh:
+  case stdAc::swingv_t::kMiddle:
+  case stdAc::swingv_t::kLow:
+  case stdAc::swingv_t::kLowest:
+    return (uint8_t)position + kDaikin312SwingVHighest;
+  case stdAc::swingv_t::kOff:
+    return kDaikin312SwingVOff;
+  default:
+    return kDaikin312SwingVAuto;
   }
 }
 
@@ -4066,14 +4688,21 @@ uint8_t IRDaikin312::convertSwingV(const stdAc::swingv_t position) {
 /// @return The common vertical swing position.
 stdAc::swingv_t IRDaikin312::toCommonSwingV(const uint8_t setting) {
   switch (setting) {
-    case kDaikin312SwingVHighest:     return stdAc::swingv_t::kHighest;
-    case kDaikin312SwingVHigh:        return stdAc::swingv_t::kHigh;
-    case kDaikin312SwingVUpperMiddle:
-    case kDaikin312SwingVLowerMiddle: return stdAc::swingv_t::kMiddle;
-    case kDaikin312SwingVLow:         return stdAc::swingv_t::kLow;
-    case kDaikin312SwingVLowest:      return stdAc::swingv_t::kLowest;
-    case kDaikin312SwingVOff:         return stdAc::swingv_t::kOff;
-    default:                        return stdAc::swingv_t::kAuto;
+  case kDaikin312SwingVHighest:
+    return stdAc::swingv_t::kHighest;
+  case kDaikin312SwingVHigh:
+    return stdAc::swingv_t::kHigh;
+  case kDaikin312SwingVUpperMiddle:
+  case kDaikin312SwingVLowerMiddle:
+    return stdAc::swingv_t::kMiddle;
+  case kDaikin312SwingVLow:
+    return stdAc::swingv_t::kLow;
+  case kDaikin312SwingVLowest:
+    return stdAc::swingv_t::kLowest;
+  case kDaikin312SwingVOff:
+    return stdAc::swingv_t::kOff;
+  default:
+    return stdAc::swingv_t::kAuto;
   }
 }
 
@@ -4091,7 +4720,8 @@ uint8_t IRDaikin312::getSwingHorizontal(void) const { return _.SwingH; }
 /// @param[in] numMins Nr. of minutes past midnight.
 void IRDaikin312::setCurrentTime(const uint16_t numMins) {
   uint16_t mins = numMins;
-  if (numMins > 24 * 60) mins = 0;  // If > 23:59, set to 00:00
+  if (numMins > 24 * 60)
+    mins = 0;  // If > 23:59, set to 00:00
   _.CurrentTime = mins;
 }
 
@@ -4286,7 +4916,8 @@ bool IRDaikin312::getSleepTimerEnabled(void) const { return _.SleepTimer; }
 void IRDaikin312::setQuiet(const bool on) {
   _.Quiet = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) setPowerful(false);
+  if (on)
+    setPowerful(false);
 }
 
 /// Get the Quiet mode status of the A/C.
@@ -4298,7 +4929,8 @@ bool IRDaikin312::getQuiet(void) const { return _.Quiet; }
 void IRDaikin312::setPowerful(const bool on) {
   _.Powerful = on;
   // Powerful & Quiet mode being on are mutually exclusive.
-  if (on) setQuiet(false);
+  if (on)
+    setQuiet(false);
 }
 
 /// Get the Powerful (Turbo) mode of the A/C.
@@ -4323,26 +4955,26 @@ uint8_t IRDaikin312::getHumidity(void) const { return _.Humidity; }
 void IRDaikin312::setHumidity(const uint8_t percent) {
   _.Humidity = kDaikin312HumidityOff;  // Default to off.
   switch (getMode()) {
-    case kDaikinHeat:
-      switch (percent) {
-        case kDaikin312HumidityOff:
-        case kDaikin312HumidityHeatLow:
-        case kDaikin312HumidityHeatMedium:
-        case kDaikin312HumidityHeatHigh:
-        case kDaikin312HumidityAuto:
-          _.Humidity = percent;
-      }
-      break;
-    case kDaikinDry:
-      switch (percent) {
-        case kDaikin312HumidityOff:
-        case kDaikin312HumidityDryLow:
-        case kDaikin312HumidityDryMedium:
-        case kDaikin312HumidityDryHigh:
-        case kDaikin312HumidityAuto:
-          _.Humidity = percent;
-      }
-      break;
+  case kDaikinHeat:
+    switch (percent) {
+    case kDaikin312HumidityOff:
+    case kDaikin312HumidityHeatLow:
+    case kDaikin312HumidityHeatMedium:
+    case kDaikin312HumidityHeatHigh:
+    case kDaikin312HumidityAuto:
+      _.Humidity = percent;
+    }
+    break;
+  case kDaikinDry:
+    switch (percent) {
+    case kDaikin312HumidityOff:
+    case kDaikin312HumidityDryLow:
+    case kDaikin312HumidityDryMedium:
+    case kDaikin312HumidityDryHigh:
+    case kDaikin312HumidityAuto:
+      _.Humidity = percent;
+    }
+    break;
   }
   _.HumidOn = (_.Humidity != kDaikin312HumidityOff);  // Enabled?
   setTemp(getTemp());  // Adjust the temperature if we need to.
@@ -4367,15 +4999,24 @@ uint8_t IRDaikin312::convertFan(const stdAc::fanspeed_t speed) {
 /// @return The native equivalent of the enum.
 uint8_t IRDaikin312::convertSwingH(const stdAc::swingh_t position) {
   switch (position) {
-    case stdAc::swingh_t::kOff:      return kDaikin312SwingHOff;
-    case stdAc::swingh_t::kAuto:     return kDaikin312SwingHSwing;
-    case stdAc::swingh_t::kLeftMax:  return kDaikin312SwingHLeftMax;
-    case stdAc::swingh_t::kLeft:     return kDaikin312SwingHLeft;
-    case stdAc::swingh_t::kMiddle:   return kDaikin312SwingHMiddle;
-    case stdAc::swingh_t::kRight:    return kDaikin312SwingHRight;
-    case stdAc::swingh_t::kRightMax: return kDaikin312SwingHRightMax;
-    case stdAc::swingh_t::kWide:     return kDaikin312SwingHWide;
-    default:                         return kDaikin312SwingHAuto;
+  case stdAc::swingh_t::kOff:
+    return kDaikin312SwingHOff;
+  case stdAc::swingh_t::kAuto:
+    return kDaikin312SwingHSwing;
+  case stdAc::swingh_t::kLeftMax:
+    return kDaikin312SwingHLeftMax;
+  case stdAc::swingh_t::kLeft:
+    return kDaikin312SwingHLeft;
+  case stdAc::swingh_t::kMiddle:
+    return kDaikin312SwingHMiddle;
+  case stdAc::swingh_t::kRight:
+    return kDaikin312SwingHRight;
+  case stdAc::swingh_t::kRightMax:
+    return kDaikin312SwingHRightMax;
+  case stdAc::swingh_t::kWide:
+    return kDaikin312SwingHWide;
+  default:
+    return kDaikin312SwingHAuto;
   }
 }
 
@@ -4384,14 +5025,22 @@ uint8_t IRDaikin312::convertSwingH(const stdAc::swingh_t position) {
 /// @return The common horizontal swing position.
 stdAc::swingh_t IRDaikin312::toCommonSwingH(const uint8_t setting) {
   switch (setting) {
-    case kDaikin312SwingHSwing:    return stdAc::swingh_t::kAuto;
-    case kDaikin312SwingHLeftMax:  return stdAc::swingh_t::kLeftMax;
-    case kDaikin312SwingHLeft:     return stdAc::swingh_t::kLeft;
-    case kDaikin312SwingHMiddle:   return stdAc::swingh_t::kMiddle;
-    case kDaikin312SwingHRight:    return stdAc::swingh_t::kRight;
-    case kDaikin312SwingHRightMax: return stdAc::swingh_t::kRightMax;
-    case kDaikin312SwingHWide:     return stdAc::swingh_t::kWide;
-    default:                     return stdAc::swingh_t::kOff;
+  case kDaikin312SwingHSwing:
+    return stdAc::swingh_t::kAuto;
+  case kDaikin312SwingHLeftMax:
+    return stdAc::swingh_t::kLeftMax;
+  case kDaikin312SwingHLeft:
+    return stdAc::swingh_t::kLeft;
+  case kDaikin312SwingHMiddle:
+    return stdAc::swingh_t::kMiddle;
+  case kDaikin312SwingHRight:
+    return stdAc::swingh_t::kRight;
+  case kDaikin312SwingHRightMax:
+    return stdAc::swingh_t::kRightMax;
+  case kDaikin312SwingHWide:
+    return stdAc::swingh_t::kWide;
+  default:
+    return stdAc::swingh_t::kOff;
   }
 }
 
@@ -4466,33 +5115,33 @@ String IRDaikin312::toString(void) const {
   result += addIntToString(_.Beep, kBeepStr);
   result += kSpaceLBraceStr;
   switch (_.Beep) {
-    case kDaikinBeepLoud:
-      result += kLoudStr;
-      break;
-    case kDaikinBeepQuiet:
-      result += kQuietStr;
-      break;
-    case kDaikinBeepOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
+  case kDaikinBeepLoud:
+    result += kLoudStr;
+    break;
+  case kDaikinBeepQuiet:
+    result += kQuietStr;
+    break;
+  case kDaikinBeepOff:
+    result += kOffStr;
+    break;
+  default:
+    result += kUnknownStr;
   }
   result += ')';
   result += addIntToString(_.Light, kLightStr);
   result += kSpaceLBraceStr;
   switch (_.Light) {
-    case kDaikinLightBright:
-      result += kHighStr;
-      break;
-    case kDaikinLightDim:
-      result += kLowStr;
-      break;
-    case kDaikinLightOff:
-      result += kOffStr;
-      break;
-    default:
-      result += kUnknownStr;
+  case kDaikinLightBright:
+    result += kHighStr;
+    break;
+  case kDaikinLightDim:
+    result += kLowStr;
+    break;
+  case kDaikinLightOff:
+    result += kOffStr;
+    break;
+  default:
+    result += kUnknownStr;
   }
   result += ')';
   result += addBoolToString(_.Announce, kAnnounceStr);
@@ -4509,14 +5158,14 @@ String IRDaikin312::toString(void) const {
   result += addBoolToString(_.Econo, kEconoStr);
   result += addIntToString(_.Humidity, kHumidStr);
   switch (_.Humidity) {
-    case kDaikin312HumidityOff:
-    case kDaikin312HumidityAuto:
-      result += kSpaceLBraceStr;
-      result += _.Humidity ? kAutoStr : kOffStr;
-      result += ')';
-      break;
-    default:
-      result += '%';
+  case kDaikin312HumidityOff:
+  case kDaikin312HumidityAuto:
+    result += kSpaceLBraceStr;
+    result += _.Humidity ? kAutoStr : kOffStr;
+    result += ')';
+    break;
+  default:
+    result += '%';
   }
   return result;
 }
@@ -4569,29 +5218,32 @@ void IRsend::sendDaikin312(const unsigned char data[], const uint16_t nbytes,
 /// @param[in] strict Flag indicating if we should perform strict matching.
 /// @return A boolean. True if it can decode it, false if it can't.
 /// @see https://github.com/crankyoldgit/IRremoteESP8266/issues/1829
-bool IRrecv::decodeDaikin312(decode_results *results, uint16_t offset,
+bool IRrecv::decodeDaikin312(decode_results* results, uint16_t offset,
                              const uint16_t nbits, const bool strict) {
   // Is there enough data to match successfully?
   if (results->rawlen < 2 * (nbits + kDaikinHeaderLength + kHeader + kFooter) +
-                        kFooter - 1 + offset)
+                            kFooter - 1 + offset)
     return false;
 
   // Compliance
-  if (strict && nbits != kDaikin312Bits) return false;
+  if (strict && nbits != kDaikin312Bits)
+    return false;
 
   const uint8_t ksectionSize[kDaikin312Sections] = {kDaikin312Section1Length,
                                                     kDaikin312Section2Length};
   // Header/Leader Section
   uint64_t leaderdata = 0;
   uint16_t used = matchGeneric(results->rawbuf + offset, &leaderdata,
-                      results->rawlen - offset, kDaikinHeaderLength,
-                      0, 0,  // No Header Mark or Space for the "header"
-                      kDaikin312BitMark, kDaikin312OneSpace,
-                      kDaikin312BitMark, kDaikin312ZeroSpace,
-                      kDaikin312BitMark, kDaikin312HdrGap,
-                      false, kDaikinTolerance, 0, false);
-  if (!used) return false;  // Failed to match.
-  if (leaderdata) return false;  // The header bits should all be zero.
+                              results->rawlen - offset, kDaikinHeaderLength,
+                              0, 0,  // No Header Mark or Space for the "header"
+                              kDaikin312BitMark, kDaikin312OneSpace,
+                              kDaikin312BitMark, kDaikin312ZeroSpace,
+                              kDaikin312BitMark, kDaikin312HdrGap,
+                              false, kDaikinTolerance, 0, false);
+  if (!used)
+    return false;  // Failed to match.
+  if (leaderdata)
+    return false;  // The header bits should all be zero.
 
   offset += used;
 
@@ -4607,13 +5259,15 @@ bool IRrecv::decodeDaikin312(decode_results *results, uint16_t offset,
                         kDaikin312BitMark, kDaikin312SectionGap,
                         section >= kDaikin312Sections - 1,
                         kDaikinTolerance, 0, false);
-    if (used == 0) return false;
+    if (used == 0)
+      return false;
     offset += used;
     pos += ksectionSize[section];
   }
   // Compliance
   if (strict) {
-    if (pos * 8 != kDaikin312Bits) return false;
+    if (pos * 8 != kDaikin312Bits)
+      return false;
   }
 
   // Success

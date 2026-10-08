@@ -243,6 +243,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_DAIKIN2
     case decode_type_t::DAIKIN2:
 #endif
+#if SEND_DAIKIN200
+    case decode_type_t::DAIKIN200:
+#endif
 #if SEND_DAIKIN216
     case decode_type_t::DAIKIN216:
 #endif
@@ -1051,6 +1054,35 @@ void IRac::daikin2(IRDaikin2 *ac,
   ac->send();
 }
 #endif  // SEND_DAIKIN2
+
+#if SEND_DAIKIN200
+/// Send a Daikin 200-bit A/C message with the supplied settings.
+/// @param[in, out] ac A Ptr to an IRDaikin200 object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode setting.
+/// @param[in] degrees The temperature setting in degrees.
+/// @param[in] fan The speed setting for the fan.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
+/// @param[in] quiet Run the device in quiet/silent mode.
+/// @param[in] turbo Run the device in turbo/powerful mode.
+void IRac::daikin200(IRDaikin200 *ac,
+                     const bool on, const stdAc::opmode_t mode,
+                     const float degrees, const stdAc::fanspeed_t fan,
+                     const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                     const bool quiet, const bool turbo) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingVertical((int8_t)swingv >= 0);
+  ac->setSwingHorizontal((int8_t)swingh >= 0);
+  ac->setQuiet(quiet);
+  ac->setPowerful(turbo);
+  ac->send();
+}
+#endif  // SEND_DAIKIN200
 
 #if SEND_DAIKIN216
 /// Send a Daikin 216-bit A/C message with the supplied settings.
@@ -3288,6 +3320,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_DAIKIN2
+#if SEND_DAIKIN200
+    case DAIKIN200:
+    {
+      IRDaikin200 ac(_pin, _inverted, _modulation);
+      daikin200(&ac, send.power, send.mode, degC, send.fanspeed, send.swingv,
+                send.swingh, send.quiet, send.turbo);
+      break;
+    }
+#endif  // SEND_DAIKIN200
 #if SEND_DAIKIN216
     case DAIKIN216:
     {
@@ -4300,6 +4341,13 @@ String resultAcToString(const decode_results * const result) {
       return ac.toString();
     }
 #endif  // DECODE_DAIKIN2
+#if DECODE_DAIKIN200
+    case decode_type_t::DAIKIN200: {
+      IRDaikin200 ac(kGpioUnused);
+      ac.setRaw(result->state);
+      return ac.toString();
+    }
+#endif  // DECODE_DAIKIN200
 #if DECODE_DAIKIN216
     case decode_type_t::DAIKIN216: {
       IRDaikin216 ac(kGpioUnused);
@@ -4808,6 +4856,14 @@ bool decodeToState(const decode_results *decode, stdAc::state_t *result,
       break;
     }
 #endif  // DECODE_DAIKIN2
+#if DECODE_DAIKIN200
+    case decode_type_t::DAIKIN200: {
+      IRDaikin200 ac(kGpioUnused);
+      ac.setRaw(decode->state);
+      *result = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_DAIKIN200
 #if DECODE_DAIKIN216
     case decode_type_t::DAIKIN216: {
       IRDaikin216 ac(kGpioUnused);

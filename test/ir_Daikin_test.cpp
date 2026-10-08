@@ -1556,7 +1556,7 @@ TEST(TestUtils, Housekeeping) {
   ASSERT_EQ("DAIKIN200", typeToString(decode_type_t::DAIKIN200));
   ASSERT_EQ(decode_type_t::DAIKIN200, strToDecodeType("DAIKIN200"));
   ASSERT_TRUE(hasACState(decode_type_t::DAIKIN200));
-  ASSERT_FALSE(IRac::isProtocolSupported(decode_type_t::DAIKIN200));
+  ASSERT_TRUE(IRac::isProtocolSupported(decode_type_t::DAIKIN200));
   ASSERT_EQ(kDaikin200Bits, IRsend::defaultBits(decode_type_t::DAIKIN200));
   ASSERT_EQ(kNoRepeat, IRsend::minRepeats(decode_type_t::DAIKIN200));
 
@@ -3985,10 +3985,11 @@ TEST(TestDecodeDaikin200, RealExample) {
   ASSERT_EQ(kDaikin200Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 2 (Cool), Temp: 27C, Fan: 5 (Maximum), "
+      "Swing(V): 1 (Highest), Quiet: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t result, prev;
-  ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
+  ASSERT_TRUE(IRAcUtils::decodeToState(&irsend.capture, &result, &prev));
 }
 
 // Decoding a message we entirely constructed based solely on a given state.
@@ -4010,7 +4011,8 @@ TEST(TestDecodeDaikin200, SyntheticExample) {
   ASSERT_EQ(kDaikin200Bits, irsend.capture.bits);
   EXPECT_STATE_EQ(expectedState, irsend.capture.state, irsend.capture.bits);
   EXPECT_EQ(
-      "",
+      "Power: On, Mode: 2 (Cool), Temp: 27C, Fan: 5 (Maximum), "
+      "Swing(V): 1 (Highest), Quiet: Off",
       IRAcUtils::resultAcToString(&irsend.capture));
 }
 
