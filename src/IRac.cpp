@@ -31,6 +31,7 @@ extern std::vector<int> timingList;
 #include "ir_Airwell.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
+#include "ir_Bluestar.h"
 #include "ir_Bosch.h"
 #include "ir_Carrier.h"
 #include "ir_Coolix.h"
@@ -213,6 +214,9 @@ bool IRac::isProtocolSupported(const decode_type_t protocol) {
 #if SEND_ARGO
     case decode_type_t::ARGO:
 #endif
+#if SEND_BLUESTAR
+    case decode_type_t::BLUESTAR:
+#endif  // SEND_BLUESTAR
 #if SEND_BOSCH144
     case decode_type_t::BOSCH144:
 #endif
@@ -657,6 +661,41 @@ void IRac::argoWrem3_SetTimer(IRArgoAC_WREM3 *ac, bool on,
 }
 #endif  // SEND_ARGO
 
+#if SEND_BLUESTAR
+/// Send a complete Blue Star state using the captured Power secondary command.
+/// Use the native class for capacity and opaque clock/timer bytes.
+/// @param[in,out] ac A pointer to an IRBluestarAc object to use.
+/// @param[in] on The power setting.
+/// @param[in] mode The operation mode.
+/// @param[in] degrees Temperature in degrees Celsius.
+/// @param[in] fan The fan speed.
+/// @param[in] swingv The vertical swing setting.
+/// @param[in] swingh The horizontal swing setting.
+/// @param[in] turbo Enable standalone Turbo.
+/// @param[in] econo Enable Energy Save.
+/// @param[in] light Enable the indoor display.
+/// @param[in] sleep Sleep mode: -1 is Off, >= 0 is On.
+void IRac::bluestar(IRBluestarAc *ac, const bool on,
+                   const stdAc::opmode_t mode, const float degrees,
+                   const stdAc::fanspeed_t fan, const stdAc::swingv_t swingv,
+                   const stdAc::swingh_t swingh, const bool turbo,
+                   const bool econo, const bool light, const int16_t sleep) {
+  ac->begin();
+  ac->setPower(on);
+  ac->setMode(ac->convertMode(mode));
+  ac->setTemp(degrees);
+  ac->setCapacity(kBluestarCapacityDefault);
+  ac->setFan(ac->convertFan(fan));
+  ac->setSwingV(swingv != stdAc::swingv_t::kOff);
+  ac->setSwingH(swingh != stdAc::swingh_t::kOff);
+  ac->setTurbo(turbo);
+  ac->setEcono(econo);
+  ac->setLight(light);
+  ac->setSleep(sleep >= 0);
+  ac->setCommand(kBluestarCommandPower);
+  ac->send();
+}
+#endif  // SEND_BLUESTAR
 #if SEND_BOSCH144
 /// Send a Bosch144 A/C message with the supplied settings.
 /// @note May result in multiple messages being sent.
@@ -2801,6 +2840,7 @@ void IRac::vestel(IRVestelAc *ac,
 }
 #endif  // SEND_VESTEL_AC
 
+
 #if SEND_VOLTAS
 /// Send a Voltas A/C message with the supplied settings.
 /// @param[in, out] ac A Ptr to an IRVoltas object to use.
@@ -3197,6 +3237,15 @@ bool IRac::sendAc(const stdAc::state_t desired, const stdAc::state_t *prev) {
       break;
     }
 #endif  // SEND_ARGO
+#if SEND_BLUESTAR
+    case BLUESTAR: {
+      IRBluestarAc ac(_pin, _inverted, _modulation);
+      bluestar(&ac, send.power, send.mode, degC, send.fanspeed,
+               send.swingv, send.swingh, send.turbo, send.econo,
+               send.light, send.sleep);
+      break;
+    }
+#endif  // SEND_BLUESTAR
 #if SEND_BOSCH144
     case BOSCH144:
     {
@@ -4220,6 +4269,13 @@ String resultAcToString(const decode_results * const result) {
       return ac.toString();
     }
 #endif  // DECODE_ARGO
+#if DECODE_BLUESTAR
+    case decode_type_t::BLUESTAR: {
+      IRBluestarAc ac(kGpioUnused);
+      if (result->bits != kBluestarBits || !ac.setRaw(result->state)) return "";
+      return ac.toString();
+    }
+#endif  // DECODE_BLUESTAR
 #if DECODE_BOSCH144
     case decode_type_t::BOSCH144: {
       IRBosch144AC ac(kGpioUnused);
@@ -4728,6 +4784,15 @@ bool decodeToState(const decode_results *decode, stdAc::state_t *result,
       break;
     }
 #endif  // DECODE_ARGO
+#if DECODE_BLUESTAR
+    case decode_type_t::BLUESTAR: {
+      IRBluestarAc ac(kGpioUnused);
+      if (decode->bits != kBluestarBits || !ac.setRaw(decode->state))
+        return false;
+      *result = ac.toCommon();
+      break;
+    }
+#endif  // DECODE_BLUESTAR
 #if DECODE_BOSCH144
     case decode_type_t::BOSCH144: {
       IRBosch144AC ac(kGpioUnused);

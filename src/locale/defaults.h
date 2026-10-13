@@ -168,6 +168,9 @@
 #ifndef D_STR_3D
 #define D_STR_3D "3D"
 #endif  // D_STR_3D
+#ifndef D_STR_CAPACITY
+#define D_STR_CAPACITY "Capacity"
+#endif  // D_STR_CAPACITY
 #ifndef D_STR_CELSIUS
 #define D_STR_CELSIUS "Celsius"
 #endif  // D_STR_CELSIUS
@@ -757,6 +760,9 @@ D_STR_INDIRECT " " D_STR_MODE
 #ifndef D_STR_BLUESTARHEACY
 #define D_STR_BLUESTARHEAVY "BLUESTARHEAVY"
 #endif  // D_STR_TESTEXAMPLE
+#ifndef D_STR_BLUESTAR
+#define D_STR_BLUESTAR "BLUESTAR"
+#endif  // D_STR_BLUESTAR
 #ifndef D_STR_BOSCH
 #define D_STR_BOSCH "BOSCH"
 #endif  // D_STR_BOSCH

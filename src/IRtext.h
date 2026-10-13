@@ -55,6 +55,7 @@ extern IRTEXT_CONST_PTR(kBottomStr);
 extern IRTEXT_CONST_PTR(kBreezeStr);
 extern IRTEXT_CONST_PTR(kButtonStr);
 extern IRTEXT_CONST_PTR(kCancelStr);
+extern IRTEXT_CONST_PTR(kCapacityStr);
 extern IRTEXT_CONST_PTR(kCeilingStr);
 extern IRTEXT_CONST_PTR(kCelsiusFahrenheitStr);
 extern IRTEXT_CONST_PTR(kCelsiusStr);

@@ -16,6 +16,7 @@
 #include "ir_Airwell.h"
 #include "ir_Amcor.h"
 #include "ir_Argo.h"
+#include "ir_Bluestar.h"
 #include "ir_Bosch.h"
 #include "ir_Carrier.h"
 #include "ir_Coolix.h"
@@ -169,6 +170,13 @@ class IRac {
   void argoWrem3_SetTimer(IRArgoAC_WREM3 *ac, bool on,
       const uint16_t currentTime, const uint16_t delayMinutes);
 #endif  // SEND_ARGO
+#if SEND_BLUESTAR
+  void bluestar(IRBluestarAc *ac, const bool on, const stdAc::opmode_t mode,
+                const float degrees, const stdAc::fanspeed_t fan,
+                const stdAc::swingv_t swingv, const stdAc::swingh_t swingh,
+                const bool turbo, const bool econo, const bool light,
+                const int16_t sleep = -1);
+#endif  // SEND_BLUESTAR
 #if SEND_BOSCH144
   void bosch144(IRBosch144AC *ac,
               const bool on, const stdAc::opmode_t mode, const float degrees,
