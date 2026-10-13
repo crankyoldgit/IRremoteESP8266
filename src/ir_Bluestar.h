@@ -18,6 +18,48 @@
 #include "IRsend_test.h"
 #endif
 
+/// Native representation of a Blue Star A/C message.
+/// @note Bytes 10-11 store the right-aligned 11-bit secondary command;
+/// the upper five bits of byte 10 are not transmitted.
+union BluestarProtocol {
+  uint8_t raw[kBluestarStateLength];
+  struct {
+    // Byte 0
+    uint8_t             :8;  // Signature: 0x33.
+    // Byte 1
+    uint8_t Mode        :4;
+    uint8_t             :1;
+    uint8_t Fan         :3;
+    // Byte 2
+    uint8_t SwingH      :1;  // Inverted: 0 is On.
+    uint8_t SwingV      :1;  // Inverted: 0 is On.
+    uint8_t             :1;
+    uint8_t Light       :1;  // Inverted: 0 is On.
+    uint8_t Turbo       :1;
+    uint8_t             :1;
+    uint8_t Sleep       :1;
+    uint8_t Power       :1;
+    // Byte 3
+    uint8_t Temp        :5;
+    uint8_t Econo       :1;
+    uint8_t             :2;
+    // Bytes 4-7: unresolved clock/timer fields. Byte 6 contains minutes.
+    uint8_t             :8;
+    uint8_t             :8;
+    uint8_t             :8;
+    uint8_t             :8;
+    // Byte 8
+    uint8_t Capacity    :3;
+    uint8_t             :5;
+    // Byte 9: complement of the sum of bytes 0-8.
+    uint8_t Sum         :8;
+    // Bytes 10-11: secondary command, most significant byte first.
+    uint8_t CommandHigh :3;
+    uint8_t             :5;
+    uint8_t CommandLow  :8;
+  };
+};
+
 const uint8_t kBluestarFanOnly = 1;
 const uint8_t kBluestarAuto = 2;
 const uint8_t kBluestarDry = 4;
@@ -80,10 +122,8 @@ class IRBluestarAc {
   uint8_t getMode() const;
   void setTemp(const uint8_t celsius);
   uint8_t getTemp() const;  ///< Stored temperature, including hidden Fan value.
-  uint8_t getEffectiveTemp() const;  ///< Includes standalone Turbo override.
   void setFan(const uint8_t speed);
   uint8_t getFan() const;  ///< Native stored fan code; 0 for Convertible Turbo.
-  uint8_t getEffectiveFan() const;  ///< Includes both Turbo mechanisms.
   void setSwingH(const bool on);
   bool getSwingH() const;
   void setSwingV(const bool on);
@@ -93,13 +133,14 @@ class IRBluestarAc {
   void setSleep(const bool on);
   bool getSleep() const;
   /// Standalone toggle, independent of capacity.
+  /// @note The remote displays 16 C/High while On, but retains the stored
+  /// temperature/fan values in the packet and restores them when Off.
   void setTurbo(const bool on);
   bool getTurbo() const;
   void setEcono(const bool on);
   bool getEcono() const;
   void setCapacity(const uint8_t capacity);
   uint8_t getCapacity() const;
-  uint8_t getClockMinute() const;  ///< Only confirmed portion of clock data.
   static uint8_t convertMode(const stdAc::opmode_t mode);
   static uint8_t convertFan(const stdAc::fanspeed_t speed);
   static stdAc::opmode_t toCommonMode(const uint8_t mode);
@@ -107,7 +148,9 @@ class IRBluestarAc {
   stdAc::state_t toCommon() const;
   String toString() const;
 #ifdef UNIT_TEST
+  /// @cond IGNORE
   IRsendTest _irsend;
+  /// @endcond
 #else
 
  private:
@@ -115,9 +158,8 @@ class IRBluestarAc {
 #endif
 
  private:
-  uint8_t _state[kBluestarStateLength];
+  BluestarProtocol _;
   uint8_t _normalFan;  ///< Fan selected before a locally set capacity override.
-  void setField(const uint8_t byte, const uint8_t mask, const uint8_t value);
 };
 
 #endif  // IR_BLUESTAR_H_

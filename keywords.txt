@@ -417,7 +417,6 @@ getChecksum	KEYWORD2
 getClean	KEYWORD2
 getCleanToggle	KEYWORD2
 getClock	KEYWORD2
-getClockMinute	KEYWORD2
 getCmd	KEYWORD2
 getComfort	KEYWORD2
 getCommand	KEYWORD2
@@ -435,8 +434,6 @@ getEco	KEYWORD2
 getEcocool	KEYWORD2
 getEcono	KEYWORD2
 getEconoToggle	KEYWORD2
-getEffectiveFan	KEYWORD2
-getEffectiveTemp	KEYWORD2
 getEnableSensorTemp	KEYWORD2
 getEye	KEYWORD2
 getEyeAuto	KEYWORD2
@@ -842,7 +839,6 @@ setEye	KEYWORD2
 setEyeAuto	KEYWORD2
 setFan	KEYWORD2
 setFanSpeed	KEYWORD2
-setField	KEYWORD2
 setFilter	KEYWORD2
 setFlap	KEYWORD2
 setFollow	KEYWORD2
@@ -1952,6 +1948,7 @@ kBottomStr	LITERAL1
 kBreezeStr	LITERAL1
 kButtonStr	LITERAL1
 kCancelStr	LITERAL1
+kCapacityStr	LITERAL1
 kCarrierAc128BitMark	LITERAL1
 kCarrierAc128Bits	LITERAL1
 kCarrierAc128Hdr2Mark	LITERAL1

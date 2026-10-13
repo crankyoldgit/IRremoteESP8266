@@ -1,12 +1,12 @@
 // Copyright 2026 IRremoteESP8266 contributors
 /// @file
 /// @brief Blue Star IE318YKU A/C support.
-/// @see docs/BlueStar.md for capture evidence.
 
 #include "ir_Bluestar.h"
 #include <algorithm>
 #include <cstring>
 #include "IRrecv.h"
+#include "IRsend.h"
 #include "IRtext.h"
 #include "IRutils.h"
 
@@ -49,6 +49,12 @@ void IRsend::sendBluestar(const uint8_t data[], const uint16_t nbytes,
 
 #if DECODE_BLUESTAR
 /// Decode the main state AND secondary command; neither section is optional.
+/// Status: ALPHA / receiver captures verified.
+/// @param[in,out] results Data to decode and storage for the result.
+/// @param[in] offset Starting index in the raw data.
+/// @param[in] nbits Number of data bits to expect.
+/// @param[in] strict Require a valid signature and checksum.
+/// @return true if the message is decoded successfully, otherwise false.
 /// @note Strict mode checks the 0x33 signature and the main-state checksum.
 bool IRrecv::decodeBluestar(decode_results *results, uint16_t offset,
                            const uint16_t nbits, const bool strict) {
@@ -115,8 +121,8 @@ bool IRBluestarAc::validChecksum(const uint8_t state[], const uint16_t length) {
 }
 
 uint8_t *IRBluestarAc::getRaw() {
-  _state[9] = calcChecksum(_state);
-  return _state;
+  _.Sum = calcChecksum(_.raw);
+  return _.raw;
 }
 
 /// Import a complete 12-byte state, or an explicitly sized 10-byte main state.
@@ -124,39 +130,34 @@ uint8_t *IRBluestarAc::getRaw() {
 bool IRBluestarAc::setRaw(const uint8_t state[], const uint16_t length) {
   if (state == nullptr || length < kBluestarMainStateLength || length == 11 ||
       (length >= kBluestarStateLength && state[10] > 7)) return false;
-  std::memcpy(_state, state, std::min(length, kBluestarStateLength));
+  std::memcpy(_.raw, state, std::min(length, kBluestarStateLength));
   _normalFan = getFan() == kBluestarFanTurbo ? kBluestarFanHigh : getFan();
   return true;
 }
 
-void IRBluestarAc::setField(const uint8_t byte, const uint8_t mask,
-                           const uint8_t value) {
-  _state[byte] = (_state[byte] & ~mask) | (value & mask);
-}
-
 uint16_t IRBluestarAc::getCommand() const {
-  return (static_cast<uint16_t>(_state[10]) << 8) | _state[11];
+  return (static_cast<uint16_t>(_.CommandHigh) << 8) | _.CommandLow;
 }
 
 void IRBluestarAc::setCommand(const uint16_t command) {
   if (command >= (1U << kBluestarCommandBits)) return;
-  _state[10] = command >> 8;
-  _state[11] = command & 0xFF;
+  _.CommandHigh = command >> 8;
+  _.CommandLow = command & 0xFF;
 }
 
 void IRBluestarAc::on() { setPower(true); }
 void IRBluestarAc::off() { setPower(false); }
-bool IRBluestarAc::getPower() const { return _state[2] & 0x80; }
+bool IRBluestarAc::getPower() const { return _.Power; }
 
 /// Mirror the observed Power-button lower bound. setTemp() can subsequently
 /// select 16-23 C while On, as the captured ordinary state packets demonstrate.
 void IRBluestarAc::setPower(const bool on) {
-  setField(2, 0x80, on ? 0x80 : 0);
-  if (getTemp() < 24) setField(3, 0x1F, 24);
+  _.Power = on;
+  if (getTemp() < 24) _.Temp = 24;
   setCommand(kBluestarCommandPower);
 }
 
-uint8_t IRBluestarAc::getMode() const { return _state[1] & 0x0F; }
+uint8_t IRBluestarAc::getMode() const { return _.Mode; }
 
 void IRBluestarAc::setMode(const uint8_t mode) {
   uint8_t value = mode;
@@ -167,29 +168,21 @@ void IRBluestarAc::setMode(const uint8_t mode) {
     case kBluestarFanOnly: break;
     default: value = kBluestarCool;
   }
-  setField(1, 0x0F, value);
-  if (value == kBluestarFanOnly) setField(3, 0x1F, kBluestarFanModeTemp);
+  _.Mode = value;
+  if (value == kBluestarFanOnly) _.Temp = kBluestarFanModeTemp;
   setCommand(kBluestarCommandMode);
 }
 
-uint8_t IRBluestarAc::getTemp() const { return _state[3] & 0x1F; }
-uint8_t IRBluestarAc::getEffectiveTemp() const {
-  return getTurbo() ? kBluestarMinTemp : getTemp();
-}
+uint8_t IRBluestarAc::getTemp() const { return _.Temp; }
 
 void IRBluestarAc::setTemp(const uint8_t celsius) {
   // No temperature control on the physical remote in Fan-only mode.
   if (getMode() == kBluestarFanOnly) return;
-  setField(3, 0x1F, std::max(kBluestarMinTemp,
-                            std::min(kBluestarMaxTemp, celsius)));
+  _.Temp = std::max(kBluestarMinTemp, std::min(kBluestarMaxTemp, celsius));
   setCommand(kBluestarCommandTemp);
 }
 
-uint8_t IRBluestarAc::getFan() const { return (_state[1] >> 5) & 7; }
-uint8_t IRBluestarAc::getEffectiveFan() const {
-  return getTurbo() || getFan() == kBluestarFanTurbo ?
-      kBluestarFanHigh : getFan();
-}
+uint8_t IRBluestarAc::getFan() const { return _.Fan; }
 
 void IRBluestarAc::setFan(const uint8_t speed) {
   uint8_t value = speed;
@@ -201,47 +194,47 @@ void IRBluestarAc::setFan(const uint8_t speed) {
     default: value = kBluestarFanAuto;
   }
   _normalFan = value;
-  setField(1, 0xE0, value << 5);
+  _.Fan = value;
   setCommand(kBluestarCommandFan);
 }
 
-bool IRBluestarAc::getSwingH() const { return !(_state[2] & 0x01); }
-bool IRBluestarAc::getSwingV() const { return !(_state[2] & 0x02); }
-bool IRBluestarAc::getLight() const { return !(_state[2] & 0x08); }
-bool IRBluestarAc::getSleep() const { return _state[2] & 0x40; }
-bool IRBluestarAc::getTurbo() const { return _state[2] & 0x10; }
-bool IRBluestarAc::getEcono() const { return _state[3] & 0x20; }
+bool IRBluestarAc::getSwingH() const { return !_.SwingH; }
+bool IRBluestarAc::getSwingV() const { return !_.SwingV; }
+bool IRBluestarAc::getLight() const { return !_.Light; }
+bool IRBluestarAc::getSleep() const { return _.Sleep; }
+bool IRBluestarAc::getTurbo() const { return _.Turbo; }
+bool IRBluestarAc::getEcono() const { return _.Econo; }
 
 void IRBluestarAc::setSwingH(const bool on) {
-  setField(2, 0x01, on ? 0 : 0x01);
+  _.SwingH = !on;
   setCommand(kBluestarCommandSwing);
 }
 void IRBluestarAc::setSwingV(const bool on) {
-  setField(2, 0x02, on ? 0 : 0x02);
+  _.SwingV = !on;
   setCommand(kBluestarCommandSwing);
 }
 void IRBluestarAc::setLight(const bool on) {
-  setField(2, 0x08, on ? 0 : 0x08);
+  _.Light = !on;
   setCommand(kBluestarCommandLight);
 }
 void IRBluestarAc::setSleep(const bool on) {
-  setField(2, 0x40, on ? 0x40 : 0);
+  _.Sleep = on;
   setCommand(kBluestarCommandSleep);
 }
 void IRBluestarAc::setTurbo(const bool on) {
-  setField(2, 0x10, on ? 0x10 : 0);
+  _.Turbo = on;
   setCommand(kBluestarCommandTurbo);
 }
 void IRBluestarAc::setEcono(const bool on) {
-  setField(3, 0x20, on ? 0x20 : 0);
+  _.Econo = on;
   if (on) {
-    setField(3, 0x1F, 24);
+    _.Temp = 24;
     setFan(kBluestarFanLow);
   }
   setCommand(kBluestarCommandEcono);
 }
 
-uint8_t IRBluestarAc::getCapacity() const { return _state[8] & 7; }
+uint8_t IRBluestarAc::getCapacity() const { return _.Capacity; }
 
 /// Select capacity and the observed fan code. Default restores a fan selected
 /// locally before the override. Raw imports only reveal the currently encoded
@@ -251,7 +244,7 @@ void IRBluestarAc::setCapacity(const uint8_t capacity) {
       capacity <= kBluestarCapacityDefault ?
       capacity : kBluestarCapacityDefault;
   if (getCapacity() == kBluestarCapacityDefault) _normalFan = getFan();
-  setField(8, 7, value);
+  _.Capacity = value;
   uint8_t fan = _normalFan;
   switch (value) {
     case kBluestarCapacityTurbo: fan = kBluestarFanTurbo; break;
@@ -260,11 +253,9 @@ void IRBluestarAc::setCapacity(const uint8_t capacity) {
     case kBluestarCapacity40: fan = kBluestarFanLow; break;
     default: break;
   }
-  setField(1, 0xE0, fan << 5);
+  _.Fan = fan;
   setCommand(kBluestarCommandCapacity);
 }
-
-uint8_t IRBluestarAc::getClockMinute() const { return _state[6]; }
 
 uint8_t IRBluestarAc::convertMode(const stdAc::opmode_t mode) {
   switch (mode) {
@@ -306,11 +297,12 @@ stdAc::fanspeed_t IRBluestarAc::toCommonFanSpeed(const uint8_t speed) {
 stdAc::state_t IRBluestarAc::toCommon() const {
   stdAc::state_t result{};
   result.protocol = BLUESTAR;
+  result.model = -1;  // No model variants supported.
   result.power = getPower();
   result.mode = toCommonMode(getMode());
   result.celsius = true;
-  result.degrees = getEffectiveTemp();
-  result.fanspeed = toCommonFanSpeed(getEffectiveFan());
+  result.degrees = getTemp();
+  result.fanspeed = toCommonFanSpeed(getFan());
   result.swingh = getSwingH() ? stdAc::swingh_t::kAuto : stdAc::swingh_t::kOff;
   result.swingv = getSwingV() ? stdAc::swingv_t::kAuto : stdAc::swingv_t::kOff;
   // Common API has one Turbo bit; the native class retains the distinction.
@@ -346,8 +338,7 @@ String IRBluestarAc::toString() const {
   const uint8_t percentages[] = {0, 110, 80, 60, 40, 100};
   const uint8_t capacity = getCapacity();
   result += addIntToString(capacity <= kBluestarCapacityDefault ?
-                           percentages[capacity] : 0, "Capacity") + "%";
-  result += addIntToString(getClockMinute(), "Clock Minute");
+                           percentages[capacity] : 0, kCapacityStr) + "%";
   result += addIntToString(getCommand(), kCommandStr);
   return result;
 }

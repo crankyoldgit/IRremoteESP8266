@@ -168,6 +168,9 @@
 #ifndef D_STR_3D
 #define D_STR_3D "3D"
 #endif  // D_STR_3D
+#ifndef D_STR_CAPACITY
+#define D_STR_CAPACITY "Capacity"
+#endif  // D_STR_CAPACITY
 #ifndef D_STR_CELSIUS
 #define D_STR_CELSIUS "Celsius"
 #endif  // D_STR_CELSIUS

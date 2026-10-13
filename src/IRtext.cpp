@@ -99,6 +99,7 @@ IRTEXT_CONST_STRING(kNightStr, D_STR_NIGHT);  ///< "Night"
 IRTEXT_CONST_STRING(kSilentStr, D_STR_SILENT);  ///< "Silent"
 IRTEXT_CONST_STRING(kFilterStr, D_STR_FILTER);  ///< "Filter"
 IRTEXT_CONST_STRING(k3DStr, D_STR_3D);  ///< "3D"
+IRTEXT_CONST_STRING(kCapacityStr, D_STR_CAPACITY);  ///< "Capacity"
 IRTEXT_CONST_STRING(kCelsiusStr, D_STR_CELSIUS);  ///< "Celsius"
 IRTEXT_CONST_STRING(kCelsiusFahrenheitStr, D_STR_CELSIUS_FAHRENHEIT);  ///<
 ///< "Celsius/Fahrenheit"
