@@ -32,7 +32,7 @@ union BluestarProtocol {
     uint8_t Fan         :3;
     // Byte 2
     uint8_t SwingH      :1;  // Inverted: 0 is On.
-    uint8_t SwingV      :1;  // Inverted: 0 is On.
+    uint8_t SwingV      :1;  // 1 is On; confirmed by testing on the A/C.
     uint8_t             :1;
     uint8_t Light       :1;  // Inverted: 0 is On.
     uint8_t Turbo       :1;
