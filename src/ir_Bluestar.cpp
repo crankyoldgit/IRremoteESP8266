@@ -198,7 +198,7 @@ void IRBluestarAc::setFan(const uint8_t speed) {
   setCommand(kBluestarCommandFan);
 }
 
-bool IRBluestarAc::getSwingH() const { return !_.SwingH; }
+bool IRBluestarAc::getSwingH() const { return _.SwingH; }
 bool IRBluestarAc::getSwingV() const { return _.SwingV; }
 bool IRBluestarAc::getLight() const { return !_.Light; }
 bool IRBluestarAc::getSleep() const { return _.Sleep; }
@@ -206,7 +206,7 @@ bool IRBluestarAc::getTurbo() const { return _.Turbo; }
 bool IRBluestarAc::getEcono() const { return _.Econo; }
 
 void IRBluestarAc::setSwingH(const bool on) {
-  _.SwingH = !on;
+  _.SwingH = on;
   setCommand(kBluestarCommandSwing);
 }
 void IRBluestarAc::setSwingV(const bool on) {

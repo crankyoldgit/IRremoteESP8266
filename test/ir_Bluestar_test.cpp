@@ -344,7 +344,7 @@ TEST(TestBluestarClass, ChecksumAndRawStorage) {
   EXPECT_STATE_EQ(kCool24, ac.getRaw(), kBluestarBits);
   EXPECT_EQ(
       "Power: On, Mode: 8 (Cool), Temp: 24C, Fan: 4 (Low), "
-      "Swing(H): On, Swing(V): On, Light: On, Turbo: Off, Econo: Off, "
+      "Swing(H): Off, Swing(V): On, Light: On, Turbo: Off, Econo: Off, "
       "Sleep: Off, Capacity: 100%, Command: 1476", ac.toString());
   EXPECT_EQ(0x3F, IRBluestarAc::calcChecksum(kCool24));
   EXPECT_FALSE(IRBluestarAc::validChecksum(kCool24, 9));
@@ -511,6 +511,29 @@ TEST(TestBluestarClass, CapturedConvertibleCycleIsDistinctFromTurbo) {
   EXPECT_EQ(24, ac.toCommon().degrees);
 }
 
+TEST(TestBluestarClass, CapturedHorizontalSwingPolarity) {
+  IRBluestarAc ac(kGpioUnused);
+  // Hardware testing confirmed byte 2 bit 0 set enables horizontal swing.
+  // These real captured frames keep the other fields identical.
+  const uint8_t on[kBluestarStateLength] = {
+      0x33, 0xE8, 0x83, 0x10, 0x2D, 0xAD, 0x0F, 0xA4, 0x05, 0xBF, 0x05, 0xC8};
+  const uint8_t off[kBluestarStateLength] = {
+      0x33, 0xE8, 0x82, 0x10, 0x2D, 0xAD, 0x0F, 0xA4, 0x05, 0xC0, 0x05, 0xC8};
+  ASSERT_TRUE(ac.setRaw(off));
+  EXPECT_FALSE(ac.getSwingH());
+  EXPECT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ac.setSwingH(true);
+  EXPECT_STATE_EQ(on, ac.getRaw(), kBluestarBits);
+  EXPECT_TRUE(ac.getSwingH());
+  EXPECT_TRUE(ac.getSwingV());
+  EXPECT_EQ(stdAc::swingh_t::kAuto, ac.toCommon().swingh);
+  ac.setSwingH(false);
+  EXPECT_STATE_EQ(off, ac.getRaw(), kBluestarBits);
+  EXPECT_FALSE(ac.getSwingH());
+  EXPECT_TRUE(ac.getSwingV());
+  EXPECT_TRUE(IRBluestarAc::validChecksum(ac.getRaw()));
+}
+
 TEST(TestBluestarClass, CapturedVerticalSwingPolarity) {
   IRBluestarAc ac(kGpioUnused);
   // Real captured swing frames. The user confirmed on the A/C that byte 2
@@ -525,24 +548,24 @@ TEST(TestBluestarClass, CapturedVerticalSwingPolarity) {
   ac.setSwingV(true);
   EXPECT_STATE_EQ(on, ac.getRaw(), kBluestarBits);
   EXPECT_TRUE(ac.getSwingV());
-  EXPECT_TRUE(ac.getSwingH());
+  EXPECT_FALSE(ac.getSwingH());
   EXPECT_EQ(stdAc::swingv_t::kAuto, ac.toCommon().swingv);
   ac.setSwingV(false);
   EXPECT_STATE_EQ(off, ac.getRaw(), kBluestarBits);
   EXPECT_FALSE(ac.getSwingV());
-  EXPECT_TRUE(ac.getSwingH());
+  EXPECT_FALSE(ac.getSwingH());
   EXPECT_TRUE(IRBluestarAc::validChecksum(ac.getRaw()));
 }
 
 TEST(TestBluestarClass, IndependentFlagsAndCommonConversion) {
   IRBluestarAc ac(kGpioUnused);
   ASSERT_TRUE(ac.setRaw(kCool16));
-  ac.setSwingH(false);
-  EXPECT_FALSE(ac.getSwingH());
+  ac.setSwingH(true);
+  EXPECT_TRUE(ac.getSwingH());
   EXPECT_TRUE(ac.getSwingV());
   ac.setSwingV(false);
   EXPECT_FALSE(ac.getSwingV());
-  EXPECT_FALSE(ac.getSwingH());
+  EXPECT_TRUE(ac.getSwingH());
   ac.setLight(false);
   ac.setSleep(true);
   EXPECT_FALSE(ac.getLight());
@@ -551,14 +574,14 @@ TEST(TestBluestarClass, IndependentFlagsAndCommonConversion) {
   const stdAc::state_t common = ac.toCommon();
   EXPECT_EQ(BLUESTAR, common.protocol);
   EXPECT_EQ(-1, common.model);
-  EXPECT_EQ(stdAc::swingh_t::kOff, common.swingh);
+  EXPECT_EQ(stdAc::swingh_t::kAuto, common.swingh);
   EXPECT_EQ(stdAc::swingv_t::kOff, common.swingv);
   EXPECT_EQ(0, common.sleep);
   EXPECT_FALSE(common.light);
   EXPECT_EQ(-1, common.clock);
   ac.setSleep(false);
   ac.setLight(true);
-  ac.setSwingH(true);
+  ac.setSwingH(false);
   ac.setSwingV(true);
   for (uint8_t i = 0; i < 10; i++) EXPECT_EQ(kCool16[i], ac.getRaw()[i]);
 }
@@ -573,8 +596,8 @@ TEST(TestBluestarClass, CommonSenderUsesDesiredState) {
   ac._irsend.makeDecodeResult();
   ASSERT_TRUE(irrecv.decode(&ac._irsend.capture));
   ASSERT_EQ(BLUESTAR, ac._irsend.capture.decode_type);
-  // Power On, horizontal On (active low), vertical Off (active high).
-  EXPECT_EQ(0x80, ac._irsend.capture.state[2]);
+  // Power On, horizontal On and vertical Off; both swing bits are active high.
+  EXPECT_EQ(0x81, ac._irsend.capture.state[2]);
   stdAc::state_t decoded;
   ASSERT_TRUE(IRAcUtils::decodeToState(&ac._irsend.capture, &decoded));
   EXPECT_TRUE(decoded.power);
