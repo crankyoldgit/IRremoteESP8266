@@ -1232,6 +1232,10 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     DPRINTLN("Attempting Eurom decode");
     if (decodeEurom(results, offset, kEuromBits)) return true;
 #endif  // DECODE_EUROM
+#if DECODE_BLUESTAR
+    DPRINTLN("Attempting Blue Star decode");
+    if (decodeBluestar(results, offset)) return true;
+#endif  // DECODE_BLUESTAR
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH

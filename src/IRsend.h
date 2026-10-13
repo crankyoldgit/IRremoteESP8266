@@ -924,6 +924,11 @@ class IRsend {
                  const uint16_t nbytes = kEuromStateLength,
                  const uint16_t repeat = kNoRepeat);
 #endif  // SEND_EUROM
+#if SEND_BLUESTAR
+  void sendBluestar(const uint8_t data[],
+                    const uint16_t nbytes = kBluestarStateLength,
+                    const uint16_t repeat = kNoRepeat);
+#endif  // SEND_BLUESTAR
 
  protected:
 #ifdef UNIT_TEST

@@ -976,6 +976,13 @@ typedef volatile const uint16_t atomic_const_uint16_t;
 #define SEND_EUROM           _IR_ENABLE_DEFAULT_
 #endif  // SEND_EUROM
 
+#ifndef DECODE_BLUESTAR
+#define DECODE_BLUESTAR             _IR_ENABLE_DEFAULT_
+#endif  // DECODE_BLUESTAR
+#ifndef SEND_BLUESTAR
+#define SEND_BLUESTAR               _IR_ENABLE_DEFAULT_
+#endif  // SEND_BLUESTAR
+
 #if (DECODE_ARGO || DECODE_DAIKIN || DECODE_FUJITSU_AC || DECODE_GREE || \
      DECODE_KELVINATOR || DECODE_MITSUBISHI_AC || DECODE_TOSHIBA_AC || \
      DECODE_TROTEC || DECODE_HAIER_AC || DECODE_HITACHI_AC || \
@@ -995,7 +1002,7 @@ typedef volatile const uint16_t atomic_const_uint16_t;
      DECODE_DAIKIN200 || DECODE_HAIER_AC160 || DECODE_TCL96AC || \
      DECODE_BOSCH144 || DECODE_SANYO_AC152 || DECODE_DAIKIN312 || \
      DECODE_CARRIER_AC84 || DECODE_YORK || DECODE_BLUESTARHEAVY || \
-     DECODE_EUROM || \
+     DECODE_EUROM || DECODE_BLUESTAR || \
      false)
   // Add any DECODE to the above if it uses result->state (see kStateSizeMax)
   // you might also want to add the protocol to hasACState function
@@ -1164,8 +1171,9 @@ enum decode_type_t {
   YORK,
   BLUESTARHEAVY,
   EUROM,
+  BLUESTAR,
   // Add new entries before this one, and update it to point to the last entry.
-  kLastDecodeType = EUROM,
+  kLastDecodeType = BLUESTAR,
 };
 
 // Message lengths & required repeat values
@@ -1194,6 +1202,13 @@ const uint16_t kArgoDefaultRepeat = kNoRepeat;
 const uint16_t kArrisBits = 32;
 const uint16_t kBluestarHeavyStateLength = 13;
 const uint16_t kBluestarHeavyBits = kBluestarHeavyStateLength * 8;
+// Ten state bytes followed by an 11-bit command, stored right-aligned in
+// two additional bytes. The five unused storage bits are not transmitted.
+const uint16_t kBluestarMainStateLength = 10;
+const uint16_t kBluestarStateLength = 12;
+const uint16_t kBluestarMainBits = kBluestarMainStateLength * 8;
+const uint16_t kBluestarCommandBits = 11;
+const uint16_t kBluestarBits = kBluestarMainBits + kBluestarCommandBits;
 const uint16_t kBosch144StateLength = 18;
 const uint16_t kBosch144Bits = kBosch144StateLength * 8;
 const uint16_t kCoolixBits = 24;

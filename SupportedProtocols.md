@@ -11,6 +11,7 @@
 | [Amcor](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Amcor.cpp) | **[Amcor](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Amcor.h)** | ADR-853H A/C<BR>TAC-444 remote<BR>TAC-495 remote |  | Yes |
 | [Argo](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Argo.cpp) | **[Argo](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Argo.h)** | Ulisse 13 DCI Mobile Split A/C [WREM2 remote]<BR>Ulisse Eco Mobile Split A/C (Wifi) [WREM3 remote] | SAC_WREM2<BR>SAC_WREM3 | Yes |
 | [Arris](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Arris.cpp) | **Arris** | 120A V1.0 A18 remote<BR>VIP1113M Set-top box |  | - |
+| [Bluestar](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Bluestar.cpp) | **[Blue Star](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Bluestar.h)** | IE318YKU A/C |  | Yes |
 | [BluestarHeavy](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_BluestarHeavy.cpp) | **Bluestar** | D716LXM0535A2400313 (Remote) |  | - |
 | [Bosch](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Bosch.cpp) | **[Bosch](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Bosch.h)** | CL3000i-Set 26 E A/C<BR>RG10A(G2S)BGEF remote |  | Yes |
 | [Bosch](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Bosch.cpp) | **[Durastar](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Bosch.h)** | RG10R(M2S)/BGEFU1 remote |  | Yes |
@@ -159,6 +160,7 @@
 - AMCOR
 - ARGO
 - ARRIS
+- BLUESTAR
 - BLUESTARHEAVY
 - BOSCH144
 - BOSE

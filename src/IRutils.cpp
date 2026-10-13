@@ -170,6 +170,7 @@ bool hasACState(const decode_type_t protocol) {
     case AMCOR:
     case ARGO:
     case BLUESTARHEAVY:
+    case BLUESTAR:
     case BOSCH144:
     case CARRIER_AC84:
     case CARRIER_AC128:
