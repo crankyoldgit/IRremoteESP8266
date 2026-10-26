@@ -25,6 +25,8 @@
 //   Brand: Kelon,  Model: RCH-R0Y3 remote (KELON168)
 //   Brand: Kelon,  Model: AST-09UW4RVETG00A A/C (KELON168)
 //   Brand: Hisense,  Model: AST-09UW4RVETG00A A/C (KELON168)
+//   Brand: Hisense,  Model: DG11R1-01 remote (KELON168)
+//   Brand: Hisense,  Model: TG25VE0AG A/C (KELON168)
 
 #ifndef IR_KELON_H_
 #define IR_KELON_H_
@@ -190,7 +192,7 @@ union Kelon168Protocol {
     uint8_t OffHours  :5;
     uint8_t           :1;
     uint8_t Swing2    :1;
-    uint8_t           :1;
+    uint8_t SwingHToggle :1;
     // Byte 9
     uint8_t OffMins         :6;
     uint8_t                 :1;
@@ -206,7 +208,9 @@ union Kelon168Protocol {
     // Byte 13
     uint8_t Sum1  :8;
     // Byte 14
-    uint8_t       :8;
+    uint8_t       :5;
+    uint8_t Econo :1;
+    uint8_t       :2;
     // Byte 15
     uint8_t Cmd   :8;
     // Byte 16
@@ -257,6 +261,8 @@ const uint8_t kKelon168CommandSuper = 0x04;
 const uint8_t kKelon168CommandOnTimer = 0x05;
 const uint8_t kKelon168CommandMode = 0x06;
 const uint8_t kKelon168CommandSwing = 0x07;
+const uint8_t kKelon168CommandSwingH = 0x08;
+const uint8_t kKelon168CommandEcono = 0x0C;
 const uint8_t kKelon168CommandIFeel = 0x0D;
 const uint8_t kKelon168CommandFanSpeed = 0x11;
 // const uint8_t kKelon168CommandIFeel = 0x17; // ?
@@ -294,6 +300,10 @@ class IRKelon168Ac {
   uint8_t getMode(void) const;
   void setSwing(const bool on);
   bool getSwing(void) const;
+  void setSwingHToggle(const bool on);
+  bool getSwingHToggle(void) const;
+  void setEcono(const bool on);
+  bool getEcono(void) const;
   void setLight(const bool on);
   bool getLight(void) const;
   uint16_t getClock(void) const;

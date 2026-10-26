@@ -1,5 +1,6 @@
 // Copyright 2021 Davide Depau
 
+#include <string>
 #include "IRac.h"
 #include "IRrecv.h"
 #include "IRrecv_test.h"
@@ -598,4 +599,266 @@ TEST(TestDecodeKelon168, SyntheticExample) {
   EXPECT_EQ("", IRAcUtils::resultAcToString(&irsend.capture));
   stdAc::state_t r, p;
   ASSERT_FALSE(IRAcUtils::decodeToState(&irsend.capture, &r, &p));
+}
+
+// Tests for IRKelon168Ac using frames captured from a real Hisense DG11R1-01
+// remote (A/C unit TG25VE0AG) with a Flipper Zero. Each frame is a full
+// 168 bit message with valid checksums. Names are the capture step ids.
+namespace {
+// Capture step: power_off
+const uint8_t kCapPowerOff[kKelon168StateLength] = {
+    0x83, 0x06, 0x04, 0x60, 0x00, 0x00, 0x8A,
+    0x2F, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC1,
+    0x00, 0x01, 0x00, 0x00, 0x28, 0x00, 0x29};
+// Capture step: power_on
+const uint8_t kCapPowerOn[kKelon168StateLength] = {
+    0x83, 0x06, 0x04, 0x60, 0x00, 0x00, 0x8A,
+    0x2F, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC1,
+    0x00, 0x01, 0x00, 0x00, 0x38, 0x00, 0x39};
+// Capture step: fan_press_1
+const uint8_t kCapFanHigh[kKelon168StateLength] = {
+    0x83, 0x06, 0x01, 0x60, 0x00, 0x00, 0x8A,
+    0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD9,
+    0x00, 0x11, 0x00, 0x00, 0x38, 0x00, 0x29};
+// Capture step: fan_press_6
+const uint8_t kCapFanAuto[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0x60, 0x00, 0x00, 0x8A,
+    0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD8,
+    0x00, 0x11, 0x00, 0x00, 0x38, 0x00, 0x29};
+// Capture step: vswing_on
+const uint8_t kCapVSwing[kKelon168StateLength] = {
+    0x83, 0x06, 0x80, 0x60, 0x00, 0x00, 0x8A,
+    0x32, 0x40, 0x00, 0x00, 0x00, 0x00, 0x18,
+    0x00, 0x07, 0x00, 0x00, 0x38, 0x00, 0x3F};
+// Capture step: hswing_on
+const uint8_t kCapHSwing[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0x60, 0x00, 0x00, 0x8A,
+    0x32, 0x80, 0x00, 0x00, 0x00, 0x00, 0x58,
+    0x00, 0x08, 0x00, 0x00, 0x38, 0x00, 0x30};
+// Capture step: hswing_off (the same bytes as hswing_on: the button toggles)
+const uint8_t kCapHSwingOff[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0x60, 0x00, 0x00, 0x8A,
+    0x32, 0x80, 0x00, 0x00, 0x00, 0x00, 0x58,
+    0x00, 0x08, 0x00, 0x00, 0x38, 0x00, 0x30};
+// Capture step: sleep_on
+const uint8_t kCapSleepOn[kKelon168StateLength] = {
+    0x83, 0x06, 0x0B, 0x60, 0x00, 0x00, 0x8A,
+    0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD3,
+    0x00, 0x03, 0x00, 0x00, 0x38, 0x00, 0x3B};
+// Capture step: turbo_on
+const uint8_t kCapTurboOn[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0xE0, 0x00, 0x90, 0x8A,
+    0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC9,
+    0x00, 0x04, 0x00, 0x00, 0x38, 0x00, 0x3C};
+// Capture step: turbo_off
+const uint8_t kCapTurboOff[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0x60, 0x00, 0x00, 0x8A,
+    0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD9,
+    0x00, 0x04, 0x00, 0x00, 0x38, 0x00, 0x3C};
+// Capture step: economy_on
+const uint8_t kCapEconoOn[kKelon168StateLength] = {
+    0x83, 0x06, 0x03, 0x60, 0x00, 0x00, 0x8A,
+    0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0xDA,
+    0x20, 0x0C, 0x00, 0x00, 0x38, 0x00, 0x14};
+// Capture step: economy_off
+const uint8_t kCapEconoOff[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0x60, 0x00, 0x00, 0x8A,
+    0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD9,
+    0x00, 0x0C, 0x00, 0x00, 0x38, 0x00, 0x34};
+// Capture step: display_1
+const uint8_t kCapDisplay[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0x60, 0x00, 0x00, 0xAA,
+    0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF9,
+    0x00, 0x00, 0x00, 0x00, 0x38, 0x00, 0x38};
+// Capture step: rebase_modes
+const uint8_t kCapTempBase[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0x60, 0x00, 0x00, 0x8A,
+    0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0xDA,
+    0x00, 0x02, 0x00, 0x00, 0x38, 0x00, 0x3A};
+// Capture step: temp_up_30
+const uint8_t kCapTemp30[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0xE0, 0x00, 0x00, 0x8A,
+    0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A,
+    0x00, 0x02, 0x00, 0x00, 0x38, 0x00, 0x3A};
+// Capture step: mode_cool
+const uint8_t kCapCool24[kKelon168StateLength] = {
+    0x83, 0x06, 0x00, 0x82, 0x00, 0x00, 0x8A,
+    0x2F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x27,
+    0x00, 0x06, 0x00, 0x00, 0x38, 0x00, 0x3E};
+}  // namespace
+
+// Decode a captured frame and describe it.
+String describeKelon168(const uint8_t frame[]) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setRaw(frame);
+  return ac.toString();
+}
+
+// Captured frame -> toString().
+TEST(TestKelon168Ac, CapturedToString) {
+  EXPECT_EQ(
+      "Model: 1 (UNKNOWN), Power Toggle: On, Mode: 0 (Heat), Temp: 22C, "
+      "Fan: 0 (Auto), Swing: Off, Swing(H) Toggle: Off, Light: On, "
+      "Clock: 10:47, On Timer: Off, Off Timer: Off, Sleep: Off, "
+      "Super: Off, Econo: Off, Command: 1 (Power)",
+      describeKelon168(kCapPowerOff));
+  EXPECT_EQ(
+      "Model: 1 (UNKNOWN), Power Toggle: Off, Mode: 2 (Cool), Temp: 24C, "
+      "Fan: 0 (Auto), Swing: Off, Swing(H) Toggle: Off, Light: On, "
+      "Clock: 10:47, On Timer: Off, Off Timer: Off, Sleep: Off, "
+      "Super: Off, Econo: Off, Command: 6 (Mode)",
+      describeKelon168(kCapCool24));
+  EXPECT_EQ(
+      "Model: 1 (UNKNOWN), Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Fan: 0 (Auto), Swing: Off, Swing(H) Toggle: Off, Light: On, "
+      "Clock: 10:48, On Timer: Off, Off Timer: Off, Sleep: Off, "
+      "Super: Off, Econo: Off, Command: 2 (Temp)",
+      describeKelon168(kCapTemp30));
+  EXPECT_EQ(
+      "Model: 1 (UNKNOWN), Power Toggle: Off, Mode: 0 (Heat), Temp: 22C, "
+      "Fan: 0 (Auto), Swing: On, Swing(H) Toggle: Off, Light: On, "
+      "Clock: 10:50, On Timer: Off, Off Timer: Off, Sleep: Off, "
+      "Super: Off, Econo: Off, Command: 7 (Swing)",
+      describeKelon168(kCapVSwing));
+  EXPECT_EQ(
+      "Model: 1 (UNKNOWN), Power Toggle: Off, Mode: 0 (Heat), Temp: 22C, "
+      "Fan: 0 (Auto), Swing: Off, Swing(H) Toggle: On, Light: On, "
+      "Clock: 10:50, On Timer: Off, Off Timer: Off, Sleep: Off, "
+      "Super: Off, Econo: Off, Command: 8 (Swing(H))",
+      describeKelon168(kCapHSwing));
+  EXPECT_EQ(
+      "Model: 1 (UNKNOWN), Power Toggle: Off, Mode: 0 (Heat), Temp: 30C, "
+      "Fan: 0 (Auto), Swing: Off, Swing(H) Toggle: Off, Light: On, "
+      "Clock: 10:51, On Timer: Off, Off Timer: Off, Sleep: Off, "
+      "Super: On, Econo: Off, Command: 4 (Super)",
+      describeKelon168(kCapTurboOn));
+  EXPECT_EQ(
+      "Model: 1 (UNKNOWN), Power Toggle: Off, Mode: 0 (Heat), Temp: 22C, "
+      "Fan: 0 (Auto), Swing: Off, Swing(H) Toggle: Off, Light: Off, "
+      "Clock: 10:51, On Timer: Off, Off Timer: Off, Sleep: Off, "
+      "Super: Off, Econo: Off, Command: 0 (Light)",
+      describeKelon168(kCapDisplay));
+
+  // Frames where the fan speed is part of the change.
+  EXPECT_NE(std::string::npos,
+            describeKelon168(kCapEconoOn).find(
+                "Econo: On, Command: 12 (Econo)"));
+  EXPECT_NE(std::string::npos,
+            describeKelon168(kCapSleepOn).find("Sleep: On, "));
+  EXPECT_NE(std::string::npos,
+            describeKelon168(kCapFanHigh).find("Command: 17 (Fan)"));
+}
+
+// Captured fan and sleep frames -> getters.
+TEST(TestKelon168Ac, CapturedFanAndSleep) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setRaw(kCapFanHigh);
+  EXPECT_EQ(kKelon168FanMax, ac.getFan());
+  ac.setRaw(kCapFanAuto);
+  EXPECT_EQ(kKelon168FanAuto, ac.getFan());
+  ac.setRaw(kCapSleepOn);
+  EXPECT_TRUE(ac.getSleep());
+  EXPECT_EQ(kKelon168FanMin, ac.getFan());
+  ac.setRaw(kCapPowerOn);
+  EXPECT_FALSE(ac.getSleep());
+}
+
+// Captured frame -> getters and toCommon().
+TEST(TestKelon168Ac, CapturedToCommon) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setRaw(kCapHSwing);
+  EXPECT_TRUE(ac.getSwingHToggle());
+  EXPECT_FALSE(ac.getEcono());
+  EXPECT_EQ(kKelon168CommandSwingH, ac.getCommand());
+  stdAc::state_t s = ac.toCommon();
+  EXPECT_EQ(stdAc::swingh_t::kOff, s.swingh);
+  EXPECT_FALSE(s.econo);
+
+  ac.setRaw(kCapEconoOn);
+  EXPECT_FALSE(ac.getSwingHToggle());
+  EXPECT_TRUE(ac.getEcono());
+  EXPECT_EQ(kKelon168CommandEcono, ac.getCommand());
+  s = ac.toCommon();
+  EXPECT_EQ(stdAc::swingh_t::kOff, s.swingh);
+  EXPECT_TRUE(s.econo);
+
+  ac.setRaw(kCapEconoOff);
+  EXPECT_FALSE(ac.getEcono());
+  EXPECT_FALSE(ac.toCommon().econo);
+}
+
+// Setters on a captured base frame -> the next captured frame, with checksums.
+TEST(TestKelon168Ac, SetHorizontalSwingToggleMatchesCapture) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setRaw(kCapFanAuto);
+  ac.setSwingHToggle(true);
+  EXPECT_STATE_EQ(kCapHSwing, ac.getRaw(), kKelon168Bits);
+  EXPECT_TRUE(IRKelon168Ac::validChecksum(ac.getRaw()));
+  ac.setRaw(kCapFanAuto);
+  ac.setSwingHToggle(true);
+  EXPECT_STATE_EQ(kCapHSwingOff, ac.getRaw(), kKelon168Bits);
+}
+
+TEST(TestKelon168Ac, HorizontalSwingOnAndOffCapturesAreToggles) {
+  IRKelon168Ac ac(kGpioUnused);
+  EXPECT_STATE_EQ(kCapHSwing, kCapHSwingOff, kKelon168Bits);
+  ac.setRaw(kCapHSwing);
+  EXPECT_TRUE(ac.getSwingHToggle());
+  EXPECT_EQ(kKelon168CommandSwingH, ac.getCommand());
+  ac.setRaw(kCapHSwingOff);
+  EXPECT_TRUE(ac.getSwingHToggle());
+  EXPECT_EQ(kKelon168CommandSwingH, ac.getCommand());
+  EXPECT_EQ(stdAc::swingh_t::kOff, ac.toCommon().swingh);
+  ac.setSwingHToggle(false);
+  EXPECT_FALSE(ac.getSwingHToggle());
+}
+
+TEST(TestKelon168Ac, SetEconomyMatchesCapture) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setRaw(kCapTurboOff);
+  // The remote lowers the fan speed when economy is switched on.
+  ac.setFan(kKelon168FanMin);
+  ac.setEcono(true);
+  EXPECT_STATE_EQ(kCapEconoOn, ac.getRaw(), kKelon168Bits);
+  EXPECT_TRUE(IRKelon168Ac::validChecksum(ac.getRaw()));
+  ac.setFan(kKelon168FanAuto);
+  ac.setEcono(false);
+  EXPECT_STATE_EQ(kCapEconoOff, ac.getRaw(), kKelon168Bits);
+}
+
+TEST(TestKelon168Ac, SetVerticalSwingMatchesCapture) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setRaw(kCapFanAuto);
+  ac.setSwing(true);
+  EXPECT_STATE_EQ(kCapVSwing, ac.getRaw(), kKelon168Bits);
+}
+
+TEST(TestKelon168Ac, SetPowerMatchesCapture) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setRaw(kCapPowerOn);
+  ac.setPower(false);
+  EXPECT_STATE_EQ(kCapPowerOff, ac.getRaw(), kKelon168Bits);
+}
+
+TEST(TestKelon168Ac, SetTempMatchesCapture) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setRaw(kCapTempBase);
+  ac.setTemp(30);
+  EXPECT_STATE_EQ(kCapTemp30, ac.getRaw(), kKelon168Bits);
+}
+
+TEST(TestKelon168Ac, SetLightCommandMatchesCapture) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setRaw(kCapEconoOff);
+  ac.setLight(false);
+  ac.setCommand(kKelon168CommandLight);
+  EXPECT_STATE_EQ(kCapDisplay, ac.getRaw(), kKelon168Bits);
+}
+
+TEST(TestKelon168Ac, HorizontalSwingToggleResetsAfterSend) {
+  IRKelon168Ac ac(kGpioUnused);
+  ac.setSwingHToggle(true);
+  EXPECT_TRUE(ac.getSwingHToggle());
+  ac.send();
+  EXPECT_FALSE(ac.getSwingHToggle());
 }

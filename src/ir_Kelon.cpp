@@ -634,6 +634,8 @@ void IRKelon168Ac::checksum(uint16_t length) {
 void IRKelon168Ac::send(const uint16_t repeat, const bool calcChecksum) {
   _irsend.sendKelon168(getRaw(calcChecksum), kKelon168StateLength,
                           repeat);
+  // Reset toggle flags
+  _.SwingHToggle = false;
 }
 #endif  // SEND_KELON168
 
@@ -801,6 +803,35 @@ void IRKelon168Ac::setSwing(const bool on) {
 /// @return true, the setting is on. false, the setting is off.
 bool IRKelon168Ac::getSwing(void) const {
   return _.Swing1 && _.Swing2;
+}
+
+/// Request a toggle of the horizontal swing of the A/C.
+/// @param[in] on true, the toggle bit is set (the button press is sent).
+///   false, the toggle bit is cleared.
+/// @note The remote horizontal swing button is a toggle. The captured "on" and
+///   "off" presses are the same frame.
+void IRKelon168Ac::setSwingHToggle(const bool on) {
+  _.SwingHToggle = on;
+  if (on) _.Cmd = kKelon168CommandSwingH;
+}
+
+/// Get whether the horizontal swing toggle is set.
+/// @return true, the toggle bit is set. false, it is not.
+bool IRKelon168Ac::getSwingHToggle(void) const {
+  return _.SwingHToggle;
+}
+
+/// Set the Economy setting of the A/C.
+/// @param[in] on true, the setting is on. false, the setting is off.
+void IRKelon168Ac::setEcono(const bool on) {
+  _.Econo = on;
+  _.Cmd = kKelon168CommandEcono;
+}
+
+/// Get the Economy setting of the A/C.
+/// @return true, the setting is on. false, the setting is off.
+bool IRKelon168Ac::getEcono(void) const {
+  return _.Econo;
 }
 
 /// Set the Light (Display/LED) setting of the A/C.
@@ -1030,11 +1061,11 @@ stdAc::state_t IRKelon168Ac::toCommon(const stdAc::state_t *prev) const {
   result.turbo = getSuper();
   result.light = getLight();
   result.sleep = _.Sleep ? 0 : -1;
-  // TODO(leonardfactory) add encoding
+  // The A/C only supports toggling horizontal swing.
   result.swingh = stdAc::swingh_t::kOff;
   result.quiet = false;
   result.filter = false;
-  result.econo = false;
+  result.econo = getEcono();
   result.clean = false;
   result.beep = false;
   result.clock = -1;
@@ -1055,6 +1086,8 @@ String IRKelon168Ac::toString(void) const {
                            kKelon168FanAuto, kKelon168FanAuto,
                            kKelon168FanMedium);
   result += addBoolToString(getSwing(), kSwingStr);
+  result += addBoolToString(getSwingHToggle(),
+                            String(kSwingHStr) + ' ' + String(kToggleStr));
   result += addBoolToString(getLight(), kLightStr);
   result += addLabeledString(minsToString(getClock()), kClockStr);
   result += addLabeledString(
@@ -1063,6 +1096,7 @@ String IRKelon168Ac::toString(void) const {
       _.OffTimerEnabled ? minsToString(getOffTimer()) : kOffStr, kOffTimerStr);
   result += addBoolToString(_.Sleep, kSleepStr);
   result += addBoolToString(getSuper(), kSuperStr);
+  result += addBoolToString(getEcono(), kEconoStr);
   result += addIntToString(_.Cmd, kCommandStr);
   result += kSpaceLBraceStr;
   switch (_.Cmd) {
@@ -1089,6 +1123,12 @@ String IRKelon168Ac::toString(void) const {
       break;
     case kKelon168CommandSwing:
       result += kSwingStr;
+      break;
+    case kKelon168CommandSwingH:
+      result += kSwingHStr;
+      break;
+    case kKelon168CommandEcono:
+      result += kEconoStr;
       break;
     case kKelon168CommandIFeel:
       result += kIFeelStr;
