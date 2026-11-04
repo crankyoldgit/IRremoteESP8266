@@ -19,6 +19,8 @@
 //   Brand: Gree,  Model: GSE-50CI A/C
 //   Brand: Sharp,  Model: YB1FA remote
 //   Brand: Sharp,  Model: A5VEY A/C
+//   Brand: Samsung,  Model: YB1FA remote
+//   Brand: Samsung,  Model: AR40F12C0AG/FA A/C
 
 #ifndef IR_KELVINATOR_H_
 #define IR_KELVINATOR_H_
